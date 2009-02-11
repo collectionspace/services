@@ -1,0 +1,99 @@
+<contents>
+<p><a name="wikitojavatestservice-getCommMediaTypes"></a><br/><a href="#wikitojavatestservice-Operations">Back to Operations</a>
+</p>
+<p><a name="wikitojavatestservice-getCommUsageTypes"></a><br/><a href="#wikitojavatestservice-Operations">Back to Operations</a></p>
+<p><a name="wikitojavatestservice-getCommMediaTypesForUsageType"></a>
+</p>
+
+<table class="methodTable">
+<tr>
+<th class="h">Method</th>
+<td colspan="3" class="methodName">getCommMediaTypesForUsageType</td>
+</tr>
+
+<tr>
+<th class="h">Description</th>
+<td colspan="3" class="methodDesc">Retrieves the list of communication media types that are supported for a given usage type.</td>
+</tr>
+
+<tr>
+<th class="h" rowspan="1">Parameters</th>
+<td class="methodParamType"><a href="/display/collectionspace/objectTypeKey+Structure" title="objectTypeKey Structure">commUsageTypeKey</a></td>
+<td class="methodParamName">commUsageTypeKey</td>
+<td class="methodParamDesc">usage type identifier</td>
+</tr>
+
+<tr>
+<th class="h">Return</th>
+<td colspan="2" class="methodReturnType"><a href="/display/collectionspace/searchTypeInfoList+Structure" title="searchTypeInfoList Structure">commMediaTypeInfoList</a></td>
+<td class="methodReturnDesc">list of communication media type information</td>
+</tr>
+
+<tr>
+<th class="h" rowspan="4">Errors</th>
+<td colspan="2" class="methodErrorType">DOES_NOT_EXIST</td>
+<td class="methodErrorDesc">commUsageTypeKey not found</td>
+</tr>
+
+<tr>
+<td colspan="2" class="methodErrorType">INVALID_PARAMETER</td>
+<td class="methodErrorDesc">invalid commUsageTypeKey</td>
+</tr>
+
+<tr>
+<td colspan="2" class="methodErrorType">MISSING_PARAMETER</td>
+<td class="methodErrorDesc">missing commUsageTypeKey</td>
+</tr>
+
+<tr>
+<td colspan="2" class="methodErrorType">OPERATION_FAILED</td>
+<td class="methodErrorDesc">unable to complete request</td>
+</tr>
+
+<tr>
+<th class="h">Capabilities</th>
+<td colspan="3" class="capabilityDesc"></td>
+</tr>
+
+<tr>
+<th class="h">Use Cases</th>
+<td colspan="3" class="usecaseDesc"></td>
+</tr>
+
+<tr>
+<th class="h">Comments/Feedback</th>
+<td colspan="3" class="commentsDesc"></td>
+</tr>
+
+</table>
+
+<p>
+<a href="#wikitojavatestservice-Operations">Back to Operations</a>
+</p>
+
+<h4>
+<a name="wikitojavatestservice-"></a>
+<font color="#000066"><em>Read</em></font>
+</h4>
+
+<p><a href="#wikitojavatestservice-Operations">Back to Operations</a></p>
+<h4>
+<a name="wikitojavatestservice-"></a>
+<font color="#000066"><em>Search</em></font>
+</h4>
+
+<p><a href="#wikitojavatestservice-Operations">Back to Operations</a></p>
+<h4>
+<a name="wikitojavatestservice-"></a>
+<font color="#000066"><em>Maintenance</em></font>
+</h4>
+
+<p><a name="wikitojavatestservice-sendMessageToPeople"></a><br/><a href="#wikitojavatestservice-Operations">Back to Operations</a></p>
+<p><a name="wikitojavatestservice-sendMessageToPeopleByUsageType"></a><br/><a href="#wikitojavatestservice-Operations">Back to Operations</a></p>
+<p><a name="wikitojavatestservice-sendMessageToPeopleByMediaType"></a><br/><a href="#wikitojavatestservice-Operations">Back to Operations</a></p>
+<p><a name="wikitojavatestservice-sendMessageToOrg"></a><br/><a href="#wikitojavatestservice-Operations">Back to Operations</a></p>
+<p><a name="wikitojavatestservice-sendMessageToOrgByUsageType"></a><br/><a href="#wikitojavatestservice-Operations">Back to Operations</a></p>
+<p><!-- ServiceOperationStop --> </p>
+
+<h3><a name="wikitojavatestservice-Capabilities"></a>Capabilities </h3>
+</div><!--<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"         xmlns:dc="http://purl.org/dc/elements/1.1/"         xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/">         <rdf:Description    rdf:about="http://wiki.collectionspace.org/display/collectionspace/wikitojavatestservice"    dc:identifier="http://wiki.collectionspace.org/display/collectionspace/wikitojavatestservice"    dc:title="wikitojavatestservice"    trackback:ping="http://wiki.collectionspace.org/rpc/trackback/8355857"/></rdf:RDF>-->            <!--    Root decorator: this is a layer of abstraction that Confluence doesn't need. It will be removed eventually.-->        <div class="wiki-content" style="margin-right:10px;">    <p style="clear: both"/><!-- comments should always display underneath the content. we should have a 'clear:both' here just in case there are floats or aligned images in the content -->                                                    </div>                            </div>                        </td>                                                                                            </tr>                </table>                <!-- End inner content table -->            </td>        </tr>    </table></div><div id="footer">                                                            <p class="license license-community">                      Powered by a free <b>Atlassian Confluence Community License</b> granted to Museum of the Moving Image. <a href="http://www.atlassian.com/c/conf/11460">Evaluate Confluence today</a>.<br>                    </p>                                            <ul id="poweredby">        <li>Powered by <a href="http://www.atlassian.com/software/confluence" class="smalltext">Atlassian Confluence</a> 2.10, the <a href="http://www.atlassian.com/software/confluence" class="smalltext">Enterprise Wiki</a>.</li>        <li><a href="http://jira.atlassian.com/secure/BrowseProject.jspa?id=10470" class="smalltext">Bug/feature request</a> &#8211;</li>        <li><a href="http://www.atlassian.com/about/connected.jsp?s_kwcid=Confluence-stayintouch" class="smalltext">Atlassian news</a> &#8211;</li>        <li><a href="/administrators.action">Contact administrators</a></li>    </ul></div></contents>
