@@ -71,7 +71,7 @@ public class ContractReader {
                 }
             } else {
 //                if (line.contains("</a>Capabilities</h3>")) {
-            	if (Pattern.matches(".*</a>\\s*Capabilities\\s*</h3>.*", line) == true) {
+            	if (line.matches(".*</a>\\s*Capabilities\\s*</h3>.*") == true) {
                     inContract = false;
                 } else {
                     builder.append(line);

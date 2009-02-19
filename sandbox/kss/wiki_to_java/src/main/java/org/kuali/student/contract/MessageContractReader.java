@@ -42,6 +42,7 @@ public class MessageContractReader extends ContractReader {
 
 		// read each line and fix any open tags, bad attributes, and '&' symbols
 		// without a ';'
+		boolean inContract = false;
 		while ((line = reader.readLine()) != null) {
 
 			// Check if the current line has a tag that does not end yet
@@ -54,16 +55,52 @@ public class MessageContractReader extends ContractReader {
 				}
 			}
 
+//			System.err.println("Line before:" + line); // BEFORE
+			
 			// Do some regex to clean up the tags
 			line = line.replaceAll("border=0", "border=\"0\"");
 			line = line.replaceAll("([^:])nowrap([^=])", "$1nowrap=\"true\"$2");
 			line = line.replaceAll("&(\\w+[^;])", "$1");
 			line = line.replaceAll("(<(META|meta|br|hr|col|link|img|input)(\\s+[\\w-]+\\s*=\\s*(\"([^\"]*)\"|'([^']*)'))*\\s*)>", "$1/>");
 			line = line.replaceAll("<div \">", "<div>");
-			builder.append(line + "\n");
+			
+//			System.err.println("Line after :" + line); // AFTER
+//			System.err.println();
+			
+			if (line.contains("Example</h3>")) {
+				inContract = false;
+				builder.append("</div>" + "\n"); // end of <div class=wiki-content>
+				builder.append("</div>" + "\n"); // end of <div id=content>
+				builder.append("</div>" + "\n"); // end of <div id=main>
+				builder.append("</body>" + "\n"); // end of <body>
+				builder.append("</html>" + "\n"); // end of <html>
+			}
+
+			if (line.contains("id=\"structureMetaTable\"")) {
+				inContract = true;
+				// Add <html>, <body>, and main <div> nodes
+				builder.append("<html>" + "\n");
+				builder.append("<body>" + "\n");
+				builder.append("<div id=\"main\">" + "\n");
+				
+				// Add <div> for content, and <div> for wiki content
+				builder.append("<div id=\"content\">" + "\n");
+				builder.append("<div class=\"wiki-content\">" + "\n");
+			}
+			
+			if (inContract == true) {
+				builder.append(line + "\n");
+//				System.out.println(line);
+			}
+			
+			
 		}
 
-		return builder.toString();
-	}
+		System.out.println(builder.toString());
 
+		return builder.toString();
+		
+		
+	}
 }
+	

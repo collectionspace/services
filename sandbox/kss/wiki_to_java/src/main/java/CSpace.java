@@ -1,5 +1,5 @@
 /**
- * CSpace.java
+ * 
  */
 
 import java.io.File;
@@ -29,8 +29,8 @@ public class CSpace {
 		// the URL to the contract to transform
 		URL contractURL = null;
 		try {
-//			contractURL = new URL("https://test.kuali.org/confluence/display/KULSTU/Authentication+Service");
-			contractURL = new URL("http://wiki.collectionspace.org/display/collectionspace/wikitojavatestservice");
+			contractURL = new URL("https://test.kuali.org/confluence/display/KULSTU/Authentication+Service");
+//			contractURL = new URL("http://wiki.collectionspace.org/display/collectionspace/wikitojavatestservice");
 			
 			//
 		} catch (MalformedURLException e) {
@@ -51,7 +51,7 @@ public class CSpace {
 			new File("C:/dev/src/kss/maven-kscontract-plugin/maven-kscontract-plugin/src/main/resources/messageInterface.xml");
 		
 		// the session ID token
-		String jsessionId = "53F14F3833498C0A43DA87B273D1DDB7.Kuali3_1Engine";
+		String jsessionId = "8B705ECBA5854E818026D31FC4A38C1A.Kuali3_1Engine";
 		
 		
 		

@@ -150,6 +150,12 @@ public class KsContractMojo extends AbstractMojo {
 				|| "integer".equals(param.toLowerCase())) {
 			return;
 		}
+		
+		//rem
+		if (param.equals("objectStructure")) {
+			System.out.println();
+		}
+		
 		ContractReader contract;
 		try {
 			contract = new MessageContractReader(url, jsessionId);
@@ -161,12 +167,25 @@ public class KsContractMojo extends AbstractMojo {
 			// add this url to the already oarsed list
 			alreadyParsedUrlSet.add(url);
 
+//			System.out.println("URL:" + url.toString());
+//			System.out.println(contract.getContractText());
+			
 			// recurse through the node to
 			NodeList nodeList = contract.getDocument().getElementsByTagName(
 					"td");
 			for (int i = 0, iCnt = nodeList.getLength(); i < iCnt; i++) {
 				Node node = nodeList.item(i);
 				NamedNodeMap nodeMap = node.getAttributes();
+				System.err.println("Node=" + i + ":" + node.toString());
+				
+				//rem
+				if (nodeMap != null) {
+					if (nodeMap.getNamedItem("class") != null) {
+						String nodeValue = nodeMap.getNamedItem("class").getNodeValue();
+						System.out.println("Node value: " + i + ":" + nodeValue);
+					}
+				}
+				
 				if (nodeMap != null
 						&& nodeMap.getNamedItem("class") != null
 						&& "structType".equals(nodeMap.getNamedItem("class")
@@ -193,6 +212,7 @@ public class KsContractMojo extends AbstractMojo {
 					"Error loading page for Type '" + param + "'"
 							+ e.getMessage());
 		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
 			getLog().warn(
 					"Error parsing page for Type '" + param + "'"
 							+ e.getMessage());
@@ -200,6 +220,8 @@ public class KsContractMojo extends AbstractMojo {
 			getLog().warn(
 					"Error parsing page for Type '" + param + "'"
 							+ e.getMessage());
+		} finally {
+			System.err.println();
 		}
 	}
 
@@ -220,8 +242,8 @@ public class KsContractMojo extends AbstractMojo {
 					try {
 						String urlString = node.getFirstChild().getAttributes()
 								.getNamedItem("href").getNodeValue();
-						System.out.println("urlString:" + urlString);
-						System.out.println("contractURL:" + contractURL);
+//						System.out.println("urlString:" + urlString);
+//						System.out.println("contractURL:" + contractURL);
 						if (!urlString.startsWith("http")
 								&& !urlString.startsWith("file")) {
 							urlString = contractURL.getProtocol()+"://"+contractURL.getHost()
@@ -258,7 +280,11 @@ public class KsContractMojo extends AbstractMojo {
 			Result result = new StreamResult(new File(outputDirectory, param
 					.substring(0, 1).toUpperCase()
 					+ param.substring(1) + ".java"));
-			transformer.transform(contract.getStreamSource(), result);
+			
+			StreamSource xmlSource = contract.getStreamSource();
+			transformer.transform(xmlSource, result);
+			
+			System.out.println(result.toString());
 		} catch (TransformerConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -268,6 +294,8 @@ public class KsContractMojo extends AbstractMojo {
 		} catch (TransformerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			System.out.println();
 		}
 
 	}
