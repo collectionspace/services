@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+	CollectionObject.xml
+
+	A skeletal instance of an CollectionObject, represented as an XML document.
+	
+	This is	created for the CollectionSpace system, http://www.collectionspace.org/
+
+-->
+
+<entity>
+	<entityName>CollectionObject</entityName>
+  <usageNotes>
+    <!-- In-depth notes about usage and meaning go in this field -->
+  </usageNotes>
+  <infoBlocks>
+		<infoBlock>
+			<fields>
+				<field
+					systemName="museumId"
+					displayName="ID"
+					usageNotes="In-depth notes about usage go here"
+					usageHint="Tooltip-type hints go here, such as 'Primary museum ID for this item'"
+					displayed="true"
+					lengthHint="20">
+					<!-- Field contents go here -->
+					pahma-collectionname-2007-06-09-00055
+				</field>
+			</fields>
+		</infoBlock>
+  </infoBlocks>
+</entity>

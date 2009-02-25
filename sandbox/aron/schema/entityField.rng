@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+	entityField.rng
+
+	This schema defines the structure of an individual field (or data element).
+
+	One or more of these entityFields may be included within an "entity",
+	a generic business object that is defined in a separate, related schema,
+	"entity.rng".
+	
+	This schema was created for the CollectionSpace system,
+	http://www.collectionspace.org/
+	
+	It is written in the XML syntax of the RELAX NG schema language,
+	http://relaxng.org/
+
+-->
+
+<element
+	name="field"
+	xmlns="http://relaxng.org/ns/structure/1.0"
+	datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+	
+	<!-- Datatype -->
+
+	<!--
+		Currently, all entity fields are defined as xs:String datatypes.
+	-->
+	<data type="string" />
+	
+	<!-- Attributes -->
+
+	<!--
+		The name of this field/data element, as used internally by the system.
+		See also "displayName", below.
+	-->
+	<attribute name="systemName">
+		<text/>
+	</attribute>
+	
+	<!--
+		The name of this field/data element, as displayed in the system UI.
+		
+		This name may be customized to meet the needs of a deployed instance,
+		internationalized, etc.
+	-->
+	<attribute name="displayName">
+		<text/>
+	</attribute>
+	
+	<!-- Informational text describing the purpose and usage of this field -->
+	<attribute name="usageNotes">
+		 <text/>
+	</attribute>
+
+	<!-- Brief, tooltip-type help text describing the purpose and usage of this field -->
+	<attribute name="usageHint">
+		 <text/>
+	</attribute>
+	
+	<!-- A Boolean value indicating whether this field is to be displayed in system UI. -->
+	<attribute name="displayed">
+		<choice>
+			<value>true</value>
+			<value>false</value>
+		</choice>
+	</attribute>
+
+	<!--
+		An optional hint regarding the length of this field.
+		
+		This may be used for dynamically laying out fields within a forms-based
+		user interface, or for similar purposes.
+		
+		The meaning of this field is instance-dependent, and may refer
+		to a typical length, or an expected maximum length, for instance.
+		It may also refer to any arbitrary measurement system, such as US-ASCII
+		characters, em units or pixels.
+	-->
+	<optional>
+		<attribute name="lengthHint">
+			<text/>
+		</attribute>
+	</optional>
+	
+</element>
+

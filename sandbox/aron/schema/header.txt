@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+	entity.rng
+
+	A schema defining the structure of an entity.  An "entity" is a business object;
+	a "noun" within the system.
+	
+	One or more fields of this type are included within an Entity Declaration,
+	which is defined in a separate, related schema file, "Entity.rng".
+	
+	This is a schema definition, using the XML syntax of the RELAX NG schema language,
+	created for the CollectionSpace system, http://www.collectionspace.org/
+	
+	For more information on RELAX NG, please see http://relaxng.org/
+
+-->
+
+
+
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+	entityField.rng
+
+	This schema defines the structure of an individual field (or data element).
+
+	One or more of these entityFields may be included within an "entity",
+	a generic business object that is defined in a separate, related schema,
+	"entity.rng".
+	
+	This schema was created for the CollectionSpace system,
+	http://www.collectionspace.org/
+	
+	It is written in the XML syntax of the RELAX NG schema language,
+	http://relaxng.org/
+
+-->
+
+
+<grammar
+	xmlns:rng="http://relaxng.org/ns/structure/1.0">
+
+  <start>
+    <ref name="entityField"/>
+  </start>
+
+  <define name="entityField">
+
+
+	</define>
+
+</grammar>

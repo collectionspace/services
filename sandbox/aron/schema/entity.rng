@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+	entity.rng
+
+	A schema defining the structure of an entity.  An "entity" is a business object;
+	a "noun" within the system.
+	
+	One or more fields of this type are included within an Entity Declaration,
+	which is defined in a separate, related schema file, "Entity.rng".
+	
+	This is a schema definition, using the XML syntax of the RELAX NG schema language,
+	created for the CollectionSpace system, http://www.collectionspace.org/
+	
+	For more information on RELAX NG, please see http://relaxng.org/
+
+-->
+
+<element
+	name="entity" 
+	xmlns="http://relaxng.org/ns/structure/1.0">
+	
+	<!-- Name of the entity -->
+		<element name="entityName">
+			 <text/>
+		</element>
+	
+	<!-- Informational text describing the purpose and usage of this entity -->
+	<optional>
+		<element name="usageNotes">
+			 <text/>
+		</element>
+	</optional>
+    
+  <choice>
+
+  <!--
+  	An entity may either contain one or more infoBlocks,
+  	each containing one or more fields ...
+  -->  
+  	<group>
+			<element name="infoBlocks">
+				<element name="infoBlock">
+					<element name="fields">
+						<oneOrMore>
+							<externalRef href="entityField.rng"/>
+						</oneOrMore>
+					</element>
+				</element>
+			</element>
+		</group>
+
+  <!--
+  	... or may simply contain one or more fields, without any infoBlocks.
+  -->
+		<group>
+			<element name="fields">
+				<oneOrMore>
+					<externalRef href="entityField.rng"/>
+				</oneOrMore>
+			</element>
+		</group>
+
+		<!--
+			Currently, there isn't an option provided to have some fields
+			contained within infoBlocks, accompanied by other fields that
+			are not contained within InfoBlocks.
+		-->
+		
+	</choice>
+	
+
+	<!--
+		An entity may optionally contain validation rules.
+		
+		The content of those rules is TBD.  Conceivably, they can be
+		written in an XML-based rules language, reference in-line or
+		external JavaScript code, etc.
+		
+		Also, whether we might wish to have rules that are 'attached'
+		to individual fields, rather than (or in addition to being)
+		specified here on a per-entity basis here, is TBD.
+	-->
+	<optional>
+		<element name="validationRules">
+			<oneOrMore>
+				<element name="validation-rule">
+					<!-- Define what goes here -->
+					<text/>
+				</element>
+			</oneOrMore>
+		</element>
+  </optional>
+
+</element>
