@@ -2,12 +2,12 @@
 
 <!--
 
-	entityField.rng
+	entityFieldAttributes.rng
 
-	A schema defining structure of an individual field (or data element)
-	in an entity.
+	A schema defining structure of the attributes of an individual field
+	(or data element) in an entity.
 
-	One or more of these entityFields may be included within an "entity",
+	These entityFieldAttributes may be included within an "entityField",
 	a generic business object defined in a separate, related schema, "entity.rng".
 	
 	This schema was created for the CollectionSpace system,
@@ -30,7 +30,8 @@
 		The name of this field/data element, as used internally by the system.
 		See also "displayName", below.
 	-->
-	<attribute name="systemName">
+	<attribute name="systemName"
+		xmlns="http://relaxng.org/ns/structure/1.0">
 		<data type="Name" />
 	</attribute>
 	

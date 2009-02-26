@@ -2,29 +2,53 @@
 
 <!--
 
-	CollectionObject.xml
+	collectionObject.xml
 
-	A skeletal instance of an CollectionObject, represented as an XML document.
+	A hypothetical, somewhat skeletal instance of an CollectionObject payload,
+	represented as an XML document.
 	
 	This is	created for the CollectionSpace system, http://www.collectionspace.org/
 
 -->
 
-<entity>
-	<entityName>CollectionObject</entityName>
-  <usageNotes>
-    <!-- In-depth notes about usage and meaning go in this field -->
-  </usageNotes>
-  <fields>
-    <field
-      systemName="museumId"
-      displayName="ID"
-    	usageNotes="In-depth notes about usage go here"
-    	usageHint="Tooltip-type hints go here, such as 'Primary museum ID for this item'"
-      displayed="true"
-      lengthHint="20">
-      <!-- Field contents go here -->
-      pahma-collectionname-2007-06-09-00055
-    </field>
-  </fields>
-</entity>
+<collectionObject>
+
+	<entity>
+	
+		<usageNotes>
+			<!-- Optional notes about the usage and meaning of this entity go here. -->
+		</usageNotes>
+		
+		<coreFields>
+			<id></id>
+			<created></created>
+			<createdBy></createdBy>
+			<lastModified></lastModified>
+			<lastModifiedBy></lastModifiedBy>
+		</coreFields>
+		
+		<fields>
+			<field
+				systemName="objectNumber"
+				displayName="ID"
+				usageNotes="In-depth notes about usage go here"
+				usageHint="Tooltip-type hints go here, such as 'Primary museum ID for this item'"
+				displayed="true"
+				lengthHint="20">
+				<!-- Field contents go here -->
+				pahma-collectionname-2007-06-09-00055
+			</field>
+			<field
+				systemName="title"
+				displayName="Title"
+				usageNotes="In-depth notes about usage go here"
+				usageHint="Tooltip-type hints go here"
+				displayed="true">
+				<!-- Field contents go here -->
+				Paiute Basket
+			</field>
+		</fields>
+		
+	</entity>
+	
+</collectionObject>

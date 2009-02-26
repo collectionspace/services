@@ -3,69 +3,86 @@
 <!--
 
 	entity.rng
+	
+	A generic schema defining the structure of an entity.  An "entity" is a
+	business object; a "noun" within the system.
 
-	A schema defining the structure of an entity.  An "entity" is a business object;
-	a "noun" within the system.
+	This schema was created for the CollectionSpace system,
+	http://www.collectionspace.org/
 	
-	One or more fields of this type are included within an Entity Declaration,
-	which is defined in a separate, related schema file, "Entity.rng".
-	
-	This is a schema definition, using the XML syntax of the RELAX NG schema language,
-	created for the CollectionSpace system, http://www.collectionspace.org/
-	
-	For more information on RELAX NG, please see http://relaxng.org/
+	It is written in the XML syntax of the RELAX NG schema language,
+	http://relaxng.org/
 
 -->
 
 <element
 	name="entity" 
-	xmlns="http://relaxng.org/ns/structure/1.0">
+	xmlns="http://relaxng.org/ns/structure/1.0"
+	datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 	
-	<!-- Name of the entity -->
-		<element name="entityName">
-			 <text/>
-		</element>
-	
-	<!-- Informational text describing the purpose and usage of this entity -->
+	<!--
+		(Optional) Informational text describing the purpose and usage
+		of this entity.  This field may be present or absent, and if
+		present, its value may be empty or contain text.
+	-->
 	<optional>
 		<element name="usageNotes">
-			 <text/>
+			<choice>
+				<empty/>
+				<text/>
+			</choice>
 		</element>
 	</optional>
-    
+	
+	<!-- Include the schema for the core fields common to all entities -->
+	<externalRef href="entityCoreFields.rng"/>
+  
   <choice>
 
-  <!--
-  	An entity may either contain one or more infoBlocks,
-  	each containing one or more fields ...
-  -->  
+		<!--
+			An entity may either contain one or more infoBlocks,
+			each containing one or more fields ...
+		-->  
   	<group>
-			<element name="infoBlocks">
-				<element name="infoBlock">
-					<element name="fields">
-						<oneOrMore>
-							<externalRef href="entityField.rng"/>
-						</oneOrMore>
-					</element>
-				</element>
-			</element>
+ 			<element name="infoBlocks">
+ 				<oneOrMore>
+					<element name="infoBlock">
+						<attribute name="blockName">
+							<data type="normalizedString" />
+						</attribute>
+						<element name="fields">
+							<oneOrMore>
+								<!--
+									Include the generic schema for a field (data element)
+									in an entity.
+								-->
+								<externalRef href="entityField.rng"/>
+							</oneOrMore>
+						</element>
+					</element> <!-- end tag for infoBlock element -->
+				</oneOrMore>
+			</element> <!-- end tag for infoBlocks element -->
 		</group>
 
-  <!--
-  	... or may simply contain one or more fields, without any infoBlocks.
-  -->
+		<!--
+			... or may simply contain one or more fields, without any infoBlocks.
+		-->
 		<group>
 			<element name="fields">
 				<oneOrMore>
+					<!--
+						Include the generic schema for a field (data element)
+						in an entity.
+					-->
 					<externalRef href="entityField.rng"/>
 				</oneOrMore>
 			</element>
 		</group>
 
 		<!--
-			Currently, there isn't an option provided to have some fields
-			contained within infoBlocks, accompanied by other fields that
-			are not contained within InfoBlocks.
+			Currently, there isn't an option provided to have a mix:
+			some fields contained within infoBlocks, accompanied by
+			other fields that are not contained within InfoBlocks.
 		-->
 		
 	</choice>
@@ -75,17 +92,31 @@
 		An entity may optionally contain validation rules.
 		
 		The content of those rules is TBD.  Conceivably, they can be
-		written in an XML-based rules language, reference in-line or
-		external JavaScript code, etc.
+		written in an XML-based rules language, or can reference in-line
+		or external JavaScript code (for use within the UI layer of
+		CollectionSpace), etc.
 		
-		Also, whether we might wish to have rules that are 'attached'
+		One of the possible approaches to specifying validation rules
+		could be to embed Schematron rules within RELAX NG schema.
+		As noted in this article, this can be done by inserting
+		the appropriate XML markup, in the Schematron namespace:
+		either grouped together below the top-level element or,
+		throughout the document, within the elements that define
+		the contexts for the embedded rules:
+		http://www.xml.com/pub/a/2004/02/11/relaxtron.html
+		
+		This page describes the support for processing embedded Schematron
+		rules in Jing, James Clark's RELAX NG library for Java:
+		http://www.thaiopensource.com/relaxng/jing-other.html
+		
+		Also, we might wish to decide whether to offer rules that are 'attached'
 		to individual fields, rather than (or in addition to being)
-		specified here on a per-entity basis here, is TBD.
+		specified here on a per-entity basis in a 'validationRules' block.
 	-->
 	<optional>
 		<element name="validationRules">
 			<oneOrMore>
-				<element name="validation-rule">
+				<element name="validationRule">
 					<!-- Define what goes here -->
 					<text/>
 				</element>

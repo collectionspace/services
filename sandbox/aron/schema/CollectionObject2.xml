@@ -2,33 +2,80 @@
 
 <!--
 
-	CollectionObject.xml
+	CollectionObject2.xml
 
-	A skeletal instance of an CollectionObject, represented as an XML document.
+	A hypothetical, somewhat skeletal instance of an CollectionObject payload,
+	represented as an XML document.
+	
+	(This instance uses InfoBlocks, that help group related fields into sub-sections
+	of the object schema.)
 	
 	This is	created for the CollectionSpace system, http://www.collectionspace.org/
 
 -->
 
-<entity>
-	<entityName>CollectionObject</entityName>
-  <usageNotes>
-    <!-- In-depth notes about usage and meaning go in this field -->
-  </usageNotes>
-  <infoBlocks>
-		<infoBlock>
-			<fields>
-				<field
-					systemName="museumId"
-					displayName="ID"
-					usageNotes="In-depth notes about usage go here"
-					usageHint="Tooltip-type hints go here, such as 'Primary museum ID for this item'"
-					displayed="true"
-					lengthHint="20">
-					<!-- Field contents go here -->
-					pahma-collectionname-2007-06-09-00055
-				</field>
-			</fields>
-		</infoBlock>
-  </infoBlocks>
-</entity>
+<collectionObject>
+
+	<entity>
+	
+		<usageNotes>
+			<!-- Optional notes about the usage and meaning of this entity go here. -->
+		</usageNotes>
+		
+		<coreFields>
+			<id></id>
+			<created></created>
+			<createdBy></createdBy>
+			<lastModified></lastModified>
+			<lastModifiedBy></lastModifiedBy>
+		</coreFields>
+		
+		<infoBlocks>
+		
+			<infoBlock blockName="basic">
+				<fields>
+					<field
+						systemName="objectNumber"
+						displayName="ID"
+						usageNotes="In-depth notes about usage go here"
+						usageHint="Tooltip-type hints go here, such as 'Primary museum ID for this item'"
+						displayed="true"
+						lengthHint="20">
+						<!-- Field contents go here -->
+						pahma-collectionname-2007-06-09-00055
+					</field>
+					<field
+						systemName="title"
+						displayName="Title"
+						usageNotes="In-depth notes about usage go here"
+						usageHint="Tooltip-type hints go here"
+						displayed="true">
+						<!-- Field contents go here -->
+						Paiute Basket
+					</field>
+				</fields>
+			</infoBlock>
+
+			<!--
+				Note: This infoBlock is here to test instances with multiple blocks;
+				it is *not* part of the Release 0.1 schema.
+			-->
+			<infoBlock blockName="locationAndMoveMentControl">
+				<fields>
+					<field
+						systemName="currentLocation"
+						displayName=""
+						usageNotes="In-depth notes about usage go here"
+						usageHint="Tooltip-type hints go here, such as 'Primary museum ID for this item'"
+						displayed="true"
+						lengthHint="20">
+						<!-- Field contents go here -->
+						Room 231, Shelf 5, Box 18
+					</field>
+				</fields>
+			</infoBlock>
+		</infoBlocks>
+		
+	</entity>
+	
+</collectionObject>
