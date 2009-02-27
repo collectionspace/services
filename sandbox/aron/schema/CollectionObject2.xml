@@ -10,7 +10,7 @@
 	(This instance uses InfoBlocks, that help group related fields into sub-sections
 	of the object schema.)
 	
-	This is	created for the CollectionSpace system, http://www.collectionspace.org/
+	This document was created for the CollectionSpace system, http://www.collectionspace.org/
 
 -->
 
@@ -22,8 +22,10 @@
 			<!-- Optional notes about the usage and meaning of this entity go here. -->
 		</usageNotes>
 		
+		<!-- Inspired by http://pahma.berkeley.edu/delphi/object/170594 -->
+
 		<coreFields>
-			<id></id>
+			<id>170594</id>
 			<created></created>
 			<createdBy></createdBy>
 			<lastModified></lastModified>
@@ -33,25 +35,77 @@
 		<infoBlocks>
 		
 			<infoBlock blockName="basic">
+			
 				<fields>
 					<field
 						systemName="objectNumber"
-						displayName="ID"
+						displayName="object Number"
 						usageNotes="In-depth notes about usage go here"
 						usageHint="Tooltip-type hints go here, such as 'Primary museum ID for this item'"
 						displayed="true"
-						lengthHint="20">
+						lengthHint="20em">
 						<!-- Field contents go here -->
-						pahma-collectionname-2007-06-09-00055
+						2-68479
+					</field>
+					<field
+						systemName="otherNumber"
+						displayName="Other number"
+						usageNotes=""
+						usageHint=""
+						displayed="false">
+						<!-- Field contents go here -->
+					</field>
+					<field
+						systemName="briefDescription"
+						displayName="Brief description"
+						usageNotes=""
+						usageHint=""
+						displayed="true">
+						<!-- Field contents go here -->
+						Conical shape, made of willow warp and weft.
+					</field>
+					<field
+						systemName="comments"
+						displayName="Comments"
+						usageNotes=""
+						usageHint=""
+						displayed="true">
+						<!-- Field contents go here -->
+						In very poor condition, flattened and broken.
+					</field>
+					<field
+						systemName="distinguishingFeatures"
+						displayName="Distinguishing features"
+						usageNotes=""
+						usageHint=""
+						displayed="true">
+						<!-- Field contents go here -->
+						Diagonal twining.
+					</field>
+					<field
+						systemName="objectName"
+						displayName="Object name"
+						usageNotes=""
+						usageHint=""
+						displayed="true">
+						<!-- Field contents go here -->
+						Basket
+					</field>
+					<field
+						systemName="responsibleDepartment"
+						displayName="Responsible department"
+						usageNotes=""
+						usageHint=""
+						displayed="true">
+						<!-- Field contents go here -->
 					</field>
 					<field
 						systemName="title"
 						displayName="Title"
-						usageNotes="In-depth notes about usage go here"
-						usageHint="Tooltip-type hints go here"
+						usageNotes=""
+						usageHint=""
 						displayed="true">
 						<!-- Field contents go here -->
-						Paiute Basket
 					</field>
 				</fields>
 			</infoBlock>

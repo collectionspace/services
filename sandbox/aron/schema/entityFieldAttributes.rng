@@ -74,10 +74,7 @@
 	<attribute
 		name="displayed"
 		a:defaultValue="true">
-		<choice>
-			<value>true</value>
-			<value>false</value>
-		</choice>
+		<data type="boolean"/>
 	</attribute>
 	
 	<!--
