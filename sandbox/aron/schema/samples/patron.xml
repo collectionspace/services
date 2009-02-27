@@ -1,7 +1,0 @@
-<patron>
-	<!-- From http://www.ibm.com/developerworks/xml/library/x-matters25.html -->
-  <book isbn="0-528-84460-X"/>
-  <name>John Doe</name>
-  <id-num>12345678</id-num>
-  <book title="Why RELAX is Clever"/>
-</patron>
