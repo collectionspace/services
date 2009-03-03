@@ -1,0 +1,6 @@
+<element name="CSID" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <element name="ID">
+    <data type="string"/>
+  </element>
+</element>
+	

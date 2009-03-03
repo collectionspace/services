@@ -1,0 +1,105 @@
+<grammar
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+  xmlns="http://relaxng.org/ns/structure/1.0">
+  <start>
+    <ref name="library"/>
+  </start>
+  <define name="library">
+    <element name="library">
+      <oneOrMore>
+        <ref name="book"/>
+      </oneOrMore>
+      <zeroOrMore>
+        <ref name="author"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="character"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="author">
+    <element name="author">
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+      <element name="name">
+        <text/>
+      </element>
+      <element name="nickName">
+        <text/>
+      </element>
+      <element name="born">
+        <text/>
+      </element>
+      <element name="dead">
+        <text/>
+      </element>
+    </element>
+  </define>
+  <define name="book">
+    <element name="book">
+      <ref name="id-attribute"/>
+      <ref name="isbn"/>
+      <ref name="title"/>
+      <zeroOrMore>
+        <element name="author-ref">
+          <attribute name="id">
+            <data type="IDREF"/>
+          </attribute>
+          <empty/>
+        </element>
+      </zeroOrMore>
+      <zeroOrMore>
+        <element name="character-ref">
+          <attribute name="id">
+            <data type="IDREF"/>
+          </attribute>
+          <empty/>
+        </element>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="id-attribute">
+    <attribute name="id">
+      <data type="ID"/>
+    </attribute>
+  </define>
+  <define name="character">
+    <element name="character">
+      <ref name="id-attribute"/>
+      <ref name="name"/>
+      <ref name="since"/>
+      <ref name="qualification"/>
+    </element>
+  </define>
+  <define name="isbn">
+    <element name="isbn">
+      <text/>
+    </element>
+  </define>
+  <define name="name">
+    <element name="name">
+      <text/>
+    </element>
+  </define>
+  <define name="nickName">
+    <element name="nickName">
+      <text/>
+    </element>
+  </define>
+  <define name="qualification">
+    <element name="qualification">
+      <text/>
+    </element>
+  </define>
+  <define name="since">
+    <element name="since">
+      <data type="date"/>
+    </element>
+  </define>
+  <define name="title">
+    <element name="title">
+      <text/>
+    </element>
+  </define>
+</grammar>
