@@ -18,17 +18,92 @@
 	name="defaultCollectionObject" 
 	xmlns="http://relaxng.org/ns/structure/1.0"
 	datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
-
+	
 	<!--
-		Description appears here as an initial, sample data element.
-		There are a number of other data elements which must be added
-		to this schema to support the requirements of Release 0.1.
+		The following data elements are taken from the Basic section,
+		Object ID Information sub-section, of the Object Data Entry wireframe
+		
+		See:
+		
+		http://wiki.collectionspace.org/display/collectionspace/Wireframes+-+Object+Data+Entry
+		and
+		http://wiki.collectionspace.org/display/collectionspace/Hello+World+(Release+0.1)+Functionality+Requirements
+		
 	-->
-	<element name="description">
-		<choice>
-			<data type="string" />
-			<empty />
-		</choice>
-	</element>
+
+	<!-- Allows child elements to appear in any order -->
+  <interleave>
+  
+		<element name="objectNumber">
+			<choice>
+				<data type="string" />
+				<empty />
+			</choice>
+		</element>
+
+		<optional>
+			<element name="otherNumber">
+				<choice>
+					<data type="string" />
+					<empty />
+				</choice>
+			</element>
+		</optional>
+		
+		<optional>
+			<element name="briefDescription">
+				<choice>
+					<data type="string" />
+					<empty />
+				</choice>
+			</element>
+		</optional>
+		
+		<optional>
+			<element name="comments">
+				<choice>
+					<data type="string" />
+					<empty />
+				</choice>
+			</element>
+		</optional>
+		
+		<optional>
+			<element name="distinguishingFeatures">
+				<choice>
+					<data type="string" />
+					<empty />
+				</choice>
+			</element>
+		</optional>
+		
+		<optional>
+			<element name="objectName">
+				<choice>
+					<data type="string" />
+					<empty />
+				</choice>
+			</element>
+		</optional>
+		
+		<optional>
+			<element name="responsibleDepartment">
+				<choice>
+					<data type="string" />
+					<empty />
+				</choice>
+			</element>
+		</optional>
+		
+		<optional>
+			<element name="title">
+				<choice>
+					<data type="string" />
+					<empty />
+				</choice>
+			</element>
+		</optional>
+
+	</interleave>
 	    
 </element>
