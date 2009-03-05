@@ -14,7 +14,6 @@ import java.net.URL;
 
 
 /**
- * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
 public class PersonResourceTest
@@ -24,7 +23,7 @@ public class PersonResourceTest
    {
       System.out.println("*** Create a new Person ***");
       // Create a new object
-      String newPerson = "<person>"
+      String newPerson = "<ns2:person xmlns:ns2=\"http://collectionspace.org/hello\">"
               + "<firstName>John</firstName>"
               + "<lastName>Doe</lastName>"
               + "<street>2195 Hearst Ave</street>"
@@ -32,7 +31,7 @@ public class PersonResourceTest
               + "<state>CA</state>"
               + "<zip>94504</zip>"
               + "<country>USA</country>"
-              + "</person>";
+              + "</ns2:person>";
 
       URL postUrl = new URL("http://localhost:8080/helloworld/cspace/persons");
       HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection();
@@ -68,7 +67,7 @@ public class PersonResourceTest
       Assert.assertEquals(HttpURLConnection.HTTP_OK, connection.getResponseCode());
       connection.disconnect();
 
-      String updatePerson = "<person>"
+      String updatePerson = "<ns2:person xmlns:ns2=\"http://collectionspace.org/hello\">"
               + "<firstName>Jane</firstName>"
               + "<lastName>Doe</lastName>"
               + "<street>1 University Ave</street>"
@@ -76,7 +75,7 @@ public class PersonResourceTest
               + "<state>CA</state>"
               + "<zip>94504</zip>"
               + "<country>USA</country>"
-              + "</person>";
+              + "</ns2:person>";
       connection = (HttpURLConnection) getUrl.openConnection();
       connection.setDoOutput(true);
       connection.setRequestMethod("PUT");

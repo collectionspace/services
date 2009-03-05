@@ -1,13 +1,12 @@
-package org.collectionspace.hello.client;
+package org.collectionspace.hello.client.test;
 
 import java.util.ArrayList;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
-import javax.xml.namespace.QName;
-import org.collectionspace.hello.client.*;
+import org.collectionspace.hello.Person;
+import org.collectionspace.hello.client.PersonClient;
 import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -65,7 +64,8 @@ public class PersonServiceTest {
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
                     Boolean.TRUE);
-            m.marshal(new JAXBElement(new QName("uri", "local"), Person.class, p), System.out);
+            m.marshal(p, System.out);
+            //m.marshal(new JAXBElement(new QName("uri", "local"), Person.class, p), System.out);
         } catch (Exception e) {
             e.printStackTrace();
         }

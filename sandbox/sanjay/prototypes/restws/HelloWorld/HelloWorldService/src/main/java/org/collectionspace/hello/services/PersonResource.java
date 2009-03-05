@@ -1,7 +1,5 @@
 package org.collectionspace.hello.services;
 
-import org.collectionspace.hello.entity.Person;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -13,18 +11,21 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
+import javax.xml.namespace.QName;
+import org.collectionspace.hello.Person;
 
 @Path("/persons")
 @Consumes("application/xml")
 @Produces("application/xml")
 public class PersonResource {
 
-    private Map<Integer, Person> personDB = new ConcurrentHashMap<Integer, Person>();
-    private AtomicInteger idCounter = new AtomicInteger();
+    private Map<Long, Person> personDB = new ConcurrentHashMap<Long, Person>();
+    private AtomicLong idCounter = new AtomicLong();
 
     public PersonResource() {
     }
@@ -43,7 +44,7 @@ public class PersonResource {
 
     @GET
     @Path("{id}")
-    public Person getPerson(@PathParam("id") int id) {
+    public Person getPerson(@PathParam("id") Long id) {
         Person p = personDB.get(id);
         if (p == null) {
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
@@ -56,12 +57,12 @@ public class PersonResource {
 
     @PUT
     @Path("{id}")
-    public Person updatePerson(@PathParam("id") int id, Person update) {
+    public Person updatePerson(@PathParam("id") Long id, Person update) {
         Person current = personDB.get(id);
         if (current == null) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
-        verbose("received person", update);
+        verbose("update input", update);
         //todo: intelligent merge needed
         current.setFirstName(update.getFirstName());
         current.setLastName(update.getLastName());
@@ -70,7 +71,7 @@ public class PersonResource {
         current.setZip(update.getZip());
         current.setCountry(update.getCountry());
         current.setVersion(current.getVersion() + 1);
-        verbose("updated person", current);
+        verbose("update output", current);
         return current;
     }
 

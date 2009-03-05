@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-   <parent>
-      <artifactId>helloworld</artifactId>
-      <groupId>org.collectionspace.hello.services</groupId>
-      <version>0.1</version>
-   </parent>
+    <parent>
+        <artifactId>helloworld</artifactId>
+        <groupId>org.collectionspace.hello.services</groupId>
+        <version>0.1</version>
+    </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services.hello</groupId>
+    <groupId>org.collectionspace.hello.services</groupId>
     <artifactId>helloworld-jaxb</artifactId>
-    <name>Helloworld Client JAXB</name>
     <version>0.1</version>
+    <name>Helloworld Client JAXB</name>
     <dependencies>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>

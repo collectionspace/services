@@ -3,6 +3,7 @@ package org.collectionspace.hello.client;
 
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.hello.Person;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;

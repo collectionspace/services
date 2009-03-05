@@ -6,14 +6,14 @@
         <version>0.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services.hello</groupId>
+    <groupId>org.collectionspace.hello.services</groupId>
     <artifactId>helloworld-client</artifactId>
     <packaging>jar</packaging>
     <version>0.1</version>
     <name>Helloworld Client</name>
     <dependencies>
         <dependency>
-            <groupId>org.collectionspace.services.hello</groupId>
+            <groupId>org.collectionspace.hello.services</groupId>
             <artifactId>helloworld-jaxb</artifactId>
             <version>0.1</version>
         </dependency>
