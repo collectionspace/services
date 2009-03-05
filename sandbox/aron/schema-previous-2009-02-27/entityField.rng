@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+	entityField.rng
+
+	A schema defining structure of an individual field (or data element)
+	in an entity.
+
+	One or more of these entityFields may be included within an "entity",
+	a generic business object defined in a separate, related schema, "entity.rng".
+	
+	This schema was created for the CollectionSpace system,
+	http://www.collectionspace.org/
+	
+	It is written in the XML syntax of the RELAX NG schema language,
+	http://relaxng.org/
+
+-->
+
+<element
+	name="field"
+	xmlns="http://relaxng.org/ns/structure/1.0"
+  xmlns:a="http://relaxng.org/ns/annotation/0.9"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+		
+	<!-- Attributes -->
+
+	<!--
+		The name of this field/data element, as used internally by the system.
+		See also "displayName", below.
+	-->
+	<attribute name="systemName">
+		<data type="Name" />
+	</attribute>
+	
+	<!--
+		The name of this field/data element, as displayed in the system UI.
+		
+		This name may be customized to meet the needs of a deployed instance,
+		internationalized, etc.
+		
+		If the value of this field is empty (blank), it is expected that the
+		systemName, above, will be displayed in the system UI.
+	-->
+	<attribute name="displayName">
+		<optional>
+			<data type="normalizedString" />
+		</optional>
+	</attribute>
+	
+	<!-- Informational text describing the purpose and usage of this field -->
+	<attribute name="usageNotes">
+		<optional>
+			<data type="string" />
+		</optional>
+	</attribute>
+
+	<!-- Brief, tooltip-type help text describing the purpose and usage of this field -->
+	<attribute name="usageHint">
+		<optional>
+			<data type="string" />
+		</optional>
+	</attribute>
+	
+	<!--
+		A Boolean value indicating whether this field is to be displayed in system UI.
+
+		If this attribute's value is empty (blank), its default value is set to "true".
+		Since an entered value for this attribute is currently required, this default
+		value may not be necessary (or ever used), but is included here nonetheless.
+	-->
+	<attribute
+		name="displayed"
+		a:defaultValue="true">
+		<choice>
+			<value>true</value>
+			<value>false</value>
+		</choice>
+	</attribute>
+	
+	<!--
+		An optional hint regarding the length of this field.
+		
+		This may be used for dynamically laying out fields within a forms-based
+		user interface, or for similar purposes.
+		
+		The meaning of this field is instance-dependent, and may refer
+		to a typical length, or an expected maximum length, for instance.
+		It may also refer to any arbitrary measurement system, such as US-ASCII
+		characters, em units or pixels.
+	-->
+	<optional>
+		<attribute name="lengthHint">
+			<data type="normalizedString" />
+		</attribute>
+	</optional>
+	
+	<!--
+		A note regarding "required fields"
+		
+		A "required field" is a data element into which valid data must be
+		entered before a new entity record, or a modification to an existing
+		entity record, can be accepted and stored.  A particular entity may
+		have one required field, or more than one such field.  In the latter
+		case, each of the required fields must contain valid data before a
+		new or modified record is stored.
+you're not
+		There isn't currently a 'required' (or similar) attribute for the
+		'field' element, because at present we're assuming that validation
+		rules will be used to define required fields.
+				
+		If this assumption isn't correct, we may wish to add such an attribute
+		to this schema.
+		
+		Apropos of this point, Patrick Schmitz wrote on 2009-02-25:
+		"We may have to separate the notion of what the system will require,
+		and what a UI interaction will require. This allows for import of
+		legacy ... data ... but can put more constraints on what folks enter."
+	-->
+
+	<!-- Value -->
+
+	<!--
+		Currently, the values of entity fields are defined as xs:String datatypes.
+	-->
+	<data type="string" />
+	
+</element>
+
