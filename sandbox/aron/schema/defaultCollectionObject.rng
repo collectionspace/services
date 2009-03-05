@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+	defaultCollectionObject.rng
+	
+	A schema defining the structure of an default, "out of the box" CollectionObject.
+
+	This schema was created for the CollectionSpace system,
+	http://www.collectionspace.org/
+	
+	It is written in the XML syntax of the RELAX NG schema language,
+	http://relaxng.org/
+
+-->
+
+<element
+	name="defaultCollectionObject" 
+	xmlns="http://relaxng.org/ns/structure/1.0"
+	datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+	<!--
+		Description appears here as an initial, sample data element.
+		There are a number of other data elements which must be added
+		to this schema to support the requirements of Release 0.1.
+	-->
+	<element name="description">
+		<choice>
+			<data type="string" />
+			<empty />
+		</choice>
+	</element>
+	    
+</element>

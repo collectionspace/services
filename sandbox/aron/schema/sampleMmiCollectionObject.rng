@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+	sampleMmiCollectionObject.rng
+	
+	A schema defining the structure of a completely hypothetical CollectionObject
+	for the Museum of the Moving Image (MMI) in Astoria, New York.  This is a minimal
+	example created for a system demo.
+
+	This schema was created for the CollectionSpace system,
+	http://www.collectionspace.org/
+	
+	It is written in the XML syntax of the RELAX NG schema language,
+	http://relaxng.org/
+
+-->
+
+<element
+	name="sampleMmiCollectionObject" 
+	xmlns="http://relaxng.org/ns/structure/1.0"
+	datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+	
+	<!--
+		These initial choices were inspired by the following item in the
+		museum's online catalog:
+		
+		http://collection.movingimage.us/index.php?g=detail&object_id=64117
+		
+		and in turn by William Gibson's short story, The Gernsback Continuum.
+	-->
+
+	<optional>
+		<element name="artifactClass">
+			<choice>
+				<data type="string" />
+				<empty />
+			</choice>
+		</element>
+	</optional>
+
+	<optional>
+		<element name="material">
+			<choice>
+				<data type="string" />
+				<empty />
+			</choice>
+		</element>
+	</optional>
+		
+	<!--
+		The following is a somewhat awkward construction, because I
+		don't know how yet to make the value of an attribute dependent on
+		the value of its corresponding element, as in "if the value of
+		this element is non-empty, then the attribute value must also be non-empty - Aron.
+	-->
+	<optional>
+		<element name="overallDimensions">
+			<element name="height">
+				<choice>
+					<data type="decimal" />
+					<empty />
+				</choice>
+			</element>
+			<element name="width">
+				<choice>
+					<data type="decimal" />
+					<empty />
+				</choice>
+			</element>
+			<element name="measurementUnit">
+				<choice>
+					<value>in</value>
+					<value>mm</value>
+					<empty />
+				</choice>
+			</element>
+		</element>
+ 	</optional>
+	    
+</element>

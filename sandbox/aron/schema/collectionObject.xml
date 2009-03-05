@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+	collectionObject.xml
+
+	A hypothetical, skeletal instance of an CollectionObject payload,
+	represented as an XML document.
+	
+	This is	created for the CollectionSpace system, http://www.collectionspace.org/
+
+-->
+
+<collectionObject>
+
+	<serviceMetadata>
+		<collectionSpaceId>1</collectionSpaceId>
+	</serviceMetadata>
+
+	<defaultCollectionObject>
+		<!-- Linebreaks were added to the following description for readability -->
+		<description>Radio News, August 1928. The cover of this issue features an
+illustration of a man and woman watching an early "radio movie." Text on
+the cover reads, "Radio's Greatest Magazine / Radio News / August 25
+Cents / Over 200 illustrations / Edited by Hugo Gernsback / Radio Movies
+and Television for the Home / Experimenter Publishing Company, 230 Fifth
+Avenue, New York."
+
+In addition to articles about radios and radio technology, the magazine
+also contains several articles about developments in the field of
+television. The issue begins with an editorial about the future of
+television by the magazine's editor, Hugo Gernsback, which is followed
+by an article about the radio movie receiver system invented by C.
+Francis Jenkins. The article includes drawings illustrating the layout
+of the sytem.</description>
+	</defaultCollectionObject>
+
+  <sampleMmiCollectionObject>
+  	<artifactClass>Books, literature, and periodicals</artifactClass>
+  	<material>Paper</material>
+  	<overallDimensions>
+  		<height>11.75</height>
+  		<width>8.75</width>
+  		<measurementUnit>in</measurementUnit>
+  	</overallDimensions>
+  </sampleMmiCollectionObject>
+  
+</collectionObject>
