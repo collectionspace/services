@@ -14,16 +14,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
-import javax.xml.namespace.QName;
 import org.collectionspace.hello.Person;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Path("/persons")
 @Consumes("application/xml")
 @Produces("application/xml")
 public class PersonResource {
 
+    final Logger logger = LoggerFactory.getLogger(PersonResource.class);
     private Map<Long, Person> personDB = new ConcurrentHashMap<Long, Person>();
     private AtomicLong idCounter = new AtomicLong();
 
@@ -35,7 +36,7 @@ public class PersonResource {
         p.setId(idCounter.incrementAndGet());
         p.setVersion(1);
         personDB.put(p.getId(), p);
-        verbose("create person", p);
+        verbose("created person", p);
         UriBuilder path = UriBuilder.fromResource(PersonResource.class);
         path.path("" + p.getId());
         Response response = Response.created(path.build()).build();
@@ -48,7 +49,7 @@ public class PersonResource {
         Person p = personDB.get(id);
         if (p == null) {
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "The requested ID was not found.").type("text/plain").build();
+                    "Get failed, the requested person ID:" + id + ": was not found.").type("text/plain").build();
             throw new WebApplicationException(response);
         }
         verbose("get person", p);
@@ -60,9 +61,11 @@ public class PersonResource {
     public Person updatePerson(@PathParam("id") Long id, Person update) {
         Person current = personDB.get(id);
         if (current == null) {
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Update failed, the person ID:" + id + ": was not found.").type("text/plain").build();
+            throw new WebApplicationException(response);
         }
-        verbose("update input", update);
+        verbose("update person input", update);
         //todo: intelligent merge needed
         current.setFirstName(update.getFirstName());
         current.setLastName(update.getLastName());
@@ -71,13 +74,13 @@ public class PersonResource {
         current.setZip(update.getZip());
         current.setCountry(update.getCountry());
         current.setVersion(current.getVersion() + 1);
-        verbose("update output", current);
+        verbose("update person output", current);
         return current;
     }
 
     private void verbose(String msg, Person p) {
         try {
-            System.out.println(msg);
+            System.out.println("PersonResource : " + msg);
             JAXBContext jc = JAXBContext.newInstance(Person.class);
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,

@@ -12,11 +12,11 @@ import java.net.URL;
 /**
  * @version $Revision: 1 $
  */
-public class IdentifierResourceTest {
+public class IdentifierServiceRawXmlTest {
 
     @Test
     public void testIdentifierResource() throws Exception {
-        System.out.println("*** Create a new Identifier ***");
+        verbose("create a new Identifier");
         // Create a new object
         String newIdentifier = "<ns2:identifier xmlns:ns2=\"http://collectionspace.org/hello\">" +
                 "<namespace>edu.stanford</namespace>" +
@@ -33,27 +33,30 @@ public class IdentifierResourceTest {
         os.flush();
         Assert.assertEquals(HttpURLConnection.HTTP_CREATED, connection.getResponseCode());
         String createdUrl = connection.getHeaderField("Location");
-        System.out.println("Location: " + createdUrl);
+        verbose("Location: " + createdUrl);
         connection.disconnect();
 
 
         // Get the new object
-        System.out.println("*** GET Created Identifier **");
+        verbose("get created Identifier");
         URL getUrl = new URL(createdUrl);
         connection = (HttpURLConnection) getUrl.openConnection();
         connection.setRequestMethod("GET");
-        System.out.println("Content-Type: " + connection.getContentType());
+        verbose("Content-Type: " + connection.getContentType());
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
         String line = reader.readLine();
         while (line != null) {
-            System.out.println(line);
+            verbose(line);
             line = reader.readLine();
         }
         Assert.assertEquals(HttpURLConnection.HTTP_OK, connection.getResponseCode());
         connection.disconnect();
 
-        connection.disconnect();
+    }
+
+    private void verbose(String msg) {
+        System.out.println("IdentifierServiceRawXmlTest : " + msg);
     }
 }

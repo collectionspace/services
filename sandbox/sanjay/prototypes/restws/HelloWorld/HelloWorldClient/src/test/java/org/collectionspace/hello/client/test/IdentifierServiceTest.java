@@ -33,26 +33,30 @@ public class IdentifierServiceTest {
     @Test(dependsOnMethods = {"createIdentifier"})
     public void getIdentifier() {
         Identifier i = identifierClient.getIdentifier(id).getEntity();
-        verbose("received with get", i);
+        verbose("got Identifier", i);
     }
 
     private Long extractId(ClientResponse<Response> res) {
         MultivaluedMap mvm = res.getMetadata();
         String uri = (String) ((ArrayList) mvm.get("Location")).get(0);
         String[] segments = uri.split("/");
-        System.out.println("id=" + segments[segments.length - 1]);
+        verbose("id=" + segments[segments.length - 1]);
         return Long.valueOf(segments[segments.length - 1]);
+    }
+
+    private void verbose(String msg) {
+        System.out.println("IdentifierServiceTest : " + msg);
     }
 
     private void verbose(String msg, Identifier p) {
         try {
-            System.out.println(msg);
+            verbose(msg);
             JAXBContext jc = JAXBContext.newInstance(Identifier.class);
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
                     Boolean.TRUE);
             m.marshal(p, System.out);
-            //m.marshal(new JAXBElement(new QName("uri", "local"), Identifier.class, p), System.out);
+        //m.marshal(new JAXBElement(new QName("uri", "local"), Identifier.class, p), System.out);
         } catch (Exception e) {
             e.printStackTrace();
         }
