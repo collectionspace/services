@@ -16,6 +16,10 @@
 	It is written in the XML syntax of the RELAX NG schema language,
 	http://relaxng.org/
 
+  $Author$
+  $Revision$
+  $Date$
+
 -->
 
 <element

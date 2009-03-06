@@ -7,9 +7,11 @@
 	A hypothetical, skeletal instance of an CollectionObject payload,
 	represented as an XML document.
 	
-	This was inspired by 
-	
 	This is	created for the CollectionSpace system, http://www.collectionspace.org/
+
+  $Author: aron $
+  $Revision: 509 $
+  $Date: 2008-10-27 13:55:56 -0700 (Mon, 27 Oct 2008) $
 
 -->
 
