@@ -39,10 +39,17 @@
   <interleave>
   
 		<element name="objectNumber">
-			<choice>
-				<data type="string" />
-				<empty />
-			</choice>
+			<!--
+				This declaration specifies that the value of this element must never be empty (blank).
+				If that's not accurate, it should be redefined, perhaps to match other elements below.
+				
+				Note: In a site- or instance-specific declaration - not in the default
+				definition here - we might wish to specify a regex-type pattern here for
+				further constraining valid object numbers.
+			-->
+			<data type="normalizedString">
+				<param name="minLength">1</param>
+			</data>
 		</element>
 
 		<optional>

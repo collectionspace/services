@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+	serviceErrorResponse.rng
+
+	A schema defining the representation of the data returned,
+	as an error response, to a call to a service.
+	
+	This schema was created for the CollectionSpace system,
+	http://www.collectionspace.org/
+	
+	It is written in the XML syntax of the RELAX NG schema language,
+	http://relaxng.org/
+
+  $Author$
+  $Revision$
+  $Date$
+
+-->
+
+<!-- The result of the operation. -->
+<element name="error"
+	xmlns="http://relaxng.org/ns/structure/1.0"
+	datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+	<!--
+		A service-dependent result code, which must be
+		at least one character in length.
+	-->
+	<element name="errorCode">
+		<data type="normalizedString">
+			<param name="minLength">1</param>
+		</data>
+	</element>
+	
+	<!--
+		An (optional) service-dependent message,
+		presumably corresponding to the result code.
+	-->
+	<element name="errorMessage">
+		<choice>
+			<empty/>
+			<data type="normalizedString" />
+		</choice>
+	</element>
+	
+</element>
