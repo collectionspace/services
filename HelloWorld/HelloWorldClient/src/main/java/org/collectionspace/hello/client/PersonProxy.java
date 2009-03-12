@@ -1,6 +1,7 @@
 package org.collectionspace.hello.client;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -10,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.hello.Person;
+import org.collectionspace.hello.Persons;
 import org.jboss.resteasy.client.ClientResponse;
 
 /**
@@ -20,12 +22,9 @@ import org.jboss.resteasy.client.ClientResponse;
 @Consumes({"application/xml"})
 public interface PersonProxy {
 
-    /**
-     * 
-     *
-     * @param id
-     * @return
-     */
+    @GET
+    ClientResponse<Persons> getPersons();
+
     @GET
     @Path("/{id}")
     ClientResponse<Person> getPerson(@PathParam("id") Long id);
@@ -36,4 +35,7 @@ public interface PersonProxy {
     @PUT
     @Path("/{id}")
     ClientResponse<Person> updatePerson(@PathParam("id") Long id, Person so);
+
+    @DELETE
+     ClientResponse<Response> deletePerson(@PathParam("id") Long id);
 }

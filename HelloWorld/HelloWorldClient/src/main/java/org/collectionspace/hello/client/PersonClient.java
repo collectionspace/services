@@ -3,6 +3,7 @@ package org.collectionspace.hello.client;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.hello.Person;
+import org.collectionspace.hello.Persons;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
@@ -47,6 +48,15 @@ public class PersonClient {
     /**
      * @param id
      * @return
+     * @see org.collectionspace.hello.client.PersonProxy#getPerson()
+     */
+    public ClientResponse<Persons> getPersons() {
+        return personProxy.getPersons();
+    }
+
+    /**
+     * @param id
+     * @return
      * @see org.collectionspace.hello.client.PersonProxy#getPerson(java.lang.Long)
      */
     public ClientResponse<Person> getPerson(Long id) {
@@ -70,5 +80,14 @@ public class PersonClient {
      */
     public ClientResponse<Person> updatePerson(Long id, Person person) {
         return personProxy.updatePerson(id, person);
+    }
+
+    /**
+     * @param id
+     * @return
+     * @see org.collectionspace.hello.client.PersonProxy#deletePerson(java.lang.Long)
+     */
+    public ClientResponse<Response> deletePerson(Long id) {
+        return personProxy.deletePerson(id);
     }
 }

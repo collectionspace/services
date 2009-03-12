@@ -1,5 +1,7 @@
 package org.collectionspace.hello.services;
 
+import java.net.URI;
+import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -12,10 +14,15 @@ import javax.ws.rs.core.Response;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import org.collectionspace.hello.Person;
+import org.collectionspace.hello.Persons.PersonListItem;
+import org.collectionspace.hello.Persons;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +83,37 @@ public class PersonResource {
         current.setVersion(current.getVersion() + 1);
         verbose("update person output", current);
         return current;
+    }
+
+    @GET
+    public Persons getPersons(@Context UriInfo ui) {
+        Persons persons = new Persons();
+        List<Persons.PersonListItem> list = persons.getPersonListItem();
+        // builder starts with current URI and has appended path of getPerson method
+        UriBuilder ub = ui.getAbsolutePathBuilder().path(this.getClass(), "getPerson");
+        for (Person p : personDB.values()) {
+            PersonListItem pli = new PersonListItem();
+            pli.setFirstName(p.getFirstName());
+            pli.setLastName(p.getLastName());
+            pli.setId(p.getId());
+            // builder has {id} variable that must be filled in for each customer
+            URI uri = ub.build(p.getId());
+            pli.setUri(uri.toString());
+            list.add(pli);
+        }
+        return persons;
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public void deletePerson(@PathParam("id") Long id) {
+        Person removed = personDB.remove(id);
+        if (removed == null) {
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Delete failed, the person ID:" + id + ": was not found.").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        verbose("deleted person", removed);
     }
 
     private void verbose(String msg, Person p) {
