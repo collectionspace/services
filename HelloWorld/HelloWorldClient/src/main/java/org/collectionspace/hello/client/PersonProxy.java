@@ -37,5 +37,6 @@ public interface PersonProxy {
     ClientResponse<Person> updatePerson(@PathParam("id") Long id, Person so);
 
     @DELETE
-     ClientResponse<Response> deletePerson(@PathParam("id") Long id);
+    @Path("/{id}")
+    ClientResponse<Response> deletePerson(@PathParam("id") Long id);
 }

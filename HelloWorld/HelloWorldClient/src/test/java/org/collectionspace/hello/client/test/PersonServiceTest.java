@@ -62,12 +62,13 @@ public class PersonServiceTest {
         List<Persons.PersonListItem> list = persons.getPersonListItem();
         int i = 0;
         for (Persons.PersonListItem pli : list) {
-            verbose("list-item[" + i + "] firstName=" + pli.getFirstName());
-            verbose("list-item[" + i + "] lastName=" + pli.getLastName());
-            verbose("list-item[" + i + "] uri=" + pli.getUri());
+            verbose("getPersons: list-item[" + i + "] firstName=" + pli.getFirstName());
+            verbose("getPersons: list-item[" + i + "] lastName=" + pli.getLastName());
+            verbose("getPersons: list-item[" + i + "] uri=" + pli.getUri());
             i++;
         }
     }
+
 
     @Test
     public void getNonExistingPerson() {
@@ -87,7 +88,7 @@ public class PersonServiceTest {
         }
     }
 
-    @Test
+    @Test(dependsOnMethods = {"updatePerson"})
     public void updateWrongPerson() {
         Person touPerson = personClient.getPerson(updateId).getEntity();
         verbose("updateWrongPerson: got person to update", touPerson, Person.class);
@@ -102,6 +103,15 @@ public class PersonServiceTest {
         }
     }
 
+
+    @Test(dependsOnMethods = {"updateWrongPerson"})
+    public void deletePerson() {
+        ClientResponse<Response> res = personClient.deletePerson(updateId);
+        verbose("deletePerson: id=" + updateId);
+        verbose("deletePerson: status = " + res.getStatus());
+        Assert.assertEquals(res.getStatus(), Response.Status.NO_CONTENT.getStatusCode());
+    }
+    
     private Person createPerson(String firstName, String lastName) {
         Person person = new Person();
         person.setFirstName(firstName);

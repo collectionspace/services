@@ -105,7 +105,7 @@ public class PersonResource {
     }
 
     @DELETE
-    @Path("/{id}")
+    @Path("{id}")
     public void deletePerson(@PathParam("id") Long id) {
         Person removed = personDB.remove(id);
         if (removed == null) {
