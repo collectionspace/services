@@ -2,10 +2,10 @@
 
 <!--
 
-	collectionObject-full.rng
+	collectionObject-full-ns.rng
 	
 	A schema defining the structure of an CollectionObject entity.
-	
+		
 	This schema includes all of its components, rather than referring
 	to them via 'externalRef' references. As such, it can be used as the
 	basis for generating a W3C XML Schema (XSD) schema, via
@@ -14,6 +14,12 @@
 	
 	As a convenience, a 'rng-to-xsd.sh' script file, which trivially wraps Trang
 	to generate XSD from a RELAX NG schema, is provided elsewhere in this distribution.
+	
+	This schema also includes one rudimentary root namespace, scoped for the Release 0.1
+	"Hello World" demo.  We'll need to determine whether, and if so how, we can
+	accommodate multiple namespaces to compose entity objects from various schemas,
+	such as service metadata, and declarations for the default entity, a domain- or community-
+	provided entity, and site- or instance-specific version of an entity.
 
 	This schema was created for the CollectionSpace system,
 	http://www.collectionspace.org/
@@ -29,9 +35,10 @@
 
 <element
 	name="collectionObject"
+	ns="http://collectionspace.org/hello"
 	xmlns="http://relaxng.org/ns/structure/1.0"
 	datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
-
+	
 	
 	<!-- ######################################################################## -->
 	<!-- Service Metadata                                                         -->

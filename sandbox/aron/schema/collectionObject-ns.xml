@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+	collectionObject-ns.xml
+
+	A hypothetical, skeletal instance of an CollectionObject payload,
+	represented as an XML document, in a rudimentary root namespace,
+	scoped for the Release 0.1 "Hello World" demo.
+	
+	This is	created for the CollectionSpace system, http://www.collectionspace.org/
+
+  $Author: aron $
+  $Revision: 509 $
+  $Date: 2008-10-27 13:55:56 -0700 (Mon, 27 Oct 2008) $
+
+-->
+
+<collectionObject
+	xmlns="http://collectionspace.org/hello">
+
+	<serviceMetadata>
+	
+		<!-- An entirely arbitrary examle -->
+		<collectionSpaceId>org.collectionspace-eR5zB8tX2aE3wN6zG1</collectionSpaceId>
+		
+	</serviceMetadata>
+	
+	
+	<!--
+		Data below was taken from the following item in the online catalog
+		of the Museum of the Moving Image in Astoria, NY:
+		
+		http://collection.movingimage.us/index.php?g=detail&object_id=64117
+		
+		The choice of this item was in turn inspired by William Gibson's short story,
+		The Gernsback Continuum:
+		
+		http://www.americanheritage.com/articles/magazine/it/1988/1/1988_1_34.shtml
+	-->
+
+
+	<defaultCollectionObject>
+	
+		<objectNumber>1984.021.0049</objectNumber>
+	
+		<objectName> Radio News, vol. 10, no. 2, August 1928</objectName>
+	
+		<!-- Linebreaks were added to the following description for readability -->
+		<briefDescription>Radio News, August 1928. The cover of this issue features an
+illustration of a man and woman watching an early "radio movie." Text on
+the cover reads, "Radio's Greatest Magazine / Radio News / August 25
+Cents / Over 200 illustrations / Edited by Hugo Gernsback / Radio Movies
+and Television for the Home / Experimenter Publishing Company, 230 Fifth
+Avenue, New York."
+
+In addition to articles about radios and radio technology, the magazine
+also contains several articles about developments in the field of
+television. The issue begins with an editorial about the future of
+television by the magazine's editor, Hugo Gernsback, which is followed
+by an article about the radio movie receiver system invented by C.
+Francis Jenkins. The article includes drawings illustrating the layout
+of the sytem.</briefDescription>
+
+	</defaultCollectionObject>
+	
+
+<!--
+  <sampleMmiCollectionObject>
+  
+  	<artifactClass>Books, literature, and periodicals</artifactClass>
+  	
+  	<format>Magazine</format>
+  	
+  	<material>Paper</material>
+  	
+  	<overallDimensions>
+  		<height>11.75</height>
+  		<width>8.75</width>
+  		<measurementUnit>in</measurementUnit>
+  	</overallDimensions>
+  	
+  </sampleMmiCollectionObject>
+-->  
+  
+</collectionObject>
