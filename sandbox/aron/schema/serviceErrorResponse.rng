@@ -21,6 +21,7 @@
 
 <!-- The result of the operation. -->
 <element name="error"
+	ns="http://collectionspace.org/hello"
 	xmlns="http://relaxng.org/ns/structure/1.0"
 	datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
