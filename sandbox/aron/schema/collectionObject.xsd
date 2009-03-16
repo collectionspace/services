@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://collectionspace.org/hello" xmlns:hello="http://collectionspace.org/hello">
   <xs:element name="collectionObject">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="serviceMetadata"/>
-        <xs:element ref="defaultCollectionObject"/>
+        <xs:element ref="hello:serviceMetadata"/>
+        <xs:element ref="hello:defaultCollectionObject"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="serviceMetadata">
     <xs:complexType>
       <xs:sequence>
-        <xs:element ref="collectionSpaceId"/>
-        <xs:element minOccurs="0" ref="created"/>
-        <xs:element minOccurs="0" ref="createdBy"/>
-        <xs:element minOccurs="0" ref="lastModified"/>
-        <xs:element minOccurs="0" ref="lastModifiedBy"/>
+        <xs:element ref="hello:collectionSpaceId"/>
+        <xs:element ref="hello:created"/>
+        <xs:element ref="hello:createdBy"/>
+        <xs:element ref="hello:lastModified"/>
+        <xs:element ref="hello:lastModifiedBy"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -67,14 +67,14 @@
   <xs:element name="defaultCollectionObject">
     <xs:complexType>
       <xs:all>
-        <xs:element ref="objectNumber"/>
-        <xs:element minOccurs="0" ref="otherNumber"/>
-        <xs:element minOccurs="0" ref="briefDescription"/>
-        <xs:element minOccurs="0" ref="comments"/>
-        <xs:element minOccurs="0" ref="distinguishingFeatures"/>
-        <xs:element minOccurs="0" ref="objectName"/>
-        <xs:element minOccurs="0" ref="responsibleDepartment"/>
-        <xs:element minOccurs="0" ref="title"/>
+        <xs:element ref="hello:objectNumber"/>
+        <xs:element minOccurs="0" ref="hello:otherNumber"/>
+        <xs:element minOccurs="0" ref="hello:briefDescription"/>
+        <xs:element minOccurs="0" ref="hello:comments"/>
+        <xs:element minOccurs="0" ref="hello:distinguishingFeatures"/>
+        <xs:element minOccurs="0" ref="hello:objectName"/>
+        <xs:element minOccurs="0" ref="hello:responsibleDepartment"/>
+        <xs:element minOccurs="0" ref="hello:title"/>
       </xs:all>
     </xs:complexType>
   </xs:element>

@@ -35,8 +35,9 @@
 	datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
 	<!--
-		Sanjay's used a different naming convention in the Person prototype,
-		which would be equivalent here to "collection-object-list-item".
+		Sanjay has used a different naming convention in the Person prototype,
+		which would be equivalent here to "collection-object-list-item", rather than
+		to "collectionObjectListItem", as used below.
 		
 		We may want to standardize on use of CamelCase or hyphenated lowercase throughout, or
 		else establish a convention for list items which is distinct from that convention.

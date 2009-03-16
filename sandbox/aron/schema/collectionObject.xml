@@ -2,10 +2,11 @@
 
 <!--
 
-	collectionObject.xml
+	collectionObject-ns.xml
 
 	A hypothetical, skeletal instance of an CollectionObject payload,
-	represented as an XML document.
+	represented as an XML document, in a rudimentary root namespace,
+	scoped for the Release 0.1 "Hello World" demo.
 	
 	This is	created for the CollectionSpace system, http://www.collectionspace.org/
 
@@ -15,7 +16,8 @@
 
 -->
 
-<collectionObject>
+<collectionObject
+	xmlns="http://collectionspace.org/hello">
 
 	<serviceMetadata>
 	
@@ -27,11 +29,14 @@
 	
 	<!--
 		Data below was taken from the following item in the online catalog
-		of the Museum of the Moving Image in Astoria, NY.
+		of the Museum of the Moving Image in Astoria, NY:
 		
 		http://collection.movingimage.us/index.php?g=detail&object_id=64117
 		
-		and in turn by William Gibson's short story, The Gernsback Continuum.
+		The choice of this item was in turn inspired by William Gibson's short story,
+		The Gernsback Continuum:
+		
+		http://www.americanheritage.com/articles/magazine/it/1988/1/1988_1_34.shtml
 	-->
 
 
@@ -60,6 +65,7 @@ of the sytem.</briefDescription>
 	</defaultCollectionObject>
 	
 
+<!--
   <sampleMmiCollectionObject>
   
   	<artifactClass>Books, literature, and periodicals</artifactClass>
@@ -75,6 +81,6 @@ of the sytem.</briefDescription>
   	</overallDimensions>
   	
   </sampleMmiCollectionObject>
-  
+-->  
   
 </collectionObject>

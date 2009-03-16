@@ -5,6 +5,10 @@
 # Simple bash shell script to generate a W3C XML Schema (XSD) document
 # from a RELAX NG schema document.
 #
+# Uses James Clark's Trang utility, http://www.thaiopensource.com/relaxng/trang.html
+#
+# Assumes Trang's 'trang.jar' file is located in a 'tools' subdirectory of the current directory.
+#
 # Requires two arguments:
 # - Filename of the RELAX NG schema document.
 #   (Or the full path to this document, if it is not in the current directory.)
