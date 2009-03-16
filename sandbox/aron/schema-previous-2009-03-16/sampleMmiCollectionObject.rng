@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+	sampleMmiCollectionObject.rng
+	
+	A schema defining the structure of a completely hypothetical CollectionObject
+	for the Museum of the Moving Image (MMI) in Astoria, New York.
+	
+	This is a minimal example created for an early system demo, and represents
+	what a site- or instance-specific entity definition might look like. 
+
+	This schema was created for the CollectionSpace system,
+	http://www.collectionspace.org/
+	
+	It is written in the XML syntax of the RELAX NG schema language,
+	http://relaxng.org/
+
+  $Author$
+  $Revision$
+  $Date$
+
+-->
+
+<element
+	name="sampleMmiCollectionObject" 
+	xmlns="http://relaxng.org/ns/structure/1.0"
+	datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+	
+	<!--
+		These initial choices for a small subset of site- or instance-specific
+		data elements were inspired by the following item in themuseum's online catalog:
+		
+		http://collection.movingimage.us/index.php?g=detail&object_id=64117
+		
+		and in turn by William Gibson's short story, The Gernsback Continuum.
+	-->
+
+	<!-- Allows child elements to appear in any order -->
+  <interleave>
+
+		<optional>
+			<element name="artifactClass">
+				<choice>
+					<data type="string" />
+					<empty />
+				</choice>
+			</element>
+		</optional>
+	
+		<optional>
+			<element name="format">
+				<choice>
+					<data type="string" />
+					<empty />
+				</choice>
+			</element>
+		</optional>
+	
+		<optional>
+			<element name="material">
+				<choice>
+					<data type="string" />
+					<empty />
+				</choice>
+			</element>
+		</optional>
+			
+		<!--
+			The following was constructed somewhat awkwardly, because I
+			don't know how yet to make the value of an attribute dependent on
+			the value of its corresponding element, as in the case where "if the
+			value of the 'height' element is non-empty, then the value of its
+			corresponding 'measurementUnit' attribute must also be non-empty." - Aron.
+		-->
+		<optional>
+			<element name="overallDimensions">
+				<element name="height">
+					<choice>
+						<data type="decimal" />
+						<empty />
+					</choice>
+				</element>
+				<element name="width">
+					<choice>
+						<data type="decimal" />
+						<empty />
+					</choice>
+				</element>
+				<element name="measurementUnit">
+					<choice>
+						<value>in</value>
+						<value>mm</value>
+						<empty />
+					</choice>
+				</element>
+			</element>
+		</optional>
+ 	
+ 	</interleave>
+	    
+</element>

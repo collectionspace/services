@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+	serviceMetadata.rng
+	
+	A schema defining the structure of service metadata:
+	data elements that are associated with every entity object.
+
+	This schema was created for the CollectionSpace system,
+	http://www.collectionspace.org/
+	
+	It is written in the XML syntax of the RELAX NG schema language,
+	http://relaxng.org/
+
+  $Author$
+  $Revision$
+  $Date$
+
+-->
+
+<element
+	name="serviceMetadata" 
+	xmlns="http://relaxng.org/ns/structure/1.0"
+	datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+	
+	<!--
+		A unique CollectionSpace system identifier (ID) for this
+		entity record.  This is distinguished from any museum-created
+		or other identifiers that might also be associated with it.
+			
+		Note: We may wish to think further about what this element name should be.
+	-->
+	<element name="collectionSpaceId">
+		<!--
+			Note: We may potentially wish to specify a regex-type pattern
+			here for further validating these IDs.
+		-->
+		<data type="string" />
+	</element>
+	
+	<!--
+		All of the data elements after this point are fully optional.
+		
+		It's possible we may never want or need to pass these in
+		routine message payloads, and if so, this merely constitutes
+		notes/documentation on a few representative types of data that
+		we might additionally store as system metadata, beyond an identifier.
+		
+		It's also possible that we might offer a service to provide this
+		system metadata for any object, so that, for instance, a client
+		might be able to retrieve the full modification history for an object.
+		This *may* even already be envisioned for an already defined or
+		candidate service ...
+	-->
+	
+		<!-- ######################### -->
+		<!-- Creation                  -->
+		<!-- ######################### -->
+	
+		<!--
+			A timestamp for the creation of this entity record, as specified in
+			http://www.w3.org/TR/xmlschema-2/#dateTime
+		-->
+		<optional>
+			<element name="created">
+				<choice>
+					<data type="dateTime" />
+					<empty />
+				</choice>
+			</element>
+		</optional>
+	
+		<!-- The system Principal that created this entity record -->
+		<optional>
+			<element name="createdBy">
+				<choice>
+					<data type="string" />
+					<empty />
+				</choice>
+			</element>
+		</optional>
+
+		<!-- 
+			Note: Do we also need 'acting as designate for' information here,
+			for cases where one system Principal created this entity while
+			acting as a designate for another Principal?
+		-->
+	
+		<!-- ######################### -->
+		<!-- Last modification         -->
+		<!-- ######################### -->
+		
+		<!--
+			A timestamp for the last modification of this entity record, as specified in
+			http://www.w3.org/TR/xmlschema-2/#dateTime
+		-->
+		<optional>
+			<element name="lastModified">
+				<choice>
+					<data type="dateTime" />
+					<empty />
+				</choice>
+			</element>
+		</optional>
+	
+		<!-- The system Principal that created this entity record -->
+		<optional>
+			<element name="lastModifiedBy">
+				<choice>
+					<data type="string" />
+					<empty />
+				</choice>
+			</element>
+		</optional>
+
+		<!-- 
+			Note: Do we also need 'acting as designate for' information here,
+			for cases where one system Principal modified this entity while
+			acting as a designate for another Principal?
+		-->
+
+		<!-- ######################### -->
+		<!-- Valid from/to             -->
+		<!-- ######################### -->
+		
+		<!--
+			Patrick mentioned the concept of 'valid to/from' timestamps.
+			If this applied to entity objects, not to schema, we might
+			explore that further as another possible type of system metadata. 
+		-->
+    
+</element>

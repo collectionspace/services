@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://collectionspace.org/hello" xmlns="http://collectionspace.org/hello"
+version="0.1">
+  <xs:element name="collectionObject">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="serviceMetadata"/>
+        <xs:element ref="defaultCollectionObject"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="serviceMetadata">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="collectionSpaceId"/>
+        <xs:element minOccurs="0" ref="created"/>
+        <xs:element minOccurs="0" ref="createdBy"/>
+        <xs:element minOccurs="0" ref="lastModified"/>
+        <xs:element minOccurs="0" ref="lastModifiedBy"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="collectionSpaceId" type="xs:string"/>
+  <xs:element name="created">
+    <xs:simpleType>
+      <xs:union memberTypes="xs:dateTime">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:length value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:union>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="createdBy">
+    <xs:simpleType>
+      <xs:union memberTypes="xs:string">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:length value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:union>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="lastModified">
+    <xs:simpleType>
+      <xs:union memberTypes="xs:dateTime">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:length value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:union>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="lastModifiedBy">
+    <xs:simpleType>
+      <xs:union memberTypes="xs:string">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:length value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:union>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="defaultCollectionObject">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="objectNumber"/>
+        <xs:element minOccurs="0" ref="otherNumber"/>
+        <xs:element minOccurs="0" ref="briefDescription"/>
+        <xs:element minOccurs="0" ref="comments"/>
+        <xs:element minOccurs="0" ref="distinguishingFeatures"/>
+        <xs:element minOccurs="0" ref="objectName"/>
+        <xs:element minOccurs="0" ref="responsibleDepartment"/>
+        <xs:element minOccurs="0" ref="title"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="objectNumber">
+    <xs:simpleType>
+      <xs:restriction base="xs:normalizedString">
+        <xs:minLength value="1"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="otherNumber">
+    <xs:simpleType>
+      <xs:union memberTypes="xs:string">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:length value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:union>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="briefDescription">
+    <xs:simpleType>
+      <xs:union memberTypes="xs:string">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:length value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:union>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="comments">
+    <xs:simpleType>
+      <xs:union memberTypes="xs:string">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:length value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:union>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="distinguishingFeatures">
+    <xs:simpleType>
+      <xs:union memberTypes="xs:string">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:length value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:union>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="objectName">
+    <xs:simpleType>
+      <xs:union memberTypes="xs:string">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:length value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:union>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="responsibleDepartment">
+    <xs:simpleType>
+      <xs:union memberTypes="xs:string">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:length value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:union>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="title">
+    <xs:simpleType>
+      <xs:union memberTypes="xs:string">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:length value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:union>
+    </xs:simpleType>
+  </xs:element>
+</xs:schema>

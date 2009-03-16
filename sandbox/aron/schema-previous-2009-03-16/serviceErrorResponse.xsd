@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://collectionspace.org/hello" xmlns="http://collectionspace.org/hello">
+  <xs:element name="error">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="errorCode"/>
+        <xs:element ref="errorMessage"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="errorCode">
+    <xs:simpleType>
+      <xs:restriction base="xs:normalizedString">
+        <xs:minLength value="1"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="errorMessage">
+    <xs:simpleType>
+      <xs:union memberTypes="xs:normalizedString">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:length value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:union>
+    </xs:simpleType>
+  </xs:element>
+</xs:schema>
