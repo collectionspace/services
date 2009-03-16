@@ -7,23 +7,23 @@
   version="0.1"
 >
 
-	<!--
-		Including multiple schemas via an 'include' directive here does work,
-		but results in duplicate declarations for several data elements.
-		
-		As a workaround, both schemas are included in full here.  Several
-		child elements of collectionObject (a single entity) are merely
-		referenced from within collectionObjects (a list).
-	-->
-	
-	<!-- xs:include schemaLocation="collectionObject-ns-no-prefix.xsd"/ -->
-	<!-- xs:include schemaLocation="collectionObjects.xsd"/ -->
-	
-	<!--
-		Sanjay noted:
-		avoid XmlRootElement nightnmare, see
-		http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
-	-->
+  <!--
+    Including multiple schemas via an 'include' directive here does work,
+    but results in duplicate declarations for several data elements.
+    
+    As a workaround, both schemas are included in full here.  Several
+    child elements of collectionObject (a single entity) are merely
+    referenced from within collectionObjects (a list).
+  -->
+  
+  <!-- xs:include schemaLocation="collectionObject-ns-no-prefix.xsd"/ -->
+  <!-- xs:include schemaLocation="collectionObjects.xsd"/ -->
+  
+  <!--
+    Sanjay noted:
+    avoid XmlRootElement nightnmare, see
+    http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+  -->
 
   <xs:element name="collectionObject">
     <xs:complexType>
@@ -93,13 +93,13 @@
     <xs:complexType>
       <xs:all>
         <xs:element ref="objectNumber"/>
-        <xs:element minOccurs="0" ref="otherNumber"/>
-        <xs:element minOccurs="0" ref="briefDescription"/>
-        <xs:element minOccurs="0" ref="comments"/>
-        <xs:element minOccurs="0" ref="distinguishingFeatures"/>
-        <xs:element minOccurs="0" ref="objectName"/>
-        <xs:element minOccurs="0" ref="responsibleDepartment"/>
-        <xs:element minOccurs="0" ref="title"/>
+        <xs:element ref="otherNumber"/>
+        <xs:element ref="briefDescription"/>
+        <xs:element ref="comments"/>
+        <xs:element ref="distinguishingFeatures"/>
+        <xs:element ref="objectName"/>
+        <xs:element ref="responsibleDepartment"/>
+        <xs:element ref="title"/>
       </xs:all>
     </xs:complexType>
   </xs:element>
@@ -196,8 +196,8 @@
     </xs:complexType>
   </xs:element>
   <!--
-  	Note CamelCase here; Sanjay uses the style "collection-object-list-item", and
-  	we can and should revert to that if needed.
+    Note CamelCase here; Sanjay uses the style "collection-object-list-item", and
+    we can and should revert to that if needed.
   -->
   <xs:element name="collectionObjectListItem">
     <xs:complexType>

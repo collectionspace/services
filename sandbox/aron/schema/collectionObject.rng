@@ -2,31 +2,31 @@
 
 <!--
 
-	collectionObject-full-ns.rng
-	
-	A schema defining the structure of an CollectionObject entity.
-		
-	This schema includes all of its components, rather than referring
-	to them via 'externalRef' references. As such, it can be used as the
-	basis for generating a W3C XML Schema (XSD) schema, via
-	James Clark's Trang utility (http://http://www.thaiopensource.com/relaxng/trang.html).
-	(Trang version 20081028 can't resolve such references.) 
-	
-	As a convenience, a 'rng-to-xsd.sh' script file, which trivially wraps Trang
-	to generate XSD from a RELAX NG schema, is provided elsewhere in this distribution.
-	
-	This schema also includes one rudimentary root namespace, scoped for the Release 0.1
-	"Hello World" demo.  We'll need to determine whether, and if so how, we can
-	accommodate multiple namespaces to compose entity objects from various schemas,
-	such as service metadata, and declarations for the default entity, a domain- or community-
-	provided entity, and site- or instance-specific version of an entity.
+  collectionObject.rng
+  
+  A schema defining the structure of an CollectionObject entity.
+    
+  This schema includes all of its components, rather than referring
+  to them via 'externalRef' references. As such, it can be used as the
+  basis for generating a W3C XML Schema (XSD) schema, via
+  James Clark's Trang utility (http://http://www.thaiopensource.com/relaxng/trang.html).
+  (Trang version 20081028 can't resolve such references.) 
+  
+  As a convenience, a 'rng-to-xsd.sh' script file, which trivially wraps Trang
+  to generate XSD from a RELAX NG schema, is provided elsewhere in this distribution.
+  
+  This schema also includes one rudimentary root namespace, scoped for the Release 0.1
+  "Hello World" demo.  We'll need to determine whether, and if so how, we can
+  accommodate multiple namespaces to compose entity objects from various schemas,
+  such as service metadata, and declarations for the default entity, a domain- or community-
+  provided entity, and site- or instance-specific version of an entity.
 
-	This schema was created for the CollectionSpace system,
-	http://www.collectionspace.org/
-	
-	It is written in the XML syntax of the RELAX NG schema language,
-	http://relaxng.org/
-	
+  This schema was created for the CollectionSpace system,
+  http://www.collectionspace.org/
+  
+  It is written in the XML syntax of the RELAX NG schema language,
+  http://relaxng.org/
+  
   $Author: aron $
   $Revision: 57 $
   $Date: 2009-03-05 16:06:06 -0800 (Thu, 05 Mar 2009) $
@@ -34,218 +34,218 @@
 -->
 
 <element
-	name="collectionObject"
-	ns="http://collectionspace.org/hello"
-	xmlns="http://relaxng.org/ns/structure/1.0"
-	datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
-	
-	
-	<!-- ######################################################################## -->
-	<!-- Service Metadata                                                         -->
-	<!-- ######################################################################## -->
-	
-	<!--
-		Data elements common to every entity object in the CollectionSpace system.
-		
-		This is an quickly conceived-of list for the Release 0.1 "Hello World" demo,
-		and is not intended to be definitive going forward; further definition
-		will be required.
-	-->
-	
-	<element
-		name="serviceMetadata">
-		
-		<!--
-			A unique CollectionSpace system identifier (ID) for this
-			entity record.  This is distinguished from any museum-created
-			or other identifiers that might also be associated with it.
-				
-			Note: We may wish to think further about what this element name should be.
-		-->
-		<element name="collectionSpaceId">
-			<!--
-				Note: We may potentially wish to specify a regex-type pattern
-				here for further validating these IDs.
-			-->
-			<data type="string" />
-		</element>
-		
-		<!--
-			All of the data elements after this point are fully optional.
-			
-			It's possible we may never want or need to pass these in
-			routine message payloads, and if so, this merely constitutes
-			notes/documentation on a few representative types of data that
-			we might additionally store as system metadata, beyond an identifier.
-			
-			It's also possible that we might offer a service to provide this
-			system metadata for any object, so that, for instance, a client
-			might be able to retrieve the full modification history for an object.
-			This *may* even already be envisioned for an already defined or
-			candidate service ...
-		-->
-		
-			<!--
-				A timestamp for the creation of this entity record, as specified in
-				http://www.w3.org/TR/xmlschema-2/#dateTime
-			-->
-			<optional>
-				<element name="created">
-					<choice>
-						<data type="dateTime" />
-						<empty />
-					</choice>
-				</element>
-			</optional>
-		
-			<!-- The system Principal that created this entity record -->
-			<optional>
-				<element name="createdBy">
-					<choice>
-						<data type="string" />
-						<empty />
-					</choice>
-				</element>
-			</optional>
-	
-			<!-- 
-				Note: Do we also need 'acting as designate for' information here,
-				for cases where one system Principal created this entity while
-				acting as a designate for another Principal?
-			-->
-		
-			<!--
-				A timestamp for the last modification of this entity record, as specified in
-				http://www.w3.org/TR/xmlschema-2/#dateTime
-			-->
-			<optional>
-				<element name="lastModified">
-					<choice>
-						<data type="dateTime" />
-						<empty />
-					</choice>
-				</element>
-			</optional>
-		
-			<!-- The system Principal that created this entity record -->
-			<optional>
-				<element name="lastModifiedBy">
-					<choice>
-						<data type="string" />
-						<empty />
-					</choice>
-				</element>
-			</optional>
-	
-			<!-- 
-				Note: Do we also need 'acting as designate for' information here,
-				for cases where one system Principal modified this entity while
-				acting as a designate for another Principal?
-			-->
-			
-			<!--
-				Patrick mentioned the concept of 'valid to/from' timestamps.
-				If this applied to entity objects, not to schema, we might
-				explore that further as another possible type of system metadata. 
-			-->
-			
-	</element>
+  name="collectionObject"
+  ns="http://collectionspace.org/hello"
+  xmlns="http://relaxng.org/ns/structure/1.0"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  
+  
+  <!-- ######################################################################## -->
+  <!-- Service Metadata                                                         -->
+  <!-- ######################################################################## -->
+  
+  <!--
+    Data elements common to every entity object in the CollectionSpace system.
+    
+    This is an quickly conceived-of list for the Release 0.1 "Hello World" demo,
+    and is not intended to be definitive going forward; further definition
+    will be required.
+  -->
+  
+  <element
+    name="serviceMetadata">
+    
+    <!--
+      A unique CollectionSpace system identifier (ID) for this
+      entity record.  This is distinguished from any museum-created
+      or other identifiers that might also be associated with it.
+        
+      Note: We may wish to think further about what this element name should be.
+    -->
+    <element name="collectionSpaceId">
+      <!--
+        Note: We may potentially wish to specify a regex-type pattern
+        here for further validating these IDs.
+      -->
+      <data type="string" />
+    </element>
+    
+    <!--
+      All of the data elements after this point are fully optional.
+      
+      It's possible we may never want or need to pass these in
+      routine message payloads, and if so, this merely constitutes
+      notes/documentation on a few representative types of data that
+      we might additionally store as system metadata, beyond an identifier.
+      
+      It's also possible that we might offer a service to provide this
+      system metadata for any object, so that, for instance, a client
+      might be able to retrieve the full modification history for an object.
+      This *may* even already be envisioned for an already defined or
+      candidate service ...
+    -->
+    
+      <!--
+        A timestamp for the creation of this entity record, as specified in
+        http://www.w3.org/TR/xmlschema-2/#dateTime
+      -->
+      <optional>
+        <element name="created">
+          <choice>
+            <data type="dateTime" />
+            <empty />
+          </choice>
+        </element>
+      </optional>
+    
+      <!-- The system Principal that created this entity record -->
+      <optional>
+        <element name="createdBy">
+          <choice>
+            <data type="string" />
+            <empty />
+          </choice>
+        </element>
+      </optional>
+  
+      <!-- 
+        Note: Do we also need 'acting as designate for' information here,
+        for cases where one system Principal created this entity while
+        acting as a designate for another Principal?
+      -->
+    
+      <!--
+        A timestamp for the last modification of this entity record, as specified in
+        http://www.w3.org/TR/xmlschema-2/#dateTime
+      -->
+      <optional>
+        <element name="lastModified">
+          <choice>
+            <data type="dateTime" />
+            <empty />
+          </choice>
+        </element>
+      </optional>
+    
+      <!-- The system Principal that created this entity record -->
+      <optional>
+        <element name="lastModifiedBy">
+          <choice>
+            <data type="string" />
+            <empty />
+          </choice>
+        </element>
+      </optional>
+  
+      <!-- 
+        Note: Do we also need 'acting as designate for' information here,
+        for cases where one system Principal modified this entity while
+        acting as a designate for another Principal?
+      -->
+      
+      <!--
+        Patrick mentioned the concept of 'valid to/from' timestamps.
+        If this applied to entity objects, not to schema, we might
+        explore that further as another possible type of system metadata. 
+      -->
+      
+  </element>
 
 
-	<!-- ######################################################################## -->
-	<!-- Default CollectionObject                                                 -->
-	<!-- ######################################################################## -->
+  <!-- ######################################################################## -->
+  <!-- Default CollectionObject                                                 -->
+  <!-- ######################################################################## -->
 
-	<!-- The default CollectionSpace schema for an entity object (extremely simplified). -->
+  <!-- The default CollectionSpace schema for an entity object (extremely simplified). -->
 
-	<element
-		name="defaultCollectionObject">
-		
-		<!--
-			The following data elements are taken from the Basic section,
-			Object ID Information sub-section, of the Object Data Entry wireframe
-			
-			See:
-			
-			http://wiki.collectionspace.org/display/collectionspace/Wireframes+-+Object+Data+Entry
-			and
-			http://wiki.collectionspace.org/display/collectionspace/Hello+World+(Release+0.1)+Functionality+Requirements
-			
-		-->
-	
-		<!-- Allows child elements to appear in any order -->
-		<interleave>
-		
-			<element name="objectNumber">
-				<!--
-					This declaration specifies that the value of this element must never be empty (blank).
-					If that's not accurate, it should be redefined, perhaps to match other elements below.
-					
-					Note: In a site- or instance-specific declaration - not in the default
-					definition here - we might wish to specify a regex-type pattern here for
-					further constraining valid object numbers.
-				-->
-				<data type="normalizedString">
-					<param name="minLength">1</param>
-				</data>
-			</element>
-	
-			<element name="otherNumber">
-				<choice>
-					<data type="string" />
-					<empty />
-				</choice>
-			</element>
-		
-			<element name="briefDescription">
-				<choice>
-					<data type="string" />
-					<empty />
-				</choice>
-			</element>
-		
-			<element name="comments">
-				<choice>
-					<data type="string" />
-					<empty />
-				</choice>
-			</element>
-		
-			<element name="distinguishingFeatures">
-				<choice>
-					<data type="string" />
-					<empty />
-				</choice>
-			</element>
-		
-			<element name="objectName">
-				<choice>
-					<data type="string" />
-					<empty />
-				</choice>
-			</element>
-		
-			<element name="responsibleDepartment">
-				<choice>
-					<data type="string" />
-					<empty />
-				</choice>
-			</element>
-		
-			<element name="title">
-				<choice>
-					<data type="string" />
-					<empty />
-				</choice>
-			</element>
-	
-		</interleave>
-				
-	</element>	
+  <element
+    name="defaultCollectionObject">
+    
+    <!--
+      The following data elements are taken from the Basic section,
+      Object ID Information sub-section, of the Object Data Entry wireframe
+      
+      See:
+      
+      http://wiki.collectionspace.org/display/collectionspace/Wireframes+-+Object+Data+Entry
+      and
+      http://wiki.collectionspace.org/display/collectionspace/Hello+World+(Release+0.1)+Functionality+Requirements
+      
+    -->
+  
+    <!-- Allows child elements to appear in any order -->
+    <interleave>
+    
+      <element name="objectNumber">
+        <!--
+          This declaration specifies that the value of this element must never be empty (blank).
+          If that's not accurate, it should be redefined, perhaps to match other elements below.
+          
+          Note: In a site- or instance-specific declaration - not in the default
+          definition here - we might wish to specify a regex-type pattern here for
+          further constraining valid object numbers.
+        -->
+        <data type="normalizedString">
+          <param name="minLength">1</param>
+        </data>
+      </element>
+  
+      <element name="otherNumber">
+        <choice>
+          <data type="string" />
+          <empty />
+        </choice>
+      </element>
+    
+      <element name="briefDescription">
+        <choice>
+          <data type="string" />
+          <empty />
+        </choice>
+      </element>
+    
+      <element name="comments">
+        <choice>
+          <data type="string" />
+          <empty />
+        </choice>
+      </element>
+    
+      <element name="distinguishingFeatures">
+        <choice>
+          <data type="string" />
+          <empty />
+        </choice>
+      </element>
+    
+      <element name="objectName">
+        <choice>
+          <data type="string" />
+          <empty />
+        </choice>
+      </element>
+    
+      <element name="responsibleDepartment">
+        <choice>
+          <data type="string" />
+          <empty />
+        </choice>
+      </element>
+    
+      <element name="title">
+        <choice>
+          <data type="string" />
+          <empty />
+        </choice>
+      </element>
+  
+    </interleave>
+        
+  </element>  
 
-	<!-- A domain- or community-provided schema, if available, would go here -->
-	
-	<!-- An site- or instance-provided schema, if available, would go here. -->
-	
+  <!-- A domain- or community-provided schema, if available, would go here -->
+  
+  <!-- An site- or instance-provided schema, if available, would go here. -->
+  
     
 </element>

@@ -16,11 +16,11 @@
 -->
 
 <!--
-	Note: this root element may require a namespace, and it and its
-	child elements may require the corresponding namespace prefix.
+  Note: this root element may require a namespace, and it and its
+  child elements may require the corresponding namespace prefix.
 -->
 <error
-	xmlns="http://collectionspace.org/hello">
-	<errorCode>1005</errorCode>
-	<errorMessage></errorMessage>
+  xmlns="http://collectionspace.org/hello">
+  <errorCode>1005</errorCode>
+  <errorMessage></errorMessage>
 </error>

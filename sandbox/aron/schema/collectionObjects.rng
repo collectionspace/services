@@ -2,26 +2,26 @@
 
 <!--
 
-	collectionObjects.rng
-	
-	A schema defining the structure of an CollectionObject collection
-	(list of multiple CollectionObjects).
-	
-	This schema includes all of its components, rather than referring
-	to them via 'externalRef' references. As such, it can be used as the
-	basis for generating a W3C XML Schema (XSD) schema, via
-	James Clark's Trang utility (http://http://www.thaiopensource.com/relaxng/trang.html).
-	(Trang version 20081028 can't resolve such references.) 
-	
-	As a convenience, a 'rng-to-xsd.sh' script file, which trivially wraps Trang
-	to generate XSD from a RELAX NG schema, is provided elsewhere in this distribution.
+  collectionObjects.rng
+  
+  A schema defining the structure of an CollectionObject collection
+  (list of multiple CollectionObjects).
+  
+  This schema includes all of its components, rather than referring
+  to them via 'externalRef' references. As such, it can be used as the
+  basis for generating a W3C XML Schema (XSD) schema, via
+  James Clark's Trang utility (http://http://www.thaiopensource.com/relaxng/trang.html).
+  (Trang version 20081028 can't resolve such references.) 
+  
+  As a convenience, a 'rng-to-xsd.sh' script file, which trivially wraps Trang
+  to generate XSD from a RELAX NG schema, is provided elsewhere in this distribution.
 
-	This schema was created for the CollectionSpace system,
-	http://www.collectionspace.org/
-	
-	It is written in the XML syntax of the RELAX NG schema language,
-	http://relaxng.org/
-	
+  This schema was created for the CollectionSpace system,
+  http://www.collectionspace.org/
+  
+  It is written in the XML syntax of the RELAX NG schema language,
+  http://relaxng.org/
+  
   $Author: aron $
   $Revision: 57 $
   $Date: 2009-03-05 16:06:06 -0800 (Thu, 05 Mar 2009) $
@@ -29,48 +29,48 @@
 -->
 
 <element
-	name="collectionObjects"
-	ns="http://collectionspace.org/hello"
-	xmlns="http://relaxng.org/ns/structure/1.0"
-	datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  name="collectionObjects"
+  ns="http://collectionspace.org/hello"
+  xmlns="http://relaxng.org/ns/structure/1.0"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
-	<!--
-		Sanjay has used a different naming convention in the Person prototype,
-		which would be equivalent here to "collection-object-list-item", rather than
-		to "collectionObjectListItem", as used below.
-		
-		We may want to standardize on use of CamelCase or hyphenated lowercase throughout, or
-		else establish a convention for list items which is distinct from that convention.
-	-->
-	
-	<zeroOrMore>
-	
-		<element
-			name="collectionObjectListItem">
-			
-			<element name="collectionSpaceId">
-				<data type="string" />
-			</element>
-	
-			<element name="objectNumber">
-				<data type="normalizedString">
-					<param name="minLength">1</param>
-				</data>
-			</element>
-	
-			<element name="objectName">
-				<choice>
-					<data type="string" />
-					<empty />
-				</choice>
-			</element>
-	
-			<element name="uri">
-				<data type="anyURI" />
-			</element>
+  <!--
+    Sanjay has used a different naming convention in the Person prototype,
+    which would be equivalent here to "collection-object-list-item", rather than
+    to "collectionObjectListItem", as used below.
+    
+    We may want to standardize on use of CamelCase or hyphenated lowercase throughout, or
+    else establish a convention for list items which is distinct from that convention.
+  -->
+  
+  <zeroOrMore>
+  
+    <element
+      name="collectionObjectListItem">
+      
+      <element name="collectionSpaceId">
+        <data type="string" />
+      </element>
+  
+      <element name="objectNumber">
+        <data type="normalizedString">
+          <param name="minLength">1</param>
+        </data>
+      </element>
+  
+      <element name="objectName">
+        <choice>
+          <data type="string" />
+          <empty />
+        </choice>
+      </element>
+  
+      <element name="uri">
+        <data type="anyURI" />
+      </element>
 
-		</element>
-		
-	</zeroOrMore>
+    </element>
+    
+  </zeroOrMore>
     
 </element>

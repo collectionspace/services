@@ -12,10 +12,10 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element ref="hello:collectionSpaceId"/>
-        <xs:element ref="hello:created"/>
-        <xs:element ref="hello:createdBy"/>
-        <xs:element ref="hello:lastModified"/>
-        <xs:element ref="hello:lastModifiedBy"/>
+        <xs:element minOccurs="0" ref="hello:created"/>
+        <xs:element minOccurs="0" ref="hello:createdBy"/>
+        <xs:element minOccurs="0" ref="hello:lastModified"/>
+        <xs:element minOccurs="0" ref="hello:lastModifiedBy"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -68,13 +68,13 @@
     <xs:complexType>
       <xs:all>
         <xs:element ref="hello:objectNumber"/>
-        <xs:element minOccurs="0" ref="hello:otherNumber"/>
-        <xs:element minOccurs="0" ref="hello:briefDescription"/>
-        <xs:element minOccurs="0" ref="hello:comments"/>
-        <xs:element minOccurs="0" ref="hello:distinguishingFeatures"/>
-        <xs:element minOccurs="0" ref="hello:objectName"/>
-        <xs:element minOccurs="0" ref="hello:responsibleDepartment"/>
-        <xs:element minOccurs="0" ref="hello:title"/>
+        <xs:element ref="hello:otherNumber"/>
+        <xs:element ref="hello:briefDescription"/>
+        <xs:element ref="hello:comments"/>
+        <xs:element ref="hello:distinguishingFeatures"/>
+        <xs:element ref="hello:objectName"/>
+        <xs:element ref="hello:responsibleDepartment"/>
+        <xs:element ref="hello:title"/>
       </xs:all>
     </xs:complexType>
   </xs:element>
