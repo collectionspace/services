@@ -5,9 +5,9 @@
 #
 # Requires two arguments:
 # - Filename of the RELAX NG schema document.
-#   (or the full path to this document, if it is not in the current directory)
-# - Filename of the XML instance document
-#   (or the full path to this document, if it is not in the current directory)
+#   (Or the full path to this document, if it is not in the current directory.)
+# - Filename of the XML instance document.
+#   (Or the full path to this document, if it is not in the current directory.)
 #
 # $Author: aron $
 # $Revision: 57 $
