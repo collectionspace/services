@@ -1,15 +1,14 @@
-
-This project is a simple example showing usage of @Path, @GET, PUT, POST, and @PathParam.  It uses pure streaming
-output as well. 
+Helloworld service interfacing with Nuxeo repository through Nuxeo
+REST apis.
 
 System Requirements:
 ====================
 - Maven 2.0.9 or higher
+- Nuxeo CollectionSpace Extensions
 
 Building the project:
 ====================
-1. In root directoy
-
-mvn clean install
-
-This will build a WAR and run it with embedded Jetty
+In root directoy...
+1. customize build.properties for your environment
+2. mvn clean package
+3. ant
