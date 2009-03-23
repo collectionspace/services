@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://collectionspace.org/hello" xmlns:hello="http://collectionspace.org/hello">
+  <xs:element name="collectionObjectList">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="hello:collectionObjectListItem"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="collectionObjectListItem">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="hello:collectionSpaceId"/>
+        <xs:element ref="hello:objectNumber"/>
+        <xs:element ref="hello:objectName"/>
+        <xs:element ref="hello:uri"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="collectionSpaceId" type="xs:string"/>
+  <xs:element name="objectNumber">
+    <xs:simpleType>
+      <xs:restriction base="xs:normalizedString">
+        <xs:minLength value="1"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="objectName">
+    <xs:simpleType>
+      <xs:union memberTypes="xs:string">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:length value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:union>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="uri" type="xs:anyURI"/>
+</xs:schema>

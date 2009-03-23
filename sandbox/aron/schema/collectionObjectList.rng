@@ -2,7 +2,7 @@
 
 <!--
 
-  collectionObjects.rng
+  collectionObjectList.rng
   
   A schema defining the structure of an CollectionObject collection
   (list of multiple CollectionObjects).
@@ -29,7 +29,7 @@
 -->
 
 <element
-  name="collectionObjects"
+  name="collectionObjectList"
   ns="http://collectionspace.org/hello"
   xmlns="http://relaxng.org/ns/structure/1.0"
   datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
