@@ -59,6 +59,28 @@
         </xs:complexType>
     </xs:element>
 
+    <!-- people as in nuxeo repository -->
+    <xs:element name="people">
+        <xs:complexType>
+            <xs:sequence>
+
+                 <xs:element name="people-item" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="title" type="xs:string"
+						minOccurs="1" />
+                            <!-- uri to retrive person details -->
+                            <xs:element name="uri" type="xs:anyURI"
+						minOccurs="1" />
+                            <xs:element name="id" type="xs:string"
+						minOccurs="1" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
     <xs:element name="identifier">
         <xs:complexType>
 
