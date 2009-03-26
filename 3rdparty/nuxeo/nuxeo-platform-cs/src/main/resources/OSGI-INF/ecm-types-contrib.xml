@@ -8,7 +8,7 @@
 
       <layouts mode="any">
         <layout>heading</layout>
-        <layout>person</layout>
+        <layout>hello</layout>
       </layouts>
       <!--layout>
         <widget jsfcomponent="h:inputText"

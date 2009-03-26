@@ -5,7 +5,7 @@
   <extension target="org.nuxeo.ecm.platform.forms.layout.WebLayoutManager"
     point="layouts">
 
-    <layout name="person">
+    <layout name="hello">
       <templates>
         <template mode="any">/layouts/layout_default_template.xhtml</template>
       </templates>
@@ -26,7 +26,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="hello">person.cid</field>
+          <field schema="hello">cid</field>
         </fields>
         <widgetModes>
           <!-- not shown in create mode -->
@@ -47,7 +47,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="hello">person.cversion</field>
+          <field schema="hello">cversion</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -61,7 +61,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="hello">person.firstName</field>
+          <field schema="hello">firstName</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -74,7 +74,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="hello">person.lastName</field>
+          <field schema="hello">lastName</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -87,7 +87,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="hello">person.street</field>
+          <field schema="hello">street</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -100,7 +100,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="hello">person.city</field>
+          <field schema="hello">city</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -113,7 +113,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="hello">person.state</field>
+          <field schema="hello">state</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -126,7 +126,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="hello">person.zip</field>
+          <field schema="hello">zip</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -139,7 +139,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="hello">person.country</field>
+          <field schema="hello">country</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>

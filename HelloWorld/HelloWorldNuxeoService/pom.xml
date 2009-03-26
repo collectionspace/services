@@ -7,10 +7,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.hello.services</groupId>
-    <artifactId>helloworld-doc-service</artifactId>
+    <artifactId>helloworld-nuxeo-service</artifactId>
     <packaging>war</packaging>
     <version>0.1</version>
-    <name>Helloworld Document Service</name>
+    <name>Helloworld Nuxeo Service</name>
 
     <repositories>
         <repository>

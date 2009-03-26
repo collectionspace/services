@@ -4,13 +4,13 @@ import javax.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Set;
 
-public class HelloworldDocApplication extends Application {
+public class HelloworldNuxeoApplication extends Application {
 
     private Set<Object> singletons = new HashSet<Object>();
     private Set<Class<?>> empty = new HashSet<Class<?>>();
 
-    public HelloworldDocApplication() {
-        singletons.add(new PersonDocResource());
+    public HelloworldNuxeoApplication() {
+        singletons.add(new PersonNuxeoResource());
     }
 
     @Override
