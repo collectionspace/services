@@ -10,6 +10,7 @@ public class HelloworldApplication extends Application {
     private Set<Class<?>> empty = new HashSet<Class<?>>();
 
     public HelloworldApplication() {
+        singletons.add(new CollectionObjectResource());
         singletons.add(new PersonResource());
         singletons.add(new IdentifierResource());
     }
