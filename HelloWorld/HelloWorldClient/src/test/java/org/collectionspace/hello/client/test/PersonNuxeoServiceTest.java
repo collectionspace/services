@@ -52,7 +52,7 @@ public class PersonNuxeoServiceTest {
 
     @Test(dependsOnMethods = {"createPerson"})
     public void updatePerson() {
-        PersonNuxeo touPerson = new PersonNuxeo();//personClient.getPerson(updateId).getEntity();
+        PersonNuxeo touPerson = personClient.getPerson(updateId).getEntity(); 
         touPerson.setId(updateId);
         verbose("got person to update", touPerson, PersonNuxeo.class);
         touPerson.setFirstName("Patrick");

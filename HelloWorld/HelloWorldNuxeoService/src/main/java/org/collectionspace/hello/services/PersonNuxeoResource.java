@@ -29,6 +29,7 @@ import org.collectionspace.hello.*;
 import org.collectionspace.hello.People.PeopleItem;
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.dom4j.Namespace;
 import org.dom4j.io.SAXReader;
 import org.restlet.resource.Representation;
 import org.slf4j.Logger;
@@ -87,7 +88,7 @@ public class PersonNuxeoResource {
         pathParams.add("createDocument");
         queryParams.put("docType", "Hello");
         queryParams.put("dublincore:title", p.getFirstName() + " " + p.getLastName());
-        queryParams.put("hello:cversion", p.getVersion());
+        queryParams.put("hello:cversion", Integer.valueOf(1).toString());
         queryParams.put("hello:firstName", p.getFirstName());
         queryParams.put("hello:lastName", p.getLastName());
         queryParams.put("hello:street", p.getStreet());
@@ -125,7 +126,73 @@ public class PersonNuxeoResource {
     @GET
     @Path("{id}")
     public PersonNuxeo getPerson(@PathParam("id") String id) {
+
         PersonNuxeo p = null;
+        try{
+
+            NuxeoRESTClient nxClient = getClient();
+
+            List<String> pathParams = new ArrayList<String>();
+            Map<String, String> queryParams = new HashMap<String, String>();
+
+            pathParams.add("default");
+            pathParams.add(id);
+            pathParams.add("export");
+            queryParams.put("format", "XML");
+
+            Representation res = nxClient.get(pathParams, queryParams);
+            SAXReader reader = new SAXReader();
+
+            Document document = reader.read(res.getStream());
+            Element root = document.getRootElement();
+            p = new PersonNuxeo();
+            //TODO: recognize schema thru namespace uri
+//            Namespace ns = new Namespace("hello", "http://collectionspace.org/hello");
+            Iterator<Element> siter = root.elementIterator("schema");
+            while(siter.hasNext()){
+
+                Element s = siter.next();
+
+                //TODO: recognize schema thru namespace uri
+                if("hello".equals(s.attribute("name").getValue())){
+                    p.setId(id);
+                    Element ele = s.element("cversion");
+                    if(ele != null){
+                        p.setVersion((String) ele.getData());
+                    }
+                    ele = s.element("firstName");
+                    if(ele != null){
+                        p.setFirstName((String) ele.getData());
+                    }
+                    ele = s.element("lastName");
+                    if(ele != null){
+                        p.setLastName((String) ele.getData());
+                    }
+                    ele = s.element("city");
+                    if(ele != null){
+                        p.setCity((String) ele.getData());
+                    }
+                    ele = s.element("state");
+                    if(ele != null){
+                        p.setState((String) ele.getData());
+                    }
+                    ele = s.element("zip");
+                    if(ele != null){
+                        p.setZip((String) ele.getData());
+                    }
+                    ele = s.element("country");
+                    if(ele != null){
+                        p.setCountry((String) ele.getData());
+                    }
+                }
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+            Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    "Get failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
         if(p == null){
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Get failed, the requested person ID:" + id + ": was not found.").type("text/plain").build();
@@ -137,7 +204,9 @@ public class PersonNuxeoResource {
 
     @PUT
     @Path("{id}")
-    public PersonNuxeo updatePerson(@PathParam("id") String id, PersonNuxeo update) {
+    public PersonNuxeo updatePerson(
+            @PathParam("id") String id,
+            PersonNuxeo update) {
 
         verbose("updating person input", update);
 
@@ -153,24 +222,31 @@ public class PersonNuxeoResource {
         if(update.getFirstName() != null){
             queryParams.put("hello:firstName", update.getFirstName());
         }
+
         if(update.getLastName() != null){
             queryParams.put("hello:lastName", update.getLastName());
         }
+
         if(update.getFirstName() != null && update.getLastName() != null){
             queryParams.put("dublincore:title", update.getFirstName() + " " + update.getLastName());
         }
+
         if(update.getStreet() != null){
             queryParams.put("hello:street", update.getStreet());
         }
+
         if(update.getCity() != null){
             queryParams.put("hello:city", update.getCity());
         }
+
         if(update.getState() != null){
             queryParams.put("hello:state", update.getState());
         }
+
         if(update.getZip() != null){
             queryParams.put("hello:zip", update.getZip());
         }
+
         if(update.getCountry() != null){
             queryParams.put("hello:country", update.getCountry());
         }
@@ -195,7 +271,6 @@ public class PersonNuxeoResource {
                     "Update failed ").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        //returning the same? ... for now
         return update;
     }
 
@@ -229,6 +304,7 @@ public class PersonNuxeoResource {
                     "Delete failed ").type("text/plain").build();
             throw new WebApplicationException(response);
         }
+
     }
 
     private void verbose(String msg, PersonNuxeo p) {
