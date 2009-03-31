@@ -56,6 +56,7 @@ public class PersonNuxeoResource {
             Map<String, String> queryParams = new HashMap<String, String>();
             //browse default repository for People
             //For sanjay, People repository id is f084243e-4b81-42a1-9a05-518e974facbd
+            //For Richard, workspace repos ID is 77187c27-0467-4c3d-b395-122b82113f4d
             pathParams = Arrays.asList("default", "f084243e-4b81-42a1-9a05-518e974facbd", "browse");
             Representation res = nxClient.get(pathParams, queryParams);
             SAXReader reader = new SAXReader();
