@@ -32,7 +32,7 @@ public class IdentifierClient {
     private IdentifierClient() {
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         RegisterBuiltin.register(factory);
-        identifierProxy = ProxyFactory.create(IdentifierProxy.class, "http://localhost:8080/helloworld/cspace");
+        identifierProxy = ProxyFactory.create(IdentifierProxy.class, "http://localhost:8080/helloworld/cspace-nuxeo");
     }
 
     /**

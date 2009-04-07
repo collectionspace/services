@@ -11,6 +11,7 @@ public class HelloworldNuxeoApplication extends Application {
 
     public HelloworldNuxeoApplication() {
         singletons.add(new CollectionObjectResource());
+        singletons.add(new IdentifierResource());
         singletons.add(new PersonNuxeoResource());
     }
 

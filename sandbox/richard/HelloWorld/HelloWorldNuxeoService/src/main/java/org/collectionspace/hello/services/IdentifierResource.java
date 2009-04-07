@@ -29,6 +29,7 @@ public class IdentifierResource {
     private AtomicLong idCounter = new AtomicLong();
 
     public IdentifierResource() {
+    	// do nothing
     }
 
     @POST
