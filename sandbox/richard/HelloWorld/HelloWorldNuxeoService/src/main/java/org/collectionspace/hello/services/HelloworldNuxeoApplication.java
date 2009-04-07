@@ -10,6 +10,7 @@ public class HelloworldNuxeoApplication extends Application {
     private Set<Class<?>> empty = new HashSet<Class<?>>();
 
     public HelloworldNuxeoApplication() {
+        singletons.add(new CollectionObjectResource());
         singletons.add(new PersonNuxeoResource());
     }
 
