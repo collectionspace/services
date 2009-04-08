@@ -115,5 +115,38 @@
 
         </xs:complexType>
     </xs:element>
+    
+    <!-- collection-object  -->
+    <xs:element name="collection-object">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="csid" type="xs:string" minOccurs="1" />
+                <xs:element name="identifier" type="xs:string" minOccurs="1" />
+                <xs:element name="description" type="xs:string" minOccurs="1" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- collection objects as in nuxeo repository -->
+    <xs:element name="collection-object-list">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="collection-object-list-item" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="identifier" type="xs:string"
+                                minOccurs="1" />
+                            <!-- uri to retrive person details -->
+                            <xs:element name="uri" type="xs:anyURI"
+                                minOccurs="1" />
+                            <xs:element name="csid" type="xs:string"
+                                minOccurs="1" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
 </xs:schema>
 
