@@ -12,19 +12,18 @@ import org.testng.annotations.Test;
 
 import org.collectionspace.hello.CollectionObject;
 import org.collectionspace.hello.CollectionObjectList;
-import org.collectionspace.hello.PersonNuxeo;
 import org.collectionspace.hello.client.CollectionObjectClient;
 
 /**
- * A PersonNuxeoServiceTest.
+ * A CollectionObjectNuxeoServiceTest.
  * 
  * @version $Revision:$
  */
 public class CollectionObjectServiceTest {
 
     private CollectionObjectClient collectionObjectClient = CollectionObjectClient.getInstance();
-    private String updateId = "";
-    private String deleteId = "";
+    private String updateId = null;
+    private String deleteId = null;
 
     @Test
     public void createCollectionObject() {
@@ -35,23 +34,26 @@ public class CollectionObjectServiceTest {
         Assert.assertEquals(res.getStatus(), Response.Status.CREATED.getStatusCode());
         
         //store updateId locally for "update" test
-        updateId = extractId(res);        
+        if (updateId == null)
+        	updateId = extractId(res);
+        else
+        	deleteId = extractId(res);
     }
 
     @Test(dependsOnMethods = {"createCollectionObject"})
-    public void updatePerson() {
+    public void updateCollectionObject() {
     	ClientResponse<CollectionObject> res = collectionObjectClient.getCollectionObject(updateId);
         CollectionObject collectionObject = res.getEntity();
         verbose("got collectionobject to update: " + updateId,
         		collectionObject, CollectionObject.class);
         
-        collectionObject.setCsid("updated-" + updateId);
+        //collectionObject.setCsid("updated-" + updateId);
         collectionObject.setIdentifier("updated-" + collectionObject.getIdentifier());
         collectionObject.setDescription("updated-" + collectionObject.getDescription());
         
         res = collectionObjectClient.updateCollectionObject(updateId, collectionObject);
         CollectionObject updatedCollectionObject = res.getEntity();
-        Assert.assertEquals(updatedCollectionObject.getDescription(), "updated-" + collectionObject.getDescription());
+        Assert.assertEquals(updatedCollectionObject.getDescription(), collectionObject.getDescription());
 
         verbose("updated collectionObject", updatedCollectionObject, CollectionObject.class);
         
@@ -114,7 +116,7 @@ public class CollectionObjectServiceTest {
     }
 
     private void verbose(String msg) {
-        System.out.println("PersonServiceTest : " + msg);
+        System.out.println("CollectionObjectServiceTest : " + msg);
     }
 
     private void verbose(String msg, Object o, Class clazz) {
