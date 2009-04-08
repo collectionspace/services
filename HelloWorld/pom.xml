@@ -11,8 +11,9 @@
     <name>HelloWorld</name>
     <modules>
         <module>HelloWorldJaxb</module>
-        <module>HelloWorldService</module>
         <module>HelloWorldClient</module>
+        <module>HelloWorldService</module>
+        <module>HelloWorldNuxeoService</module>
     </modules>
     <repositories>
         <repository>
