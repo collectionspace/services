@@ -13,7 +13,7 @@
         <module>HelloWorldJaxb</module>
         <module>HelloWorldClient</module>
         <module>HelloWorldService</module>
-        <module>HelloWorldNuxeoService</module>
+<!--        <module>HelloWorldNuxeoService</module> -->
     </modules>
     <repositories>
         <repository>
