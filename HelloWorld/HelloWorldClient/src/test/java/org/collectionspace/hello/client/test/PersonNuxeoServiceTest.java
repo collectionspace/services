@@ -48,11 +48,41 @@ public class PersonNuxeoServiceTest {
         res = personClient.createPerson(person);
         Assert.assertEquals(res.getStatus(), Response.Status.CREATED.getStatusCode());
 
+        person = createPerson("Megan", "Forbes");
+        person.setCity("NewYork");
+        person.setState("NY");
+        person.setZip("01234");
+        res = personClient.createPerson(person);
+        Assert.assertEquals(res.getStatus(), Response.Status.CREATED.getStatusCode());
+
+        person = createPerson("Carl", "Goodman");
+        person.setCity("NewYork");
+        person.setState("NY");
+        person.setZip("01234");
+        res = personClient.createPerson(person);
+        Assert.assertEquals(res.getStatus(), Response.Status.CREATED.getStatusCode());
+
+        person = createPerson("Dan", "Sheppard");
+        person.setCity("Cambridge");
+        person.setState("ZZ");
+        person.setCountry("UK");
+        person.setZip("UK-01234");
+        res = personClient.createPerson(person);
+        Assert.assertEquals(res.getStatus(), Response.Status.CREATED.getStatusCode());
+
+        person = createPerson("Colin", "Clark");
+        person.setCity("Toranto");
+        person.setState("ON");
+        person.setCountry("CA");
+        person.setZip("CA-01234");
+        res = personClient.createPerson(person);
+        Assert.assertEquals(res.getStatus(), Response.Status.CREATED.getStatusCode());
+
     }
 
     @Test(dependsOnMethods = {"createPerson"})
     public void updatePerson() {
-        PersonNuxeo touPerson = personClient.getPerson(updateId).getEntity(); 
+        PersonNuxeo touPerson = personClient.getPerson(updateId).getEntity();
         touPerson.setId(updateId);
         verbose("got person to update", touPerson, PersonNuxeo.class);
         touPerson.setFirstName("Patrick");
@@ -103,7 +133,7 @@ public class PersonNuxeoServiceTest {
         String uri = (String) ((ArrayList) mvm.get("Location")).get(0);
         String[] segments = uri.split("/");
         String id = segments[segments.length - 1];
-        verbose("id=" + id);
+        verbose("extractId: id=" + id);
         return id;
     }
 
