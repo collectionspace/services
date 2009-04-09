@@ -129,16 +129,22 @@ public class NuxeoRESTClient {
 
         if (queryParams != null) {
             urlBuffer.append('?');
+            
+            String qpValue = null;
             for (String qpName : queryParams.keySet()) {
                 urlBuffer.append(qpName);
                 urlBuffer.append('=');
-                urlBuffer.append(queryParams.get(qpName).replaceAll(" ", "%20"));
+                qpValue = queryParams.get(qpName);
+                if (qpValue != null) {
+                	urlBuffer.append(qpValue.replaceAll(" ", "%20"));
+                }
                 urlBuffer.append('&');
             }
         }
 
         String completeURL = urlBuffer.toString();
-
+        // debug statement should be made conditional
+        System.err.println("CollectionSpace: The complete post URL is: " + completeURL);
         Request request = new Request(Method.POST, completeURL);
 
         setupAuth(request);
