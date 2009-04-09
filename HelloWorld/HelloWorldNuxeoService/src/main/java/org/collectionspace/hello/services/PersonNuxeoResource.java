@@ -55,7 +55,7 @@ public class PersonNuxeoResource implements CollectionSpaceResource {
             List<String> pathParams = new ArrayList<String>();
             Map<String, String> queryParams = new HashMap<String, String>();
 
-            pathParams = Arrays.asList("default", CS_NUXEO_WORKSPACE_UID, "browse");
+            pathParams = Arrays.asList(CS_NUXEO_DEFAULT_REPOS, CS_NUXEO_WORKSPACE_UID, "browse");
             Representation res = nxClient.get(pathParams, queryParams);
             SAXReader reader = new SAXReader();
             Document document = reader.read(res.getStream());
@@ -82,7 +82,7 @@ public class PersonNuxeoResource implements CollectionSpaceResource {
 
         List<String> pathParams = new ArrayList<String>();
         Map<String, String> queryParams = new HashMap<String, String>();
-        pathParams.add("default");
+        pathParams.add(CS_NUXEO_DEFAULT_REPOS);
         pathParams.add(CS_NUXEO_WORKSPACE_UID);
         pathParams.add("createDocument");
         queryParams.put("docType", "Hello");
@@ -96,7 +96,7 @@ public class PersonNuxeoResource implements CollectionSpaceResource {
         queryParams.put("hello:zip", p.getZip());
         queryParams.put("hello:country", p.getCountry());
         ByteArrayInputStream bais = new ByteArrayInputStream(new byte[0]);
-        Representation res = nxClient.post(pathParams, queryParams, bais);
+        Representation res = nxClient.post(pathParams, queryParams,bais);
 
         SAXReader reader = new SAXReader();
         try{
@@ -355,7 +355,7 @@ public class PersonNuxeoResource implements CollectionSpaceResource {
 //
 //    }
     private NuxeoRESTClient getClient() {
-        NuxeoRESTClient nxClient = new NuxeoRESTClient("http://127.0.0.1:8080/nuxeo");
+        NuxeoRESTClient nxClient = new NuxeoRESTClient(CS_NUXEO_URI);
         nxClient.setAuthType(NuxeoRESTClient.AUTH_TYPE_BASIC);
         nxClient.setBasicAuthentication("Administrator", "Administrator");
         return nxClient;

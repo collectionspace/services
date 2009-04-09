@@ -143,8 +143,7 @@ public class NuxeoRESTClient {
         }
 
         String completeURL = urlBuffer.toString();
-        // debug statement should be made conditional
-        System.err.println("CollectionSpace: The complete post URL is: " + completeURL);
+        System.out.println("\nNuxeoRESTClient: calling " + completeURL);
         Request request = new Request(Method.POST, completeURL);
 
         setupAuth(request);
