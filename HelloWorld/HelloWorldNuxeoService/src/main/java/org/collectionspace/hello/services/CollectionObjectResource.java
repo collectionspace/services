@@ -67,12 +67,15 @@ public class CollectionObjectResource implements CollectionSpaceResource {
             Document document = reader.read(res.getStream());
             Element root = document.getRootElement();
             
+            //debug
             System.err.println(res.toString());
-            System.err.println(document.toString());
+            System.err.println(document.asXML());
 
             List<CollectionObjectList.CollectionObjectListItem> list = p.getCollectionObjectListItem();
             for(Iterator i = root.elementIterator(); i.hasNext();){
                 Element element = (Element) i.next();
+                //debug
+                System.err.println();element.asXML();
 
                 // set the CollectionObject list item entity elements                
                 CollectionObjectListItem pli = new CollectionObjectListItem();
