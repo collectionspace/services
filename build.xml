@@ -17,6 +17,7 @@
         <property name="jboss.server" value="${jboss.home}/server/${jboss.config}" />
         <property name="jboss.deploy" value="${jboss.server}/deploy" />
         <property name="jboss.lib" value="${jboss.server}/lib" />
+        <property name="nuxeo.deploy" value="${jboss.deploy}/nuxeo.ear" />
     </target>
 
 
@@ -44,6 +45,22 @@
 
     <target name="dist" depends="compile"
         description="generate the distribution" >
+        <fail message="JBoss is not installed or ${jboss.dir} not found">
+            <condition>
+                <not>
+                    <available file="${jboss.dir}" type="dir"/>
+                </not>
+            </condition>
+        </fail>
+
+        <fail message="Nuxeo is not deployed or ${nuxeo.deploy} not found">
+            <condition>
+                <not>
+                    <available file="${nuxeo.deploy}" type="dir"/>
+                </not>
+            </condition>
+        </fail>
+
     <!-- Create the distribution directory -->
         <mkdir dir="${dist}"/>
 
