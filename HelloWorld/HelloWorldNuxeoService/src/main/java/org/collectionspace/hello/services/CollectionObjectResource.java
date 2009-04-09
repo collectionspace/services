@@ -66,6 +66,9 @@ public class CollectionObjectResource implements CollectionSpaceResource {
             SAXReader reader = new SAXReader();
             Document document = reader.read(res.getStream());
             Element root = document.getRootElement();
+            
+            System.err.println(res.toString());
+            System.err.println(document.toString());
 
             List<CollectionObjectList.CollectionObjectListItem> list = p.getCollectionObjectListItem();
             for(Iterator i = root.elementIterator(); i.hasNext();){
@@ -73,9 +76,9 @@ public class CollectionObjectResource implements CollectionSpaceResource {
 
                 // set the CollectionObject list item entity elements                
                 CollectionObjectListItem pli = new CollectionObjectListItem();
-                pli.setObjectNumber(element.attributeValue(CollectionObjectListItemJAXBSchema.OBJECT_NUMBER));
-                pli.setUri(element.attributeValue(CollectionObjectListItemJAXBSchema.URI));
-                pli.setCsid(element.attributeValue(CollectionObjectListItemJAXBSchema.CSID));
+                pli.setObjectNumber(element.attributeValue("title"));
+                pli.setUri(element.attributeValue("url"));
+                pli.setCsid(element.attributeValue("id"));
                 list.add(pli);
             }
 
