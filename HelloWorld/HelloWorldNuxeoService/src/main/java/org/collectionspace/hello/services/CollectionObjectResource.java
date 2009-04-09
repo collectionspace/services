@@ -1,7 +1,6 @@
 package org.collectionspace.hello.services;
 
 import java.io.ByteArrayInputStream;
-import org.collectionspace.hello.services.nuxeo.NuxeoRESTClient;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,7 +25,11 @@ import javax.xml.bind.Marshaller;
 import org.collectionspace.hello.*;
 
 
+import org.collectionspace.hello.services.nuxeo.NuxeoRESTClient;
 import org.collectionspace.hello.CollectionObjectList.CollectionObjectListItem;
+import org.collectionspace.hello.services.CollectionObjectJAXBSchema;
+import org.collectionspace.hello.services.CollectionObjectListItemJAXBSchema;
+
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Namespace;
@@ -38,10 +41,11 @@ import org.slf4j.LoggerFactory;
 @Path("/collectionobjects")
 @Consumes("application/xml")
 @Produces("application/xml")
-public class CollectionObjectResource {
+public class CollectionObjectResource implements CollectionSpaceResource {
 
-	final static String NUXEO_WORKSPACE_UID = "776a8787-9d81-41b0-a02c-1ba674638c0a";
-	final static String NUXEO_DOCTYPE = "CollectionObject";
+	final static String CO_NUXEO_DOCTYPE = "CollectionObject";
+	final static String CO_NUXEO_SCHEMA_NAME = "collectionobject";
+	final static String CO_NUXEO_DC_TITLE = "CollectionSpace-CollectionObject";
 	
     final Logger logger = LoggerFactory.getLogger(CollectionObjectResource.class);
 
@@ -53,29 +57,32 @@ public class CollectionObjectResource {
     public CollectionObjectList getCollectionObjectList(@Context UriInfo ui) {
     	CollectionObjectList p = new CollectionObjectList();
         try{
-            List<CollectionObjectList.CollectionObjectListItem> list = p.getCollectionObjectListItem();
             NuxeoRESTClient nxClient = getClient();
 
             List<String> pathParams = new ArrayList<String>();
             Map<String, String> queryParams = new HashMap<String, String>();
-            pathParams = Arrays.asList("default", NUXEO_WORKSPACE_UID, "browse");
+            pathParams = Arrays.asList("default", CS_NUXEO_WORKSPACE_UID, "browse");
             Representation res = nxClient.get(pathParams, queryParams);
             SAXReader reader = new SAXReader();
             Document document = reader.read(res.getStream());
             Element root = document.getRootElement();
+
+            List<CollectionObjectList.CollectionObjectListItem> list = p.getCollectionObjectListItem();
             for(Iterator i = root.elementIterator(); i.hasNext();){
                 Element element = (Element) i.next();
+
+                // set the CollectionObject list item entity elements                
                 CollectionObjectListItem pli = new CollectionObjectListItem();
-                //
-                pli.setCsid(element.attributeValue("csid"));
-                pli.setUri(element.attributeValue("url"));
-                pli.setIdentifier(element.attributeValue("identifier"));
+                pli.setObjectNumber(element.attributeValue(CollectionObjectListItemJAXBSchema.OBJECT_NUMBER));
+                pli.setUri(element.attributeValue(CollectionObjectListItemJAXBSchema.URI));
+                pli.setCsid(element.attributeValue(CollectionObjectListItemJAXBSchema.CSID));
                 list.add(pli);
             }
 
         }catch(Exception e){
             e.printStackTrace();
         }
+        
         return p;
     }
 
@@ -87,19 +94,35 @@ public class CollectionObjectResource {
         List<String> pathParams = new ArrayList<String>();
         Map<String, String> queryParams = new HashMap<String, String>();
         pathParams.add("default");
-        pathParams.add(NUXEO_WORKSPACE_UID);
+        pathParams.add(CS_NUXEO_WORKSPACE_UID);
         pathParams.add("createDocument");
-        queryParams.put("docType", NUXEO_DOCTYPE);
+        queryParams.put("docType", CO_NUXEO_DOCTYPE);
         
-        queryParams.put("dublincore:title", co.getIdentifier());
+        // a default title for the Dublin Core schema
+        queryParams.put("dublincore:title", CO_NUXEO_DC_TITLE);
+        
         // CollectionObject core values
-        queryParams.put("collectionobject:csid", Integer.valueOf(1).toString());
-        queryParams.put("collectionobject:identifier", co.getIdentifier());
-        queryParams.put("collectionobject:description", co.getDescription());
-
+        queryParams.put(CO_NUXEO_SCHEMA_NAME + ":" + CollectionObjectJAXBSchema.OBJECT_NUMBER, 
+        		co.getObjectNumber());
+        queryParams.put(CO_NUXEO_SCHEMA_NAME + ":" + CollectionObjectJAXBSchema.OTHER_NUMBER, 
+        		co.getOtherNumber());
+        queryParams.put(CO_NUXEO_SCHEMA_NAME + ":" + CollectionObjectJAXBSchema.BRIEF_DESCRIPTION,
+        		co.getBriefDescription());
+        queryParams.put(CO_NUXEO_SCHEMA_NAME + ":" + CollectionObjectJAXBSchema.COMMENTS,
+        		co.getComments());
+        queryParams.put(CO_NUXEO_SCHEMA_NAME + ":" + CollectionObjectJAXBSchema.DIST_FEATURES,
+        		co.getDistFeatures());
+        queryParams.put(CO_NUXEO_SCHEMA_NAME + ":" + CollectionObjectJAXBSchema.OBJECT_NAME,
+        		co.getObjectName());
+        queryParams.put(CO_NUXEO_SCHEMA_NAME + ":" + CollectionObjectJAXBSchema.RESPONSIBLE_DEPT,
+        		co.getResponsibleDept());
+        queryParams.put(CO_NUXEO_SCHEMA_NAME + ":" + CollectionObjectJAXBSchema.TITLE,
+        		co.getTitle());
+        
         ByteArrayInputStream bais = new ByteArrayInputStream(new byte[0]);
         Representation res = nxClient.post(pathParams, queryParams, bais);
 
+        String csid = null;
         SAXReader reader = new SAXReader();
         try {
             Document document = reader.read(res.getStream());
@@ -107,8 +130,7 @@ public class CollectionObjectResource {
             for (Iterator i = root.elementIterator(); i.hasNext();){
                 Element element = (Element) i.next();
                 if ("docRef".equals(element.getName())){
-                    String id = (String) element.getData();
-                    co.setCsid(id);
+                    csid = (String) element.getData();
                 }
             }
         } catch(Exception e){
@@ -117,9 +139,9 @@ public class CollectionObjectResource {
             throw new WebApplicationException(response);
         }
 
-        verbose("created collectionobject", co);
+        verbose("createCollectionObject: ", co);
         UriBuilder path = UriBuilder.fromResource(PersonNuxeoResource.class);
-        path.path("" + co.getCsid());
+        path.path("" + csid);
         Response response = Response.created(path.build()).build();
         
         return response;
@@ -157,19 +179,41 @@ public class CollectionObjectResource {
                 System.err.println("CollectionObject.getCollectionObject() called.");
 
                 //TODO: recognize schema thru namespace uri
-                if ("collectionobject".equals(schemaElement.attribute("name").getValue())){
-                    co.setCsid(csid);
-                    Element ele = schemaElement.element("identifier");
+                if (CO_NUXEO_SCHEMA_NAME.equals(schemaElement.attribute("name").getValue())){
+                    Element ele = schemaElement.element(CollectionObjectJAXBSchema.OBJECT_NUMBER);
                     if(ele != null){
-                        co.setIdentifier((String) ele.getData());
+                        co.setObjectNumber((String) ele.getData());
                     }
-                    ele = schemaElement.element("description");
+                    ele = schemaElement.element(CollectionObjectJAXBSchema.OTHER_NUMBER);
                     if(ele != null){
-                        co.setDescription((String) ele.getData());
+                        co.setOtherNumber((String) ele.getData());
+                    }
+                    ele = schemaElement.element(CollectionObjectJAXBSchema.BRIEF_DESCRIPTION);
+                    if(ele != null){
+                        co.setBriefDescription((String) ele.getData());
+                    }
+                    ele = schemaElement.element(CollectionObjectJAXBSchema.COMMENTS);
+                    if(ele != null){
+                        co.setComments((String) ele.getData());
+                    }
+                    ele = schemaElement.element(CollectionObjectJAXBSchema.DIST_FEATURES);
+                    if(ele != null){
+                        co.setDistFeatures((String) ele.getData());
+                    }
+                    ele = schemaElement.element(CollectionObjectJAXBSchema.OBJECT_NAME);
+                    if(ele != null){
+                        co.setObjectName((String) ele.getData());
+                    }
+                    ele = schemaElement.element(CollectionObjectJAXBSchema.RESPONSIBLE_DEPT);
+                    if(ele != null){
+                        co.setResponsibleDept((String) ele.getData());
+                    }
+                    ele = schemaElement.element(CollectionObjectJAXBSchema.TITLE);
+                    if(ele != null){
+                        co.setTitle((String) ele.getData());
                     }
                 }
             }
-
         } catch(Exception e){
             e.printStackTrace();
             Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
@@ -181,7 +225,7 @@ public class CollectionObjectResource {
                     "Get failed, the requested CollectionObject CSID:" + csid + ": was not found.").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        verbose("get collectionobject", co);
+        verbose("getCollectionObject: ", co);
         
         return co;
     }
@@ -190,29 +234,61 @@ public class CollectionObjectResource {
     @Path("{csid}")
     public CollectionObject updateCollectionObject(
             @PathParam("csid") String csid,
-            CollectionObject update) {
+            CollectionObject theUpdate) {
 
-        verbose("updating collectionobject input", update);
+        verbose("updateCollectionObject with input: ", theUpdate);
 
         List<String> pathParams = new ArrayList<String>();
         Map<String, String> queryParams = new HashMap<String, String>();
         pathParams.add("default");
-        pathParams.add(update.getCsid());
+        pathParams.add(csid);
         pathParams.add("updateDocumentRestlet");
         
         //todo: intelligent merge needed
-        if(update.getIdentifier() != null){
-            queryParams.put("collectionobject:identifier", update.getIdentifier());
+        if(theUpdate.getObjectNumber() != null){
+            queryParams.put(CO_NUXEO_SCHEMA_NAME + ":" + CollectionObjectJAXBSchema.OBJECT_NUMBER, 
+            		theUpdate.getObjectNumber());
         }
 
-        if(update.getDescription() != null){
-            queryParams.put("collectionobject:description", update.getDescription());
+        if(theUpdate.getOtherNumber() != null){
+            queryParams.put(CO_NUXEO_SCHEMA_NAME + ":" + CollectionObjectJAXBSchema.OTHER_NUMBER, 
+            		theUpdate.getOtherNumber());
+        }
+
+        if(theUpdate.getBriefDescription()!= null){
+            queryParams.put(CO_NUXEO_SCHEMA_NAME + ":" + CollectionObjectJAXBSchema.BRIEF_DESCRIPTION, 
+            		theUpdate.getBriefDescription());
+        }
+
+        if(theUpdate.getComments() != null){
+            queryParams.put(CO_NUXEO_SCHEMA_NAME + ":" + CollectionObjectJAXBSchema.COMMENTS, 
+            		theUpdate.getComments());
+        }
+
+        if(theUpdate.getDistFeatures() != null){
+            queryParams.put(CO_NUXEO_SCHEMA_NAME + ":" + CollectionObjectJAXBSchema.DIST_FEATURES, 
+            		theUpdate.getDistFeatures());
+        }
+
+        if(theUpdate.getObjectName() != null){
+            queryParams.put(CO_NUXEO_SCHEMA_NAME + ":" + CollectionObjectJAXBSchema.OBJECT_NAME, 
+            		theUpdate.getObjectName());
+        }
+
+        if(theUpdate.getResponsibleDept() != null){
+            queryParams.put(CO_NUXEO_SCHEMA_NAME + ":" + CollectionObjectJAXBSchema.RESPONSIBLE_DEPT, 
+            		theUpdate.getResponsibleDept());
+        }
+
+        if(theUpdate.getTitle() != null){
+            queryParams.put(CO_NUXEO_SCHEMA_NAME + ":" + CollectionObjectJAXBSchema.TITLE, 
+            		theUpdate.getTitle());
         }
 
         NuxeoRESTClient nxClient = getClient();
         Representation res = nxClient.get(pathParams, queryParams);
         SAXReader reader = new SAXReader();
-        String status = "";
+        String status = null;
         try {
             Document document = reader.read(res.getStream());
             Element root = document.getRootElement();
@@ -220,9 +296,8 @@ public class CollectionObjectResource {
                 Element element = (Element) i.next();
                 if("docRef".equals(element.getName())){
                     status = (String) element.getData();
-                    verbose("update collectionobject: response=" + status);
+                    verbose("updateCollectionObject response: " + status);
                 }
-
             }
         } catch(Exception e) {
             //FIXME: NOT_FOUND?
@@ -231,14 +306,14 @@ public class CollectionObjectResource {
             throw new WebApplicationException(response);
         }
         
-        return update;
+        return theUpdate;
     }
 
     @DELETE
     @Path("{csid}")
     public void deleteCollectionObject(@PathParam("csid") String csid) {
 
-    	verbose("deleting collectionobject with csid=" + csid);
+    	verbose("deleteCollectionObject with csid=" + csid);
         
     	NuxeoRESTClient nxClient = getClient();
         List<String> pathParams = new ArrayList<String>();
@@ -258,9 +333,8 @@ public class CollectionObjectResource {
                 Element element = (Element) i.next();
                 if("docRef".equals(element.getName())){
                     status = (String) element.getData();
-                    verbose("delete collectionobject: response=" + status);
+                    verbose("deleteCollectionObjectt response: " + status);
                 }
-
             }
         }catch(Exception e){
             //FIXME: NOT_FOUND?
@@ -284,7 +358,6 @@ public class CollectionObjectResource {
         } catch(Exception e){
             e.printStackTrace();
         }
-
     }
 
     private NuxeoRESTClient getClient() {
@@ -295,6 +368,6 @@ public class CollectionObjectResource {
     }
 
     private void verbose(String msg) {
-        System.out.println("CollectionObjectResource: " + msg);
+        System.out.println("CollectionObjectResource. " + msg);
     }
 }

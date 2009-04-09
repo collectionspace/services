@@ -14,7 +14,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
  * @version $Revision:$
  */
-public class PersonNuxeoClient {
+public class PersonNuxeoClient implements CollectionSpaceClient {
 
     /**
      *
@@ -33,7 +33,7 @@ public class PersonNuxeoClient {
     private PersonNuxeoClient() {
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         RegisterBuiltin.register(factory);
-        personProxy = ProxyFactory.create(PersonNuxeoProxy.class, "http://localhost:8080/helloworld/cspace-nuxeo");
+        personProxy = ProxyFactory.create(PersonNuxeoProxy.class, HOST + URI);
     }
 
     /**

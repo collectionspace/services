@@ -15,10 +15,8 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
  * @version $Revision:$
  */
-public class CollectionObjectClient {
+public class CollectionObjectClient implements CollectionSpaceClient {
 
-	private static final String HOST = "http://localhost:8080";
-	private static final String URI = "/helloworld/cspace-nuxeo";
 
     /**
      *

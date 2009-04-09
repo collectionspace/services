@@ -44,18 +44,20 @@ public class CollectionObjectServiceTest {
     public void updateCollectionObject() {
     	ClientResponse<CollectionObject> res = collectionObjectClient.getCollectionObject(updateId);
         CollectionObject collectionObject = res.getEntity();
-        verbose("got collectionobject to update: " + updateId,
+        verbose("Got CollectionObject to update with ID: " + updateId,
         		collectionObject, CollectionObject.class);
         
         //collectionObject.setCsid("updated-" + updateId);
-        collectionObject.setIdentifier("updated-" + collectionObject.getIdentifier());
-        collectionObject.setDescription("updated-" + collectionObject.getDescription());
+        collectionObject.setObjectNumber("updated-" + collectionObject.getObjectNumber());
+        collectionObject.setObjectName("updated-" + collectionObject.getObjectName());
         
+        // make call to update service
         res = collectionObjectClient.updateCollectionObject(updateId, collectionObject);
-        CollectionObject updatedCollectionObject = res.getEntity();
-        Assert.assertEquals(updatedCollectionObject.getDescription(), collectionObject.getDescription());
-
-        verbose("updated collectionObject", updatedCollectionObject, CollectionObject.class);
+        
+        // check the response
+        CollectionObject updatedCollectionObject = res.getEntity();        
+        Assert.assertEquals(updatedCollectionObject.getObjectName(), collectionObject.getObjectName());
+        verbose("updateCollectionObject: ", updatedCollectionObject, CollectionObject.class);
         
         return;
     }
@@ -75,7 +77,7 @@ public class CollectionObjectServiceTest {
         int i = 0;
         for(CollectionObjectList.CollectionObjectListItem pli : coItemList) {
             verbose("getCollectionObjectList: list-item[" + i + "] csid=" + pli.getCsid());
-            verbose("getCollectionObjectList: list-item[" + i + "] identifier=" + pli.getIdentifier());
+            verbose("getCollectionObjectList: list-item[" + i + "] objectNumber=" + pli.getObjectNumber());
             verbose("getCollectionObjectList: list-item[" + i + "] URI=" + pli.getUri());
             i++;
         }
@@ -89,19 +91,18 @@ public class CollectionObjectServiceTest {
         Assert.assertEquals(res.getStatus(), Response.Status.NO_CONTENT.getStatusCode());
     }
 
-    private CollectionObject createCollectionObject(String csid, String identifier, String description) {
-    	CollectionObject collectionObject = new CollectionObject();
-    	
-    	collectionObject.setCsid(csid);
-    	collectionObject.setIdentifier(identifier);
-    	collectionObject.setDescription(description);
+    private CollectionObject createCollectionObject(long identifier) {
+    	CollectionObject collectionObject = createCollectionObject("objectNumber-" + identifier,
+    			"objectName-" + identifier);    	
 
         return collectionObject;
     }
 
-    private CollectionObject createCollectionObject(long identifier) {
-    	CollectionObject collectionObject = createCollectionObject("csid-" + identifier,
-    			"did-" + identifier, "description-" + identifier);    	
+    private CollectionObject createCollectionObject(String objectNumber, String objectName) {
+    	CollectionObject collectionObject = new CollectionObject();
+    	
+    	collectionObject.setObjectNumber(objectNumber);
+    	collectionObject.setObjectName(objectName);
 
         return collectionObject;
     }
@@ -116,7 +117,7 @@ public class CollectionObjectServiceTest {
     }
 
     private void verbose(String msg) {
-        System.out.println("CollectionObjectServiceTest : " + msg);
+        System.out.println("CollectionObject Test: " + msg);
     }
 
     private void verbose(String msg, Object o, Class clazz) {

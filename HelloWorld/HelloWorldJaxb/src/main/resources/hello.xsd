@@ -116,13 +116,28 @@
         </xs:complexType>
     </xs:element>
     
+    <!-- domain-identifier  -->
+    <xs:element name="domain-identifier">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="dsid" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    
     <!-- collection-object  -->
     <xs:element name="collection-object">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="csid" type="xs:string" minOccurs="1" />
-                <xs:element name="identifier" type="xs:string" minOccurs="1" />
-                <xs:element name="description" type="xs:string" minOccurs="1" />
+			    <xs:element name="objectNumber" type="xs:string"/>
+			    <xs:element name="otherNumber" type="xs:string"/>
+			    <xs:element name="briefDescription" type="xs:string"/>
+			    <xs:element name="comments" type="xs:string"/>
+			    <xs:element name="distFeatures" type="xs:string"/>
+			    <xs:element name="objectName" type="xs:string"/>
+			    <xs:element name="responsibleDept" type="xs:string"/>
+			    <xs:element name="title" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -134,9 +149,9 @@
                 <xs:element name="collection-object-list-item" maxOccurs="unbounded">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="identifier" type="xs:string"
+                            <xs:element name="objectNumber" type="xs:string"
                                 minOccurs="1" />
-                            <!-- uri to retrive person details -->
+                            <!-- uri to retrive collection object details -->
                             <xs:element name="uri" type="xs:anyURI"
                                 minOccurs="1" />
                             <xs:element name="csid" type="xs:string"
