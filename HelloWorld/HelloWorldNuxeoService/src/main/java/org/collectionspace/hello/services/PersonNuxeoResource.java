@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 @Path("/persons")
 @Consumes("application/xml")
 @Produces("application/xml")
-public class PersonNuxeoResource {
+public class PersonNuxeoResource implements CollectionSpaceResource {
 
     final Logger logger = LoggerFactory.getLogger(PersonNuxeoResource.class);
 
@@ -54,10 +54,8 @@ public class PersonNuxeoResource {
 
             List<String> pathParams = new ArrayList<String>();
             Map<String, String> queryParams = new HashMap<String, String>();
-            //browse default repository for People
-            //For sanjay, People repository id is f084243e-4b81-42a1-9a05-518e974facbd
-            //For Richard, workspace repos ID is 77187c27-0467-4c3d-b395-122b82113f4d
-            pathParams = Arrays.asList("default", "f084243e-4b81-42a1-9a05-518e974facbd", "browse");
+
+            pathParams = Arrays.asList("default", CS_NUXEO_WORKSPACE_UID, "browse");
             Representation res = nxClient.get(pathParams, queryParams);
             SAXReader reader = new SAXReader();
             Document document = reader.read(res.getStream());
@@ -85,7 +83,7 @@ public class PersonNuxeoResource {
         List<String> pathParams = new ArrayList<String>();
         Map<String, String> queryParams = new HashMap<String, String>();
         pathParams.add("default");
-        pathParams.add("f084243e-4b81-42a1-9a05-518e974facbd");
+        pathParams.add(CS_NUXEO_WORKSPACE_UID);
         pathParams.add("createDocument");
         queryParams.put("docType", "Hello");
         queryParams.put("dublincore:title", p.getFirstName() + " " + p.getLastName());
