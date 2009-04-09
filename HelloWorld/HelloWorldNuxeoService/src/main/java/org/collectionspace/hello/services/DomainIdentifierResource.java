@@ -39,7 +39,7 @@ public class DomainIdentifierResource implements CollectionSpaceResource {
         if (newId.getDsid() == null) {
         	newId.setDsid("org.collectionspace");
         }
-        newId.setDsid(newId.getDsid() + System.currentTimeMillis());
+        newId.setDsid(newId.getDsid() + "." + System.currentTimeMillis());
         idDB.put(newId.getDsid(), newId);
         
         verbose("createIdentifier: ", newId);

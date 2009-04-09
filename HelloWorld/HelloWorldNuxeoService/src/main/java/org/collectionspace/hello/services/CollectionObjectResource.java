@@ -131,6 +131,7 @@ public class CollectionObjectResource implements CollectionSpaceResource {
                 Element element = (Element) i.next();
                 if ("docRef".equals(element.getName())){
                     csid = (String) element.getData();
+                    co.setCsid(csid);
                 }
             }
         } catch(Exception e){
@@ -139,6 +140,7 @@ public class CollectionObjectResource implements CollectionSpaceResource {
             throw new WebApplicationException(response);
         }
 
+        
         verbose("createCollectionObject: ", co);
         UriBuilder path = UriBuilder.fromResource(PersonNuxeoResource.class);
         path.path("" + csid);

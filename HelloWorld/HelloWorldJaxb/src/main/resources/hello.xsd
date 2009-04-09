@@ -130,6 +130,7 @@
     <xs:element name="collection-object">
         <xs:complexType>
             <xs:sequence>
+			    <xs:element name="csid" type="xs:string" />
 			    <xs:element name="objectNumber" type="xs:string"/>
 			    <xs:element name="otherNumber" type="xs:string"/>
 			    <xs:element name="briefDescription" type="xs:string"/>
