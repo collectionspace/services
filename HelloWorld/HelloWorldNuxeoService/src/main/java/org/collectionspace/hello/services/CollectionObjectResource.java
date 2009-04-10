@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 @Path("/collectionobjects")
 @Consumes("application/xml")
 @Produces("application/xml")
-public class CollectionObjectResource implements CollectionSpaceResource {
+public class CollectionObjectResource extends CollectionSpaceResource {
 
 	final static String CO_NUXEO_DOCTYPE = "CollectionObject";
 	final static String CO_NUXEO_SCHEMA_NAME = "collectionobject";
@@ -60,7 +60,7 @@ public class CollectionObjectResource implements CollectionSpaceResource {
 
             List<String> pathParams = new ArrayList<String>();
             Map<String, String> queryParams = new HashMap<String, String>();
-            pathParams = Arrays.asList("default", CS_NUXEO_WORKSPACE_UID, "browse");
+            pathParams = Arrays.asList("default", CS_COLLECTIONOBJECT_WORKSPACE_UID, "browse");
             Representation res = nxClient.get(pathParams, queryParams);
             SAXReader reader = new SAXReader();
             Document document = reader.read(res.getStream());
@@ -99,7 +99,7 @@ public class CollectionObjectResource implements CollectionSpaceResource {
         List<String> pathParams = new ArrayList<String>();
         Map<String, String> queryParams = new HashMap<String, String>();
         pathParams.add("default");
-        pathParams.add(CS_NUXEO_WORKSPACE_UID);
+        pathParams.add(CS_COLLECTIONOBJECT_WORKSPACE_UID);
         pathParams.add("createDocument");
         queryParams.put("docType", CO_NUXEO_DOCTYPE);
         
@@ -365,13 +365,6 @@ public class CollectionObjectResource implements CollectionSpaceResource {
         } catch(Exception e){
             e.printStackTrace();
         }
-    }
-
-    private NuxeoRESTClient getClient() {
-        NuxeoRESTClient nxClient = new NuxeoRESTClient("http://127.0.0.1:8080/nuxeo");
-        nxClient.setAuthType(NuxeoRESTClient.AUTH_TYPE_BASIC);
-        nxClient.setBasicAuthentication("Administrator", "Administrator");
-        return nxClient;
     }
 
     private void verbose(String msg) {
