@@ -22,9 +22,8 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
+
 import org.collectionspace.hello.*;
-
-
 import org.collectionspace.hello.services.nuxeo.NuxeoRESTClient;
 import org.collectionspace.hello.CollectionObjectList.CollectionObjectListItem;
 import org.collectionspace.hello.services.CollectionObjectJAXBSchema;
