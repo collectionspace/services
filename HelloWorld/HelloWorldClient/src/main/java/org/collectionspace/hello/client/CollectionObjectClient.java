@@ -15,7 +15,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
  * @version $Revision:$
  */
-public class CollectionObjectClient implements CollectionSpaceClient {
+public class CollectionObjectClient extends CollectionSpaceClient {
 
 
     /**
@@ -35,7 +35,7 @@ public class CollectionObjectClient implements CollectionSpaceClient {
     private CollectionObjectClient() {
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         RegisterBuiltin.register(factory);
-        collectionObjectProxy = ProxyFactory.create(CollectionObjectProxy.class, HOST + URI);
+        collectionObjectProxy = ProxyFactory.create(CollectionObjectProxy.class, getURL());
     }
 
     /**

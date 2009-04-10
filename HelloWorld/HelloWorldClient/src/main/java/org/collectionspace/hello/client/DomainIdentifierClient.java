@@ -13,7 +13,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
  * @version $Revision:$
  */
-public class DomainIdentifierClient implements CollectionSpaceClient {
+public class DomainIdentifierClient extends CollectionSpaceClient {
 
 
     /**
@@ -33,7 +33,7 @@ public class DomainIdentifierClient implements CollectionSpaceClient {
     private DomainIdentifierClient() {
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         RegisterBuiltin.register(factory);
-        identifierProxy = ProxyFactory.create(DomainIdentifierProxy.class, HOST + URI);
+        identifierProxy = ProxyFactory.create(DomainIdentifierProxy.class, getURL());
     }
 
     /**

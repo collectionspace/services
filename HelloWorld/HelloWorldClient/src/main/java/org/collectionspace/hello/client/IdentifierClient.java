@@ -13,7 +13,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
  * @version $Revision:$
  */
-public class IdentifierClient implements CollectionSpaceClient {
+public class IdentifierClient {
 
     /**
      *
@@ -32,7 +32,7 @@ public class IdentifierClient implements CollectionSpaceClient {
     private IdentifierClient() {
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         RegisterBuiltin.register(factory);
-        identifierProxy = ProxyFactory.create(IdentifierProxy.class, HOST + URI);
+        identifierProxy = ProxyFactory.create(IdentifierProxy.class, "http://localhost:8080/helloworld/cspace");
     }
 
     /**
