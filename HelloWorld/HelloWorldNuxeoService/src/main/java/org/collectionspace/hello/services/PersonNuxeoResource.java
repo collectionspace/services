@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 @Path("/persons")
 @Consumes("application/xml")
 @Produces("application/xml")
-public class PersonNuxeoResource implements CollectionSpaceResource {
+public class PersonNuxeoResource extends CollectionSpaceResource {
 
     final Logger logger = LoggerFactory.getLogger(PersonNuxeoResource.class);
 
@@ -55,7 +55,7 @@ public class PersonNuxeoResource implements CollectionSpaceResource {
             List<String> pathParams = new ArrayList<String>();
             Map<String, String> queryParams = new HashMap<String, String>();
 
-            pathParams = Arrays.asList(CS_NUXEO_DEFAULT_REPOS, CS_NUXEO_WORKSPACE_UID, "browse");
+            pathParams = Arrays.asList("default", CS_PERSON_WORKSPACE_UID, "browse");
             Representation res = nxClient.get(pathParams, queryParams);
             SAXReader reader = new SAXReader();
             Document document = reader.read(res.getStream());
@@ -82,8 +82,8 @@ public class PersonNuxeoResource implements CollectionSpaceResource {
 
         List<String> pathParams = new ArrayList<String>();
         Map<String, String> queryParams = new HashMap<String, String>();
-        pathParams.add(CS_NUXEO_DEFAULT_REPOS);
-        pathParams.add(CS_NUXEO_WORKSPACE_UID);
+        pathParams.add("default");
+        pathParams.add(CS_PERSON_WORKSPACE_UID);
         pathParams.add("createDocument");
         queryParams.put("docType", "Hello");
         queryParams.put("dublincore:title", p.getFirstName() + " " + p.getLastName());
@@ -316,7 +316,7 @@ public class PersonNuxeoResource implements CollectionSpaceResource {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
                     Boolean.TRUE);
             m.marshal(p, System.out);
-        }catch(Exception e){
+        } catch(Exception e){
             e.printStackTrace();
         }
 
@@ -354,12 +354,6 @@ public class PersonNuxeoResource implements CollectionSpaceResource {
 //        verbose("getVocabulary:" + resStr);
 //
 //    }
-    private NuxeoRESTClient getClient() {
-        NuxeoRESTClient nxClient = new NuxeoRESTClient(CS_NUXEO_URI);
-        nxClient.setAuthType(NuxeoRESTClient.AUTH_TYPE_BASIC);
-        nxClient.setBasicAuthentication("Administrator", "Administrator");
-        return nxClient;
-    }
 
     private void verbose(String msg) {
         System.out.println("PersonNuxeoResource: " + msg);
