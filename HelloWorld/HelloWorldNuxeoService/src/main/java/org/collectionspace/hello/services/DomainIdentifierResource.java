@@ -23,9 +23,9 @@ import org.slf4j.LoggerFactory;
 @Path("/domainidentifiers")
 @Consumes("application/xml")
 @Produces("application/xml")
-public class DomainIdentifierResource implements CollectionSpaceResource {
+public class DomainIdentifierResource extends CollectionSpaceResource {
 
-    final Logger logger = LoggerFactory.getLogger(IdentifierResource.class);
+    final Logger logger = LoggerFactory.getLogger(DomainIdentifierResource.class);
     private Map<String, DomainIdentifier> idDB = new ConcurrentHashMap<String, DomainIdentifier>();
 
     public DomainIdentifierResource() {
