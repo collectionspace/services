@@ -30,11 +30,18 @@
         </dependency>
     </dependencies>
     <build>
-    	<defaultGoal>install</defaultGoal>
+        <defaultGoal>install</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <dependencies>
                <!-- javax.activation.DataSource provider is required by spec -->
                     <dependency>
@@ -48,6 +55,37 @@
                         <version>2.1.2</version>
                     </dependency>
                 </dependencies>
+                <configuration>
+                    <args>
+                        <arg>-XtoString</arg>
+                        <arg>-Xinject-listener-code</arg>
+
+                     <!-- <arg>-Xcollection-setter-injector</arg>
+                                <arg>-Xfluent-api</arg> -->
+                    </args>
+                    <plugins>
+                        <plugin>
+                            <groupId>
+                           org.jvnet.jaxb2_commons
+                            </groupId>
+                            <artifactId>basic</artifactId>
+                            <version>0.4.1</version>
+                        </plugin>
+                        <plugin>
+                            <groupId>
+                           org.jvnet.jaxb2-commons
+                            </groupId>
+                            <artifactId>
+                           property-listener-injector
+                            </artifactId>
+                            <version>1.0</version>
+                        </plugin>
+
+                    </plugins>
+                    <!--generatePackage>
+                     org.collectionspace.hello
+                    </generatePackage-->
+                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>

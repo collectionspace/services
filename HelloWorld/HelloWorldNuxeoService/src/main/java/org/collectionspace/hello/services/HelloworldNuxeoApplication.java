@@ -14,6 +14,7 @@ public class HelloworldNuxeoApplication extends Application {
         singletons.add(new DomainIdentifierResource());
         singletons.add(new IdentifierResource());
         singletons.add(new PersonNuxeoResource());
+        singletons.add(new MultipartResource());
     }
 
     @Override
