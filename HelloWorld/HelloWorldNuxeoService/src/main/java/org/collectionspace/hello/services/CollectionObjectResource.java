@@ -147,7 +147,7 @@ public class CollectionObjectResource extends CollectionSpaceResource {
 
         
         verbose("createCollectionObject: ", co);
-        UriBuilder path = UriBuilder.fromResource(PersonNuxeoResource.class);
+        UriBuilder path = UriBuilder.fromResource(CollectionObjectResource.class);
         path.path("" + csid);
         Response response = Response.created(path.build()).build();
         

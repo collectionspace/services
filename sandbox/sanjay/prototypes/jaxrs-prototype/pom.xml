@@ -4,15 +4,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.hello.services</groupId>
     <version>0.1</version>
-    <artifactId>helloworld</artifactId>
+    <artifactId>jaxrs-prototype</artifactId>
     <packaging>pom</packaging>
-    <name>HelloWorld</name>
+    <name>jaxrs-prototype</name>
     <modules>
-        <module>HelloWorldJaxb</module>
-        <module>HelloWorldClient</module>
-        <module>HelloWorldNuxeoService</module>
-        
-</modules>
+        <module>jaxrs-jaxb</module>
+        <module>jaxrs-service</module>
+        <module>jaxrs-client</module>
+        <module>jaxrs-nuxeo-service</module>
+        <module>jaxrs-nuxeo-client</module>
+    </modules>
     <repositories>
         <repository>
             <id>jboss</id>

@@ -11,9 +11,9 @@
 
   <artifactId>nuxeo-platform-cs</artifactId>
   <packaging>jar</packaging>
-  <name>Nuxeo CS extensions</name>
+  <name>jaxrs-nuxeo extensions</name>
   <description>
-    Nuxeo Enterprise Platform: CS extensions
+    Nuxeo Enterprise Platform: jaxrs-nuxeo extensions
   </description>
 
   <dependencies>

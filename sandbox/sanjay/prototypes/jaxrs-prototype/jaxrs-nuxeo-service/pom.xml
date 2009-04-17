@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <artifactId>helloworld</artifactId>
+        <artifactId>jaxrs-prototype</artifactId>
         <groupId>org.collectionspace.hello.services</groupId>
         <version>0.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.hello.services</groupId>
-    <artifactId>helloworld-service</artifactId>
+    <artifactId>jaxrs-nuxeo-service</artifactId>
     <packaging>war</packaging>
     <version>0.1</version>
-    <name>Helloworld Service</name>
+    <name>jaxrs-nuxeo-service</name>
 
     <repositories>
         <repository>
@@ -34,19 +34,88 @@
             <name>mojo repo</name>
             <url>http://svn.codehaus.org/mojo/trunk/mojo/jboss-maven-plugin</url>
         </repository>
+
+        <repository>
+            <id>maven-restlet</id>
+            <name>Public online Restlet repository</name>
+            <url>http://maven.restlet.org</url>
+        </repository>
+        
+        <repository>
+            <id>cspace.local.nuxeo</id>
+            <url>${nuxeo.local.repo.dir}</url>
+        </repository>
+        <repository>
+            <id>cspace.local.nuxeo.client</id>
+            <url>${nuxeo.local.repo.client.dir}</url>
+        </repository>
+        <repository>
+            <id>public</id>
+            <url>http://maven.nuxeo.org/public</url>
+            <releases>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>public-snapshot</id>
+            <url>http://maven.nuxeo.org/public-snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+            </snapshots>
+        </repository>
+
+
     </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>public</id>
+            <url>http://maven.nuxeo.org/public</url>
+            <name>Nuxeo virtual release repository</name>
+            <releases>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>public-snapshot</id>
+            <url>http://maven.nuxeo.org/public-snapshot</url>
+            <name>Nuxeo virtual snapshot repository</name>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+
+    <properties>
+        <jboss.version>4.2.3.GA</jboss.version>
+        <jboss.ejb.version>3.0</jboss.ejb.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <apacheds.version>1.5.1</apacheds.version>
+        <apachedshared.version>0.9.7</apachedshared.version>
+        <nuxeo.version.5.2>5.2-SNAPSHOT</nuxeo.version.5.2>
+        <nuxeo.version.1.5>1.5-SNAPSHOT</nuxeo.version.1.5>
+    </properties>
+
 
     <dependencies>
         <dependency>
             <groupId>org.collectionspace.hello.services</groupId>
-            <artifactId>helloworld-jaxb</artifactId>
+            <artifactId>jaxrs-jaxb</artifactId>
             <version>0.1</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
             <version>1.0.2.GA</version>
-            <!-- filter out unwanted jars -->
             <exclusions>
                 <exclusion>
                     <groupId>tjws</groupId>
@@ -60,11 +129,81 @@
             <version>1.0.2.GA</version>
         </dependency>
         <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-multipart-provider</artifactId>
+            <version>1.0.2.GA</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.1</version>
             <scope>test</scope>
         </dependency>
+
+      <!-- javax -->
+
+
+        <dependency>
+            <groupId>javax.security</groupId>
+            <artifactId>jaas</artifactId>
+            <version>1.0.01</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.6.1</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <!-- jboss -->
+
+        <!-- nuxeo -->
+
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-api</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jboss-remoting</artifactId>
+                    <groupId>jboss</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+<!--
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-client</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+-->
+
+        <dependency>
+            <groupId>org.restlet</groupId>
+            <artifactId>org.restlet</artifactId>
+            <version>1.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>com.noelios.restlet</groupId>
+            <artifactId>com.noelios.restlet.ext.httpclient</artifactId>
+            <version>1.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>com.noelios.restlet</groupId>
+            <artifactId>com.noelios.restlet</artifactId>
+            <version>1.0.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jaxen</groupId>
+            <artifactId>jaxen</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
+
     </dependencies>
     
     <build>
@@ -100,52 +239,11 @@
 
                 </executions>
             </plugin>
-         <!--
-            <plugin>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>maven-jetty-plugin</artifactId>
-                <version>6.1.10</version>
-                <configuration>
-                    
-                    <contextPath>/</contextPath>
-                    <scanIntervalSeconds>2</scanIntervalSeconds>
-                    <stopKey>foo</stopKey>
-                    <stopPort>9999</stopPort>
-                    <connectors>
-                        <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
-                            <port>9095</port>
-                            <maxIdleTime>60000</maxIdleTime>
-                        </connector>
-                    </connectors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>start-jetty</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <scanIntervalSeconds>0</scanIntervalSeconds>
-                            <daemon>true</daemon>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>stop-jetty</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                </configuration>
+                <configuration></configuration>
                 <executions>
                     <execution>
                         <id>surefire-it</id>

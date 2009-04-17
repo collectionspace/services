@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.hello.ecm.types">
+  <extension target="org.nuxeo.ecm.platform.types.TypeService" point="types">
+    <type id="Hello" coretype="Hello">
+      <label>org.collectionspace.hello</label>
+      <!--icon>/icons/file.gif</icon-->
+      <default-view>view_documents</default-view>
+
+      <layouts mode="any">
+        <layout>heading</layout>
+        <layout>hello</layout>
+      </layouts>
+      <!--layout>
+        <widget jsfcomponent="h:inputText"
+          schemaname="dublincore" fieldname="title"
+          required="true" />
+        <widget jsfcomponent="h:inputTextarea"
+          schemaname="dublincore" fieldname="description" />
+        <widget jsfcomponent="h:inputText"
+          schemaname="Hello" fieldname="person:firstName" />
+        <widget jsfcomponent="h:inputText"
+          schemaname="Hello" fieldname="person:lastName" />
+      </layout-->
+    </type>
+    <type id="Folder" coretype="Folder">
+      <subtypes>
+        <type>Hello</type>
+      </subtypes>
+    </type>
+    <type id="Workspace" coretype="Workspace">
+      <subtypes>
+        <type>Hello</type>
+      </subtypes>
+    </type>
+
+  </extension>
+</component>
