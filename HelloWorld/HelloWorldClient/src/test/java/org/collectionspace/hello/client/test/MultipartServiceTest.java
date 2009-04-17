@@ -103,7 +103,7 @@ public class MultipartServiceTest {
     }
 
     private void verbose(String msg) {
-        System.out.println("PersonServiceTest : " + msg);
+        System.out.println("MultipartServiceTest : " + msg);
     }
 
     private void verbose(String msg, Object o, Class clazz) {
