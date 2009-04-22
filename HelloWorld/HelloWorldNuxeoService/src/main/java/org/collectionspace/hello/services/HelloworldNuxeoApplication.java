@@ -12,7 +12,7 @@ public class HelloworldNuxeoApplication extends Application {
     public HelloworldNuxeoApplication() {
         singletons.add(new CollectionObjectResource());
         singletons.add(new DomainIdentifierResource());
-        singletons.add(new VersionResource());
+        singletons.add(new PingResource());
     }
 
     @Override
