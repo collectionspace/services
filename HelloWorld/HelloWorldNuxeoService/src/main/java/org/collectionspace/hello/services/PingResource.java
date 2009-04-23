@@ -61,4 +61,5 @@ public class PingResource {
   public String getEcho() {
     return getPing();
   }
+  
 }
