@@ -13,7 +13,7 @@
     <groupId>org.collectionspace.services</groupId>
     <artifactId>collectionobject-service</artifactId>
     <packaging>jar</packaging>
-    <version>0.1</version>
+    <version>0.2</version>
     <name>CollectionObject Service</name>
 
     <repositories>
@@ -114,13 +114,13 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org-collectionspace-services-common</artifactId>
-            <version>0.1</version>
+            <version>0.2</version>
         </dependency>
         
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>collectionobject-jaxb</artifactId>
-            <version>0.1</version>
+            <version>0.2</version>
         </dependency>
         
         <dependency>

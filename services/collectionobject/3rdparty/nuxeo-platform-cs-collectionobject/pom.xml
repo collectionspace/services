@@ -11,7 +11,7 @@
 
   <artifactId>nuxeo-platform-collectionspace</artifactId>
   <packaging>jar</packaging>
-  <name>Nuxeo CS extensions</name>
+  <name>Nuxeo CS Extensions</name>
   <description>
     Nuxeo Enterprise Platform: CS extensions
   </description>

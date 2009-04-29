@@ -14,7 +14,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>collectionobject-jaxb</artifactId>
-    <version>0.1</version>
+    <version>0.2</version>
     <name>CollectionObject Service JAXB</name>
     
     <pluginRepositories>
