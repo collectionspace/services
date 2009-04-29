@@ -11,7 +11,7 @@
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org-collectionspace-services-common</artifactId>
     <packaging>jar</packaging>
-    <version>0.1</version>
+    <version>0.2</version>
     <name>CollectionSpace Services Common</name>
 
     <repositories>
