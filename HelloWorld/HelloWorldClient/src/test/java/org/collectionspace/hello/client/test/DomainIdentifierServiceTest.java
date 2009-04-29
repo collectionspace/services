@@ -12,7 +12,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
- * A IdentifierServiceTest.
+ * A DomainIdentifierServiceTest.
  * 
  * @version $Revision:$
  */
@@ -33,7 +33,7 @@ public class DomainIdentifierServiceTest {
     @Test(dependsOnMethods = {"createIdentifier"})
     public void getIdentifier() {
         DomainIdentifier i = identifierClient.getIdentifier(id).getEntity();
-        verbose("got Identifier", i);
+        verbose("got DomainIdentifier", i);
     }
 
     private String extractId(ClientResponse<Response> res) {
@@ -45,7 +45,7 @@ public class DomainIdentifierServiceTest {
     }
 
     private void verbose(String msg) {
-        System.out.println("IdentifierServiceTest : " + msg);
+        System.out.println("DomainIdentifierServiceTest : " + msg);
     }
 
     private void verbose(String msg, DomainIdentifier p) {
@@ -56,7 +56,7 @@ public class DomainIdentifierServiceTest {
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
                     Boolean.TRUE);
             m.marshal(p, System.out);
-        //m.marshal(new JAXBElement(new QName("uri", "local"), Identifier.class, p), System.out);
+        //m.marshal(new JAXBElement(new QName("uri", "local"), DomainIdentifier.class, p), System.out);
         } catch (Exception e) {
             e.printStackTrace();
         }
