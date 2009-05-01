@@ -13,7 +13,7 @@ import org.collectionspace.services.collectionobject.CollectionObject;
  * @author remillet
  * 
  */
-public interface CollectionObjectService extends CollectionSpaceService {
+public interface CollectionObjectService {
 
 	public final static String CO_SCHEMA_NAME = "collectionobject";
 

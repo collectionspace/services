@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 @Path("/collectionobjects")
 @Consumes("application/xml")
 @Produces("application/xml")
-public class CollectionObjectResource implements CollectionSpaceResource {
+public class CollectionObjectResource {
 
 	final Logger logger = LoggerFactory
 			.getLogger(CollectionObjectResource.class);
