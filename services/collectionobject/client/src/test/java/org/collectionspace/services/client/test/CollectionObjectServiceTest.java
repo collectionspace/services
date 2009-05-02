@@ -34,10 +34,12 @@ public class CollectionObjectServiceTest {
         Assert.assertEquals(res.getStatus(), Response.Status.CREATED.getStatusCode());
         
         //store updateId locally for "update" test
-        if (updateId == null)
+        if (updateId == null) {
         	updateId = extractId(res);
-        else
+        } else {
         	deleteId = extractId(res);
+        	System.out.println("Set deleteId: " + deleteId);
+        }
     }
 
     @Test(dependsOnMethods = {"createCollectionObject"})
@@ -83,8 +85,9 @@ public class CollectionObjectServiceTest {
         }
     }
 
-    @Test(dependsOnMethods = {"updateCollectionObject"})
+    @Test(dependsOnMethods = {"createCollection"})
     public void deleteCollectionObject() {
+    	System.out.println("Calling deleteCollectionObject:" + deleteId);
         ClientResponse<Response> res = collectionObjectClient.deleteCollectionObject(deleteId);
         verbose("deleteCollectionObject: csid=" + deleteId);
         verbose("deleteCollectionObject: status = " + res.getStatus());
