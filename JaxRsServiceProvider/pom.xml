@@ -1,103 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     
-    <!-- 
-        <parent>
-        <artifactId>helloworld</artifactId>
-        <groupId>org.collectionspace.hello.services</groupId>
-        <version>0.1</version>
-        </parent>
-    -->
+    <parent>
+        <artifactId>org.collectionspace.services</artifactId>
+        <groupId>org.collectionspace.services</groupId>
+        <version>1.0</version>
+    </parent>
+
     
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
-    <artifactId>CollectionSpace-JAXRS-ServiceProvider</artifactId>
+    <artifactId>org.collectionspace.services.jaxrs.provider</artifactId>
     <packaging>war</packaging>
-    <version>0.2</version>
-    <name>CollectionSpace JAX-RS Service Provider</name>
-    
-    <repositories>
-        <repository>
-            <id>java.net</id>
-            <url>http://download.java.net/maven/1</url>
-            <layout>legacy</layout>
-        </repository>
-        <repository>
-            <id>maven repo</id>
-            <name>maven repo</name>
-            <url>http://repo1.maven.org/maven2/</url>
-        </repository>
-        <!-- For resteasy -->
-        <repository>
-            <id>jboss</id>
-            <name>jboss repo</name>
-            <url>http://repository.jboss.org/maven2</url>
-        </repository>
-        <repository>
-            <id>mojo</id>
-            <name>mojo repo</name>
-            <url>http://svn.codehaus.org/mojo/trunk/mojo/jboss-maven-plugin</url>
-        </repository>
-        
-        <repository>
-            <id>maven-restlet</id>
-            <name>Public online Restlet repository</name>
-            <url>http://maven.restlet.org</url>
-        </repository>
-        
-        <repository>
-            <id>cspace.local.nuxeo</id>
-            <url>${nuxeo.local.repo.dir}</url>
-        </repository>
-        <repository>
-            <id>cspace.local.nuxeo.client</id>
-            <url>${nuxeo.local.repo.client.dir}</url>
-        </repository>
-        <repository>
-            <id>public</id>
-            <url>http://maven.nuxeo.org/public</url>
-            <releases>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>public-snapshot</id>
-            <url>http://maven.nuxeo.org/public-snapshot</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-            </snapshots>
-        </repository>
-        
-        
-    </repositories>
-    
-    <pluginRepositories>
-        <pluginRepository>
-            <id>public</id>
-            <url>http://maven.nuxeo.org/public</url>
-            <name>Nuxeo virtual release repository</name>
-            <releases>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>public-snapshot</id>
-            <url>http://maven.nuxeo.org/public-snapshot</url>
-            <name>Nuxeo virtual snapshot repository</name>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
-    
+    <version>1.0</version>
+    <name>services.jaxrs.provider</name>
     
     <properties>
         <jboss.version>4.2.3.GA</jboss.version>
@@ -113,18 +29,13 @@
     <dependencies>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>collectionobject-jaxb</artifactId>
-            <version>0.2</version>
+            <artifactId>org.collectionspace.services.common</artifactId>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org-collectionspace-services-common</artifactId>
-            <version>0.2</version>
-        </dependency>   
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>collectionobject-service</artifactId>
-            <version>0.2</version>
+            <artifactId>org.collectionspace.services.collectionobject.service</artifactId>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -156,68 +67,14 @@
         
         <!-- javax -->
         
-        <dependency>
-            <groupId>javax.security</groupId>
-            <artifactId>jaas</artifactId>
-            <version>1.0.01</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>1.6.1</version>
-            <scope>provided</scope>
-        </dependency>
-        
         <!-- jboss -->
         
         <!-- nuxeo -->
-        
-        <dependency>
-            <groupId>org.nuxeo.ecm.core</groupId>
-            <artifactId>nuxeo-core-api</artifactId>
-            <version>${nuxeo.version.1.5}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jboss-remoting</artifactId>
-                    <groupId>jboss</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        
-        <!--
-            <dependency>
-            <groupId>org.nuxeo.ecm.core</groupId>
-            <artifactId>nuxeo-core-client</artifactId>
-            <version>${nuxeo.version.1.5}</version>
-            </dependency>
-        -->
-        
-        <dependency>
-            <groupId>org.restlet</groupId>
-            <artifactId>org.restlet</artifactId>
-            <version>1.0.7</version>
-        </dependency>
-        <dependency>
-            <groupId>com.noelios.restlet</groupId>
-            <artifactId>com.noelios.restlet.ext.httpclient</artifactId>
-            <version>1.0.7</version>
-        </dependency>
-        <dependency>
-            <groupId>com.noelios.restlet</groupId>
-            <artifactId>com.noelios.restlet</artifactId>
-            <version>1.0.7</version>
-        </dependency>
-        <dependency>
-            <groupId>jaxen</groupId>
-            <artifactId>jaxen</artifactId>
-            <version>1.1.1</version>
-        </dependency>               
+
     </dependencies>
     
     <build>
-        <finalName>CollectionSpace</finalName>
+        <finalName>collectionspace-services-jaxrs-provider</finalName>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -233,7 +90,7 @@
                             <goal>undeploy</goal>
                         </goals>
                         <configuration>
-                            <fileName>${basedir}/target/CollectionSpace.war</fileName>
+                            <fileName>${basedir}/target/collectionspace-services.war</fileName>
                         </configuration>
                     </execution>
                     <execution>
@@ -247,24 +104,8 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>        
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration></configuration>
-                <executions>
-                    <execution>
-                        <id>surefire-it</id>
-                        <phase>integration-test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                        <configuration>
-                            <skip>false</skip>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>

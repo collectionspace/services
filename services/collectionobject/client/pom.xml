@@ -2,29 +2,29 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-<!--    <parent>
-        <artifactId>helloworld</artifactId>
-        <groupId>org.collectionspace.hello.services</groupId>
-        <version>0.1</version>
+
+    <parent>
+        <artifactId>org.collectionspace.services.collectionobject</artifactId>
+        <groupId>org.collectionspace.services</groupId>
+        <version>1.0</version>
     </parent>
--->
-    
+
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.services.client</groupId>
-    <artifactId>collectionobject-client</artifactId>
-    <packaging>jar</packaging>
-    <version>0.2</version>
-    <name>CollectionObject Client</name>
+    <groupId>org.collectionspace.services</groupId>
+    <artifactId>org.collectionspace.services.collectionobject.client</artifactId>
+    <version>1.0</version>
+    <name>services.collectionobject.client</name>
+    
     <dependencies>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>collectionobject-jaxb</artifactId>
-            <version>0.2</version>
-        </dependency>        
+            <artifactId>org.collectionspace.services.collectionobject.jaxb</artifactId>
+            <version>1.0</version>
+        </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org-collectionspace-services-common</artifactId>
-            <version>0.2</version>
+            <artifactId>org.collectionspace.services.client</artifactId>
+            <version>1.0</version>
         </dependency>
         
         <dependency>
@@ -72,6 +72,7 @@
     </dependencies>
     
     <build>
+        <finalName>collectionspace-services-collectionobject-client</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>

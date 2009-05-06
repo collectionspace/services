@@ -1,53 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+    <parent>
+        <artifactId>org.collectionspace.services</artifactId>
+        <groupId>org.collectionspace.services</groupId>
+        <version>1.0</version>
+    </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.hello.services</groupId>
-    <version>0.1</version>
-    <artifactId>jaxrs-prototype</artifactId>
+    <groupId>org.collectionspace.services</groupId>
+    <version>1.0</version>
+    <artifactId>org.collectionspace.services.main</artifactId>
     <packaging>pom</packaging>
-    <name>jaxrs-prototype</name>
+    <name>services.main</name>
+
+    <properties>
+        <jboss.version>4.2.3.GA</jboss.version>
+        <jboss.ejb.version>3.0</jboss.ejb.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <nuxeo.version.5.2>5.2-SNAPSHOT</nuxeo.version.5.2>
+        <nuxeo.version.1.5>1.5-SNAPSHOT</nuxeo.version.1.5>
+    </properties>
+
     <modules>
-        <module>jaxrs-jaxb</module>
-        <module>jaxrs-service</module>
-        <module>jaxrs-client</module>
-        <module>jaxrs-nuxeo-service</module>
-        <module>jaxrs-nuxeo-client</module>
-        <module>jaxrs-nuxeo-javaapi-service</module>
+        <module>common</module>
+        <module>client</module>
+        <module>collectionobject</module>
     </modules>
+
     <repositories>
         <repository>
-            <id>jboss</id>
-            <url>http://repository.jboss.org/maven2</url>
+            <id>maven-restlet</id>
+            <name>Public online Restlet repository</name>
+            <url>http://maven.restlet.org</url>
         </repository>
         <repository>
-            <id>sun</id>
-            <url>http://download.java.net/maven/2</url>
+            <id>cspace.local.nuxeo</id>
+            <url>${nuxeo.local.repo.dir}</url>
         </repository>
         <repository>
-            <id>java.net</id>
-            <name>java.net Maven Repository</name>
-            <url>https://maven-repository.dev.java.net/nonav/repository</url>
-            <layout>legacy</layout>
+            <id>cspace.local.nuxeo.client</id>
+            <url>${nuxeo.local.repo.client.dir}</url>
         </repository>
         <repository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Maven 2 Repository</name>
-            <url>http://download.java.net/maven/2</url>
+            <id>public</id>
+            <url>http://maven.nuxeo.org/public</url>
+            <releases>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>public-snapshot</id>
+            <url>http://maven.nuxeo.org/public-snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+            </snapshots>
         </repository>
     </repositories>
+    
     <pluginRepositories>
-
         <pluginRepository>
-            <id>java.net</id>
-            <name>java.net Maven Repository</name>
-            <url>https://maven-repository.dev.java.net/nonav/repository</url>
-            <layout>legacy</layout>
+            <id>public</id>
+            <url>http://maven.nuxeo.org/public</url>
+            <name>Nuxeo virtual release repository</name>
+            <releases>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </pluginRepository>
         <pluginRepository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Maven 2 Repository</name>
-            <url>http://download.java.net/maven/2</url>
+            <id>public-snapshot</id>
+            <url>http://maven.nuxeo.org/public-snapshot</url>
+            <name>Nuxeo virtual snapshot repository</name>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+            </snapshots>
         </pluginRepository>
     </pluginRepositories>
 
@@ -74,7 +106,6 @@
                     <artifactId>maven-war-plugin</artifactId>
                     <version>2.0.1</version>
                     <configuration>
-
                         <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
                         <archive>
                             <manifest>
@@ -84,7 +115,6 @@
                         </archive>
                     </configuration>
                 </plugin>
-
             </plugins>
         </pluginManagement>
     </build>
@@ -138,13 +168,6 @@
                 <version>2.1.7</version>
             </dependency>
             <dependency>
-                <groupId>org.testng</groupId>
-                <artifactId>testng</artifactId>
-                <version>5.6</version>
-                <scope>test</scope>
-                <classifier>jdk15</classifier>
-            </dependency>
-            <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>1.5.2</version>
@@ -159,16 +182,6 @@
                 <artifactId>mysql-connector-java</artifactId>
                 <version>5.1.5</version>
                 <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.jgoodies</groupId>
-                <artifactId>binding</artifactId>
-                <version>2.0.2</version>
-            </dependency>
-            <dependency>
-                <groupId>com.jgoodies</groupId>
-                <artifactId>forms</artifactId>
-                <version>1.2.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -2,27 +2,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.collectionspace.hello.services</groupId>
-    <version>0.1</version>
-    <artifactId>jaxrs-prototype</artifactId>
+    <groupId>org.collectionspace.services</groupId>
+    <version>1.0</version>
+    <artifactId>org.collectionspace.services</artifactId>
     <packaging>pom</packaging>
-    <name>jaxrs-prototype</name>
+    <name>org.collectionspace.services</name>
+
     <modules>
-        <module>jaxrs-jaxb</module>
-        <module>jaxrs-service</module>
-        <module>jaxrs-client</module>
-        <module>jaxrs-nuxeo-service</module>
-        <module>jaxrs-nuxeo-client</module>
-        <module>jaxrs-nuxeo-javaapi-service</module>
+        <module>services</module>
+        <module>JaxRsServiceProvider</module>
     </modules>
     <repositories>
         <repository>
-            <id>jboss</id>
-            <url>http://repository.jboss.org/maven2</url>
-        </repository>
-        <repository>
-            <id>sun</id>
-            <url>http://download.java.net/maven/2</url>
+            <id>maven repo</id>
+            <name>maven repo</name>
+            <url>http://repo1.maven.org/maven2/</url>
         </repository>
         <repository>
             <id>java.net</id>
@@ -35,9 +29,21 @@
             <name>Java.net Maven 2 Repository</name>
             <url>http://download.java.net/maven/2</url>
         </repository>
+        <repository>
+            <id>sun</id>
+            <url>http://download.java.net/maven/2</url>
+        </repository>
+        <repository>
+            <id>jboss</id>
+            <url>http://repository.jboss.org/maven2</url>
+        </repository>
+        <repository>
+            <id>mojo</id>
+            <name>mojo repo</name>
+            <url>http://svn.codehaus.org/mojo/trunk/mojo/jboss-maven-plugin</url>
+        </repository>
     </repositories>
     <pluginRepositories>
-
         <pluginRepository>
             <id>java.net</id>
             <name>java.net Maven Repository</name>
@@ -79,7 +85,6 @@
                         <archive>
                             <manifest>
                                 <addClasspath>true</addClasspath>
-
                             </manifest>
                         </archive>
                     </configuration>
@@ -103,48 +108,6 @@
                 <classifier>jdk15</classifier>
             </dependency>
             <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>jaxrs-api</artifactId>
-                <version>1.0.2.GA</version>
-            </dependency>
-            <dependency>
-                <groupId>net.java.dev.jaxb2-commons</groupId>
-                <artifactId>jaxb-fluent-api</artifactId>
-                <version>2.0.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jvnet.jaxb2-commons</groupId>
-                <artifactId>property-listener-injector</artifactId>
-                <version>1.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jvnet.jaxb2_commons</groupId>
-                <artifactId>runtime</artifactId>
-                <version>0.4.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-jaxrs</artifactId>
-                <version>1.0.2.GA</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-httpclient</groupId>
-                <artifactId>commons-httpclient</artifactId>
-                <version>3.1</version>
-            </dependency>
-            <dependency>
-                <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-impl</artifactId>
-                <version>2.1.7</version>
-            </dependency>
-            <dependency>
-                <groupId>org.testng</groupId>
-                <artifactId>testng</artifactId>
-                <version>5.6</version>
-                <scope>test</scope>
-                <classifier>jdk15</classifier>
-            </dependency>
-            <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>1.5.2</version>
@@ -159,16 +122,6 @@
                 <artifactId>mysql-connector-java</artifactId>
                 <version>5.1.5</version>
                 <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.jgoodies</groupId>
-                <artifactId>binding</artifactId>
-                <version>2.0.2</version>
-            </dependency>
-            <dependency>
-                <groupId>com.jgoodies</groupId>
-                <artifactId>forms</artifactId>
-                <version>1.2.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

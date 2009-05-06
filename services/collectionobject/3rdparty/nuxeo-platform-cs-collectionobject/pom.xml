@@ -1,30 +1,35 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.nuxeo.ecm.platform</groupId>
-    <artifactId>nuxeo-platform-parent</artifactId>
-    <version>5.2-SNAPSHOT</version>
-  </parent>
+    <parent>
+        <artifactId>org.collectionspace.services.collectionobject.3rdparty</artifactId>
+        <groupId>org.collectionspace.services</groupId>
+        <version>1.0</version>
+    </parent>
 
-  <artifactId>nuxeo-platform-collectionspace</artifactId>
-  <packaging>jar</packaging>
-  <name>Nuxeo CS Extensions</name>
-  <description>
-    Nuxeo Enterprise Platform: CS extensions
-  </description>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.nuxeo.ecm.core</groupId>
-      <artifactId>nuxeo-core-schema</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.nuxeo.ecm.platform</groupId>
-      <artifactId>nuxeo-platform-types-core</artifactId>
-    </dependency>
-  </dependencies>
+    <artifactId>org.collectionspace.services.collectionobject.doctype</artifactId>
+    <packaging>jar</packaging>
+    <name>services.collectionobject.doctype</name>
+    <description>
+    CollectionObject Nuxeo document type
+    </description>
+    <properties>
+        <nuxeo.version.5.2>5.2-SNAPSHOT</nuxeo.version.5.2>
+        <nuxeo.version.1.5>1.5-SNAPSHOT</nuxeo.version.1.5>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-schema</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.platform</groupId>
+            <artifactId>nuxeo-platform-types-core</artifactId>
+            <version>${nuxeo.version.5.2}</version>
+        </dependency>
+    </dependencies>
 
 </project>
