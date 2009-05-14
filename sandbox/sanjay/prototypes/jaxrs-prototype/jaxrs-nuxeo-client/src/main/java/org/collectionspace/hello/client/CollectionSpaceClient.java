@@ -13,7 +13,7 @@ public abstract class CollectionSpaceClient {
 	
 	private static final String SCHEME = "http";
 	private static final String HOST = "localhost";
-	private static final String PORT = "8080";
+	private static final String PORT = "8180";
 	private static final String URI = "/helloworld/cspace-nuxeo";
 	private static final String URL = SCHEME + "://" +
 		HOST + ":" +

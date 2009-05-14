@@ -1,0 +1,14 @@
+
+<jboss-web>
+   <!-- Uncomment the security-domain to enable security. You will
+      need to edit the htmladaptor login configuration to setup the
+      login modules used to authentication users.
+      <security-domain>java:/jaas/jmx-console</security-domain>
+   -->
+    <!--class-loading >
+        <loader-repository>
+             org.nuxeo:loader=nuxeo.ear
+            <loader-repository-config>java2ParentDelegation=false</loader-repository-config>
+        </loader-repository>
+    </class-loading-->
+</jboss-web>

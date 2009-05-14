@@ -1,6 +1,5 @@
 package org.collectionspace.hello.services;
 
-import org.collectionspace.hello.services.nuxeo.NuxeoRESTClient;
 
 public abstract class CollectionSpaceResource {
     //replace WORKSPACE_UID for resource workspace
@@ -13,12 +12,5 @@ public abstract class CollectionSpaceResource {
     //static String CS_NUXEO_HOST = "173.45.234.217";
 	static String CS_NUXEO_HOST = "localhost";
     static String CS_NUXEO_URI = "http://" + CS_NUXEO_HOST + ":8080/nuxeo";
-    
-    NuxeoRESTClient getClient() {
-        NuxeoRESTClient nxClient = new NuxeoRESTClient(CS_NUXEO_URI);
-        nxClient.setAuthType(NuxeoRESTClient.AUTH_TYPE_BASIC);
-        nxClient.setBasicAuthentication("Administrator", "Administrator");
-        return nxClient;
-    }
-    
+
 }
