@@ -64,8 +64,8 @@ public class MultischemaResource extends CollectionSpaceResource {
 
         PersonNuxeo personPart = new PersonNuxeo();
         DublincoreNuxeo dcPart = new DublincoreNuxeo();
-        CoreSession repoSession = null;
-        RepositoryInstance repo = null;
+
+        RepositoryInstance repoSession = null;
         try{
             if(multipart.getFormData().containsKey("dublincore")){
                 dcPart = multipart.getFormDataPart("dublincore", DublincoreNuxeo.class, null);
@@ -74,8 +74,7 @@ public class MultischemaResource extends CollectionSpaceResource {
                 personPart = multipart.getFormDataPart("hello", PersonNuxeo.class, null);
             }
 
-            repo = getRepository();
-            repoSession = repo.getSession();
+            repoSession = getRepositorySession();
             DocumentRef nuxeoWspace = new IdRef(CS_PERSON_WORKSPACE_UID);
             DocumentModel wspacePeople = repoSession.getDocument(nuxeoWspace);
             String wspacePath = wspacePeople.getPathAsString();
@@ -96,18 +95,17 @@ public class MultischemaResource extends CollectionSpaceResource {
                     "Create failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }finally{
-            try{
-//                repo.close(repoSession);
-            }catch(Exception e){
-                logger.error("Could not close the repository session", e);
-                throw new WebApplicationException();
+            if(repoSession != null){
+                releaseRepositorySession(repoSession);
             }
         }
+
         if(logger.isDebugEnabled()){
-            verbosePerson("createPerson: person", personPart);
-            verboseDublin("createPerson: dublincore", dcPart);
+            verboseObject("createPerson: person", PersonNuxeo.class, personPart);
+            verboseObject("createPerson: dublincore", DublincoreNuxeo.class, dcPart);
         }
         UriBuilder path = UriBuilder.fromResource(MultischemaResource.class);
+
         path.path("" + personPart.getId());
         Response response = Response.created(path.build()).build();
         return response;
@@ -116,19 +114,23 @@ public class MultischemaResource extends CollectionSpaceResource {
     @GET
     @Path("{id}")
     @Produces("multipart/form-data")
-    public MultipartFormDataOutput getPerson(@PathParam("id") String id) {
+    public MultipartFormDataOutput getPerson(
+            @PathParam("id") String id) {
 
         PersonNuxeo personPart = new PersonNuxeo();
         DublincoreNuxeo dublinPart = new DublincoreNuxeo();
         MultipartFormDataOutput output = new MultipartFormDataOutput();
-        RepositoryInstance repo = null;
-        CoreSession repoSession = null;
+        RepositoryInstance repoSession = null;
 
         try{
-            repo = getRepository();
-            repoSession = repo.getSession();
+            repoSession = getRepositorySession();
             DocumentRef helloDocRef = new IdRef(id);
             DocumentModel helloDoc = repoSession.getDocument(helloDocRef);
+            if(helloDoc == null){
+                Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                        "Get failed, the requested person ID:" + id + ": was not found.").type("text/plain").build();
+                throw new WebApplicationException(response);
+            }
             Document doc = getDocument(repoSession, helloDoc);
             Element root = doc.getRootElement();
             //TODO: recognize schema thru namespace uri
@@ -177,31 +179,27 @@ public class MultischemaResource extends CollectionSpaceResource {
                 }
             }//while
             if(logger.isDebugEnabled()){
-                verbosePerson("getPerson:hello:", personPart);
-                verboseDublin("getPerson:dublincore:", dublinPart);
+                verboseObject("getPerson:hello:", PersonNuxeo.class, personPart);
+                verboseObject("getPerson:dublincore:", DublincoreNuxeo.class, dublinPart);
             }
             output.addFormData("hello", personPart, MediaType.APPLICATION_XML_TYPE);
             output.addFormData("dublincore", dublinPart, MediaType.APPLICATION_XML_TYPE);
 
         }catch(Exception e){
-            e.printStackTrace();
+            if(e instanceof WebApplicationException){
+                throw (WebApplicationException) e;
+            }
+            if(logger.isDebugEnabled()){
+                e.printStackTrace();
+            }
             Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
                     "Get failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }finally{
-            try{
-//                repo.close(repoSession);
-            }catch(Exception e){
-                logger.error("Could not close the repository session", e);
-                throw new WebApplicationException();
+            if(repoSession != null){
+                releaseRepositorySession(repoSession);
             }
         }
-        if(personPart == null){
-            Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed, the requested person ID:" + id + ": was not found.").type("text/plain").build();
-            throw new WebApplicationException(response);
-        }
-
         return output;
     }
 
@@ -211,29 +209,32 @@ public class MultischemaResource extends CollectionSpaceResource {
             @PathParam("id") String id,
             PersonNuxeo personPart) {
         if(logger.isDebugEnabled()){
-            verbosePerson("updating person input", personPart);
+            verboseObject("updating person input", PersonNuxeo.class, personPart);
         }
-        CoreSession repoSession = null;
-        RepositoryInstance repo = null;
+        RepositoryInstance repoSession = null;
         try{
-            repo = getRepository();
-            repoSession = repo.getSession();
+            repoSession = getRepositorySession();
             DocumentRef helloDocRef = new IdRef(id);
             DocumentModel helloDoc = repoSession.getDocument(helloDocRef);
+            if(helloDoc == null){
+                Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                        "Get failed, the requested person ID:" + id + ": was not found.").type("text/plain").build();
+                throw new WebApplicationException(response);
+            }
             fillDocument(personPart, helloDoc);
             repoSession.saveDocument(helloDoc);
             repoSession.save();
         }catch(Exception e){
+            if(e instanceof WebApplicationException){
+                throw (WebApplicationException) e;
+            }
             //FIXME: NOT_FOUND?
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Update failed ").type("text/plain").build();
             throw new WebApplicationException(response);
         }finally{
-            try{
-//                repo.close(repoSession);
-            }catch(Exception e){
-                logger.error("Could not close the repository session", e);
-                throw new WebApplicationException();
+            if(repoSession != null){
+                releaseRepositorySession(repoSession);
             }
         }
         return personPart;
@@ -245,11 +246,9 @@ public class MultischemaResource extends CollectionSpaceResource {
         if(logger.isDebugEnabled()){
             logger.debug("deleting person with id=" + id);
         }
-        CoreSession repoSession = null;
-        RepositoryInstance repo = null;
+        RepositoryInstance repoSession = null;
         try{
-            repo = getRepository();
-            repoSession = repo.getSession();
+            repoSession = getRepositorySession();
             DocumentRef helloDocRef = new IdRef(id);
             repoSession.removeDocument(helloDocRef);
             repoSession.save();
@@ -259,28 +258,37 @@ public class MultischemaResource extends CollectionSpaceResource {
                     "Delete failed ").type("text/plain").build();
             throw new WebApplicationException(response);
         }finally{
-            try{
-//                repo.close(repoSession);
-            }catch(Exception e){
-                logger.error("Could not close the repository session", e);
-                throw new WebApplicationException();
+            if(repoSession != null){
+                releaseRepositorySession(repoSession);
             }
         }
-
     }
 
-    synchronized private RepositoryInstance getRepository() throws Exception {
-        NuxeoConnector rmiClient = NuxeoConnector.getInstance();
-        rmiClient.initialize();
-        NuxeoClient client = rmiClient.getClient();
-        RepositoryInstance repo = client.openRepository();
+    private RepositoryInstance getRepositorySession() throws Exception {
+        NuxeoConnector nuxeoConnector = NuxeoConnector.getInstance();
+        nuxeoConnector.initialize();
+        NuxeoClient client = nuxeoConnector.getClient();
+        //FIXME: is it possible to reuse repository session?
+        //Authentication failures happen while trying to reuse the session
+        RepositoryInstance repoSession = client.openRepository();
         if(logger.isDebugEnabled()){
-            logger.debug("deployNuxeo: repository root: " + repo.getRootDocument());
+            logger.debug("getRepository() repository root: " +
+                    repoSession.getRootDocument());
         }
-        return repo;
+        return repoSession;
     }
 
-    private Document getDocument(CoreSession repoSession, DocumentModel helloDoc)
+    private void releaseRepositorySession(RepositoryInstance repoSession) {
+        try{
+            //release session
+            NuxeoClient.getInstance().releaseRepository(repoSession);
+        }catch(Exception e){
+            logger.error("Could not close the repository session", e);
+        //no need to throw this service specific exception
+        }
+    }
+
+    private Document getDocument(RepositoryInstance repoSession, DocumentModel helloDoc)
             throws Exception {
         Document doc = null;
         DocumentWriter writer = null;
@@ -289,11 +297,11 @@ public class MultischemaResource extends CollectionSpaceResource {
         ByteArrayInputStream bais = null;
         try{
             baos = new ByteArrayOutputStream();
-            reader = new SingleDocumentReader(repoSession,
-                    helloDoc);
+            //nuxeo io.impl begin
+            reader = new SingleDocumentReader(repoSession, helloDoc);
             writer = new XMLDocumentWriter(baos);
             DocumentPipe pipe = new DocumentPipeImpl();
-
+            //nuxeo io.impl end
             pipe.setReader(reader);
             pipe.setWriter(writer);
             pipe.run();
@@ -347,36 +355,15 @@ public class MultischemaResource extends CollectionSpaceResource {
         }
     }
 
-    private void verbosePerson(String msg, PersonNuxeo person) {
+    private void verboseObject(String msg, Class klass, Object obj) {
         try{
             if(logger.isDebugEnabled()){
                 logger.debug(msg);
             }
-            JAXBContext jc = JAXBContext.newInstance(
-                    PersonNuxeo.class);
-
+            JAXBContext jc = JAXBContext.newInstance(klass);
             Marshaller m = jc.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-                    Boolean.TRUE);
-            m.marshal(person, System.out);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-
-    }
-
-    private void verboseDublin(String msg, DublincoreNuxeo dubin) {
-        try{
-            if(logger.isDebugEnabled()){
-                logger.debug(msg);
-            }
-            JAXBContext jc = JAXBContext.newInstance(
-                    DublincoreNuxeo.class);
-
-            Marshaller m = jc.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-                    Boolean.TRUE);
-            m.marshal(dubin, System.out);
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            m.marshal(obj, System.out);
         }catch(Exception e){
             e.printStackTrace();
         }

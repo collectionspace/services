@@ -53,6 +53,12 @@ public class NuxeoConnector {
         }
     }
 
+    public void release() throws Exception {
+        if(initialized == true) {
+            client.disconnect();
+        }
+    }
+
     private void loadBundles() throws Exception {
         String bundles = "nuxeo-client/lib/nuxeo-runtime-*:nuxeo-client/lib/nuxeo-*";
         Collection<File> files = null;
