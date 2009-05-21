@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Document   : web.xml
+    Created on : May 19, 2009, 1:31 PM
+    Author     :
+    Copyright 2009 University of California at Berkeley
+    Description:
+        service layer web application
+-->
 <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 <web-app>
     <display-name>CollectionSpace</display-name>
@@ -13,9 +21,16 @@
         <param-value>/nuxeo-rest</param-value>
     </context-param>
 
+    <!-- Listeners -->
     <listener>
         <listener-class>
             org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap
+        </listener-class>
+    </listener>
+
+    <listener>
+        <listener-class>
+            org.collectionspace.services.common.ServiceContextListener
         </listener-class>
     </listener>
 

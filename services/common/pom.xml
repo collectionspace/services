@@ -12,6 +12,14 @@
     <version>1.0</version>
     <name>services.common</name>
 
+    <properties>
+        <jboss.version>4.2.3.GA</jboss.version>
+        <jboss.ejb.version>3.0</jboss.ejb.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <nuxeo.version.5.2>5.2-SNAPSHOT</nuxeo.version.5.2>
+        <nuxeo.version.1.5>1.5-SNAPSHOT</nuxeo.version.1.5>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -34,13 +42,22 @@
             <artifactId>resteasy-multipart-provider</artifactId>
             <version>1.0.2.GA</version>
         </dependency>
+
+        <!-- utilities -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.1</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
       <!-- javax -->
 
 
@@ -59,21 +76,67 @@
         </dependency>
         
         <!-- jboss -->
-
+        <dependency>
+            <groupId>jboss</groupId>
+            <artifactId>jboss-remoting</artifactId>
+            <version>2.2.2.SP8</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- nuxeo -->
 
+        <dependency>
+            <groupId>org.nuxeo.common</groupId>
+            <artifactId>nuxeo-common</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.runtime</groupId>
+            <artifactId>nuxeo-runtime</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-api</artifactId>
             <version>${nuxeo.version.1.5}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jboss-remoting</artifactId>
-                    <groupId>jboss</groupId>
-                </exclusion>
-            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-client</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-query</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-schema</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-io</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-facade</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.runtime</groupId>
+            <artifactId>nuxeo-runtime-osgi</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi-core</artifactId>
+            <version>4.1</version>
         </dependency>
 
+        <!-- fixme remove restlet dependencies once REST client is no more used -->
         <dependency>
             <groupId>org.restlet</groupId>
             <artifactId>org.restlet</artifactId>
@@ -90,17 +153,88 @@
             <version>1.0.7</version>
         </dependency>
 
-        <!-- where is jaxen needed? -->
+        <!--fixme where is jaxen needed? -->
         <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
             <version>1.1.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jvnet.jaxb2-commons</groupId>
+            <artifactId>property-listener-injector</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jvnet.jaxb2_commons</groupId>
+            <artifactId>runtime</artifactId>
+            <version>0.4.1.4</version>
         </dependency>
     </dependencies>
     
     <build>
         <finalName>collectionspace-services-common</finalName>
         <plugins>
+            <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+               <!-- javax.activation.DataSource provider is required by spec -->
+                    <dependency>
+                        <groupId>javax.activation</groupId>
+                        <artifactId>activation</artifactId>
+                        <version>1.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.sun.xml.bind</groupId>
+                        <artifactId>jaxb-impl</artifactId>
+                        <version>2.1.2</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <args>
+                        <arg>-XtoString</arg>
+                        <arg>-Xinject-listener-code</arg>
+
+                     <!-- <arg>-Xcollection-setter-injector</arg>
+                                <arg>-Xfluent-api</arg> -->
+                    </args>
+                    <plugins>
+                        <plugin>
+                            <groupId>
+                           org.jvnet.jaxb2_commons
+                            </groupId>
+                            <artifactId>basic</artifactId>
+                            <version>0.4.1</version>
+                        </plugin>
+                        <plugin>
+                            <groupId>
+                           org.jvnet.jaxb2-commons
+                            </groupId>
+                            <artifactId>
+                           property-listener-injector
+                            </artifactId>
+                            <version>1.0</version>
+                        </plugin>
+
+                    </plugins>
+                    <!--generatePackage>
+                     org.collectionspace.hello
+                    </generatePackage-->
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

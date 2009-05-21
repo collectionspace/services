@@ -68,19 +68,77 @@
         <!-- javax -->
         
         <!-- jboss -->
-        
+        <dependency>
+            <groupId>jboss</groupId>
+            <artifactId>jboss-remoting</artifactId>
+            <version>2.2.2.SP8</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- nuxeo -->
+
+        <dependency>
+            <groupId>org.nuxeo.common</groupId>
+            <artifactId>nuxeo-common</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.runtime</groupId>
+            <artifactId>nuxeo-runtime</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-api</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-client</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-query</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-schema</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-io</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-facade</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.runtime</groupId>
+            <artifactId>nuxeo-runtime-osgi</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi-core</artifactId>
+            <version>4.1</version>
+        </dependency>
 
     </dependencies>
     
     <build>
-        <finalName>collectionspace-services-jaxrs-provider</finalName>
+        <finalName>CollectionSpace</finalName>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jboss-maven-plugin</artifactId>
                 <configuration>
                     <jbossHome>${jboss.dir}</jbossHome>
+                    <port>8180</port>
                 </configuration>
                 <executions>
                     <execution>
@@ -90,7 +148,7 @@
                             <goal>undeploy</goal>
                         </goals>
                         <configuration>
-                            <fileName>${basedir}/target/collectionspace-services.war</fileName>
+                            <fileName>${basedir}/target/CollectionSpace.war</fileName>
                         </configuration>
                     </execution>
                     <execution>

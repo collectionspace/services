@@ -31,7 +31,6 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 
 
 import org.nuxeo.common.utils.IdUtils;
-import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
 
