@@ -33,8 +33,7 @@ public class CollectionObjectServiceNuxeoImpl extends
 	final static String CO_NUXEO_DC_TITLE = "CollectionSpace-CollectionObject";
 
 	// replace WORKSPACE_UID for resource workspace
-	static String CS_COLLECTIONOBJECT_WORKSPACE_UID = "ed110dfd-34e2-4870-bfdb-3be13d19c3f9";
-            //"e4a8e3d4-0954-4c10-963a-cc4ed09d5112";
+	static String CS_COLLECTIONOBJECT_WORKSPACE_UID = "e4a8e3d4-0954-4c10-963a-cc4ed09d5112";
 
 	public Document deleteCollectionObject(String csid)
 			throws DocumentException, IOException {
