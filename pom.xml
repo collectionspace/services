@@ -10,7 +10,6 @@
 
     <modules>
         <module>services</module>
-        <module>JaxRsServiceProvider</module>
     </modules>
     <repositories>
         <repository>
