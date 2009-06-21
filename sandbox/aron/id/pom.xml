@@ -7,7 +7,11 @@
   <version>0.1-SNAPSHOT</version>
   <name>id</name>
   <url>http://maven.apache.org</url>
-  <build>
+  	<properties>
+  		<!-- See http://docs.codehaus.org/display/MAVENUSER/POM+Element+for+Source+File+Encoding -->
+    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <build>
   	<plugins>
     	<plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -20,11 +24,6 @@
 			</plugins>
 		</build>
 		<dependencies>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-id</artifactId>
-      <version>1.0-SNAPSHOT</version>
-		</dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
