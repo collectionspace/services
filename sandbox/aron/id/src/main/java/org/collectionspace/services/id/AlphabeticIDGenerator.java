@@ -23,6 +23,15 @@
  */
 
 // @TODO: Add Javadoc comments
+
+// @TODO: This still has dependencies on code and algorithms from
+// Apache Commons ID; we'll need to remove those, which will give us
+// more flexibility, most likely by:
+// * Switching to a Vector of chars, which will allow us to automatically
+//   (and optionally) expand the number of chars returned.
+// * Introducing flexibility, through configuration, in the series of
+//   characters through which this generator cycles, rather than hard-coding
+//   specific characters in the USASCII character set.
  
 // @TODO: The initial value determines the fixed number of characters.
 // We may also need to model cases where the number of characters
@@ -102,6 +111,7 @@ public class AlphabeticIDGenerator implements IDGenerator {
 
 	}
 
+	// @TODO: This is still failing; we'll address this through as larger refactoring.
 	public synchronized void reset() {
 		try {
 			// TODO: Investigate using different methods to perform this copying,
