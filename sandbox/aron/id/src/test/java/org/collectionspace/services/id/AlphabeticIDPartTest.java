@@ -52,24 +52,24 @@ public class AlphabeticIDPartTest extends TestCase {
 	
 	public void testGetNextIDUppercase() {
 		
-		part = new AlphabeticIDPart("A");
+		part = new AlphabeticIDPart("A", "Z", "A");
 		assertEquals("B", part.getNextID());
 		assertEquals("C", part.getNextID());
 
-		part = new AlphabeticIDPart("X");
+		part = new AlphabeticIDPart("A", "Z", "X");
 		assertEquals("Y", part.getNextID());
 		assertEquals("Z", part.getNextID());
 
-		part = new AlphabeticIDPart("AA");
+		part = new AlphabeticIDPart("A", "Z", "AA");
 		assertEquals("AB", part.getNextID());
 		assertEquals("AC", part.getNextID());
 
-		part = new AlphabeticIDPart("AY");
+		part = new AlphabeticIDPart("A", "Z", "AY");
 		assertEquals("AZ", part.getNextID());
 		assertEquals("BA", part.getNextID());
 		assertEquals("BB", part.getNextID());
 
-		part = new AlphabeticIDPart("ZX");
+		part = new AlphabeticIDPart("A", "Z", "ZX");
 		assertEquals("ZY", part.getNextID());
 		assertEquals("ZZ", part.getNextID());
 			
@@ -87,7 +87,7 @@ public class AlphabeticIDPartTest extends TestCase {
 
 	public void testResetUppercase() {
 		
-		part = new AlphabeticIDPart("RA");
+		part = new AlphabeticIDPart("A", "Z", "RA");
 		assertEquals("RB", part.getNextID());
 		assertEquals("RC", part.getNextID());
 		part.reset();
@@ -104,7 +104,7 @@ public class AlphabeticIDPartTest extends TestCase {
 
 	public void testInitialUppercase() {
 		
-		part = new AlphabeticIDPart("AZ");
+		part = new AlphabeticIDPart("A", "Z", "AZ");
 		assertEquals("AZ", part.getInitialID());
 		
 	}
@@ -122,7 +122,7 @@ public class AlphabeticIDPartTest extends TestCase {
 
 	public void testCurrentUppercase() {
 		
-		part = new AlphabeticIDPart("A");
+		part = new AlphabeticIDPart("A", "Z", "A");
 		assertEquals("A", part.getCurrentID());
 		assertEquals("B", part.getNextID());
 		assertEquals("C", part.getNextID());
@@ -133,31 +133,19 @@ public class AlphabeticIDPartTest extends TestCase {
 	
 	public void testOverflowLowercase() {
 	
-		try {
-			part = new AlphabeticIDPart("zx");
-			assertEquals("zy", part.getNextID());
-			assertEquals("zz", part.getNextID());
-			// Should throw IllegalStateException
-			assertNotNull(part.getNextID());
-			fail("Should have thrown IllegalStateException here");
-		} catch (IllegalStateException expected) {
-			// This Exception should be thrown, and thus the test should pass.
-		}
+    part = new AlphabeticIDPart("zx");
+    assertEquals("zy", part.getNextID());
+    assertEquals("zz", part.getNextID());
+    assertEquals("aaa", part.getNextID());
 		
 	}
 
 	public void testOverflowUppercase() {
 	
-		try {
-			part = new AlphabeticIDPart("X");
-			assertEquals("Y", part.getNextID());
-			assertEquals("Z", part.getNextID());
-			// Should throw IllegalStateException
-			assertNotNull(part.getNextID());
-			fail("Should have thrown IllegalStateException here");
-		} catch (IllegalStateException expected) {
-			// This Exception should be thrown, and thus the test should pass.
-		}
+    part = new AlphabeticIDPart("A", "Z", "X");
+    assertEquals("Y", part.getNextID());
+    assertEquals("Z", part.getNextID());
+    assertEquals("AA", part.getNextID());
 		
 	}
 

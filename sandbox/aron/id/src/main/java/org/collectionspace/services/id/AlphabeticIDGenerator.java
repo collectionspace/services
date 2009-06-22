@@ -1,13 +1,8 @@
 /*	
  * AlphabeticIDGenerator
  *
- * <p>An identifier generator that generates an incrementing ID from any composite
- * of the USASCII character sequences 'A-Z' and 'a-z', as a String object.</p>
- *
- * <p>The <code>wrap</code> property determines whether or not the sequence wraps
- * when it reaches the largest value that can be represented in <code>size</code>.
- * If <code>wrap</code> is false and the the maximum representable
- * value is exceeded, an IllegalStateException is thrown</p>
+ * <p>An identifier generator that generates an incrementing alphabetic ID
+ * from any sequence of characters, as a String object.</p>
  *
  * Copyright 2009 Regents of the University of California
  *
@@ -24,165 +19,200 @@
 
 // @TODO: Add Javadoc comments
 
-// @TODO: This still has dependencies on code and algorithms from
-// Apache Commons ID; we'll need to remove those, which will give us
-// more flexibility, most likely by:
-// * Switching to a Vector of chars, which will allow us to automatically
-//   (and optionally) expand the number of chars returned.
-// * Introducing flexibility, through configuration, in the series of
-//   characters through which this generator cycles, rather than hard-coding
-//   specific characters in the USASCII character set.
- 
 // @TODO: The initial value determines the fixed number of characters.
-// We may also need to model cases where the number of characters
-// increases as values roll over, up to a specified maximum number of
-// characters; e.g. "z" becomes "aa", and "ZZ" becomes "AAA". When
-// doing so, we'll also need to set a maximum length to which the
-// generated IDs can grow.
-
-// @TODO: This class is hard-coded to use two series within the
-// USASCII character set.
+// Currently, identifiers simply 'wrap' (roll over) within that fixed
+// series, which is not always the desired outcome.
 //
-// With some minor refactoring, we could draw upon minimum and maximum
-// character values for a wide range of arbitrary character sets.
+// We may also need to model cases where the number of characters
+// auto-expands as the value of the most significant character
+// rolls over, up to a specified maximum number of characters:
+// e.g. a call to getNextID(), where the current ID is "z",
+// auto-expands to "aa", and a current ID of "ZZ" auto-expands to "AAA".
+//
+// When doing so, we'll also need to set a maximum length to which the
+// generated IDs can grow, likely as an additional parameter to be
+// passed to a constructor, with a default value hard-coded in the class.
 
-// Some code and algorithms in the current iteration of this class
-// were adapted from the org.apache.commons.Id package, and thus
-// the relevant licensing terms are included here:
+// @TODO: Handle escaped character sequences representing Unicode code points,
+// both in the start and end characters of the sequence, and in the initial value.
+//
+// Some initial research on this:
+// http://www.velocityreviews.com/forums/t367758-unescaping-unicode-code-points-in-a-java-string.html
 
-/*
- * Licensed under the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License. You may obtain
- * a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
- * implied. See the License for the specific language governing
- * permissions and limitations under the License.
- */
+// NOTE: This class currently hard-codes the assumption that the values in
+// alphabetic identifiers are ordered in significance from left-to-right;
+// that is, the most significant value appears in the left-most position.
  
 package org.collectionspace.services.id;
 
+import java.util.Collections;
+import java.util.Vector;
+
 public class AlphabeticIDGenerator implements IDGenerator {
-    
-	private static final char LOWERCASE_Z_CHAR = 'z';
-	private static final char UPPERCASE_Z_CHAR = 'Z';
+   
+  private static final char NULL_CHAR = '\u0000';
 
-	private char[] initialValue = null;
-	private char[] currentValue = null;
-	
-	public AlphabeticIDGenerator(String initialValue) throws IllegalArgumentException {
+  private static final String DEFAULT_START_CHAR = "a";
+  private static final String DEFAULT_END_CHAR = "z";
+	  
+  private char startChar = NULL_CHAR;
+  private char endChar = NULL_CHAR;
+  
+	private Vector<Character> initialValue = new Vector<Character>();
+	private Vector<Character> currentValue = new Vector<Character>();
 
-		if ( initialValue == null ) {
-			throw new IllegalArgumentException("Initial value must not be null");
-		}
+  // Defaults to an 'a-z' series, representing lowercase alphabetic characters
+  // in the USASCII character set within Java's internal representation of
+  // characters (Unicode's UTF-16 encoding), if no start and end characters
+  // are provided for the alphabetic character sequence.
+	public AlphabeticIDGenerator(String initial) throws IllegalArgumentException {
+	  
+	  this(DEFAULT_START_CHAR, DEFAULT_END_CHAR, initial);
+	  
+	}
 	
-		if ( initialValue == "" ) {
-			throw new IllegalArgumentException("Initial value must not be empty");
-		}
-	
-		char[] charsToValidate = initialValue.toCharArray();
-		
-		// Validate each of the characters in the initial value
-		// against ranges of valid values.
-		for (int i = 0; i < charsToValidate.length; i++) {
-		
-			char ch = charsToValidate[i];
-			
-			// If the value of the current character matches a character
-			// in the uppercase ('A-Z') or lowercase ('a-z') series
-			// in the USASCII character set, that character has a valid value,
-			// so we can skip to checking the next character.
-			if (ch >= 'A' && ch <= 'Z') continue;
-			if (ch >= 'a' && ch <= 'z') continue;
-			
-			// Otherwise, we've detected a character not in those series.
+	public AlphabeticIDGenerator(String seriesStart, String seriesEnd, String initial)
+	  throws IllegalArgumentException {
+	  
+	  // Validate and store the start character in the alphabetic series.
+	  
+	  if (seriesStart == null || seriesStart.equals("")) {
 			throw new IllegalArgumentException(
-				"character " + charsToValidate[i] + " is not valid");
+			  "Start character in the alphabetic series must not be null or empty");
+		}
+	  
+    // @TODO The next two statements will need to be revised to handle escaped
+    // representations of characters outside the USASCII character set.
+	  if (seriesStart.length() > 1) {
+			throw new IllegalArgumentException(
+			  "Start character in the alphabetic series must be exactly one character in length");
+		}
+
+    this.startChar = seriesStart.charAt(0);
+
+	  // Validate and store the end character in the alphabetic series.
+
+	  if (seriesEnd == null || seriesEnd.equals("")) {
+			throw new IllegalArgumentException(
+			  "End character in the alphabetic series must not be null or empty");
+		}
+	  
+    // @TODO The next two statements will need to be revised to handle escaped
+    // representations of characters outside the USASCII character set.
+	  if (seriesEnd.length() > 1) {
+			throw new IllegalArgumentException(
+			  "End character in the alphabetic series must be exactly one character in length");
+		}
+
+    this.endChar = seriesEnd.charAt(0);
+    
+	  if (this.endChar <= this.startChar) {
+			throw new IllegalArgumentException(
+			  "End (last) character in an alphabetic series must be greater than the start character");
+		}
+		
+	  // Validate and store the initial value of this identifier.
+
+		if (initial == null || initial.equals("")) {
+			throw new IllegalArgumentException("Initial value must not be null or empty");
+		}
+		
+		// @TODO: Add a check for maximum length of the initial value here.
+	
+	  // Store the chars in the initial value as Characters in a Vector.
+	  // (Since we're performing casts from char to Character, we can't just
+	  // use Arrays.asList() to copy the initial array to a Vector.)
+		char[] chars = initial.toCharArray();
+		for (int i=0; i < chars.length; i++) {
+		  this.initialValue.add(new Character(chars[i]));
+		}
+		
+		// Validate that each of the characters in the initial value
+		// falls within the provided series.
+		for ( Character ch : this.initialValue ) {
+		
+			if (ch.charValue() >= this.startChar && ch.charValue() <= this.endChar) {
+			  continue;
+      // Otherwise, we've detected a character not in the series.
+			} else {
+        throw new IllegalArgumentException("character " + "\'" + ch + "\'" + " is not valid");
+      }
 				
 		} // end 'for' loop
 		
-		// Store the initial character array
-		this.initialValue = charsToValidate;
-		this.currentValue = charsToValidate;
+		// Initialize the current value from the initial value.
+		this.currentValue = new Vector<Character>(this.initialValue);
 
 	}
 
-	// @TODO: This is still failing; we'll address this through as larger refactoring.
+  // Reset the current value to the initial value.
 	public synchronized void reset() {
-		try {
-			// TODO: Investigate using different methods to perform this copying,
-			// such as clone.  See "Java Practices - Copy an Array"
-			// <http://www.javapractices.com/topic/TopicAction.do?Id=3>
-			// char [] copy = (char []) initialValue.clone();
-			// this.currentValue = copy;
-			// System.arraycopy( 
-			//	this.initialValue, 0, this.currentValue, 0, this.initialValue.length );
-      for ( int i = 0; i < this.initialValue.length; ++i ) {
-        this.currentValue[i] = this.initialValue[i];
-      }
-		// If copying would cause access of data outside array bounds.
-		} catch (IndexOutOfBoundsException iobe) {
-			// For experimentation - do nothing here at this time.
-		// If an element in the source array could not be stored into
-		// the destination array because of a type mismatch. 
-		} catch (ArrayStoreException ase) {
-			// For experimentation - do nothing here at this time.
-		// If either source or destination is null.
-		} catch (NullPointerException npe) {
-			// For experimentation - do nothing here at this time.
-		}
+	  Collections.copy(this.currentValue, this.initialValue);
 	}
 
+  // Returns the initial value.
 	public synchronized String getInitialID() {
-		return new String(this.initialValue);
+		return getIDString(this.initialValue);
 	}
 
+  // Returns the current value.
 	public synchronized String getCurrentID() {
-		return new String(this.currentValue);
+		return getIDString(this.currentValue);
 	}
 	
+	// Returns the next alphabetic ID in the series.
 	public synchronized String getNextID() {
-	        
+		        
 		// Get next values for each character, from right to left
 		// (least significant to most significant).
-		//
-		// When reaching the maximum value for any character position,
-		// 'roll over' to the minimum value for that position.
-		for (int i = (this.currentValue.length - 1); i >= 0; i--) {
+		boolean expandIdentifier = false;
+		int size = this.currentValue.size();
+		char c;
+		for (int i = (size - 1); i >= 0; i--) {
+
+      c = this.currentValue.get(i).charValue();
+
+      // When reaching the maximum value for any character position,
+      // 'roll over' to the minimum value for that position.
+      if (c == this.endChar) {
+		    this.currentValue.set(i, Character.valueOf(this.startChar));
+		    // If this roll over occurs in the most significant value,
+		    // set a flag to later expand the size of the identifier.
+		    //
+		    // @TODO: Set another flag to enable or disable this behavior,
+		    // as well as a mechanism for setting the maximum expansion permitted.
+		    if (i == 0) {
+		      expandIdentifier = true;
+		    }
+		  } else {
+        c++;
+        this.currentValue.set(i, Character.valueOf(c));
+        i = -1;
+        break;		  
+		  }
+
+		}
+
+    // If we are expanding the size of the identifier, insert a new
+    // value at the most significant character position, sliding other
+    // values to the right.
+    if (expandIdentifier) {
+      this.currentValue.add(0, Character.valueOf(this.startChar));
+    }
 		
-			switch (this.currentValue[i]) {
-			
-				case LOWERCASE_Z_CHAR:  // z
-					if (i == 0) {
-						throw new IllegalStateException(
-							"The maximum number of IDs has been reached");
-					}
-					this.currentValue[i] = 'a';
-					break;
-
-			 case UPPERCASE_Z_CHAR:  // Z
-					if (i == 0) {
-						throw new IllegalStateException(
-						"The maximum number of IDs has been reached");
-					}
-					this.currentValue[i] = 'A';
-					break;
-
-				default:
-					this.currentValue[i]++;
-					i = -1;
-					break;
-					
-			} // end switch
-
-		} // end 'for' loop
-   
-		return new String(currentValue);
-
+		return getIDString(this.currentValue);
+		
   }
-	
+
+  // Returns a String representation of the contents of a Vector,
+  // in the form of an identifier (e.g. each Character's String value
+  // is appended to the next).
+  public synchronized String getIDString(Vector<Character> v) {
+		StringBuffer sb = new StringBuffer();
+	  for ( Character ch : v ) {
+      sb.append(ch.toString());
+		}
+		return sb.toString();
+	}
+
 }

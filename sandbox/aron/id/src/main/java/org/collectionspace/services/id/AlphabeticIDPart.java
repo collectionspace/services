@@ -25,5 +25,9 @@ public class AlphabeticIDPart extends IDPart {
 	public AlphabeticIDPart(String baseVal) {
 		super(new AlphabeticIDGenerator(baseVal));
 	};
+
+	public AlphabeticIDPart(String startVal, String endVal, String baseVal) {
+		super(new AlphabeticIDGenerator(startVal, endVal, baseVal));
+	};
 		
 }
