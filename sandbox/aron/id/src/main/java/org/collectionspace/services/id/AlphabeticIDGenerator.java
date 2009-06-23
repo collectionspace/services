@@ -223,4 +223,9 @@ public class AlphabeticIDGenerator implements IDGenerator {
 		return sb.toString();
 	}
 
+	public synchronized boolean isValidID(String value) throws IllegalArgumentException {
+		// Currently stubbed-out
+		return true;
+	}
+	
 }

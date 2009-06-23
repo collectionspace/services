@@ -22,6 +22,9 @@
 
 package org.collectionspace.services.id;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class StringIDGenerator implements IDGenerator {
     
 	private String initialValue = null;
@@ -30,7 +33,7 @@ public class StringIDGenerator implements IDGenerator {
 	public StringIDGenerator(String initialValue) throws IllegalArgumentException {
 
 		if ( initialValue == null || initialValue == "") {
-			throw new IllegalArgumentException("Initial value must not be null or empty");
+			throw new IllegalArgumentException("Initial ID value must not be null or empty");
 		}
 		
 		this.initialValue = initialValue;
@@ -53,5 +56,26 @@ public class StringIDGenerator implements IDGenerator {
 	public synchronized String getNextID() {
 		return this.currentValue;
   }
+
+	public synchronized boolean isValidID(String value) throws IllegalArgumentException {
+
+		if ( value == null || value == "") {
+			throw new IllegalArgumentException("ID to validate must not be null or empty");
+		}
+
+		Pattern pattern = Pattern.compile(getRegex());
+		Matcher matcher = pattern.matcher(value);
+		if (matcher.matches()) {
+			return true;
+		} else {
+			return false;
+		}
+		
+	}
+
+	public synchronized String getRegex() {
+		String regex = "(" + this.initialValue + ")";
+		return regex;
+	}
 	
 }

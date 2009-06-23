@@ -32,14 +32,14 @@ public class NumericIDGenerator implements IDGenerator {
 		try {
 			long l = Long.parseLong(initialValue.trim());
 			if ( l < 0 ) {
-				throw new IllegalArgumentException("Initial value should be zero (0) or greater");
+				throw new IllegalArgumentException("Initial ID value should be zero (0) or greater");
 			}
 			this.currentValue = l;
 			this.initialValue = l;
 		} catch (NullPointerException e) {
-			throw new IllegalArgumentException("Initial value should not be null");
+			throw new IllegalArgumentException("Initial ID value should not be null");
 		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("Initial value must be parseable as a number");
+			throw new IllegalArgumentException("Initial ID value must be parseable as a number");
 		}
 	}
 
@@ -58,6 +58,11 @@ public class NumericIDGenerator implements IDGenerator {
 	public synchronized String getNextID() {
 		this.currentValue++;
 		return Long.toString(this.currentValue);
+	}
+
+	public synchronized boolean isValidID(String value) throws IllegalArgumentException {
+		// Currently stubbed-out
+		return true;
 	}
 	
 }

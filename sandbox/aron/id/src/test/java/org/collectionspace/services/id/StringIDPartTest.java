@@ -70,7 +70,41 @@ public class StringIDPartTest extends TestCase {
 		}
 
 	}
+
+	public void testIsValidID() {
 	
+		part = new StringIDPart("-");
+		assertTrue(part.isValidID("-"));
+
+		part = new StringIDPart("-");
+		assertFalse(part.isValidID("--"));
+
+		// Test chars with special meaning in regexes.
+		part = new StringIDPart(".");
+		assertTrue(part.isValidID("."));
+
+		part = new StringIDPart("TE");
+		assertTrue(part.isValidID("TE"));
+
+		part = new StringIDPart("TE");
+		assertFalse(part.isValidID("T"));
+
+		part = new StringIDPart("T");
+		assertFalse(part.isValidID("TE"));
+	
+	}	
+
+	public void testNullValidationValue() {
+	
+		try {
+			part = new StringIDPart("-");
+			assertFalse(part.isValidID(null));
+			fail("Should have thrown IllegalArgumentException here");
+		} catch (IllegalArgumentException expected) {
+			// This Exception should be thrown, and thus the test should pass.
+		}
+
+	}	
 	// @TODO: Add more tests of boundary conditions, exceptions ...
  
 }

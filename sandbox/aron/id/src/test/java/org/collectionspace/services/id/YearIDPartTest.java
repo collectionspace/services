@@ -88,7 +88,34 @@ public class YearIDPartTest extends TestCase {
 		}
 
 	}
+
+	public void testIsValidID() {
 	
+		part = new YearIDPart();
+		assertTrue(part.isValidID("2009"));
+
+		part = new YearIDPart();
+		assertFalse(part.isValidID("839"));
+
+		part = new YearIDPart();
+		assertFalse(part.isValidID("10100"));
+		
+		part = new YearIDPart();
+		assertFalse(part.isValidID("non-numeric value"));
+		
+	}
+
+	public void testNullValidationValue() {
+	
+		try {
+			part = new YearIDPart();
+			assertFalse(part.isValidID(null));
+			fail("Should have thrown IllegalArgumentException here");
+		} catch (IllegalArgumentException expected) {
+			// This Exception should be thrown, and thus the test should pass.
+		}
+		
+	}	
 	// @TODO: Add more tests of boundary conditions, exceptions ...
  
 }

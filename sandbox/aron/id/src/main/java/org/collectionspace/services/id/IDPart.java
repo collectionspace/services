@@ -56,14 +56,19 @@ public abstract class IDPart {
 	}
 
 	// Returns the next value of this ID.
-	public synchronized String getNextID() {
-		try {
-			return generator.getNextID();
-		} catch (IllegalStateException e) {
-			throw e;
-		}
+	public synchronized String getNextID() throws IllegalStateException {
+		return generator.getNextID();
 	}
 
-	// public boolean validate() {};
+	// Validates an instance of the ID, to
+	// identify if it matches this IDPart's pattern.
+	//
+	// Some IDParts may offer generic validation,
+	// while others may offer per-instance valiadation
+	// based on the values, series, etc. that are
+	// stored within those parts.
+	public synchronized boolean isValidID(String value) throws IllegalArgumentException {
+		return generator.isValidID(value);
+	}
  
 }

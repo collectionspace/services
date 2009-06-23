@@ -27,5 +27,9 @@ public interface IDGenerator {
 	public String getCurrentID();
 
 	public String getNextID();
+
+	public boolean isValidID(String value);
+
+	// public String getRegex();
 		
 }

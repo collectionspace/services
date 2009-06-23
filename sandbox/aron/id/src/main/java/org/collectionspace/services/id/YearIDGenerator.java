@@ -41,6 +41,9 @@ package org.collectionspace.services.id;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class YearIDGenerator implements IDGenerator {
     
 	private String initialValue = null;
@@ -57,7 +60,7 @@ public class YearIDGenerator implements IDGenerator {
 	public YearIDGenerator(String initialValue) throws IllegalArgumentException {
 
 		if ( initialValue == null || initialValue == "") {
-			throw new IllegalArgumentException("Initial value must not be null or empty");
+			throw new IllegalArgumentException("Initial ID value must not be null or empty");
 		}
 		
 		// @TODO: Add regex-based validation here, by calling a
@@ -95,5 +98,28 @@ public class YearIDGenerator implements IDGenerator {
     int y = cal.get(Calendar.YEAR);
 		return Integer.toString(y);
 	}	
+
+	public synchronized boolean isValidID(String value) throws IllegalArgumentException {
+
+		if ( value == null || value == "") {
+			throw new IllegalArgumentException("ID to validate must not be null or empty");
+		}
+
+		Pattern pattern = Pattern.compile(getRegex());
+		Matcher matcher = pattern.matcher(value);
+		if (matcher.matches()) {
+			return true;
+		} else {
+			return false;
+		}
+		
+	}
+
+	public synchronized String getRegex() {
+		// NOTE: Currently hard-coded to accept only a range of
+		// four-digit Gregorian Calendar year dates.
+		String regex = "(\\d\\d\\d\\d)";
+		return regex;
+	}
 	
 }
