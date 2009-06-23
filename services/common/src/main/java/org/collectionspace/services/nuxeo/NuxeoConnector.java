@@ -83,9 +83,20 @@ public class NuxeoConnector {
 
     private void loadBundles() throws Exception {
         String bundles = "nuxeo-client/lib/nuxeo-runtime-*:nuxeo-client/lib/nuxeo-*";
+        String serverRootDir = System.getProperty("jboss.server.home.dir");
+        if(serverRootDir == null){
+            serverRootDir = "."; //assume server is started from server root, e.g. server/cspace
+        }
+        File clientLibDir = new File(serverRootDir + File.separator + "nuxeo-client");
+        if(!clientLibDir.exists()){
+            String msg = "Library bundles requried to deploy Nuxeo client not found: " +
+                    " directory named nuxeo-client with bundles does not exist in " + serverRootDir;
+            logger.error(msg);
+            throw new IllegalStateException(msg);
+        }
         Collection<File> files = null;
         if(bundles != null){
-            files = NuxeoApp.getBundleFiles(new File("."), bundles, ":");
+            files = NuxeoApp.getBundleFiles(new File(serverRootDir), bundles, ":");
         }
         if(logger.isDebugEnabled()){
             logger.debug("loadBundles(): deploying bundles: " + files);
@@ -154,10 +165,9 @@ public class NuxeoConnector {
     public void releaseRepositorySession(RepositoryInstance repoSession) throws Exception {
         if(repoSession != null){
             getClient().releaseRepository(repoSession);
+
             if(logger.isDebugEnabled()){
-                if(logger.isDebugEnabled()){
-                    logger.debug("releaseRepositorySession() released repository session");
-                }
+                logger.debug("releaseRepositorySession() released repository session");
             }
         }
     }
@@ -179,7 +189,7 @@ public class NuxeoConnector {
                 DocumentModel domain = riter.next();
                 DocumentModelList domainChildrenList = repoSession.getChildren(domain.getRef());
                 Iterator<DocumentModel> diter = domainChildrenList.iterator();
-                if(diter.hasNext()){
+                while(diter.hasNext()){
                     DocumentModel childNode = diter.next();
                     if("Workspaces".equalsIgnoreCase(childNode.getName())){
                         DocumentModelList workspaceList = repoSession.getChildren(childNode.getRef());
@@ -195,6 +205,11 @@ public class NuxeoConnector {
                     }
                 }
             }
+        }catch(Exception e){
+            if(logger.isDebugEnabled()){
+                logger.debug("retrieveWorkspaceIds() caught exception ", e);
+            }
+            throw e;
         }finally{
             if(repoSession != null){
                 releaseRepositorySession(repoSession);
