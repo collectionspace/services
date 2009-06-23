@@ -23,12 +23,24 @@
  
 package org.collectionspace.services.id;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class NumericIDGenerator implements IDGenerator {
-    
+  
+  final static private int DEFAULT_MAX_LENGTH = 6;
+  private int maxLength = DEFAULT_MAX_LENGTH;
+  
   private long initialValue = 0;
 	private long currentValue = 0;
 
 	public NumericIDGenerator(String initialValue) throws IllegalArgumentException {
+		this(initialValue, Integer.toString(DEFAULT_MAX_LENGTH));
+	}
+
+	public NumericIDGenerator(String initialValue, String maxLength)
+		throws IllegalArgumentException {
+		
 		try {
 			long l = Long.parseLong(initialValue.trim());
 			if ( l < 0 ) {
@@ -41,6 +53,13 @@ public class NumericIDGenerator implements IDGenerator {
 		} catch (NumberFormatException e) {
 			throw new IllegalArgumentException("Initial ID value must be parseable as a number");
 		}
+
+		try {
+			this.maxLength = Integer.parseInt(maxLength);
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("Maximum ID length must be parseable as a number");
+		}
+		
 	}
 
 	public synchronized void reset() {
@@ -55,14 +74,34 @@ public class NumericIDGenerator implements IDGenerator {
 		return Long.toString(this.currentValue);
 	}
 	
-	public synchronized String getNextID() {
+	public synchronized String getNextID() throws IllegalStateException {
 		this.currentValue++;
-		return Long.toString(this.currentValue);
+		String nextID = Long.toString(this.currentValue);
+		if (nextID.length() > this.maxLength) {
+			throw new IllegalStateException("Next ID cannot exceed maximum length");
+		}
+		return nextID;
 	}
 
-	public synchronized boolean isValidID(String value) throws IllegalArgumentException {
-		// Currently stubbed-out
-		return true;
+	public synchronized boolean isValidID(String value) {
+
+		if ( value == null || value == "") {
+			return false;
+		}
+
+		Pattern pattern = Pattern.compile(getRegex());
+		Matcher matcher = pattern.matcher(value);
+		if (matcher.matches()) {
+			return true;
+		} else {
+			return false;
+		}
+		
+	}
+
+	public synchronized String getRegex() {
+		String regex = "(" + "\\d" + "{1," + Integer.toString(this.maxLength) + "}" + ")";
+		return regex;
 	}
 	
 }

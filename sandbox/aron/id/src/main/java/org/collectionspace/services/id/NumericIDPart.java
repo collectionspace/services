@@ -24,13 +24,13 @@ package org.collectionspace.services.id;
 
 public class NumericIDPart extends IDPart {
 
-	public NumericIDPart(String baseVal) {
+	public NumericIDPart(String baseVal) throws IllegalArgumentException {
 		// Store the appropriate Numeric ID generator and the base value for this part.
-		
-		// @TODO: Determine how to handle the NumberFormatException that will be thrown
-		// from parseLong "if the string does not contain a parsable long."  We may
-		// need a shim to perform this conversion prior to setting up the generator.
 		super(new NumericIDGenerator(baseVal));
+	};
+
+	public NumericIDPart(String baseVal, String maxLength) throws IllegalArgumentException {
+		super(new NumericIDGenerator(baseVal, maxLength));
 	};
 
 }

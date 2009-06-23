@@ -16,6 +16,10 @@
  * $Date: 2009-06-19 19:03:38 -0700 (Fri, 19 Jun 2009) $
  */
  
+// @TODO: Consider making this class, or a class that implements
+// this interface, abstract, in part because we're duplicating code
+// in isValidID() in multiple Generator subclasses.
+ 
 package org.collectionspace.services.id;
 
 public interface IDGenerator {
@@ -30,6 +34,6 @@ public interface IDGenerator {
 
 	public boolean isValidID(String value);
 
-	// public String getRegex();
+	public String getRegex();
 		
 }

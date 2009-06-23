@@ -56,6 +56,9 @@ package org.collectionspace.services.id;
 import java.util.Collections;
 import java.util.Vector;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class AlphabeticIDGenerator implements IDGenerator {
    
   private static final char NULL_CHAR = '\u0000';
@@ -224,8 +227,24 @@ public class AlphabeticIDGenerator implements IDGenerator {
 	}
 
 	public synchronized boolean isValidID(String value) throws IllegalArgumentException {
-		// Currently stubbed-out
-		return true;
+
+		if ( value == null || value == "") {
+			throw new IllegalArgumentException("ID to validate must not be null or empty");
+		}
+
+		Pattern pattern = Pattern.compile(getRegex());
+		Matcher matcher = pattern.matcher(value);
+		if (matcher.matches()) {
+			return true;
+		} else {
+			return false;
+		}
+		
 	}
-	
+
+	public synchronized String getRegex() {
+		// @TODO: This method is stubbed out; it needs to be implemented.
+		String regex = "(" + "\\*" + ")";
+		return regex;
+	}	
 }
