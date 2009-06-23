@@ -29,12 +29,8 @@ public class StringIDGenerator implements IDGenerator {
 	
 	public StringIDGenerator(String initialValue) throws IllegalArgumentException {
 
-		if ( initialValue == null ) {
-			throw new IllegalArgumentException("Initial value must not be null");
-		}
-	
-		if ( initialValue == "" ) {
-			throw new IllegalArgumentException("Initial value must not be empty");
+		if ( initialValue == null || initialValue == "") {
+			throw new IllegalArgumentException("Initial value must not be null or empty");
 		}
 		
 		this.initialValue = initialValue;

@@ -57,6 +57,12 @@ public class IDPattern {
 	// Returns the next value of this ID.
 	public synchronized String getNextID() {
 		StringBuffer sb = new StringBuffer(MAX_ID_LENGTH);
+		// Obtain the last (least significant) IDPart,
+		// call its getNextID() method, and 
+		int last = this.parts.size() - 1;
+		this.parts.get(last).getNextID();
+		// lastPart.getNextID();
+		// this.parts.set(last, lastPart);
 		for (IDPart part : this.parts) {
 			sb.append(part.getCurrentID());
 		}

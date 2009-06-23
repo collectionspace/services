@@ -19,7 +19,22 @@
 
 // @TODO: Add Javadoc comments
 
-// @TODO: Need to understand and reflect time zone issues.
+// @TODO: Need to understand and reflect time zone issues;
+// what happens when a year rollover occurs:
+// - In the time zone of the end user.
+// - In the time zone of the museum or other institution.
+// - In the time zone of the physical server where the code is hosted.
+
+// NOTE: This class currently hard-codes the assumption that the
+// Gregorian Calendar system is in use.
+//
+// We may wish to use the Joda-Time framework if handling of
+// additional calendar systems is needed, or additional treatment
+// of time zones is warranted:
+// http://joda-time.sourceforge.net/
+//
+// There may also be a need to have a structured set of date-time
+// classes related to identifier generation.
 
 package org.collectionspace.services.id;
 
@@ -41,16 +56,13 @@ public class YearIDGenerator implements IDGenerator {
 	
 	public YearIDGenerator(String initialValue) throws IllegalArgumentException {
 
-		if ( initialValue == null ) {
-			throw new IllegalArgumentException("Initial value must not be null");
-		}
-	
-		if ( initialValue == "" ) {
-			throw new IllegalArgumentException("Initial value must not be empty");
+		if ( initialValue == null || initialValue == "") {
+			throw new IllegalArgumentException("Initial value must not be null or empty");
 		}
 		
 		// @TODO: Add regex-based validation here, by calling a
-		// to-be-added validate() method
+		// to-be-added validate() method.  Consider implications
+		// for Internationalization when doing so.
 		
 		this.initialValue = initialValue;
 		this.currentValue = initialValue;
@@ -70,9 +82,9 @@ public class YearIDGenerator implements IDGenerator {
 	}
 	
 	// @TODO: We'll need to decide what a "next" ID means in the context of:
-	// * An initially supplied value.
-	// * A year value that has not changed from its previous value.
-	// * A year value that has changed, as a result of a rollover
+	// - An initially supplied value.
+	// - A year value that has not changed from its previous value.
+	// - A year value that has changed, as a result of a rollover
 	//   to a new instant in time.
 	public synchronized String getNextID() {
 		return this.currentValue;

@@ -36,7 +36,7 @@ public abstract class IDPart {
 	protected IDGenerator generator;
 	
 	// Constructor
-	public IDPart(IDGenerator idGenerator) {
+	public IDPart(IDGenerator idGenerator) throws IllegalArgumentException {
 		this.generator = idGenerator;
 	}
 

@@ -33,11 +33,19 @@
 // generated IDs can grow, likely as an additional parameter to be
 // passed to a constructor, with a default value hard-coded in the class.
 
-// @TODO: Handle escaped character sequences representing Unicode code points,
+// @TODO: Handle escaped characters or sequences which represent Unicode code points,
 // both in the start and end characters of the sequence, and in the initial value.
+// (Example: '\u0072' for the USASCII 'r' character; see
+// http://www.fileformat.info/info/unicode/char/0072/index.htm)
+//
+// Ideally, we should read these in free-text patterns, alongside unescaped characters,
+// but in practice we may wish to require some structured form for arguments
+// containing such characters.
 //
 // Some initial research on this:
 // http://www.velocityreviews.com/forums/t367758-unescaping-unicode-code-points-in-a-java-string.html
+// We might also look into the (protected) source code for java.util.Properties.load()
+// which reads escaped Unicode values.
 
 // NOTE: This class currently hard-codes the assumption that the values in
 // alphabetic identifiers are ordered in significance from left-to-right;
