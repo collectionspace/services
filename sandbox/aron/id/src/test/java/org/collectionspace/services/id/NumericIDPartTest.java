@@ -28,14 +28,14 @@ public class NumericIDPartTest extends TestCase {
 	public void testNextID() {
 
 		part = new NumericIDPart("0");		
-		assertEquals("1", part.getNextID());
-		assertEquals("2", part.getNextID());
-		assertEquals("3", part.getNextID());
+		assertEquals("1", part.nextID());
+		assertEquals("2", part.nextID());
+		assertEquals("3", part.nextID());
 
 		part = new NumericIDPart("25");
-		assertEquals("26", part.getNextID());
-		assertEquals("27", part.getNextID());
-		assertEquals("28", part.getNextID());
+		assertEquals("26", part.nextID());
+		assertEquals("27", part.nextID());
+		assertEquals("28", part.nextID());
 			
 	}
 
@@ -43,9 +43,9 @@ public class NumericIDPartTest extends TestCase {
 
 		try {
 			part = new NumericIDPart("997", "3");		
-			assertEquals("998", part.getNextID());
-			assertEquals("999", part.getNextID());
-			assertEquals("1000", part.getNextID());
+			assertEquals("998", part.nextID());
+			assertEquals("999", part.nextID());
+			assertEquals("1000", part.nextID());
 			fail("Should have thrown IllegalStateException here");
 		} catch (IllegalStateException expected) {
 			// This Exception should be thrown, and thus the test should pass.
@@ -54,9 +54,9 @@ public class NumericIDPartTest extends TestCase {
 		// Tests default MAX_LENGTH value of 6 decimal places
 		try {
 			part = new NumericIDPart("999997");		
-			assertEquals("999998", part.getNextID());
-			assertEquals("999999", part.getNextID());
-			assertEquals("1000000", part.getNextID());
+			assertEquals("999998", part.nextID());
+			assertEquals("999999", part.nextID());
+			assertEquals("1000000", part.nextID());
 			fail("Should have thrown IllegalStateException here");
 		} catch (IllegalStateException expected) {
 			// This Exception should be thrown, and thus the test should pass.
@@ -64,14 +64,14 @@ public class NumericIDPartTest extends TestCase {
 			
 	}
 
-	public void testReset() {
+	public void testresetID() {
 	
 		part = new NumericIDPart("25");
-		assertEquals("26", part.getNextID());
-		assertEquals("27", part.getNextID());
-		assertEquals("28", part.getNextID());
-		part.reset();
-		assertEquals("26", part.getNextID());
+		assertEquals("26", part.nextID());
+		assertEquals("27", part.nextID());
+		assertEquals("28", part.nextID());
+		part.resetID();
+		assertEquals("26", part.nextID());
 			
 	}
 
@@ -89,10 +89,10 @@ public class NumericIDPartTest extends TestCase {
 
 		part = new NumericIDPart("0");
 		assertEquals("0", part.getCurrentID());
-		assertEquals("1", part.getNextID());
-		assertEquals("2", part.getNextID());
+		assertEquals("1", part.nextID());
+		assertEquals("2", part.nextID());
 		assertEquals("2", part.getCurrentID());
-		assertEquals("3", part.getNextID());
+		assertEquals("3", part.nextID());
 
 		part = new NumericIDPart("25");
 		assertEquals("25", part.getCurrentID());

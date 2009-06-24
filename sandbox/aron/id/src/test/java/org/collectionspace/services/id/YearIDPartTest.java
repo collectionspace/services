@@ -48,15 +48,15 @@ public class YearIDPartTest extends TestCase {
 /*
 	public void testNextID() {
 		part = new YearIDPart("XYZ");		
-		assertEquals("XYZ", part.getNextID());			
+		assertEquals("XYZ", part.nextID());			
 	}
 
-	public void testReset() {
+	public void testresetID() {
 	
 		part = new YearIDPart(".");
-		assertEquals(".", part.getNextID());
-		part.reset();
-		assertEquals(".", part.getNextID());
+		assertEquals(".", part.nextID());
+		part.resetID();
+		assertEquals(".", part.nextID());
 			
 	}
 

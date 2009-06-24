@@ -70,10 +70,6 @@ public class NumericIDGenerator implements IDGenerator {
 		
 	}
 
-	public synchronized void reset() {
-		this.currentValue = this.initialValue;
-	}
-
 	public synchronized String getInitialID() {
 		return Long.toString(this.initialValue);
 	}
@@ -82,7 +78,7 @@ public class NumericIDGenerator implements IDGenerator {
 		return Long.toString(this.currentValue);
 	}
 
-  // Sets the current value.
+  // Sets the current value of the ID.
 	public synchronized void setCurrentID(String value) throws IllegalArgumentException {
 
 	  // @TODO Much of this code is copied from the main constructor,
@@ -105,7 +101,12 @@ public class NumericIDGenerator implements IDGenerator {
 		this.maxLength = DEFAULT_MAX_LENGTH;
 	}
 	
-	public synchronized String getNextID() throws IllegalStateException {
+	public synchronized void resetID() {
+		this.currentValue = this.initialValue;
+	}
+
+	// Returns the next ID in the sequence, and sets the current value to that ID.
+	public synchronized String nextID() throws IllegalStateException {
 		this.currentValue++;
 		String nextID = Long.toString(this.currentValue);
 		if (nextID.length() > this.maxLength) {

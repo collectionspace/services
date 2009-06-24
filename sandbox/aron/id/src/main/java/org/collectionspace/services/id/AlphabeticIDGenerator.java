@@ -170,11 +170,6 @@ public class AlphabeticIDGenerator implements IDGenerator {
 
 	}
 
-  // Reset the current value to the initial value.
-	public synchronized void reset() {
-	  Collections.copy(this.currentValue, this.initialValue);
-	}
-
   // Returns the initial value.
 	public synchronized String getInitialID() {
 		return getIDString(this.initialValue);
@@ -222,7 +217,14 @@ public class AlphabeticIDGenerator implements IDGenerator {
 
 		// Set the current value.
 		this.currentValue = new Vector<Character>(v);
+		
 	}
+
+  // Reset the current value to the initial value.
+	public synchronized void resetID() {
+	  Collections.copy(this.currentValue, this.initialValue);
+	}
+
 	
 	// Returns the next alphabetic ID in the sequence.
 	//
@@ -233,7 +235,7 @@ public class AlphabeticIDGenerator implements IDGenerator {
   //
   // See the TODOs at the top of this class for additional
   // functionality that needs to be implemented.
-  public synchronized String getNextID() {
+  public synchronized String nextID() {
 
 		// Get next values for each character, from right to left
 		// (least significant to most significant).
@@ -279,7 +281,7 @@ public class AlphabeticIDGenerator implements IDGenerator {
   }
 
   // Returns a String representation of the ID, by appending
-  // the String values of each character in the Vector.
+  // the String values of each character.
   public synchronized String getIDString(Vector<Character> v) {
 		StringBuffer sb = new StringBuffer();
 	  for ( Character ch : v ) {

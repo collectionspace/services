@@ -71,10 +71,6 @@ public class YearIDGenerator implements IDGenerator {
 
 	}
 
-	public synchronized void reset() {
-		this.currentValue = this.initialValue;
-	}
-
 	public synchronized String getInitialID() {
 		return this.initialValue;
 	}
@@ -100,12 +96,16 @@ public class YearIDGenerator implements IDGenerator {
 
 	}
 	
+	public synchronized void resetID() {
+		this.currentValue = this.initialValue;
+	}
+
 	// @TODO: We'll need to decide what a "next" ID means in the context of:
 	// - An initially supplied value.
 	// - A year value that has not changed from its previous value.
 	// - A year value that has changed, as a result of a rollover
 	//   to a new instant in time.
-	public synchronized String getNextID() {
+	public synchronized String nextID() {
 		return this.currentValue;
   }
 

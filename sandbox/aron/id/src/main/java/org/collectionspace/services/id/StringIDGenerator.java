@@ -42,10 +42,6 @@ public class StringIDGenerator implements IDGenerator {
 
 	}
 
-	public synchronized void reset() {
-		// Do nothing
-	}
-
 	public synchronized String getInitialID() {
 		return this.initialValue;
 	}
@@ -61,7 +57,11 @@ public class StringIDGenerator implements IDGenerator {
 		this.currentValue = value;
 	}
 	
-	public synchronized String getNextID() {
+	public synchronized void resetID() {
+		// Do nothing
+	}
+
+	public synchronized String nextID() {
 		return this.currentValue;
   }
 

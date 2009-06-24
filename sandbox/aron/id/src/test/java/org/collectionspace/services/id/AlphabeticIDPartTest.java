@@ -25,89 +25,89 @@ public class AlphabeticIDPartTest extends TestCase {
 
 	IDPart part;
 	
-	public void testGetNextIDLowercase() {
+	public void testnextIDLowercase() {
 
 		part = new AlphabeticIDPart("a");
-		assertEquals("b", part.getNextID());
-		assertEquals("c", part.getNextID());
+		assertEquals("b", part.nextID());
+		assertEquals("c", part.nextID());
 
 		part = new AlphabeticIDPart("x");
-		assertEquals("y", part.getNextID());
-		assertEquals("z", part.getNextID());
+		assertEquals("y", part.nextID());
+		assertEquals("z", part.nextID());
 
 }
 
-	public void testGetNextIDLowercase2Chars() {
+	public void testnextIDLowercase2Chars() {
 
 		part = new AlphabeticIDPart("aa");
-		assertEquals("ab", part.getNextID());
-		assertEquals("ac", part.getNextID());
+		assertEquals("ab", part.nextID());
+		assertEquals("ac", part.nextID());
 
 		part = new AlphabeticIDPart("zx");
-		assertEquals("zy", part.getNextID());
-		assertEquals("zz", part.getNextID());
+		assertEquals("zy", part.nextID());
+		assertEquals("zz", part.nextID());
 
 	}
 
-	public void testGetNextIDLowercase2CharsRolloverFirst() {
+	public void testnextIDLowercase2CharsRolloverFirst() {
 
 		part = new AlphabeticIDPart("ay");
-		assertEquals("az", part.getNextID());
-		assertEquals("ba", part.getNextID());
-		assertEquals("bb", part.getNextID());
+		assertEquals("az", part.nextID());
+		assertEquals("ba", part.nextID());
+		assertEquals("bb", part.nextID());
 
   }
 	
-	public void testGetNextIDUppercase() {
+	public void testnextIDUppercase() {
 		
 		part = new AlphabeticIDPart("A", "Z", "A");
-		assertEquals("B", part.getNextID());
-		assertEquals("C", part.getNextID());
+		assertEquals("B", part.nextID());
+		assertEquals("C", part.nextID());
 
 		part = new AlphabeticIDPart("A", "Z", "X");
-		assertEquals("Y", part.getNextID());
-		assertEquals("Z", part.getNextID());
+		assertEquals("Y", part.nextID());
+		assertEquals("Z", part.nextID());
 
 }
 
-	public void testGetNextIDUppercase2Chars() {
+	public void testnextIDUppercase2Chars() {
 
 		part = new AlphabeticIDPart("A", "Z", "AA");
-		assertEquals("AB", part.getNextID());
-		assertEquals("AC", part.getNextID());
+		assertEquals("AB", part.nextID());
+		assertEquals("AC", part.nextID());
 
 		part = new AlphabeticIDPart("A", "Z", "ZX");
-		assertEquals("ZY", part.getNextID());
-		assertEquals("ZZ", part.getNextID());
+		assertEquals("ZY", part.nextID());
+		assertEquals("ZZ", part.nextID());
 			
 	}
 
-	public void testGetNextIDUppercase2CharsRolloverFirst() {
+	public void testnextIDUppercase2CharsRolloverFirst() {
 
 		part = new AlphabeticIDPart("A", "Z", "AY");
-		assertEquals("AZ", part.getNextID());
-		assertEquals("BA", part.getNextID());
-		assertEquals("BB", part.getNextID());
+		assertEquals("AZ", part.nextID());
+		assertEquals("BA", part.nextID());
+		assertEquals("BB", part.nextID());
 
   }
   
-	public void testResetLowercase() {
+	public void testresetIDLowercase() {
 		
 		part = new AlphabeticIDPart("zx");
-		assertEquals("zy", part.getNextID());
-		assertEquals("zz", part.getNextID());
-		part.reset();
+		assertEquals("zy", part.nextID());
+		assertEquals("zz", part.nextID());
+		part.resetID();
 		assertEquals("zx", part.getCurrentID());
 	
 	}
 
-	public void testResetUppercase() {
+	public void testresetIDUppercase() {
 		
 		part = new AlphabeticIDPart("A", "Z", "RA");
-		assertEquals("RB", part.getNextID());
-		assertEquals("RC", part.getNextID());
-		part.reset();
-		assertEquals("RB", part.getNextID());
+		assertEquals("RB", part.nextID());
+		assertEquals("RC", part.nextID());
+		part.resetID();
+		assertEquals("RB", part.nextID());
 	
 	}
 	
@@ -129,10 +129,10 @@ public class AlphabeticIDPartTest extends TestCase {
 		
 		part = new AlphabeticIDPart("aaa");
 		assertEquals("aaa", part.getCurrentID());
-		assertEquals("aab", part.getNextID());
-		assertEquals("aac", part.getNextID());
+		assertEquals("aab", part.nextID());
+		assertEquals("aac", part.nextID());
 		assertEquals("aac", part.getCurrentID());
-		assertEquals("aad", part.getNextID());
+		assertEquals("aad", part.nextID());
 		
 	}
 
@@ -140,28 +140,28 @@ public class AlphabeticIDPartTest extends TestCase {
 		
 		part = new AlphabeticIDPart("A", "Z", "A");
 		assertEquals("A", part.getCurrentID());
-		assertEquals("B", part.getNextID());
-		assertEquals("C", part.getNextID());
+		assertEquals("B", part.nextID());
+		assertEquals("C", part.nextID());
 		assertEquals("C", part.getCurrentID());
-		assertEquals("D", part.getNextID());
+		assertEquals("D", part.nextID());
 		
 	}	
 	
 	public void testOverflowLowercase() {
 	
     part = new AlphabeticIDPart("zx");
-    assertEquals("zy", part.getNextID());
-    assertEquals("zz", part.getNextID());
-    assertEquals("aaa", part.getNextID());
+    assertEquals("zy", part.nextID());
+    assertEquals("zz", part.nextID());
+    assertEquals("aaa", part.nextID());
 		
 	}
 
 	public void testOverflowUppercase() {
 	
     part = new AlphabeticIDPart("A", "Z", "X");
-    assertEquals("Y", part.getNextID());
-    assertEquals("Z", part.getNextID());
-    assertEquals("AA", part.getNextID());
+    assertEquals("Y", part.nextID());
+    assertEquals("Z", part.nextID());
+    assertEquals("AA", part.nextID());
 		
 	}
 

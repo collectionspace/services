@@ -40,33 +40,33 @@ public abstract class IDPart {
 		this.generator = idGenerator;
 	}
 
-	// Resets the ID to its initial value.
-	public synchronized void reset() {
-		generator.reset();
-	}
-
-	// Returns the initial value of this ID.
+	// Returns the initial value of the ID associated with this IDPart.
 	public synchronized String getInitialID() {
 		return generator.getInitialID();
 	}
 
-	// Returns the current value of this ID.
+	// Returns the current value of the ID associated with this IDPart.
 	public synchronized String getCurrentID() {
 		return generator.getCurrentID();
 	}
 
-	// Sets the current value of this ID.
+	// Sets the current value of the ID associated with this IDPart.
 	public synchronized void setCurrentID(String value) {
 		generator.setCurrentID(value);
 	}
 
-	// Returns the next value of this ID.
-	public synchronized String getNextID() throws IllegalStateException {
-		return generator.getNextID();
+	// Resets the ID associated with this IDPart to its initial value.
+	public synchronized void resetID() {
+		generator.resetID();
 	}
 
-	// Validates an instance of the ID, to
-	// identify if it matches this IDPart's pattern.
+	// Returns the next ID in the sequence, and sets the current value
+	// of the ID associated with this IDPart to that next ID.
+	public synchronized String nextID() throws IllegalStateException {
+		return generator.nextID();
+	}
+
+	// Validates a supplied ID against the pattern of this IDPart.
 	//
 	// Some IDParts may offer generic validation,
 	// while others may offer per-instance valiadation
@@ -76,7 +76,8 @@ public abstract class IDPart {
 		return generator.isValidID(value);
 	}
 
-  // Returns a regular expression pattern used for ID validation.
+	// Returns a String representation of the regular expression ("regex")
+	// pattern used to validate instance values of this IDPart.  
 	public synchronized String getRegex() {
 		return generator.getRegex();
 	}

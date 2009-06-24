@@ -63,14 +63,22 @@ public class IDPattern {
 	// Returns the current value of this ID, given a
 	// supplied ID that partly matches the pattern.
 	//
-	// This will result in an ID that matches
-	// the supplied ID, with an optional next ID component
-	// that reflects the initial ID of that component.
-	// (E.g. "2009.5." becomes "2009.5.1", if the next
-	// ID component is an incrementing numeric IDPart.)
+	// If the supplied ID fully matches the pattern,
+	// will return the supplied ID.
 	//
-  // @TODO: Throws IllegalArgumentException
-	public synchronized String getCurrentID(String value) {
+	// However, if the supplied ID is a partial ID, which
+	// partly "stem-matches" the pattern but does not
+	// ully match the pattern, will return the partial ID with
+	// its next ID component appended.  The next ID component
+	// will be set to its initial value.
+	//
+	// Examples:
+	// * 2009.5." becomes "2009.5.1", in a case where the
+	//   next ID component is an incrementing numeric IDPart.
+	// * "E55-" becomes "E55-a", where the next ID component
+	//   is an incrementing alphabetic IDPart.
+	public synchronized String getCurrentID(String value)
+		throws IllegalArgumentException {
 
 	  if (value == null) return value;
 	  
@@ -101,59 +109,51 @@ public class IDPattern {
 			}
 		}
 
-		// If the supplied ID doesn't entirely match the pattern,
-		// return the supplied ID as the next ID.
-		//
-		// @TODO: We may wish to handle this differently,
-		// such as by throwing an Exception.
+		// If the supplied ID doesn't partly match the pattern,
+		// throw an Exception.
 		if (matchedParts == 0) {
-			// return value;
-			return "foo1";
+			throw new IllegalArgumentException("Supplied ID does not match this ID pattern.");
 		}
 
 		pattern = Pattern.compile(regex.toString());
 		matcher = pattern.matcher(value);
 		
-		// If the supplied ID doesn't entirely match the pattern,
-		// return the supplied ID as the next ID.
-		//
-		// @TODO: We may wish to handle this differently,
-		// such as by throwing an Exception.
+		// If the supplied ID doesn't match the pattern built above,
+		// throw an Exception.  (This error condition should likely
+		// never be reached, but it's here as a guard.)
 		if (! matcher.matches()) {
-			// return value;
-			return "foo2";
+			throw new IllegalArgumentException("Supplied ID does not match this ID pattern.");
 		}
 		
-		// Temporary for debugging
-		// return regex.toString();
-
-		// Otherwise, if the supplied ID partly matches the pattern,
-		// split the ID into its components and store those values in
-		// each of the pattern's IDParts.
+		// Otherwise, if the supplied ID matches the pattern,
+		// split the ID into its components and store those
+		// values in each of the pattern's IDParts.
 		IDPart currentPart;
 		for (int i = 1; i <= matchedParts; i++) {
 		  currentPart = this.parts.get(i - 1);
       currentPart.setCurrentID(matcher.group(i));
 		}
 
-		// Obtain the initial value of the next IDPart,
-		// and set the current value of that part to its initial value.
+		// Obtain the initial value of the next IDPart, and
+		// set the current value of that part to its initial value.
 		//
 		// If the supplied ID fully matches the pattern, there will
-		// be no 'next' IDPart, and an Exception will be thrown. 
+		// be no 'next' IDPart, and we must catch that Exception below. 
 		int nextPartNum = matchedParts;
 		try {
 			String initial = this.parts.get(nextPartNum).getInitialID();
 			this.parts.get(nextPartNum).setCurrentID(initial);
+			// Increment the number of matched parts to reflect the
+			// addition of this next IDPart.
 			matchedParts++;
 		} catch (ArrayIndexOutOfBoundsException e ) {
 			// Do nothing here; we simply won't increment
-			// the number of matched parts for the loop below.
+			// the number of matched parts, used in the loop below.
 		}
 		
 		// Call the getCurrentID() method on each of the
 		// supplied IDParts, as well as on the added IDPart
-		// whose current value was just obtained, if any.
+		// whose initial value was just obtained, if any.
 		StringBuffer sb = new StringBuffer();
 		for (int i = 1; i <= matchedParts; i++) {
 			sb.append(this.parts.get(i - 1).getCurrentID());
@@ -163,17 +163,15 @@ public class IDPattern {
 
 	}
 
-	// Returns the next value of this ID.
-	//
-	// @TODO: Throws IllegalArgumentException
-	public synchronized String getNextID() {
+	// Returns the next value of this ID, and sets the current value to that ID.
+	public synchronized String nextID() throws IllegalStateException {
 	
 		// Obtain the last (least significant) IDPart,
-		// and call its getNextID() method, which will
+		// and call its nextID() method, which will
 		// concurrently set the current value of that ID
 		// to the next ID.
 		int lastPartNum = this.parts.size() - 1;
-		this.parts.get(lastPartNum).getNextID();
+		this.parts.get(lastPartNum).nextID();
 		
 		// Then call the getCurrentID() method on all of the IDParts
 		StringBuffer sb = new StringBuffer(MAX_ID_LENGTH);
@@ -186,23 +184,22 @@ public class IDPattern {
 	}
 
 	// Returns the next value of this ID, given a
-	// supplied ID that entirely matches the pattern.
-	//
-  // @TODO: Throws IllegalArgumentException
-	public synchronized String getNextID(String value) {
+	// supplied ID that entirely matches the pattern,
+	// and sets the current value to that ID.
+	public synchronized String nextID(String value)
+		throws IllegalStateException, IllegalArgumentException {
 
-	  if (value == null) return value;
+	  if (value == null) { 
+	  	throw new IllegalArgumentException("Supplied ID cannot be null.");
+	  }
 	
 		Pattern pattern = Pattern.compile(getRegex());
 		Matcher matcher = pattern.matcher(value);
 		
 		// If the supplied ID doesn't entirely match the pattern,
-		// return the supplied ID as the next ID.
-		//
-		// @TODO: We may wish to handle this differently,
-		// such as by throwing an Exception.
+		// throw an Exception.
 		if (! matcher.matches()) {
-			return value;
+			throw new IllegalArgumentException("Supplied ID does not match this ID pattern.");
 		}
 		
 		// Otherwise, if the supplied ID entirely matches the pattern,
@@ -215,14 +212,14 @@ public class IDPattern {
 		}
 
 		// Obtain the last (least significant) IDPart,
-		// and call its getNextID() method, which will
+		// and call its nextID() method, which will
 		// concurrently set the current value of that ID
 		// to the next ID.
 		//
-		// @TODO: This code is duplicated in getNextID(), above,
+		// @TODO: This code is duplicated in nextID(), above,
 		// and thus we may want to refactor this.
 		int lastPartNum = this.parts.size() - 1;
-		this.parts.get(lastPartNum).getNextID();
+		this.parts.get(lastPartNum).nextID();
 		
 		// Then call the getCurrentID() method on all of the IDParts
 		StringBuffer sb = new StringBuffer();
@@ -236,7 +233,8 @@ public class IDPattern {
 
 	// Validates a provided ID against the pattern.
 	//
-	// @TODO May potentially throw at least one pattern-related exception.
+	// @TODO May potentially throw at least one pattern-related exception;
+	// we'll need to catch and handle this.
 	public synchronized boolean isValidID(String value) {
 	
 	  if (value == null) return false;
