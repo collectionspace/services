@@ -22,6 +22,10 @@ package org.collectionspace.services.id;
 
 public class AlphabeticIDPart extends IDPart {
 
+	public AlphabeticIDPart() {
+		super(new AlphabeticIDGenerator());
+	};
+
 	public AlphabeticIDPart(String baseVal) {
 		super(new AlphabeticIDGenerator(baseVal));
 	};

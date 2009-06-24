@@ -118,7 +118,7 @@ public class YearIDGenerator implements IDGenerator {
 	public synchronized String getRegex() {
 		// NOTE: Currently hard-coded to accept only a range of
 		// four-digit Gregorian Calendar year dates.
-		String regex = "(\\d\\d\\d\\d)";
+		String regex = "(\\d{4})";
 		return regex;
 	}
 	

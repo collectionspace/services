@@ -22,9 +22,12 @@ package org.collectionspace.services.id;
 
 import java.util.Vector;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class IDPattern {
 
-	final static int MAX_ID_LENGTH = 30;
+	final static int MAX_ID_LENGTH = 50;
 	
 	private Vector<IDPart> parts = new Vector<IDPart>();
 
@@ -58,17 +61,38 @@ public class IDPattern {
 	public synchronized String getNextID() {
 		StringBuffer sb = new StringBuffer(MAX_ID_LENGTH);
 		// Obtain the last (least significant) IDPart,
-		// call its getNextID() method, and 
+		// and call its getNextID() method, which will
+		// concurrently set the current value of that ID
+		// to the next ID.
 		int last = this.parts.size() - 1;
 		this.parts.get(last).getNextID();
-		// lastPart.getNextID();
-		// this.parts.set(last, lastPart);
+		// Then call the getCurrentID() method on all of the IDParts
 		for (IDPart part : this.parts) {
 			sb.append(part.getCurrentID());
 		}
 		return sb.toString();
 	}
 
-	// public boolean validate() {};
+	// Validates a provided ID against the pattern.
+	public synchronized boolean isValidID(String value) {
+	
+		Pattern pattern = Pattern.compile(getRegex());
+		Matcher matcher = pattern.matcher(value);
+		if (matcher.matches()) {
+			return true;
+		} else {
+			return false;
+		}
+		
+	}
+
+	// Returns a regular expression to validate this ID.
+	public synchronized String getRegex() {
+		StringBuffer sb = new StringBuffer();
+		for (IDPart part : this.parts) {
+			sb.append(part.getRegex());
+		}
+		return sb.toString();
+	}
  
 }

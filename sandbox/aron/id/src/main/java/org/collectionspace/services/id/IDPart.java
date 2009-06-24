@@ -70,5 +70,10 @@ public abstract class IDPart {
 	public synchronized boolean isValidID(String value) throws IllegalArgumentException {
 		return generator.isValidID(value);
 	}
+
+  // Returns a regular expression pattern used for ID validation.
+	public synchronized String getRegex() {
+		return generator.getRegex();
+	}
  
 }

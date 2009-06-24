@@ -101,6 +101,56 @@ public class IDPatternTest extends TestCase {
 			
 	}
 
+	public void testIsValidIDYearPattern() {
+	
+		pattern = new IDPattern();
+		pattern.add(new YearIDPart("2009"));
+
+		assertTrue(pattern.isValidID("2009"));
+		assertTrue(pattern.isValidID("5555"));
+
+		assertFalse(pattern.isValidID("456"));
+		assertFalse(pattern.isValidID("10000"));
+		
+	}
+
+
+	public void testGetRegex() {
+	
+		pattern = new IDPattern();
+		pattern.add(new YearIDPart("2009"));
+		pattern.add(new StringIDPart("."));
+		pattern.add(new NumericIDPart("1"));
+		assertEquals("(\\d{4})(\\.)(\\d{1,6})", pattern.getRegex());
+	
+	}
+
+	public void testIsValidIDYearSeparatorItemPattern() {
+	
+		pattern = new IDPattern();
+		pattern.add(new YearIDPart("2009"));
+		pattern.add(new StringIDPart("."));
+		pattern.add(new NumericIDPart("1"));
+		
+		assertTrue(pattern.isValidID("2009.1"));
+		assertTrue(pattern.isValidID("5555.55"));
+
+		assertFalse(pattern.isValidID("456.1"));
+		assertFalse(pattern.isValidID("2009-1"));
+		assertFalse(pattern.isValidID("2009.a"));
+		assertFalse(pattern.isValidID("2009-a"));
+		assertFalse(pattern.isValidID("non-pattern conforming text"));
+
+		pattern = new IDPattern();
+		pattern.add(new YearIDPart("2009"));
+		pattern.add(new StringIDPart("ZZ.AND."));
+		pattern.add(new NumericIDPart("1"));
+
+		assertTrue(pattern.isValidID("2009ZZ.AND.1"));
+		assertFalse(pattern.isValidID("2009ZZ-AND-1"));
+	
+	}
+
 	// @TODO: Add more tests of boundary conditions, exceptions ...
  
 }

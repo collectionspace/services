@@ -19,17 +19,7 @@
 
 // @TODO: Add Javadoc comments
 
-// @TODO: The initial value determines the fixed number of characters.
-// Currently, identifiers simply 'wrap' (roll over) within that fixed
-// series, which is not always the desired outcome.
-//
-// We may also need to model cases where the number of characters
-// auto-expands as the value of the most significant character
-// rolls over, up to a specified maximum number of characters:
-// e.g. a call to getNextID(), where the current ID is "z",
-// auto-expands to "aa", and a current ID of "ZZ" auto-expands to "AAA".
-//
-// When doing so, we'll also need to set a maximum length to which the
+// @TODO: When auto expanding, we'll need to set a maximum length to which the
 // generated IDs can grow, likely as an additional parameter to be
 // passed to a constructor, with a default value hard-coded in the class.
 
@@ -50,7 +40,7 @@
 // NOTE: This class currently hard-codes the assumption that the values in
 // alphabetic identifiers are ordered in significance from left-to-right;
 // that is, the most significant value appears in the left-most position.
- 
+
 package org.collectionspace.services.id;
 
 import java.util.Collections;
@@ -65,6 +55,7 @@ public class AlphabeticIDGenerator implements IDGenerator {
 
   private static final String DEFAULT_START_CHAR = "a";
   private static final String DEFAULT_END_CHAR = "z";
+  private static final String DEFAULT_INITIAL_VALUE = "a";
 	  
   private char startChar = NULL_CHAR;
   private char endChar = NULL_CHAR;
@@ -72,10 +63,22 @@ public class AlphabeticIDGenerator implements IDGenerator {
 	private Vector<Character> initialValue = new Vector<Character>();
 	private Vector<Character> currentValue = new Vector<Character>();
 
-  // Defaults to an 'a-z' series, representing lowercase alphabetic characters
-  // in the USASCII character set within Java's internal representation of
-  // characters (Unicode's UTF-16 encoding), if no start and end characters
-  // are provided for the alphabetic character sequence.
+  // If no start and end characters are provided for the alphabetic character
+  // sequence, default to an 'a-z' series, representing the lowercase alphabetic
+  // characters in the USASCII character set (within Java's internal
+  // Unicode UTF-16 representation).
+  //
+  // Additionally defaults to an initial value of "a".
+	public AlphabeticIDGenerator() throws IllegalArgumentException {
+	  
+	  this(DEFAULT_START_CHAR, DEFAULT_END_CHAR, DEFAULT_INITIAL_VALUE);
+	  
+	}
+
+  // If no start and end characters are provided for the alphabetic character
+  // sequence, default to an 'a-z' series, representing the lowercase alphabetic
+  // characters in the USASCII character set (within Java's internal
+  // Unicode UTF-16 representation).
 	public AlphabeticIDGenerator(String initial) throws IllegalArgumentException {
 	  
 	  this(DEFAULT_START_CHAR, DEFAULT_END_CHAR, initial);
@@ -92,14 +95,15 @@ public class AlphabeticIDGenerator implements IDGenerator {
 			  "Start character in the alphabetic series must not be null or empty");
 		}
 	  
-    // @TODO The next two statements will need to be revised to handle escaped
-    // representations of characters outside the USASCII character set.
-	  if (seriesStart.length() > 1) {
+	  if (seriesStart.length() == 1) {
+      this.startChar = seriesStart.charAt(0);
+    } else if (false) {
+      // Handle representations of Unicode code points here
+    } else {
 			throw new IllegalArgumentException(
-			  "Start character in the alphabetic series must be exactly one character in length");
+			  "Start character must be one character in length");
+			  // "Start character must be one character in length or a Unicode value such as '\u0000'");
 		}
-
-    this.startChar = seriesStart.charAt(0);
 
 	  // Validate and store the end character in the alphabetic series.
 
@@ -108,18 +112,19 @@ public class AlphabeticIDGenerator implements IDGenerator {
 			  "End character in the alphabetic series must not be null or empty");
 		}
 	  
-    // @TODO The next two statements will need to be revised to handle escaped
-    // representations of characters outside the USASCII character set.
-	  if (seriesEnd.length() > 1) {
+	  if (seriesEnd.length() == 1) {
+      this.endChar = seriesEnd.charAt(0);
+    } else if (false) {
+      // Handle representations of Unicode code points here
+    } else {
 			throw new IllegalArgumentException(
-			  "End character in the alphabetic series must be exactly one character in length");
+			  "End character must be one character in length");
+			  // "End character must be one character in length or a Unicode value such as '\u0000'");
 		}
-
-    this.endChar = seriesEnd.charAt(0);
     
 	  if (this.endChar <= this.startChar) {
 			throw new IllegalArgumentException(
-			  "End (last) character in an alphabetic series must be greater than the start character");
+			  "End (last) character in the alphabetic series must be greater than the start character");
 		}
 		
 	  // Validate and store the initial value of this identifier.
@@ -130,27 +135,28 @@ public class AlphabeticIDGenerator implements IDGenerator {
 		
 		// @TODO: Add a check for maximum length of the initial value here.
 	
-	  // Store the chars in the initial value as Characters in a Vector.
+	  // Store the chars in the initial value as Characters in a Vector,
+	  // validating each character to identify whether it falls within
+	  // the provided series.
+	  //
 	  // (Since we're performing casts from char to Character, we can't just
 	  // use Arrays.asList() to copy the initial array to a Vector.)
 		char[] chars = initial.toCharArray();
+		char ch;
 		for (int i=0; i < chars.length; i++) {
-		  this.initialValue.add(new Character(chars[i]));
-		}
-		
-		// Validate that each of the characters in the initial value
-		// falls within the provided series.
-		for ( Character ch : this.initialValue ) {
-		
-			if (ch.charValue() >= this.startChar && ch.charValue() <= this.endChar) {
-			  continue;
+
+      // If the character falls within the range bounded by the start and end
+      // characters, copy it to the Vector.
+      ch = chars[i];
+			if (ch >= this.startChar && ch <= this.endChar) {
+			  this.initialValue.add(new Character(ch));
       // Otherwise, we've detected a character not in the series.
 			} else {
         throw new IllegalArgumentException("character " + "\'" + ch + "\'" + " is not valid");
       }
-				
-		} // end 'for' loop
-		
+		  
+		}
+
 		// Initialize the current value from the initial value.
 		this.currentValue = new Vector<Character>(this.initialValue);
 
@@ -172,22 +178,30 @@ public class AlphabeticIDGenerator implements IDGenerator {
 	}
 	
 	// Returns the next alphabetic ID in the series.
-	public synchronized String getNextID() {
-		        
+	//
+  // Currently, the number of characters auto-expands as the
+  // value of the most significant character rolls over.
+  // E.g. a call to getNextID(), where the current ID is "z",
+  // auto-expands to "aa", and "ZZ" auto-expands to "AAA".
+  //
+  // See the TODOs at the top of this class for additional
+  // functionality that needs to be implemented.
+  public synchronized String getNextID() {
+
 		// Get next values for each character, from right to left
 		// (least significant to most significant).
 		boolean expandIdentifier = false;
 		int size = this.currentValue.size();
-		char c;
+		char ch;
 		for (int i = (size - 1); i >= 0; i--) {
 
-      c = this.currentValue.get(i).charValue();
+      ch = this.currentValue.get(i).charValue();
 
-      // When reaching the maximum value for any character position,
-      // 'roll over' to the minimum value for that position.
-      if (c == this.endChar) {
+      // When we reach the maximum value for any character,
+      // 'roll over' to the minimum value in our character range.
+      if (ch == this.endChar) {
 		    this.currentValue.set(i, Character.valueOf(this.startChar));
-		    // If this roll over occurs in the most significant value,
+		    // If this rollover occurs in the most significant value,
 		    // set a flag to later expand the size of the identifier.
 		    //
 		    // @TODO: Set another flag to enable or disable this behavior,
@@ -195,9 +209,11 @@ public class AlphabeticIDGenerator implements IDGenerator {
 		    if (i == 0) {
 		      expandIdentifier = true;
 		    }
+      // When we reach the most significant character whose value
+      // doesn't roll over, increment that character and exit the loop.
 		  } else {
-        c++;
-        this.currentValue.set(i, Character.valueOf(c));
+        ch++;
+        this.currentValue.set(i, Character.valueOf(ch));
         i = -1;
         break;		  
 		  }
@@ -205,8 +221,8 @@ public class AlphabeticIDGenerator implements IDGenerator {
 		}
 
     // If we are expanding the size of the identifier, insert a new
-    // value at the most significant character position, sliding other
-    // values to the right.
+    // value at the most significant (leftmost) character position,
+    // sliding other values to the right.
     if (expandIdentifier) {
       this.currentValue.add(0, Character.valueOf(this.startChar));
     }
@@ -215,9 +231,8 @@ public class AlphabeticIDGenerator implements IDGenerator {
 		
   }
 
-  // Returns a String representation of the contents of a Vector,
-  // in the form of an identifier (e.g. each Character's String value
-  // is appended to the next).
+  // Returns a String representation of the ID, by appending
+  // the String values of each character in the Vector.
   public synchronized String getIDString(Vector<Character> v) {
 		StringBuffer sb = new StringBuffer();
 	  for ( Character ch : v ) {
@@ -243,8 +258,13 @@ public class AlphabeticIDGenerator implements IDGenerator {
 	}
 
 	public synchronized String getRegex() {
-		// @TODO: This method is stubbed out; it needs to be implemented.
-		String regex = "(" + "\\*" + ")";
+	  // @TODO: May need to constrain the number of alphabetic characters based
+	  // on a maximum value, TBA.  Currently, this regex simply matches sequences
+	  // of one or more characters.
+		String regex = 
+		  "(" + "[" + 
+		  String.valueOf(this.startChar) + "-" + String.valueOf(this.endChar) +
+		  "]+" + ")";
 		return regex;
 	}	
 }
