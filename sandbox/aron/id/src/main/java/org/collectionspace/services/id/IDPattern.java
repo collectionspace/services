@@ -63,6 +63,12 @@ public class IDPattern {
 	// Returns the current value of this ID, given a
 	// supplied ID that partly matches the pattern.
 	//
+	// This will result in an ID that matches
+	// the supplied ID, with an optional next ID component
+	// that reflects the initial ID of that component.
+	// (E.g. "2009.5." becomes "2009.5.1", if the next
+	// ID component is an incrementing numeric IDPart.)
+	//
   // @TODO: Throws IllegalArgumentException
 	public synchronized String getCurrentID(String value) {
 
@@ -119,9 +125,8 @@ public class IDPattern {
 		}
 		
 		// Temporary for debugging
-		return regex.toString();
+		// return regex.toString();
 
-/*		
 		// Otherwise, if the supplied ID partly matches the pattern,
 		// split the ID into its components and store those values in
 		// each of the pattern's IDParts.
@@ -131,21 +136,30 @@ public class IDPattern {
       currentPart.setCurrentID(matcher.group(i));
 		}
 
-		// Obtain the initial value of the next IDPart.
-		int nextPartNum = matchedParts - 1;
-		this.parts.get(nextPartNum).getInitialID();
+		// Obtain the initial value of the next IDPart,
+		// and set the current value of that part to its initial value.
+		//
+		// If the supplied ID fully matches the pattern, there will
+		// be no 'next' IDPart, and an Exception will be thrown. 
+		int nextPartNum = matchedParts;
+		try {
+			String initial = this.parts.get(nextPartNum).getInitialID();
+			this.parts.get(nextPartNum).setCurrentID(initial);
+			matchedParts++;
+		} catch (ArrayIndexOutOfBoundsException e ) {
+			// Do nothing here; we simply won't increment
+			// the number of matched parts for the loop below.
+		}
 		
-		// Then call the getCurrentID() method on each of the
-		// supplied IDParts, as well as on the additional
-		// IDPart whose current value was just obtained.
+		// Call the getCurrentID() method on each of the
+		// supplied IDParts, as well as on the added IDPart
+		// whose current value was just obtained, if any.
 		StringBuffer sb = new StringBuffer();
-		IDPart part = null;
-		for (int i = 1; i <= matchedParts - 1; i++) {
-			sb.append(part.getCurrentID());
+		for (int i = 1; i <= matchedParts; i++) {
+			sb.append(this.parts.get(i - 1).getCurrentID());
 		}
 		
 		return sb.toString();
-*/
 
 	}
 

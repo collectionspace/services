@@ -63,46 +63,40 @@ public class IDPatternTest extends TestCase {
 		pattern = new IDPattern();
 		pattern.add(new StringIDPart("E"));
 		pattern.add(new NumericIDPart("1"));
-		assertEquals("(E)", pattern.getCurrentID("E"));
-
-		// assertEquals("E1", pattern.getCurrentID("E"));
-		// assertEquals("E2.", pattern.getNextID());
+		assertEquals("E1", pattern.getCurrentID("E"));
+		assertEquals("E2", pattern.getNextID());
 
 		pattern = new IDPattern();
 		pattern.add(new YearIDPart());
 		pattern.add(new StringIDPart("."));
-		assertEquals("(\\d{4})", pattern.getCurrentID("2009"));
-		
-		// assertEquals("2009.", pattern.getCurrentID("2009"));
-		// assertEquals("2009.", pattern.getNextID());
-		// assertEquals("2010.", pattern.getCurrentID("2010"));
-		// assertEquals("2010.", pattern.getNextID());
+		assertEquals("2009.", pattern.getCurrentID("2009"));
+		assertEquals("2009.", pattern.getNextID());
+		assertEquals("2010.", pattern.getCurrentID("2010"));
+		assertEquals("2010.", pattern.getNextID());
 
 		pattern = new IDPattern();
 		pattern.add(new YearIDPart());
 		pattern.add(new StringIDPart("."));
 		pattern.add(new NumericIDPart("1"));
-		assertEquals("(\\d{4})(\\.)", pattern.getCurrentID("2009."));
-		
-		// assertEquals("2009.1", pattern.getCurrentID("2009."));
-		// assertEquals("2009.2", pattern.getNextID());
+		assertEquals("2009.1", pattern.getCurrentID("2009."));
+		assertEquals("2009.2", pattern.getNextID());
 
 		pattern = new IDPattern();
 		pattern.add(new YearIDPart());
 		pattern.add(new StringIDPart("."));
 		pattern.add(new NumericIDPart("55"));
-		assertEquals("(\\d{4})(\\.)", pattern.getCurrentID("2010."));
-
-		// assertEquals("2010.55", pattern.getCurrentID("2010."));
-		// assertEquals("2010.56", pattern.getNextID());
+		assertEquals("2010.55", pattern.getCurrentID("2010."));
+		assertEquals("2010.56", pattern.getNextID());
 
 		pattern = new IDPattern();
 		pattern.add(new YearIDPart("2009"));
 		pattern.add(new StringIDPart("."));
-		assertEquals("(\\d{4})(\\.)", pattern.getCurrentID("2009."));
-
-		// assertEquals("2009.1", pattern.getCurrentID("2009."));
-		// assertEquals("2009.2", pattern.getNextID());
+		pattern.add(new NumericIDPart());
+		assertEquals("2009.1", pattern.getCurrentID("2009."));
+		assertEquals("2009.2", pattern.getNextID());
+		// Test a repeat of the last two operations.
+		assertEquals("2009.1", pattern.getCurrentID("2009."));
+		assertEquals("2009.2", pattern.getNextID());
 
 		pattern = new IDPattern();
 		pattern.add(new YearIDPart("2009"));
@@ -110,17 +104,29 @@ public class IDPatternTest extends TestCase {
 		pattern.add(new NumericIDPart("1"));
 		pattern.add(new StringIDPart("-"));
 		pattern.add(new AlphabeticIDPart("a"));
-		assertEquals("(\\d{4})(\\.)(\\d{1,6})(-)", pattern.getCurrentID("2009.1-"));
-		
-		// assertEquals("2009.1-a", pattern.getNextID("2009.1-"));
-		// assertEquals("2009.1-b", pattern.getNextID();
-		// assertEquals("2009.3-a", pattern.getNextID("2009.3-"));
+		assertEquals("2009.1-a", pattern.getCurrentID("2009.1-"));
+		assertEquals("2009.1-b", pattern.getNextID());
+		assertEquals("2009.3-a", pattern.getCurrentID("2009.3-"));
 
 	}
 
 	public void testCurrentIDWithFullSuppliedID() {
 	
-		// @TODO TBA
+		pattern = new IDPattern();
+		pattern.add(new YearIDPart("2009"));
+		pattern.add(new StringIDPart("."));
+		pattern.add(new NumericIDPart("55"));
+		assertEquals("2009.55", pattern.getCurrentID("2009.55"));
+		assertEquals("2009.56", pattern.getNextID());
+
+		pattern = new IDPattern();
+		pattern.add(new YearIDPart("2009"));
+		pattern.add(new StringIDPart("."));
+		pattern.add(new NumericIDPart("1"));
+		pattern.add(new StringIDPart("-"));
+		pattern.add(new AlphabeticIDPart("a"));
+		assertEquals("2009.1-a", pattern.getCurrentID("2009.1-a"));
+		assertEquals("2009.1-b", pattern.getNextID());
 
 	}
 
