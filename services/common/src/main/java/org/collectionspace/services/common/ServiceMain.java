@@ -22,11 +22,14 @@ import org.slf4j.LoggerFactory;
 public class ServiceMain {
 
     private static volatile ServiceMain instance = null;
-    final private static String CONFIG_FILE_NAME = "./cs/service-config.xml";
+    final public static String CSPACE_DIR_NAME = "cspace";
+    final public static String CONFIG_DIR_NAME = "config" + File.separator + "services";
+    final private static String CONFIG_FILE_NAME = "service-config.xml";
     final Logger logger = LoggerFactory.getLogger(ServiceMain.class);
     private ServiceConfig serviceConfig;
     private Hashtable<String, String> serviceWorkspaces = new Hashtable<String, String>();
     private NuxeoConnector nuxeoConnector;
+    private String serverRootDir = null;
 
     private ServiceMain() {
     }
@@ -59,6 +62,7 @@ public class ServiceMain {
     }
 
     private void initialize() throws Exception {
+        setServerRootDir();
         serviceConfig = readConfig();
         nuxeoConnector = NuxeoConnector.getInstance();
         nuxeoConnector.initialize(serviceConfig.getNuxeoClientConfig());
@@ -84,9 +88,13 @@ public class ServiceMain {
     private ServiceConfig readConfig() throws Exception {
         JAXBContext jc = JAXBContext.newInstance(ServiceConfig.class);
         Unmarshaller um = jc.createUnmarshaller();
-        File configFile = new File(CONFIG_FILE_NAME);
+        String configFileName = getServerRootDir() +
+                File.separator + CSPACE_DIR_NAME +
+                File.separator + CONFIG_DIR_NAME +
+                File.separator + CONFIG_FILE_NAME;
+        File configFile = new File(configFileName);
         if(!configFile.exists()){
-            String msg = "Could not find configuration file " + CONFIG_FILE_NAME;
+            String msg = "Could not find configuration file " + configFileName;
             logger.error(msg);
             throw new RuntimeException(msg);
         }
@@ -133,5 +141,19 @@ public class ServiceMain {
      */
     public NuxeoConnector getNuxeoConnector() {
         return nuxeoConnector;
+    }
+
+    private void setServerRootDir() {
+        serverRootDir = System.getProperty("jboss.server.home.dir");
+        if(serverRootDir == null){
+            serverRootDir = "."; //assume server is started from server root, e.g. server/cspace
+        }
+    }
+
+    /**
+     * @return the serverRootDir
+     */
+    public String getServerRootDir() {
+        return serverRootDir;
     }
 }

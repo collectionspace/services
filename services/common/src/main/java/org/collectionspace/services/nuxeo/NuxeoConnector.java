@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
  */
 public class NuxeoConnector {
 
+    public final static String NUXEO_CLIENT_DIR = "nuxeo-client";
     private Logger logger = LoggerFactory.getLogger(NuxeoConnector.class);
     private static final NuxeoConnector self = new NuxeoConnector();
     private NuxeoApp app;
@@ -83,11 +84,14 @@ public class NuxeoConnector {
 
     private void loadBundles() throws Exception {
         String bundles = "nuxeo-client/lib/nuxeo-runtime-*:nuxeo-client/lib/nuxeo-*";
+//        String serverRootDir = ServiceMain.getInstance().getServerRootDir();
+        //can't call ServiceMain here because loadBundles is called within
+        //the iniitialization context of ServiceMain, recrusion problem
         String serverRootDir = System.getProperty("jboss.server.home.dir");
         if(serverRootDir == null){
             serverRootDir = "."; //assume server is started from server root, e.g. server/cspace
         }
-        File clientLibDir = new File(serverRootDir + File.separator + "nuxeo-client");
+        File clientLibDir = new File(serverRootDir);
         if(!clientLibDir.exists()){
             String msg = "Library bundles requried to deploy Nuxeo client not found: " +
                     " directory named nuxeo-client with bundles does not exist in " + serverRootDir;
