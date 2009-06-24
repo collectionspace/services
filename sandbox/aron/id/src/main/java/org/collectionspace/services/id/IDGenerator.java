@@ -29,6 +29,8 @@ public interface IDGenerator {
 	public String getInitialID();
 
 	public String getCurrentID();
+	
+	public void setCurrentID(String value);
 
 	public String getNextID();
 

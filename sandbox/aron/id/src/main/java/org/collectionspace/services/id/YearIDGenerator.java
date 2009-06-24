@@ -63,9 +63,8 @@ public class YearIDGenerator implements IDGenerator {
 			throw new IllegalArgumentException("Initial ID value must not be null or empty");
 		}
 		
-		// @TODO: Add regex-based validation here, by calling a
-		// to-be-added validate() method.  Consider implications
-		// for Internationalization when doing so.
+		// @TODO: Add regex-based validation here, by calling isValidID().
+		// Consider implications for Internationalization when doing so.
 		
 		this.initialValue = initialValue;
 		this.currentValue = initialValue;
@@ -82,6 +81,23 @@ public class YearIDGenerator implements IDGenerator {
 
 	public synchronized String getCurrentID() {
 		return this.currentValue;
+	}
+
+  // Sets the current value.
+	public synchronized void setCurrentID(String value) throws IllegalArgumentException {
+
+	  // @TODO This code is copied from the main constructor,
+	  // and thus there may be an opportunity for refactoring.
+
+		if ( value == null || value == "") {
+			throw new IllegalArgumentException("ID value must not be null or empty");
+		}
+		
+		// @TODO: Add regex-based validation here, by calling isValidID().
+		// Consider implications for Internationalization when doing so.
+
+		this.currentValue = value;
+
 	}
 	
 	// @TODO: We'll need to decide what a "next" ID means in the context of:

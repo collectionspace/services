@@ -73,6 +73,29 @@ public class NumericIDGenerator implements IDGenerator {
 	public synchronized String getCurrentID() {
 		return Long.toString(this.currentValue);
 	}
+
+  // Sets the current value.
+	public synchronized void setCurrentID(String value) throws IllegalArgumentException {
+
+	  // @TODO Much of this code is copied from the main constructor,
+	  // and may be ripe for refactoring.
+		try {
+			long l = Long.parseLong(value.trim());
+			if ( l < 0 ) {
+				throw new IllegalArgumentException("Initial ID value should be zero (0) or greater");
+			}
+			this.currentValue = l;
+			this.initialValue = l;
+		} catch (NullPointerException e) {
+			throw new IllegalArgumentException("ID value should not be null");
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("ID value must be parseable as a number");
+		}
+		
+		// @TODO An expedient; we may need to check the String length of the
+		// provided ID and calculate a maximum length here.
+		this.maxLength = DEFAULT_MAX_LENGTH;
+	}
 	
 	public synchronized String getNextID() throws IllegalStateException {
 		this.currentValue++;

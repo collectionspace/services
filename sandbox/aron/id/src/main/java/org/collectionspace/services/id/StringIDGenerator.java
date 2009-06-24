@@ -53,6 +53,13 @@ public class StringIDGenerator implements IDGenerator {
 	public synchronized String getCurrentID() {
 		return this.currentValue;
 	}
+
+	public synchronized void setCurrentID(String value) throws IllegalArgumentException {
+		if ( initialValue == null || initialValue == "") {
+			throw new IllegalArgumentException("ID value must not be null or empty");
+		}
+		this.currentValue = value;
+	}
 	
 	public synchronized String getNextID() {
 		return this.currentValue;

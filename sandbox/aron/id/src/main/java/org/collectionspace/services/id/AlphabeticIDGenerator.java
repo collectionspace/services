@@ -23,8 +23,8 @@
 // generated IDs can grow, likely as an additional parameter to be
 // passed to a constructor, with a default value hard-coded in the class.
 
-// @TODO: Handle escaped characters or sequences which represent Unicode code points,
-// both in the start and end characters of the sequence, and in the initial value.
+// @TODO: Consider handling escaped characters or sequences which represent Unicode
+// code points, both in the start and end characters of the sequence, and in the initial value.
 // (Example: '\u0072' for the USASCII 'r' character; see
 // http://www.fileformat.info/info/unicode/char/0072/index.htm)
 //
@@ -36,6 +36,10 @@
 // http://www.velocityreviews.com/forums/t367758-unescaping-unicode-code-points-in-a-java-string.html
 // We might also look into the (protected) source code for java.util.Properties.load()
 // which reads escaped Unicode values.
+//
+// Note also that, if the goal is to cycle through a series of alphabetic identifiers,
+// such as the sequence of characters used in a particular human language, it may or may not
+// be the case that any contiguous Unicode code point sequence reflects such a character sequence.
 
 // NOTE: This class currently hard-codes the assumption that the values in
 // alphabetic identifiers are ordered in significance from left-to-right;
@@ -143,7 +147,7 @@ public class AlphabeticIDGenerator implements IDGenerator {
 	  // use Arrays.asList() to copy the initial array to a Vector.)
 		char[] chars = initial.toCharArray();
 		char ch;
-		for (int i=0; i < chars.length; i++) {
+		for (int i = 0; i < chars.length; i++) {
 
       // If the character falls within the range bounded by the start and end
       // characters, copy it to the Vector.
@@ -175,6 +179,45 @@ public class AlphabeticIDGenerator implements IDGenerator {
   // Returns the current value.
 	public synchronized String getCurrentID() {
 		return getIDString(this.currentValue);
+	}
+
+  // Sets the current value.
+	public synchronized void setCurrentID(String value) throws IllegalArgumentException {
+	
+	  // @TODO Much of this code is copied from the main constructor,
+	  // and may be ripe for refactoring.
+	  
+		if (value == null || value.equals("")) {
+			throw new IllegalArgumentException("Initial value must not be null or empty");
+		}
+		
+		// @TODO: Add a check for maximum length of the value here.
+	
+	  // Store the chars in the value as Characters in a Vector,
+	  // validating each character to identify whether it falls within
+	  // the provided series.
+	  //
+	  // (Since we're performing casts from char to Character, we can't just
+	  // use Arrays.asList() to copy the initial array to a Vector.)
+		char[] chars = value.toCharArray();
+		char ch;
+		Vector v = new Vector<Character>();
+		for (int i = 0; i < chars.length; i++) {
+
+      // If the character falls within the range bounded by the start and end
+      // characters, copy it to the Vector.
+      ch = chars[i];
+			if (ch >= this.startChar && ch <= this.endChar) {
+			  v.add(new Character(ch));
+      // Otherwise, we've detected a character not in the series.
+			} else {
+        throw new IllegalArgumentException("character " + "\'" + ch + "\'" + " is not valid");
+      }
+		  
+		}
+
+		// Set the current value.
+		this.currentValue = new Vector<Character>(v);
 	}
 	
 	// Returns the next alphabetic ID in the series.

@@ -93,6 +93,26 @@ public class IDPatternTest extends TestCase {
 		assertEquals("2009.1-", pattern.getNextID());
 
 	}
+
+	public void testNextIDWithSuppliedID() {
+	
+		pattern = new IDPattern();
+		pattern.add(new YearIDPart("2009"));
+		pattern.add(new StringIDPart("."));
+		pattern.add(new NumericIDPart("1"));
+		assertEquals("2009.2", pattern.getNextID("2009.1"));
+		assertEquals("2009.3", pattern.getNextID("2009.2"));
+
+		pattern = new IDPattern();
+		pattern.add(new YearIDPart("2009"));
+		pattern.add(new StringIDPart("."));
+		pattern.add(new NumericIDPart("1"));
+		pattern.add(new StringIDPart("-"));
+		pattern.add(new AlphabeticIDPart("a"));
+		assertEquals("2009.1-b", pattern.getNextID("2009.1-a"));
+		assertEquals("2009.3-c", pattern.getNextID("2009.3-b"));
+
+	}
 	
 	public void testEmptyPartsListCurrentID() {
 

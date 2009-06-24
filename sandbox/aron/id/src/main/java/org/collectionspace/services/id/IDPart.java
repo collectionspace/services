@@ -55,6 +55,11 @@ public abstract class IDPart {
 		return generator.getCurrentID();
 	}
 
+	// Sets the current value of this ID.
+	public synchronized void setCurrentID(String value) {
+		generator.setCurrentID(value);
+	}
+
 	// Returns the next value of this ID.
 	public synchronized String getNextID() throws IllegalStateException {
 		return generator.getNextID();
