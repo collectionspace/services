@@ -37,7 +37,7 @@
 // We might also look into the (protected) source code for java.util.Properties.load()
 // which reads escaped Unicode values.
 //
-// Note also that, if the goal is to cycle through a series of alphabetic identifiers,
+// Note also that, if the goal is to cycle through a sequence of alphabetic identifiers,
 // such as the sequence of characters used in a particular human language, it may or may not
 // be the case that any contiguous Unicode code point sequence reflects such a character sequence.
 
@@ -67,8 +67,10 @@ public class AlphabeticIDGenerator implements IDGenerator {
 	private Vector<Character> initialValue = new Vector<Character>();
 	private Vector<Character> currentValue = new Vector<Character>();
 
+	// Constructor using defaults for character sequence and initial value.
+	//
   // If no start and end characters are provided for the alphabetic character
-  // sequence, default to an 'a-z' series, representing the lowercase alphabetic
+  // sequence, default to an 'a-z' sequence, representing the lowercase alphabetic
   // characters in the USASCII character set (within Java's internal
   // Unicode UTF-16 representation).
   //
@@ -79,8 +81,10 @@ public class AlphabeticIDGenerator implements IDGenerator {
 	  
 	}
 
+	// Constructor using defaults for character sequence.
+	//
   // If no start and end characters are provided for the alphabetic character
-  // sequence, default to an 'a-z' series, representing the lowercase alphabetic
+  // sequence, default to an 'a-z' sequence, representing the lowercase alphabetic
   // characters in the USASCII character set (within Java's internal
   // Unicode UTF-16 representation).
 	public AlphabeticIDGenerator(String initial) throws IllegalArgumentException {
@@ -89,18 +93,19 @@ public class AlphabeticIDGenerator implements IDGenerator {
 	  
 	}
 	
-	public AlphabeticIDGenerator(String seriesStart, String seriesEnd, String initial)
+	// Constructor.
+	public AlphabeticIDGenerator(String sequenceStart, String sequenceEnd, String initial)
 	  throws IllegalArgumentException {
 	  
-	  // Validate and store the start character in the alphabetic series.
+	  // Validate and store the start character in the character sequence.
 	  
-	  if (seriesStart == null || seriesStart.equals("")) {
+	  if (sequenceStart == null || sequenceStart.equals("")) {
 			throw new IllegalArgumentException(
-			  "Start character in the alphabetic series must not be null or empty");
+			  "Start character in the character sequence must not be null or empty");
 		}
 	  
-	  if (seriesStart.length() == 1) {
-      this.startChar = seriesStart.charAt(0);
+	  if (sequenceStart.length() == 1) {
+      this.startChar = sequenceStart.charAt(0);
     } else if (false) {
       // Handle representations of Unicode code points here
     } else {
@@ -109,15 +114,15 @@ public class AlphabeticIDGenerator implements IDGenerator {
 			  // "Start character must be one character in length or a Unicode value such as '\u0000'");
 		}
 
-	  // Validate and store the end character in the alphabetic series.
+	  // Validate and store the end character in the character sequence.
 
-	  if (seriesEnd == null || seriesEnd.equals("")) {
+	  if (sequenceEnd == null || sequenceEnd.equals("")) {
 			throw new IllegalArgumentException(
-			  "End character in the alphabetic series must not be null or empty");
+			  "End character in the character sequence must not be null or empty");
 		}
 	  
-	  if (seriesEnd.length() == 1) {
-      this.endChar = seriesEnd.charAt(0);
+	  if (sequenceEnd.length() == 1) {
+      this.endChar = sequenceEnd.charAt(0);
     } else if (false) {
       // Handle representations of Unicode code points here
     } else {
@@ -128,7 +133,7 @@ public class AlphabeticIDGenerator implements IDGenerator {
     
 	  if (this.endChar <= this.startChar) {
 			throw new IllegalArgumentException(
-			  "End (last) character in the alphabetic series must be greater than the start character");
+			  "End (last) character in the character sequence must be greater than the start character");
 		}
 		
 	  // Validate and store the initial value of this identifier.
@@ -141,7 +146,7 @@ public class AlphabeticIDGenerator implements IDGenerator {
 	
 	  // Store the chars in the initial value as Characters in a Vector,
 	  // validating each character to identify whether it falls within
-	  // the provided series.
+	  // the provided sequence.
 	  //
 	  // (Since we're performing casts from char to Character, we can't just
 	  // use Arrays.asList() to copy the initial array to a Vector.)
@@ -149,12 +154,11 @@ public class AlphabeticIDGenerator implements IDGenerator {
 		char ch;
 		for (int i = 0; i < chars.length; i++) {
 
-      // If the character falls within the range bounded by the start and end
-      // characters, copy it to the Vector.
+      // If the character falls within the provided sequence, copy it to the Vector.
       ch = chars[i];
 			if (ch >= this.startChar && ch <= this.endChar) {
 			  this.initialValue.add(new Character(ch));
-      // Otherwise, we've detected a character not in the series.
+      // Otherwise, we've detected a character not in the sequence.
 			} else {
         throw new IllegalArgumentException("character " + "\'" + ch + "\'" + " is not valid");
       }
@@ -195,7 +199,7 @@ public class AlphabeticIDGenerator implements IDGenerator {
 	
 	  // Store the chars in the value as Characters in a Vector,
 	  // validating each character to identify whether it falls within
-	  // the provided series.
+	  // the provided sequence.
 	  //
 	  // (Since we're performing casts from char to Character, we can't just
 	  // use Arrays.asList() to copy the initial array to a Vector.)
@@ -209,7 +213,7 @@ public class AlphabeticIDGenerator implements IDGenerator {
       ch = chars[i];
 			if (ch >= this.startChar && ch <= this.endChar) {
 			  v.add(new Character(ch));
-      // Otherwise, we've detected a character not in the series.
+      // Otherwise, we've detected a character not in the sequence.
 			} else {
         throw new IllegalArgumentException("character " + "\'" + ch + "\'" + " is not valid");
       }
@@ -220,7 +224,7 @@ public class AlphabeticIDGenerator implements IDGenerator {
 		this.currentValue = new Vector<Character>(v);
 	}
 	
-	// Returns the next alphabetic ID in the series.
+	// Returns the next alphabetic ID in the sequence.
 	//
   // Currently, the number of characters auto-expands as the
   // value of the most significant character rolls over.

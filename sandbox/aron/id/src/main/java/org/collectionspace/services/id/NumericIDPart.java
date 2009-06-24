@@ -24,11 +24,17 @@ package org.collectionspace.services.id;
 
 public class NumericIDPart extends IDPart {
 
+	public NumericIDPart() throws IllegalArgumentException {
+		super(new NumericIDGenerator());
+	};
+
+	// Store the appropriate Numeric ID generator and the base value for this part.
 	public NumericIDPart(String baseVal) throws IllegalArgumentException {
-		// Store the appropriate Numeric ID generator and the base value for this part.
 		super(new NumericIDGenerator(baseVal));
 	};
 
+	// Store the appropriate Numeric ID generator, and the base value
+	// and maximum length for this part.
 	public NumericIDPart(String baseVal, String maxLength) throws IllegalArgumentException {
 		super(new NumericIDGenerator(baseVal, maxLength));
 	};

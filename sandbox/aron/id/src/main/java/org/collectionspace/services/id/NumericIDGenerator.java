@@ -31,13 +31,21 @@ public class NumericIDGenerator implements IDGenerator {
   final static private int DEFAULT_MAX_LENGTH = 6;
   private int maxLength = DEFAULT_MAX_LENGTH;
   
-  private long initialValue = 0;
-	private long currentValue = 0;
+  final static private int DEFAULT_INITIAL_VALUE = 1;
+  private long initialValue = DEFAULT_INITIAL_VALUE;
+	private long currentValue = DEFAULT_INITIAL_VALUE;
 
+	// Constructor using defaults for initial value and maximum length.
+	public NumericIDGenerator() throws IllegalArgumentException {
+		this(Integer.toString(DEFAULT_INITIAL_VALUE), Integer.toString(DEFAULT_MAX_LENGTH));
+	}
+
+	// Constructor using default maximum length.
 	public NumericIDGenerator(String initialValue) throws IllegalArgumentException {
 		this(initialValue, Integer.toString(DEFAULT_MAX_LENGTH));
 	}
 
+	// Constructor.
 	public NumericIDGenerator(String initialValue, String maxLength)
 		throws IllegalArgumentException {
 		
