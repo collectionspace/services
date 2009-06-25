@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+
+<component name="org.collectionspace.collectionobject.layouts.webapp">
+
+  <extension target="org.nuxeo.ecm.platform.forms.layout.WebLayoutManager"
+    point="layouts">
+
+    <layout name="collectionobject">
+      <templates>
+        <template mode="any">/layouts/layout_default_template.xhtml</template>
+      </templates>
+      <rows>
+        <row><widget>objectNumber</widget></row>
+        <row><widget>otherNumber</widget></row>
+        <row><widget>briefDescription</widget></row>
+        <row><widget>comments</widget></row>
+        <row><widget>distFeatures</widget></row>
+        <row><widget>objectName</widget></row>
+        <row><widget>responsibleDept</widget></row>
+        <row><widget>title</widget></row>
+      </rows>
+
+      <widget name="objectNumber" type="text">
+        <labels>
+          <label mode="any">objectNumber</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="collectionobject">objectNumber</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="otherNumber" type="text">
+        <labels>
+          <label mode="any">otherNumber</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="collectionobject">otherNumber</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="briefDescription" type="text">
+        <labels>
+          <label mode="any">briefDescription</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="collectionobject">briefDescription</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="comments" type="text">
+        <labels>
+          <label mode="any">comments</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="collectionobject">comments</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="distFeatures" type="text">
+        <labels>
+          <label mode="any">distFeatures</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="collectionobject">distFeatures</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="objectName" type="text">
+        <labels>
+          <label mode="any">objectName</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="collectionobject">objectName</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="responsibleDept" type="text">
+        <labels>
+          <label mode="any">responsibleDept</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="collectionobject">responsibleDept</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="title" type="text">
+        <labels>
+          <label mode="any">title</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="collectionobject">title</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+    </layout>
+  </extension>
+</component>
