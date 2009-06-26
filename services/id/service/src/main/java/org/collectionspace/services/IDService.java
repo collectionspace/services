@@ -20,12 +20,7 @@
  
 package org.collectionspace.services;
 
-import java.io.IOException;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-
 import org.collectionspace.services.id.*;
-import org.collectionspace.services.id.IDServiceNuxeoImpl;
 
 public interface IDService {
 
@@ -55,28 +50,5 @@ public interface IDService {
 	// Update
 	
 	// Delete (possibly not permitted - deactivate instead?)
-	
-
-/*
-	// Create
-	Document postCollectionObject(CollectionObject co)
-			throws DocumentException, IOException;
-
-	// Read single object
-	Document getCollectionObject(String csid) throws DocumentException,
-			IOException;
-
-	// Read a list of objects
-	Document getCollectionObjectList() throws DocumentException, IOException;
-
-	// Update
-	Document putCollectionObject(String csid, CollectionObject theUpdate)
-			throws DocumentException, IOException;
-
-	// Delete
-	Document deleteCollectionObject(String csid) throws DocumentException,
-			IOException;
-			
-*/
 
 }
