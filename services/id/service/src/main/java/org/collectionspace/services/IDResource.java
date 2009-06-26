@@ -18,6 +18,14 @@
  * $Date: 2009-06-19 19:03:38 -0700 (Fri, 19 Jun 2009) $
  */
  
+ // @TODO: Add Javadoc comments.
+ 
+ // @TODO: Remove unused import statements.
+ 
+ // @TODO: Replace wildcarded import statement for
+ // org.collectionspace.services.id.* with class-specific
+ // import statements.
+ 
  package org.collectionspace.services;
 
 import java.util.Iterator;
@@ -48,26 +56,60 @@ import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("/idpatterns") // Think long and hard about this ...
+@Path("/ids")
 @Consumes("application/xml")
 @Produces("application/xml")
 public class IDResource {
 
 	final Logger logger = LoggerFactory.getLogger(IDResource.class);
 
-	// This should be a DI wired by a container like Spring, Seam, or EJB3
-	// final static CollectionObjectService service = new CollectionObjectServiceNuxeoImpl();
+	// Richard's comment in the CollectionObject Resource class, from which
+	// this class was derived: This should be a DI wired by a container like
+	// Spring, Seam, or EJB3.
+	final static IDService service = new IDServiceJdbcImpl();
 
 	public IDResource() {
 		// do nothing
 	}
 
-  // Retrieve the next ID 
+  // Retrieve the next available ID associated with a specified pattern.
+  //
+  // @TODO: We're currently using simple integer IDs.  We'll need to
+  // handle both CSIDs, and URIs or another identifier type that we select,
+  // for uniquely identifying IDPatterns.
 	@GET
-	@Path("/{csid}/ids/next")
+	@Path("/next/patterns/{id}")
+	// @TODO: Temporary during testing; to be changed to return XML
   @Produces("text/plain")
-	public String getCollectionObject(@PathParam("csid") String csid) {
-    return "foo"; // placeholder
+	public Response getNextID(@PathParam("csid") String csid) {
+	
+		Response response = null;
+		String nextId = "";
+		String msg = "";
+	
+		try {
+		
+			nextId = service.nextID(csid);
+		
+		// @TODO: An IllegalStateException often indicates an overflow
+		// of an IDPart.  Consider whether returning a 400 Bad Request
+		// status code is warranted, or whether returning some other
+		// status would be more appropriate.
+		} catch (IllegalStateException ise) {
+			response = Response.status(Response.Status.BAD_REQUEST)
+				.entity(ise.getMessage()).type("text/plain").build();
+				
+		} catch (IllegalArgumentException iae) {
+			response = Response.status(Response.Status.BAD_REQUEST)
+				.entity(iae.getMessage()).type("text/plain").build();
+				
+		} catch (Exception e) {
+			response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+				.entity(e.getMessage()).type("text/plain").build();
+		}
+		
+    return response;
+    
   }
 
 /*

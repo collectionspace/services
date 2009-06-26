@@ -29,7 +29,33 @@ import org.collectionspace.services.id.IDServiceNuxeoImpl;
 
 public interface IDService {
 
-	public final static String ID_SCHEMA_NAME = "id"; // Note to self: Where is this used?
+	// public final static String ID_SCHEMA_NAME = "id"; // Note to self: Where is this used?
+
+	// ----------------------------------------
+	// IDs
+	// ----------------------------------------
+
+	// Create
+
+	// Read single object
+	public String nextID(String csid) throws IllegalArgumentException, IllegalStateException;
+	
+	// Read a list of objects (aka read multiple)
+	
+	// ----------------------------------------
+	// ID Patterns
+	// ----------------------------------------
+	
+	// Create
+	
+	// Read single object
+	
+	// Read a list of objects (aka read multiple)
+	
+	// Update
+	
+	// Delete (possibly not permitted - deactivate instead?)
+	
 
 /*
 	// Create

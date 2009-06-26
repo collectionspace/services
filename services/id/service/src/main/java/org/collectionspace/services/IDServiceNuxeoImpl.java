@@ -4,6 +4,8 @@
  * Implementation of Nuxeo-specific portions of the ID Service,
  * such as storing and retrieving documents from the Nuxeo repository.
  *
+ * NOTE: Placeholder class - not currently used.
+ *
  * Copyright 2009 Regents of the University of California
  *
  * Licensed under the Educational Community License (ECL), Version 2.0.
@@ -19,7 +21,7 @@
  * $Date: 2009-06-19 19:03:38 -0700 (Fri, 19 Jun 2009) $
  */
  
-package org.collectionspace.services.id;
+package org.collectionspace.services;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -38,7 +40,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
 // import org.restlet.resource.Representation;
 
-public class IDServiceNuxeoImpl { // implements IDService {
+public class IDServiceNuxeoImpl {      // implements IDService {
 
   // Placeholder constructor.
   public void IDServiceNuxeoImpl() {
