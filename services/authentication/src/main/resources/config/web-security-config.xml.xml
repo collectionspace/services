@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Copyright 2009 University of California at Berkeley
+    Licensed under the Educational Community License (ECL), Version 2.0.
+    You may not use this file except in compliance with this License.
+    
+    Document   : web-security-config.xml.xml
+    Created on : June 19, 2009, 10:04 AM
+    Author     : 
+    Description:
+        web.xml snippet for security configuration
+-->
+<!-- copy the following into web.xml of cspace-services.war -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>CollectionSpace Services</web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>*</role-name>
+        </auth-constraint>
+
+        <user-data-constraint>
+            <transport-guarantee>NONE</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
+    <login-config>
+        <auth-method>BASIC</auth-method>
+        <realm-name>CollectionSpace realm</realm-name>
+    </login-config>
