@@ -4,7 +4,14 @@
  * Implementation of portions of the ID Service that use JDBC
  * for persistence of IDPatterns, IDParts, and ID values.
  *
- * Copyright 2009 Regents of the University of California
+ * This document is a part of the source code and related artifacts
+ * for CollectionSpace, an open source collections management system
+ * for museums and related institutions:
+ *
+ * http://www.collectionspace.org
+ * http://wiki.collectionspace.org
+ *
+ * Copyright © 2009 Regents of the University of California
  *
  * Licensed under the Educational Community License (ECL), Version 2.0.
  * You may not use this file except in compliance with this License.
@@ -14,9 +21,9 @@
  *
  * Based on work by Richard Millet and Sanjay Dalal.
  *
- * @author $Author: aron $
- * @version $Revision: 267 $
- * $Date: 2009-06-19 19:03:38 -0700 (Fri, 19 Jun 2009) $
+ * @author $Author$
+ * @version $Revision$
+ * $Date$
  */
 
 // @TODO: Replace wildcarded import statement for

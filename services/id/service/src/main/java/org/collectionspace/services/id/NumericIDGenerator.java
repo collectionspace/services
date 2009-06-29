@@ -1,10 +1,17 @@
 /*	
  * NumericIDGenerator
  *
- * <p>An identifier generator that generates an incrementing ID as a
- * series of numeric values, beginning from an initial value.</p>
+ * Generates identifiers (IDs) that consist of a sequence of
+ * numeric values, beginning from an initial value.
  *
- * Copyright 2009 Regents of the University of California
+ * This document is a part of the source code and related artifacts
+ * for CollectionSpace, an open source collections management system
+ * for museums and related institutions:
+ *
+ * http://www.collectionspace.org
+ * http://wiki.collectionspace.org
+ *
+ * Copyright © 2009 Regents of the University of California
  *
  * Licensed under the Educational Community License (ECL), Version 2.0.
  * You may not use this file except in compliance with this License.
@@ -12,9 +19,9 @@
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
  *
- * @author $Author: aron $
- * @version $Revision: 267 $
- * $Date: 2009-06-19 19:03:38 -0700 (Fri, 19 Jun 2009) $
+ * $LastChangedBy$
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
 
 // @TODO: Add Javadoc comments
