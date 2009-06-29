@@ -21,9 +21,9 @@
  *
  * Based on work by Richard Millet and Sanjay Dalal.
  *
- * @author $Author$
- * @version $Revision$
- * $Date$
+ * $LastChangedBy$
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
 
 // @TODO: Replace wildcarded import statement for

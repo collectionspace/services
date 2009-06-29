@@ -20,7 +20,7 @@
  *
  * $LastChangedBy$
  * $LastChangedRevision$
- * $LastchangedDate: 2009-06-19 19:03:38 -0700 (Fri, 19 Jun 2009) $
+ * $LastChangedDate$
  */
 
 package org.collectionspace.services.id;
