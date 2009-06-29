@@ -135,7 +135,7 @@ public class CSpaceDBLoginModule extends DatabaseServerLoginModule {
 //         InitialContext ctx = new InitialContext();
 //         DataSource ds = (DataSource) ctx.lookup(dsJndiName);
 //         conn = ds.getConnection();
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/cspace", "root", "admin");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/cspace", "test", "test");
             // Get the user role names
             if(log){
                 log("Excuting query: " + rolesQuery + ", with username: " + username);
