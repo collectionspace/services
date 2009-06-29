@@ -17,7 +17,6 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  */
 public class CollectionObjectClient extends CollectionSpaceClient {
 
-
     /**
      *
      */
@@ -35,7 +34,13 @@ public class CollectionObjectClient extends CollectionSpaceClient {
     private CollectionObjectClient() {
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         RegisterBuiltin.register(factory);
-        collectionObjectProxy = ProxyFactory.create(CollectionObjectProxy.class, getURL());
+        if(useAuth()){
+            collectionObjectProxy = ProxyFactory.create(CollectionObjectProxy.class,
+                    getBaseURL(), getHttpClient());
+        }else{
+            collectionObjectProxy = ProxyFactory.create(CollectionObjectProxy.class,
+                    getBaseURL());
+        }
     }
 
     /**

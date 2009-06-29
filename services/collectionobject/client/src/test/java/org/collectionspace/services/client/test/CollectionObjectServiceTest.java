@@ -13,6 +13,8 @@ import org.testng.annotations.Test;
 import org.collectionspace.services.collectionobject.CollectionObject;
 import org.collectionspace.services.collectionobject.CollectionObjectList;
 import org.collectionspace.services.client.CollectionObjectClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A CollectionObjectNuxeoServiceTest.
@@ -24,60 +26,61 @@ public class CollectionObjectServiceTest {
     private CollectionObjectClient collectionObjectClient = CollectionObjectClient.getInstance();
     private String updateId = null;
     private String deleteId = null;
+    final Logger logger = LoggerFactory.getLogger(CollectionObjectServiceTest.class);
 
     @Test
     public void createCollectionObject() {
-    	long identifier = this.createIdentifier();
-    	
-    	CollectionObject collectionObject = createCollectionObject(identifier);
+        long identifier = this.createIdentifier();
+
+        CollectionObject collectionObject = createCollectionObject(identifier);
         ClientResponse<Response> res = collectionObjectClient.createCollectionObject(collectionObject);
         Assert.assertEquals(res.getStatus(), Response.Status.CREATED.getStatusCode());
-        
+
         //store updateId locally for "update" test
-        if (updateId == null) {
-        	updateId = extractId(res);
-        } else {
-        	deleteId = extractId(res);
-        	System.out.println("Set deleteId: " + deleteId);
+        if(updateId == null){
+            updateId = extractId(res);
+        }else{
+            deleteId = extractId(res);
+            verbose("Set deleteId: " + deleteId);
         }
     }
 
     @Test(dependsOnMethods = {"createCollectionObject"})
     public void updateCollectionObject() {
-    	ClientResponse<CollectionObject> res = collectionObjectClient.getCollectionObject(updateId);
+        ClientResponse<CollectionObject> res = collectionObjectClient.getCollectionObject(updateId);
         CollectionObject collectionObject = res.getEntity();
         verbose("Got CollectionObject to update with ID: " + updateId,
-        		collectionObject, CollectionObject.class);
-        
+                collectionObject, CollectionObject.class);
+
         //collectionObject.setCsid("updated-" + updateId);
         collectionObject.setObjectNumber("updated-" + collectionObject.getObjectNumber());
         collectionObject.setObjectName("updated-" + collectionObject.getObjectName());
-        
+
         // make call to update service
         res = collectionObjectClient.updateCollectionObject(updateId, collectionObject);
-        
+
         // check the response
-        CollectionObject updatedCollectionObject = res.getEntity();        
+        CollectionObject updatedCollectionObject = res.getEntity();
         Assert.assertEquals(updatedCollectionObject.getObjectName(), collectionObject.getObjectName());
         verbose("updateCollectionObject: ", updatedCollectionObject, CollectionObject.class);
-        
+
         return;
     }
 
     @Test(dependsOnMethods = {"createCollectionObject"})
     public void createCollection() {
-    	for (int i = 0; i < 3; i++) {
-    		this.createCollectionObject();
-    	}
+        for(int i = 0; i < 3; i++){
+            this.createCollectionObject();
+        }
     }
-    
+
     @Test(dependsOnMethods = {"createCollection"})
     public void getCollectionObjectList() {
         //the resource method is expected to return at least an empty list
         CollectionObjectList coList = collectionObjectClient.getCollectionObjectList().getEntity();
         List<CollectionObjectList.CollectionObjectListItem> coItemList = coList.getCollectionObjectListItem();
         int i = 0;
-        for(CollectionObjectList.CollectionObjectListItem pli : coItemList) {
+        for(CollectionObjectList.CollectionObjectListItem pli : coItemList){
             verbose("getCollectionObjectList: list-item[" + i + "] csid=" + pli.getCsid());
             verbose("getCollectionObjectList: list-item[" + i + "] objectNumber=" + pli.getObjectNumber());
             verbose("getCollectionObjectList: list-item[" + i + "] URI=" + pli.getUri());
@@ -87,7 +90,7 @@ public class CollectionObjectServiceTest {
 
     @Test(dependsOnMethods = {"createCollection"})
     public void deleteCollectionObject() {
-    	System.out.println("Calling deleteCollectionObject:" + deleteId);
+        verbose("Calling deleteCollectionObject:" + deleteId);
         ClientResponse<Response> res = collectionObjectClient.deleteCollectionObject(deleteId);
         verbose("deleteCollectionObject: csid=" + deleteId);
         verbose("deleteCollectionObject: status = " + res.getStatus());
@@ -95,17 +98,17 @@ public class CollectionObjectServiceTest {
     }
 
     private CollectionObject createCollectionObject(long identifier) {
-    	CollectionObject collectionObject = createCollectionObject("objectNumber-" + identifier,
-    			"objectName-" + identifier);    	
+        CollectionObject collectionObject = createCollectionObject("objectNumber-" + identifier,
+                "objectName-" + identifier);
 
         return collectionObject;
     }
 
     private CollectionObject createCollectionObject(String objectNumber, String objectName) {
-    	CollectionObject collectionObject = new CollectionObject();
-    	
-    	collectionObject.setObjectNumber(objectNumber);
-    	collectionObject.setObjectName(objectName);
+        CollectionObject collectionObject = new CollectionObject();
+
+        collectionObject.setObjectNumber(objectNumber);
+        collectionObject.setObjectName(objectName);
 
         return collectionObject;
     }
@@ -120,7 +123,10 @@ public class CollectionObjectServiceTest {
     }
 
     private void verbose(String msg) {
-        System.out.println("CollectionObject Test: " + msg);
+//        if(logger.isInfoEnabled()){
+//            logger.debug(msg);
+//        }
+        System.out.println(msg);
     }
 
     private void verbose(String msg, Object o, Class clazz) {
@@ -142,9 +148,9 @@ public class CollectionObjectServiceTest {
             verbose("    name=" + mentry.getKey() + " value=" + mentry.getValue());
         }
     }
-    
+
     private long createIdentifier() {
-    	long identifier = System.currentTimeMillis();
-    	return identifier;
+        long identifier = System.currentTimeMillis();
+        return identifier;
     }
 }
