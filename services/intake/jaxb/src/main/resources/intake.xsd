@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/intake"
+  xmlns="http://collectionspace.org/intake"
+  targetNamespace="http://services.collectionspace.org/intake"
+  version="0.1"
+>
+
+
+<!-- avoid XmlRootElement nightnmare, see http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html-->
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Intake+Schema -->    
+    
+    <!-- intake  -->
+    <xs:element name="intake">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="csid" type="xs:string" />
+                
+                <!--  Object Entry Information Group -->
+                <xs:element name="currentOwner" type="xs:string"/>
+                <xs:element name="depositor" type="xs:string"/>
+                <xs:element name="depositorsRequirements" type="xs:string"/>
+                <xs:element name="entryDate" type="xs:string"/>
+                <xs:element name="entryMethod" type="xs:string"/>
+                <xs:element name="entryNote" type="xs:string"/>
+                <xs:element name="entryNumber" type="xs:string"/>
+                <xs:element name="entryReason" type="xs:string"/>
+                <xs:element name="packingNote" type="xs:string"/>
+                <xs:element name="returnDate" type="xs:string"/>
+                
+                <!--  Date Information Group -->
+                <xs:element name="associationDate" type="xs:string"/>
+                <xs:element name="earliestDate" type="xs:string"/>
+                <xs:element name="earliestDateCertainty" type="xs:string"/>
+                <xs:element name="earliestDateQualifier" type="xs:string"/>
+                <xs:element name="latestDate" type="xs:string"/>
+                <xs:element name="latestDateCertainty" type="xs:string"/>
+                <xs:element name="latestDateQualifier" type="xs:string"/>
+                <xs:element name="datePeriod" type="xs:string"/>
+                <xs:element name="dateText" type="xs:string"/>
+                
+                <!--  Object Collection Information Group -->
+                <xs:element name="fieldCollectionDate" type="xs:string"/>
+                <xs:element name="fieldCollectionEventName" type="xs:string"/>
+                <xs:element name="fieldCollectionEventRefNumber" type="xs:string"/>
+                <xs:element name="fieldCollectionMethod" type="xs:string"/>
+                <xs:element name="fieldCollectionNote" type="xs:string"/>
+                <xs:element name="fieldCollectionNumber" type="xs:string"/>
+                <xs:element name="fieldCollectionPlace" type="xs:string"/>
+                <xs:element name="fieldCollectionSource" type="xs:string"/>
+                <xs:element name="fieldCollector" type="xs:string"/>
+                <xs:element name="geologicalComplexName" type="xs:string"/>
+                <xs:element name="habitat" type="xs:string"/>
+                <xs:element name="habitatNote" type="xs:string"/>
+                <xs:element name="stratigraphicUnitName" type="xs:string"/>
+                <xs:element name="stratigraphicUnitType" type="xs:string"/>
+                <xs:element name="stratigraphicUnitNote" type="xs:string"/>
+                
+                <!-- Valuation Information Group -->
+                <xs:element name="ValuationReferenceNumber" type="xs:string"/>
+                <xs:element name="Valuer" type="xs:string"/>
+                
+                <!-- Insurance Information Group -->
+                <xs:element name="insuranceNote" type="xs:string"/>
+                <xs:element name="insurancePolicyNumber" type="xs:string"/>
+                <xs:element name="InsuranceReferenceNumber" type="xs:string"/>
+                <xs:element name="insuranceRenewalDate" type="xs:string"/>
+                <xs:element name="insurer" type="xs:string"/>
+                
+                <!-- Object Location Information Group -->
+                <xs:element name="currentLocation" type="xs:string"/>
+                <xs:element name="currentLocationFitness" type="xs:string"/>
+                <xs:element name="currentLocationNote" type="xs:string"/>
+                <xs:element name="locationDate" type="xs:string"/>
+                <xs:element name="normalLocation" type="xs:string"/>
+                
+                <!-- Condition Check/Technical Assessment Information Group -->
+                <xs:element name="conditionCheckDate" type="xs:string"/>
+                <xs:element name="conditionCheckMethod" type="xs:string"/>
+                <xs:element name="conditionCheckNote" type="xs:string"/>
+                <xs:element name="conditionCheckReason" type="xs:string"/>
+                <xs:element name="conditionCheckReferenceNumber" type="xs:string"/>
+                <xs:element name="conditionCheckAssesor" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- intake records, as in nuxeo repository -->
+    <xs:element name="intake-list">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="intake-list-item" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="entryNumber" type="xs:string"
+                                minOccurs="1" />
+                            <!-- uri to retrive intake details -->
+                            <xs:element name="uri" type="xs:anyURI"
+                                minOccurs="1" />
+                            <xs:element name="csid" type="xs:string"
+                                minOccurs="1" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+</xs:schema>
+
