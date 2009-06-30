@@ -29,6 +29,8 @@ package org.collectionspace.services;
 
 public interface IDService {
 
+	public final static String ID_SCHEMA_NAME = "id";
+
 	// ----------------------------------------
 	// IDs
 	// ----------------------------------------
