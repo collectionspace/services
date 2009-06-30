@@ -15,11 +15,19 @@ import org.collectionspace.services.nuxeo.NuxeoRESTClient;
 import org.collectionspace.services.nuxeo.CollectionSpaceServiceNuxeoImpl;
 import org.collectionspace.services.collectionobject.CollectionObject;
 import org.collectionspace.services.CollectionObjectJAXBSchema;
+import org.collectionspace.services.nuxeo.NuxeoUtils;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
 import org.restlet.resource.Representation;
+
+import org.nuxeo.ecm.core.api.IdRef;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentRef;
+
+
 
 /**
  * @author remillet
@@ -54,6 +62,11 @@ public class CollectionObjectServiceNuxeoImpl extends
 
 	public Document getCollectionObject(String csid) throws DocumentException,
 			IOException {
+		
+		// Calling via Nuxeo Java API
+		//getCollectionObjectViaJavaAPI(csid);
+		
+		// Return to normal Nuxeo REST call
 		List<String> pathParams = new ArrayList<String>();
 		Map<String, String> queryParams = new HashMap<String, String>();
 
@@ -69,6 +82,35 @@ public class CollectionObjectServiceNuxeoImpl extends
 		Document document = reader.read(res.getStream());
 
 		return document;
+	}
+	
+	/*
+	 * Prototype method for calling the Nuxeo Java API
+	 */
+	private Document getCollectionObjectViaJavaAPI(String csid)
+			throws DocumentException, IOException {
+		Document result = null;
+		RepositoryInstance repoSession = null;
+		
+		try {
+			repoSession = getRepositorySession();
+			DocumentRef documentRef = new IdRef(csid);
+			DocumentModel documentModel = repoSession.getDocument(documentRef);
+			result = NuxeoUtils.getDocument(repoSession, documentModel);
+		} catch (Exception e) {
+			if (logger.isDebugEnabled()) {
+				e.printStackTrace();
+			}
+		} finally {
+			if (repoSession != null) {
+				releaseRepositorySession(repoSession);
+			}
+		}
+		
+		// Dump out the contents of the result to stdout
+		System.out.println(result.asXML());
+		
+		return result;
 	}
 
 	public Document getCollectionObjectList() throws DocumentException,
