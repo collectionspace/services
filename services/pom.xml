@@ -25,6 +25,7 @@
         <module>authentication</module>
         <module>client</module>
         <module>collectionobject</module>
+        <module>intake</module>
         <module>JaxRsServiceProvider</module>
   </modules>
 
