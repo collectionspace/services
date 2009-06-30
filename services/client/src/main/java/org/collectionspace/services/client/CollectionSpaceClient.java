@@ -8,8 +8,10 @@ import org.slf4j.LoggerFactory;
 
 public abstract class CollectionSpaceClient {
 
-    static final String AUTH_PROPERTY = "org.collectionspace.auth";
-    static final String SSL_PROPERTY = "org.collectionspace.ssl";
+    static final String USER_PROPERTY = "cspace.user";
+    static final String PASSWORD_PROPERTY = "cspace.password";
+    static final String AUTH_PROPERTY = "cspace.auth";
+    static final String SSL_PROPERTY = "cspace.ssl";
     static final String URL_PROPERTY = "org.collectionspace.url";
     /*
     static final String URL_PROPERTY_SCHEME = "org.collectionspace.url.schme";
@@ -40,9 +42,20 @@ public abstract class CollectionSpaceClient {
         useAuth = Boolean.getBoolean(AUTH_PROPERTY);
         if(useAuth){
             httpClient = new HttpClient();
+            String user = System.getProperty(USER_PROPERTY);
+            if(user == null || "".equals(user)){
+                user = "test";
+            }
+            String password = System.getProperty(PASSWORD_PROPERTY);
+            if(password == null || "".equals(password)){
+                password = "test";
+            }
+            if(logger.isDebugEnabled()){
+                logger.debug("using user=" + user + " password=" + password);
+            }
             httpClient.getState().setCredentials(
                     new AuthScope(HOST, PORT, AuthScope.ANY_REALM),
-                    new UsernamePasswordCredentials("test", "test"));
+                    new UsernamePasswordCredentials(user, password));
             httpClient.getParams().setAuthenticationPreemptive(true);
             if(logger.isDebugEnabled()){
                 logger.debug("set up httpClient for authentication");
