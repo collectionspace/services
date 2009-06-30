@@ -79,7 +79,7 @@ public class IntakeServiceTest {
         int i = 0;
         for(IntakeList.IntakeListItem pli : coItemList) {
             verbose("getIntakeList: list-item[" + i + "] csid=" + pli.getCsid());
-            verbose("getIntakeList: list-item[" + i + "] objectNumber=" + pli.getEntryNumber());
+            verbose("getIntakeList: list-item[" + i + "] entryNumber=" + pli.getEntryNumber());
             verbose("getIntakeList: list-item[" + i + "] URI=" + pli.getUri());
             i++;
         }
@@ -95,8 +95,8 @@ public class IntakeServiceTest {
     }
 
     private Intake createIntake(long identifier) {
-    	Intake intake = createIntake("objectNumber-" + identifier,
-    			"objectName-" + identifier);    	
+    	Intake intake = createIntake("entryNumber-" + identifier,
+    			"entryDate-" + identifier);    	
 
         return intake;
     }
