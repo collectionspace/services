@@ -25,6 +25,7 @@
         <module>authentication</module>
         <module>client</module>
         <module>collectionobject</module>
+        <module>id</module>
         <module>intake</module>
         <module>JaxRsServiceProvider</module>
   </modules>
@@ -118,6 +119,24 @@
                         </archive>
                     </configuration>
                 </plugin>
+                
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-dependency-plugin</artifactId>
+                  <executions>
+                    <execution>
+                      <id>classpath</id>
+                      <goals>
+                        <goal>build-classpath</goal>
+                      </goals>
+                      <configuration>
+                      <outputFile>classpath</outputFile>
+                      </configuration>
+                    </execution>
+                  </executions>
+                </plugin>
+
+
             </plugins>
         </pluginManagement>
     </build>

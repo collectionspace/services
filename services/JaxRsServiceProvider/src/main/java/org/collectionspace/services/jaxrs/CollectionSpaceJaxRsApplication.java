@@ -1,6 +1,7 @@
 package org.collectionspace.services.jaxrs;
 
 import org.collectionspace.services.CollectionObjectResource;
+import org.collectionspace.services.IDResource;
 import org.collectionspace.services.IntakeResource;
 
 import javax.ws.rs.core.Application;
@@ -14,6 +15,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
 
     public CollectionSpaceJaxRsApplication() {
         singletons.add(new CollectionObjectResource());
+        singletons.add(new IDResource());
         singletons.add(new IntakeResource());
 //        singletons.add(new DomainIdentifierResource());
 //        singletons.add(new PingResource());
