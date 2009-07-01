@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>org.collectionspace.services.3rdparty</artifactId>
+        <groupId>org.collectionspace.services</groupId>
+        <version>1.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.collectionspace.services</groupId>
+    <artifactId>org.collectionspace.services.3rdparty.nuxeo</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0</version>
+    <name>services.3rdparty.nuxeo</name>
+
+    <properties>
+        <jboss.version>4.2.3.GA</jboss.version>
+        <jboss.ejb.version>3.0</jboss.ejb.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <nuxeo.version.5.2>5.2-SNAPSHOT</nuxeo.version.5.2>
+        <nuxeo.version.1.5>1.5-SNAPSHOT</nuxeo.version.1.5>
+    </properties>
+    
+    <repositories>
+        <repository>
+            <id>public</id>
+            <url>http://maven.nuxeo.org/public</url>
+            <releases>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>public-snapshot</id>
+            <url>http://maven.nuxeo.org/public-snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots/>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>public</id>
+            <url>http://maven.nuxeo.org/public</url>
+            <name>Nuxeo virtual release repository</name>
+            <releases>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>public-snapshot</id>
+            <url>http://maven.nuxeo.org/public-snapshot</url>
+            <name>Nuxeo virtual snapshot repository</name>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <dependencies>
+       
+        <!-- jboss -->
+        <dependency>
+            <groupId>jboss</groupId>
+            <artifactId>jboss-remoting</artifactId>
+            <version>2.2.2.SP8</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- nuxeo -->
+
+        <dependency>
+            <groupId>org.nuxeo.common</groupId>
+            <artifactId>nuxeo-common</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.runtime</groupId>
+            <artifactId>nuxeo-runtime</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-api</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-client</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-query</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-schema</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-io</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-facade</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuxeo.runtime</groupId>
+            <artifactId>nuxeo-runtime-osgi</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi-core</artifactId>
+            <version>4.1</version>
+        </dependency>
+
+    </dependencies>
+    
+
+</project>

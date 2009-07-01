@@ -1,5 +1,5 @@
 
-<project name="services" default="package" basedir=".">
+<project name="services-trunk" default="package" basedir=".">
     <description>
         collectionspace services
     </description>
@@ -10,16 +10,9 @@
     <property name="build" location="build"/>
     <property name="dist"  location="dist"/>
 
-    <target name="set.jboss.home" unless="jboss.home">
-        <property name="jboss.home" value="${jboss.dir}" />
-    </target>
+    <property name="db" value="mysql"/>
+    <property name="db.script.dir" location="${basedir}/src/main/resources/scripts/db/${db}"/>
 
-    <target name="setproperties" unless="jboss.server" depends="set.jboss.home">
-        <property name="jboss.server" value="${jboss.home}/server/${jboss.config}" />
-        <property name="jboss.deploy" value="${jboss.server}/deploy" />
-        <property name="jboss.lib" value="${jboss.server}/lib" />
-        <property name="nuxeo.deploy" value="${jboss.deploy}/nuxeo.ear" />
-    </target>
 
 
     <condition property="osfamily-unix">
@@ -29,7 +22,7 @@
         <os family="windows" />
     </condition>
 
-    <target name="init" depends="setproperties">
+    <target name="init" depends="setup">
     <!-- Create the time stamp -->
         <tstamp/>
     <!-- Create the build directory structure used by compile -->
@@ -44,8 +37,34 @@
 
     </target>
 
-    <target name="dist" depends="compile"
-        description="generate the distribution" >
+    <target name="dist" depends="package"
+    description="generate cspace service an nuxeo distribution">
+        <!-- Create the distribution directory -->
+        <mkdir dir="${dist}"/>
+        <antcall name="dist-cspace"/>
+        <antcall name="dist-nuxeo"/>
+    </target>
+
+    <target name="dist-cspace" depends="package"
+    description="generate cspace service distribution">
+
+        <tar destfile="${dist}/${jboss.release}.${cspace.services.release}.tar.gz" compression="gzip">
+            <tarfileset dir="${basedir}/services"
+              preserveLeadingSlashes="true">
+                <include name="/services/JaxRsServiceProvider/target/*.war"/>
+                <exclude name="server/${jboss.domain.cspace}/tmp/**"/>
+                <exclude name="server/${jboss.domain.cspace}/deploy/helloworld.war"/>
+            </tarfileset>
+            <tarfileset dir="${src}/main/resources"
+              preserveLeadingSlashes="true">
+                <exclude name="schemas/**"/>
+            </tarfileset>
+
+        </tar>
+    </target>
+
+    <target name="dist-nuxeo" depends="compile"
+        description="generate nuxeo domain distribution" >
         <fail message="JBoss is not installed or ${jboss.dir} not found">
             <condition>
                 <not>
@@ -62,14 +81,13 @@
             </condition>
         </fail>
 
-    <!-- Create the distribution directory -->
-        <mkdir dir="${dist}"/>
+
         <tar destfile="${dist}/${jboss.release}.${nuxeo.release}.tar.gz" compression="gzip">
             <tarfileset dir="${jboss.dir}"
               preserveLeadingSlashes="true">
-                <exclude name="server/${jboss.config}/log/**"/>
-                <exclude name="server/${jboss.config}/tmp/**"/>
-                <exclude name="server/${jboss.config}/deploy/helloworld.war"/>
+                <exclude name="server/${jboss.domain.nuxeo}/log/**"/>
+                <exclude name="server/${jboss.domain.nuxeo}/tmp/**"/>
+                <exclude name="server/${jboss.domain.nuxeo}/deploy/cspace*.*"/>
             </tarfileset>
             <tarfileset dir="${src}/main/resources"
               preserveLeadingSlashes="true">
@@ -79,7 +97,7 @@
         </tar>
     </target>
 
-    <target name="package" depends="setproperties,package-unix,package-windows"
+    <target name="package" depends="setup,package-unix,package-windows"
   description="Package CollectionSpace Services" />
     <target name="package-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
@@ -141,6 +159,35 @@
         </exec>
     </target>
 
+    <target name="create_db"
+    description="create database(s), grant privileges to test users"
+    depends="setup">
+        <sql driver="com.mysql.jdbc.Driver"
+        url="jdbc:mysql://localhost:3306/cspace"
+        userid="root"
+        password="admin"
+        src="${db.script.dir}/init_db.sql"
+        >
+            <classpath>
+                <pathelement path="${jboss.lib.cspace}/mysql-connector-java-5.1.7-bin.jar"/>
+            </classpath>
+        </sql>
+    </target>
+
+    <target name="deploy" depends="package"
+    description="deploy services in ${jboss.server.cspace}">
+        <ant antfile="services/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="3rdparty/build.xml" target="deploy" inheritall="false"/>
+        <copy file="${basedir}/target/${cspace-services.war}" todir="${jboss.lib.cspace}"/>
+    </target>
+
+    <target name="undeploy" depends="setup"
+    description="undeploy authentication service from ${jboss.server.cspace}">
+        <ant antfile="services/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="3rdparty/build.xml" target="undeploy" inheritall="false"/>
+        <delete file="${jboss.lib.cspace}/${cspace-services.war}"/>
+    </target>
+
 
     <target name="eclipse" depends="eclipse-unix,eclipse-windows" description="Generate Eclipse files" />
     <target name="eclipse-unix" if="osfamily-unix">
@@ -160,5 +207,6 @@
             <arg value="${mvn.opts}" />
         </exec>
     </target>
+
 
 </project>
