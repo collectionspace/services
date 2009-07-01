@@ -58,7 +58,7 @@ public abstract class IDPart {
 	}
 
 	// Sets the current value of the ID associated with this IDPart.
-	public synchronized void setCurrentID(String value) {
+	public synchronized void setCurrentID(String value) throws IllegalArgumentException {
 		generator.setCurrentID(value);
 	}
 

@@ -71,7 +71,7 @@ public class NumericIDPartTest extends TestCase {
 			
 	}
 
-	public void testresetID() {
+	public void testResetID() {
 	
 		part = new NumericIDPart("25");
 		assertEquals("26", part.nextID());
@@ -139,6 +139,17 @@ public class NumericIDPartTest extends TestCase {
 
 	}
 
+	public void testNegativeInitialValue() {
+
+		try {
+			part = new NumericIDPart("-1");
+			fail("Should have thrown IllegalArgumentException here");
+		} catch (IllegalArgumentException expected) {
+			// This Exception should be thrown, and thus the test should pass.
+		}
+	}
+
+
 	public void testIsValidID() {
 	
 		part = new NumericIDPart("1");
@@ -164,6 +175,12 @@ public class NumericIDPartTest extends TestCase {
 
 		part = new NumericIDPart("1", "3");
 		assertFalse(part.isValidID("not a parseable long"));
+
+		part = new NumericIDPart("1", "3");
+		assertFalse(part.isValidID(null));
+
+		part = new NumericIDPart("1", "3");
+		assertFalse(part.isValidID(""));
 	
 	}	
 	

@@ -98,20 +98,15 @@ public class StringIDPartTest extends TestCase {
 
 		part = new StringIDPart("T");
 		assertFalse(part.isValidID("TE"));
+
+    part = new StringIDPart("-");
+    assertFalse(part.isValidID(null));
+
+    part = new StringIDPart("-");
+    assertFalse(part.isValidID(""));
 	
 	}	
 
-	public void testNullValidationValue() {
-	
-		try {
-			part = new StringIDPart("-");
-			assertFalse(part.isValidID(null));
-			fail("Should have thrown IllegalArgumentException here");
-		} catch (IllegalArgumentException expected) {
-			// This Exception should be thrown, and thus the test should pass.
-		}
-
-	}	
 	// @TODO: Add more tests of boundary conditions, exceptions ...
  
 }

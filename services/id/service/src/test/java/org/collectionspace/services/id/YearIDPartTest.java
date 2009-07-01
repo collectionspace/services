@@ -50,29 +50,60 @@ public class YearIDPartTest extends TestCase {
 		assertEquals(year, part.getCurrentID());
 
 	}
-	
 
-/*
+	public void testSetCurrentID() {
+
+		part = new YearIDPart("1999");
+		part.setCurrentID("1999");
+		assertEquals("1999", part.getCurrentID());
+		part.setCurrentID("2000");
+		assertEquals("2000", part.getCurrentID());
+
+	}
+
+	public void testSetCurrentIDNullOrEmpty() {
+
+		part = new YearIDPart();
+
+		try {
+		  part.setCurrentID(null);
+			fail("Should have thrown IllegalArgumentException here");
+		} catch (IllegalArgumentException expected) {
+			// This Exception should be thrown, and thus the test should pass.
+		}
+
+		try {
+		  part.setCurrentID("");
+			fail("Should have thrown IllegalArgumentException here");
+		} catch (IllegalArgumentException expected) {
+			// This Exception should be thrown, and thus the test should pass.
+		}
+
+  }
+	
 	public void testNextID() {
-		part = new YearIDPart("XYZ");		
-		assertEquals("XYZ", part.nextID());			
+	
+		part = new YearIDPart("1999");		
+		assertEquals("1999", part.nextID());		
+		
 	}
 
 	public void testresetID() {
 	
-		part = new YearIDPart(".");
-		assertEquals(".", part.nextID());
+		part = new YearIDPart("1999");
+		assertEquals("1999", part.nextID());
 		part.resetID();
-		assertEquals(".", part.nextID());
+		assertEquals("1999", part.getCurrentID());
 			
 	}
 
 	public void testInitialID() {
-		part = new YearIDPart("-");
-		assertEquals("-", part.getInitialID());
+	
+		part = new YearIDPart("1999");
+		assertEquals("1999", part.getInitialID());
+		
 	}
 
-*/
 
 	public void testNullInitialValue() {
 	
@@ -109,20 +140,15 @@ public class YearIDPartTest extends TestCase {
 		
 		part = new YearIDPart();
 		assertFalse(part.isValidID("non-numeric value"));
-		
+
+    part = new YearIDPart();
+    assertFalse(part.isValidID(null));
+    
+    part = new YearIDPart();
+    assertFalse(part.isValidID(""));
+
 	}
 
-	public void testNullValidationValue() {
-	
-		try {
-			part = new YearIDPart();
-			assertFalse(part.isValidID(null));
-			fail("Should have thrown IllegalArgumentException here");
-		} catch (IllegalArgumentException expected) {
-			// This Exception should be thrown, and thus the test should pass.
-		}
-		
-	}	
 	// @TODO: Add more tests of boundary conditions, exceptions ...
  
 }

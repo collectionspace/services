@@ -66,7 +66,7 @@ public class YearIDGenerator implements IDGenerator {
 	
 	public YearIDGenerator(String initialValue) throws IllegalArgumentException {
 
-		if ( initialValue == null || initialValue == "") {
+		if (initialValue == null || initialValue.equals("")) {
 			throw new IllegalArgumentException("Initial ID value must not be null or empty");
 		}
 		
@@ -92,7 +92,7 @@ public class YearIDGenerator implements IDGenerator {
 	  // @TODO This code is copied from the main constructor,
 	  // and thus there may be an opportunity for refactoring.
 
-		if ( value == null || value == "") {
+		if (value == null || value.equals("")) {
 			throw new IllegalArgumentException("ID value must not be null or empty");
 		}
 		
@@ -124,8 +124,8 @@ public class YearIDGenerator implements IDGenerator {
 
 	public synchronized boolean isValidID(String value) throws IllegalArgumentException {
 
-		if ( value == null || value == "") {
-			throw new IllegalArgumentException("ID to validate must not be null or empty");
+		if (value == null || value.equals("")) {
+			return false;
 		}
 
 		Pattern pattern = Pattern.compile(getRegex());

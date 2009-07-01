@@ -38,14 +38,14 @@ public interface IDGenerator {
 	public String getCurrentID();
 	
 	// Sets the current value of an ID.
-	public void setCurrentID(String value);
+	public void setCurrentID(String value) throws IllegalArgumentException;
 
 	// Resets an ID to its initial value.
 	public void resetID();
 
 	// Returns the next ID in the sequence, and sets
 	// the current value to that ID.
-	public String nextID();
+	public String nextID() throws IllegalStateException;
 
 	// Validates an ID against a pattern of generated IDs.
 	public boolean isValidID(String value);

@@ -40,7 +40,7 @@ public class StringIDGenerator implements IDGenerator {
 	
 	public StringIDGenerator(String initialValue) throws IllegalArgumentException {
 
-		if ( initialValue == null || initialValue == "") {
+		if (initialValue == null || initialValue.equals("")) {
 			throw new IllegalArgumentException("Initial ID value must not be null or empty");
 		}
 		
@@ -58,7 +58,7 @@ public class StringIDGenerator implements IDGenerator {
 	}
 
 	public synchronized void setCurrentID(String value) throws IllegalArgumentException {
-		if ( initialValue == null || initialValue == "") {
+		if (value == null || value.equals("")) {
 			throw new IllegalArgumentException("ID value must not be null or empty");
 		}
 		this.currentValue = value;
@@ -72,10 +72,10 @@ public class StringIDGenerator implements IDGenerator {
 		return this.currentValue;
   }
 
-	public synchronized boolean isValidID(String value) throws IllegalArgumentException {
+	public synchronized boolean isValidID(String value) {
 
-		if ( value == null || value == "") {
-			throw new IllegalArgumentException("ID to validate must not be null or empty");
+		if (value == null || value.equals("")) {
+			return false;
 		}
 
 		Pattern pattern = Pattern.compile(getRegex());

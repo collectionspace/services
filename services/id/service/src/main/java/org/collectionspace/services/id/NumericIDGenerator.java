@@ -55,6 +55,10 @@ public class NumericIDGenerator implements IDGenerator {
 	// Constructor.
 	public NumericIDGenerator(String initialValue, String maxLength)
 		throws IllegalArgumentException {
+
+		if (initialValue == null || initialValue.equals("")) {
+			throw new IllegalArgumentException("Initial ID value must not be null or empty");
+		}
 		
 		try {
 			long l = Long.parseLong(initialValue.trim());
@@ -67,6 +71,10 @@ public class NumericIDGenerator implements IDGenerator {
 			throw new IllegalArgumentException("Initial ID value should not be null");
 		} catch (NumberFormatException e) {
 			throw new IllegalArgumentException("Initial ID value must be parseable as a number");
+		}
+
+		if (maxLength == null || maxLength.equals("")) {
+			throw new IllegalArgumentException("Initial ID value must not be null or empty");
 		}
 
 		try {
@@ -90,10 +98,15 @@ public class NumericIDGenerator implements IDGenerator {
 
 	  // @TODO Much of this code is copied from the main constructor,
 	  // and may be ripe for refactoring.
+
+		if (value == null || value.equals("")) {
+			throw new IllegalArgumentException("ID value must not be null or empty");
+		}
+		
 		try {
 			long l = Long.parseLong(value.trim());
 			if ( l < 0 ) {
-				throw new IllegalArgumentException("Initial ID value should be zero (0) or greater");
+				throw new IllegalArgumentException("ID value should be zero (0) or greater");
 			}
 			this.currentValue = l;
 			this.initialValue = l;

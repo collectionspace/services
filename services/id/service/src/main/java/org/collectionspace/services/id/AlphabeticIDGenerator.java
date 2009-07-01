@@ -26,9 +26,10 @@
 
 // @TODO: Add Javadoc comments
 
-// @TODO: When auto expanding, we'll need to set a maximum length to which the
-// generated IDs can grow, likely as an additional parameter to be
+// @TODO: When auto expanding, we'll need to allow setting of a maximum length to
+// which the generated IDs can grow, likely as an additional parameter to be
 // passed to a constructor, with a default value hard-coded in the class.
+// If that length is exceeded, nextID() should throw an IllegalStateException.
 
 // @TODO: Consider handling escaped characters or sequences which represent Unicode
 // code points, both in the start and end characters of the sequence, and in the initial value.
@@ -242,7 +243,7 @@ public class AlphabeticIDGenerator implements IDGenerator {
   //
   // See the TODOs at the top of this class for additional
   // functionality that needs to be implemented.
-  public synchronized String nextID() {
+  public synchronized String nextID() throws IllegalStateException {
 
 		// Get next values for each character, from right to left
 		// (least significant to most significant).
@@ -297,10 +298,10 @@ public class AlphabeticIDGenerator implements IDGenerator {
 		return sb.toString();
 	}
 
-	public synchronized boolean isValidID(String value) throws IllegalArgumentException {
+	public synchronized boolean isValidID(String value) {
 
-		if ( value == null || value == "") {
-			throw new IllegalArgumentException("ID to validate must not be null or empty");
+		if (value == null || value.equals("")) {
+			return false;
 		}
 
 		Pattern pattern = Pattern.compile(getRegex());
