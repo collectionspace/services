@@ -144,6 +144,17 @@
       <version>1.1.5</version>
     </dependency>
 
+     <dependency>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>cobertura-maven-plugin</artifactId>
+      <version>2.2</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sourceforge.cobertura</groupId>
+      <artifactId>cobertura</artifactId>
+      <version>1.9</version>
+    </dependency>
+
   </dependencies>
   
   <!-- Build element: declares the project's directory structure and manages plugins. -->
@@ -171,5 +182,9 @@
       </plugin>
     </plugins>
   </build>
+
+  <reports>
+    <report>maven-cobertura-plugin</report>
+  </reports>
   
 </project>
