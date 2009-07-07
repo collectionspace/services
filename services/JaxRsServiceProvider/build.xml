@@ -27,6 +27,30 @@
 
     </target>
 
+    <target name="install" depends="package,install-unix,install-windows"
+  description="Install" />
+    <target name="install-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="install" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="install-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="install" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
 
     <target name="package" depends="package-unix,package-windows"
   description="Package CollectionSpace Services" />
@@ -89,7 +113,7 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="package"
+    <target name="deploy" depends="install"
     description="deploy authentication service in ${jboss.server.cspace}">
         <copy file="${basedir}/target/${cspace-services.war}" todir="${jboss.server.cspace}/deploy"/>
     </target>

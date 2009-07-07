@@ -1,7 +1,7 @@
 
-<project name="common" default="package" basedir=".">
+<project name="collectionobject" default="package" basedir=".">
     <description>
-        collectionspace authentication service
+        collectionobject service
     </description>
   <!-- set global properties for this build -->
     <property name="services.trunk" value="../.."/>
@@ -18,16 +18,9 @@
         <os family="windows" />
     </condition>
 
-    <target name="init" >
-    <!-- Create the time stamp -->
-        <tstamp/>
-    <!-- Create the build directory structure used by compile -->
-        <mkdir dir="${build}"/>
-
-    </target>
-
     <target name="package" depends="package-unix,package-windows"
   description="Package CollectionSpace Services" />
+  
     <target name="package-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
             <arg value="package" />
@@ -38,6 +31,7 @@
             <arg value="${mvn.opts}" />
         </exec>
     </target>
+    
     <target name="package-windows" if="osfamily-windows">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
@@ -50,6 +44,7 @@
             <arg value="${mvn.opts}" />
         </exec>
     </target>
+
 
     <target name="install" depends="package,install-unix,install-windows"
   description="Install" />
@@ -75,7 +70,7 @@
             <arg value="${mvn.opts}" />
         </exec>
     </target>
-    
+
     <target name="clean" depends="clean-unix,clean-windows"
   description="Delete target directories" >
         <delete dir="${build}"/>
@@ -112,14 +107,13 @@
     </target>
 
     <target name="deploy" depends="install"
-    description="deploy common elements in ${jboss.server.cspace}">
-        <copy file="${basedir}/src/main/config/service-config.xml"
-        todir="${jboss.server.cspace}/cspace/config/services"/>
+    description="deploy services in ${jboss.server.cspace}">
+        <ant antfile="3rdparty/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy common elements from ${jboss.server.cspace}">
-        <delete file="${jboss.server.cspace}/cspace/config/services/service-config.xml"/>
+    description="undeploy authentication service from ${jboss.server.cspace}">
+        <ant antfile="3rdparty/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
 

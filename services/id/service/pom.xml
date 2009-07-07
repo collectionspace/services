@@ -159,7 +159,7 @@
   
   <!-- Build element: declares the project's directory structure and manages plugins. -->
   <build>
-    <finalName>collectionspace-services-commonobject</finalName>
+    <finalName>collectionspace-services-id</finalName>
     <plugins>
       <plugin>
         <!-- The Mojo project manages a collection of plugins for Maven 2. -->

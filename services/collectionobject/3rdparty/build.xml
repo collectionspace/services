@@ -1,10 +1,10 @@
 
-<project name="common" default="package" basedir=".">
+<project name="services.collectionobject.3rdparty" default="package" basedir=".">
     <description>
         collectionspace authentication service
     </description>
   <!-- set global properties for this build -->
-    <property name="services.trunk" value="../.."/>
+    <property name="services.trunk" value="../../.."/>
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
@@ -113,13 +113,12 @@
 
     <target name="deploy" depends="install"
     description="deploy common elements in ${jboss.server.cspace}">
-        <copy file="${basedir}/src/main/config/service-config.xml"
-        todir="${jboss.server.cspace}/cspace/config/services"/>
+        <ant antfile="nuxeo-platform-cs-collectionobject/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
     description="undeploy common elements from ${jboss.server.cspace}">
-        <delete file="${jboss.server.cspace}/cspace/config/services/service-config.xml"/>
+        <ant antfile="nuxeo-platform-cs-collectionobject/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
 

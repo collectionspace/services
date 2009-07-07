@@ -154,7 +154,6 @@
                 <executions>
                     <execution>
                         <id>jboss-undeploy</id>
-                        <phase>pre-integration-test</phase>
                         <goals>
                             <goal>undeploy</goal>
                         </goals>
@@ -166,7 +165,6 @@
                     </execution>
                     <execution>
                         <id>jboss-deploy</id>
-                        <phase>pre-integration-test</phase>
                         <goals>
                             <goal>deploy</goal>
                         </goals>
