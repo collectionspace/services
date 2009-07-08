@@ -179,17 +179,17 @@ public class AlphabeticIDGenerator implements IDGenerator {
 	}
 
   // Returns the initial value.
-	public synchronized String getInitialID() {
+	public String getInitialID() {
 		return getIDString(this.initialValue);
 	}
 
   // Returns the current value.
-	public synchronized String getCurrentID() {
+	public String getCurrentID() {
 		return getIDString(this.currentValue);
 	}
 
   // Sets the current value.
-	public synchronized void setCurrentID(String value) throws IllegalArgumentException {
+	public void setCurrentID(String value) throws IllegalArgumentException {
 	
 	  // @TODO Much of this code is copied from the main constructor,
 	  // and may be ripe for refactoring.
@@ -229,7 +229,7 @@ public class AlphabeticIDGenerator implements IDGenerator {
 	}
 
   // Reset the current value to the initial value.
-	public synchronized void resetID() {
+	public void resetID() {
 	  Collections.copy(this.currentValue, this.initialValue);
 	}
 
@@ -243,7 +243,7 @@ public class AlphabeticIDGenerator implements IDGenerator {
   //
   // See the TODOs at the top of this class for additional
   // functionality that needs to be implemented.
-  public synchronized String nextID() throws IllegalStateException {
+  public String nextID() throws IllegalStateException {
 
 		// Get next values for each character, from right to left
 		// (least significant to most significant).
@@ -290,7 +290,7 @@ public class AlphabeticIDGenerator implements IDGenerator {
 
   // Returns a String representation of the ID, by appending
   // the String values of each character.
-  public synchronized String getIDString(Vector<Character> v) {
+  public String getIDString(Vector<Character> v) {
 		StringBuffer sb = new StringBuffer();
 	  for ( Character ch : v ) {
       sb.append(ch.toString());
@@ -298,7 +298,7 @@ public class AlphabeticIDGenerator implements IDGenerator {
 		return sb.toString();
 	}
 
-	public synchronized boolean isValidID(String value) {
+	public boolean isValidID(String value) {
 
 		if (value == null || value.equals("")) {
 			return false;
@@ -314,7 +314,7 @@ public class AlphabeticIDGenerator implements IDGenerator {
 		
 	}
 
-	public synchronized String getRegex() {
+	public String getRegex() {
 	  // @TODO: May need to constrain the number of alphabetic characters based
 	  // on a maximum value, TBA.  Currently, this regex simply matches sequences
 	  // of one or more characters.

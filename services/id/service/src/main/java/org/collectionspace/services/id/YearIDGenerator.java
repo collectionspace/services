@@ -78,16 +78,16 @@ public class YearIDGenerator implements IDGenerator {
 
 	}
 
-	public synchronized String getInitialID() {
+	public String getInitialID() {
 		return this.initialValue;
 	}
 
-	public synchronized String getCurrentID() {
+	public String getCurrentID() {
 		return this.currentValue;
 	}
 
   // Sets the current value.
-	public synchronized void setCurrentID(String value) throws IllegalArgumentException {
+	public void setCurrentID(String value) throws IllegalArgumentException {
 
 	  // @TODO This code is copied from the main constructor,
 	  // and thus there may be an opportunity for refactoring.
@@ -103,7 +103,7 @@ public class YearIDGenerator implements IDGenerator {
 
 	}
 	
-	public synchronized void resetID() {
+	public void resetID() {
 		this.currentValue = this.initialValue;
 	}
 
@@ -112,7 +112,7 @@ public class YearIDGenerator implements IDGenerator {
 	// - A year value that has not changed from its previous value.
 	// - A year value that has changed, as a result of a rollover
 	//   to a new instant in time.
-	public synchronized String nextID() {
+	public String nextID() {
 		return this.currentValue;
   }
 
@@ -122,7 +122,7 @@ public class YearIDGenerator implements IDGenerator {
 		return Integer.toString(y);
 	}	
 
-	public synchronized boolean isValidID(String value) throws IllegalArgumentException {
+	public boolean isValidID(String value) throws IllegalArgumentException {
 
 		if (value == null || value.equals("")) {
 			return false;
@@ -138,7 +138,7 @@ public class YearIDGenerator implements IDGenerator {
 		
 	}
 
-	public synchronized String getRegex() {
+	public String getRegex() {
 		// NOTE: Currently hard-coded to accept only a range of
 		// four-digit Gregorian Calendar year dates.
 		String regex = "(\\d{4})";

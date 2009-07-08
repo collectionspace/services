@@ -85,16 +85,16 @@ public class NumericIDGenerator implements IDGenerator {
 		
 	}
 
-	public synchronized String getInitialID() {
+	public String getInitialID() {
 		return Long.toString(this.initialValue);
 	}
 
-	public synchronized String getCurrentID() {
+	public String getCurrentID() {
 		return Long.toString(this.currentValue);
 	}
 
   // Sets the current value of the ID.
-	public synchronized void setCurrentID(String value) throws IllegalArgumentException {
+	public void setCurrentID(String value) throws IllegalArgumentException {
 
 	  // @TODO Much of this code is copied from the main constructor,
 	  // and may be ripe for refactoring.
@@ -121,12 +121,12 @@ public class NumericIDGenerator implements IDGenerator {
 		this.maxLength = DEFAULT_MAX_LENGTH;
 	}
 	
-	public synchronized void resetID() {
+	public void resetID() {
 		this.currentValue = this.initialValue;
 	}
 
 	// Returns the next ID in the sequence, and sets the current value to that ID.
-	public synchronized String nextID() throws IllegalStateException {
+	public String nextID() throws IllegalStateException {
 		this.currentValue++;
 		String nextID = Long.toString(this.currentValue);
 		if (nextID.length() > this.maxLength) {
@@ -135,7 +135,7 @@ public class NumericIDGenerator implements IDGenerator {
 		return nextID;
 	}
 
-	public synchronized boolean isValidID(String value) {
+	public boolean isValidID(String value) {
 
 		if ( value == null || value == "") {
 			return false;
@@ -151,7 +151,7 @@ public class NumericIDGenerator implements IDGenerator {
 		
 	}
 
-	public synchronized String getRegex() {
+	public String getRegex() {
 		String regex = "(" + "\\d" + "{1," + Integer.toString(this.maxLength) + "}" + ")";
 		return regex;
 	}

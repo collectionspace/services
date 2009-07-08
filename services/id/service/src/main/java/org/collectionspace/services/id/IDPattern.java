@@ -59,7 +59,7 @@ public class IDPattern {
 	}
 
 	// Returns the current value of this ID.
-	public synchronized String getCurrentID() {
+	public String getCurrentID() {
 		StringBuffer sb = new StringBuffer(MAX_ID_LENGTH);
 		for (IDPart part : this.parts) {
 			sb.append(part.getCurrentID());
@@ -84,7 +84,7 @@ public class IDPattern {
 	//   next ID component is an incrementing numeric IDPart.
 	// * "E55-" becomes "E55-a", where the next ID component
 	//   is an incrementing alphabetic IDPart.
-	public synchronized String getCurrentID(String value)
+	public String getCurrentID(String value)
 		throws IllegalArgumentException {
 
 	  if (value == null) return value;
@@ -171,7 +171,7 @@ public class IDPattern {
 	}
 
 	// Returns the next value of this ID, and sets the current value to that ID.
-	public synchronized String nextID() throws IllegalStateException {
+	public String nextID() throws IllegalStateException {
 	
 		// Obtain the last (least significant) IDPart,
 		// and call its nextID() method, which will
@@ -193,7 +193,7 @@ public class IDPattern {
 	// Returns the next value of this ID, given a
 	// supplied ID that entirely matches the pattern,
 	// and sets the current value to that ID.
-	public synchronized String nextID(String value)
+	public String nextID(String value)
 		throws IllegalStateException, IllegalArgumentException {
 
 	  if (value == null) { 
@@ -242,7 +242,7 @@ public class IDPattern {
 	//
 	// @TODO May potentially throw at least one pattern-related exception;
 	// we'll need to catch and handle this.
-	public synchronized boolean isValidID(String value) {
+	public boolean isValidID(String value) {
 	
 	  if (value == null) return false;
 	
@@ -257,7 +257,7 @@ public class IDPattern {
 	}
 
 	// Returns a regular expression to validate this ID.
-	public synchronized String getRegex() {
+	public String getRegex() {
 		StringBuffer sb = new StringBuffer();
 		for (IDPart part : this.parts) {
 			sb.append(part.getRegex());

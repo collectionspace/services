@@ -49,30 +49,30 @@ public class StringIDGenerator implements IDGenerator {
 
 	}
 
-	public synchronized String getInitialID() {
+	public String getInitialID() {
 		return this.initialValue;
 	}
 
-	public synchronized String getCurrentID() {
+	public String getCurrentID() {
 		return this.currentValue;
 	}
 
-	public synchronized void setCurrentID(String value) throws IllegalArgumentException {
+	public void setCurrentID(String value) throws IllegalArgumentException {
 		if (value == null || value.equals("")) {
 			throw new IllegalArgumentException("ID value must not be null or empty");
 		}
 		this.currentValue = value;
 	}
 	
-	public synchronized void resetID() {
+	public void resetID() {
 		// Do nothing
 	}
 
-	public synchronized String nextID() {
+	public String nextID() {
 		return this.currentValue;
   }
 
-	public synchronized boolean isValidID(String value) {
+	public boolean isValidID(String value) {
 
 		if (value == null || value.equals("")) {
 			return false;
@@ -88,7 +88,7 @@ public class StringIDGenerator implements IDGenerator {
 		
 	}
 
-	public synchronized String getRegex() {
+	public String getRegex() {
 
 	  String initial = this.initialValue;
 
