@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+    Copyright 2009 University of California at Berkeley
+    Licensed under the Educational Community License (ECL), Version 2.0.
+    You may not use this file except in compliance with this License.
+    
+    You may obtain a copy of the ECL 2.0 License at
+    https://source.collectionspace.org/collection-space/LICENSE.txt
+
+    Document   : relation.xsd
+    Revision   : $LastChangedRevision: $
+    Created on : $LastChangedDate: $
+    Author     : $LastChangedBy: $
+    Description:
+        Nuxeo document core type for CollectionSpace Relation
+-->
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://collectionspace.org/relation/"
+    xmlns:rel="http://collectionspace.org/relation/"
+    targetNamespace="http://collectionspace.org/relation/"
+    version="0.1">
+
+    <!-- Note: Nuxeo creates a table with the name of the complextype instead of the name of the element -->
+    <xs:element name="relationtype" type="rel:relation"/>
+    <xs:complexType name="relation">
+        <xs:sequence>
+            <!-- Note: nuxeo ecm types does not support xs:anyURI type -->
+            <!-- if xs:anyURI is used, it fails to register that doctype -->
+
+            <!-- conventions for describing relationships -->
+            <!-- 1. left to right in alphabetical order for the association relations -->
+            <!-- e.g. for association between collectionobject and intake entities -->
+            <!-- document-id-1 would be the id of the collectionobject -->
+            <!-- document-type-1 would be the doc-type of the collectionobject -->
+            <!-- document-id-2 would be the id of the intake -->
+            <!-- document-type-2 would be the doc-type of the intake -->
+            <!-- 2. left to right container and containee or children -->
+            <!-- e.g. for collectionobject containing other collectionobjects -->
+            <!-- document-id-1 would be the id of the container collectionobject -->
+            <!-- document-type-1 would be the doc-type of the container collectionobject -->
+            <!-- document-id-2 would be the id of the contained (or child) collectionobject -->
+            <!-- document-type-2 would be the doc-type of the collectionobejct -->
+            <xs:element name="document-id-1" type="xs:string"  minOccurs="1" maxOccurs="1"/>
+            <xs:element name="document-type-1" type="xs:string"  minOccurs="1" maxOccurs="1"/>
+            <xs:element name="document-id-2" type="xs:string"  minOccurs="1" maxOccurs="1"/>
+            <xs:element name="document-type-2" type="xs:string"  minOccurs="1" maxOccurs="1"/>
+
+            <!-- type of relatinoship between two entities -->
+            <xs:element name="relationship-type" type="rel:RelationshipType" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+
+    <!-- enumeration defining the type of relationship between two entities -->
+    <xs:simpleType name="RelationshipType">
+        <xs:restriction base="xs:string">
+            <!-- document with id as document-id-1 is associated with document with id as document-id-2 -->
+            <xs:enumeration value="association" />
+            <!-- document with id as document-id-1 contains one or more document with id as document-id-2 -->
+            <xs:enumeration value="contains" />
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>
+
+
+
+
+
+
