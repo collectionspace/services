@@ -110,6 +110,7 @@
     description="deploy services in ${jboss.server.cspace}">
         <ant antfile="authentication/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="common/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="relation/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="collectionobject/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="JaxRsServiceProvider/build.xml" target="deploy" inheritall="false"/>
     </target>
@@ -118,6 +119,7 @@
     description="undeploy authentication service from ${jboss.server.cspace}">
         <ant antfile="authentication/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="common/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="relation/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="collectionobject/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="JaxRsServiceProvider/build.xml" target="undeploy" inheritall="false"/>
     </target>
