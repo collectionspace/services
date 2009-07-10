@@ -7,8 +7,6 @@
     <property file="build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
-    <property name="build" location="build"/>
-    <property name="dist"  location="dist"/>
 
     <property name="db" value="mysql"/>
     <property name="db.script.dir" location="${basedir}/src/main/resources/scripts/db/${db}"/>
@@ -24,45 +22,66 @@
     <target name="init">
     <!-- Create the time stamp -->
         <tstamp/>
-    <!-- Create the build directory structure used by compile -->
-        <mkdir dir="${build}"/>
-
     </target>
 
-    <target name="compile" depends="init"
-        description="compile the source " >
-    <!-- Compile the java code from ${src} into ${build} -->
-        <javac srcdir="${src}" destdir="${build}"/>
-
-    </target>
-
-    <target name="dist" depends="package"
-    description="generate cspace service an nuxeo distribution">
-        <!-- Create the distribution directory -->
-        <mkdir dir="${dist}"/>
-        <antcall name="dist-cspace"/>
-        <antcall name="dist-nuxeo"/>
-    </target>
-
-    <target name="dist-cspace" depends="package"
+    <target name="dist" depends="install"
     description="generate cspace service distribution">
+        <!-- Create the distribution directory -->
+        <mkdir dir="${basedir}/dist"/>
+        <!-- copy db scripts, etc. -->
+        <copy todir="${basedir}/${dist.server.cspace}/cspace/services">
+            <fileset dir="${src}/main/resources/scripts"/>
+        </copy>
+        <!-- copy datasources -->
+        <copy todir="${basedir}/${dist.deploy.cspace}">
+            <fileset dir="${src}/main/resources/config"/>
+        </copy>
+        <ant antfile="3rdparty/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="services/build.xml" target="dist" inheritall="false"/>
 
-        <tar destfile="${dist}/${jboss.release}.${cspace.services.release}.tar.gz" compression="gzip">
-            <tarfileset dir="${basedir}/services"
+        <!-- bundle up everything -->
+        <tar destfile="${basedir}/dist/${cspace.services.release}-${jboss.release}.tar.gz" compression="gzip">
+            <tarfileset dir="${basedir}/dist/cspace"
               preserveLeadingSlashes="true">
-                <include name="/services/JaxRsServiceProvider/target/*.war"/>
-                <exclude name="server/${jboss.domain.cspace}/tmp/**"/>
-                <exclude name="server/${jboss.domain.cspace}/deploy/helloworld.war"/>
             </tarfileset>
-            <tarfileset dir="${src}/main/resources"
-              preserveLeadingSlashes="true">
-                <exclude name="schemas/**"/>
-            </tarfileset>
-
         </tar>
     </target>
 
-    <target name="dist-nuxeo" depends="compile"
+    <target name="dist-jboss-domains" depends="init"
+    description="create jboss distributions for cspace and nuxeo">
+        <antcall name="dist-jboss-cspace"/>
+        <antcall name="dist-jboss-nuxeo"/>
+    </target>
+
+    <target name="dist-jboss-cspace" depends="dist"
+    description="generate jboss distribution for cspace">
+        <fail message="JBoss is not installed or ${jboss.dir} not found">
+            <condition>
+                <not>
+                    <available file="${jboss.dir}" type="dir"/>
+                </not>
+            </condition>
+        </fail>
+
+        <fail message="CSpace is not deployed or ${nuxeo.deploy} not found">
+            <condition>
+                <not>
+                    <available file="${nuxeo.deploy}" type="dir"/>
+                </not>
+            </condition>
+        </fail>
+
+        <tar destfile="${basedir}/dist/${jboss.release}-${cspace.release}.tar.gz" compression="gzip">
+            <tarfileset dir="${jboss.dir}"
+              preserveLeadingSlashes="true">
+                <exclude name="server/${jboss.domain.nuxeo}/**"/>
+                <exclude name="server/${jboss.domain.cspace}/log/**"/>
+                <exclude name="server/${jboss.domain.cspace}/tmp/**"/>
+            </tarfileset>
+        </tar>
+    </target>
+    
+    <target name="dist-nuxeo-domain" depends="install"
         description="generate nuxeo domain distribution" >
         <fail message="JBoss is not installed or ${jboss.dir} not found">
             <condition>
@@ -72,27 +91,21 @@
             </condition>
         </fail>
 
-        <fail message="Nuxeo is not deployed or ${nuxeo.deploy} not found">
+        <fail message="Nuxeo is not deployed or ${jboss.deploy.nuxeo.systemy} not found">
             <condition>
                 <not>
-                    <available file="${nuxeo.deploy}" type="dir"/>
+                    <available file="${jboss.deploy.nuxeo.system}" type="dir"/>
                 </not>
             </condition>
         </fail>
 
-
-        <tar destfile="${dist}/${jboss.release}.${nuxeo.release}.tar.gz" compression="gzip">
+        <tar destfile="${basedir}/dist/${jboss.release}-${nuxeo.release}.tar.gz" compression="gzip">
             <tarfileset dir="${jboss.dir}"
               preserveLeadingSlashes="true">
+                <exclude name="server/${jboss.domain.cspace}/**"/>
                 <exclude name="server/${jboss.domain.nuxeo}/log/**"/>
                 <exclude name="server/${jboss.domain.nuxeo}/tmp/**"/>
-                <exclude name="server/${jboss.domain.nuxeo}/deploy/cspace*.*"/>
             </tarfileset>
-            <tarfileset dir="${src}/main/resources"
-              preserveLeadingSlashes="true">
-                <exclude name="schemas/**"/>
-            </tarfileset>
-
         </tar>
     </target>
 
@@ -149,8 +162,8 @@
 
     <target name="clean" depends="clean-unix,clean-windows"
   description="Delete target directories" >
-        <delete dir="${build}"/>
-        <delete dir="${dist}"/>
+        <delete dir="${basedir}/build"/>
+        <delete dir="${basedir}/dist"/>
     </target>
     <target name="clean-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
@@ -201,14 +214,12 @@
     description="deploy services in ${jboss.server.cspace}">
         <ant antfile="services/build.xml" target="deploy" inheritall="false"/>
         <ant antfile="3rdparty/build.xml" target="deploy" inheritall="false"/>
-        <copy file="${basedir}/target/${cspace-services.war}" todir="${jboss.lib.cspace}"/>
     </target>
 
     <target name="undeploy"
     description="undeploy authentication service from ${jboss.server.cspace}">
         <ant antfile="services/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="3rdparty/build.xml" target="undeploy" inheritall="false"/>
-        <delete file="${jboss.lib.cspace}/${cspace-services.war}"/>
     </target>
 
 

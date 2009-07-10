@@ -1,16 +1,14 @@
 
 <project name="nuxeo-platform-cs-relation" default="package" basedir=".">
     <description>
-        relationhip nuxeo document type
+        relation nuxeo document type
     </description>
   <!-- set global properties for this build -->
     <property name="services.trunk" value="../../../.."/>
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
-    <property name="build" location="build"/>
-    <property name="dist"  location="dist"/>
-    <property name="nuxeo.relation.jar" value="nuxeo-platform-cs-relation-5.2-SNAPSHOT.jar"/>
+    <property name="nuxeo.relation.jar" value="org.collectionspace.services.relation.3rdparty.nuxeo-1.0.jar"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -22,9 +20,6 @@
     <target name="init" >
     <!-- Create the time stamp -->
         <tstamp/>
-    <!-- Create the build directory structure used by compile -->
-        <mkdir dir="${build}"/>
-
     </target>
 
     <target name="package" depends="package-unix,package-windows"
@@ -113,16 +108,22 @@
     </target>
 
     <target name="deploy" depends="install"
-    description="deploy common elements in ${jboss.server.cspace}">
+    description="deploy relation doctype in ${jboss.server.cspace}">
         <copy file="${basedir}/target/${nuxeo.relation.jar}"
-        todir="${nuxeo.dir}"/>
+        todir="${jboss.deploy.nuxeo.system}"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy common elements from ${jboss.server.cspace}">
-        <delete file="${nuxeo.dir}/${nuxeo.relation.jar}"/>
+    description="undeploy relation doctype from ${jboss.server.cspace}">
+        <delete file="${jboss.deploy.nuxeo.system}/${nuxeo.relation.jar}"/>
     </target>
 
 
+    <target name="dist"
+    description="generate distribution for relation doctype" depends="install">
+        <copy todir="${services.trunk}/${dist.deploy.nuxeo.system}">
+            <fileset file="${basedir}/target/${nuxeo.relation.jar}"/>
+        </copy>
+    </target>
 
 </project>

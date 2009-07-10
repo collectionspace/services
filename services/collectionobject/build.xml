@@ -9,7 +9,6 @@
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
     <property name="build" location="build"/>
-    <property name="dist"  location="dist"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -107,15 +106,18 @@
     </target>
 
     <target name="deploy" depends="install"
-    description="deploy services in ${jboss.server.cspace}">
+    description="deploy collectionobject service">
         <ant antfile="3rdparty/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy authentication service from ${jboss.server.cspace}">
+    description="undeploy collectionobject service">
         <ant antfile="3rdparty/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
-
+    <target name="dist" depends="install"
+    description="distribute collectionobject service}">
+        <ant antfile="3rdparty/build.xml" target="dist" inheritall="false"/>
+    </target>
 
 </project>

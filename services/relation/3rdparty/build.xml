@@ -1,15 +1,13 @@
 
-<project name="services.relation.3rdparty" default="package" basedir=".">
+<project name="relation.3rdparty" default="package" basedir=".">
     <description>
-        collectionspace authentication service
+        relation service 3rdparty
     </description>
   <!-- set global properties for this build -->
     <property name="services.trunk" value="../../.."/>
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
-    <property name="build" location="build"/>
-    <property name="dist"  location="dist"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -21,8 +19,6 @@
     <target name="init" >
     <!-- Create the time stamp -->
         <tstamp/>
-    <!-- Create the build directory structure used by compile -->
-        <mkdir dir="${build}"/>
 
     </target>
 
@@ -112,15 +108,19 @@
     </target>
 
     <target name="deploy" depends="install"
-    description="deploy common elements in ${jboss.server.cspace}">
+    description="deploy relation in ${jboss.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-relation/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy common elements from ${jboss.server.cspace}">
+    description="undeploy relation from ${jboss.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-relation/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
+    <target name="dist"
+    description="generate distribution for relation">
+        <ant antfile="nuxeo-platform-cs-relation/build.xml" target="dist" inheritall="false"/>
+    </target>
 
 
 </project>

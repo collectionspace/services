@@ -1,7 +1,7 @@
 
-<project name="services.collectionobject.3rdparty" default="package" basedir=".">
+<project name="collectionobject.3rdparty" default="package" basedir=".">
     <description>
-        collectionspace authentication service
+        collectionobject service 3rd party
     </description>
   <!-- set global properties for this build -->
     <property name="services.trunk" value="../../.."/>
@@ -9,7 +9,6 @@
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
     <property name="build" location="build"/>
-    <property name="dist"  location="dist"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -21,8 +20,6 @@
     <target name="init" >
     <!-- Create the time stamp -->
         <tstamp/>
-    <!-- Create the build directory structure used by compile -->
-        <mkdir dir="${build}"/>
 
     </target>
 
@@ -112,15 +109,18 @@
     </target>
 
     <target name="deploy" depends="install"
-    description="deploy common elements in ${jboss.server.cspace}">
+    description="deploy collectionobject in ${jboss.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-collectionobject/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy common elements from ${jboss.server.cspace}">
+    description="undeploy collectionobject from ${jboss.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-collectionobject/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
-
+    <target name="dist"
+    description="generate distribution for collectionobject">
+        <ant antfile="nuxeo-platform-cs-collectionobject/build.xml" target="dist" inheritall="false"/>
+    </target>
 
 </project>

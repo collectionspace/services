@@ -8,8 +8,6 @@
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
-    <property name="build" location="build"/>
-    <property name="dist"  location="dist"/>
     <property name="authentication.jar" value="cspace-services-authn.jar"/>
 
     <condition property="osfamily-unix">
@@ -22,9 +20,6 @@
     <target name="init">
     <!-- Create the time stamp -->
         <tstamp/>
-    <!-- Create the build directory structure used by compile -->
-        <mkdir dir="${build}"/>
-
     </target>
 
 
@@ -126,6 +121,11 @@
         <echo message="Remove authentication-policy from ${jboss.server.cspace}/conf/login-config.xml"/>
     </target>
 
-
+    <target name="dist"
+    description="generate distribution for authentication service" depends="install">
+        <copy todir="${services.trunk}/${dist.lib.cspace}">
+            <fileset file="${basedir}/target/${authentication.jar}"/>
+        </copy>
+    </target>
 
 </project>

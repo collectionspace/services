@@ -6,7 +6,7 @@
     <version>1.0</version>
     <artifactId>org.collectionspace.services</artifactId>
     <packaging>pom</packaging>
-    <name>org.collectionspace.services</name>
+    <name>services</name>
 
     <modules>
         <module>services</module>

@@ -1,15 +1,13 @@
 
 <project name="jaxrs.provider" default="package" basedir=".">
     <description>
-        collectionspace authentication service
+        collectionspace services war
     </description>
   <!-- set global properties for this build -->
     <property name="services.trunk" value="../.."/>
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
-    <property name="build" location="build"/>
-    <property name="dist"  location="dist"/>
     <property name="cspace-services.war" value="cspace-services.war"/>
 
     <condition property="osfamily-unix">
@@ -22,9 +20,6 @@
     <target name="init">
     <!-- Create the time stamp -->
         <tstamp/>
-    <!-- Create the build directory structure used by compile -->
-        <mkdir dir="${build}"/>
-
     </target>
 
     <target name="install" depends="package,install-unix,install-windows"
@@ -114,15 +109,20 @@
     </target>
 
     <target name="deploy" depends="install"
-    description="deploy authentication service in ${jboss.server.cspace}">
+    description="deploy cspace services in ${jboss.server.cspace}">
         <copy file="${basedir}/target/${cspace-services.war}" todir="${jboss.server.cspace}/deploy"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy authentication service from ${jboss.server.cspace}">
+    description="undeploy cspace services from ${jboss.server.cspace}">
         <delete file="${jboss.server.cspace}/deploy/${cspace-services.war}"/>
     </target>
 
-
+    <target name="dist"
+    description="generate distribution for cspace services" depends="install">
+        <copy todir="${services.trunk}/${dist.deploy.cspace}">
+            <fileset file="${basedir}/target/${cspace-services.war}"/>
+        </copy>
+    </target>
 
 </project>

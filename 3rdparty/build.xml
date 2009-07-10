@@ -1,7 +1,7 @@
 
 <project name="3rdparty" default="package" basedir=".">
     <description>
-        collectionspace authentication service
+        collectionspace 3rdparty
     </description>
   <!-- set global properties for this build -->
     <property name="services.trunk" value=".."/>
@@ -113,14 +113,18 @@
     </target>
 
     <target name="deploy" depends="install"
-    description="deploy 3rdparty stuff in ${jboss.server.cspace}">
+    description="deploy 3rdparty in ${jboss.server.cspace}">
         <ant antfile="nuxeo/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy authentication service from ${jboss.server.cspace}">
+    description="undeploy 3rdparty from ${jboss.server.cspace}">
         <ant antfile="nuxeo/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
+    <target name="dist"
+    description="generate distribution for 3rdparty">
+        <ant antfile="nuxeo/build.xml" target="dist" inheritall="false"/>
+    </target>
 
 </project>

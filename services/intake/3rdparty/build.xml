@@ -1,14 +1,13 @@
 
-<project name="common" default="package" basedir=".">
+<project name="intake.3rdparty" default="package" basedir=".">
     <description>
-        collectionspace services common
+        intake service 3rdparty
     </description>
   <!-- set global properties for this build -->
-    <property name="services.trunk" value="../.."/>
+    <property name="services.trunk" value="../../.."/>
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
-    <property name="build" location="build"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -108,21 +107,19 @@
     </target>
 
     <target name="deploy" depends="install"
-    description="deploy common elements in ${jboss.server.cspace}">
-        <copy file="${basedir}/src/main/config/service-config.xml"
-        todir="${jboss.server.cspace}/cspace/config/services"/>
+    description="deploy intake in ${jboss.server.nuxeo}">
+        <ant antfile="nuxeo-platform-cs-intake/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy common elements from ${jboss.server.cspace}">
-        <delete file="${jboss.server.cspace}/cspace/config/services/service-config.xml"/>
+    description="undeploy intake from ${jboss.server.nuxeo}">
+        <ant antfile="nuxeo-platform-cs-intake/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"
-    description="generate distribution for common elements" depends="install">
-        <copy todir="${services.trunk}/${dist.server.cspace}/cspace/config/services">
-            <fileset file="${basedir}/src/main/config/service-config.xml"/>
-        </copy>
+    description="generate distribution for intake">
+        <ant antfile="nuxeo-platform-cs-intake/build.xml" target="dist" inheritall="false"/>
     </target>
+
 
 </project>
