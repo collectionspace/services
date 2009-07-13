@@ -21,10 +21,11 @@
     </properties>
 
     <modules>
+        <!-- add modules below in the order based on dependencies -->
         <module>common</module>
         <module>authentication</module>
-        <module>id</module>
         <module>relation</module>
+        <module>id</module>
         <module>collectionobject</module>
         <module>intake</module>
         <module>JaxRsServiceProvider</module>
