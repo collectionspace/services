@@ -113,7 +113,7 @@
     </dependencies>
     
     <build>
-        <finalName>collectionspace-services-commonobject</finalName>
+        <finalName>collectionspace-services-intake</finalName>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
