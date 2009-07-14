@@ -17,4 +17,7 @@
     3rd party build for intake service
     </description>
 
+    <modules>
+        <module>nuxeo-platform-cs-intake</module>
+    </modules>
 </project>
