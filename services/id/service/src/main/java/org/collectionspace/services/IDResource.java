@@ -80,7 +80,7 @@ public class IDResource {
    * other form of identifier to be determined, such as URLs or URNs.
    */
 	@GET
-	@Path("/next/patterns/{id}")
+	@Path("/next/patterns/{csid}")
 	// @TODO: Temporary during testing; to be changed to return XML
   @Produces("text/plain")
 	public Response getNextID(@PathParam("csid") String csid) {
@@ -91,6 +91,9 @@ public class IDResource {
 		try {
 		
 			nextId = service.nextID(csid);
+			
+			response = Response.status(Response.Status.OK)
+				.entity(nextId).type("text/plain").build();
 
 		// @TODO: Return our XML-based error results format.
 		
