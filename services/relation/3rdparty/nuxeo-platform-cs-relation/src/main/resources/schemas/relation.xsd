@@ -41,13 +41,13 @@
             <!-- document-type-1 would be the doc-type of the container collectionobject -->
             <!-- document-id-2 would be the id of the contained (or child) collectionobject -->
             <!-- document-type-2 would be the doc-type of the collectionobejct -->
-            <xs:element name="document-id-1" type="xs:string"  minOccurs="1" maxOccurs="1"/>
-            <xs:element name="document-type-1" type="xs:string"  minOccurs="1" maxOccurs="1"/>
-            <xs:element name="document-id-2" type="xs:string"  minOccurs="1" maxOccurs="1"/>
-            <xs:element name="document-type-2" type="xs:string"  minOccurs="1" maxOccurs="1"/>
+            <xs:element name="documentId1" type="xs:string"  minOccurs="1" maxOccurs="1"/>
+            <xs:element name="documentType1" type="xs:string"  minOccurs="1" maxOccurs="1"/>
+            <xs:element name="documentId2" type="xs:string"  minOccurs="1" maxOccurs="1"/>
+            <xs:element name="documentType2" type="xs:string"  minOccurs="1" maxOccurs="1"/>
 
             <!-- type of relatinoship between two entities -->
-            <xs:element name="relationship-type" type="rel:RelationshipType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="relationshipType" type="rel:RelationshipType" minOccurs="1" maxOccurs="1"/>
         </xs:sequence>
     </xs:complexType>
 
