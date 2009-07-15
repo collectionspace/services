@@ -28,6 +28,10 @@
             <service-name>collectionobjects</service-name>
             <workspace-name>CollectionObjects</workspace-name>
         </workspace>
+        <workspace>
+            <service-name>intakes</service-name>
+            <workspace-name>Intakes</workspace-name>
+        </workspace>        
     </nuxeo-workspace>
 
 </ns1:service-config>
