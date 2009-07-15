@@ -8,7 +8,7 @@
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
-    <property name="cspace-services.war" value="cspace-services.war"/>
+    <property name="cspace-services.war" value="${cspace.services.war}"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
