@@ -42,6 +42,7 @@ import junit.framework.TestCase;
 import static org.junit.Assert.*;
 
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.net.URL;
 
 import org.restlet.Client;
@@ -53,10 +54,15 @@ import org.restlet.data.Status;
 
 public class IDServiceTest extends TestCase {
 
+  // Duration of time to wait for a connection before timing out.
+  final static int CONNECT_TIMEOUT_MILLISECONDS = 10000; // Ten thousand; e.g. 10 seconds
+
 	final static String DEFAULT_REFERRER_URL = "http://collectionspace.org";
 	
 	final static String SUCCESS_URL_STRING = "http://www.example.com/";
 	final static String FAILURE_URL_STRING = "http://www.example.com/nonexistent";
+	final static String NONEXISTENT_DOMAIN_URL_STRING =
+	  "http://aardvarks-eat-glue-for-breakfast-27.com/";
 	final static String NON_PARSEABLE_URL = "example.com";
 	final static String NON_HTTP_PROTOCOL = "ftp://example.com";
 	
@@ -69,17 +75,42 @@ public class IDServiceTest extends TestCase {
   	response = null;
   }
   
+  // Tests related to open issues with Restlet.
+
+  // Submitted 2009-07-16 as Restlet Issue 847,
+  // http://restlet.tigris.org/issues/show_bug.cgi?id=847
+	public void testPossibleRestletUnknownHostBug() {
+  
+    Request request =
+      new Request(Method.GET, "http://aardvarks-eat-glue-for-breakfast-27.com");
+		Client client = new Client(Protocol.HTTP);
+		Response response = client.handle(request);
+		
+  }
+  
 	// Stub tests to run first, to verify the basic functionality of this test class.
 	
-	public void testSuccessfulRequest() {
+	// Tests of GET requests.
+	
+	public void testSuccessfulGetRequest() {
 	  response = sendGetRequest(SUCCESS_URL_STRING);
 		assertTrue(isSuccessResponse(response));		
 	}
 
-	public void testFailureRequest() {
+	public void testFailureGetRequest() {
 	  response = sendGetRequest(FAILURE_URL_STRING);
 		assertFalse(isSuccessResponse(response));		
 	}
+
+	public void testNonExistentDomainGetRequest() {
+	  // This triggered an UnknownHostException in Restlet's Uniform
+	  // (and hence Client) classes, which is not yet documented as
+	  // being thrown.
+	  response = sendGetRequest(NONEXISTENT_DOMAIN_URL_STRING);
+		assertFalse(isSuccessResponse(response));		
+	}
+	
+	// Tests that are believed to be independent of HTTP method.
 
 	public void testNonParseableURL() {
 	  try {
@@ -148,17 +179,147 @@ public class IDServiceTest extends TestCase {
 
   //////////////////////////////////////////////////////////////////////
   /*
+   * Returns the requested Internet protocol contained in a String representation
+   * of an HTTP or HTTPS URL.
+   *
+   * @param  httpUrlStr  A String representation of an HTTP or HTTPS URL.
+   *
+   * @return  The requested Internet protocol.
+   *
+   * @throws IllegalArgumentException  If the URL string could not be parsed
+   *   or does not contain a legal Internet protocol (as recognized by the
+   *   URL class used here), or if the requested Internet protocol in that URL
+   *   is not either HTTP or HTTPS.
+   */
+	public Protocol getHttpOrHttpsProtocol(String httpUrlStr)
+	  throws IllegalArgumentException {
+
+    URL url;
+
+    try {
+      url = new URL(httpUrlStr);
+    } catch (MalformedURLException e) {
+      throw new IllegalArgumentException("URL string could not be parsed successfully");
+    }
+    
+    if (url.getProtocol().equals(Protocol.HTTP.getSchemeName())) {
+      return Protocol.HTTP;
+    } else if (url.getProtocol().equals(Protocol.HTTPS.getSchemeName())) {
+      return Protocol.HTTPS;
+    } else {
+      throw new IllegalArgumentException("Protocol of submitted URL must be http:// or https://");
+    }
+    
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  /*
    * Sends (or submits) a GET request to an HTTP- or HTTPS-based service.
    *
    * @param  urlStr  A String representation of an HTTP or HTTPS URL.
    *
-   * @return  The response received from sending a GET request to that URL.
+   * @return  The response received from sending a GET request to the specified URL.
    *
-   * @throws IllegalArgumentException  If the URL string could not be parsed
-   *   or does not contain a legal protocol, or if the protocol name in the URL
-   *   is not HTTP or HTTPS.
+   * @throws IllegalArgumentException  If the URL string does not represent
+   *   a valid request to an HTTP- or HTTPS-based service.
    */
 	public Response sendGetRequest(String urlStr) throws IllegalArgumentException {
+	  
+	  Response response;
+	  try {
+	    response = sendRequest(urlStr, Method.GET);
+    } catch (IllegalArgumentException e) {
+      throw e;
+    }
+    return response;
+    
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  /*
+   * Sends (or submits) a POST request to an HTTP- or HTTPS-based service.
+   *
+   * @param  urlStr  A String representation of an HTTP or HTTPS URL.
+   *
+   * @return  The response received from sending a POST request to the specified URL.
+   *
+   * @throws IllegalArgumentException  If the URL string does not represent
+   *   a valid request to an HTTP- or HTTPS-based service.
+   */
+	public Response sendPostRequest(String urlStr) throws IllegalArgumentException {
+	  
+	  Response response;
+	  try {
+	    response = sendRequest(urlStr, Method.POST);
+    } catch (IllegalArgumentException e) {
+      throw e;
+    }
+    return response;
+    
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  /*
+   * Sends (or submits) a PUT request to an HTTP- or HTTPS-based service.
+   *
+   * @param  urlStr  A String representation of an HTTP or HTTPS URL.
+   *
+   * @return  The response received from sending a PUT request to the specified URL.
+   *
+   * @throws IllegalArgumentException  If the URL string does not represent
+   *   a valid request to an HTTP- or HTTPS-based service.
+   */
+	public Response sendPutRequest(String urlStr) throws IllegalArgumentException {
+	  
+	  Response response;
+	  try {
+	    response = sendRequest(urlStr, Method.PUT);
+    } catch (IllegalArgumentException e) {
+      throw e;
+    }
+    return response;
+    
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  /*
+   * Sends (or submits) a DELETE request to an HTTP- or HTTPS-based service.
+   *
+   * @param  urlStr  A String representation of an HTTP or HTTPS URL.
+   *
+   * @return  The response received from sending a DELETE request to the specified URL.
+   *
+   * @throws IllegalArgumentException  If the URL string does not represent
+   *   a valid request to an HTTP- or HTTPS-based service.
+   */
+	public Response sendDeleteRequest(String urlStr) throws IllegalArgumentException {
+	  
+	  Response response;
+	  try {
+	    response = sendRequest(urlStr, Method.DELETE);
+    } catch (IllegalArgumentException e) {
+      throw e;
+    }
+    return response;
+    
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  /*
+   * Sends (or submits) a request to an HTTP- or HTTPS-based service.
+   *
+   * @param  urlStr  A String representation of an HTTP or HTTPS URL.
+   *
+   * @param  method  An HTTP method, such as GET or POST.
+   *
+   * @return  The response received from sending a request, via the specified
+   *   method, to the specified URL.
+   *
+   * @throws IllegalArgumentException  If the URL string does not represent
+   *   a valid request to an HTTP- or HTTPS-based service.
+   */
+	public Response sendRequest(String urlStr, Method method)
+	  throws IllegalArgumentException {
 
 		// Adapted from the Restlet 1.1 tutorial
 		// http://www.restlet.org/documentation/1.1/tutorial
@@ -168,29 +329,26 @@ public class IDServiceTest extends TestCase {
 		// via the ClientResource class:
 		// http://www.restlet.org/documentation/2.0/tutorial
 		
-    URL url;
+    // Retrieve the HTTP or HTTPS protocol from the URL.
     Protocol protocol;
-    
     try {
-      url = new URL(urlStr);
-    } catch (MalformedURLException e) {
-      throw new IllegalArgumentException("URL string could not be parsed successfully");
+      protocol = getHttpOrHttpsProtocol(urlStr);
+    } catch (IllegalArgumentException e) {
+      throw e;
     }
     
-    if (url.getProtocol().equals(Protocol.HTTP.getSchemeName())) {
-      protocol = Protocol.HTTP;
-    } else if (url.getProtocol().equals(Protocol.HTTPS.getSchemeName())) {
-      protocol = Protocol.HTTPS;
-    } else {
-      throw new IllegalArgumentException("Protocol of submitted URL must be http:// or https://");
-    }
-    
-		// Prepare the request.
-		Request request = new Request(Method.GET, urlStr);
+		// Prepare the request, specifying such values as the
+		// HTTP method, URL, and referrer.
+		Request request = new Request(method, urlStr);
 		request.setReferrerRef(DEFAULT_REFERRER_URL);
 		
-		// Handle it using an HTTP or HTTPS client connector.
+		// Handle (submit) the request via a client connector,
+		// specifying the protocol, HTTP or HTTPS.
 		Client client = new Client(protocol);
+		client.setConnectTimeout(CONNECT_TIMEOUT_MILLISECONDS);
+		
+		// May throw java.net.UnknownHostException, without that
+		// Exception being present in the method signature?
 		Response response = client.handle(request);
 		
 		return response;
