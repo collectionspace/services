@@ -23,25 +23,13 @@
  * $LastChangedDate$
  */
 
-// @TODO: Use a URL builder in core Java or the Restlet framework,
-// rather than String objects.
-
-// @TODO: Consider using client-side RESTeasy, rather than Restlet,
-// if there is a desire to reduce the number of dependencies.
-//
-// (Note also Sanjay's comment c. June 2009 re RESTEasy's client-side
-// behavior around having to send authentication credentials in
-// advance, rather than via a challenge - if that was understood correctly.)
-
 package org.collectionspace.services.test;
-
-//import org.collectionspace.services.id.Id;
-//import org.collectionspace.services.id.IdList;
-//import org.collectionspace.services.id.IdPattern;
-//import org.collectionspace.services.id.IdPatternList;
 
 import junit.framework.TestCase;
 import static org.junit.Assert.*;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.restlet.Client;
 import org.restlet.data.Method;
@@ -53,30 +41,68 @@ import org.restlet.data.Status;
 public class IDServiceTest extends TestCase {
 
 	final static String DEFAULT_REFERRER_URL = "http://collectionspace.org";
-	final static String DEFAULT_SUCCESS_URL_STRING = "http://www.example.com/";
-	final static String DEFAULT_FAILURE_URL_STRING = "http://www.example.com/nonexistent";
+	final static String SUCCESS_URL_STRING = "http://www.example.com/";
+	final static String FAILURE_URL_STRING = "http://www.example.com/nonexistent";
+	final static String NON_PARSEABLE_URL = "example.com";
+	final static String NON_HTTP_PROTOCOL = "ftp://example.com";
+	
+	Response response;
 
-	// Stub test to verify basic functionality.
+  protected void setUp() {
+  	response = null;
+  }
+  
+	// Stub tests to run first, to verify the basic functionality of this test class.
+	
 	public void testSuccessfulRequest() {
-		Response response = submitRequest(DEFAULT_SUCCESS_URL_STRING);
+	  response = sendGetRequest(SUCCESS_URL_STRING);
 		assertTrue(isSuccessResponse(response));		
 	}
 
-	// Stub test to verify basic functionality.
 	public void testFailureRequest() {
-		Response response = submitRequest(DEFAULT_FAILURE_URL_STRING);
+	  response = sendGetRequest(FAILURE_URL_STRING);
 		assertFalse(isSuccessResponse(response));		
 	}
 
-	// Return a flag indicating whether a response from a
-	// service request represents a successful outcome.
+	public void testNonParseableURL() {
+	  try {
+      response = sendGetRequest(NON_PARSEABLE_URL);
+      fail("Should have thrown IllegalArgumentException here.");
+		} catch (IllegalArgumentException expected) {
+			// This Exception should be thrown, and thus the test should pass.
+		}
+	}
+
+	public void testNonHttpProtocol() {
+	  try {
+      response = sendGetRequest(NON_HTTP_PROTOCOL);
+      fail("Should have thrown IllegalArgumentException here.");
+		} catch (IllegalArgumentException expected) {
+			// This Exception should be thrown, and thus the test should pass.
+		}
+	}
+	
+	// Tests specific to the ID Service
+	
+	// ...
+
+  //////////////////////////////////////////////////////////////////////
+  /*
+   * Tests whether a response from an HTTP or HTTPS service request
+   * represents a successful outcome.
+   *
+   * @param  response  A response from an HTTP or HTTP service request.
+   *
+   * @return  True if the response represents a successful outcome;
+   *          false if the response represents a failure (i.e. error) outcome.
+   */
 	public boolean isSuccessResponse(Response response) {
 	
 		if (response == null || response.getStatus() == null) {
 			return false;
 		}
 
-		// Note: we can also test specifically for a 200 OK response via
+		// Note: If needed, we can also test specifically for a 200 OK response via
 		// 'if (response.getStatus() == Status.SUCCESS_OK) ...'
 		if (response.getStatus().isSuccess()) {
 			return true;
@@ -86,10 +112,19 @@ public class IDServiceTest extends TestCase {
 		
 	}
 
-	// Submit a request to a service.
-	//
-	// @TODO: Remove hard-coding of HTTP protocol requests.
-	public Response submitRequest(String urlStr) {
+  //////////////////////////////////////////////////////////////////////
+  /*
+   * Sends (or submits) a GET request to an HTTP- or HTTPS-based service.
+   *
+   * @param  urlStr  A String representation of an HTTP or HTTPS URL.
+   *
+   * @return  The response received from sending a GET request to that URL.
+   *
+   * @throws IllegalArgumentException  If the URL string could not be parsed
+   *   or does not contain a legal protocol, or if the protocol name in the URL
+   *   is not HTTP or HTTPS.
+   */
+	public Response sendGetRequest(String urlStr) throws IllegalArgumentException {
 
 		// Adapted from the Restlet 1.1 tutorial
 		// http://www.restlet.org/documentation/1.1/tutorial
@@ -98,18 +133,30 @@ public class IDServiceTest extends TestCase {
 		// framework, it uses a resource model on the client-side,
 		// via the ClientResource class:
 		// http://www.restlet.org/documentation/2.0/tutorial
-
-		// @TODO: Validate the submitted URL here. 
 		
+    URL url;
+    Protocol protocol;
+    
+    try {
+      url = new URL(urlStr);
+    } catch (MalformedURLException e) {
+      throw new IllegalArgumentException("URL string could not be parsed successfully");
+    }
+    
+    if (url.getProtocol().equals(Protocol.HTTP.getSchemeName())) {
+      protocol = Protocol.HTTP;
+    } else if (url.getProtocol().equals(Protocol.HTTPS.getSchemeName())) {
+      protocol = Protocol.HTTPS;
+    } else {
+      throw new IllegalArgumentException("Protocol of submitted URL must be http:// or https://");
+    }
+    
 		// Prepare the request.
 		Request request = new Request(Method.GET, urlStr);
 		request.setReferrerRef(DEFAULT_REFERRER_URL);
 		
-		// Handle it using an HTTP client connector.
-		//
-		// @TODO: We may need to derive the protocol,
-		// such as HTTP v. HTTPS, from the submitted URL.
-		Client client = new Client(Protocol.HTTP);
+		// Handle it using an HTTP or HTTPS client connector.
+		Client client = new Client(protocol);
 		Response response = client.handle(request);
 		
 		return response;
