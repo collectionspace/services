@@ -22,6 +22,19 @@
  * $LastChangedRevision$
  * $LastChangedDate$
  */
+ 
+// @TODO: A large fraction of the current code will be used by
+// multiple service tests.  It should be refactored; it could
+// go into a "RESTClient" or similarly-named class in the 'common'
+// package, along with a corresponding test class in that package.
+
+// @TODO: The name of this class should likely reflect that
+// this is a test of a service via its REST APIs, rather than
+// a test of that service using a Java client library.
+
+// @TODO: We may want to run our own HTTP/HTTPS server for
+// verifying basic functionality, rather than relying on
+// public Internet services, like example.com.
 
 package org.collectionspace.services.test;
 
@@ -41,10 +54,14 @@ import org.restlet.data.Status;
 public class IDServiceTest extends TestCase {
 
 	final static String DEFAULT_REFERRER_URL = "http://collectionspace.org";
+	
 	final static String SUCCESS_URL_STRING = "http://www.example.com/";
 	final static String FAILURE_URL_STRING = "http://www.example.com/nonexistent";
 	final static String NON_PARSEABLE_URL = "example.com";
 	final static String NON_HTTP_PROTOCOL = "ftp://example.com";
+	
+	// @TODO Construct a parameterized base path, rather than hard-coding it here.
+	final static String SERVICES_BASE_PATH = "http://localhost:8180/cspace-services";
 	
 	Response response;
 
@@ -84,7 +101,24 @@ public class IDServiceTest extends TestCase {
 	
 	// Tests specific to the ID Service
 	
-	// ...
+	// Stubbed example, just as a beachhead ...
+	
+	// @TODO: Look into whether there may be a way to at least partly
+	// automate the task of building these tests.
+	
+	// @TODO: Retrieve the service schema(s) and validate the received
+	// payloads against the schema(s).
+	//
+	// If there is a multi-part payload, decide which payload parts
+	// to validate.
+	
+	// @TODO: When the time comes, include support for HTTP Basic Authentication.
+	
+	public void testNextID() {
+	  final String NEXT_ID_URL = SERVICES_BASE_PATH + "/ids/next/patterns/2";
+	  response = sendGetRequest(NEXT_ID_URL);
+		assertTrue(isSuccessResponse(response));
+	}
 
   //////////////////////////////////////////////////////////////////////
   /*
