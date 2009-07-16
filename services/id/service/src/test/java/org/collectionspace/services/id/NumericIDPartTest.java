@@ -43,6 +43,9 @@ public class NumericIDPartTest extends TestCase {
 		assertEquals("26", part.nextID());
 		assertEquals("27", part.nextID());
 		assertEquals("28", part.nextID());
+		
+		part = new NumericIDPart();
+		assertEquals("2", part.nextID());
 			
 	}
 

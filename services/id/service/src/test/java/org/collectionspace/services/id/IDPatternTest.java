@@ -60,6 +60,14 @@ public class IDPatternTest extends TestCase {
 		pattern.add(new StringIDPart("-"));
 		pattern.add(new AlphabeticIDPart("a"));	
 		assertEquals("2009.1-a", pattern.getCurrentID());
+
+		pattern = new IDPattern();
+		pattern.add(new YearIDPart("2009"));
+		pattern.add(new StringIDPart("."));
+		pattern.add(new NumericIDPart("0"));
+		pattern.add(new StringIDPart("."));
+		pattern.add(new NumericIDPart("0"));
+		assertEquals("2009.0.0", pattern.getCurrentID());
 			
 	}
 
@@ -160,6 +168,14 @@ public class IDPatternTest extends TestCase {
 		pattern.add(new NumericIDPart("1005"));
 		assertEquals("T1006", pattern.nextID());
 		assertEquals("T1007", pattern.nextID());
+
+		pattern = new IDPattern();
+		pattern.add(new YearIDPart("2009"));
+		pattern.add(new StringIDPart("."));
+		pattern.add(new NumericIDPart("1"));
+		pattern.add(new StringIDPart("."));
+		pattern.add(new NumericIDPart("1"));
+		assertEquals("2009.1.2", pattern.nextID());
 			
 	}
 
@@ -194,7 +210,7 @@ public class IDPatternTest extends TestCase {
 		assertEquals("2009.3-c", pattern.nextID("2009.3-b"));
 
 	}
-	
+
 	public void testEmptyPartsListCurrentID() {
 
 		pattern = new IDPattern();

@@ -54,6 +54,8 @@
 package org.collectionspace.services;
 
 import org.collectionspace.services.IDService;
+// The following import statement has been left open-ended
+// to accommodate future ID generation components.
 import org.collectionspace.services.id.*;
 
 public class IDServiceJdbcImpl implements IDService {
@@ -70,14 +72,25 @@ public class IDServiceJdbcImpl implements IDService {
 	// a candidate ID.
 	public String nextID(String csid) throws
 		IllegalArgumentException, IllegalStateException {
-
+		
 		IDPattern pattern;
 		String nextId = "";
+
+		if (csid == null || csid.equals("")) {
+			throw new IllegalArgumentException(
+				"Identifier for ID pattern must not be null or empty.");
+		}
 
 		try {
 			pattern = getIDPattern(csid);
 		} catch (IllegalArgumentException e ) {
 			throw e;
+		}
+		
+		// Guard code - should not be needed.
+		if (pattern == null) {
+			throw new IllegalArgumentException(
+				"Pattern with ID " + "\'" + csid + "\'" + " could not be found.");
 		}
 		
 		// Get the next ID associated with the pattern,
@@ -97,8 +110,8 @@ public class IDServiceJdbcImpl implements IDService {
 	
 	// Returns an IDPattern.
 	public IDPattern getIDPattern(String csid) throws IllegalArgumentException {
-
-		IDPattern pattern = new IDPattern();
+	
+	  IDPattern pattern;
 
     // @TODO: Replace hard-coded IDs and related logic - currently
     // used here for bootstrapping and initial testing - with actual
@@ -115,8 +128,9 @@ public class IDServiceJdbcImpl implements IDService {
     	
     	// Retrieve the pattern.  (In this example, we're
     	// simply hard-coding its construction here.)
+  		pattern = new IDPattern();
 			pattern.add(new StringIDPart("E"));
-			pattern.add(new NumericIDPart());
+			pattern.add(new NumericIDPart("0"));
 			
 			return pattern;
     	
@@ -126,11 +140,12 @@ public class IDServiceJdbcImpl implements IDService {
 
     	// Retrieve the pattern.(In this example, we're
     	// simply hard-coding its construction here.)
+  		pattern = new IDPattern();
 			pattern.add(new YearIDPart());
 			pattern.add(new StringIDPart("."));
-			pattern.add(new NumericIDPart());
+			pattern.add(new NumericIDPart("1"));
 			pattern.add(new StringIDPart("."));
-			pattern.add(new NumericIDPart());
+			pattern.add(new NumericIDPart("0"));
 			
 			return pattern;
 
@@ -140,5 +155,5 @@ public class IDServiceJdbcImpl implements IDService {
 		}
 		
 	}
-	
+		
 }

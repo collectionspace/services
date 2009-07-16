@@ -33,8 +33,13 @@ public class StringIDPartTest extends TestCase {
 	IDPart part;
 
 	public void testNextID() {
+
+		part = new StringIDPart("E");		
+		assertEquals("E", part.nextID());	
+		
 		part = new StringIDPart("XYZ");		
-		assertEquals("XYZ", part.nextID());			
+		assertEquals("XYZ", part.nextID());		
+		
 	}
 
 	public void testresetID() {

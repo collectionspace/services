@@ -116,7 +116,7 @@ public class YearIDGenerator implements IDGenerator {
 		return this.currentValue;
   }
 
-	public String getCurrentYear() {
+	public static String getCurrentYear() {
 		Calendar cal = GregorianCalendar.getInstance();
     int y = cal.get(Calendar.YEAR);
 		return Integer.toString(y);

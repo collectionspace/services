@@ -32,6 +32,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -44,16 +45,19 @@ import org.slf4j.LoggerFactory;
 
 // Set the base path component for URLs that access this service.
 @Path("/ids")
+
 // Identify the default MIME media types consumed and produced by this service.
-@Consumes("application/xml")
-@Produces("application/xml")
+@Consumes(MediaType.APPLICATION_XML)
+@Produces(MediaType.APPLICATION_XML)
+
 public class IDResource {
 
 	final Logger logger = LoggerFactory.getLogger(IDResource.class);
 
-	// Richard's comment in the CollectionObject Resource class, from which
-	// this class was derived: This should be a DI wired by a container like
-	// Spring, Seam, or EJB3.
+	// Per Richard's comment in the CollectionObject Resource class, from which
+	// this class was derived: "This should be a DI wired by a container like
+	// Spring, Seam, or EJB3."
+	
 	final static IDService service = new IDServiceJdbcImpl();
 
   //////////////////////////////////////////////////////////////////////
@@ -85,37 +89,52 @@ public class IDResource {
   @Produces("text/plain")
 	public Response getNextID(@PathParam("csid") String csid) {
 	
-		Response response = null;
+	  verbose("> in getNextID");
+	  
+	  // Unless the 'response' variable is explicitly initialized here, the
+	  // compiler gives the error: "variable response might not have been initialized."
+	  Response response = null;
+	  response = response.ok().build();
 		String nextId = "";
 	
 		try {
 		
+		  // Retrieve the next ID for the requested pattern,
+		  // and return it in the entity body of the response.
 			nextId = service.nextID(csid);
 			
+      if (nextId == null || nextId.equals("")) {
+        response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+          .entity("ID Service returned null or empty ID").type(MediaType.TEXT_PLAIN).build();
+        return response;
+      }
+			
 			response = Response.status(Response.Status.OK)
-				.entity(nextId).type("text/plain").build();
-
-		// @TODO: Return our XML-based error results format.
+			  .entity(nextId).type(MediaType.TEXT_PLAIN).build();
+		
+		// @TODO: Return an XML-based error results format with the
+		// responses below.
 		
 		// @TODO: An IllegalStateException often indicates an overflow
 		// of an IDPart.  Consider whether returning a 400 Bad Request
-		// status code is warranted, or whether returning some other
+		// status code is still warranted, or whether returning some other
 		// status would be more appropriate.
 		} catch (IllegalStateException ise) {
-			response = Response.status(Response.Status.BAD_REQUEST)
-				.entity(ise.getMessage()).type("text/plain").build();
-				
+		  response = Response.status(Response.Status.BAD_REQUEST)
+			  .entity(ise.getMessage()).type(MediaType.TEXT_PLAIN).build();
+
 		} catch (IllegalArgumentException iae) {
 			response = Response.status(Response.Status.BAD_REQUEST)
-				.entity(iae.getMessage()).type("text/plain").build();
-				
+			  .entity(iae.getMessage()).type(MediaType.TEXT_PLAIN).build();
+	  
+	  // This is guard code that should never be reached.
 		} catch (Exception e) {
-			response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-				.entity(e.getMessage()).type("text/plain").build();
+		  response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			  .entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
 		}
 		
-    return response;
-    
+		return response;
+ 
   }
 
   //////////////////////////////////////////////////////////////////////
