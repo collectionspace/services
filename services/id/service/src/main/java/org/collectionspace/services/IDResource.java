@@ -1,4 +1,4 @@
-/*	
+/**
  * IDResource
  *
  * Resource class to handle requests to the ID Service.
@@ -146,7 +146,7 @@ public class IDResource {
    * @param  idPattern  An ID Pattern.
    *
    */
-	private void verbose(String msg, IDPattern idPattern) {
+	protected void verbose(String msg, IDPattern idPattern) {
 	
 		try {
 			verbose(msg);
@@ -167,7 +167,7 @@ public class IDResource {
    * @param	msg  A message.
    *
    */
-	private void verbose(String msg) {
+	protected void verbose(String msg) {
 		System.out.println("IDResource. " + msg);
 	}
 

@@ -150,6 +150,14 @@
       <artifactId>cobertura-maven-plugin</artifactId>
       <version>2.2</version>
     </dependency>
+    
+    <!-- MySQL Connector, a JDBC driver for the MySQL DBMS -->
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.6</version>
+    </dependency>
+
 
   </dependencies>
   
