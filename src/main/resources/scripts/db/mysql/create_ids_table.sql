@@ -27,21 +27,26 @@
 CREATE DATABASE IF NOT EXISTS `cspace`;
 USE `cspace`;
 
-DROP TABLE IF EXISTS `ids_last_generated`;
-CREATE TABLE `ids_last_generated` (
-  `id_pattern`  varchar(255) PRIMARY KEY,
-  `last_id`     varchar(255),
-  `modified`    timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  INDEX `id_patterns_index` (`id_pattern`)
+DROP TABLE IF EXISTS `id_patterns`;
+CREATE TABLE `id_patterns` (
+  `id_pattern_csid`        varchar(80) PRIMARY KEY,
+  `id_pattern_uri`         varchar(200),
+  `id_pattern_description` varchar(2000),
+  `id_pattern_state`       varchar(8000),
+  `last_generated_id`      varchar(255),
+  `modified`               timestamp NOT NULL
+                           default CURRENT_TIMESTAMP
+                           on update CURRENT_TIMESTAMP,
+  INDEX `id_pattern_csid_index` (`id_pattern_csid`)
 ) ENGINE=InnoDB;
 
 -- Hard-coding of identifiers for an initial set of ID Patterns,
 -- as a temporary expedient during development.
-INSERT INTO `ids_last_generated` (`id_pattern`, `last_id`) VALUES ('1', NULL);
-INSERT INTO `ids_last_generated` (`id_pattern`, `last_id`) VALUES ('2', NULL);
+-- INSERT INTO `id_patterns` (`id_pattern_csid`, `last_generated_id`) VALUES ('1', NULL);
+-- INSERT INTO `id_patterns` (`id_pattern_csid', `last_generated_id`) VALUES ('2', NULL);
 
 GRANT SELECT, INSERT, UPDATE, DELETE
-  on `ids_last_generated`
+  on `id_patterns`
   to `test`;
 
 SHOW WARNINGS;

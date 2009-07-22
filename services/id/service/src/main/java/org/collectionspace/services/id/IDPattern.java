@@ -37,16 +37,22 @@ import java.util.regex.Pattern;
 
 public class IDPattern {
 
-	final static int MAX_ID_LENGTH = 50;
-	
+	private String csid = "";
 	private Vector<IDPart> parts = new Vector<IDPart>();
+	final static int MAX_ID_LENGTH = 50;
 
 	// Constructor
-	public IDPattern() {
+	public IDPattern(String csid) {
+	  if (csid != null && ! csid.equals("")) {
+	    this.csid = csid;
+	  }
 	}
 	
 	// Constructor
-	public IDPattern(Vector<IDPart> partsList) {
+	public IDPattern(String csid, Vector<IDPart> partsList) {
+	  if (csid != null && ! csid.equals("")) {
+	    this.csid = csid;
+	  }
 		if (partsList != null) {
 			this.parts = partsList;
 		}

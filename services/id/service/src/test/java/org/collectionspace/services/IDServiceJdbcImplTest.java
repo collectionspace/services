@@ -27,7 +27,7 @@ package org.collectionspace.services.test;
 
 import org.collectionspace.services.IDService;
 import org.collectionspace.services.IDServiceJdbcImpl;
-import org.collectionspace.services.id.YearIDGenerator;
+import org.collectionspace.services.id.*;
 
 import junit.framework.TestCase;
 import static org.junit.Assert.*;
@@ -36,12 +36,20 @@ public class IDServiceJdbcImplTest extends TestCase {
 
   String currentYear = YearIDGenerator.getCurrentYear();
   String nextId;
-  IDService service;
+  IDServiceJdbcImpl jdbc = new IDServiceJdbcImpl();
+  IDService service = jdbc;
+
+	final static String DEFAULT_CSID = "1";
+
+  final static String DEFAULT_SERIALIZED_ID_PATTERN =
+    "<org.collectionspace.services.id.IDPattern>\n" +
+    "  <csid>" + DEFAULT_CSID + "</csid>\n" +
+    "  <parts/>\n" +
+    "</org.collectionspace.services.id.IDPattern>";
 
   protected void setUp() {
   
   	nextId = "";
-	  service = new IDServiceJdbcImpl();
 	  
   }
 
@@ -56,6 +64,8 @@ public class IDServiceJdbcImplTest extends TestCase {
     
 	}
 
+  // This test requires that the ID Service is running,
+  // and that an ID Pattern with the identifier '3' does not exist.
 	public void testNextIDNotValidPattern() {
 	
 		try {
@@ -65,6 +75,22 @@ public class IDServiceJdbcImplTest extends TestCase {
 			// This Exception should be thrown, and thus the test should pass.
 		}
 		
+	}
+
+  // @TODO We may want to canonicalize (or otherwise normalize) the expected and
+  // actual XML in these tests, to avoid failures resulting from differences in
+  // whitespace, etc.
+	public void testSerializeIDPattern() {
+	  IDPattern pattern = new IDPattern(DEFAULT_CSID);
+		assertEquals(DEFAULT_SERIALIZED_ID_PATTERN, jdbc.serializeIDPattern(pattern));
+	}
+
+	public void testDeserializeIDPattern() {
+	  // This test will fail with different hash codes unless we add an IDPattern.equals()
+	  // method that explicitly defines object equality as, for instance, having identical values
+	  // in each of its instance variables.
+	  // IDPattern pattern = jdbc.deserializeIDPattern(DEFAULT_SERIALIZED_ID_PATTERN);
+	  // assertEquals(pattern, new IDPattern(DEFAULT_CSID));
 	}
 	
 }

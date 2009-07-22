@@ -51,6 +51,8 @@
 
 // @TODO: Verify access (public, protected, or private) to service methods.
 
+// @TODO: As long as we're using JDBC, use PreparedStatements, not Statements.
+
 package org.collectionspace.services;
 
 import org.collectionspace.services.IDService;
@@ -58,10 +60,15 @@ import org.collectionspace.services.IDService;
 // to accommodate future ID generation components.
 import org.collectionspace.services.id.*;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+// import com.thoughtworks.xstream.io.HierarchicalStreamDriver; 
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.PreparedStatement;
 import java.sql.Statement;
 
 public class IDServiceJdbcImpl implements IDService {
@@ -77,8 +84,45 @@ public class IDServiceJdbcImpl implements IDService {
   final String DATABASE_USERNAME = "test";
   final String DATABASE_PASSWORD = "test";
 
-  // Placeholder constructor.
+  // Constructor.
   public void IDServiceJdbcImpl() {
+  }
+
+  // Temporary expedient to populate the database with hard-coded ID Pattens.
+  //
+  // @TODO: Remove this temporary expedient when possible.
+  public void init() {
+
+    Integer integer;
+    IDPattern pattern;
+    String csid = "";
+    
+    // Test whether ID patterns 1 and 2 exist in the database;
+    // if not, create and populate records for those patterns.
+    
+    csid = "1";
+		try {
+			pattern = getIDPattern(csid);
+		} catch (IllegalArgumentException e ) {
+      pattern = new IDPattern(csid);
+      pattern.add(new StringIDPart("E"));
+      pattern.add(new NumericIDPart("1"));
+      storeIDPattern(csid, pattern);
+    }
+
+    csid = "2";
+		try {
+			pattern = getIDPattern(csid);
+		} catch (IllegalArgumentException e ) {
+      pattern = new IDPattern(csid);
+      pattern.add(new YearIDPart());
+      pattern.add(new StringIDPart("."));
+      pattern.add(new NumericIDPart("1"));
+      pattern.add(new StringIDPart("."));
+      pattern.add(new NumericIDPart("1"));
+      storeIDPattern(csid, pattern);
+    }
+
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -109,6 +153,11 @@ public class IDServiceJdbcImpl implements IDService {
 		IDPattern pattern;
 		String nextId = "";
 		String lastId = "";
+		
+		// @TODO: Remove this call to init (a temporary expedient) when possible.
+		// Even as is, this should be a one-time utility function, not called
+		// each time nextID is invoked.
+		init();
 
 		if (csid == null || csid.equals("")) {
 			throw new IllegalArgumentException(
@@ -118,6 +167,8 @@ public class IDServiceJdbcImpl implements IDService {
 		try {
 			pattern = getIDPattern(csid);
 		} catch (IllegalArgumentException e ) {
+			throw e;
+		} catch (IllegalStateException e ) {
 			throw e;
 		}
 		
@@ -153,6 +204,7 @@ public class IDServiceJdbcImpl implements IDService {
 		  // Store the 'next' ID as the last-generated ID for this pattern.
 		  IDResource.verbose("> storing last-generated ID: " + nextId);
 		  storeLastID(csid, nextId);
+		  storeIDPattern(csid, pattern);
 		  
 		} catch (IllegalArgumentException e ) {
 		  throw e;
@@ -183,7 +235,8 @@ public class IDServiceJdbcImpl implements IDService {
    * @TODO: Retrieve IDPatterns from the database using JDBC,
    * rather than hard-coding their construction here.
    */
-	public IDPattern getIDPattern(String csid) throws IllegalArgumentException {
+
+/*	public IDPattern getIDPattern(String csid) throws IllegalArgumentException {
 	
 	  IDPattern pattern;
    		
@@ -220,6 +273,7 @@ public class IDServiceJdbcImpl implements IDService {
 		}
 		
 	}
+*/
 
   //////////////////////////////////////////////////////////////////////
   /*
@@ -240,6 +294,9 @@ public class IDServiceJdbcImpl implements IDService {
    * To uniquely identify ID patterns in production, we'll need to handle
    * both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
    * other form of identifier to be determined, such as URLs or URNs.
+   *
+   * @TODO: Refactor to remove redundant code that this method shares with other
+   * database-using methods in this class.
    */
 	public String getLastID(String csid) throws IllegalArgumentException, IllegalStateException {
 
@@ -278,7 +335,7 @@ public class IDServiceJdbcImpl implements IDService {
       Statement stmt = conn.createStatement();
 			
 			ResultSet rs = stmt.executeQuery(
-			  "SELECT last_id FROM ids_last_generated WHERE id_pattern='" + csid + "'");
+			  "SELECT last_generated_id FROM id_patterns WHERE id_pattern_csid='" + csid + "'");
 			  
 			boolean moreRows = rs.next();
 			if (! moreRows) {
@@ -313,10 +370,112 @@ public class IDServiceJdbcImpl implements IDService {
 
   //////////////////////////////////////////////////////////////////////
   /*
+   * Returns a requested ID pattern from persistent storage.  This pattern will
+   * include values for the last-generated IDs of each of its constituent parts,
+   * and thus can be used to generate a current or 'next' ID for that pattern.
+   *
+   * @param  csid  An identifier for an ID pattern.
+   *
+   * @return  The requested ID pattern.
+   *
+   * @throws  IllegalArgumentException if the requested ID pattern could not be found.
+   *
+   * @throws  IllegalStateException if a storage-related error occurred.
+   *
+   * @TODO: We're currently using simple integer IDs to identify ID patterns
+   * in this initial iteration.
+   *
+   * To uniquely identify ID patterns in production, we'll need to handle
+   * both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
+   * other form of identifier to be determined, such as URLs or URNs.
+   *
+   * @TODO: Refactor to remove redundant code that this method shares with other
+   * database-using methods in this class.
+   */
+	public IDPattern getIDPattern(String csid) throws IllegalArgumentException, IllegalStateException {
+
+		IDResource.verbose("> in getIDPattern");
+
+    String serializedIDPattern = null;
+    Connection conn = null;
+    
+    try {
+      Class.forName(JDBC_DRIVER_CLASSNAME).newInstance();
+    } catch (ClassNotFoundException e) {
+      throw new IllegalStateException(
+        "Error finding JDBC driver class '" +
+        JDBC_DRIVER_CLASSNAME +
+        "' to set up database connection.");
+    } catch (InstantiationException e) {
+      throw new IllegalStateException(
+        "Error instantiating JDBC driver class '" +
+        JDBC_DRIVER_CLASSNAME +
+        "' to set up database connection.");
+     } catch (IllegalAccessException e) {
+      throw new IllegalStateException(
+        "Error accessing JDBC driver class '" +
+        JDBC_DRIVER_CLASSNAME +
+        "' to set up database connection.");
+    }
+
+    try {
+          
+      // @TODO: Get these values from configuration; better yet, substitute Hibernate
+      // for JDBC for accessing database-managed persistence.
+      //
+      // @TODO: Remove any hard-coded dependencies on MySQL.
+      conn = DriverManager.getConnection(DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD);
+
+      Statement stmt = conn.createStatement();
+			
+			ResultSet rs = stmt.executeQuery(
+			  "SELECT id_pattern_state FROM id_patterns WHERE id_pattern_csid='" + csid + "'");
+			  
+			boolean moreRows = rs.next();
+			if (! moreRows) {
+        throw new IllegalArgumentException(
+          "Pattern with ID " +
+          "\'" + csid + "\'" +
+          " could not be found.");
+      }
+
+			serializedIDPattern = rs.getString(1);
+			
+			rs.close();
+
+    } catch (SQLException e) {
+      System.err.println("Exception: " + e.getMessage());
+      throw new IllegalStateException(
+        "Error retrieving ID pattern " +
+        "\'" + csid + "\'" +
+        " from database: " + e.getMessage());
+    } finally {
+      try {
+        if (conn != null) {
+          conn.close();
+        }
+      } catch(SQLException e) {
+        // Do nothing here
+      }
+    }
+    
+      
+	  IDResource.verbose("> retrieved IDPattern: " + serializedIDPattern);
+
+    IDPattern pattern = deserializeIDPattern(serializedIDPattern);
+    
+    return pattern;
+
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  /*
    * Stores the last-generated ID, corresponding to a specified ID pattern,
    * into persistent storage.
    *
-   * @param  csid    An identifier for an ID pattern.
+   * @param  csid     An identifier for an ID pattern.
+   *
+   * @param  pattern  An ID Pattern, including the values of its constituent parts.
    *
    * @param  lastId  The value of the last-generated ID associated with that ID pattern.
    *
@@ -331,7 +490,8 @@ public class IDServiceJdbcImpl implements IDService {
    * both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
    * other form of identifier to be determined, such as URLs or URNs.
    *
-   * @TODO: Refactor to remove redundant code that this method shares with getLastID(), above.
+   * @TODO: Refactor to remove redundant code that this method shares with other
+   * database-using methods in this class.
    */
 	public void storeLastID(String csid, String lastId)
 	  throws IllegalArgumentException, IllegalStateException {
@@ -370,7 +530,7 @@ public class IDServiceJdbcImpl implements IDService {
       Statement stmt = conn.createStatement();
 			
 			int rowsUpdated = stmt.executeUpdate(
-			  "UPDATE ids_last_generated SET last_id='" + lastId + "' WHERE id_pattern='" + csid + "'");
+			  "UPDATE id_patterns SET last_generated_id='" + lastId + "' WHERE id_pattern_csid='" + csid + "'");
 			  
 			if (rowsUpdated != 1) {
         throw new IllegalStateException(
@@ -393,5 +553,190 @@ public class IDServiceJdbcImpl implements IDService {
     }
 
   }
-		
+
+  //////////////////////////////////////////////////////////////////////
+  /*
+   * Stores a serialized ID pattern, representing the state of that pattern,
+   * into persistent storage.
+   *
+   * @param  csid     An identifier for an ID pattern.
+   *
+   * @param  pattern  An ID Pattern, reflecting its current state, including the
+   * values of its constituent parts.
+   *
+   * @throws  IllegalStateException if a storage-related error occurred.
+   *
+   * @TODO: We're currently using simple integer IDs to identify ID patterns
+   * in this initial iteration.
+   *
+   * To uniquely identify ID patterns in production, we'll need to handle
+   * both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
+   * other form of identifier to be determined, such as URLs or URNs.
+   *
+   * @TODO: Refactor to remove redundant code that this method shares with other
+   * database-using methods in this class.
+   */
+	public void storeIDPattern(String csid, IDPattern pattern)
+	  throws IllegalArgumentException, IllegalStateException {
+    
+		IDResource.verbose("> in storeIDPattern");
+
+    Connection conn = null;
+    
+    String serializedIDPattern = serializeIDPattern(pattern);
+
+    try {
+      Class.forName(JDBC_DRIVER_CLASSNAME).newInstance();
+    } catch (ClassNotFoundException e) {
+      throw new IllegalStateException(
+        "Error finding JDBC driver class '" +
+        JDBC_DRIVER_CLASSNAME +
+        "' to set up database connection.");
+    } catch (InstantiationException e) {
+      throw new IllegalStateException(
+        "Error instantiating JDBC driver class '" +
+        JDBC_DRIVER_CLASSNAME +
+        "' to set up database connection.");
+     } catch (IllegalAccessException e) {
+      throw new IllegalStateException(
+        "Error accessing JDBC driver class '" +
+        JDBC_DRIVER_CLASSNAME +
+        "' to set up database connection.");
+    }
+    
+    try {
+    
+      // @TODO: Get these values from configuration; better yet, substitute Hibernate
+      // for JDBC for accessing database-managed persistence.
+      //
+      // @TODO: Remove any hard-coded dependencies on MySQL.
+      conn = DriverManager.getConnection(DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD);
+
+      Statement stmt = conn.createStatement();
+
+      // Test whether the ID Pattern record already exists in the database.
+			ResultSet rs = stmt.executeQuery(
+			  "SELECT id_pattern_csid FROM id_patterns WHERE id_pattern_csid='" + csid + "'");
+			  
+			boolean moreRows = rs.next();
+			
+			boolean idPatternFound = true;
+			if (! moreRows) {
+        idPatternFound = false;
+      }
+			
+			// If the ID Pattern already exists in the database, update its record;
+			// otherwise, add it as a new record.
+			if (idPatternFound) {
+
+			  String stmtStr =
+			    "UPDATE id_patterns SET id_pattern_state = ? WHERE id_pattern_csid = ?";
+			
+        PreparedStatement ps = conn.prepareStatement(stmtStr);
+        ps.setString(1, serializedIDPattern);
+        ps.setString(2, csid);
+        
+        int rowsUpdated = ps.executeUpdate();
+        if (rowsUpdated != 1) {
+          throw new IllegalStateException(
+            "Error adding new ID pattern '" + csid + "'" + " to the database.");
+        }
+        
+/*			
+			  String stmtStr =
+			    "UPDATE id_patterns SET id_pattern_state='" + serializedIDPattern + "'" +
+			    " WHERE id_pattern_csid='" + csid + "'";
+		    IDResource.verbose("> update statement: " + stmtStr);
+			
+        int rowsUpdated = stmt.executeUpdate(stmtStr);
+        if (rowsUpdated != 1) {
+          throw new IllegalStateException(
+            "Error updating state of ID pattern '" + csid + "'" + " in the database.");
+        }
+*/
+
+      } else {
+ 
+        String stmtStr =
+			    "INSERT INTO id_patterns (id_pattern_csid, id_pattern_state) VALUES (?, ?)";
+        PreparedStatement ps = conn.prepareStatement(stmtStr);
+        ps.setString(1, csid);
+        ps.setString(2, serializedIDPattern);
+        
+        int rowsUpdated = ps.executeUpdate();
+        if (rowsUpdated != 1) {
+          throw new IllegalStateException(
+            "Error adding new ID pattern '" + csid + "'" + " to the database.");
+        }
+        
+/*
+ 			  String stmtStr =
+			    "INSERT INTO id_patterns (id_pattern_csid, id_pattern_state) " +
+          "VALUES (" + csid + "," + serializedIDPattern + ")";
+		    IDResource.verbose("> insert statement: " + stmtStr);
+          
+        int rowsUpdated = stmt.executeUpdate(stmtStr);
+        if (rowsUpdated != 1) {
+          throw new IllegalStateException(
+            "Error adding new ID pattern '" + csid + "'" + " to the database.");
+        }
+*/
+
+       } // end if (idPatternFound)
+
+		  IDResource.verbose("> successfully stored ID Pattern: " + csid);
+
+    } catch (SQLException e) {
+      System.err.println("Exception: " + e.getMessage());
+      throw new IllegalStateException("Error updating last-generated ID in database: " + e.getMessage());
+    } finally {
+      try {
+        if (conn != null) {
+          conn.close();
+        }
+      } catch(SQLException e) {
+        // Do nothing here
+      }
+    }
+
+  }
+  
+  //////////////////////////////////////////////////////////////////////
+  /*
+   * Serializes an ID Pattern.
+   *
+   * @param  pattern  An ID pattern.
+   *
+   * @return  A serialized representation of that ID pattern.
+   *
+   * @throws  IllegalStateException if a storage-related error occurred.
+   */
+	public static String serializeIDPattern(IDPattern pattern) {
+  
+    // @TODO: Add Exception handling
+    XStream xstream = new XStream(new DomDriver()); 
+    String serializedIDPattern = xstream.toXML(pattern);
+    
+    return serializedIDPattern;
+  
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  /*
+   * Deerializes an ID Pattern.
+   *
+   * @param   serializedIDPattern  A serialized representation of an ID pattern.
+   *
+   * @return  The ID pattern as a Java Object.
+   */
+	public static IDPattern deserializeIDPattern(String serializedIDPattern) {
+
+    // @TODO: Add Exception handling
+    XStream xstream = new XStream(new DomDriver()); 
+    IDPattern pattern = (IDPattern) xstream.fromXML(serializedIDPattern);
+
+    return pattern;
+  
+  }
+  
 }

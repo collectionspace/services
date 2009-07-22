@@ -37,6 +37,14 @@
   <version>1.0</version>
   <name>services.id.service</name>
 
+  <repositories>
+    <repository>
+      <id>codehaus-snapshot</id>
+      <name>Codehaus Snapshot Repo</name>
+      <url>http://snapshots.repository.codehaus.org</url>
+    </repository>
+  </repositories>
+
   <dependencies>
   
     <!-- Code common to all CollectionSpace services. -->
@@ -157,7 +165,13 @@
       <artifactId>mysql-connector-java</artifactId>
       <version>5.1.6</version>
     </dependency>
-
+    
+    <!-- XStream, an XML serializer -->
+    <dependency>
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+      <version>1.3.2-SNAPSHOT</version>
+    </dependency> 
 
   </dependencies>
   

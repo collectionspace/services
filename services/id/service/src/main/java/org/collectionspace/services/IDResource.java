@@ -84,6 +84,9 @@ public class IDResource {
    * other form of identifier to be determined, such as URLs or URNs.
    */
 	@GET
+	// @TODO: Temporary during early testing.
+	// To be changed to a POST request, and most likely to a different URL.
+	// E.g. /idpatterns/{identifier}/ids
 	@Path("/next/patterns/{csid}")
 	// @TODO: Temporary during testing; to be changed to return XML
   @Produces("text/plain")
@@ -146,7 +149,7 @@ public class IDResource {
    * @param  idPattern  An ID Pattern.
    *
    */
-	protected void verbose(String msg, IDPattern idPattern) {
+	protected static void verbose(String msg, IDPattern idPattern) {
 	
 		try {
 			verbose(msg);
@@ -167,7 +170,7 @@ public class IDResource {
    * @param	msg  A message.
    *
    */
-	protected void verbose(String msg) {
+	protected static void verbose(String msg) {
 		System.out.println("IDResource. " + msg);
 	}
 
