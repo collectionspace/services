@@ -25,7 +25,7 @@
  * $LastChangedDate$
  */
   
-package org.collectionspace.services;
+package org.collectionspace.services.id;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -37,8 +37,8 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
-import org.collectionspace.services.IDService;
-import org.collectionspace.services.id.IDPattern;
+// import org.collectionspace.services.IDService;
+// import org.collectionspace.services.id.IDPattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

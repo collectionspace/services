@@ -36,7 +36,7 @@
 // verifying basic functionality, rather than relying on
 // public Internet services, like example.com.
 
-package org.collectionspace.services.test;
+package org.collectionspace.services.test.id;
 
 import junit.framework.TestCase;
 import static org.junit.Assert.*;

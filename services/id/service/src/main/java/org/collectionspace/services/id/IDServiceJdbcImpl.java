@@ -61,12 +61,12 @@
 // - "persist/find" (used by JPA)
 // - or?
 
-package org.collectionspace.services;
+package org.collectionspace.services.id;
 
-import org.collectionspace.services.IDService;
+// import org.collectionspace.services.IDService;
 // The following import statement has been left open-ended
 // to accommodate future ID generation components.
-import org.collectionspace.services.id.*;
+// import org.collectionspace.services.id.*;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;

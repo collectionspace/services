@@ -21,7 +21,7 @@
  * $Date: 2009-06-19 19:03:38 -0700 (Fri, 19 Jun 2009) $
  */
  
-package org.collectionspace.services;
+package org.collectionspace.services.id;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

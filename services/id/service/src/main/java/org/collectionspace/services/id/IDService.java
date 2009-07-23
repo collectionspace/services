@@ -25,7 +25,7 @@
  * $LastChangedDate$
  */
  
-package org.collectionspace.services;
+package org.collectionspace.services.id;
 
 public interface IDService {
 

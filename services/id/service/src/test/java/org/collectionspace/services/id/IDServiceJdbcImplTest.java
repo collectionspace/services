@@ -23,11 +23,11 @@
  * $LastChangedDate$
  */
 
-package org.collectionspace.services.test;
+package org.collectionspace.services.test.id;
 
-import org.collectionspace.services.IDService;
-import org.collectionspace.services.IDServiceJdbcImpl;
-import org.collectionspace.services.id.*;
+// import org.collectionspace.services.IDService;
+// import org.collectionspace.services.IDServiceJdbcImpl;
+// import org.collectionspace.services.id.*;
 
 import junit.framework.TestCase;
 import static org.junit.Assert.*;
