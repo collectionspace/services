@@ -1,4 +1,4 @@
- /*	
+/**
  * IDPattern
  *
  * Models an identifier (ID), which consists of multiple IDParts.
@@ -30,17 +30,21 @@
 
 package org.collectionspace.services.id;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Vector;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class IDPattern {
 
 	private String csid = "";
+	private String uri = "";
+	private String description = "";
 	private Vector<IDPart> parts = new Vector<IDPart>();
-	final static int MAX_ID_LENGTH = 50;
 
+	final static int MAX_ID_LENGTH = 50;
+	
 	// Constructor
 	public IDPattern(String csid) {
 	  if (csid != null && ! csid.equals("")) {
@@ -58,6 +62,37 @@ public class IDPattern {
 		}
 	}
 
+	public String getCsid() {
+	  return this.csid;
+  }
+
+	public void setURI(String uriStr) {
+    if (uriStr == null || uriStr.equals("")) {
+      return;
+    }
+    // Validate that this is a legal URI.
+    try {
+      URI uri = new URI(uriStr);
+    } catch (URISyntaxException e) {
+      return;
+    }
+    this.uri = uriStr;
+  }
+
+	public String getURI() {
+	  return this.uri;
+  }
+
+	public void setDescription(String description) {
+    if (description != null) {
+      this.description = description;
+    }
+  }
+
+	public String getDescription() {
+    return this.description;
+  }
+  
 	public void add(IDPart part) {
 		if (part != null) {
 			this.parts.add(part);

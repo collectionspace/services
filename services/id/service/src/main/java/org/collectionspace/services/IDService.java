@@ -1,4 +1,4 @@
-/*	
+/**
  * IDService
  *
  * Interface for the methods of the ID Service.
@@ -29,8 +29,6 @@ package org.collectionspace.services;
 
 public interface IDService {
 
-	public final static String ID_SCHEMA_NAME = "id";
-
 	// ----------------------------------------
 	// IDs
 	// ----------------------------------------
@@ -38,10 +36,15 @@ public interface IDService {
 	// Create
 
 	// Read single object
-	//
-	// Returns the next available ID associated with a specified ID pattern.
-	public String nextID(String csid) throws IllegalArgumentException, IllegalStateException;
 	
+    // Returns the next ID associated with a specified ID pattern.
+    public String nextID(String csid)
+      throws IllegalArgumentException, IllegalStateException;
+    
+    // Returns the last generated ID associated with a specified ID pattern.
+    public String getLastID(String csid)
+      throws IllegalArgumentException, IllegalStateException;
+
 	// Read a list of objects (aka read multiple)
 	
 	// ----------------------------------------
@@ -50,11 +53,19 @@ public interface IDService {
 	
 	// Create
 	
-	// Read single object
+	  // Adds a new ID pattern.
+    public void addIDPattern(String csid, String serializedIDPattern)
+      throws IllegalArgumentException, IllegalStateException;
+	
+	  // Read single object
+    public String getIDPattern(String csid)
+      throws IllegalArgumentException, IllegalStateException;
 	
 	// Read a list of objects (aka read multiple)
 	
-	// Update
+	  // Update (may need to check for changes in the ID pattern structure)
+    public void updateIDPattern(String csid, String serializedIDPattern)
+      throws IllegalArgumentException, IllegalStateException;
 	
 	// Delete (possibly not permitted - deactivate instead?)
 

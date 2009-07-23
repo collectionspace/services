@@ -30,14 +30,14 @@ USE `cspace`;
 DROP TABLE IF EXISTS `id_patterns`;
 CREATE TABLE `id_patterns` (
   `id_pattern_csid`        varchar(80) PRIMARY KEY,
-  `id_pattern_uri`         varchar(200),
-  `id_pattern_description` varchar(2000),
+  -- `id_pattern_uri`      varchar(200),
   `id_pattern_state`       varchar(8000),
   `last_generated_id`      varchar(255),
   `modified`               timestamp NOT NULL
                            default CURRENT_TIMESTAMP
                            on update CURRENT_TIMESTAMP,
   INDEX `id_pattern_csid_index` (`id_pattern_csid`)
+  -- INDEX `id_pattern_uri_index` (`id_pattern_uri`)
 ) ENGINE=InnoDB;
 
 -- Hard-coding of identifiers for an initial set of ID Patterns,

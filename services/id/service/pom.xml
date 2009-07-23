@@ -38,6 +38,7 @@
   <name>services.id.service</name>
 
   <repositories>
+    <!-- Repository for recent versions of XStream -->
     <repository>
       <id>codehaus-snapshot</id>
       <name>Codehaus Snapshot Repo</name>
