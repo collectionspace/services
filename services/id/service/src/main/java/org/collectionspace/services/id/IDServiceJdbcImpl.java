@@ -63,10 +63,6 @@
 
 package org.collectionspace.services.id;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.XStreamException;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -74,7 +70,12 @@ import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class IDServiceJdbcImpl implements IDService {
+
+	final Logger logger = LoggerFactory.getLogger(IDServiceJdbcImpl.class);
 
   // @TODO Get the JDBC driver classname and database URL from configuration;
   // better yet, substitute Hibernate for JDBC for accessing database-managed persistence.
@@ -120,7 +121,7 @@ public class IDServiceJdbcImpl implements IDService {
 	public String nextID(String csid) throws
 		IllegalArgumentException, IllegalStateException {
 		
-		IDResource.verbose("> in nextID");
+		logger.debug("> in nextID");
 
 		String nextId = "";
 		String lastId = "";
@@ -147,7 +148,7 @@ public class IDServiceJdbcImpl implements IDService {
 
     IDPattern pattern;
     try {
-      pattern = deserializeIDPattern(serializedPattern);
+      pattern = IDPatternSerializer.deserialize(serializedPattern);
     } catch (IllegalArgumentException e) {
 	    throw e;
     }
@@ -216,7 +217,7 @@ public class IDServiceJdbcImpl implements IDService {
 	public void updateLastID(String csid, String lastId)
 	  throws IllegalArgumentException, IllegalStateException {
     
-		IDResource.verbose("> in updateLastID");
+		logger.debug("> in updateLastID");
 
     try {
       Class.forName(JDBC_DRIVER_CLASSNAME).newInstance();
@@ -252,10 +253,9 @@ public class IDServiceJdbcImpl implements IDService {
           "Error updating last-generated ID in the database for ID Pattern '" + csid + "'");
       }
 
-		  IDResource.verbose("> successfully updated last-generated ID: " + lastId);
+		  logger.debug("> successfully updated last-generated ID: " + lastId);
 
     } catch (SQLException e) {
-      System.err.println("Exception: " + e.getMessage());
       throw new IllegalStateException("Error updating last-generated ID in the database: " + e.getMessage());
     } finally {
       try {
@@ -296,7 +296,7 @@ public class IDServiceJdbcImpl implements IDService {
    */
 	public String getLastID(String csid) throws IllegalArgumentException, IllegalStateException {
 
-		IDResource.verbose("> in getLastID");
+		logger.debug("> in getLastID");
 
     String lastId = null;
     
@@ -337,12 +337,11 @@ public class IDServiceJdbcImpl implements IDService {
 
 			lastId = rs.getString(1);
 
-		  IDResource.verbose("> retrieved ID: " + lastId);
+		  logger.debug("> retrieved ID: " + lastId);
 
 			rs.close();
 
     } catch (SQLException e) {
-      System.err.println("Exception: " + e.getMessage());
       throw new IllegalStateException("Error retrieving last ID from the database: " + e.getMessage());
     } finally {
       try {
@@ -354,7 +353,7 @@ public class IDServiceJdbcImpl implements IDService {
       }
     }
 
-		IDResource.verbose("> returning ID: " + lastId);
+		logger.debug("> returning ID: " + lastId);
     
     return lastId;
 
@@ -386,7 +385,7 @@ public class IDServiceJdbcImpl implements IDService {
 	public void addIDPattern(String csid, IDPattern pattern)
 	  throws IllegalArgumentException, IllegalStateException {
     
-		IDResource.verbose("> in addIDPattern(String, IDPattern)");
+		logger.debug("> in addIDPattern(String, IDPattern)");
 
 	  if (pattern == null) {
 	    throw new IllegalArgumentException("New ID pattern to add cannot be null.");
@@ -394,7 +393,7 @@ public class IDServiceJdbcImpl implements IDService {
 
     String serializedPattern = "";
     try {
-      serializedPattern = serializeIDPattern(pattern);
+      serializedPattern = IDPatternSerializer.serialize(pattern);
     } catch (IllegalArgumentException e) {
 	    throw e;
     }
@@ -439,7 +438,7 @@ public class IDServiceJdbcImpl implements IDService {
 	public void addIDPattern(String csid, String serializedPattern)
 	  throws IllegalArgumentException, IllegalStateException {
     
-		IDResource.verbose("> in addIDPattern(String, String)");
+		logger.debug("> in addIDPattern(String, String)");
 		
 		if (serializedPattern == null || serializedPattern.equals("")) {
 		  throw new IllegalArgumentException(
@@ -521,10 +520,9 @@ public class IDServiceJdbcImpl implements IDService {
         
        } // end if (idPatternFound)
 
-		  IDResource.verbose("> successfully added ID Pattern: " + csid);
+		  logger.debug("> successfully added ID Pattern: " + csid);
 
     } catch (SQLException e) {
-      System.err.println("Exception: " + e.getMessage());
       throw new IllegalStateException("Error adding new ID pattern to the database: " + e.getMessage());
     } finally {
       try {
@@ -564,7 +562,7 @@ public class IDServiceJdbcImpl implements IDService {
 	public void updateIDPattern(String csid, IDPattern pattern)
 	  throws IllegalArgumentException, IllegalStateException {
     
-		IDResource.verbose("> in updateIDPattern(String, IDPattern)");
+		logger.debug("> in updateIDPattern(String, IDPattern)");
 
 	  if (pattern == null) {
 	    throw new IllegalArgumentException(
@@ -573,7 +571,7 @@ public class IDServiceJdbcImpl implements IDService {
 
     String serializedPattern = "";
     try {
-      serializedPattern = serializeIDPattern(pattern);
+      serializedPattern = IDPatternSerializer.serialize(pattern);
     } catch (IllegalArgumentException e) {
 	    throw e;
     }
@@ -619,7 +617,7 @@ public class IDServiceJdbcImpl implements IDService {
 	public void updateIDPattern(String csid, String serializedPattern)
 	  throws IllegalArgumentException, IllegalStateException {
     
-		IDResource.verbose("> in updateIDPattern(String, String)");
+		logger.debug("> in updateIDPattern(String, String)");
 		
 		if (serializedPattern == null || serializedPattern.equals("")) {
 		  throw new IllegalArgumentException(
@@ -674,7 +672,7 @@ public class IDServiceJdbcImpl implements IDService {
 			    
 			  IDPattern pattern;
         try {
-          pattern = deserializeIDPattern(serializedPattern);
+          pattern = IDPatternSerializer.deserialize(serializedPattern);
         } catch (IllegalArgumentException e) {
           throw e;
         }
@@ -700,10 +698,9 @@ public class IDServiceJdbcImpl implements IDService {
        
        } // end if (idPatternFound)
 
-		  IDResource.verbose("> successfully updated ID Pattern: " + csid);
+		  logger.debug("> successfully updated ID Pattern: " + csid);
 
     } catch (SQLException e) {
-      System.err.println("Exception: " + e.getMessage());
       throw new IllegalStateException("Error updating ID pattern in the database: " + e.getMessage());
     } finally {
       try {
@@ -740,7 +737,7 @@ public class IDServiceJdbcImpl implements IDService {
 	public void deleteIDPattern(String csid)
 	  throws IllegalArgumentException, IllegalStateException {
     
-		IDResource.verbose("> in deleteIDPattern");
+		logger.debug("> in deleteIDPattern");
 		
     try {
       Class.forName(JDBC_DRIVER_CLASSNAME).newInstance();
@@ -803,10 +800,9 @@ public class IDServiceJdbcImpl implements IDService {
        
        } // end if (idPatternFound)
 
-		  IDResource.verbose("> successfully deleted ID Pattern: " + csid);
+		  logger.debug("> successfully deleted ID Pattern: " + csid);
 
     } catch (SQLException e) {
-      System.err.println("Exception: " + e.getMessage());
       throw new IllegalStateException("Error deleting ID pattern in database: " + e.getMessage());
     } finally {
       try {
@@ -846,7 +842,7 @@ public class IDServiceJdbcImpl implements IDService {
    */
 	public String getIDPattern (String csid) throws IllegalArgumentException, IllegalStateException {
 
-		IDResource.verbose("> in getIDPattern");
+		logger.debug("> in getIDPattern");
 
     String serializedPattern = null;
     
@@ -892,7 +888,6 @@ public class IDServiceJdbcImpl implements IDService {
 			rs.close();
 
     } catch (SQLException e) {
-      System.err.println("Exception: " + e.getMessage());
       throw new IllegalStateException(
         "Error retrieving ID pattern " +
         "\'" + csid + "\'" +
@@ -907,72 +902,10 @@ public class IDServiceJdbcImpl implements IDService {
       }
     }
     
-	  IDResource.verbose("> retrieved IDPattern: " + serializedPattern);
+	  logger.debug("> retrieved IDPattern: " + serializedPattern);
 
     return serializedPattern;
 
-  }
-
-  //////////////////////////////////////////////////////////////////////
-  /**
-   * Serializes an ID pattern, converting it from a Java object into an XML representation.
-   *
-   * @param  pattern  An ID pattern.
-   *
-   * @return  A serialized representation of that ID pattern.
-   *
-   * @throws  IllegalArgumentException if the ID pattern cannot be serialized.
-   */
-	public static String serializeIDPattern(IDPattern pattern) throws IllegalArgumentException {
-	
-	  if (pattern == null) {
-	    throw new IllegalArgumentException("ID pattern cannot be null.");
-	  }
-  
-    XStream xstream = new XStream(new DomDriver()); 
-    
-    String serializedPattern = "";
-    try {
-      serializedPattern = xstream.toXML(pattern);
-    } catch (XStreamException e) {
-	    throw new IllegalArgumentException(
-	      "Could not convert ID pattern to XML for storage in database.");
-    }
-    
-    return serializedPattern;
-  
-  }
-
-  //////////////////////////////////////////////////////////////////////
-  /**
-   * Deserializes an ID pattern, converting it from an XML representation
-   * into a Java object.
-   *
-   * @param   serializedPattern  A serialized representation of an ID pattern.
-   *
-   * @return  The ID pattern deserialized as a Java object.
-   *
-   * @throws  IllegalArgumentException if the ID pattern cannot be deserialized.
-   */
-	public static IDPattern deserializeIDPattern(String serializedPattern)
-	  throws IllegalArgumentException {
-
-	  if (serializedPattern == null || serializedPattern.equals("")) {
-	    throw new IllegalArgumentException("ID pattern cannot be null or empty.");
-	  }
-
-    XStream xstream = new XStream(new DomDriver());
-
-    IDPattern pattern;
-    try {
-      pattern = (IDPattern) xstream.fromXML(serializedPattern);
-    } catch (XStreamException e) {
-	    throw new IllegalArgumentException(
-	      "Could not understand or parse this representation of an ID pattern.");
-    }
-
-    return pattern;
-  
   }
   
 }

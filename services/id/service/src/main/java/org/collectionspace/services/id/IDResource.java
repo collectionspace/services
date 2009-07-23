@@ -51,6 +51,7 @@ public class IDResource {
 
 	final Logger logger = LoggerFactory.getLogger(IDResource.class);
 
+	// @TODO Determine if this is pertinent here:
 	// Per Richard's comment in the CollectionObject Resource class, from which
 	// this class was derived: "This should be a DI wired by a container like
 	// Spring, Seam, or EJB3."
@@ -58,7 +59,7 @@ public class IDResource {
 	final static IDService service = new IDServiceJdbcImpl();
 
   //////////////////////////////////////////////////////////////////////
-	/* 
+	/**
 	 * Constructor (no argument).
    */
 	public IDResource() {
@@ -66,7 +67,7 @@ public class IDResource {
 	}
 
   //////////////////////////////////////////////////////////////////////
-  /*
+  /**
    * Returns the next available ID associated with a specified ID pattern.
    *
    * @param  csid  An identifier for an ID pattern.
@@ -89,7 +90,7 @@ public class IDResource {
   @Produces("text/plain")
 	public Response getNextID(@PathParam("csid") String csid) {
 	
-	  verbose("> in getNextID");
+	  logger.debug("> in getNextID(String)");
 	  
 	  // Unless the 'response' variable is explicitly initialized here, the
 	  // compiler gives the error: "variable response might not have been initialized."
@@ -136,39 +137,5 @@ public class IDResource {
 		return response;
  
   }
-
-  //////////////////////////////////////////////////////////////////////
-  /*
-   * Prints a serialized ID pattern to the console (stdout).
-   *
-   * @param	msg  A message.
-   *
-   * @param  idPattern  An ID Pattern.
-   *
-   */
-	protected static void verbose(String msg, IDPattern idPattern) {
-	
-		try {
-			verbose(msg);
-			JAXBContext jc = JAXBContext.newInstance(IDPattern.class);
-			Marshaller m = jc.createMarshaller();
-			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			m.marshal(idPattern, System.out);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-	}
-
-  //////////////////////////////////////////////////////////////////////
-  /*
-   * Prints a message to the console (stdout).
-   *
-   * @param	msg  A message.
-   *
-   */
-	protected static void verbose(String msg) {
-		System.out.println("IDResource. " + msg);
-	}
 
 }
