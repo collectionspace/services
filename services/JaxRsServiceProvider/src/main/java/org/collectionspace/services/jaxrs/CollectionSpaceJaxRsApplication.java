@@ -1,7 +1,7 @@
 package org.collectionspace.services.jaxrs;
 
 import org.collectionspace.services.CollectionObjectResource;
-import org.collectionspace.services.IDResource;
+import org.collectionspace.services.id.IDResource;
 import org.collectionspace.services.IntakeResource;
 
 import javax.ws.rs.core.Application;
