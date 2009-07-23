@@ -38,12 +38,12 @@
 
 package org.collectionspace.services.test.id;
 
-import junit.framework.TestCase;
-import static org.junit.Assert.*;
-
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.net.URL;
+
+import junit.framework.TestCase;
+import static org.junit.Assert.*;
 
 import org.restlet.Client;
 import org.restlet.data.Method;
