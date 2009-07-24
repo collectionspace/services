@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.collectionspace.services.nuxeo.NuxeoRESTClient;
+import org.collectionspace.services.nuxeo.client.rest.NuxeoRESTClient;
 import org.collectionspace.services.nuxeo.CollectionSpaceServiceNuxeoImpl;
 import org.collectionspace.services.intake.Intake;
 import org.collectionspace.services.IntakeJAXBSchema;

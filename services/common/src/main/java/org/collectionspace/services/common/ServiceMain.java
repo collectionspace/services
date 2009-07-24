@@ -10,7 +10,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import org.collectionspace.services.common.ServiceConfig.NuxeoWorkspace;
 import org.collectionspace.services.common.ServiceConfig.NuxeoWorkspace.Workspace;
-import org.collectionspace.services.nuxeo.NuxeoConnector;
+import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +30,7 @@ public class ServiceMain {
     private Hashtable<String, String> serviceWorkspaces = new Hashtable<String, String>();
     private NuxeoConnector nuxeoConnector;
     private String serverRootDir = null;
+    private NuxeoClientType nuxeoClientType = null;
 
     private ServiceMain() {
     }
@@ -64,8 +65,10 @@ public class ServiceMain {
     private void initialize() throws Exception {
         setServerRootDir();
         serviceConfig = readConfig();
-        nuxeoConnector = NuxeoConnector.getInstance();
-        nuxeoConnector.initialize(serviceConfig.getNuxeoClientConfig());
+        if(getNuxeoClientType().equals(NuxeoClientType.JAVA)){
+            nuxeoConnector = NuxeoConnector.getInstance();
+            nuxeoConnector.initialize(serviceConfig.getNuxeoClientConfig());
+        }
     }
 
     /**
@@ -81,7 +84,7 @@ public class ServiceMain {
             instance = null;
         }catch(Exception e){
             e.printStackTrace();
-        //gobble it
+            //gobble it
         }
     }
 
@@ -102,20 +105,39 @@ public class ServiceMain {
         if(logger.isDebugEnabled()){
             logger.debug("readConfig() read config file " + configFile.getAbsolutePath());
         }
+        nuxeoClientType = sconfig.getNuxeoClientConfig().getClientType();
+        if(logger.isDebugEnabled()) {
+            logger.debug("using Nuxeo client=" + nuxeoClientType.toString());
+        }
         return sconfig;
     }
 
     synchronized public void getWorkspaceIds() throws Exception {
-        Hashtable<String, String> workspaceIds = nuxeoConnector.retrieveWorkspaceIds();
+        Hashtable<String, String> workspaceIds = new Hashtable<String, String>();
+
+        if(getNuxeoClientType().equals(NuxeoClientType.JAVA)){
+            workspaceIds = nuxeoConnector.retrieveWorkspaceIds();
+        }
         NuxeoWorkspace nuxeoWorkspace = serviceConfig.getNuxeoWorkspace();
         List<Workspace> workspaces = nuxeoWorkspace.getWorkspace();
+        String workspaceId = null;
         for(Workspace workspace : workspaces){
-            String workspaceId = workspaceIds.get(workspace.getWorkspaceName().toLowerCase());
-            if(workspaceId == null){
-                logger.error("failed to retrieve workspace id for " + workspace.getWorkspaceName());
-                //FIXME: should we throw an exception here?
-                continue;
+            if(getNuxeoClientType().equals(NuxeoClientType.JAVA)){
+                workspaceId = workspaceIds.get(workspace.getWorkspaceName().toLowerCase());
+                if(workspaceId == null){
+                    logger.warn("failed to retrieve workspace id for " + workspace.getWorkspaceName());
+                    //FIXME: should we throw an exception here?
+                    continue;
+                }
+            }else{
+                workspaceId = workspace.getWorkspaceId();
+                if(workspaceId == null || "".equals(workspaceId)){
+                    logger.error("could not find workspace id for " + workspace.getWorkspaceName());
+                    //FIXME: should we throw an exception here?
+                    continue;
+                }
             }
+
             serviceWorkspaces.put(workspace.getServiceName(), workspaceId);
             if(logger.isDebugEnabled()){
                 logger.debug("retrieved workspace id=" + workspaceId +
@@ -155,5 +177,12 @@ public class ServiceMain {
      */
     public String getServerRootDir() {
         return serverRootDir;
+    }
+
+    /**
+     * @return the nuxeoClientType
+     */
+    public NuxeoClientType getNuxeoClientType() {
+        return nuxeoClientType;
     }
 }

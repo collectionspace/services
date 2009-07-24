@@ -1,8 +1,10 @@
 /**
  * 
  */
-package org.collectionspace.services;
+package org.collectionspace.services.collectionobject.nuxeo;
 
+import org.collectionspace.services.collectionobject.CollectionObjectService;
+import org.collectionspace.services.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,11 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.collectionspace.services.nuxeo.NuxeoRESTClient;
+import org.collectionspace.services.nuxeo.client.rest.NuxeoRESTClient;
 import org.collectionspace.services.nuxeo.CollectionSpaceServiceNuxeoImpl;
 import org.collectionspace.services.collectionobject.CollectionObject;
 import org.collectionspace.services.CollectionObjectJAXBSchema;
-import org.collectionspace.services.nuxeo.NuxeoUtils;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -84,35 +86,7 @@ public class CollectionObjectServiceNuxeoImpl extends
 		return document;
 	}
 	
-	/*
-	 * Prototype method for calling the Nuxeo Java API
-	 */
-	private Document getCollectionObjectViaJavaAPI(String csid)
-			throws DocumentException, IOException {
-		Document result = null;
-		RepositoryInstance repoSession = null;
-		
-		try {
-			repoSession = getRepositorySession();
-			DocumentRef documentRef = new IdRef(csid);
-			DocumentModel documentModel = repoSession.getDocument(documentRef);
-			result = NuxeoUtils.getDocument(repoSession, documentModel);
-		} catch (Exception e) {
-			if (logger.isDebugEnabled()) {
-				e.printStackTrace();
-			}
-		} finally {
-			if (repoSession != null) {
-				releaseRepositorySession(repoSession);
-			}
-		}
-		
-		// Dump out the contents of the result to stdout
-		System.out.println(result.asXML());
-		
-		return result;
-	}
-
+	
 	public Document getCollectionObjectList() throws DocumentException,
 			IOException {
 		Document result = null;

@@ -17,7 +17,7 @@
  * $Id: JOOoConvertPluginImpl.java 18651 2007-05-13 20:28:53Z sfermigier $
  */
 
-package org.collectionspace.services.nuxeo;
+package org.collectionspace.services.nuxeo.client.rest;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;

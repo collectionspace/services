@@ -34,6 +34,7 @@ public class CollectionObjectServiceTest {
 
         CollectionObject collectionObject = createCollectionObject(identifier);
         ClientResponse<Response> res = collectionObjectClient.createCollectionObject(collectionObject);
+        verbose("createCollectionObject: status = " + res.getStatus());
         Assert.assertEquals(res.getStatus(), Response.Status.CREATED.getStatusCode());
 
         //store updateId locally for "update" test
@@ -48,6 +49,7 @@ public class CollectionObjectServiceTest {
     @Test(dependsOnMethods = {"createCollectionObject"})
     public void updateCollectionObject() {
         ClientResponse<CollectionObject> res = collectionObjectClient.getCollectionObject(updateId);
+        verbose("getCollectionObject: status = " + res.getStatus());
         CollectionObject collectionObject = res.getEntity();
         verbose("Got CollectionObject to update with ID: " + updateId,
                 collectionObject, CollectionObject.class);
@@ -58,7 +60,7 @@ public class CollectionObjectServiceTest {
 
         // make call to update service
         res = collectionObjectClient.updateCollectionObject(updateId, collectionObject);
-
+        verbose("updateCollectionObject: status = " + res.getStatus());
         // check the response
         CollectionObject updatedCollectionObject = res.getEntity();
         Assert.assertEquals(updatedCollectionObject.getObjectName(), collectionObject.getObjectName());
@@ -77,7 +79,10 @@ public class CollectionObjectServiceTest {
     @Test(dependsOnMethods = {"createCollection"})
     public void getCollectionObjectList() {
         //the resource method is expected to return at least an empty list
-        CollectionObjectList coList = collectionObjectClient.getCollectionObjectList().getEntity();
+        ClientResponse<CollectionObjectList> res = collectionObjectClient.getCollectionObjectList();
+        CollectionObjectList coList = res.getEntity();
+        verbose("getCollectionObjectList: status = " + res.getStatus());
+
         List<CollectionObjectList.CollectionObjectListItem> coItemList = coList.getCollectionObjectListItem();
         int i = 0;
         for(CollectionObjectList.CollectionObjectListItem pli : coItemList){
@@ -94,7 +99,7 @@ public class CollectionObjectServiceTest {
         ClientResponse<Response> res = collectionObjectClient.deleteCollectionObject(deleteId);
         verbose("deleteCollectionObject: csid=" + deleteId);
         verbose("deleteCollectionObject: status = " + res.getStatus());
-        Assert.assertEquals(res.getStatus(), Response.Status.NO_CONTENT.getStatusCode());
+        Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
     }
 
     private CollectionObject createCollectionObject(long identifier) {

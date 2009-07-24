@@ -3,8 +3,7 @@
  */
 package org.collectionspace.services.nuxeo;
 
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-import org.nuxeo.ecm.core.client.NuxeoClient;
+import org.collectionspace.services.nuxeo.client.rest.NuxeoRESTClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,21 +28,4 @@ public abstract class CollectionSpaceServiceNuxeoImpl {
         return nxClient;
     }
 
-    protected RepositoryInstance getRepositorySession() throws Exception {
-        //FIXME: is it possible to reuse repository session?
-        //Authentication failures happen while trying to reuse the session
-        NuxeoConnector nuxeoConnector = NuxeoConnector.getInstance();
-        return nuxeoConnector.getRepositorySession();
-    }
-
-    protected void releaseRepositorySession(RepositoryInstance repoSession) {
-        try{
-            //release session
-            NuxeoConnector nuxeoConnector = NuxeoConnector.getInstance();
-            nuxeoConnector.releaseRepositorySession(repoSession);
-        }catch(Exception e){
-            logger.error("Could not close the repository session", e);
-        //no need to throw this service specific exception
-        }
-    }
 }

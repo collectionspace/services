@@ -16,7 +16,7 @@
  *
  * $Id: JOOoConvertPluginImpl.java 18651 2007-05-13 20:28:53Z sfermigier $
  */
-package org.collectionspace.services.nuxeo;
+package org.collectionspace.services.nuxeo.client.rest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,13 +68,13 @@ public class NuxeoRESTClient {
         sb.append(protocol);
         sb.append("://");
         sb.append(serverIP);
-        if (serverPort != null && !serverIP.equals("80")) {
+        if(serverPort != null && !serverIP.equals("80")){
             sb.append(':');
             sb.append(serverPort);
         }
-        sb.append(servletPath);
         sb.append('/');
-        baseURL = sb.toString();
+        sb.append(servletPath);
+        this.baseURL = sb.toString();
     }
 
     public void setBasicAuthentication(String userName, String password) {
@@ -99,8 +99,8 @@ public class NuxeoRESTClient {
         String path = "";
         StringBuffer pathBuffer = new StringBuffer();
 
-        if (pathParams != null) {
-            for (String p : pathParams) {
+        if(pathParams != null){
+            for(String p : pathParams){
                 pathBuffer.append(p);
                 pathBuffer.append('/');
             }
@@ -114,10 +114,10 @@ public class NuxeoRESTClient {
             Map<String, String> queryParams, InputStream istream) {
         StringBuffer urlBuffer = new StringBuffer();
 
-        if (subPath.startsWith("/")) {
+        if(subPath.startsWith("/")){
             subPath = subPath.substring(1);
         }
-        if (subPath.endsWith("/")) {
+        if(subPath.endsWith("/")){
             subPath = subPath.substring(0, subPath.length() - 1);
         }
 
@@ -127,16 +127,16 @@ public class NuxeoRESTClient {
         urlBuffer.append('/');
         urlBuffer.append(subPath);
 
-        if (queryParams != null) {
+        if(queryParams != null){
             urlBuffer.append('?');
-            
+
             String qpValue = null;
-            for (String qpName : queryParams.keySet()) {
+            for(String qpName : queryParams.keySet()){
                 urlBuffer.append(qpName);
                 urlBuffer.append('=');
                 qpValue = queryParams.get(qpName);
-                if (qpValue != null) {
-                	urlBuffer.append(qpValue.replaceAll(" ", "%20"));
+                if(qpValue != null){
+                    urlBuffer.append(qpValue.replaceAll(" ", "%20"));
                 }
                 urlBuffer.append('&');
             }
@@ -156,7 +156,7 @@ public class NuxeoRESTClient {
             public void write(OutputStream outputStream) throws IOException {
                 byte[] buffer = new byte[1024 * 64];
                 int read;
-                while ((read = in.read(buffer)) != -1) {
+                while((read = in.read(buffer)) != -1){
                     outputStream.write(buffer, 0, read);
                 }
 
@@ -171,8 +171,8 @@ public class NuxeoRESTClient {
         String path = "";
         StringBuffer pathBuffer = new StringBuffer();
 
-        if (pathParams != null) {
-            for (String p : pathParams) {
+        if(pathParams != null){
+            for(String p : pathParams){
                 pathBuffer.append(p);
                 pathBuffer.append('/');
             }
@@ -186,10 +186,10 @@ public class NuxeoRESTClient {
             Map<String, String> queryParams) {
         StringBuffer urlBuffer = new StringBuffer();
 
-        if (subPath.startsWith("/")) {
+        if(subPath.startsWith("/")){
             subPath = subPath.substring(1);
         }
-        if (subPath.endsWith("/")) {
+        if(subPath.endsWith("/")){
             subPath = subPath.substring(0, subPath.length() - 1);
         }
 
@@ -199,9 +199,9 @@ public class NuxeoRESTClient {
         urlBuffer.append('/');
         urlBuffer.append(subPath);
 
-        if (queryParams != null) {
+        if(queryParams != null){
             urlBuffer.append('?');
-            for (String qpName : queryParams.keySet()) {
+            for(String qpName : queryParams.keySet()){
                 urlBuffer.append(qpName);
                 urlBuffer.append('=');
                 urlBuffer.append(queryParams.get(qpName).replaceAll(" ", "%20"));
@@ -220,19 +220,19 @@ public class NuxeoRESTClient {
 
     protected void setupAuth(Request request) {
 
-        if (authType == AUTH_TYPE_BASIC) {
+        if(authType == AUTH_TYPE_BASIC){
             ChallengeScheme scheme = ChallengeScheme.HTTP_BASIC;
             ChallengeResponse authentication = new ChallengeResponse(scheme,
                     userName, password);
             request.setChallengeResponse(authentication);
 
-        } else if (authType == AUTH_TYPE_SECRET) {
+        }else if(authType == AUTH_TYPE_SECRET){
             Series<Parameter> additionnalHeaders = new Form();
 
             Map<String, String> securityHeaders = PortalSSOAuthenticationProvider.getHeaders(
                     secretToken, userName);
 
-            for (String hn : securityHeaders.keySet()) {
+            for(String hn : securityHeaders.keySet()){
                 additionnalHeaders.add(hn, securityHeaders.get(hn));
             }
 
@@ -242,20 +242,20 @@ public class NuxeoRESTClient {
     }
 
     protected void setupCookies(Request request) {
-        if (cookies != null) {
+        if(cookies != null){
             request.getCookies().clear();
-            for (Cookie cookie : cookies) {
+            for(Cookie cookie : cookies){
                 request.getCookies().add(cookie);
             }
         }
 
     }
 
-    protected Client getRestClient() {
-        if (restClient == null) {
-            if (baseURL.startsWith("https")) {
+    Client getRestClient() {
+        if(restClient == null){
+            if(baseURL.startsWith("https")){
                 restClient = new Client(Protocol.HTTPS);
-            } else {
+            }else{
                 restClient = new Client(Protocol.HTTP);
             }
         }
@@ -309,5 +309,57 @@ public class NuxeoRESTClient {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    /**
+     * buildUrl build URL from given path and query parameters
+     * @param pathParams
+     * @param queryParams
+     * @return
+     */
+    String buildUrl(List<String> pathParams,
+            Map<String, String> queryParams) {
+        String subPath = "";
+        StringBuffer pathBuffer = new StringBuffer();
+
+        if(pathParams != null){
+            for(String p : pathParams){
+                pathBuffer.append(p);
+                pathBuffer.append('/');
+            }
+            subPath = pathBuffer.toString();
+        }
+
+        StringBuffer urlBuffer = new StringBuffer();
+
+        if(subPath.startsWith("/")){
+            subPath = subPath.substring(1);
+        }
+        if(subPath.endsWith("/")){
+            subPath = subPath.substring(0, subPath.length() - 1);
+        }
+
+        urlBuffer.append(baseURL);
+        urlBuffer.append('/');
+        urlBuffer.append(restPrefix);
+        urlBuffer.append('/');
+        urlBuffer.append(subPath);
+
+        if(queryParams != null){
+            urlBuffer.append('?');
+
+            String qpValue = null;
+            for(String qpName : queryParams.keySet()){
+                urlBuffer.append(qpName);
+                urlBuffer.append('=');
+                qpValue = queryParams.get(qpName);
+                if(qpValue != null){
+                    urlBuffer.append(qpValue.replaceAll(" ", "%20"));
+                }
+                urlBuffer.append('&');
+            }
+        }
+
+        return urlBuffer.toString();
     }
 }

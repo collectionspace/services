@@ -24,8 +24,8 @@
         <nuxeo.version.5.2>5.2-SNAPSHOT</nuxeo.version.5.2>
         <nuxeo.version.1.5>1.5-SNAPSHOT</nuxeo.version.1.5>
     </properties>
-    
-    
+
+
     <dependencies>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
@@ -74,9 +74,9 @@
             <version>4.1</version>
             <scope>test</scope>
         </dependency>
-        
+
         <!-- javax -->
-        
+
         <!-- jboss -->
         <dependency>
             <groupId>jboss</groupId>
@@ -139,7 +139,7 @@
         </dependency>
 
     </dependencies>
-    
+
     <build>
         <finalName>cspace-services</finalName>
         <plugins>
@@ -157,6 +157,7 @@
                         <goals>
                             <goal>undeploy</goal>
                         </goals>
+                        <phase>pre-integration-test</phase>
                         <configuration>
                             <fileNames>
                                 <param>${project.build.directory}/${project.build.finalName}.war</param>
@@ -168,6 +169,7 @@
                         <goals>
                             <goal>deploy</goal>
                         </goals>
+                        <phase>pre-integration-test</phase>
                         <configuration>
                             <fileNames>
                                 <param>${project.build.directory}/${project.build.finalName}.war</param>
@@ -193,3 +195,4 @@
         </plugins>
     </build>
 </project>
+

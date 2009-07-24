@@ -22,9 +22,15 @@
                         <xs:sequence>
                             <xs:element name="host" type="xs:string" minOccurs="1"  maxOccurs="1" />
                             <xs:element name="port" type="xs:int" minOccurs="1"  maxOccurs="1" />
+                            <!-- protocol (http/https) is only applicable for rest client -->
+                            <xs:element name="protocol" type="xs:string" minOccurs="0"  maxOccurs="1" />
+                                           <!-- default client is java -->
+                            <xs:element name="client-type" type="NuxeoClientType" minOccurs="0"  maxOccurs="1" />
+
                             <xs:element name="user" type="xs:string" minOccurs="1"  maxOccurs="1" />
                 <!-- password should not be in cleartext -->
                             <xs:element name="password" type="xs:string" minOccurs="1"  maxOccurs="1" />
+             
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
@@ -35,7 +41,10 @@
                                 <xs:complexType>
                                     <xs:sequence>
                                         <xs:element name="service-name" type="xs:string" minOccurs="1"  maxOccurs="1" />
+                                        <!-- workspace name is required for Nuxeo Java client -->
                                         <xs:element name="workspace-name" type="xs:string" minOccurs="1"  maxOccurs="1" />
+                                        <!-- workspace ids are required only for Nuxeo REST client -->
+                                        <xs:element name="workspace-id" type="xs:string" minOccurs="1"  maxOccurs="1" />
                                     </xs:sequence>
                                 </xs:complexType>
                             </xs:element>
@@ -45,6 +54,14 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <!-- enumeration defining the type nuxeo client -->
+    <xs:simpleType name="NuxeoClientType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="java" />
+            <xs:enumeration value="rest" />
+        </xs:restriction>
+    </xs:simpleType>
 
 
 </xs:schema>

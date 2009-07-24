@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jboss-web>
-     <!-- All secure web resources will use this security domain -->
-    <security-domain>java:/jaas/cspace</security-domain>
+  <!-- All secure web resources will use this security domain -->
+  <security-domain>java:/jaas/cspace</security-domain>
+  <context-root>/cspace-services</context-root>
 </jboss-web>

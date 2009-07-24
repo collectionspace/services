@@ -15,7 +15,9 @@
     <nuxeo-client-config>
         <!-- ip of network interface to which Nuxeo server is listening on -->
         <host>127.0.0.1</host>
-        <port>62474</port>
+        <port>62474</port> <!-- java -->
+        <!--port>8080</port--> <!-- rest -->
+        <client-type>java</client-type>
         <user>Administrator</user>
         <password>Administrator</password>
     </nuxeo-client-config>
@@ -23,15 +25,21 @@
         <workspace>
             <service-name>persons</service-name>
             <workspace-name>People</workspace-name>
+            <!-- use hard-coded workspace id for REST client -->
+            <!--workspace-id></workspace-id-->
         </workspace>
-                <workspace>
+        <workspace>
             <service-name>collectionobjects</service-name>
             <workspace-name>CollectionObjects</workspace-name>
+            <!-- use hard-coded workspace id for REST client -->
+            <!--workspace-id></workspace-id-->
         </workspace>
         <workspace>
             <service-name>intakes</service-name>
             <workspace-name>Intakes</workspace-name>
-        </workspace>        
+            <!-- use hard-coded workspace id for REST client -->
+            <!--workspace-id></workspace-id-->
+        </workspace>
     </nuxeo-workspace>
 
 </ns1:service-config>
