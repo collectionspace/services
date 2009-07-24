@@ -35,9 +35,9 @@ public abstract class CollectionSpaceClient {
 
     protected CollectionSpaceClient() {
 
-        String url = System.getProperty(URL_PROPERTY, DEFAULT_URL);
-        if(url != null){
-            baseURL = url;
+        String urlProperty = System.getProperty(URL_PROPERTY, DEFAULT_URL);
+        if(urlProperty != null){
+            baseURL = urlProperty;
         }
         useAuth = Boolean.getBoolean(AUTH_PROPERTY);
         if(useAuth){
@@ -65,7 +65,12 @@ public abstract class CollectionSpaceClient {
         if(logger.isDebugEnabled()){
             logger.debug("useSSL=" + useSSL);
         }
-        baseURL = useSSL ? DEFAULT_SSL_URL : DEFAULT_URL;
+        
+        // if the urlProperty prop is set, then it overrides.
+        if (urlProperty == null) {
+        	baseURL = useSSL ? DEFAULT_SSL_URL : DEFAULT_URL;
+        }
+        
         if(logger.isDebugEnabled()){
             logger.debug("using baseURL=" + baseURL);
         }
