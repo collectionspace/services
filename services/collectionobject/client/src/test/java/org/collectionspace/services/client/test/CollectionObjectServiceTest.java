@@ -50,6 +50,8 @@ public class CollectionObjectServiceTest {
     public void updateCollectionObject() {
         ClientResponse<CollectionObject> res = collectionObjectClient.getCollectionObject(updateId);
         verbose("getCollectionObject: status = " + res.getStatus());
+        Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
+        
         CollectionObject collectionObject = res.getEntity();
         verbose("Got CollectionObject to update with ID: " + updateId,
                 collectionObject, CollectionObject.class);
@@ -61,6 +63,8 @@ public class CollectionObjectServiceTest {
         // make call to update service
         res = collectionObjectClient.updateCollectionObject(updateId, collectionObject);
         verbose("updateCollectionObject: status = " + res.getStatus());
+        Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
+
         // check the response
         CollectionObject updatedCollectionObject = res.getEntity();
         Assert.assertEquals(updatedCollectionObject.getObjectName(), collectionObject.getObjectName());
@@ -82,6 +86,7 @@ public class CollectionObjectServiceTest {
         ClientResponse<CollectionObjectList> res = collectionObjectClient.getCollectionObjectList();
         CollectionObjectList coList = res.getEntity();
         verbose("getCollectionObjectList: status = " + res.getStatus());
+        Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
 
         List<CollectionObjectList.CollectionObjectListItem> coItemList = coList.getCollectionObjectListItem();
         int i = 0;

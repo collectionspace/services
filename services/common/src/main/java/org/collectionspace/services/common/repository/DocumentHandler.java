@@ -60,6 +60,34 @@ public interface DocumentHandler<T, TL> {
      */
     public void handle(Action action, DocumentWrapper docWrap) throws Exception;
 
+        /**
+     * handleCreate processes create operation response
+     * @param wrapDoc
+     * @throws Exception
+     */
+    public void handleCreate(DocumentWrapper wrapDoc) throws Exception;
+
+    /**
+     * handleUpdate processes update operation response
+     * @param wrapDoc
+     * @throws Exception
+     */
+    public void handleUpdate(DocumentWrapper wrapDoc) throws Exception;
+
+    /**
+     * handleGet processes get operation response
+     * @param wrapDoc
+     * @throws Exception
+     */
+    public void handleGet(DocumentWrapper wrapDoc) throws Exception;
+
+    /**
+     * handleGetAll processes index operation response
+     * @param wrapDoc
+     * @throws Exception
+     */
+    public void handleGetAll(DocumentWrapper wrapDoc) throws Exception;
+    
     /**
      * extractCommonObject extracts common part of a CS document from given Nuxeo document.
      * @param docWrap nuxeo document

@@ -30,12 +30,10 @@ import org.collectionspace.services.CollectionObjectJAXBSchema;
 import org.collectionspace.services.collectionobject.CollectionObject;
 import org.collectionspace.services.collectionobject.CollectionObjectList;
 import org.collectionspace.services.collectionobject.CollectionObjectList.CollectionObjectListItem;
-import org.collectionspace.services.collectionobject.CollectionObjectService;
 import org.collectionspace.services.common.repository.DocumentWrapper;
 import org.collectionspace.services.nuxeo.client.rest.RepresentationHandler;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,78 +66,6 @@ public class CollectionObjectRepresenationHandler
             case UPDATE:
                 prepare();
         }
-    }
-
-    @Override
-    public void handle(Action action, DocumentWrapper wrapDoc)
-            throws Exception {
-        switch(action){
-            case CREATE:
-                handleCreate(wrapDoc);
-                break;
-            case UPDATE:
-                handleUpdate(wrapDoc);
-                break;
-            case GET:
-                handleGet(wrapDoc);
-                break;
-            case GET_ALL:
-                handleGetAll(wrapDoc);
-                break;
-        }
-    }
-
-    /**
-     * handleCreate processes create operation response
-     * @param wrapDoc
-     * @throws Exception
-     */
-    public void handleCreate(DocumentWrapper wrapDoc) throws Exception {
-        CollectionObject co = getCommonObject();
-        if(co == null){
-            String msg = "Error creating document: Missing input data";
-            logger.error(msg);
-            throw new IllegalStateException(msg);
-        }
-        //FIXME set other parts as well
-        fillCommonObject(co, wrapDoc);
-    }
-
-    /**
-     * handleUpdate processes update operation response
-     * @param wrapDoc
-     * @throws Exception
-     */
-    public void handleUpdate(DocumentWrapper wrapDoc) throws Exception {
-        CollectionObject co = getCommonObject();
-        if(co == null){
-            String msg = "Error updating document: Missing input data";
-            logger.error(msg);
-            throw new IllegalStateException(msg);
-        }
-        //FIXME set other parts as well
-        fillCommonObject(co, wrapDoc);
-    }
-
-    /**
-     * handleGet processes get operation response
-     * @param wrapDoc
-     * @throws Exception
-     */
-    public void handleGet(DocumentWrapper wrapDoc) throws Exception {
-        CollectionObject co = extractCommonObject(wrapDoc);
-        setCommonObject(co);
-        //FIXME retrive other parts as well
-    }
-
-    /**
-     * handleGetAll processes index operation response
-     * @param wrapDoc
-     * @throws Exception
-     */
-    public void handleGetAll(DocumentWrapper wrapDoc) throws Exception {
-        CollectionObjectList coList = extractCommonObjectList(wrapDoc);
-        setCommonObjectList(coList);
     }
 
     private void prepare() {

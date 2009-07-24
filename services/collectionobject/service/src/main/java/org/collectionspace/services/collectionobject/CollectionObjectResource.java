@@ -46,7 +46,7 @@ public class CollectionObjectResource {
 
     @POST
     public Response createCollectionObject(
-            CollectionObject co) {
+            CollectionObject collectionObject) {
 
         String csid = null;
         try{
@@ -54,11 +54,11 @@ public class CollectionObjectResource {
             RepositoryClient client = clientFactory.getClient(CLIENT_TYPE.toString());
             CollectionObjectHandlerFactory handlerFactory = CollectionObjectHandlerFactory.getInstance();
             DocumentHandler handler = (DocumentHandler) handlerFactory.getHandler(CLIENT_TYPE.toString());
-            handler.setCommonObject(co);
+            handler.setCommonObject(collectionObject);
             csid = client.create(CO_SERVICE_NAME, CollectionObjectConstants.CO_NUXEO_DOCTYPE, handler);
-            co.setCsid(csid);
+            collectionObject.setCsid(csid);
             if(logger.isDebugEnabled()){
-                verbose("createCollectionObject: ", co);
+                verbose("createCollectionObject: ", collectionObject);
             }
             UriBuilder path = UriBuilder.fromResource(CollectionObjectResource.class);
             path.path("" + csid);
@@ -69,7 +69,7 @@ public class CollectionObjectResource {
                 logger.debug("Caught exception in createCollectionObject", e);
             }
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Crate failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Create failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
     }
@@ -88,14 +88,14 @@ public class CollectionObjectResource {
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        CollectionObject co = null;
+        CollectionObject collectionObject = null;
         try{
             RepositoryClientFactory clientFactory = RepositoryClientFactory.getInstance();
             RepositoryClient client = clientFactory.getClient(CLIENT_TYPE.toString());
             CollectionObjectHandlerFactory handlerFactory = CollectionObjectHandlerFactory.getInstance();
             DocumentHandler handler = (DocumentHandler) handlerFactory.getHandler(CLIENT_TYPE.toString());
             client.get(csid, handler);
-            co = (CollectionObject) handler.getCommonObject();
+            collectionObject = (CollectionObject) handler.getCommonObject();
         }catch(DocumentNotFoundException dnfe){
             if(logger.isDebugEnabled()){
                 logger.debug("getCollectionObject", dnfe);
@@ -113,37 +113,37 @@ public class CollectionObjectResource {
             throw new WebApplicationException(response);
         }
 
-        if(co == null){
+        if(collectionObject == null){
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Get failed, the requested CollectionObject CSID:" + csid + ": was not found.").type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
         if(logger.isDebugEnabled()){
-            verbose("getCollectionObject: ", co);
+            verbose("getCollectionObject: ", collectionObject);
         }
-        return co;
+        return collectionObject;
     }
 
     @GET
     public CollectionObjectList getCollectionObjectList(@Context UriInfo ui) {
-        CollectionObjectList coList = new CollectionObjectList();
+        CollectionObjectList collectionObjectList = new CollectionObjectList();
         try{
             RepositoryClientFactory clientFactory = RepositoryClientFactory.getInstance();
             RepositoryClient client = clientFactory.getClient(CLIENT_TYPE.toString());
             CollectionObjectHandlerFactory handlerFactory = CollectionObjectHandlerFactory.getInstance();
             DocumentHandler handler = (DocumentHandler) handlerFactory.getHandler(CLIENT_TYPE.toString());
             client.getAll(CO_SERVICE_NAME, handler);
-            coList = (CollectionObjectList) handler.getCommonObjectList();
+            collectionObjectList = (CollectionObjectList) handler.getCommonObjectList();
         }catch(Exception e){
             if(logger.isDebugEnabled()){
                 logger.debug("Caught exception in getCollectionObjectList", e);
             }
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("index failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return coList;
+        return collectionObjectList;
     }
 
     @PUT
@@ -222,7 +222,7 @@ public class CollectionObjectResource {
 
     }
 
-    private void verbose(String msg, CollectionObject co) {
+    private void verbose(String msg, CollectionObject collectionObject) {
         try{
             verbose(msg);
             JAXBContext jc = JAXBContext.newInstance(
@@ -230,7 +230,7 @@ public class CollectionObjectResource {
 
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            m.marshal(co, System.out);
+            m.marshal(collectionObject, System.out);
         }catch(Exception e){
             e.printStackTrace();
         }

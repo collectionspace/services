@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 import org.collectionspace.services.nuxeo.client.*;
 import org.dom4j.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * RepresentationHandler is a base abstract Nuxeo document handler
@@ -44,6 +46,7 @@ import org.dom4j.Document;
 public abstract class RepresentationHandler<T, TL>
         implements DocumentHandler<T, TL> {
 
+    private final Logger logger = LoggerFactory.getLogger(RepresentationHandler.class);
     private Map<String, Object> properties = new HashMap<String, Object>();
     private List<String> pathParams = new ArrayList<String>();
     private Map<String, String> queryParams = new HashMap<String, String>();
@@ -54,7 +57,56 @@ public abstract class RepresentationHandler<T, TL>
     public abstract void prepare(Action action) throws Exception;
 
     @Override
-    public abstract void handle(Action action, DocumentWrapper wrapDoc) throws Exception;
+    public void handle(Action action, DocumentWrapper wrapDoc) throws Exception {
+        switch(action){
+            case CREATE:
+                handleCreate(wrapDoc);
+                break;
+            case UPDATE:
+                handleUpdate(wrapDoc);
+                break;
+            case GET:
+                handleGet(wrapDoc);
+                break;
+            case GET_ALL:
+                handleGetAll(wrapDoc);
+                break;
+        }
+    }
+
+    @Override
+    public void handleCreate(DocumentWrapper wrapDoc) throws Exception {
+        if(getCommonObject() == null){
+            String msg = "Error creating document: Missing input data";
+            logger.error(msg);
+            throw new IllegalStateException(msg);
+        }
+        //FIXME set other parts as well
+        fillCommonObject(getCommonObject(), wrapDoc);
+    }
+
+    @Override
+    public void handleUpdate(DocumentWrapper wrapDoc) throws Exception {
+        if(getCommonObject() == null){
+            String msg = "Error updating document: Missing input data";
+            logger.error(msg);
+            throw new IllegalStateException(msg);
+        }
+        //FIXME set other parts as well
+        fillCommonObject(getCommonObject(), wrapDoc);
+    }
+
+    @Override
+    public void handleGet(DocumentWrapper wrapDoc) throws Exception {
+        setCommonObject(extractCommonObject(wrapDoc));
+
+        //FIXME retrive other parts as well
+    }
+
+    @Override
+    public void handleGetAll(DocumentWrapper wrapDoc) throws Exception {
+        setCommonObjectList(extractCommonObjectList(wrapDoc));
+    }
 
     @Override
     public abstract T extractCommonObject(DocumentWrapper wrapDoc) throws Exception;
