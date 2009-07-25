@@ -87,7 +87,6 @@ public class CollectionObjectServiceTest {
 
     // Store the ID returned from this create operation for additional tests below.
     knownCollectionObjectId = extractId(res);
-    knownCollectionObjectId = extractId(res);    
   }
 
   // Create multiple (used for Read multiple tests, below)
