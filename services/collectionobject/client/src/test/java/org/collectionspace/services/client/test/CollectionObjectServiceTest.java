@@ -1,3 +1,26 @@
+/**
+ * This document is a part of the source code and related artifacts
+ * for CollectionSpace, an open source collections management system
+ * for museums and related institutions:
+ *
+ * http://www.collectionspace.org
+ * http://wiki.collectionspace.org
+ *
+ * Copyright © 2009 Regents of the University of California
+ *
+ * Licensed under the Educational Community License (ECL), Version 2.0.
+ * You may not use this file except in compliance with this License.
+ *
+ * You may obtain a copy of the ECL 2.0 License at
+ * https://source.collectionspace.org/collection-space/LICENSE.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+ 
 package org.collectionspace.services.client.test;
 
 import java.util.ArrayList;
@@ -17,150 +40,305 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A CollectionObjectNuxeoServiceTest.
+ * CollectionObjectServiceTest, carries out tests against a
+ * deployed and running CollectionObject Service.
  * 
- * @version $Revision:$
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
 public class CollectionObjectServiceTest {
 
-    private CollectionObjectClient collectionObjectClient = CollectionObjectClient.getInstance();
-    private String updateId = null;
-    private String deleteId = null;
-    final Logger logger = LoggerFactory.getLogger(CollectionObjectServiceTest.class);
+  private CollectionObjectClient collectionObjectClient = CollectionObjectClient.getInstance();
+  private String knownCollectionObjectId = null;
+  private final String NON_EXISTENT_ID = createNonExistentIdentifier();
+  final Logger logger = LoggerFactory.getLogger(CollectionObjectServiceTest.class);
+  
+  
+  // ---------------------------------------------------------------
+  // Service Discovery tests
+  // ---------------------------------------------------------------
 
-    @Test
-    public void createCollectionObject() {
-        long identifier = this.createIdentifier();
+  // TBA
+  
+  
+  // ---------------------------------------------------------------
+  // CRUD tests : CREATE tests
+  // ---------------------------------------------------------------
 
-        CollectionObject collectionObject = createCollectionObject(identifier);
-        ClientResponse<Response> res = collectionObjectClient.createCollectionObject(collectionObject);
-        verbose("createCollectionObject: status = " + res.getStatus());
-        Assert.assertEquals(res.getStatus(), Response.Status.CREATED.getStatusCode());
+  // Success outcomes
+  // ----------------
+  
+  // NOTE The W3C HTTP spec suggests that the URL of the newly-created
+  // resource be returned in the Location header, as well as in the
+  // entity body of the response: <http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html>.
+  // If we follow this practice in our service, we might also test for the presence of
+  // these URLs in the response headers (e.g. via res.getMetadata().getFirst("Location"))
+  // and entity body.
 
-        //store updateId locally for "update" test
-        if(updateId == null){
-            updateId = extractId(res);
-        }else{
-            deleteId = extractId(res);
-            verbose("Set deleteId: " + deleteId);
-        }
+  // Create
+  @Test
+  public void createCollectionObject() {
+    String identifier = this.createIdentifier();
+
+    CollectionObject collectionObject = createCollectionObject(identifier);
+    ClientResponse<Response> res = collectionObjectClient.createCollectionObject(collectionObject);
+    verbose("createCollectionObject: status = " + res.getStatus());
+    Assert.assertEquals(res.getStatus(), Response.Status.CREATED.getStatusCode());
+
+    // Store the ID returned from this create operation for additional tests below.
+    knownCollectionObjectId = extractId(res);
+    knownCollectionObjectId = extractId(res);    
+  }
+
+  // Create multiple (used for Read multiple tests, below)
+  @Test(dependsOnMethods = {"createCollectionObject"})
+  public void createCollection() {
+    for(int i = 0; i < 3; i++){
+      this.createCollectionObject();
     }
+  }
 
-    @Test(dependsOnMethods = {"createCollectionObject"})
-    public void updateCollectionObject() {
-        ClientResponse<CollectionObject> res = collectionObjectClient.getCollectionObject(updateId);
-        verbose("getCollectionObject: status = " + res.getStatus());
-        Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
-        
-        CollectionObject collectionObject = res.getEntity();
-        verbose("Got CollectionObject to update with ID: " + updateId,
-                collectionObject, CollectionObject.class);
+  // Failure outcomes
+  // ----------------
 
-        //collectionObject.setCsid("updated-" + updateId);
-        collectionObject.setObjectNumber("updated-" + collectionObject.getObjectNumber());
-        collectionObject.setObjectName("updated-" + collectionObject.getObjectName());
+  // Create : sending null payload
 
-        // make call to update service
-        res = collectionObjectClient.updateCollectionObject(updateId, collectionObject);
-        verbose("updateCollectionObject: status = " + res.getStatus());
-        Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
+  // Create : sending wrong schema in payload
+  
+  // Create : sending random data in payload
 
-        // check the response
-        CollectionObject updatedCollectionObject = res.getEntity();
-        Assert.assertEquals(updatedCollectionObject.getObjectName(), collectionObject.getObjectName());
-        verbose("updateCollectionObject: ", updatedCollectionObject, CollectionObject.class);
+  // Invalid CollectionObject schema
+  // Question: How can we pass an empty entity body, a different (non-CollectionObject) schema,
+  // and/or 'junk' data to the service via the CollectionObjectClient?
 
-        return;
+  // Create : with duplicate object ID
+  //
+  // Should fail with a 409 Conflict status code.
+  @Test(dependsOnMethods = {"createCollectionObject"})
+  public void createDuplicateCollectionObject() {
+    CollectionObject collectionObject = createCollectionObject(knownCollectionObjectId);
+    ClientResponse<Response> res = 
+      collectionObjectClient.createCollectionObject(collectionObject);
+    verbose("createDuplicateCollectionObject: status = " + res.getStatus());
+    Assert.assertEquals(res.getStatus(), Response.Status.CONFLICT.getStatusCode());
+  }
+
+
+  // ---------------------------------------------------------------
+  // CRUD tests : READ tests
+  // ---------------------------------------------------------------
+
+  // Success outcomes
+  // ----------------
+  
+  // These two test methods have not yet been tested:
+
+/*
+  // Read
+  @Test(dependsOnMethods = {"createCollectionObject"})
+  public void getCollectionObject() {
+    ClientResponse<CollectionObject> res = 
+      collectionObjectClient.getCollectionObject(knownCollectionObjectId);
+    verbose("getCollectionObject: status = " + res.getStatus());
+    Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
+  }
+*/
+
+  // Failure outcomes
+  // ----------------
+
+/*
+  // Read : with non-existent object ID
+  //
+  // Should fail with a 404 Not Found status code. 
+  @Test(dependsOnMethods = {"createCollectionObject"})
+  public void getNonExistentCollectionObject() {
+    ClientResponse<CollectionObject> res = 
+      collectionObjectClient.getCollectionObject(NON_EXISTENT_ID);
+    verbose("getNonExistentCollectionObject: status = " + res.getStatus());
+    Assert.assertEquals(res.getStatus(), Response.Status.NOT_FOUND.getStatusCode());
+  }
+*/  
+
+  // ---------------------------------------------------------------
+  // CRUD tests : READ (list, or multiple) tests
+  // ---------------------------------------------------------------
+
+  // Success outcomes
+  // ----------------
+
+  // Read (multiple)
+  @Test(dependsOnMethods = {"createCollection"})
+  public void getCollectionObjectList() {
+    // The resource method is expected to return at least an empty list
+    ClientResponse<CollectionObjectList> res = collectionObjectClient.getCollectionObjectList();
+    CollectionObjectList coList = res.getEntity();
+    verbose("getCollectionObjectList: status = " + res.getStatus());
+    Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
+
+    List<CollectionObjectList.CollectionObjectListItem> coItemList =
+      coList.getCollectionObjectListItem();
+    int i = 0;
+    for(CollectionObjectList.CollectionObjectListItem pli : coItemList){
+      verbose("getCollectionObjectList: list-item[" + i + "] csid=" + pli.getCsid());
+      verbose("getCollectionObjectList: list-item[" + i + "] objectNumber=" + pli.getObjectNumber());
+      verbose("getCollectionObjectList: list-item[" + i + "] URI=" + pli.getUri());
+      i++;
     }
+  }
 
-    @Test(dependsOnMethods = {"createCollectionObject"})
-    public void createCollection() {
-        for(int i = 0; i < 3; i++){
-            this.createCollectionObject();
-        }
+  // Failure outcomes
+  // ----------------
+
+  
+
+  // ---------------------------------------------------------------
+  // CRUD tests : UPDATE tests
+  // ---------------------------------------------------------------
+
+  // Success outcomes
+  // ----------------
+
+  // Update
+  @Test(dependsOnMethods = {"createCollectionObject"})
+  public void updateCollectionObject() {
+    ClientResponse<CollectionObject> res = 
+      collectionObjectClient.getCollectionObject(knownCollectionObjectId);
+    verbose("getCollectionObject: status = " + res.getStatus());
+    Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
+    CollectionObject collectionObject = res.getEntity();
+    verbose("Got CollectionObject to update with ID: " + knownCollectionObjectId,
+        collectionObject, CollectionObject.class);
+
+    //collectionObject.setCsid("updated-" + knownCollectionObjectId);
+    collectionObject.setObjectNumber("updated-" + collectionObject.getObjectNumber());
+    collectionObject.setObjectName("updated-" + collectionObject.getObjectName());
+
+    // make call to update service
+    res = 
+      collectionObjectClient.updateCollectionObject(knownCollectionObjectId, collectionObject);
+    verbose("updateCollectionObject: status = " + res.getStatus());
+    Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
+    
+    // check the response
+    CollectionObject updatedCollectionObject = res.getEntity();
+    Assert.assertEquals(updatedCollectionObject.getObjectName(), 
+      collectionObject.getObjectName());
+    verbose("updateCollectionObject: ", updatedCollectionObject, CollectionObject.class);
+  }
+
+  // Failure outcomes
+  // ----------------
+  
+  // Update : with non-existent object ID
+  //
+  // Should fail with a 404 Not Found status code.
+  @Test(dependsOnMethods = {"updateCollectionObject"})
+  public void updateNonExistentCollectionObject() {
+    CollectionObject collectionObject = createCollectionObject(NON_EXISTENT_ID);
+    // make call to update service
+    ClientResponse<CollectionObject> res =
+      collectionObjectClient.updateCollectionObject(NON_EXISTENT_ID, collectionObject);
+    verbose("createCollectionObject: status = " + res.getStatus());
+    Assert.assertEquals(res.getStatus(), Response.Status.NOT_FOUND.getStatusCode());
+  }
+
+
+  // ---------------------------------------------------------------
+  // CRUD tests : DELETE tests
+  // ---------------------------------------------------------------
+
+  // Success outcomes
+  // ----------------
+
+  // Delete
+  @Test(dependsOnMethods = {"createCollectionObject"})
+  public void deleteCollectionObject() {
+    verbose("Calling deleteCollectionObject:" + knownCollectionObjectId);
+    ClientResponse<Response> res = collectionObjectClient.deleteCollectionObject(knownCollectionObjectId);
+    verbose("deleteCollectionObject: status = " + res.getStatus());
+    Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
+  }
+
+  // Failure outcomes
+  // ----------------
+
+  // Delete : with non-existent object ID
+  //
+  // Should fail with a 404 Not Found status code.
+  @Test(dependsOnMethods = {"deleteCollectionObject"})
+  public void deleteNonExistentCollectionObject() {
+    verbose("Calling deleteCollectionObject:" + NON_EXISTENT_ID);
+    ClientResponse<Response> res =
+      collectionObjectClient.deleteCollectionObject(NON_EXISTENT_ID);
+    verbose("deleteCollectionObject: status = " + res.getStatus());
+    Assert.assertEquals(res.getStatus(), Response.Status.NOT_FOUND.getStatusCode());
+  }
+
+
+  // ---------------------------------------------------------------
+  // Utility methods used by tests above
+  // ---------------------------------------------------------------
+
+  private CollectionObject createCollectionObject(String identifier) {
+    CollectionObject collectionObject = createCollectionObject("objectNumber-" + identifier,
+        "objectName-" + identifier);
+
+    return collectionObject;
+  }
+
+  private CollectionObject createCollectionObject(String objectNumber, String objectName) {
+    CollectionObject collectionObject = new CollectionObject();
+
+    collectionObject.setObjectNumber(objectNumber);
+    collectionObject.setObjectName(objectName);
+
+    return collectionObject;
+  }
+
+  private String extractId(ClientResponse<Response> res) {
+    MultivaluedMap mvm = res.getMetadata();
+    String uri = (String) ((ArrayList) mvm.get("Location")).get(0);
+    String[] segments = uri.split("/");
+    String id = segments[segments.length - 1];
+    verbose("id=" + id);
+    return id;
+  }
+
+  private void verbose(String msg) {
+//    if(logger.isInfoEnabled()){
+//      logger.debug(msg);
+//    }
+    System.out.println(msg);
+  }
+
+  private void verbose(String msg, Object o, Class clazz) {
+    try{
+      verbose(msg);
+      JAXBContext jc = JAXBContext.newInstance(clazz);
+      Marshaller m = jc.createMarshaller();
+      m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
+          Boolean.TRUE);
+      m.marshal(o, System.out);
+    }catch(Exception e){
+      e.printStackTrace();
     }
+  }
 
-    @Test(dependsOnMethods = {"createCollection"})
-    public void getCollectionObjectList() {
-        //the resource method is expected to return at least an empty list
-        ClientResponse<CollectionObjectList> res = collectionObjectClient.getCollectionObjectList();
-        CollectionObjectList coList = res.getEntity();
-        verbose("getCollectionObjectList: status = " + res.getStatus());
-        Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
-
-        List<CollectionObjectList.CollectionObjectListItem> coItemList = coList.getCollectionObjectListItem();
-        int i = 0;
-        for(CollectionObjectList.CollectionObjectListItem pli : coItemList){
-            verbose("getCollectionObjectList: list-item[" + i + "] csid=" + pli.getCsid());
-            verbose("getCollectionObjectList: list-item[" + i + "] objectNumber=" + pli.getObjectNumber());
-            verbose("getCollectionObjectList: list-item[" + i + "] URI=" + pli.getUri());
-            i++;
-        }
+  private void verboseMap(MultivaluedMap map) {
+    for(Object entry : map.entrySet()){
+      MultivaluedMap.Entry mentry = (MultivaluedMap.Entry) entry;
+      verbose("  name=" + mentry.getKey() + " value=" + mentry.getValue());
     }
+  }
 
-    @Test(dependsOnMethods = {"createCollection"})
-    public void deleteCollectionObject() {
-        verbose("Calling deleteCollectionObject:" + deleteId);
-        ClientResponse<Response> res = collectionObjectClient.deleteCollectionObject(deleteId);
-        verbose("deleteCollectionObject: csid=" + deleteId);
-        verbose("deleteCollectionObject: status = " + res.getStatus());
-        Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
-    }
+  private String createIdentifier() {
+    long identifier = System.currentTimeMillis();
+    return Long.toString(identifier);
+  }
 
-    private CollectionObject createCollectionObject(long identifier) {
-        CollectionObject collectionObject = createCollectionObject("objectNumber-" + identifier,
-                "objectName-" + identifier);
-
-        return collectionObject;
-    }
-
-    private CollectionObject createCollectionObject(String objectNumber, String objectName) {
-        CollectionObject collectionObject = new CollectionObject();
-
-        collectionObject.setObjectNumber(objectNumber);
-        collectionObject.setObjectName(objectName);
-
-        return collectionObject;
-    }
-
-    private String extractId(ClientResponse<Response> res) {
-        MultivaluedMap mvm = res.getMetadata();
-        String uri = (String) ((ArrayList) mvm.get("Location")).get(0);
-        String[] segments = uri.split("/");
-        String id = segments[segments.length - 1];
-        verbose("id=" + id);
-        return id;
-    }
-
-    private void verbose(String msg) {
-//        if(logger.isInfoEnabled()){
-//            logger.debug(msg);
-//        }
-        System.out.println(msg);
-    }
-
-    private void verbose(String msg, Object o, Class clazz) {
-        try{
-            verbose(msg);
-            JAXBContext jc = JAXBContext.newInstance(clazz);
-            Marshaller m = jc.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-                    Boolean.TRUE);
-            m.marshal(o, System.out);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    private void verboseMap(MultivaluedMap map) {
-        for(Object entry : map.entrySet()){
-            MultivaluedMap.Entry mentry = (MultivaluedMap.Entry) entry;
-            verbose("    name=" + mentry.getKey() + " value=" + mentry.getValue());
-        }
-    }
-
-    private long createIdentifier() {
-        long identifier = System.currentTimeMillis();
-        return identifier;
-    }
+  private String createNonExistentIdentifier() {
+    return Long.toString(Long.MAX_VALUE);
+  }
+  
 }
