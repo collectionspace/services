@@ -1,8 +1,8 @@
 /*	
- * create_ids_table.sql
+ * create_id_patterns_table.sql
  *
- * Creates the "ids_last_generated table", which stores the last-generated
- * IDs associated with each ID Pattern, and sets the access permissions of that table.
+ * Creates the "id_patterns" table, which stores ID patterns and their state.
+ * Also sets the access permissions of that table.
  *
  * This document is a part of the source code and related artifacts
  * for CollectionSpace, an open source collections management system
@@ -39,11 +39,6 @@ CREATE TABLE `id_patterns` (
   INDEX `id_pattern_csid_index` (`id_pattern_csid`)
   -- INDEX `id_pattern_uri_index` (`id_pattern_uri`)
 ) ENGINE=InnoDB;
-
--- Hard-coding of identifiers for an initial set of ID Patterns,
--- as a temporary expedient during development.
--- INSERT INTO `id_patterns` (`id_pattern_csid`, `last_generated_id`) VALUES ('1', NULL);
--- INSERT INTO `id_patterns` (`id_pattern_csid', `last_generated_id`) VALUES ('2', NULL);
 
 GRANT SELECT, INSERT, UPDATE, DELETE
   on `id_patterns`
