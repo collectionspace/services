@@ -2,11 +2,12 @@ package org.collectionspace.services.jaxrs;
 
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.id.IDResource;
-import org.collectionspace.services.IntakeResource;
+import org.collectionspace.services.intake.IntakeResource;
 
 import javax.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Set;
+
 
 public class CollectionSpaceJaxRsApplication extends Application {
 

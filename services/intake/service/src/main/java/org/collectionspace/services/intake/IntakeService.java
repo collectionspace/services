@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.collectionspace.services;
+package org.collectionspace.services.intake;
 
 import java.io.IOException;
 import org.dom4j.Document;

@@ -1,8 +1,9 @@
 /**
  * 
  */
-package org.collectionspace.services;
+package org.collectionspace.services.intake;
 
+import org.collectionspace.services.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;

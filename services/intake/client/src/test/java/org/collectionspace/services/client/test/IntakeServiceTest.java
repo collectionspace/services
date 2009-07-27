@@ -27,57 +27,64 @@ public class IntakeServiceTest {
 
     @Test
     public void createIntake() {
-    	long identifier = this.createIdentifier();
-    	
-    	Intake intake = createIntake(identifier);
+        long identifier = this.createIdentifier();
+
+        Intake intake = createIntake(identifier);
         ClientResponse<Response> res = intakeClient.createIntake(intake);
+        verbose("createIntake: status = " + res.getStatus());
         Assert.assertEquals(res.getStatus(), Response.Status.CREATED.getStatusCode());
-        
+
         //store updateId locally for "update" test
-        if (updateId == null) {
-        	updateId = extractId(res);
-        } else {
-        	deleteId = extractId(res);
-        	System.out.println("Set deleteId: " + deleteId);
+        if(updateId == null){
+            updateId = extractId(res);
+        }else{
+            deleteId = extractId(res);
+            System.out.println("Set deleteId: " + deleteId);
         }
     }
 
     @Test(dependsOnMethods = {"createIntake"})
     public void updateIntake() {
-    	ClientResponse<Intake> res = intakeClient.getIntake(updateId);
+        ClientResponse<Intake> res = intakeClient.getIntake(updateId);
+        Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
+        verbose("getIntake: status = " + res.getStatus());
         Intake intake = res.getEntity();
         verbose("Got Intake to update with ID: " + updateId,
-        		intake, Intake.class);
-        
+                intake, Intake.class);
+
         //intake.setCsid("updated-" + updateId);
         intake.setEntryNumber("updated-" + intake.getEntryNumber());
         intake.setEntryDate("updated-" + intake.getEntryDate());
-        
+
         // make call to update service
         res = intakeClient.updateIntake(updateId, intake);
-        
+        verbose("updateIntake: status = " + res.getStatus());
+        Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
         // check the response
-        Intake updatedIntake = res.getEntity();        
+        Intake updatedIntake = res.getEntity();
         Assert.assertEquals(updatedIntake.getEntryDate(), intake.getEntryDate());
         verbose("updateIntake: ", updatedIntake, Intake.class);
-        
+
         return;
     }
 
     @Test(dependsOnMethods = {"createIntake"})
     public void createCollection() {
-    	for (int i = 0; i < 3; i++) {
-    		this.createIntake();
-    	}
+        for(int i = 0; i < 3; i++){
+            this.createIntake();
+        }
     }
-    
+
     @Test(dependsOnMethods = {"createCollection"})
     public void getIntakeList() {
         //the resource method is expected to return at least an empty list
-        IntakeList coList = intakeClient.getIntakeList().getEntity();
+        ClientResponse<IntakeList> res = intakeClient.getIntakeList();
+        verbose("getIntakeList: status = " + res.getStatus());
+        Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
+        IntakeList coList = res.getEntity();
         List<IntakeList.IntakeListItem> coItemList = coList.getIntakeListItem();
         int i = 0;
-        for(IntakeList.IntakeListItem pli : coItemList) {
+        for(IntakeList.IntakeListItem pli : coItemList){
             verbose("getIntakeList: list-item[" + i + "] csid=" + pli.getCsid());
             verbose("getIntakeList: list-item[" + i + "] entryNumber=" + pli.getEntryNumber());
             verbose("getIntakeList: list-item[" + i + "] URI=" + pli.getUri());
@@ -87,25 +94,25 @@ public class IntakeServiceTest {
 
     @Test(dependsOnMethods = {"createCollection"})
     public void deleteIntake() {
-    	System.out.println("Calling deleteIntake:" + deleteId);
+        System.out.println("Calling deleteIntake:" + deleteId);
         ClientResponse<Response> res = intakeClient.deleteIntake(deleteId);
         verbose("deleteIntake: csid=" + deleteId);
         verbose("deleteIntake: status = " + res.getStatus());
-        Assert.assertEquals(res.getStatus(), Response.Status.NO_CONTENT.getStatusCode());
+        Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
     }
 
     private Intake createIntake(long identifier) {
-    	Intake intake = createIntake("entryNumber-" + identifier,
-    			"entryDate-" + identifier);    	
+        Intake intake = createIntake("entryNumber-" + identifier,
+                "entryDate-" + identifier);
 
         return intake;
     }
 
     private Intake createIntake(String entryNumber, String entryDate) {
-    	Intake intake = new Intake();
-    	
-    	intake.setEntryNumber(entryNumber);
-    	intake.setEntryDate(entryDate);
+        Intake intake = new Intake();
+
+        intake.setEntryNumber(entryNumber);
+        intake.setEntryDate(entryDate);
 
         return intake;
     }
@@ -142,9 +149,9 @@ public class IntakeServiceTest {
             verbose("    name=" + mentry.getKey() + " value=" + mentry.getValue());
         }
     }
-    
+
     private long createIdentifier() {
-    	long identifier = System.currentTimeMillis();
-    	return identifier;
+        long identifier = System.currentTimeMillis();
+        return identifier;
     }
 }
