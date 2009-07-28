@@ -298,6 +298,7 @@ public class CollectionObjectServiceTest {
   private String extractId(ClientResponse<Response> res) {
     MultivaluedMap mvm = res.getMetadata();
     String uri = (String) ((ArrayList) mvm.get("Location")).get(0);
+    verbose("extractId:uri=" + uri);
     String[] segments = uri.split("/");
     String id = segments[segments.length - 1];
     verbose("id=" + id);
