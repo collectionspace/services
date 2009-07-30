@@ -41,34 +41,11 @@ public class IDServiceJdbcImplTest extends TestCase {
   IDService service = jdbc;
 
 	final static String DEFAULT_CSID = "TEST-1";
-
-  // @TODO Read test patterns from external configuration.
-  public String generateSpectrumEntryNumberTestPattern() {
-    
-    pattern = new IDPattern(DEFAULT_CSID);
-    pattern.setDescription("SPECTRUM entry number pattern");
-    pattern.setURI("urn:collectionspace:idpattern:spectrum-entry-number");
-    pattern.add(new StringIDPart("E"));
-    pattern.add(new NumericIDPart("1"));
-    
-    return IDPatternSerializer.serialize(pattern);
-    
-  }
-
-  // @TODO Read test patterns from external configuration.
-  public String generateChinAccessionNumberTestPattern() {
-
-    pattern = new IDPattern(DEFAULT_CSID);
-    pattern.setDescription("CHIN accession number pattern, for items without parts");
-    pattern.setURI("urn:collectionspace:idpattern:chin-accession-number-no-parts");
-    pattern.add(new YearIDPart());
-    pattern.add(new StringIDPart("."));
-    pattern.add(new NumericIDPart("1"));
-    pattern.add(new StringIDPart("."));
-    pattern.add(new NumericIDPart("1"));    
-
-    return IDPatternSerializer.serialize(pattern);
-    
+  
+  public void testPlaceholder() {
+    // Placeholder test to avoid "org.testng.TestNGException:
+    // Failure in JUnit mode ...: could not create/run JUnit test suite"
+    // errors until we add working tests to this class.
   }
  
 /*
@@ -161,5 +138,38 @@ public class IDServiceJdbcImplTest extends TestCase {
 	}
 	
 */
+
+  // ---------------------------------------------------------------
+  // Utility methods used by tests above
+  // ---------------------------------------------------------------
+
+  // @TODO Read test patterns from external configuration.
+  public String generateSpectrumEntryNumberTestPattern() {
+    
+    pattern = new IDPattern(DEFAULT_CSID);
+    pattern.setDescription("SPECTRUM entry number pattern");
+    pattern.setURI("urn:collectionspace:idpattern:spectrum-entry-number");
+    pattern.add(new StringIDPart("E"));
+    pattern.add(new NumericIDPart("1"));
+    
+    return IDPatternSerializer.serialize(pattern);
+    
+  }
+
+  // @TODO Read test patterns from external configuration.
+  public String generateChinAccessionNumberTestPattern() {
+
+    pattern = new IDPattern(DEFAULT_CSID);
+    pattern.setDescription("CHIN accession number pattern, for items without parts");
+    pattern.setURI("urn:collectionspace:idpattern:chin-accession-number-no-parts");
+    pattern.add(new YearIDPart());
+    pattern.add(new StringIDPart("."));
+    pattern.add(new NumericIDPart("1"));
+    pattern.add(new StringIDPart("."));
+    pattern.add(new NumericIDPart("1"));    
+
+    return IDPatternSerializer.serialize(pattern);
+    
+  }
 	
 }
