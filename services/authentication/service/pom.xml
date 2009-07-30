@@ -7,10 +7,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
-    <artifactId>org.collectionspace.services.authentication</artifactId>
+    <artifactId>org.collectionspace.services.authentication.service</artifactId>
     <packaging>jar</packaging>
     <version>1.0</version>
-    <name>services.authentication</name>
+    <name>services.authentication.service</name>
 
     <properties>
         <jboss.version>4.2.3.GA</jboss.version>
@@ -19,14 +19,6 @@
     </properties>
 
     <dependencies>
-
-        <!-- utilities -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.1</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -34,6 +26,13 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+        <!-- utilities -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.1</version>
+            <scope>test</scope>
         </dependency>
 
       <!-- javax -->
@@ -53,6 +52,18 @@
     <build>
         <finalName>cspace-services-authn</finalName>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemProperties>
+                        <property>
+                            <name>log4j.configuration</name>
+                            <value>file:target/test-classes/log4j.properties</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

@@ -4,7 +4,7 @@
         collectionspace authentication service
     </description>
   <!-- set global properties for this build -->
-    <property name="services.trunk" value="../.."/>
+    <property name="services.trunk" value="../../.."/>
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>

@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CollectionObjectServiceTest {
 
-  private CollectionObjectClient collectionObjectClient = CollectionObjectClient.getInstance();
+  private CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
   private String knownCollectionObjectId = null;
   private final String NON_EXISTENT_ID = createNonExistentIdentifier();
   final Logger logger = LoggerFactory.getLogger(CollectionObjectServiceTest.class);

@@ -15,12 +15,8 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
  * @version $Revision:$
  */
-public class CollectionObjectClient extends CollectionSpaceClient {
+public class CollectionObjectClient extends BaseServiceClient {
 
-    /**
-     *
-     */
-    private static final CollectionObjectClient instance = new CollectionObjectClient();
     /**
      *
      */
@@ -31,9 +27,16 @@ public class CollectionObjectClient extends CollectionSpaceClient {
      * Default constructor for CollectionObjectClient class.
      *
      */
-    private CollectionObjectClient() {
+    public CollectionObjectClient() {
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         RegisterBuiltin.register(factory);
+        setProxy();
+    }
+
+    /**
+     * allow to reset proxy as per security needs
+     */
+    public void setProxy() {
         if(useAuth()){
             collectionObjectProxy = ProxyFactory.create(CollectionObjectProxy.class,
                     getBaseURL(), getHttpClient());
@@ -41,15 +44,6 @@ public class CollectionObjectClient extends CollectionSpaceClient {
             collectionObjectProxy = ProxyFactory.create(CollectionObjectProxy.class,
                     getBaseURL());
         }
-    }
-
-    /**
-     * FIXME Comment this
-     *
-     * @return
-     */
-    public static CollectionObjectClient getInstance() {
-        return instance;
     }
 
     /**

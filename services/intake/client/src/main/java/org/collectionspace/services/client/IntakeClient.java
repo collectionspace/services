@@ -15,7 +15,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
  * @version $Revision:$
  */
-public class IntakeClient extends CollectionSpaceClient {
+public class IntakeClient extends BaseServiceClient {
 
 
     /**
