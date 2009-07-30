@@ -68,14 +68,17 @@ public class CollectionObjectServiceTest {
   // Success outcomes
   // ----------------
   
-  // NOTE The W3C HTTP spec suggests that the URL of the newly-created
-  // resource be returned in the Location header, as well as in the
-  // entity body of the response: <http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html>.
-  // If we follow this practice in our service, we might also test for the presence of
-  // these URLs in the response headers (e.g. via res.getMetadata().getFirst("Location"))
-  // and entity body.
-
-  // Create
+  /**
+   * Tests creation of a new CollectionObject.
+   *
+   * Expected status code: 200 OK
+   *
+   * Also expected: The 'Location' header contains the URL for the newly created object.
+   * This is required by the extractId() utility method, below.
+   *
+   * The newly-created CollectionObject is also used by other test(s)
+   * (e.g. update, delete) which follow, below.
+   */
   @Test
   public void createCollectionObject() {
     String identifier = this.createIdentifier();
@@ -89,7 +92,14 @@ public class CollectionObjectServiceTest {
     knownCollectionObjectId = extractId(res);
   }
 
-  // Create multiple (used for Read multiple tests, below)
+  /**
+   * Tests creation of two or more new CollectionObjects.
+   *
+   * Expected status code: 200 OK
+   *
+   * The newly-created CollectionObjects are also used by other test(s)
+   * (e.g. read multiple/list) which follow, below.
+   */
   @Test(dependsOnMethods = {"createCollectionObject"})
   public void createCollection() {
     for(int i = 0; i < 3; i++){
@@ -100,19 +110,42 @@ public class CollectionObjectServiceTest {
   // Failure outcomes
   // ----------------
 
-  // Create : sending null payload
-
-  // Create : sending wrong schema in payload
+  /**
+   * Tests creation of a CollectionObject by sending a null to the client proxy.
+   *
+   * Expected status code: (none)
+   *
+   * Expected result: NullPointerException
+   * (Make sure this is a reported exception in the called class.)
+   */
+/*
+  @Test(dependsOnMethods = {"createCollectionObject"}, expectedExceptions = NullPointerException.class)
+  public void createNullCollectionObject() {
+    ClientResponse<Response> res = collectionObjectClient.createCollectionObject(null);
+  }
+*/
+		
+  /**
+   * Tests creation of a CollectionObject by sending data in the wrong format
+   * (i.e. any format that doesn't match the CollectionObject schema) in the
+   * entity body of the request.
+   *
+   * Expected status code: 400 Bad Request
+   */
+/*
+  @Test(dependsOnMethods = {"createCollectionObject"})
+  public void createCollectionObjectWithWrongDataFormat() {
+    // Currently only a stub
+  }
+*/
   
-  // Create : sending random data in payload
-
-  // Invalid CollectionObject schema
-  // Question: How can we pass an empty entity body, a different (non-CollectionObject) schema,
-  // and/or 'junk' data to the service via the CollectionObjectClient?
-
-  // Create : with duplicate object ID
-  //
-  // Should fail with a 409 Conflict status code.
+  /**
+   * Tests creation of a duplicate CollectionObject, whose unique resource identifier
+   * duplicates that of an existing CollectionObject.
+   * 
+   * Expected status code: 409 Conflict
+   */
+/*
   @Test(dependsOnMethods = {"createCollectionObject"})
   public void createDuplicateCollectionObject() {
     CollectionObject collectionObject = createCollectionObject(knownCollectionObjectId);
@@ -121,7 +154,7 @@ public class CollectionObjectServiceTest {
     verbose("createDuplicateCollectionObject: status = " + res.getStatus());
     Assert.assertEquals(res.getStatus(), Response.Status.CONFLICT.getStatusCode());
   }
-
+*/
 
   // ---------------------------------------------------------------
   // CRUD tests : READ tests
@@ -130,10 +163,12 @@ public class CollectionObjectServiceTest {
   // Success outcomes
   // ----------------
   
-  // These two test methods have not yet been tested:
-
+  /**
+   * Tests reading (i.e. retrieval) of a CollectionObject.
+   *
+   * Expected status code: 200 OK
+   */
 /*
-  // Read
   @Test(dependsOnMethods = {"createCollectionObject"})
   public void getCollectionObject() {
     ClientResponse<CollectionObject> res = 
@@ -146,10 +181,13 @@ public class CollectionObjectServiceTest {
   // Failure outcomes
   // ----------------
 
+  /**
+   * Tests reading (i.e. retrieval) of a non-existent CollectionObject,
+   * whose resource identifier does not exist at the specified URL.
+   *
+   * Expected status code: 404 Not Found
+   */
 /*
-  // Read : with non-existent object ID
-  //
-  // Should fail with a 404 Not Found status code. 
   @Test(dependsOnMethods = {"createCollectionObject"})
   public void getNonExistentCollectionObject() {
     ClientResponse<CollectionObject> res = 
@@ -166,7 +204,14 @@ public class CollectionObjectServiceTest {
   // Success outcomes
   // ----------------
 
-  // Read (multiple)
+  /**
+   * Tests reading (i.e. retrieval) of a list of multiple CollectionObjects.
+   *
+   * Expected status code: 200 OK
+   *
+   * Also expected: The entity body in the response contains
+   * a representation of the list of CollectionObjects.
+   */
   @Test(dependsOnMethods = {"createCollection"})
   public void getCollectionObjectList() {
     // The resource method is expected to return at least an empty list
@@ -186,9 +231,26 @@ public class CollectionObjectServiceTest {
     }
   }
 
+  /**
+   * Tests reading (i.e. retrieval) of a list of multiple CollectionObjects
+   * when the contents of the list are expected to be empty.
+   *
+   * Expected status code: 200 OK
+   * (Note: *not* 204 No Content)
+   *
+   * Also expected: The entity body in the response contains
+   * a representation of an empty list of CollectionObjects.
+   */
+/*
+  @Test(dependsOnMethods = {"createCollection"})
+  public void getCollectionObjectEmptyList() {
+  }
+*/
+
   // Failure outcomes
   // ----------------
-
+  
+  // None known at present.
   
 
   // ---------------------------------------------------------------
@@ -198,7 +260,14 @@ public class CollectionObjectServiceTest {
   // Success outcomes
   // ----------------
 
-  // Update
+  /**
+   * Tests updating the content of a CollectionObject.
+   *
+   * Expected status code: 200 OK
+   *
+   * Also expected: The entity body in the response contains
+   * a representation of the updated CollectionObject.
+   */
   @Test(dependsOnMethods = {"createCollectionObject"})
   public void updateCollectionObject() {
     ClientResponse<CollectionObject> res = 
@@ -228,12 +297,17 @@ public class CollectionObjectServiceTest {
 
   // Failure outcomes
   // ----------------
-  
-  // Update : with non-existent object ID
-  //
-  // Should fail with a 404 Not Found status code.
+
+  /**
+   * Tests updating the content of a non-existent CollectionObject, whose
+   * resource identifier does not exist.
+   *
+   * Expected status code: 404 Not Found
+   */
   @Test(dependsOnMethods = {"updateCollectionObject"})
   public void updateNonExistentCollectionObject() {
+    // Note: The ID used in this call may not be relevant, only the ID used
+    // in updateCollectionObject(), below.
     CollectionObject collectionObject = createCollectionObject(NON_EXISTENT_ID);
     // make call to update service
     ClientResponse<CollectionObject> res =
@@ -250,7 +324,11 @@ public class CollectionObjectServiceTest {
   // Success outcomes
   // ----------------
 
-  // Delete
+  /**
+   * Tests deleting a CollectionObject.
+   *
+   * Expected status code: 200 OK
+   */
   @Test(dependsOnMethods = {"createCollectionObject"})
   public void deleteCollectionObject() {
     verbose("Calling deleteCollectionObject:" + knownCollectionObjectId);
@@ -262,9 +340,12 @@ public class CollectionObjectServiceTest {
   // Failure outcomes
   // ----------------
 
-  // Delete : with non-existent object ID
-  //
-  // Should fail with a 404 Not Found status code.
+  /**
+   * Tests deleting a non-existent CollectionObject, whose
+   * resource identifier does not exist at the specified URL.
+   *
+   * Expected status code: 404 Not Found
+   */
   @Test(dependsOnMethods = {"deleteCollectionObject"})
   public void deleteNonExistentCollectionObject() {
     verbose("Calling deleteCollectionObject:" + NON_EXISTENT_ID);
