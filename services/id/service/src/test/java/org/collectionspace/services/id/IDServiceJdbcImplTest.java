@@ -70,7 +70,9 @@ public class IDServiceJdbcImplTest extends TestCase {
     return IDPatternSerializer.serialize(pattern);
     
   }
-  
+ 
+/*
+
   public void testAddIDPattern() {
     jdbc.addIDPattern(DEFAULT_CSID, generateSpectrumEntryNumberTestPattern());
   }
@@ -157,6 +159,7 @@ public class IDServiceJdbcImplTest extends TestCase {
 		}
 		
 	}
-
+	
+*/
 	
 }
