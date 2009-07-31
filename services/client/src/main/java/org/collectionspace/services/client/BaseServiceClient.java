@@ -175,4 +175,9 @@ public abstract class BaseServiceClient implements CollectionSpaceClient {
             }
         }
     }
+
+    @Override
+    public boolean isServerSecure() {
+        return Boolean.getBoolean("cspace.server.secure");
+    }
 }

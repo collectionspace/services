@@ -50,12 +50,13 @@ public class AuthenticationServiceTest {
 
     @Test
     public void auth_createCollectionObject() {
-        if(!isServerSecure()){
-            return;
-        }
         String identifier = this.createIdentifier();
         CollectionObject collectionObject = createCollectionObject(identifier);
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+        if(!collectionObjectClient.isServerSecure()){
+            logger.warn("set -Dcspace.server.secure=true to run security tests");
+            return;
+        }
         collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY, "true");
         collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY, "test");
         collectionObjectClient.setProperty(CollectionSpaceClient.PASSWORD_PROPERTY, "test");
@@ -77,12 +78,13 @@ public class AuthenticationServiceTest {
 
     @Test(dependsOnMethods = {"auth_createCollectionObject"})
     public void auth_createCollectionObjectWithoutUser() {
-        if(!isServerSecure()){
-            return;
-        }
         String identifier = this.createIdentifier();
         CollectionObject collectionObject = createCollectionObject(identifier);
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+        if(!collectionObjectClient.isServerSecure()){
+            logger.warn("set -Dcspace.server.secure=true to run security tests");
+            return;
+        }
         collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY, "true");
         collectionObjectClient.removeProperty(CollectionSpaceClient.USER_PROPERTY);
         collectionObjectClient.setProperty(CollectionSpaceClient.PASSWORD_PROPERTY, "test");
@@ -101,13 +103,13 @@ public class AuthenticationServiceTest {
 
     @Test(dependsOnMethods = {"auth_createCollectionObjectWithoutUser"})
     public void auth_createCollectionObjectWithoutPassword() {
-        if(!isServerSecure()){
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
         String identifier = this.createIdentifier();
         CollectionObject collectionObject = createCollectionObject(identifier);
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+        if(!collectionObjectClient.isServerSecure()){
+            logger.warn("set -Dcspace.server.secure=true to run security tests");
+            return;
+        }
         collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY, "true");
         collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY, "test");
         collectionObjectClient.removeProperty(CollectionSpaceClient.PASSWORD_PROPERTY);
@@ -126,13 +128,13 @@ public class AuthenticationServiceTest {
 
     @Test(dependsOnMethods = {"auth_createCollectionObjectWithoutPassword"})
     public void auth_createCollectionObjectWithIncorrectPassword() {
-        if(!isServerSecure()){
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
         String identifier = this.createIdentifier();
         CollectionObject collectionObject = createCollectionObject(identifier);
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+        if(!collectionObjectClient.isServerSecure()){
+            logger.warn("set -Dcspace.server.secure=true to run security tests");
+            return;
+        }
         collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY, "true");
         collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY, "test");
         collectionObjectClient.setProperty(CollectionSpaceClient.PASSWORD_PROPERTY, "bar");
@@ -151,13 +153,13 @@ public class AuthenticationServiceTest {
 
     @Test(dependsOnMethods = {"auth_createCollectionObjectWithoutPassword"})
     public void auth_createCollectionObjectWithoutUserPassword() {
-        if(!isServerSecure()){
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
         String identifier = this.createIdentifier();
         CollectionObject collectionObject = createCollectionObject(identifier);
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+        if(!collectionObjectClient.isServerSecure()){
+            logger.warn("set -Dcspace.server.secure=true to run security tests");
+            return;
+        }
         collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY, "true");
         collectionObjectClient.removeProperty(CollectionSpaceClient.USER_PROPERTY);
         collectionObjectClient.removeProperty(CollectionSpaceClient.PASSWORD_PROPERTY);
@@ -176,13 +178,13 @@ public class AuthenticationServiceTest {
 
     @Test(dependsOnMethods = {"auth_createCollectionObjectWithoutPassword"})
     public void auth_createCollectionObjectWithIncorrectUserPassword() {
-        if(!isServerSecure()){
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
         String identifier = this.createIdentifier();
         CollectionObject collectionObject = createCollectionObject(identifier);
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+        if(!collectionObjectClient.isServerSecure()){
+            logger.warn("set -Dcspace.server.secure=true to run security tests");
+            return;
+        }
         collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY, "true");
         collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY, "foo");
         collectionObjectClient.setProperty(CollectionSpaceClient.PASSWORD_PROPERTY, "bar");
@@ -199,15 +201,14 @@ public class AuthenticationServiceTest {
                 "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
     }
 
-
     @Test(dependsOnMethods = {"auth_createCollectionObjectWithIncorrectUserPassword"})
     public void auth_deleteCollectionObject() {
-        if(!isServerSecure()){
+        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+        collectionObjectClient = new CollectionObjectClient();
+        if(!collectionObjectClient.isServerSecure()){
             logger.warn("set -Dcspace.server.secure=true to run security tests");
             return;
         }
-        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY, "true");
         collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY, "test");
         collectionObjectClient.setProperty(CollectionSpaceClient.PASSWORD_PROPERTY, "test");
@@ -276,9 +277,5 @@ public class AuthenticationServiceTest {
     private String createIdentifier() {
         long identifier = System.currentTimeMillis();
         return Long.toString(identifier);
-    }
-
-    private boolean isServerSecure() {
-        return Boolean.getBoolean("cspace.server.secure");
     }
 }

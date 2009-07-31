@@ -59,4 +59,10 @@ public interface CollectionSpaceClient {
 
     boolean useSSL();
 
+    /**
+     * checks System property cspace.server.secure
+     * @return
+     */
+    boolean isServerSecure();
+
 }
