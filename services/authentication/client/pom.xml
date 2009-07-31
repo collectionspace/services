@@ -32,6 +32,7 @@
             <artifactId>org.collectionspace.services.client</artifactId>
             <version>1.0</version>
         </dependency>
+        <!-- authentication tests use CollectionObject service -->
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.collectionobject.client</artifactId>
