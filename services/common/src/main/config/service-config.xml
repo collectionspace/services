@@ -40,6 +40,10 @@
             <!-- use hard-coded workspace id for REST client -->
             <!--workspace-id></workspace-id-->
         </workspace>
+        <workspace>
+            <service-name>relations</service-name>
+            <workspace-name>Relations</workspace-name>
+        </workspace>        
     </nuxeo-workspace>
 
 </ns1:service-config>
