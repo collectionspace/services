@@ -20,22 +20,30 @@ package org.collectionspace.services.nuxeo.util;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+
 import org.collectionspace.services.common.repository.DocumentException;
+import org.collectionspace.services.common.ServiceMain;
+
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
+
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.ecm.core.api.DocumentRef;
+import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.io.DocumentPipe;
 import org.nuxeo.ecm.core.io.DocumentReader;
 import org.nuxeo.ecm.core.io.DocumentWriter;
 import org.nuxeo.ecm.core.io.impl.DocumentPipeImpl;
 import org.nuxeo.ecm.core.io.impl.plugins.SingleDocumentReader;
 import org.nuxeo.ecm.core.io.impl.plugins.XMLDocumentWriter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Various utilities related to Nuxeo 
+ * Various utilities related to Nuxeo API
  */
 public class NuxeoUtils {
 
@@ -95,4 +103,43 @@ public class NuxeoUtils {
         }
         return doc;
     }
+    
+public static Document getDocument(RepositoryInstance repoSession, String csid)
+	throws DocumentException {
+		Document result = null;
+		
+		DocumentModel docModel = getDocumentModel(repoSession, csid);
+		result = getDocument(repoSession, docModel);
+		
+		return result;
+	}
+	
+	public static DocumentModel getWorkspaceModel(
+			RepositoryInstance repoSession, String workspaceName)
+			throws DocumentException, IOException, ClientException {
+		DocumentModel result = null;
+
+		String workspaceUUID = ServiceMain.getInstance().getWorkspaceId(
+				workspaceName);
+		DocumentRef workspaceRef = new IdRef(workspaceUUID);
+		result = repoSession.getDocument(workspaceRef);
+
+		return result;
+	}
+
+	public static DocumentModel getDocumentModel(
+			RepositoryInstance repoSession, String csid)
+			throws DocumentException {
+		DocumentModel result = null;
+
+		try {
+			DocumentRef documentRef = new IdRef(csid);
+			result = repoSession.getDocument(documentRef);
+		} catch (ClientException e) {
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+	    
 }
