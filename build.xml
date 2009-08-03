@@ -219,7 +219,7 @@
     </target>
 
     <target name="undeploy"
-    description="undeploy authentication service from ${jboss.server.cspace}">
+    description="undeploy services from ${jboss.server.cspace}">
         <ant antfile="services/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="3rdparty/build.xml" target="undeploy" inheritall="false"/>
     </target>
