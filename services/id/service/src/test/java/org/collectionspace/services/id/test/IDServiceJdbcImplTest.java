@@ -23,7 +23,7 @@
  * $LastChangedDate$
  */
 
-package org.collectionspace.services.test.id;
+package org.collectionspace.services.id.test;
 
 import org.collectionspace.services.id.*;
 
