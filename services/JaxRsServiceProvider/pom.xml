@@ -48,6 +48,11 @@
             <version>1.0</version>
         </dependency>
         <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.relation.service</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
             <exclusions>

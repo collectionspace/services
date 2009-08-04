@@ -3,6 +3,7 @@ package org.collectionspace.services.jaxrs;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.id.IDResource;
 import org.collectionspace.services.intake.IntakeResource;
+import org.collectionspace.services.RelationResource;
 
 import javax.ws.rs.core.Application;
 import java.util.HashSet;
@@ -18,6 +19,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new CollectionObjectResource());
         singletons.add(new IDResource());
         singletons.add(new IntakeResource());
+        singletons.add(new RelationResource());
 //        singletons.add(new DomainIdentifierResource());
 //        singletons.add(new PingResource());
     }
