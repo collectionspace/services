@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 public class NuxeoUtils {
 
+    /** The logger. */
     private static Logger logger = LoggerFactory.getLogger(NuxeoUtils.class);
 
     /**
@@ -104,6 +105,16 @@ public class NuxeoUtils {
         return doc;
     }
     
+/**
+ * Gets the document.
+ * 
+ * @param repoSession the repo session
+ * @param csid the csid
+ * 
+ * @return the document
+ * 
+ * @throws DocumentException the document exception
+ */
 public static Document getDocument(RepositoryInstance repoSession, String csid)
 	throws DocumentException {
 		Document result = null;
@@ -114,6 +125,18 @@ public static Document getDocument(RepositoryInstance repoSession, String csid)
 		return result;
 	}
 	
+	/**
+	 * Gets the workspace model.
+	 * 
+	 * @param repoSession the repo session
+	 * @param workspaceName the workspace name
+	 * 
+	 * @return the workspace model
+	 * 
+	 * @throws DocumentException the document exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws ClientException the client exception
+	 */
 	public static DocumentModel getWorkspaceModel(
 			RepositoryInstance repoSession, String workspaceName)
 			throws DocumentException, IOException, ClientException {
@@ -127,6 +150,16 @@ public static Document getDocument(RepositoryInstance repoSession, String csid)
 		return result;
 	}
 
+	/**
+	 * Gets the document model.
+	 * 
+	 * @param repoSession the repo session
+	 * @param csid the csid
+	 * 
+	 * @return the document model
+	 * 
+	 * @throws DocumentException the document exception
+	 */
 	public static DocumentModel getDocumentModel(
 			RepositoryInstance repoSession, String csid)
 			throws DocumentException {
