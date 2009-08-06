@@ -214,14 +214,25 @@
 
     <target name="deploy" depends="install"
     description="deploy services in ${jboss.server.cspace}">
-        <ant antfile="services/build.xml" target="deploy" inheritall="false"/>
+                <!-- copy db scripts, etc. -->
+        <copy todir="${jboss.server.cspace}/cspace/services">
+            <fileset dir="${src}/main/resources/scripts"/>
+        </copy>
+        <!-- copy datasources -->
+        <copy todir="${jboss.deploy.cspace}">
+            <fileset dir="${src}/main/resources/config"/>
+        </copy>
         <ant antfile="3rdparty/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="services/build.xml" target="deploy" inheritall="false"/>
+
     </target>
 
     <target name="undeploy"
     description="undeploy services from ${jboss.server.cspace}">
         <ant antfile="services/build.xml" target="undeploy" inheritall="false"/>
         <ant antfile="3rdparty/build.xml" target="undeploy" inheritall="false"/>
+        <delete file="${jboss.deploy.cspace}/cspace-ds.xml"/>
+        <delete dir="${jboss.server.cspace}/cspace/services"/>
     </target>
 
 
