@@ -32,7 +32,7 @@ public class IntakeClient extends BaseServiceClient {
      * Default constructor for IntakeClient class.
      *
      */
-    private IntakeClient() {
+    public IntakeClient() {
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         RegisterBuiltin.register(factory);
         intakeProxy = ProxyFactory.create(IntakeProxy.class, getBaseURL());
