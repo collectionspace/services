@@ -14,11 +14,11 @@
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
  
 package org.collectionspace.services.client.test;
@@ -33,9 +33,9 @@ import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.collectionobject.CollectionObject;
 import org.collectionspace.services.collectionobject.CollectionObjectList;
-import org.collectionspace.services.client.CollectionObjectClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +71,7 @@ public class CollectionObjectServiceTest {
   /**
    * Tests creation of a new CollectionObject.
    *
-   * Expected status code: 200 OK
+   * Expected status code: 201 Created
    *
    * Also expected: The 'Location' header contains the URL for the newly created object.
    * This is required by the extractId() utility method, below.
@@ -93,9 +93,12 @@ public class CollectionObjectServiceTest {
   }
 
   /**
-   * Tests creation of two or more new CollectionObjects.
+   * Creates two or more new CollectionObjects.
    *
-   * Expected status code: 200 OK
+   * Repeatedly calls the createCollectionObject test, above, and relies on its
+   * test assertions.
+   *
+   * Expected status code: 201 Created
    *
    * The newly-created CollectionObjects are also used by other test(s)
    * (e.g. read multiple/list) which follow, below.
@@ -124,19 +127,33 @@ public class CollectionObjectServiceTest {
   }
 		
   /**
-   * Tests creation of a CollectionObject by sending data in the wrong format
-   * (i.e. any format that doesn't match the CollectionObject schema) in the
-   * entity body of the request.
+   * Tests creation of a CollectionObject by sending bad data
+   * (e.g. in a format that doesn't match the CollectionObject schema)
+   * in the entity body of the request.
    *
    * Expected status code: 400 Bad Request
    */
 /*
   @Test(dependsOnMethods = {"createCollectionObject"})
-  public void createCollectionObjectWithWrongDataFormat() {
+  public void createCollectionObjectWithBadData() {
+    
     // Currently only a stub
   }
 */
-  
+
+  /**
+   * Tests creation of a CollectionObject by a user who
+   * is not authorized to perform this action.
+   *
+   * Expected status code: 403 Forbidden
+   */
+/*
+  @Test(dependsOnMethods = {"createCollectionObject"})
+  public void createCollectionObjectWithUnauthorizedUser() {
+    // Currently only a stub
+  }
+*/
+
   /**
    * Tests creation of a duplicate CollectionObject, whose unique resource identifier
    * duplicates that of an existing CollectionObject.
@@ -178,18 +195,32 @@ public class CollectionObjectServiceTest {
   // ----------------
 
   /**
+   * Tests reading (i.e. retrieval) of a CollectionObject by a user who
+   * is not authorized to perform this action.
+   *
+   * Expected status code: 403 Forbidden
+   */
+/*
+  @Test(dependsOnMethods = {"getCollectionObject"})
+  public void getCollectionObjectWithUnauthorizedUser() {
+    // Currently only a stub
+  }
+*/
+
+  /**
    * Tests reading (i.e. retrieval) of a non-existent CollectionObject,
    * whose resource identifier does not exist at the specified URL.
    *
    * Expected status code: 404 Not Found
    */
-  @Test(dependsOnMethods = {"createCollectionObject"})
+  @Test(dependsOnMethods = {"getCollectionObject"})
   public void getNonExistentCollectionObject() {
     ClientResponse<CollectionObject> res = 
       collectionObjectClient.getCollectionObject(NON_EXISTENT_ID);
     verbose("getNonExistentCollectionObject: status = " + res.getStatus());
     Assert.assertEquals(res.getStatus(), Response.Status.NOT_FOUND.getStatusCode());
   }
+
 
   // ---------------------------------------------------------------
   // CRUD tests : READ (list, or multiple) tests
@@ -236,15 +267,41 @@ public class CollectionObjectServiceTest {
    * a representation of an empty list of CollectionObjects.
    */
 /*
-  @Test(dependsOnMethods = {"createCollection"})
+  @Test(dependsOnMethods = {"getCollectionObjectList"})
   public void getCollectionObjectEmptyList() {
+    // Currently only a stub.
+  }
+*/
+  
+  // Failure outcomes
+  // ----------------
+
+  /**
+   * Tests reading (i.e. retrieval) of a list of CollectionObjects
+   * when sending unrecognized query parameters with the request.
+   *
+   * Expected status code: 400 Bad Request
+   */
+/*
+  @Test(dependsOnMethods = {"getCollectionObjectList"})
+  public void getCollectionObjectListWithBadParams() {
+    // Currently only a stub.
   }
 */
 
-  // Failure outcomes
-  // ----------------
-  
-  // None known at present.
+  /**
+   * Tests reading (i.e. retrieval) of a list of CollectionObjects by a user who
+   * is not authorized to perform this action.
+   *
+   * Expected status code: 403 Forbidden
+   */
+/*
+  @Test(dependsOnMethods = {"getCollectionObjectList"})
+  public void getCollectionObjectListWithUnauthorizedUser() {
+    // Currently only a stub.
+  }
+*/
+
   
 
   // ---------------------------------------------------------------
@@ -293,6 +350,33 @@ public class CollectionObjectServiceTest {
   // ----------------
 
   /**
+   * Tests updating the content of a CollectionObject by sending bad data
+   * (e.g. in a format that doesn't match the CollectionObject schema)
+   * in the entity body of the request.
+   *
+   * Expected status code: 400 Bad Request
+   */
+/*
+  @Test(dependsOnMethods = {"updateCollectionObject"})
+  public void updateCollectionObjectWithBadData() {
+    // Currently only a stub.
+  }
+*/
+
+  /**
+   * Tests updating the content of a CollectionObject by a user who
+   * is not authorized to perform this action.
+   *
+   * Expected status code: 403 Forbidden
+   */
+/*
+  @Test(dependsOnMethods = {"updateCollectionObject"})
+  public void updateCollectionObjectWithUnauthorizedUser() {
+    // Currently only a stub.
+  }
+*/
+
+  /**
    * Tests updating the content of a non-existent CollectionObject, whose
    * resource identifier does not exist.
    *
@@ -300,8 +384,8 @@ public class CollectionObjectServiceTest {
    */
   @Test(dependsOnMethods = {"updateCollectionObject"})
   public void updateNonExistentCollectionObject() {
-    // Note: The ID used in this call may not be relevant, only the ID used
-    // in updateCollectionObject(), below.
+    // Note: The ID used in this 'create' call may be arbitrary.
+    // The only relevant ID may be the one used in updateCollectionObject(), below.
     CollectionObject collectionObject = createCollectionObject(NON_EXISTENT_ID);
     // make call to update service
     ClientResponse<CollectionObject> res =
@@ -333,6 +417,19 @@ public class CollectionObjectServiceTest {
 
   // Failure outcomes
   // ----------------
+
+  /**
+   * Tests deleting a CollectionObject by a user who
+   * is not authorized to perform this action.
+   *
+   * Expected status code: 403 Forbidden
+   */
+/*
+  @Test(dependsOnMethods = {"deleteCollectionObject"})
+  public void deleteCollectionObjectWithUnauthorizedUser() {
+    // Currently only a stub.
+  }
+*/
 
   /**
    * Tests deleting a non-existent CollectionObject, whose
