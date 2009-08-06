@@ -115,10 +115,10 @@ public class CollectionObjectServiceTest {
    *
    * Expected status code: (none)
    *
-   * Expected result: NullPointerException
+   * Expected result: IllegalArgumentException 
    * (Make sure this is a reported exception in the called class.)
    */
-  @Test(dependsOnMethods = {"createCollectionObject"}, expectedExceptions = NullPointerException.class)
+  @Test(dependsOnMethods = {"createCollectionObject"}, expectedExceptions = IllegalArgumentException.class)
   public void createNullCollectionObject() {
     ClientResponse<Response> res = collectionObjectClient.createCollectionObject(null);
   }
