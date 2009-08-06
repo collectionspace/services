@@ -407,7 +407,7 @@ public class CollectionObjectServiceTest {
    *
    * Expected status code: 200 OK
    */
-  @Test(dependsOnMethods = {"createCollectionObject"})
+  @Test(dependsOnMethods = {"createCollectionObject", "getCollectionObject"})
   public void deleteCollectionObject() {
     verbose("Calling deleteCollectionObject:" + knownCollectionObjectId);
     ClientResponse<Response> res = collectionObjectClient.deleteCollectionObject(knownCollectionObjectId);
