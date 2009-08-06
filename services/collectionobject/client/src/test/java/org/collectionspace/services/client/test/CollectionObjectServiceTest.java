@@ -118,12 +118,10 @@ public class CollectionObjectServiceTest {
    * Expected result: NullPointerException
    * (Make sure this is a reported exception in the called class.)
    */
-/*
   @Test(dependsOnMethods = {"createCollectionObject"}, expectedExceptions = NullPointerException.class)
   public void createNullCollectionObject() {
     ClientResponse<Response> res = collectionObjectClient.createCollectionObject(null);
   }
-*/
 		
   /**
    * Tests creation of a CollectionObject by sending data in the wrong format
@@ -168,7 +166,6 @@ public class CollectionObjectServiceTest {
    *
    * Expected status code: 200 OK
    */
-/*
   @Test(dependsOnMethods = {"createCollectionObject"})
   public void getCollectionObject() {
     ClientResponse<CollectionObject> res = 
@@ -176,7 +173,6 @@ public class CollectionObjectServiceTest {
     verbose("getCollectionObject: status = " + res.getStatus());
     Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
   }
-*/
 
   // Failure outcomes
   // ----------------
@@ -187,7 +183,6 @@ public class CollectionObjectServiceTest {
    *
    * Expected status code: 404 Not Found
    */
-/*
   @Test(dependsOnMethods = {"createCollectionObject"})
   public void getNonExistentCollectionObject() {
     ClientResponse<CollectionObject> res = 
@@ -195,7 +190,6 @@ public class CollectionObjectServiceTest {
     verbose("getNonExistentCollectionObject: status = " + res.getStatus());
     Assert.assertEquals(res.getStatus(), Response.Status.NOT_FOUND.getStatusCode());
   }
-*/  
 
   // ---------------------------------------------------------------
   // CRUD tests : READ (list, or multiple) tests
