@@ -96,4 +96,13 @@ public interface RelationUtils {
 	 */
 	public Relation createRelationship(Object repoSession, String subjectCsid,
 			String predicate, String objectCsid) throws DocumentException;
+	
+	/**
+	 * Gets the q property name.
+	 * 
+	 * @param propertyName the property name
+	 * 
+	 * @return the q property name
+	 */
+	public String getQPropertyName(String propertyName);
 }

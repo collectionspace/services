@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.collectionspace.services.common.repository.DocumentException;
-import org.collectionspace.services.nuxeo.relation.RelationUtilsNuxeoImpl;
+import org.collectionspace.services.common.relation.nuxeo.RelationUtilsNuxeoImpl;
 import org.collectionspace.services.relation.Relation;
 import org.collectionspace.services.common.relation.RelationUtils;
 
@@ -123,6 +123,10 @@ public class RelationsManager {
 			String objectCsid) throws DocumentException {
 		return relationUtils.createRelationship(repoSession, subjectCsid,
 				predicate, objectCsid);
+	}
+	
+	static public String getQPropertyName(String propertyName) {
+		return relationUtils.getQPropertyName(propertyName);
 	}
 
 }
