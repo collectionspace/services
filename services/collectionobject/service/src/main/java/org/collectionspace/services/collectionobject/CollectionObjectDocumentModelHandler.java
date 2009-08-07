@@ -21,18 +21,14 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.collectionspace.services.relation.nuxeo;
+package org.collectionspace.services.collectionobject.nuxeo;
 
 import java.util.Iterator;
 import java.util.List;
-import org.collectionspace.services.common.relation.RelationJAXBSchema;
-//import org.collectionspace.services.common.relation.nuxeo.RelationUtilsNuxeoImpl;
-import org.collectionspace.services.common.relation.RelationsManager;
-
-import org.collectionspace.services.relation.Relation;
-import org.collectionspace.services.relation.RelationList;
-import org.collectionspace.services.relation.RelationList.RelationListItem;
-
+import org.collectionspace.services.CollectionObjectJAXBSchema;
+import org.collectionspace.services.collectionobject.CollectionObject;
+import org.collectionspace.services.collectionobject.CollectionObjectList;
+import org.collectionspace.services.collectionobject.CollectionObjectList.CollectionObjectListItem;
 import org.collectionspace.services.common.repository.DocumentWrapper;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -41,25 +37,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * RelationDocumentModelHandler
+ * CollectionObjectDocumentModelHandler
  *
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public class RelationDocumentModelHandler
-        extends DocumentModelHandler<Relation, RelationList> {
+public class CollectionObjectDocumentModelHandler
+        extends DocumentModelHandler<CollectionObject, CollectionObjectList> {
 
-    private final Logger logger = LoggerFactory.getLogger(RelationDocumentModelHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(CollectionObjectDocumentModelHandler.class);
     /**
-     * relation is used to stash JAXB object to use when handle is called
+     * collectionObject is used to stash JAXB object to use when handle is called
      * for Action.CREATE, Action.UPDATE or Action.GET
      */
-    private Relation relation;
+    private CollectionObject collectionObject;
     /**
-     * relationList is stashed when handle is called
+     * collectionObjectList is stashed when handle is called
      * for ACTION.GET_ALL
      */
-    private RelationList relationList;
+    private CollectionObjectList collectionObjectList;
 
     @Override
     public void prepare(Action action) throws Exception {
@@ -68,73 +64,136 @@ public class RelationDocumentModelHandler
 
 
     /**
-     * getCommonObject get associated Relation
+     * getCommonObject get associated CollectionObject
      * @return
      */
     @Override
-    public Relation getCommonObject() {
-        return relation;
+    public CollectionObject getCommonObject() {
+        return collectionObject;
     }
 
     /**
-     * setCommonObject set associated relation
-     * @param relation
+     * setCommonObject set associated collectionobject
+     * @param collectionObject
      */
     @Override
-    public void setCommonObject(Relation relation) {
-        this.relation = relation;
+    public void setCommonObject(CollectionObject collectionObject) {
+        this.collectionObject = collectionObject;
     }
 
     /**
-     * getRelationList get associated Relation (for index/GET_ALL)
+     * getCollectionObjectList get associated CollectionObject (for index/GET_ALL)
      * @return
      */
     @Override
-    public RelationList getCommonObjectList() {
-        return relationList;
+    public CollectionObjectList getCommonObjectList() {
+        return collectionObjectList;
     }
 
     @Override
-    public void setCommonObjectList(RelationList relationList) {
-        this.relationList = relationList;
+    public void setCommonObjectList(CollectionObjectList collectionObjectList) {
+        this.collectionObjectList = collectionObjectList;
     }
 
     @Override
-    public Relation extractCommonObject(DocumentWrapper wrapDoc)
+    public CollectionObject extractCommonObject(DocumentWrapper wrapDoc)
             throws Exception {
         DocumentModel docModel = (DocumentModel) wrapDoc.getWrappedObject();
-        Relation co = new Relation();
+        CollectionObject co = new CollectionObject();
+
+        //FIXME property get should be dynamically set using schema inspection
+        //so it does not require hard coding
+
+        // CollectionObject core values
+        co.setObjectNumber((String) docModel.getPropertyValue(
+                getQProperty(CollectionObjectJAXBSchema.OBJECT_NUMBER)));
+        co.setOtherNumber((String) docModel.getPropertyValue(
+                getQProperty(CollectionObjectJAXBSchema.OTHER_NUMBER)));
+        co.setBriefDescription((String) docModel.getPropertyValue(
+                getQProperty(CollectionObjectJAXBSchema.BRIEF_DESCRIPTION)));
+        co.setComments((String) docModel.getPropertyValue(
+                getQProperty(CollectionObjectJAXBSchema.COMMENTS)));
+        co.setDistFeatures((String) docModel.getPropertyValue(
+                getQProperty(CollectionObjectJAXBSchema.DIST_FEATURES)));
+        co.setObjectName((String) docModel.getPropertyValue(
+                getQProperty(CollectionObjectJAXBSchema.OBJECT_NAME)));
+        co.setResponsibleDept((String) docModel.getPropertyValue(
+                getQProperty(CollectionObjectJAXBSchema.RESPONSIBLE_DEPT)));
+        co.setTitle((String) docModel.getPropertyValue(
+                getQProperty(CollectionObjectJAXBSchema.TITLE)));
 
         return co;
     }
 
     @Override
-    public void fillCommonObject(Relation co, DocumentWrapper wrapDoc) throws Exception {
+    public void fillCommonObject(CollectionObject co, DocumentWrapper wrapDoc) throws Exception {
         DocumentModel docModel = (DocumentModel) wrapDoc.getWrappedObject();
         //FIXME property setter should be dynamically set using schema inspection
         //so it does not require hard coding
 
+        // a default title for the Dublin Core schema
+        docModel.setPropertyValue("dublincore:title", CollectionObjectConstants.CO_NUXEO_DC_TITLE);
+
+        // CollectionObject core values
+        if(co.getObjectNumber() != null){
+            docModel.setPropertyValue(
+                    getQProperty(CollectionObjectJAXBSchema.OBJECT_NUMBER),
+                    co.getObjectNumber());
+        }
+        if(co.getOtherNumber() != null){
+            docModel.setPropertyValue(
+                    getQProperty(CollectionObjectJAXBSchema.OTHER_NUMBER),
+                    co.getOtherNumber());
+        }
+        if(co.getBriefDescription() != null){
+            docModel.setPropertyValue(
+                    getQProperty(CollectionObjectJAXBSchema.BRIEF_DESCRIPTION),
+                    co.getBriefDescription());
+        }
+        if(co.getComments() != null){
+            docModel.setPropertyValue(
+                    getQProperty(CollectionObjectJAXBSchema.COMMENTS),
+                    co.getComments());
+        }
+        if(co.getDistFeatures() != null){
+            docModel.setPropertyValue(
+                    getQProperty(CollectionObjectJAXBSchema.DIST_FEATURES),
+                    co.getDistFeatures());
+        }
+        if(co.getObjectName() != null){
+            docModel.setPropertyValue(
+                    getQProperty(CollectionObjectJAXBSchema.OBJECT_NAME),
+                    co.getObjectName());
+        }
+        if(co.getResponsibleDept() != null){
+            docModel.setPropertyValue(
+                    getQProperty(CollectionObjectJAXBSchema.RESPONSIBLE_DEPT),
+                    co.getResponsibleDept());
+        }
+        if(co.getTitle() != null){
+            docModel.setPropertyValue(
+                    getQProperty(CollectionObjectJAXBSchema.TITLE),
+                    co.getTitle());
+        }
     }
 
     @Override
-    public RelationList extractCommonObjectList(DocumentWrapper wrapDoc) throws Exception {
+    public CollectionObjectList extractCommonObjectList(DocumentWrapper wrapDoc) throws Exception {
         DocumentModelList docList = (DocumentModelList) wrapDoc.getWrappedObject();
 
-        RelationList coList = new RelationList();
-        List<RelationList.RelationListItem> list = coList.getRelationListItem();
+        CollectionObjectList coList = new CollectionObjectList();
+        List<CollectionObjectList.CollectionObjectListItem> list = coList.getCollectionObjectListItem();
 
         //FIXME: iterating over a long list of documents is not a long term
         //strategy...need to change to more efficient iterating in future
         Iterator<DocumentModel> iter = docList.iterator();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
-            RelationListItem coListItem = new RelationListItem();
-            
-            coListItem.setCsid((String) docModel.getPropertyValue(
-                    getQProperty(RelationJAXBSchema.DOCUMENT_ID_1)));
-            
+            CollectionObjectListItem coListItem = new CollectionObjectListItem();
+            coListItem.setObjectNumber((String) docModel.getPropertyValue(
+                    getQProperty(CollectionObjectJAXBSchema.OBJECT_NUMBER)));
             //need fully qualified context for URI
-            coListItem.setUri("/relations/" + docModel.getId());
+            coListItem.setUri("/collectionobjects/" + docModel.getId());
             coListItem.setCsid(docModel.getId());
             list.add(coListItem);
         }
@@ -143,7 +202,7 @@ public class RelationDocumentModelHandler
     }
 
     @Override
-    public void fillCommonObjectList(RelationList obj, DocumentWrapper wrapDoc) throws Exception {
+    public void fillCommonObjectList(CollectionObjectList obj, DocumentWrapper wrapDoc) throws Exception {
         throw new UnsupportedOperationException();
     }
 
@@ -152,8 +211,8 @@ public class RelationDocumentModelHandler
      * @param prop
      * @return
      */
-    private String getQProperty(String property) {
-    	return RelationsManager.getQPropertyName(property);
+    private String getQProperty(String prop) {
+        return CollectionObjectConstants.CO_NUXEO_SCHEMA_NAME + ":" + prop;
     }
 }
 

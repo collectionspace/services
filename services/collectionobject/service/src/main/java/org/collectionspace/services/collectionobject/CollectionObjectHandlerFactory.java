@@ -21,7 +21,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.collectionspace.services.relation.nuxeo;
+package org.collectionspace.services.collectionobject.nuxeo;
 
 import org.collectionspace.services.common.NuxeoClientType;
 import org.collectionspace.services.common.repository.DocumentHandler;
@@ -33,22 +33,22 @@ import org.collectionspace.services.common.repository.DocumentHandler;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public class RelationHandlerFactory {
+public class CollectionObjectHandlerFactory {
 
-    private static final RelationHandlerFactory self = new RelationHandlerFactory();
+    private static final CollectionObjectHandlerFactory self = new CollectionObjectHandlerFactory();
 
-    private RelationHandlerFactory() {
+    private CollectionObjectHandlerFactory() {
     }
 
-    public static RelationHandlerFactory getInstance() {
+    public static CollectionObjectHandlerFactory getInstance() {
         return self;
     }
 
     public DocumentHandler getHandler(String clientType) {
         if(NuxeoClientType.JAVA.toString().equals(clientType)){
-            return new RelationDocumentModelHandler();
+            return new CollectionObjectDocumentModelHandler();
         } else if(NuxeoClientType.REST.toString().equals(clientType)) {
-//            return new RelationRepresenationHandler();
+            return new CollectionObjectRepresenationHandler();
         }
         throw new IllegalArgumentException("Not supported client=" + clientType);
     }
