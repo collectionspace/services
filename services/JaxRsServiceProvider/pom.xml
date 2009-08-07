@@ -172,7 +172,7 @@
                     <port>8180</port>
                 </configuration>
                 <executions>
-<!--                    <execution>
+                    <execution>
                         <id>jboss-undeploy</id>
                         <goals>
                             <goal>undeploy</goal>
@@ -195,7 +195,7 @@
                                 <param>${project.build.directory}/${project.build.finalName}.war</param>
                             </fileNames>
                         </configuration>
-                    </execution> -->
+                    </execution>
                 </executions>
             </plugin>
 
