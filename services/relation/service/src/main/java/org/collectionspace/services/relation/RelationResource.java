@@ -50,8 +50,8 @@ import org.collectionspace.services.relation.RelationService;
 import org.collectionspace.services.relation.*;
 import org.collectionspace.services.relation.RelationList.*;
 
-import org.collectionspace.services.relation.RelationJAXBSchema;
-import org.collectionspace.services.relation.RelationListItemJAXBSchema;
+import org.collectionspace.services.common.relation.RelationJAXBSchema;
+import org.collectionspace.services.common.relation.RelationListItemJAXBSchema;
 
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.repository.DocumentException;

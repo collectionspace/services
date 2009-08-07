@@ -32,8 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.collectionspace.services.relation.RelationJAXBSchema;
-import org.collectionspace.services.relation.RelationListItemJAXBSchema;
+import org.collectionspace.services.common.relation.RelationJAXBSchema;
+import org.collectionspace.services.common.relation.RelationListItemJAXBSchema;
 import org.collectionspace.services.common.relation.RelationUtils;
 
 import org.collectionspace.services.relation.Relation;
