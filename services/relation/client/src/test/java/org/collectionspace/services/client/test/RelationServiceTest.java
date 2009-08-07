@@ -15,7 +15,7 @@ import org.collectionspace.services.relation.RelationList;
 import org.collectionspace.services.relation.RelationshipType;
 
 import org.collectionspace.services.client.RelationClient;
-import org.collectionspace.services.RelationJAXBSchema;
+import org.collectionspace.services.relation.RelationJAXBSchema;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -24,14 +24,16 @@
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
  */
-package org.collectionspace.services.common;
+package org.collectionspace.services.common.relation;
 
 import java.io.IOException;
 import java.util.List;
 
 import org.collectionspace.services.common.repository.DocumentException;
-import org.collectionspace.services.nuxeo.RelationUtilsNuxeoImpl;
+import org.collectionspace.services.nuxeo.relation.RelationUtilsNuxeoImpl;
 import org.collectionspace.services.relation.Relation;
+import org.collectionspace.services.common.relation.RelationUtils;
+
 import org.dom4j.Document;
 
 /**

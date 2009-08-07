@@ -24,7 +24,7 @@
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
  */
-package org.collectionspace.services.nuxeo;
+package org.collectionspace.services.nuxeo.relation;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -32,10 +32,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.collectionspace.services.RelationJAXBSchema;
-import org.collectionspace.services.RelationListItemJAXBSchema;
+import org.collectionspace.services.relation.RelationJAXBSchema;
+import org.collectionspace.services.relation.RelationListItemJAXBSchema;
+import org.collectionspace.services.common.relation.RelationUtils;
 
-import org.collectionspace.services.common.RelationUtils;
 import org.collectionspace.services.relation.Relation;
 import org.collectionspace.services.relation.RelationshipType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;

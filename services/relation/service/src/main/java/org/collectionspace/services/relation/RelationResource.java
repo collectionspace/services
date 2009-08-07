@@ -24,7 +24,7 @@
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
  */
-package org.collectionspace.services;
+package org.collectionspace.services.relation;
 
 import java.util.Iterator;
 import java.util.List;
@@ -46,12 +46,12 @@ import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
-import org.collectionspace.services.RelationService;
+import org.collectionspace.services.relation.RelationService;
 import org.collectionspace.services.relation.*;
 import org.collectionspace.services.relation.RelationList.*;
 
-import org.collectionspace.services.RelationJAXBSchema;
-import org.collectionspace.services.RelationListItemJAXBSchema;
+import org.collectionspace.services.relation.RelationJAXBSchema;
+import org.collectionspace.services.relation.RelationListItemJAXBSchema;
 
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.repository.DocumentException;
