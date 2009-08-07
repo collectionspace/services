@@ -28,7 +28,9 @@ package org.collectionspace.services;
 
 import java.io.IOException;
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
+//import org.dom4j.DocumentException;
+import org.collectionspace.services.common.repository.DocumentException;
+
 
 import org.collectionspace.services.relation.Relation;
 
@@ -79,6 +81,22 @@ public interface RelationService {
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	Document getRelationList() throws DocumentException, IOException;
+	
+	/**
+	 * Gets the relation list of type.
+	 * 
+	 * @param subjectCsid the subject csid
+	 * @param predicate the predicate
+	 * @param objectCsid the object csid
+	 * 
+	 * @return the relation list of type
+	 * 
+	 * @throws DocumentException the document exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	Document getRelationList(String subjectCsid,
+			String predicate, String objectCsid)
+		throws DocumentException, IOException;
 
 	// Update
 	/**

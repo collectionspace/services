@@ -6,6 +6,7 @@ package org.collectionspace.services.nuxeo;
 import java.io.IOException;
 
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.repository.DocumentNotFoundException;
 import org.collectionspace.services.nuxeo.client.rest.NuxeoRESTClient;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
@@ -60,16 +61,22 @@ public abstract class CollectionSpaceServiceNuxeoImpl {
 		return nuxeoConnector.getRepositorySession();
 	}
 			
-	protected Document deleteDocument(RepositoryInstance repoSession, String csid) throws DocumentException,
-			IOException {
+	protected Document deleteDocument(RepositoryInstance repoSession, String csid)
+			throws DocumentException, IOException {
 		Document result = null;
 
 		try {
 			repoSession = getRepositorySession();
 			DocumentRef relDocumentRef = new IdRef(csid);
-			repoSession.removeDocument(relDocumentRef);
-			repoSession.save();
-			result = new DOMDocument(); // set to non-null to indicate success
+			
+            try{
+                repoSession.removeDocument(relDocumentRef);
+            }catch(ClientException ce){
+                String msg = "could not find document to delete with id=" + csid;
+                logger.error(msg, ce);
+                throw new DocumentNotFoundException(msg, ce);
+            }
+            repoSession.save();			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -77,7 +84,7 @@ public abstract class CollectionSpaceServiceNuxeoImpl {
 		return result;
 	}
 	
-	protected Document browseWorkspace(RepositoryInstance repoSession,
+	protected Document listWorkspaceContent(RepositoryInstance repoSession,
 			String workspaceName) {
 
 		DOMDocumentFactory domfactory = new DOMDocumentFactory();

@@ -49,8 +49,13 @@ import javax.xml.bind.Marshaller;
 import org.collectionspace.services.RelationService;
 import org.collectionspace.services.relation.*;
 import org.collectionspace.services.relation.RelationList.*;
+
 import org.collectionspace.services.RelationJAXBSchema;
+import org.collectionspace.services.RelationListItemJAXBSchema;
+
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.repository.DocumentException;
+import org.collectionspace.services.common.repository.DocumentNotFoundException;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -67,8 +72,7 @@ import org.slf4j.LoggerFactory;
 public class RelationResource {
 
 	/** The logger. */
-	final Logger logger = LoggerFactory
-			.getLogger(RelationResource.class);
+	final Logger logger = LoggerFactory.getLogger(RelationResource.class);
 
 	// This should be a DI wired by a container like Spring, Seam, or EJB3
 	/** The Constant service. */
@@ -82,81 +86,264 @@ public class RelationResource {
 	}
 
 	/**
-	 * Gets the relation list.
+	 * Returns a list of *all* relation entities.
 	 * 
-	 * @param ui the ui
+	 * @param ui
+	 *            the ui
 	 * 
 	 * @return the relation list
 	 */
 	@GET
 	public RelationList getRelationList(@Context UriInfo ui) {
-		
-		URI absoluteURI = ui.getAbsolutePath();
-		String uriString = absoluteURI.toString();
-		
-		RelationList p = new RelationList();
-		try {
-			Document document = service.getRelationList();
-			Element root = document.getRootElement();
+		RelationList relationList = this.getRequestedRelationList(ui, null,
+				null, null);
 
-			// debug
-			System.err.println(document.asXML());
+		return relationList;
+	}
 
-			List<RelationList.RelationListItem> list = p
-					.getRelationListItem();
-			for (Iterator i = root.elementIterator(); i.hasNext();) {
-				Element element = (Element) i.next();
-				// debug
-				System.err.println();
-				element.asXML();
+	/**
+	 * Gets a list of relations with the subject=
+	 * 
+	 * @param ui
+	 *            the ui
+	 * @param subjectCsid
+	 *            the subject == subjectCsid
+	 * 
+	 * @return the relation list_ s
+	 */
+	@GET
+	@Path("subject/{subjectCsid}")
+	public RelationList getRelationList_S(@Context UriInfo ui,
+			@PathParam("subjectCsid") String subjectCsid) {
+		RelationList relationList = this.getRequestedRelationList(ui,
+				subjectCsid, null, null);
 
-				// set the Relation list item entity elements
-				RelationListItem pli = new RelationListItem();
-				pli.setUri(element.attributeValue("url"));
-				pli.setCsid(element.attributeValue("id"));
-				list.add(pli);
-			}
+		return relationList;
+	}
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	/**
+	 * Gets a list of relations with predicate == predicate.
+	 * 
+	 * @param ui
+	 *            the ui
+	 * @param predicate
+	 *            the predicate
+	 * 
+	 * @return the relation list of type
+	 */
+	@GET
+	@Path("type/{predicate}")
+	public RelationList getRelationList_P(@Context UriInfo ui,
+			@PathParam("predicate") String predicate) {
+		RelationList relationList = this.getRequestedRelationList(ui, null,
+				predicate, null);
 
-		return p;
+		return relationList;
+	}
+
+	/**
+	 * Gets a list of relations with object == objectCsid
+	 * 
+	 * @param ui
+	 *            the ui
+	 * @param objectCsid
+	 *            the object csid
+	 * 
+	 * @return the relation list_ o
+	 */
+	@GET
+	@Path("object/{objectCsid}")
+	public RelationList getRelationList_O(@Context UriInfo ui,
+			@PathParam("objectCsid") String objectCsid) {
+		RelationList relationList = this.getRequestedRelationList(ui, null,
+				null, objectCsid);
+
+		return relationList;
+	}
+
+	/**
+	 * Gets a list of relations with predicate == predicate *and* subject ==
+	 * subjectCsid
+	 * 
+	 * @param ui
+	 *            the ui
+	 * @param predicate
+	 *            the predicate
+	 * @param subjectCsid
+	 *            the subject subjectCsid
+	 * 
+	 * @return the relation list of type with subject
+	 */
+	@GET
+	@Path("type/{predicate}/subject/{subjectCsid}")
+	public RelationList getRelationList_PS(@Context UriInfo ui,
+			@PathParam("predicate") String predicate,
+			@PathParam("subjectCsid") String subjectCsid) {
+		RelationList relationList = this.getRequestedRelationList(ui,
+				subjectCsid, predicate, null);
+
+		return relationList;
+	}
+
+	/**
+	 * Gets a list of relations with subject == subjectCsid *and* predicate ==
+	 * predicate
+	 * 
+	 * @param ui
+	 *            the ui
+	 * @param subjectCsid
+	 *            the subject csid
+	 * @param predicate
+	 *            the predicate
+	 * 
+	 * @return the relation list_ sp
+	 */
+	@GET
+	@Path("subject/{subjectCsid}/type/{predicate}")
+	public RelationList getRelationList_SP(@Context UriInfo ui,
+			@PathParam("subjectCsid") String subjectCsid,
+			@PathParam("predicate") String predicate) {
+		RelationList relationList = this.getRequestedRelationList(ui,
+				subjectCsid, predicate, null);
+
+		return relationList;
+	}
+
+	/**
+	 * Gets a list of relations with predicate == predicate *and* object ==
+	 * objectCsid
+	 * 
+	 * @param ui
+	 *            the ui
+	 * @param predicate
+	 *            the predicate
+	 * @param objectCsid
+	 *            the object csid
+	 * 
+	 * @return the relation list of type with object
+	 */
+	@GET
+	@Path("type/{predicate}/object/{objectCsid}")
+	public RelationList getRelationList_PO(@Context UriInfo ui,
+			@PathParam("predicate") String predicate,
+			@PathParam("objectCsid") String objectCsid) {
+		RelationList relationList = this.getRequestedRelationList(ui, null,
+				predicate, objectCsid);
+
+		return relationList;
+	}
+
+	/**
+	 * Gets a list of relations with object == objectCsid *and* predicate ==
+	 * predicate
+	 * 
+	 * @param ui
+	 *            the ui
+	 * @param objectCsid
+	 *            the object csid
+	 * @param predicate
+	 *            the predicate
+	 * 
+	 * @return the relation list_ op
+	 */
+	@GET
+	@Path("object/{objectCsid}/type/{predicate}")
+	public RelationList getRelationList_OP(@Context UriInfo ui,
+			@PathParam("objectCsid") String objectCsid,
+			@PathParam("predicate") String predicate) {
+		RelationList relationList = this.getRequestedRelationList(ui, null,
+				predicate, objectCsid);
+
+		return relationList;
+	}
+
+	/**
+	 * Gets a list of relations with predicate == predicate *and* subject ==
+	 * subjectCsid *and* object == objectCsid
+	 * 
+	 * @param ui
+	 *            the ui
+	 * @param predicate
+	 *            the predicate
+	 * @param subjectCsid
+	 *            the subject csid
+	 * @param objectCsid
+	 *            the object csid
+	 * 
+	 * @return the relation list
+	 */
+	@GET
+	@Path("type/{predicate}/subject/{subjectCsid}/object/{objectCsid}")
+	public RelationList getRelationList_PSO(@Context UriInfo ui,
+			@PathParam("predicate") String predicate,
+			@PathParam("subjectCsid") String subjectCsid,
+			@PathParam("objectCsid") String objectCsid) {
+		RelationList relationList = this.getRequestedRelationList(ui,
+				predicate, subjectCsid, objectCsid);
+
+		return relationList;
+	}
+
+	/**
+	 * Gets a list of relations with subject == subjectCsid *and* predicate ==
+	 * predicate *and* object == objectCsid
+	 * 
+	 * @param ui
+	 *            the ui
+	 * @param subjectCsid
+	 *            the subject csid
+	 * @param predicate
+	 *            the predicate
+	 * @param objectCsid
+	 *            the object csid
+	 * 
+	 * @return the relation list_ spo
+	 */
+	@GET
+	@Path("subject/{subjectCsid}/type/{predicate}/object/{objectCsid}")
+	public RelationList getRelationList_SPO(@Context UriInfo ui,
+			@PathParam("subjectCsid") String subjectCsid,
+			@PathParam("predicate") String predicate,
+			@PathParam("objectCsid") String objectCsid) {
+		RelationList relationList = this.getRequestedRelationList(ui,
+				subjectCsid, predicate, objectCsid);
+
+		return relationList;
 	}
 
 	/**
 	 * Creates the relation.
 	 * 
-	 * @param ui the ui
-	 * @param co the co
+	 * @param ui
+	 *            the ui
+	 * @param co
+	 *            the co
 	 * 
 	 * @return the response
 	 */
 	@POST
 	public Response createRelation(@Context UriInfo ui, Relation co) {
 		String csid = null;
-		
+
 		try {
 			Document document = service.postRelation(co);
 			Element root = document.getRootElement();
 			csid = root.attributeValue("id");
 			co.setCsid(csid);
 		} catch (Exception e) {
-			Response response = Response.status(Response.Status.NOT_FOUND)
-					.entity("Create failed").type("text/plain").build();
+			if (logger.isDebugEnabled()) {
+				logger.debug("Caught exception in createRelation", e);
+			}
+			Response response = Response.status(
+					Response.Status.INTERNAL_SERVER_ERROR).entity(
+					"Index failed").type("text/plain").build();
 			throw new WebApplicationException(response);
 		}
 
-		//debug
-		verbose("createRelation: ", co);
-		
 		UriBuilder uriBuilder = ui.getAbsolutePathBuilder();
 		uriBuilder.path(csid);
 		URI uri = uriBuilder.build();
-		
-		//debug
-		System.out.println(uri.toString());
-		
+
 		Response response = Response.created(uri).build();
 		return response;
 	}
@@ -164,7 +351,8 @@ public class RelationResource {
 	/**
 	 * Gets the relation.
 	 * 
-	 * @param csid the csid
+	 * @param csid
+	 *            the csid
 	 * 
 	 * @return the relation
 	 */
@@ -193,8 +381,9 @@ public class RelationResource {
 					Iterator<Element> relIter = schemaElement
 							.elementIterator(RelationJAXBSchema.REL_ROOT_ELEM_NAME);
 					Iterator<Element> relIter2 = schemaElement
-					.elementIterator("rel:" + RelationJAXBSchema.REL_ROOT_ELEM_NAME);
-					
+							.elementIterator("rel:"
+									+ RelationJAXBSchema.REL_ROOT_ELEM_NAME);
+
 					while (relIter.hasNext()) {
 						Element relElement = relIter.next();
 
@@ -229,10 +418,12 @@ public class RelationResource {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			if (logger.isDebugEnabled()) {
+				logger.debug("Caught exception in getRelation", e);
+			}
 			Response response = Response.status(
-					Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed")
-					.type("text/plain").build();
+					Response.Status.INTERNAL_SERVER_ERROR).entity(
+					"Index failed").type("text/plain").build();
 			throw new WebApplicationException(response);
 		}
 		if (co == null) {
@@ -243,7 +434,10 @@ public class RelationResource {
 					.build();
 			throw new WebApplicationException(response);
 		}
-		verbose("getRelation: ", co);
+
+		if (logger.isDebugEnabled() == true) {
+			verbose("getRelation: ", co);
+		}
 
 		return co;
 	}
@@ -251,17 +445,21 @@ public class RelationResource {
 	/**
 	 * Update relation.
 	 * 
-	 * @param csid the csid
-	 * @param theUpdate the the update
+	 * @param csid
+	 *            the csid
+	 * @param theUpdate
+	 *            the the update
 	 * 
 	 * @return the relation
 	 */
 	@PUT
 	@Path("{csid}")
-	public Relation updateRelation(
-			@PathParam("csid") String csid, Relation theUpdate) {
+	public Relation updateRelation(@PathParam("csid") String csid,
+			Relation theUpdate) {
 
-		verbose("updateRelation with input: ", theUpdate);
+		if (logger.isDebugEnabled() == true) {
+			verbose("updateRelation with input: ", theUpdate);
+		}
 
 		String status = null;
 		try {
@@ -276,9 +474,12 @@ public class RelationResource {
 				}
 			}
 		} catch (Exception e) {
-			// FIXME: NOT_FOUND?
-			Response response = Response.status(Response.Status.NOT_FOUND)
-					.entity("Update failed ").type("text/plain").build();
+			if (logger.isDebugEnabled()) {
+				logger.debug("Caught exception in updateRelation", e);
+			}
+			Response response = Response.status(
+					Response.Status.INTERNAL_SERVER_ERROR).entity(
+					"Index failed").type("text/plain").build();
 			throw new WebApplicationException(response);
 		}
 
@@ -288,7 +489,8 @@ public class RelationResource {
 	/**
 	 * Delete relation.
 	 * 
-	 * @param csid the csid
+	 * @param csid
+	 *            the csid
 	 */
 	@DELETE
 	@Path("{csid}")
@@ -296,30 +498,133 @@ public class RelationResource {
 
 		verbose("deleteRelation with csid=" + csid);
 		try {
-			
-			Document document = service.deleteRelation(csid);
-			Element root = document.getRootElement();
-			for (Iterator i = root.elementIterator(); i.hasNext();) {
-				Element element = (Element) i.next();
-				if ("docRef".equals(element.getName())) {
-					String status = (String) element.getData();
-					verbose("deleteRelationt response: " + status);
-				}
+			service.deleteRelation(csid);
+		} catch (DocumentNotFoundException dnfe) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("caught exception in deleteRelation", dnfe);
 			}
-		} catch (Exception e) {
-			// FIXME: NOT_FOUND?
 			Response response = Response.status(Response.Status.NOT_FOUND)
-					.entity("Delete failed ").type("text/plain").build();
+					.entity("Delete failed on Relation csid=" + csid)
+					.type("text/plain").build();
+			throw new WebApplicationException(response);
+		} catch (Exception e) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Caught exception in deleteRelation", e);
+			}
+			Response response = Response.status(
+					Response.Status.INTERNAL_SERVER_ERROR).entity(
+					"Index failed").type("text/plain").build();
+			throw new WebApplicationException(response);
+		}
+	}
+
+	/*
+	 * Private Methods
+	 */
+
+	/**
+	 * Gets the relation list common.
+	 * 
+	 * @param ui
+	 *            the ui
+	 * @param subjectCsid
+	 *            the subject csid
+	 * @param predicate
+	 *            the predicate
+	 * @param objectCsid
+	 *            the object csid
+	 * 
+	 * @return the relation list common
+	 * 
+	 * @throws WebApplicationException
+	 *             the web application exception
+	 */
+	private RelationList getRequestedRelationList(@Context UriInfo ui,
+			String subjectCsid, String predicate, String objectCsid)
+			throws WebApplicationException {
+
+		URI absoluteURI = ui.getAbsolutePath();
+		String uriString = absoluteURI.toString();
+
+		RelationList relationList = null;
+		try {
+			relationList = this.getRelationList(subjectCsid, predicate,
+					objectCsid);
+		} catch (Exception e) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Caught exception in getRelationList", e);
+			}
+			Response response = Response.status(
+					Response.Status.INTERNAL_SERVER_ERROR).entity(
+					"Index failed").type("text/plain").build();
 			throw new WebApplicationException(response);
 		}
 
+		return relationList;
 	}
-	
+
+	/**
+	 * Gets the relation list.
+	 * 
+	 * @param subjectCsid
+	 *            the subject csid
+	 * @param predicate
+	 *            the predicate
+	 * @param objectCsid
+	 *            the object csid
+	 * 
+	 * @return the relation list
+	 * 
+	 * @throws DocumentException
+	 *             the document exception
+	 */
+	private RelationList getRelationList(String subjectCsid, String predicate,
+			String objectCsid) throws DocumentException {
+		RelationList relationList = new RelationList();
+		try {
+			Document document = service.getRelationList(subjectCsid, predicate,
+					objectCsid);
+			if (logger.isDebugEnabled() == true) {
+				System.err.println(document.asXML());
+			}
+
+			Element root = document.getRootElement();
+			List<RelationList.RelationListItem> list = relationList
+					.getRelationListItem();
+			Element node = null;
+			for (Iterator i = root.elementIterator(); i.hasNext();) {
+				node = (Element) i.next();
+				if (logger.isDebugEnabled() == true) {
+					System.out.println();
+					node.asXML();
+				}
+
+				// set the Relation list item entity elements
+				RelationListItem listItem = new RelationListItem();
+				listItem.setUri(node
+						.attributeValue(RelationListItemJAXBSchema.URI));
+				listItem.setCsid(node
+						.attributeValue(RelationListItemJAXBSchema.CSID));
+				list.add(listItem);
+			}
+
+		} catch (Exception e) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Caught exception in getRelationListOfType", e);
+			}
+			throw new DocumentException(e);
+		}
+
+		return relationList;
+	}
+
 	/**
 	 * Verbose.
 	 * 
-	 * @param msg the msg
-	 * @param co the co
+	 * @param msg
+	 *            the msg
+	 * @param co
+	 *            the co
 	 */
 	private void verbose(String msg, Relation co) {
 		try {
@@ -331,13 +636,14 @@ public class RelationResource {
 			m.marshal(co, System.out);
 		} catch (Exception e) {
 			e.printStackTrace();
-		}		
+		}
 	}
 
 	/**
 	 * Verbose.
 	 * 
-	 * @param msg the msg
+	 * @param msg
+	 *            the msg
 	 */
 	private void verbose(String msg) {
 		System.out.println("RelationResource. " + msg);

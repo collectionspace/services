@@ -26,9 +26,74 @@
  */
 package org.collectionspace.services.common;
 
+import java.io.IOException;
+import java.util.List;
+
+import org.collectionspace.services.common.repository.DocumentException;
+import org.collectionspace.services.relation.Relation;
+import org.dom4j.Document;
+
 /**
  * The Interface RelationUtils.
  */
 public interface RelationUtils {
 
+	/**
+	 * Gets the relationships.
+	 * 
+	 * @param repoSession the repo session
+	 * 
+	 * @return the relationships
+	 * 
+	 * @throws DocumentException the document exception
+	 */
+	public List<Relation> getRelationships(Object repoSession)
+			throws DocumentException;
+
+	/**
+	 * Gets the relationships for the entity corresponding to the CSID=csid.
+	 * The csid refers to either the subject *OR* the object.
+	 * 
+	 * @param nuxeoRepoSession the nuxeo repo session
+	 * @param csid the csid
+	 * 
+	 * @return the relationships
+	 * 
+	 * @throws DocumentException the document exception
+	 */
+	public List<Relation> getRelationships(Object nuxeoRepoSession, String csid)
+		throws DocumentException;
+	
+	/**
+	 * Gets the relationships.
+	 * 
+	 * @param repoSession the repo session
+	 * @param subjectCsid the subject csid
+	 * @param relationType the relation type
+	 * @param objectCsid the object csid
+	 * 
+	 * @return the relationships
+	 * 
+	 * @throws DocumentException the document exception
+	 */
+	public List<Relation> getRelationships(Object repoSession,
+			String subjectCsid, 
+			String relationType, 
+			String objectCsid)
+		throws DocumentException;
+
+	/**
+	 * Creates the relationship.
+	 * 
+	 * @param repoSession the repo session
+	 * @param subjectCsid the subject csid
+	 * @param predicate the predicate
+	 * @param objectCsid the object csid
+	 * 
+	 * @return the relation
+	 * 
+	 * @throws DocumentException the document exception
+	 */
+	public Relation createRelationship(Object repoSession, String subjectCsid,
+			String predicate, String objectCsid) throws DocumentException;
 }
