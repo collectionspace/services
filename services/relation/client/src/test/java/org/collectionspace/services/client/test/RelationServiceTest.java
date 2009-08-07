@@ -30,12 +30,6 @@ public class RelationServiceTest {
     /** The relation client. */
     private RelationClient relationClient = RelationClient.getInstance();
     
-    /** The update id. */
-    private String updateId = null;
-    
-    /** The delete id. */
-    private String deleteId = null;
-    
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(RelationServiceTest.class);
 
@@ -45,53 +39,49 @@ public class RelationServiceTest {
     @Test
     public void createRelation() {
         long identifier = this.createIdentifier();
-
-        Relation relation = createRelation(identifier);
-        ClientResponse<Response> res = relationClient.createRelation(relation);
-        Assert.assertEquals(res.getStatus(), Response.Status.CREATED.getStatusCode());
-        
-        String responseString = res.toString();
-        System.out.println(responseString);
-
-        //store updateId locally for "update" test
-        if(updateId == null){
-            updateId = extractId(res);
-        }else{
-            deleteId = extractId(res);
-            verbose("Set deleteId: " + deleteId);
-        }
-    }
+        this.createRelationEntity(identifier);
+    }    
 
     /**
      * Update relation.
      */
     @Test(dependsOnMethods = {"createRelation"})
     public void updateRelation() {
-        ClientResponse<Relation> res = relationClient.getRelation(updateId);
-        Relation relation = res.getEntity();
-        verbose("Got Relation to update with ID: " + updateId,
-                relation, Relation.class);
+    	
+    	String relationID = this.createRelationEntity(1);
+    	Assert.assertNotNull(relationID, "Could not create a new object to update.");
+    	
+        ClientResponse<Relation> res = relationClient.getRelation(relationID);
+        Relation theRelation = res.getEntity();
+        verbose("Got Relation to update with ID: " + relationID,
+        		theRelation, Relation.class);
 
         //relation.setCsid("updated-" + updateId);
-        relation.setDocumentId1("updated-" + relation.getDocumentId1());
-        relation.setDocumentType1("updated-" + relation.getDocumentType1());
+        theRelation.setDocumentId1("updated-" + theRelation.getDocumentId1());
+        theRelation.setDocumentType1("updated-" + theRelation.getDocumentType1());
+        theRelation.setDocumentId2("updated-" + theRelation.getDocumentId2());
+        theRelation.setDocumentType2("updated-" + theRelation.getDocumentType2());
 
         // make call to update service
-        res = relationClient.updateRelation(updateId, relation);
+        res = relationClient.updateRelation(relationID, theRelation);
 
         // check the response
         Relation updatedRelation = res.getEntity();
-        Assert.assertEquals(updatedRelation.getDocumentId1(), relation.getDocumentId1());
+        Assert.assertEquals(updatedRelation.getDocumentId1(), theRelation.getDocumentId1());
+        Assert.assertEquals(updatedRelation.getDocumentType1(), theRelation.getDocumentType1());
+        Assert.assertEquals(updatedRelation.getDocumentId2(), theRelation.getDocumentId2());
+        Assert.assertEquals(updatedRelation.getDocumentType2(), theRelation.getDocumentType2());
+        
         verbose("updateRelation: ", updatedRelation, Relation.class);
 
         return;
     }
 
     /**
-     * Creates the collection.
+     * Creates a set of three relation objects.
      */
     @Test(dependsOnMethods = {"createRelation"})
-    public void createCollection() {
+    public void createRelationList() {
         for(int i = 0; i < 3; i++){
             this.createRelation();
         }
@@ -102,7 +92,7 @@ public class RelationServiceTest {
      * 
      * @return the relation list
      */
-    @Test(dependsOnMethods = {"createCollection"})
+    @Test(dependsOnMethods = {"createRelationList"})
     public void getRelationList() {
         //the resource method is expected to return at least an empty list
         RelationList coList = relationClient.getRelationList().getEntity();
@@ -119,31 +109,58 @@ public class RelationServiceTest {
     /**
      * Delete relation.
      */
-    @Test(dependsOnMethods = {"createCollection"})
+    @Test(dependsOnMethods = {"createRelation", "updateRelation"})
     public void deleteRelation() {
-        verbose("Calling deleteRelation:" + deleteId);
-        ClientResponse<Response> res = relationClient.deleteRelation(deleteId);
-        verbose("deleteRelation: csid=" + deleteId);
+    	
+    	String relationID = this.createRelationEntity(0);
+    	Assert.assertNotNull(relationID, "Could not create a new object to delete.");
+    	
+        verbose("Calling deleteRelation:" + relationID);
+        ClientResponse<Response> res = relationClient.deleteRelation(relationID);
+        
+        verbose("deleteRelation: csid=" + relationID);
         verbose("deleteRelation: status = " + res.getStatus());
         Assert.assertEquals(res.getStatus(), Response.Status.NO_CONTENT.getStatusCode());
     }
+    
+    @Test(dependsOnMethods = {"createRelation"})
+    public void relateObjects() {
+    }
 
+    /*
+     * Private Methods
+     */
+    
+    private String createRelationEntity(long identifier) {
+
+        String result = null;
+        
+        Relation relation = new Relation();
+        fillRelation(relation, identifier);
+        ClientResponse<Response> res = relationClient.createRelation(relation);
+        Assert.assertEquals(res.getStatus(), Response.Status.CREATED.getStatusCode());
+        
+        result = extractId(res);
+        String responseString = res.toString();
+        System.out.println(responseString);
+        
+        return result;
+    }
+    
     /**
-     * Creates the relation.
+     * Fills the relation.
      * 
      * @param identifier the identifier
      * 
      * @return the relation
      */
-    private Relation createRelation(long identifier) {
-        Relation relation = createRelation("documentId1-" + identifier,
-                "documentType1-" + identifier + "-type",
-                "documentType1-" + identifier + "-type",
-                "documentType1-" + identifier + "-type",
+    private void fillRelation(Relation relation, long identifier) {
+        fillRelation(relation, "Subject-" + identifier,
+                "SubjectType-" + identifier + "-type",
+                "Object-" + identifier,
+                "ObjectType-" + identifier + "-type",
                 RelationshipType.fromValue(
-                		RelationJAXBSchema.ENUM_RELATIONSHIP_TYPE_ASSOC));
-
-        return relation;
+                		RelationJAXBSchema.ENUM_REL_TYPE_ASSOC));
     }
 
     /**
@@ -157,18 +174,15 @@ public class RelationServiceTest {
      * 
      * @return the relation
      */
-    private Relation createRelation(String documentId1, String documentType1,
-    		String documentId2, String documentType2, RelationshipType rt) {
-        Relation relation = new Relation();
-
+    private void fillRelation(Relation relation, String documentId1, String documentType1,
+    		String documentId2, String documentType2, RelationshipType rt)
+    {
         relation.setDocumentId1(documentId1);
         relation.setDocumentType1(documentType1);
         relation.setDocumentId2(documentId2);
         relation.setDocumentType2(documentType2);
         
         relation.setRelationshipType(rt);
-
-        return relation;
     }
 
     /**
@@ -193,9 +207,6 @@ public class RelationServiceTest {
      * @param msg the msg
      */
     private void verbose(String msg) {
-//        if(logger.isInfoEnabled()){
-//            logger.debug(msg);
-//        }
         System.out.println(msg);
     }
 
@@ -206,10 +217,10 @@ public class RelationServiceTest {
      * @param o the o
      * @param clazz the clazz
      */
-    private void verbose(String msg, Object o, Class clazz) {
+    private void verbose(String msg, Object o, Class theClass) {
         try{
             verbose(msg);
-            JAXBContext jc = JAXBContext.newInstance(clazz);
+            JAXBContext jc = JAXBContext.newInstance(theClass);
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
                     Boolean.TRUE);
