@@ -78,7 +78,7 @@ public class IntakeResource {
             IntakeHandlerFactory handlerFactory = IntakeHandlerFactory.getInstance();
             DocumentHandler handler = (DocumentHandler) handlerFactory.getHandler(CLIENT_TYPE.toString());
             handler.setCommonObject(intakeObject);
-            csid = client.create(INTAKE_SERVICE_NAME, IntakeConstants.INTAKE_NUXEO_DOCTYPE, handler);
+            csid = client.create(INTAKE_SERVICE_NAME, handler);
             intakeObject.setCsid(csid);
             if(logger.isDebugEnabled()){
                 verbose("createIntake: ", intakeObject);

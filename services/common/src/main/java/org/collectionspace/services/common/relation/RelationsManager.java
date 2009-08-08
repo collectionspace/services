@@ -38,15 +38,6 @@ import org.dom4j.Document;
 
 /**
  * The Class RelationsManager.
- * 
- * This class loosely uses the RDF terms subject, predicate, object to describe
- * relationships between entity objects.  For example, if a CollectionObject entity named
- * CO#1 is related to a Intake entity named IN#1 then the corresponding
- * RDF-like term would be: (Subject) CO#1 (Predicate) has-intake (Object) IN#1.
- * 
- * Many of the methods below, refer to RDF-like terms such as "Subject" and "Object" and
- * "Predicate."
- *  
  */
 public class RelationsManager {
 
@@ -54,15 +45,13 @@ public class RelationsManager {
 	static private RelationUtils relationUtils = new RelationUtilsNuxeoImpl();
 
 	/**
-	 * Gets the ALL relationships in the system.
+	 * Gets the relationships.
 	 * 
-	 * @param repoSession
-	 *            the repo session
+	 * @param repoSession the repo session
 	 * 
 	 * @return the relationships
 	 * 
-	 * @throws DocumentException
-	 *             the document exception
+	 * @throws DocumentException the document exception
 	 */
 	static public List<Relation> getRelationships(Object repoSession)
 			throws DocumentException {
@@ -70,7 +59,7 @@ public class RelationsManager {
 	}
 		
 	/**
-	 * Gets the relationships.  Null values act as wild card and match everything.
+	 * Gets the relationships.
 	 * 
 	 * @param repoSession the repo session
 	 * @param subjectCsid the subject csid
@@ -87,18 +76,14 @@ public class RelationsManager {
 	}
 	
 	/**
-	 * Gets the relationships for the entity corresponding to the CSID=csid.
-	 * The csid refers to either the subject OR the object
+	 * Gets the relationships.
 	 * 
-	 * @param repoSession
-	 *            the repo session
-	 * @param csid
-	 *            the csid
+	 * @param repoSession the repo session
+	 * @param csid the csid
 	 * 
 	 * @return the relationships
 	 * 
-	 * @throws DocumentException
-	 *             the document exception
+	 * @throws DocumentException the document exception
 	 */
 	static public List<Relation> getRelationships(Object repoSession,
 			String csid) throws DocumentException {
@@ -125,6 +110,13 @@ public class RelationsManager {
 				predicate, objectCsid);
 	}
 	
+	/**
+	 * Gets the q property name.
+	 * 
+	 * @param propertyName the property name
+	 * 
+	 * @return the q property name
+	 */
 	static public String getQPropertyName(String propertyName) {
 		return relationUtils.getQPropertyName(propertyName);
 	}

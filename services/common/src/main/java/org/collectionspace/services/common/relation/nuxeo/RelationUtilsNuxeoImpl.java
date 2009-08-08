@@ -29,6 +29,7 @@ package org.collectionspace.services.common.relation.nuxeo;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +38,9 @@ import org.collectionspace.services.common.relation.RelationListItemJAXBSchema;
 import org.collectionspace.services.common.relation.RelationUtils;
 
 import org.collectionspace.services.relation.Relation;
+import org.collectionspace.services.relation.RelationList;
 import org.collectionspace.services.relation.RelationshipType;
+import org.collectionspace.services.relation.RelationList.RelationListItem;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.common.repository.DocumentException;
 
@@ -66,6 +69,8 @@ public class RelationUtilsNuxeoImpl implements RelationUtils {
 	
 	/** The C s_ relatio n_ servic e_ name. */
 	static public String CS_RELATION_SERVICE_NAME = "relations";
+	
+	/** The C s_ empt y_ string. */
 	static public String CS_EMPTY_STRING = "";
 	
 	/** The Constant REL_NUXEO_DOCTYPE. */
@@ -128,6 +133,44 @@ public class RelationUtilsNuxeoImpl implements RelationUtils {
 		}
 	}
 
+	/**
+	 * Fill relation list item from doc model.
+	 * 
+	 * @param relationListItem the relation list item
+	 * @param relDocModel the rel doc model
+	 * 
+	 * @throws DocumentException the document exception
+	 */
+	static public void fillRelationListItemFromDocModel(RelationListItem relationListItem,
+			DocumentModel relDocModel)
+		throws DocumentException {
+
+		try {
+			relationListItem.setUri(
+					relDocModel.getId());
+			relationListItem.setCsid(
+					getRelURL(CS_RELATION_SERVICE_NAME, relDocModel.getId()));
+		} catch (Exception e) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Caught exception in fillRelationListItemFromDocModel", e);
+			}
+			throw new DocumentException(e);
+		}
+	}
+	
+	/**
+	 * Fill doc model list from relation list.
+	 * 
+	 * @param relationList the relation list
+	 * @param relDocModelList the rel doc model list
+	 * 
+	 * @throws Exception the exception
+	 */
+	static public void fillDocModelListFromRelationList(RelationList relationList,
+			DocumentModelList relDocModelList)
+		throws Exception {
+	}	
+	
 	/**
 	 * Fill doc model from relation.
 	 * 
@@ -364,7 +407,10 @@ public class RelationUtilsNuxeoImpl implements RelationUtils {
 		
 		return result;
 	}
-	
+		
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.common.relation.RelationUtils#getQPropertyName(java.lang.String)
+	 */
 	public String getQPropertyName(String propertyName) {
 		return "/" + REL_NUXEO_SCHEMA_ROOT_ELEMENT + "/" + propertyName;
 	}
@@ -419,6 +465,16 @@ public class RelationUtilsNuxeoImpl implements RelationUtils {
 		return result;
 	}
 	
+	/**
+	 * Checks if is predicate of relation.
+	 * 
+	 * @param predicate the predicate
+	 * @param documentModel the document model
+	 * 
+	 * @return true, if is predicate of relation
+	 * 
+	 * @throws ClientException the client exception
+	 */
 	private boolean isPredicateOfRelation(String predicate,
 			DocumentModel documentModel) throws ClientException {
 		boolean result = false;
@@ -435,12 +491,12 @@ public class RelationUtilsNuxeoImpl implements RelationUtils {
 	}
 
 	/**
-	 * Gets the object ID from of the (Subject-Predicate-Object) relationship.
+	 * Gets the object from subject.
 	 * 
-	 * @param csid the ID of the 'Subject' (Subject-Predicate-Object)
-	 * @param documentModel represents the relation entry.
+	 * @param csid the csid
+	 * @param documentModel the document model
 	 * 
-	 * @return the object csid of the relationship
+	 * @return the object from subject
 	 * 
 	 * @throws ClientException the client exception
 	 */
@@ -465,6 +521,15 @@ public class RelationUtilsNuxeoImpl implements RelationUtils {
 		return result;
 	}
 	
+	/**
+	 * Gets the document.
+	 * 
+	 * @param relationList the relation list
+	 * 
+	 * @return the document
+	 * 
+	 * @throws DocumentException the document exception
+	 */
 	static public Document getDocument(List<Relation> relationList)
 			throws DocumentException {
 		DOMDocumentFactory domfactory = new DOMDocumentFactory();
@@ -504,6 +569,18 @@ public class RelationUtilsNuxeoImpl implements RelationUtils {
 		return result;
 	}
 	
+	/**
+	 * Checks if is query match.
+	 * 
+	 * @param documentModel the document model
+	 * @param subjectCsid the subject csid
+	 * @param predicate the predicate
+	 * @param objectCsid the object csid
+	 * 
+	 * @return true, if is query match
+	 * 
+	 * @throws ClientException the client exception
+	 */
 	private boolean isQueryMatch(DocumentModel documentModel,
 			String subjectCsid,
 			String predicate,
@@ -534,6 +611,14 @@ public class RelationUtilsNuxeoImpl implements RelationUtils {
 		return result;
 	}
 	
+    /**
+     * Gets the rel url.
+     * 
+     * @param repo the repo
+     * @param uuid the uuid
+     * 
+     * @return the rel url
+     */
     private static String getRelURL(String repo, String uuid) {
         return '/' + repo + '/' + uuid;
     }	

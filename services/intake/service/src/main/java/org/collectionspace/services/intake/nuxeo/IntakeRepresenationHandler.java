@@ -72,52 +72,52 @@ public class IntakeRepresenationHandler
         Map<String, String> queryParams = getQueryParams();
         Intake intakeObject = getCommonObject();
         if(intakeObject.getCurrentOwner() != null){
-            queryParams.put(IntakeConstants.INTAKE_NUXEO_SCHEMA_NAME + ":" +
+            queryParams.put(IntakeConstants.NUXEO_SCHEMA_NAME + ":" +
                     IntakeJAXBSchema.CURRENT_OWNER, intakeObject.getCurrentOwner());
         }
 
         if(intakeObject.getDepositor() != null){
-            queryParams.put(IntakeConstants.INTAKE_NUXEO_SCHEMA_NAME + ":" +
+            queryParams.put(IntakeConstants.NUXEO_SCHEMA_NAME + ":" +
                     IntakeJAXBSchema.DEPOSITOR, intakeObject.getDepositor());
         }
 
         if(intakeObject.getDepositorsRequirements() != null){
-            queryParams.put(IntakeConstants.INTAKE_NUXEO_SCHEMA_NAME + ":" +
+            queryParams.put(IntakeConstants.NUXEO_SCHEMA_NAME + ":" +
                     IntakeJAXBSchema.DEPOSITORS_REQUIREMENTS, intakeObject.getDepositorsRequirements());
         }
 
         if(intakeObject.getEntryDate() != null){
-            queryParams.put(IntakeConstants.INTAKE_NUXEO_SCHEMA_NAME + ":" +
+            queryParams.put(IntakeConstants.NUXEO_SCHEMA_NAME + ":" +
                     IntakeJAXBSchema.ENTRY_DATE, intakeObject.getEntryDate());
         }
 
         if(intakeObject.getEntryMethod() != null){
-            queryParams.put(IntakeConstants.INTAKE_NUXEO_SCHEMA_NAME + ":" +
+            queryParams.put(IntakeConstants.NUXEO_SCHEMA_NAME + ":" +
                     IntakeJAXBSchema.ENTRY_METHOD, intakeObject.getEntryMethod());
         }
 
         if(intakeObject.getEntryNote() != null){
-            queryParams.put(IntakeConstants.INTAKE_NUXEO_SCHEMA_NAME + ":" +
+            queryParams.put(IntakeConstants.NUXEO_SCHEMA_NAME + ":" +
                     IntakeJAXBSchema.ENTRY_NOTE, intakeObject.getEntryNote());
         }
 
         if(intakeObject.getEntryNumber() != null){
-            queryParams.put(IntakeConstants.INTAKE_NUXEO_SCHEMA_NAME + ":" +
+            queryParams.put(IntakeConstants.NUXEO_SCHEMA_NAME + ":" +
                     IntakeJAXBSchema.ENTRY_NUMBER, intakeObject.getEntryNumber());
         }
 
         if(intakeObject.getEntryReason() != null){
-            queryParams.put(IntakeConstants.INTAKE_NUXEO_SCHEMA_NAME + ":" +
+            queryParams.put(IntakeConstants.NUXEO_SCHEMA_NAME + ":" +
                     IntakeJAXBSchema.ENTRY_REASON, intakeObject.getEntryReason());
         }
 
         if(intakeObject.getPackingNote() != null){
-            queryParams.put(IntakeConstants.INTAKE_NUXEO_SCHEMA_NAME + ":" +
+            queryParams.put(IntakeConstants.NUXEO_SCHEMA_NAME + ":" +
                     IntakeJAXBSchema.PACKING_NOTE, intakeObject.getPackingNote());
         }
 
         if(intakeObject.getReturnDate() != null){
-            queryParams.put(IntakeConstants.INTAKE_NUXEO_SCHEMA_NAME + ":" +
+            queryParams.put(IntakeConstants.NUXEO_SCHEMA_NAME + ":" +
                     IntakeJAXBSchema.RETURN_DATE, intakeObject.getReturnDate());
         }
     }
@@ -144,7 +144,7 @@ public class IntakeRepresenationHandler
                 logger.debug("getCommonObject() populating Common Object");
             }
             // TODO: recognize schema thru namespace uri
-            if(IntakeConstants.INTAKE_NUXEO_SCHEMA_NAME.equals(schemaElement.attribute("name").getValue())){
+            if(IntakeConstants.NUXEO_SCHEMA_NAME.equals(schemaElement.attribute("name").getValue())){
                 Element ele = schemaElement.element(IntakeJAXBSchema.CURRENT_OWNER);
                 if(ele != null){
                     intakeObj.setCurrentOwner((String) ele.getData());
@@ -248,13 +248,20 @@ public class IntakeRepresenationHandler
         this.intakeList = obj;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#getDocumentType()
+     */
+    public String getDocumentType() {
+    	return IntakeConstants.NUXEO_DOCTYPE;
+    }
+    
     /**
      * getQProperty converts the given property to qualified schema property
      * @param prop
      * @return
      */
     private String getQProperty(String prop) {
-        return IntakeConstants.INTAKE_NUXEO_SCHEMA_NAME + ":" + prop;
+        return IntakeConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
 }
 

@@ -26,13 +26,14 @@ package org.collectionspace.services.relation.nuxeo;
 import java.util.Iterator;
 import java.util.List;
 import org.collectionspace.services.common.relation.RelationJAXBSchema;
-//import org.collectionspace.services.common.relation.nuxeo.RelationUtilsNuxeoImpl;
+import org.collectionspace.services.common.relation.nuxeo.RelationUtilsNuxeoImpl;
 import org.collectionspace.services.common.relation.RelationsManager;
 
 import org.collectionspace.services.relation.Relation;
 import org.collectionspace.services.relation.RelationList;
 import org.collectionspace.services.relation.RelationList.RelationListItem;
 
+import org.collectionspace.services.relation.nuxeo.RelationNuxeoConstants;
 import org.collectionspace.services.common.repository.DocumentWrapper;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -103,17 +104,18 @@ public class RelationDocumentModelHandler
     public Relation extractCommonObject(DocumentWrapper wrapDoc)
             throws Exception {
         DocumentModel docModel = (DocumentModel) wrapDoc.getWrappedObject();
-        Relation co = new Relation();
+        Relation theRelation = new Relation();
+        
+        RelationUtilsNuxeoImpl.fillRelationFromDocModel(theRelation, docModel);
 
-        return co;
+        return theRelation;
     }
 
     @Override
-    public void fillCommonObject(Relation co, DocumentWrapper wrapDoc) throws Exception {
+    public void fillCommonObject(Relation relation, DocumentWrapper wrapDoc) throws Exception {
         DocumentModel docModel = (DocumentModel) wrapDoc.getWrappedObject();
-        //FIXME property setter should be dynamically set using schema inspection
-        //so it does not require hard coding
 
+        RelationUtilsNuxeoImpl.fillDocModelFromRelation(relation, docModel);
     }
 
     @Override
@@ -130,16 +132,16 @@ public class RelationDocumentModelHandler
             DocumentModel docModel = iter.next();
             RelationListItem coListItem = new RelationListItem();
             
-            coListItem.setCsid((String) docModel.getPropertyValue(
-                    getQProperty(RelationJAXBSchema.DOCUMENT_ID_1)));
+            RelationUtilsNuxeoImpl.fillRelationListItemFromDocModel(coListItem, docModel);
             
-            //need fully qualified context for URI
-            coListItem.setUri("/relations/" + docModel.getId());
-            coListItem.setCsid(docModel.getId());
             list.add(coListItem);
         }
 
         return coList;
+    }
+    
+    public String getDocumentType() {
+    	return RelationNuxeoConstants.NUXEO_DOCTYPE;
     }
 
     @Override

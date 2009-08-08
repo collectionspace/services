@@ -25,6 +25,8 @@ package org.collectionspace.services.collectionobject.nuxeo;
 
 import java.util.Iterator;
 import java.util.List;
+
+import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.CollectionObjectJAXBSchema;
 import org.collectionspace.services.collectionobject.CollectionObject;
 import org.collectionspace.services.collectionobject.CollectionObjectList;
@@ -132,7 +134,7 @@ public class CollectionObjectDocumentModelHandler
         //so it does not require hard coding
 
         // a default title for the Dublin Core schema
-        docModel.setPropertyValue("dublincore:title", CollectionObjectConstants.CO_NUXEO_DC_TITLE);
+        docModel.setPropertyValue("dublincore:title", CollectionObjectConstants.NUXEO_DC_TITLE);
 
         // CollectionObject core values
         if(co.getObjectNumber() != null){
@@ -205,6 +207,10 @@ public class CollectionObjectDocumentModelHandler
     public void fillCommonObjectList(CollectionObjectList obj, DocumentWrapper wrapDoc) throws Exception {
         throw new UnsupportedOperationException();
     }
+    
+    public String getDocumentType() {
+    	return CollectionObjectConstants.NUXEO_DOCTYPE;
+    }
 
     /**
      * getQProperty converts the given property to qualified schema property
@@ -212,7 +218,7 @@ public class CollectionObjectDocumentModelHandler
      * @return
      */
     private String getQProperty(String prop) {
-        return CollectionObjectConstants.CO_NUXEO_SCHEMA_NAME + ":" + prop;
+        return CollectionObjectConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
 }
 

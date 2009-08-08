@@ -25,12 +25,15 @@ package org.collectionspace.services.intake.nuxeo;
 
 import java.util.Iterator;
 import java.util.List;
+
 import org.collectionspace.services.IntakeJAXBSchema;
 import org.collectionspace.services.common.repository.DocumentWrapper;
 import org.collectionspace.services.intake.Intake;
 import org.collectionspace.services.intake.IntakeList;
 import org.collectionspace.services.intake.IntakeList.IntakeListItem;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
+import org.collectionspace.services.intake.nuxeo.IntakeConstants;
+
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
@@ -144,7 +147,7 @@ public class IntakeDocumentModelHandler
         //so it does not require hard coding
 
         // a default title for the Dublin Core schema
-        docModel.setPropertyValue("dublincore:title", IntakeConstants.INTAKE_NUXEO_DC_TITLE);
+        docModel.setPropertyValue("dublincore:title", IntakeConstants.NUXEO_DC_TITLE);
 
         // intake core values
         if(intakeObject.getCurrentOwner() != null){
@@ -229,13 +232,20 @@ public class IntakeDocumentModelHandler
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#getDocumentType()
+     */
+    public String getDocumentType() {
+    	return IntakeConstants.NUXEO_DOCTYPE;
+    }
+    
     /**
      * getQProperty converts the given property to qualified schema property
      * @param prop
      * @return
      */
     private String getQProperty(String prop) {
-        return IntakeConstants.INTAKE_NUXEO_SCHEMA_NAME + ":" + prop;
+        return IntakeConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
 }
 

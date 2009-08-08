@@ -47,7 +47,7 @@ public interface RepositoryClient {
      * @throws BadRequestException data input is bad
      * @throws DocumentException
      */
-    String create(String serviceName, String docType, DocumentHandler handler) throws BadRequestException, DocumentException;
+    String create(String serviceName, DocumentHandler handler) throws BadRequestException, DocumentException;
 
     /**
      * delete a document from the Document repository

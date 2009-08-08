@@ -26,12 +26,15 @@ package org.collectionspace.services.collectionobject.nuxeo;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import org.collectionspace.services.CollectionObjectJAXBSchema;
 import org.collectionspace.services.collectionobject.CollectionObject;
 import org.collectionspace.services.collectionobject.CollectionObjectList;
 import org.collectionspace.services.collectionobject.CollectionObjectList.CollectionObjectListItem;
 import org.collectionspace.services.common.repository.DocumentWrapper;
 import org.collectionspace.services.nuxeo.client.rest.RepresentationHandler;
+import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
+
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.slf4j.Logger;
@@ -73,42 +76,42 @@ public class CollectionObjectRepresenationHandler
         CollectionObject co = getCommonObject();
         // todo: intelligent merge needed
         if(co.getObjectNumber() != null){
-            queryParams.put(CollectionObjectConstants.CO_NUXEO_SCHEMA_NAME +
+            queryParams.put(CollectionObjectConstants.NUXEO_SCHEMA_NAME +
                     ":" + CollectionObjectJAXBSchema.OBJECT_NUMBER, co.getObjectNumber());
         }
 
         if(co.getOtherNumber() != null){
-            queryParams.put(CollectionObjectConstants.CO_NUXEO_SCHEMA_NAME +
+            queryParams.put(CollectionObjectConstants.NUXEO_SCHEMA_NAME +
                     ":" + CollectionObjectJAXBSchema.OTHER_NUMBER, co.getOtherNumber());
         }
 
         if(co.getBriefDescription() != null){
-            queryParams.put(CollectionObjectConstants.CO_NUXEO_SCHEMA_NAME +
+            queryParams.put(CollectionObjectConstants.NUXEO_SCHEMA_NAME +
                     ":" + CollectionObjectJAXBSchema.BRIEF_DESCRIPTION, co.getBriefDescription());
         }
 
         if(co.getComments() != null){
-            queryParams.put(CollectionObjectConstants.CO_NUXEO_SCHEMA_NAME +
+            queryParams.put(CollectionObjectConstants.NUXEO_SCHEMA_NAME +
                     ":" + CollectionObjectJAXBSchema.COMMENTS, co.getComments());
         }
 
         if(co.getDistFeatures() != null){
-            queryParams.put(CollectionObjectConstants.CO_NUXEO_SCHEMA_NAME +
+            queryParams.put(CollectionObjectConstants.NUXEO_SCHEMA_NAME +
                     ":" + CollectionObjectJAXBSchema.DIST_FEATURES, co.getDistFeatures());
         }
 
         if(co.getObjectName() != null){
-            queryParams.put(CollectionObjectConstants.CO_NUXEO_SCHEMA_NAME +
+            queryParams.put(CollectionObjectConstants.NUXEO_SCHEMA_NAME +
                     ":" + CollectionObjectJAXBSchema.OBJECT_NAME, co.getObjectName());
         }
 
         if(co.getResponsibleDept() != null){
-            queryParams.put(CollectionObjectConstants.CO_NUXEO_SCHEMA_NAME +
+            queryParams.put(CollectionObjectConstants.NUXEO_SCHEMA_NAME +
                     ":" + CollectionObjectJAXBSchema.RESPONSIBLE_DEPT, co.getResponsibleDept());
         }
 
         if(co.getTitle() != null){
-            queryParams.put(CollectionObjectConstants.CO_NUXEO_SCHEMA_NAME +
+            queryParams.put(CollectionObjectConstants.NUXEO_SCHEMA_NAME +
                     ":" + CollectionObjectJAXBSchema.TITLE, co.getTitle());
         }
     }
@@ -135,7 +138,7 @@ public class CollectionObjectRepresenationHandler
                 logger.debug("getCommonObject() populating Common Object");
             }
             // TODO: recognize schema thru namespace uri
-            if(CollectionObjectConstants.CO_NUXEO_SCHEMA_NAME.equals(schemaElement.attribute("name").getValue())){
+            if(CollectionObjectConstants.NUXEO_SCHEMA_NAME.equals(schemaElement.attribute("name").getValue())){
                 Element ele = schemaElement.element(CollectionObjectJAXBSchema.OBJECT_NUMBER);
                 if(ele != null){
                     co.setObjectNumber((String) ele.getData());
@@ -232,6 +235,10 @@ public class CollectionObjectRepresenationHandler
     public void setCommonObjectList(CollectionObjectList obj) {
         this.collectionObjectList = obj;
     }
+    
+    public String getDocumentType() {
+    	return CollectionObjectConstants.NUXEO_DOCTYPE;
+    }
 
     /**
      * getQProperty converts the given property to qualified schema property
@@ -239,7 +246,7 @@ public class CollectionObjectRepresenationHandler
      * @return
      */
     private String getQProperty(String prop) {
-        return CollectionObjectConstants.CO_NUXEO_SCHEMA_NAME + ":" + prop;
+        return CollectionObjectConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
 }
 

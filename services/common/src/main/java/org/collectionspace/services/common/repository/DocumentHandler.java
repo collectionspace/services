@@ -153,6 +153,13 @@ public interface DocumentHandler<T, TL> {
      * @throws DocumentException
      */
     public Document getDocument(DocumentWrapper docWrap) throws DocumentException;
+    
+    /**
+     * Gets the document type.
+     * 
+     * @return the document type
+     */
+    public String getDocumentType();
 
     /**
      * getProperties

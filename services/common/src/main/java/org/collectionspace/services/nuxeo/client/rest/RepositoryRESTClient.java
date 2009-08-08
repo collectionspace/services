@@ -78,11 +78,11 @@ public class RepositoryRESTClient implements RepositoryClient {
     }
 
     @Override
-    public String create(String serviceName, String docType, DocumentHandler handler) throws BadRequestException, DocumentException {
+    public String create(String serviceName, DocumentHandler handler) throws BadRequestException, DocumentException {
         if(serviceName == null){
             throw new IllegalArgumentException("RepositoryRESTClient.create: serviceName is missing");
         }
-        if(docType == null){
+        if(handler.getDocumentType() == null){
             throw new IllegalArgumentException("RepositoryRESTClient.create: docType is missing");
         }
         if(handler == null){
@@ -106,9 +106,9 @@ public class RepositoryRESTClient implements RepositoryClient {
                 pathParams.addAll(repHandler.getPathParams());
             }
             Map<String, String> queryParams = new HashMap<String, String>();
-            queryParams.put("docType", docType);
+            queryParams.put("docType", handler.getDocumentType());
             // a default title for the Dublin Core schema
-            queryParams.put("dublincore:title", "CollectionSpace-" + docType);
+            queryParams.put("dublincore:title", "CollectionSpace-" + handler.getDocumentType());
             if(repHandler.getQueryParams().size() > 0){
                 queryParams.putAll(repHandler.getQueryParams());
             }

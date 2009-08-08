@@ -1,4 +1,4 @@
-package org.collectionspace.services.collectionobject;
+package org.collectionspace.services.relation;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -16,10 +16,10 @@ import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
-import org.collectionspace.services.collectionobject.CollectionObjectList.*;
+import org.collectionspace.services.relation.RelationList.RelationListItem;
 
-import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
-import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectHandlerFactory;
+import org.collectionspace.services.relation.nuxeo.RelationNuxeoConstants;
+import org.collectionspace.services.relation.nuxeo.RelationHandlerFactory;
 import org.collectionspace.services.common.NuxeoClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.repository.DocumentNotFoundException;
@@ -30,43 +30,43 @@ import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("/collectionobjects")
+@Path("/relations")
 @Consumes("application/xml")
 @Produces("application/xml")
-public class CollectionObjectResource {
+public class NewRelationResource {
 
-    public final static String CO_SERVICE_NAME = "collectionobjects";
-    final Logger logger = LoggerFactory.getLogger(CollectionObjectResource.class);
+    public final static String SERVICE_NAME = "relations";
+    final Logger logger = LoggerFactory.getLogger(NewRelationResource.class);
     //FIXME retrieve client type from configuration
     final static NuxeoClientType CLIENT_TYPE = ServiceMain.getInstance().getNuxeoClientType();
 
-    public CollectionObjectResource() {
+    public NewRelationResource() {
         // do nothing
     }
 
     @POST
-    public Response createCollectionObject(
-            CollectionObject collectionObject) {
+    public Response createRelation(
+            Relation relation) {
 
         String csid = null;
         try{
             RepositoryClientFactory clientFactory = RepositoryClientFactory.getInstance();
             RepositoryClient client = clientFactory.getClient(CLIENT_TYPE.toString());
-            CollectionObjectHandlerFactory handlerFactory = CollectionObjectHandlerFactory.getInstance();
+            RelationHandlerFactory handlerFactory = RelationHandlerFactory.getInstance();
             DocumentHandler handler = (DocumentHandler) handlerFactory.getHandler(CLIENT_TYPE.toString());
-            handler.setCommonObject(collectionObject);
-            csid = client.create(CO_SERVICE_NAME, handler);
-            collectionObject.setCsid(csid);
+            handler.setCommonObject(relation);
+            csid = client.create(SERVICE_NAME, handler);
+            relation.setCsid(csid);
             if(logger.isDebugEnabled()){
-                verbose("createCollectionObject: ", collectionObject);
+                verbose("createRelation: ", relation);
             }
-            UriBuilder path = UriBuilder.fromResource(CollectionObjectResource.class);
+            UriBuilder path = UriBuilder.fromResource(RelationResource.class);
             path.path("" + csid);
             Response response = Response.created(path.build()).build();
             return response;
         }catch(Exception e){
             if(logger.isDebugEnabled()){
-                logger.debug("Caught exception in createCollectionObject", e);
+                logger.debug("Caught exception in createRelation", e);
             }
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Create failed").type("text/plain").build();
@@ -76,107 +76,107 @@ public class CollectionObjectResource {
 
     @GET
     @Path("{csid}")
-    public CollectionObject getCollectionObject(
+    public Relation getRelation(
             @PathParam("csid") String csid) {
         if(logger.isDebugEnabled()){
-            verbose("getCollectionObject with csid=" + csid);
+            verbose("getRelation with csid=" + csid);
         }
         if(csid == null || "".equals(csid)){
-            logger.error("getCollectionObject: missing csid!");
+            logger.error("getRelation: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "get failed on CollectionObject csid=" + csid).type(
+                    "get failed on Relation csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        CollectionObject collectionObject = null;
+        Relation relation = null;
         try{
             RepositoryClientFactory clientFactory = RepositoryClientFactory.getInstance();
             RepositoryClient client = clientFactory.getClient(CLIENT_TYPE.toString());
-            CollectionObjectHandlerFactory handlerFactory = CollectionObjectHandlerFactory.getInstance();
+            RelationHandlerFactory handlerFactory = RelationHandlerFactory.getInstance();
             DocumentHandler handler = (DocumentHandler) handlerFactory.getHandler(CLIENT_TYPE.toString());
             client.get(csid, handler);
-            collectionObject = (CollectionObject) handler.getCommonObject();
+            relation = (Relation) handler.getCommonObject();
         }catch(DocumentNotFoundException dnfe){
             if(logger.isDebugEnabled()){
-                logger.debug("getCollectionObject", dnfe);
+                logger.debug("getRelation", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed on CollectionObject csid=" + csid).type(
+                    "Get failed on Relation csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }catch(Exception e){
             if(logger.isDebugEnabled()){
-                logger.debug("getCollectionObject", e);
+                logger.debug("getRelation", e);
             }
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
 
-        if(collectionObject == null){
+        if(relation == null){
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed, the requested CollectionObject CSID:" + csid + ": was not found.").type(
+                    "Get failed, the requested Relation CSID:" + csid + ": was not found.").type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
         if(logger.isDebugEnabled()){
-            verbose("getCollectionObject: ", collectionObject);
+            verbose("getRelation: ", relation);
         }
-        return collectionObject;
+        return relation;
     }
 
     @GET
-    public CollectionObjectList getCollectionObjectList(@Context UriInfo ui) {
-        CollectionObjectList collectionObjectList = new CollectionObjectList();
+    public RelationList getRelationList(@Context UriInfo ui) {
+        RelationList relationList = new RelationList();
         try{
             RepositoryClientFactory clientFactory = RepositoryClientFactory.getInstance();
             RepositoryClient client = clientFactory.getClient(CLIENT_TYPE.toString());
-            CollectionObjectHandlerFactory handlerFactory = CollectionObjectHandlerFactory.getInstance();
+            RelationHandlerFactory handlerFactory = RelationHandlerFactory.getInstance();
             DocumentHandler handler = (DocumentHandler) handlerFactory.getHandler(CLIENT_TYPE.toString());
-            client.getAll(CO_SERVICE_NAME, handler);
-            collectionObjectList = (CollectionObjectList) handler.getCommonObjectList();
+            client.getAll(SERVICE_NAME, handler);
+            relationList = (RelationList) handler.getCommonObjectList();
         }catch(Exception e){
             if(logger.isDebugEnabled()){
-                logger.debug("Caught exception in getCollectionObjectList", e);
+                logger.debug("Caught exception in getRelationList", e);
             }
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return collectionObjectList;
+        return relationList;
     }
 
     @PUT
     @Path("{csid}")
-    public CollectionObject updateCollectionObject(
+    public Relation updateRelation(
             @PathParam("csid") String csid,
-            CollectionObject theUpdate) {
+            Relation theUpdate) {
         if(logger.isDebugEnabled()){
-            verbose("updateCollectionObject with csid=" + csid);
+            verbose("updateRelation with csid=" + csid);
         }
         if(csid == null || "".equals(csid)){
-            logger.error("updateCollectionObject: missing csid!");
+            logger.error("updateRelation: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "update failed on CollectionObject csid=" + csid).type(
+                    "update failed on Relation csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
         if(logger.isDebugEnabled()){
-            verbose("updateCollectionObject with input: ", theUpdate);
+            verbose("updateRelation with input: ", theUpdate);
         }
         try{
             RepositoryClientFactory clientFactory = RepositoryClientFactory.getInstance();
             RepositoryClient client = clientFactory.getClient(CLIENT_TYPE.toString());
-            CollectionObjectHandlerFactory handlerFactory = CollectionObjectHandlerFactory.getInstance();
+            RelationHandlerFactory handlerFactory = RelationHandlerFactory.getInstance();
             DocumentHandler handler = (DocumentHandler) handlerFactory.getHandler(CLIENT_TYPE.toString());
             handler.setCommonObject(theUpdate);
             client.update(csid, handler);
         }catch(DocumentNotFoundException dnfe){
             if(logger.isDebugEnabled()){
-                logger.debug("caugth exception in updateCollectionObject", dnfe);
+                logger.debug("caugth exception in updateRelation", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Update failed on CollectionObject csid=" + csid).type(
+                    "Update failed on Relation csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }catch(Exception e){
@@ -189,15 +189,15 @@ public class CollectionObjectResource {
 
     @DELETE
     @Path("{csid}")
-    public Response deleteCollectionObject(@PathParam("csid") String csid) {
+    public Response deleteRelation(@PathParam("csid") String csid) {
 
         if(logger.isDebugEnabled()){
-            verbose("deleteCollectionObject with csid=" + csid);
+            verbose("deleteRelation with csid=" + csid);
         }
         if(csid == null || "".equals(csid)){
-            logger.error("deleteCollectionObject: missing csid!");
+            logger.error("deleteRelation: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "delete failed on CollectionObject csid=" + csid).type(
+                    "delete failed on Relation csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -208,10 +208,10 @@ public class CollectionObjectResource {
             return Response.status(HttpResponseCodes.SC_OK).build();
         }catch(DocumentNotFoundException dnfe){
             if(logger.isDebugEnabled()){
-                logger.debug("caught exception in deleteCollectionObject", dnfe);
+                logger.debug("caught exception in deleteRelation", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Delete failed on CollectionObject csid=" + csid).type(
+                    "Delete failed on Relation csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }catch(Exception e){
@@ -222,15 +222,15 @@ public class CollectionObjectResource {
 
     }
 
-    private void verbose(String msg, CollectionObject collectionObject) {
+    private void verbose(String msg, Relation relation) {
         try{
             verbose(msg);
             JAXBContext jc = JAXBContext.newInstance(
-                    CollectionObject.class);
+                    Relation.class);
 
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            m.marshal(collectionObject, System.out);
+            m.marshal(relation, System.out);
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -238,6 +238,6 @@ public class CollectionObjectResource {
     }
 
     private void verbose(String msg) {
-        System.out.println("CollectionObjectResource. " + msg);
+        System.out.println("RelationResource. " + msg);
     }
 }

@@ -29,7 +29,7 @@ package org.collectionspace.services.intake.nuxeo;
  */
 public class IntakeConstants {
 
-    public final static String INTAKE_NUXEO_DOCTYPE = "Intake";
-    public final static String INTAKE_NUXEO_SCHEMA_NAME = "intake";
-    public final static String INTAKE_NUXEO_DC_TITLE = "CollectionSpace-Intake";
+    public final static String NUXEO_DOCTYPE = "Intake";
+    public final static String NUXEO_SCHEMA_NAME = "intake";
+    public final static String NUXEO_DC_TITLE = "CollectionSpace-Intake";
 }

@@ -150,7 +150,13 @@ public abstract class DocumentModelHandler<T, TL>
         DocumentModel docModel = (DocumentModel) wrapDoc.getWrappedObject();
         return NuxeoUtils.getDocument(getRepositorySession(), docModel);
     }
-
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.repository.DocumentHandler#getDocumentType()
+     */
+    @Override
+    public abstract String getDocumentType();
+    
     /**
      * @return the properties
      */

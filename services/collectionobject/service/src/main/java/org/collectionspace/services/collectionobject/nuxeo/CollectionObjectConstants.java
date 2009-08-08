@@ -29,8 +29,8 @@ package org.collectionspace.services.collectionobject.nuxeo;
  */
 public class CollectionObjectConstants {
 
-    public final static String CO_NUXEO_DOCTYPE = "CollectionObject";
-    public final static String CO_NUXEO_SCHEMA_NAME = "collectionobject";
-    public final static String CO_NUXEO_DC_TITLE = "CollectionSpace-CollectionObject";
+    public final static String NUXEO_DOCTYPE = "CollectionObject";
+    public final static String NUXEO_SCHEMA_NAME = "collectionobject";
+    public final static String NUXEO_DC_TITLE = "CollectionSpace-CollectionObject";
     
 }

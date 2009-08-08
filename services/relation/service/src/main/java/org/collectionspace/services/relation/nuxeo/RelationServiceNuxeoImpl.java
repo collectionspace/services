@@ -68,8 +68,7 @@ import org.nuxeo.ecm.core.api.DocumentRef;
 
 
 /**
- * @author remillet
- * 
+ * The Class RelationServiceNuxeoImpl.
  */
 public class RelationServiceNuxeoImpl extends
 		CollectionSpaceServiceNuxeoImpl implements RelationService {
@@ -77,15 +76,8 @@ public class RelationServiceNuxeoImpl extends
 	// replace WORKSPACE_UID for resource workspace
 	//	static String CS_RELATION_WORKSPACE_UID = "55f99358-5dbe-4462-8000-c5c3c2063919";
 
-	/**
-	 * Delete relation.
-	 * 
-	 * @param csid the csid
-	 * 
-	 * @return the document
-	 * 
-	 * @throws DocumentException the document exception
-	 * @throws IOException Signals that an I/O exception has occurred.
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.relation.RelationService#deleteRelation(java.lang.String)
 	 */
 	public Document deleteRelation(String csid) throws DocumentException {
 		Document result = null;
@@ -108,15 +100,8 @@ public class RelationServiceNuxeoImpl extends
 		return result;
 	}
 	
-	/**
-	 * Gets the relation.
-	 * 
-	 * @param csid the csid
-	 * 
-	 * @return the relation
-	 * 
-	 * @throws DocumentException the document exception
-	 * @throws IOException Signals that an I/O exception has occurred.
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.relation.RelationService#getRelation(java.lang.String)
 	 */
 	public Document getRelation(String csid)
 			throws DocumentException, IOException {
@@ -145,13 +130,8 @@ public class RelationServiceNuxeoImpl extends
 		return result;
 	}
 
-	/**
-	 * Gets the relation list.
-	 * 
-	 * @return the relation list
-	 * 
-	 * @throws DocumentException the document exception
-	 * @throws IOException Signals that an I/O exception has occurred.
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.relation.RelationService#getRelationList()
 	 */
 	public Document getRelationList()
 			throws DocumentException, IOException {
@@ -215,15 +195,8 @@ public class RelationServiceNuxeoImpl extends
 		}
 
 	// Create a new relation document
-	/**
-	 * Post relation.
-	 * 
-	 * @param co the co
-	 * 
-	 * @return the document
-	 * 
-	 * @throws DocumentException the document exception
-	 * @throws IOException Signals that an I/O exception has occurred.
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.relation.RelationService#postRelation(org.collectionspace.services.relation.Relation)
 	 */
 	public Document postRelation(Relation co) throws DocumentException,
 			IOException {
@@ -254,16 +227,8 @@ public class RelationServiceNuxeoImpl extends
 		return result;
 	}
 	
-	/**
-	 * Put relation.
-	 * 
-	 * @param csid the csid
-	 * @param theUpdate the the update
-	 * 
-	 * @return the document
-	 * 
-	 * @throws DocumentException the document exception
-	 * @throws IOException Signals that an I/O exception has occurred.
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.relation.RelationService#putRelation(java.lang.String, org.collectionspace.services.relation.Relation)
 	 */
 	public Document putRelation(String csid, Relation theUpdate)
 			throws DocumentException, IOException {
