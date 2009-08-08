@@ -120,7 +120,7 @@ public class RelationServiceTest {
         
         verbose("deleteRelation: csid=" + relationID);
         verbose("deleteRelation: status = " + res.getStatus());
-        Assert.assertEquals(res.getStatus(), Response.Status.NO_CONTENT.getStatusCode());
+        Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
     }
     
     @Test(dependsOnMethods = {"createRelation"})
