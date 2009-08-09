@@ -581,12 +581,13 @@ public class RelationUtilsNuxeoImpl implements RelationUtils {
 	 * 
 	 * @throws ClientException the client exception
 	 */
-	private boolean isQueryMatch(DocumentModel documentModel,
+	public boolean isQueryMatch(DocumentModel documentModel,
 			String subjectCsid,
 			String predicate,
-			String objectCsid) throws ClientException {
+			String objectCsid) throws DocumentException {
 		boolean result = true;
 		
+		try {
 		block: {
 			if (subjectCsid != null) {
 				if (isSubjectOfRelation(subjectCsid, documentModel) == false) {
@@ -606,6 +607,12 @@ public class RelationUtilsNuxeoImpl implements RelationUtils {
 					break block;
 				}
 			}
+		}
+		} catch (ClientException e) {
+			if (logger.isDebugEnabled() == true) {
+				e.printStackTrace();
+			}
+			throw new DocumentException(e);
 		}
 		
 		return result;

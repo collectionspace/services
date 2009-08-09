@@ -25,6 +25,8 @@ package org.collectionspace.services.relation.nuxeo;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
 import org.collectionspace.services.common.relation.RelationJAXBSchema;
 import org.collectionspace.services.common.relation.nuxeo.RelationUtilsNuxeoImpl;
 import org.collectionspace.services.common.relation.RelationsManager;
@@ -122,6 +124,11 @@ public class RelationDocumentModelHandler
     public RelationList extractCommonObjectList(DocumentWrapper wrapDoc) throws Exception {
         DocumentModelList docList = (DocumentModelList) wrapDoc.getWrappedObject();
 
+        Map propsFromResource = this.getProperties();
+        String subjectCsid = (String)propsFromResource.get(RelationsManager.SUBJECT);
+        String predicate = (String)propsFromResource.get(RelationsManager.PREDICATE);
+        String objectCsid = (String)propsFromResource.get(RelationsManager.OBJECT);
+
         RelationList coList = new RelationList();
         List<RelationList.RelationListItem> list = coList.getRelationListItem();
 
@@ -130,11 +137,13 @@ public class RelationDocumentModelHandler
         Iterator<DocumentModel> iter = docList.iterator();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
-            RelationListItem coListItem = new RelationListItem();
-            
-            RelationUtilsNuxeoImpl.fillRelationListItemFromDocModel(coListItem, docModel);
-            
-            list.add(coListItem);
+            if (RelationsManager.isQueryMatch(docModel, subjectCsid,
+					predicate, objectCsid) == true) {
+				RelationListItem coListItem = new RelationListItem();
+				RelationUtilsNuxeoImpl.fillRelationListItemFromDocModel(
+						coListItem, docModel);
+				list.add(coListItem);
+			}
         }
 
         return coList;

@@ -32,6 +32,7 @@ import java.util.List;
 import org.collectionspace.services.common.repository.DocumentException;
 import org.collectionspace.services.relation.Relation;
 import org.dom4j.Document;
+import org.nuxeo.ecm.core.api.DocumentModel;
 
 /**
  * The Interface RelationUtils.
@@ -105,4 +106,21 @@ public interface RelationUtils {
 	 * @return the q property name
 	 */
 	public String getQPropertyName(String propertyName);
+	
+	/**
+	 * Checks if is query match.
+	 * 
+	 * @param documentModel the document model
+	 * @param subjectCsid the subject csid
+	 * @param predicate the predicate
+	 * @param objectCsid the object csid
+	 * 
+	 * @return true, if is query match
+	 * 
+	 * @throws DocumentException the document exception
+	 */
+	public boolean isQueryMatch(DocumentModel documentModel,
+			String subjectCsid,
+			String predicate,
+			String objectCsid) throws DocumentException;	
 }

@@ -35,11 +35,21 @@ import org.collectionspace.services.relation.Relation;
 import org.collectionspace.services.common.relation.RelationUtils;
 
 import org.dom4j.Document;
+import org.nuxeo.ecm.core.api.DocumentModel;
 
 /**
  * The Class RelationsManager.
  */
 public class RelationsManager {
+
+	/** The Constant SUBJECT. */
+	static public final String SUBJECT = "subjectCsid";
+	
+	/** The Constant PREDICATE. */
+	static public final String PREDICATE = "predicate";
+	
+	/** The Constant OBJECT. */
+	static public final String OBJECT = "objectCsid";
 
 	/** The relation utils. */
 	static private RelationUtils relationUtils = new RelationUtilsNuxeoImpl();
@@ -119,6 +129,25 @@ public class RelationsManager {
 	 */
 	static public String getQPropertyName(String propertyName) {
 		return relationUtils.getQPropertyName(propertyName);
+	}
+	
+	/**
+	 * Checks if is query match.
+	 * 
+	 * @param documentModel the document model
+	 * @param subjectCsid the subject csid
+	 * @param predicate the predicate
+	 * @param objectCsid the object csid
+	 * 
+	 * @return true, if is query match
+	 * 
+	 * @throws DocumentException the document exception
+	 */
+	static public boolean isQueryMatch(DocumentModel documentModel,
+			String subjectCsid, String predicate, String objectCsid)
+			throws DocumentException {
+		return relationUtils.isQueryMatch(documentModel, subjectCsid,
+				predicate, objectCsid);
 	}
 
 }
