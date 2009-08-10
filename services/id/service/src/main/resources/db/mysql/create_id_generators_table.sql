@@ -1,7 +1,7 @@
 /*	
- * create_id_patterns_table.sql
+ * create_id_generators_table.sql
  *
- * Creates the "id_patterns" table, which stores ID patterns and their state.
+ * Creates the "id_generators" table, which stores ID patterns and their state.
  * Also sets the access permissions of that table.
  *
  * This document is a part of the source code and related artifacts
@@ -27,21 +27,21 @@
 CREATE DATABASE IF NOT EXISTS `cspace`;
 USE `cspace`;
 
-DROP TABLE IF EXISTS `id_patterns`;
-CREATE TABLE `id_patterns` (
-  `id_pattern_csid`        varchar(80) PRIMARY KEY,
-  -- `id_pattern_uri`      varchar(200),
-  `id_pattern_state`       varchar(8000),
+DROP TABLE IF EXISTS `id_generators`;
+CREATE TABLE `id_generators` (
+  `id_generator_csid`        varchar(80) PRIMARY KEY,
+  -- `id_generator_uri`      varchar(200),
+  `id_generator_state`       varchar(8000),
   `last_generated_id`      varchar(255),
   `modified`               timestamp NOT NULL
                            default CURRENT_TIMESTAMP
                            on update CURRENT_TIMESTAMP,
-  INDEX `id_pattern_csid_index` (`id_pattern_csid`)
-  -- INDEX `id_pattern_uri_index` (`id_pattern_uri`)
+  INDEX `id_generator_csid_index` (`id_generator_csid`)
+  -- INDEX `id_generator_uri_index` (`id_generator_uri`)
 ) ENGINE=InnoDB;
 
 GRANT SELECT, INSERT, UPDATE, DELETE
-  on `id_patterns`
+  on `id_generators`
   to `test`;
 
 SHOW WARNINGS;
