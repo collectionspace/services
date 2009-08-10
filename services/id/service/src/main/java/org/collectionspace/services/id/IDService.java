@@ -1,8 +1,4 @@
 /**
- * IDService
- *
- * Interface for the methods of the ID Service.
- *
  * This document is a part of the source code and related artifacts
  * for CollectionSpace, an open source collections management system
  * for museums and related institutions:
@@ -17,16 +13,19 @@
  *
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
+ */
+ 
+package org.collectionspace.services.id;
+
+/**
+ * IDService
  *
- * Based on work by Richard Millet and Sanjay Dalal.
+ * Interface for the ID Service.
  *
  * $LastChangedBy$
  * $LastChangedRevision$
  * $LastChangedDate$
  */
- 
-package org.collectionspace.services.id;
-
 public interface IDService {
 
 	// ----------------------------------------
@@ -37,11 +36,11 @@ public interface IDService {
 
 	// Read single object
 	
-    // Returns the next ID associated with a specified ID pattern.
-    public String nextID(String csid)
+    // Generates and returns a new ID from the specified ID generator.
+    public String newID(String csid)
       throws IllegalArgumentException, IllegalStateException;
     
-    // Returns the last generated ID associated with a specified ID pattern.
+    // Returns the last-generated ID associated with the specified ID generator.
     public String getLastID(String csid)
       throws IllegalArgumentException, IllegalStateException;
 
@@ -50,6 +49,8 @@ public interface IDService {
 	// ----------------------------------------
 	// ID Patterns
 	// ----------------------------------------
+	
+	// @TODO Change this to IDGenerators in the next refactoring.
 	
 	// Create
 	
