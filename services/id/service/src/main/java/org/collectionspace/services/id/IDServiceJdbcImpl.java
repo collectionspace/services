@@ -14,14 +14,20 @@
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
  */
- 
+
+// *IMPORTANT*
+// @TODO: This class is in an early state of a refactoring to
+// reflect a change from IDPatterns to IDGenerators at the top level
+// of the ID Service.  As a result, there will be some naming
+// inconsistencies throughout this source file.
+
 // @TODO: Revise exception handling to return custom Exceptions,
 // perhaps mirroring the subset of HTTP status codes returned.
 //
 // We're currently overloading existing core and extension Java Exceptions
 // in ways that are not consistent with their original semantic meaning.
 
-// @TODO: Retrieve IDPatterns from the database (via JDBC or
+// @TODO: Retrieve IDGenerators from the database (via JDBC or
 // Hibernate) at initialization and refresh time.
 
 // @TODO: Handle concurrency.
@@ -31,7 +37,7 @@
 // the generated IDs may well duplicate other, previously-generated IDs.
 //
 // When we start storing ID generators and IDs in a database, the
-// the current ID associated with each pattern will be stored
+// the current ID associated with each generator will be stored
 // and modified in a single location.
 //
 // At that point, we'll also need to add code to handle concurrent requests.
@@ -111,10 +117,10 @@ public class IDServiceJdbcImpl implements IDService {
     // @TODO Where relevant, implement logic to check for ID availability,
     // after generating a candidate ID.
    
-    // @TODO We're currently using simple integer IDs to identify ID patterns
+    // @TODO We're currently using simple integer IDs to identify ID generators
     // in this initial iteration.
     //
-    // To uniquely identify ID patterns in production, we'll need to handle
+    // To uniquely identify ID generators in production, we'll need to handle
     // both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
     // other form of identifier to be determined, such as URLs or URNs.
     //
@@ -125,12 +131,12 @@ public class IDServiceJdbcImpl implements IDService {
 		
 		if (csid == null || csid.equals("")) {
 			throw new IllegalArgumentException(
-				"Identifier for ID pattern must not be null or empty.");
+				"Identifier for ID generator must not be null or empty.");
 		}
 
-    String serializedPattern = "";
+    String serializedGenerator = "";
 		try {
-			serializedPattern = getIDPattern(csid);
+			serializedGenerator = getIDGenerator(csid);
 		} catch (IllegalArgumentException e ) {
 			throw e;
 		} catch (IllegalStateException e ) {
@@ -138,14 +144,14 @@ public class IDServiceJdbcImpl implements IDService {
 		}
 		
 		// Guard code - should not be needed.
-		if (serializedPattern == null || serializedPattern.equals("")) {
+		if (serializedGenerator == null || serializedGenerator.equals("")) {
 			throw new IllegalArgumentException(
 				"Pattern with ID " + "\'" + csid + "\'" + " could not be found.");
 		}
 
     IDPattern pattern;
     try {
-      pattern = IDPatternSerializer.deserialize(serializedPattern);
+      pattern = IDPatternSerializer.deserialize(serializedGenerator);
     } catch (IllegalArgumentException e) {
 	    throw e;
     }
@@ -173,7 +179,7 @@ public class IDServiceJdbcImpl implements IDService {
 		  // Store the new state of this ID generator, reflecting that
 		  // one of its parts may possibly have had its value updated as
 		  // a result of the generation of this 'new' ID.
-		  updateIDPattern(csid, pattern);
+		  updateIDGenerator(csid, pattern);
 		  
 		} catch (IllegalArgumentException e ) {
 		  throw e;
@@ -187,23 +193,23 @@ public class IDServiceJdbcImpl implements IDService {
 	
   //////////////////////////////////////////////////////////////////////
   /**
-   * Stores the last-generated ID, corresponding to a specified ID pattern,
+   * Stores the last-generated ID, corresponding to a specified ID generator,
    * into persistent storage.
    *
-   * @param  csid     An identifier for an ID pattern.
+   * @param  csid     An identifier for an ID generator.
    *
    * @param  pattern  An ID Pattern, including the values of its constituent parts.
    *
-   * @param  lastId  The value of the last-generated ID associated with that ID pattern.
+   * @param  lastId  The value of the last-generated ID associated with that ID generator.
    *
-   * @throws  IllegalArgumentException if the requested ID pattern could not be found.
+   * @throws  IllegalArgumentException if the requested ID generator could not be found.
    *
    * @throws  IllegalStateException if a storage-related error occurred.
    *
-   * @TODO: We're currently using simple integer IDs to identify ID patterns
+   * @TODO: We're currently using simple integer IDs to identify ID generators
    * in this initial iteration.
    *
-   * To uniquely identify ID patterns in production, we'll need to handle
+   * To uniquely identify ID generators in production, we'll need to handle
    * both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
    * other form of identifier to be determined, such as URLs or URNs.
    *
@@ -244,7 +250,7 @@ public class IDServiceJdbcImpl implements IDService {
       Statement stmt = conn.createStatement();
 			
 			int rowsUpdated = stmt.executeUpdate(
-			  "UPDATE id_patterns SET last_generated_id='" + lastId + "' WHERE id_pattern_csid='" + csid + "'");
+			  "UPDATE id_generators SET last_generated_id='" + lastId + "' WHERE id_generator_csid='" + csid + "'");
 			  
 			if (rowsUpdated != 1) {
         throw new IllegalStateException(
@@ -269,32 +275,32 @@ public class IDServiceJdbcImpl implements IDService {
 
   //////////////////////////////////////////////////////////////////////
   /**
-   * Returns the last-generated ID, corresponding to a specified ID pattern,
+   * Returns the last-generated ID, corresponding to a specified ID generator,
    * from persistent storage.
    *
-   * @param  csid  An identifier for an ID pattern.
+   * @param  csid  An identifier for an ID generator.
    *
-   * @return  The last ID generated that corresponds to the requested ID pattern.
+   * @return  The last ID generated that corresponds to the requested ID generator.
    *
-   * @throws  IllegalArgumentException if the requested ID pattern could not be found.
+   * @throws  IllegalArgumentException if the requested ID generator could not be found.
    *
    * @throws  IllegalStateException if a storage-related error occurred.
-   *
-   * @TODO: We're currently using simple integer IDs to identify ID patterns
-   * in this initial iteration.
-   *
-   * To uniquely identify ID patterns in production, we'll need to handle
-   * both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
-   * other form of identifier to be determined, such as URLs or URNs.
-   *
-   * @TODO: Refactor to remove redundant code that this method shares with other
-   * database-using methods in this class.
-   *
-   * @TODO: Determine whether to add checks for authorization to perform this operation.
    */
 	public String getLastID(String csid) throws IllegalArgumentException, IllegalStateException {
 
 		logger.debug("> in getLastID");
+
+    // @TODO: We're currently using simple integer IDs to identify ID generators
+    // in this initial iteration.
+    //
+    // To uniquely identify ID generators in production, we'll need to handle
+    // both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
+    // other form of identifier to be determined, such as URLs or URNs.
+    //
+    // @TODO: Refactor to remove redundant code that this method shares with other
+    // database-using methods in this class.
+    //
+    // @TODO: Determine whether to add checks for authorization to perform this operation.
 
     String lastId = null;
     
@@ -325,7 +331,7 @@ public class IDServiceJdbcImpl implements IDService {
       Statement stmt = conn.createStatement();
 			
 			ResultSet rs = stmt.executeQuery(
-			  "SELECT last_generated_id FROM id_patterns WHERE id_pattern_csid='" + csid + "'");
+			  "SELECT last_generated_id FROM id_generators WHERE id_generator_csid='" + csid + "'");
 			  
 			boolean moreRows = rs.next();
 			if (! moreRows) {
@@ -359,45 +365,45 @@ public class IDServiceJdbcImpl implements IDService {
 
   //////////////////////////////////////////////////////////////////////
   /**
-   * Adds a new ID pattern to persistent storage.
+   * Adds a new ID generator to persistent storage.
    *
-   * @param  csid     An identifier for an ID pattern.
+   * @param  csid     An identifier for an ID generator.
    *
-   * @param  pattern  An ID pattern, reflecting its current state,
+   * @param  pattern  An ID generator, reflecting its current state,
    *                  including the values of its constituent parts.
    *
    * @throws  IllegalStateException if a storage-related error occurred.
-   *
-   * @TODO: We're currently using simple integer IDs to identify ID patterns
-   * in this initial iteration.
-   *
-   * To uniquely identify ID patterns in production, we'll need to handle
-   * both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
-   * other form of identifier to be determined, such as URLs or URNs.
-   *
-   * @TODO: Refactor to remove redundant code that this method shares with other
-   * database-using methods in this class.
-   *
-   * @TODO: Add checks for authorization to perform this operation.
    */
-	public void addIDPattern(String csid, IDPattern pattern)
+	public void addIDGenerator(String csid, IDPattern pattern)
 	  throws IllegalArgumentException, IllegalStateException {
     
-		logger.debug("> in addIDPattern(String, IDPattern)");
+		logger.debug("> in addIDGenerator(String, IDPattern)");
+
+    // @TODO: We're currently using simple integer IDs to identify ID generators
+    // in this initial iteration.
+    //
+    // To uniquely identify ID generators in production, we'll need to handle
+    // both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
+    // other form of identifier to be determined, such as URLs or URNs.
+
+    // @TODO: Refactor to remove redundant code that this method shares with other
+    // database-using methods in this class.
+
+    // @TODO: Add checks for authorization to perform this operation.
 
 	  if (pattern == null) {
-	    throw new IllegalArgumentException("New ID pattern to add cannot be null.");
+	    throw new IllegalArgumentException("New ID generator to add cannot be null.");
 	  }
 
-    String serializedPattern = "";
+    String serializedGenerator = "";
     try {
-      serializedPattern = IDPatternSerializer.serialize(pattern);
+      serializedGenerator = IDPatternSerializer.serialize(pattern);
     } catch (IllegalArgumentException e) {
 	    throw e;
     }
 
 		try {
-			addIDPattern(csid, serializedPattern);
+			addIDGenerator(csid, serializedGenerator);
 		} catch (IllegalArgumentException e ) {
 			throw e;
 		} catch (IllegalStateException e ) {
@@ -408,39 +414,40 @@ public class IDServiceJdbcImpl implements IDService {
 
   //////////////////////////////////////////////////////////////////////
   /**
-   * Adds a new ID pattern to persistent storage, from a serialization of that pattern.
+   * Adds a new ID generator to persistent storage, from a serialization
+   * of that generator.
    *
    * The serialization method recognized by this method has implementation
    * dependencies.  Currently, this method expects serialization via XStream's
    * out-of-the-box serializer, without custom configuration.
    *
-   * @param  csid     An identifier for an ID pattern.
+   * @param  csid     An identifier for an ID generator.
    *
-   * @param  serializedPattern  A serialized ID Pattern, reflecting its current state,
+   * @param  serializedGenerator  A serialized ID generator, reflecting its current state,
    *                            including the values of its constituent parts.
    *
    * @throws  IllegalStateException if a storage-related error occurred.
-   *
-   * @TODO: We're currently using simple integer IDs to identify ID patterns
-   * in this initial iteration.
-   *
-   * To uniquely identify ID patterns in production, we'll need to handle
-   * both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
-   * other form of identifier to be determined, such as URLs or URNs.
-   *
-   * @TODO: Refactor to remove redundant code that this method shares with other
-   * database-using methods in this class.
-   *
-   * @TODO: Add checks for authorization to perform this operation.
    */
-	public void addIDPattern(String csid, String serializedPattern)
+	public void addIDGenerator(String csid, String serializedGenerator)
 	  throws IllegalArgumentException, IllegalStateException {
     
-		logger.debug("> in addIDPattern(String, String)");
+		logger.debug("> in addIDGenerator(String, String)");
+
+    // @TODO We're currently using simple integer IDs to identify ID generators
+    // in this initial iteration.
+    //
+    // To uniquely identify ID generators in production, we'll need to handle
+    // both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
+    // other form of identifier to be determined, such as URLs or URNs.
+    
+    // @TODO Refactor to remove redundant code that this method shares with other
+    // database-using methods in this class.
+    
+    // @TODO Add checks for authorization to perform this operation.
 		
-		if (serializedPattern == null || serializedPattern.equals("")) {
+		if (serializedGenerator == null || serializedGenerator.equals("")) {
 		  throw new IllegalArgumentException(
-	      "Could not understand or parse this representation of an ID pattern.");
+	      "Could not understand or parse this representation of an ID generator.");
     }
 
     try {
@@ -469,12 +476,12 @@ public class IDServiceJdbcImpl implements IDService {
 
       Statement stmt = conn.createStatement();
 
-      // Test whether this ID pattern already exists in the database.
+      // Test whether this ID generator already exists in the database.
 			//
 			// @TODO This check should extend further, to other aspects of the pattern,
 			// such as its URI, if any, and its structure.
 			ResultSet rs = stmt.executeQuery(
-			  "SELECT id_pattern_csid FROM id_patterns WHERE id_pattern_csid='" + csid + "'");
+			  "SELECT id_generator_csid FROM id_generators WHERE id_generator_csid='" + csid + "'");
 			  
 			boolean moreRows = rs.next();
 			
@@ -483,37 +490,37 @@ public class IDServiceJdbcImpl implements IDService {
         idPatternFound = false;
       }
 			
-			// If this ID pattern already exists in the database, throw an Exception.
+			// If this ID generator already exists in the database, throw an Exception.
 			//
 			// @TODO This exception needs to convey the meaning that a conflict has
 			// occurred, so that this status can be reported to the client.
 			if (idPatternFound) {
         throw new IllegalStateException(
-          "Conflict with existing pattern when attempting to add new ID pattern with ID '" +
+          "Conflict with existing pattern when attempting to add new ID generator with ID '" +
           csid +
           "' to the database.");
           
- 			// Otherwise, add this new ID pattern, as a new record to the database.
+ 			// Otherwise, add this new ID generator, as a new record to the database.
       } else {
  
         final String SQL_STATEMENT_STRING =
-			    "INSERT INTO id_patterns " +
+			    "INSERT INTO id_generators " +
 			    "(" +
-			      "id_pattern_csid, " +
-			      "id_pattern_state, " + 
+			      "id_generator_csid, " +
+			      "id_generator_state, " + 
 			      "last_generated_id" +
 			    ")" +
 			    " VALUES (?, ?, ?)";
 			    
         PreparedStatement ps = conn.prepareStatement(SQL_STATEMENT_STRING);
         ps.setString(1, csid);
-        ps.setString(2, serializedPattern);
+        ps.setString(2, serializedGenerator);
         ps.setNull(3, java.sql.Types.VARCHAR);
         
         int rowsUpdated = ps.executeUpdate();
         if (rowsUpdated != 1) {
           throw new IllegalStateException(
-            "Error adding new ID pattern '" + csid + "'" + " to the database.");
+            "Error adding new ID generator '" + csid + "'" + " to the database.");
         }
         
        } // end if (idPatternFound)
@@ -521,7 +528,7 @@ public class IDServiceJdbcImpl implements IDService {
 		  logger.debug("> successfully added ID Pattern: " + csid);
 
     } catch (SQLException e) {
-      throw new IllegalStateException("Error adding new ID pattern to the database: " + e.getMessage());
+      throw new IllegalStateException("Error adding new ID generator to the database: " + e.getMessage());
     } finally {
       try {
         if (conn != null) {
@@ -536,19 +543,19 @@ public class IDServiceJdbcImpl implements IDService {
 
   //////////////////////////////////////////////////////////////////////
   /**
-   * Updates an existing ID pattern in persistent storage.
+   * Updates an existing ID generator in persistent storage.
    *
-   * @param  csid     An identifier for an ID pattern.
+   * @param  csid     An identifier for an ID generator.
    *
-   * @param  pattern  An ID pattern, reflecting its current state,
+   * @param  pattern  An ID generator, reflecting its current state,
    *                  including the values of its constituent parts.
    *
    * @throws  IllegalStateException if a storage-related error occurred.
    *
-   * @TODO: We're currently using simple integer IDs to identify ID patterns
+   * @TODO: We're currently using simple integer IDs to identify ID generators
    * in this initial iteration.
    *
-   * To uniquely identify ID patterns in production, we'll need to handle
+   * To uniquely identify ID generators in production, we'll need to handle
    * both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
    * other form of identifier to be determined, such as URLs or URNs.
    *
@@ -557,25 +564,25 @@ public class IDServiceJdbcImpl implements IDService {
    *
    * @TODO: Add checks for authorization to perform this operation.
    */
-	public void updateIDPattern(String csid, IDPattern pattern)
+	public void updateIDGenerator(String csid, IDPattern pattern)
 	  throws IllegalArgumentException, IllegalStateException {
     
-		logger.debug("> in updateIDPattern(String, IDPattern)");
+		logger.debug("> in updateIDGenerator(String, IDPattern)");
 
 	  if (pattern == null) {
 	    throw new IllegalArgumentException(
-	      "ID pattern supplied in an attempt to update an existing ID pattern cannot be null.");
+	      "ID generator supplied in an attempt to update an existing ID generator cannot be null.");
 	  }
 
-    String serializedPattern = "";
+    String serializedGenerator = "";
     try {
-      serializedPattern = IDPatternSerializer.serialize(pattern);
+      serializedGenerator = IDPatternSerializer.serialize(pattern);
     } catch (IllegalArgumentException e) {
 	    throw e;
     }
 
 		try {
-			updateIDPattern(csid, serializedPattern);
+			updateIDGenerator(csid, serializedGenerator);
 		} catch (IllegalArgumentException e ) {
 			throw e;
 		} catch (IllegalStateException e ) {
@@ -586,24 +593,24 @@ public class IDServiceJdbcImpl implements IDService {
   
   //////////////////////////////////////////////////////////////////////
   /**
-   * Updates an existing ID pattern in persistent storage,
+   * Updates an existing ID generator in persistent storage,
    * from a serialization of the current state of that pattern.
    *
    * The serialization method recognized by this method has implementation
    * dependencies.  Currently, this method expects serialization via XStream's
    * out-of-the-box serializer, without custom configuration.
    *
-   * @param  csid     An identifier for an ID pattern.
+   * @param  csid     An identifier for an ID generator.
    *
-   * @param  serializedPattern  A serialized ID Pattern, reflecting its current state,
+   * @param  serializedGenerator  A serialized ID Pattern, reflecting its current state,
    *                            including the values of its constituent parts.
    *
    * @throws  IllegalStateException if a storage-related error occurred.
    *
-   * @TODO: We're currently using simple integer IDs to identify ID patterns
+   * @TODO: We're currently using simple integer IDs to identify ID generators
    * in this initial iteration.
    *
-   * To uniquely identify ID patterns in production, we'll need to handle
+   * To uniquely identify ID generators in production, we'll need to handle
    * both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
    * other form of identifier to be determined, such as URLs or URNs.
    *
@@ -612,14 +619,14 @@ public class IDServiceJdbcImpl implements IDService {
    *
    * @TODO: Add checks for authorization to perform this operation.
    */
-	public void updateIDPattern(String csid, String serializedPattern)
+	public void updateIDGenerator(String csid, String serializedGenerator)
 	  throws IllegalArgumentException, IllegalStateException {
     
-		logger.debug("> in updateIDPattern(String, String)");
+		logger.debug("> in updateIDGenerator(String, String)");
 		
-		if (serializedPattern == null || serializedPattern.equals("")) {
+		if (serializedGenerator == null || serializedGenerator.equals("")) {
 		  throw new IllegalArgumentException(
-	      "Could not understand or parse this representation of an ID pattern.");
+	      "Could not understand or parse this representation of an ID generator.");
     }
 
     try {
@@ -648,58 +655,58 @@ public class IDServiceJdbcImpl implements IDService {
 
       Statement stmt = conn.createStatement();
 
-      // Test whether this ID pattern already exists in the database.
+      // Test whether this ID generator already exists in the database.
 			ResultSet rs = stmt.executeQuery(
-			  "SELECT id_pattern_csid FROM id_patterns WHERE id_pattern_csid='" + csid + "'");
+			  "SELECT id_generator_csid FROM id_generators WHERE id_generator_csid='" + csid + "'");
 			  
 			boolean moreRows = rs.next();
 			
-			boolean idPatternFound = true;
+			boolean idGeneratorFound = true;
 			if (! moreRows) {
-        idPatternFound = false;
+        idGeneratorFound = false;
       }
 			
-			// If this ID pattern already exists in the database, update its record.
-			if (idPatternFound) {
+			// If this ID generator already exists in the database, update its record.
+			if (idGeneratorFound) {
 
  			  final String SQL_STATEMENT_STRING =
-			    "UPDATE id_patterns SET " + 
-			       "id_pattern_state = ?, " + 
+			    "UPDATE id_generators SET " + 
+			       "id_generator_state = ?, " + 
 			       "last_generated_id = ? " + 
-			    "WHERE id_pattern_csid = ?";
+			    "WHERE id_generator_csid = ?";
 			    
 			  IDPattern pattern;
         try {
-          pattern = IDPatternSerializer.deserialize(serializedPattern);
+          pattern = IDPatternSerializer.deserialize(serializedGenerator);
         } catch (IllegalArgumentException e) {
           throw e;
         }
 		    String lastId = pattern.getCurrentID();
 			
         PreparedStatement ps = conn.prepareStatement(SQL_STATEMENT_STRING);
-        ps.setString(1, serializedPattern);
+        ps.setString(1, serializedGenerator);
         ps.setString(2, lastId);
         ps.setString(3, csid);
                 
         int rowsUpdated = ps.executeUpdate();
         if (rowsUpdated != 1) {
           throw new IllegalStateException(
-            "Error updating ID pattern '" + csid + "'" + " in the database.");
+            "Error updating ID generator '" + csid + "'" + " in the database.");
         }
         
 			// Otherwise, throw an exception, which indicates that the requested
-			// ID pattern was not found.
+			// ID generator was not found.
       } else {
  
         throw new IllegalArgumentException(
-          "Error updating ID pattern '" + csid + "': pattern could not be found in the database.");
+          "Error updating ID generator '" + csid + "': generator could not be found in the database.");
        
-       } // end if (idPatternFound)
+       } // end if (idGeneratorFound)
 
-		  logger.debug("> successfully updated ID Pattern: " + csid);
+		  logger.debug("> successfully updated ID Generator: " + csid);
 
     } catch (SQLException e) {
-      throw new IllegalStateException("Error updating ID pattern in the database: " + e.getMessage());
+      throw new IllegalStateException("Error updating ID generator in the database: " + e.getMessage());
     } finally {
       try {
         if (conn != null) {
@@ -714,16 +721,16 @@ public class IDServiceJdbcImpl implements IDService {
 
   //////////////////////////////////////////////////////////////////////
   /**
-   * Deletes an existing ID pattern from persistent storage.
+   * Deletes an existing ID generator from persistent storage.
    *
-   * @param  csid     An identifier for an ID pattern.
+   * @param  csid     An identifier for an ID generator.
    *
    * @throws  IllegalStateException if a storage-related error occurred.
    *
-   * @TODO: We're currently using simple integer IDs to identify ID patterns
+   * @TODO: We're currently using simple integer IDs to identify ID generators
    * in this initial iteration.
    *
-   * To uniquely identify ID patterns in production, we'll need to handle
+   * To uniquely identify ID generators in production, we'll need to handle
    * both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
    * other form of identifier to be determined, such as URLs or URNs.
    *
@@ -732,10 +739,10 @@ public class IDServiceJdbcImpl implements IDService {
    *
    * @TODO: Add checks for authorization to perform this operation.
    */
-	public void deleteIDPattern(String csid)
+	public void deleteIDGenerator(String csid)
 	  throws IllegalArgumentException, IllegalStateException {
     
-		logger.debug("> in deleteIDPattern");
+		logger.debug("> in deleteIDGenerator");
 		
     try {
       Class.forName(JDBC_DRIVER_CLASSNAME).newInstance();
@@ -763,22 +770,22 @@ public class IDServiceJdbcImpl implements IDService {
 
       Statement stmt = conn.createStatement();
 
-      // Test whether this ID pattern already exists in the database.
+      // Test whether this ID generator already exists in the database.
 			ResultSet rs = stmt.executeQuery(
-			  "SELECT id_pattern_csid FROM id_patterns WHERE id_pattern_csid='" + csid + "'");
+			  "SELECT id_generator_csid FROM id_generators WHERE id_generator_csid='" + csid + "'");
 			  
 			boolean moreRows = rs.next();
 			
-			boolean idPatternFound = true;
+			boolean idGeneratorFound = true;
 			if (! moreRows) {
-        idPatternFound = false;
+        idGeneratorFound = false;
       }
 			
-			// If this ID pattern already exists in the database, update its record.
-			if (idPatternFound) {
+			// If this ID generator already exists in the database, update its record.
+			if (idGeneratorFound) {
 
  			  final String SQL_STATEMENT_STRING =
-			    "DELETE FROM id_patterns WHERE id_pattern_csid = ?";
+			    "DELETE FROM id_generators WHERE id_generator_csid = ?";
 			    
         PreparedStatement ps = conn.prepareStatement(SQL_STATEMENT_STRING);
         ps.setString(1, csid);
@@ -786,22 +793,22 @@ public class IDServiceJdbcImpl implements IDService {
         int rowsUpdated = ps.executeUpdate();
         if (rowsUpdated != 1) {
           throw new IllegalStateException(
-            "Error deleting ID pattern '" + csid + "'" + " in the database.");
+            "Error deleting ID generator '" + csid + "'" + " in the database.");
         }
         
 			// Otherwise, throw an exception, which indicates that the requested
-			// ID pattern was not found.
+			// ID generator was not found.
       } else {
  
         throw new IllegalArgumentException(
-          "Error deleting ID pattern '" + csid + "': pattern could not be found in the database.");
+          "Error deleting ID generator '" + csid + "': generator could not be found in the database.");
        
-       } // end if (idPatternFound)
+       } // end if (idGeneratorFound)
 
-		  logger.debug("> successfully deleted ID Pattern: " + csid);
+		  logger.debug("> successfully deleted ID generator: " + csid);
 
     } catch (SQLException e) {
-      throw new IllegalStateException("Error deleting ID pattern in database: " + e.getMessage());
+      throw new IllegalStateException("Error deleting ID generator in database: " + e.getMessage());
     } finally {
       try {
         if (conn != null) {
@@ -816,33 +823,31 @@ public class IDServiceJdbcImpl implements IDService {
     
   //////////////////////////////////////////////////////////////////////
   /**
-   * Returns a requested ID pattern from persistent storage.  This pattern will
-   * include values for the last-generated IDs of each of its constituent parts,
-   * and thus can be used to generate a current or 'next' ID for that pattern.
+   * Returns a requested ID generator from persistent storage.
    *
-   * @param  csid  An identifier for an ID pattern.
+   * @param  csid  An identifier for an ID generator.
    *
-   * @return  A serialized representation of the requested ID pattern.
+   * @return  A serialized representation of the requested ID generator.
    *
-   * @throws  IllegalArgumentException if the requested ID pattern could not be found.
+   * @throws  IllegalArgumentException if the requested ID generator could not be found.
    *
    * @throws  IllegalStateException if a storage-related error occurred.
    *
-   * @TODO: We're currently using simple integer IDs to identify ID patterns
+   * @TODO: We're currently using simple integer IDs to identify ID generators
    * in this initial iteration.
    *
-   * To uniquely identify ID patterns in production, we'll need to handle
+   * To uniquely identify ID generators in production, we'll need to handle
    * both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
    * other form of identifier to be determined, such as URLs or URNs.
    *
    * @TODO: Refactor to remove redundant code that this method shares with other
    * database-using methods in this class.
    */
-	public String getIDPattern (String csid) throws IllegalArgumentException, IllegalStateException {
+	public String getIDGenerator (String csid) throws IllegalArgumentException, IllegalStateException {
 
-		logger.debug("> in getIDPattern");
+		logger.debug("> in getIDGenerator");
 
-    String serializedPattern = null;
+    String serializedGenerator = null;
     
     try {
       Class.forName(JDBC_DRIVER_CLASSNAME).newInstance();
@@ -871,23 +876,23 @@ public class IDServiceJdbcImpl implements IDService {
       Statement stmt = conn.createStatement();
 			
 			ResultSet rs = stmt.executeQuery(
-			  "SELECT id_pattern_state FROM id_patterns WHERE id_pattern_csid='" + csid + "'");
+			  "SELECT id_generator_state FROM id_generators WHERE id_generator_csid='" + csid + "'");
 			  
 			boolean moreRows = rs.next();
 			if (! moreRows) {
         throw new IllegalArgumentException(
-          "Pattern with ID " +
+          "ID generator with ID " +
           "\'" + csid + "\'" +
           " could not be found.");
       }
 
-			serializedPattern = rs.getString(1);
+			serializedGenerator = rs.getString(1);
 			
 			rs.close();
 
     } catch (SQLException e) {
       throw new IllegalStateException(
-        "Error retrieving ID pattern " +
+        "Error retrieving ID generator " +
         "\'" + csid + "\'" +
         " from database: " + e.getMessage());
     } finally {
@@ -900,9 +905,9 @@ public class IDServiceJdbcImpl implements IDService {
       }
     }
     
-	  logger.debug("> retrieved IDPattern: " + serializedPattern);
+	  logger.debug("> retrieved IDGenerator: " + serializedGenerator);
 
-    return serializedPattern;
+    return serializedGenerator;
 
   }
   

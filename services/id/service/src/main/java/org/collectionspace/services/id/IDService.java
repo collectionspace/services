@@ -47,25 +47,23 @@ public interface IDService {
 	// Read a list of objects (aka read multiple)
 	
 	// ----------------------------------------
-	// ID Patterns
+	// ID Generators
 	// ----------------------------------------
-	
-	// @TODO Change this to IDGenerators in the next refactoring.
 	
 	// Create
 	
-	  // Adds a new ID pattern.
-    public void addIDPattern(String csid, String serializedIDPattern)
+	  // Adds a new ID generator.
+    public void addIDGenerator(String csid, String serializedIDGenerator)
       throws IllegalArgumentException, IllegalStateException;
 	
 	  // Read single object
-    public String getIDPattern(String csid)
+    public String getIDGenerator(String csid)
       throws IllegalArgumentException, IllegalStateException;
 	
 	// Read a list of objects (aka read multiple)
 	
-	  // Update (may need to check for changes in the ID pattern structure)
-    public void updateIDPattern(String csid, String serializedIDPattern)
+	  // Update (may need to check for changes in the ID generator structure)
+    public void updateIDGenerator(String csid, String serializedIDGenerator)
       throws IllegalArgumentException, IllegalStateException;
 	
 	// Delete (possibly not permitted - deactivate instead?)
