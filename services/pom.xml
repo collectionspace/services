@@ -30,6 +30,7 @@
         <module>intake</module>
         <module>JaxRsServiceProvider</module>
         <module>client</module>
+        <module>IntegrationTests</module>
     </modules>
 
     <repositories>
