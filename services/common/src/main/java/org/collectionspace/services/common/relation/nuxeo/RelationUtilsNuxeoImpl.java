@@ -118,7 +118,7 @@ public class RelationUtilsNuxeoImpl implements RelationUtils {
 		relation.setDocumentId2((String) valueObject);
 
 		valueObject = relDocModel.getProperty(REL_NUXEO_SCHEMA_NAME, xpathRoot
-				+ RelationJAXBSchema.DOCUMENT_TYPE_1);
+				+ RelationJAXBSchema.DOCUMENT_TYPE_2);
 		relation.setDocumentType2((String) valueObject);
 
 		valueObject = relDocModel.getProperty(REL_NUXEO_SCHEMA_NAME, xpathRoot
@@ -146,9 +146,9 @@ public class RelationUtilsNuxeoImpl implements RelationUtils {
 		throws DocumentException {
 
 		try {
-			relationListItem.setUri(
-					relDocModel.getId());
 			relationListItem.setCsid(
+					relDocModel.getId());
+			relationListItem.setUri(
 					getRelURL(CS_RELATION_SERVICE_NAME, relDocModel.getId()));
 		} catch (Exception e) {
 			if (logger.isDebugEnabled()) {
