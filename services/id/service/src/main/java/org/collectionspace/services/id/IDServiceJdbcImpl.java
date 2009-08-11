@@ -21,16 +21,26 @@
 // of the ID Service.  As a result, there will be some naming
 // inconsistencies throughout this source file.
 
-// @TODO: Revise exception handling to return custom Exceptions,
+// @TODO Revise exception handling to return custom Exceptions,
 // perhaps mirroring the subset of HTTP status codes returned.
 //
 // We're currently overloading existing core and extension Java Exceptions
 // in ways that are not consistent with their original semantic meaning.
 
-// @TODO: Retrieve IDGenerators from the database (via JDBC or
+// @TODO Get the JDBC driver classname and database URL from configuration;
+// better yet, substitute Hibernate for JDBC for accessing database-managed persistence.
+
+// @TODO Remove any hard-coded dependencies on MySQL.
+
+// @TODO Determine how to restrict access to ID-related tables by role.
+
+// @TODO Retrieve IDGenerators from the database (via JDBC or
 // Hibernate) at initialization and refresh time.
 
-// @TODO: Handle concurrency.
+// @TODO Remove redundancy.  If we're using JDBC, a great deal of JDBC code
+// is replicated in each method below.
+
+// @TODO Handle concurrency.
 //
 // Right now, with each new request we're simply instantiating
 // a new IDPattern and returning its next ID.  As a result,
@@ -42,11 +52,12 @@
 //
 // At that point, we'll also need to add code to handle concurrent requests.
 
-// @TODO: Verify access (public, protected, or private) to service methods.
+// @TODO Verify access (public, protected, or private) to service methods.
 
-// @TODO: As long as we're using JDBC, use PreparedStatements, not Statements.
+// @TODO As long as we're using JDBC, use PreparedStatements, not Statements,
+// throughout the code below.
 
-// @TODO: Re-consider beginnings of method names:
+// @TODO Re-consider beginnings of method names:
 // - "store/get" versus:
 // - "store/retrieve"
 // - "save/read" (appears to be used by Hibernate),
@@ -79,25 +90,123 @@ public class IDServiceJdbcImpl implements IDService {
 
 	final Logger logger = LoggerFactory.getLogger(IDServiceJdbcImpl.class);
 
-  // @TODO Get the JDBC driver classname and database URL from configuration;
-  // better yet, substitute Hibernate for JDBC for accessing database-managed persistence.
-  
-  // @TODO: Remove any hard-coded dependencies on MySQL.
-  
-  // @TODO: Determine how to restrict access to ID-related tables by role.
-  
   final String JDBC_DRIVER_CLASSNAME = "com.mysql.jdbc.Driver";
-  final String DATABASE_URL = "jdbc:mysql://localhost:3306/cspace";
+  final String DATABASE_NAME = "cspace";
+  final String DATABASE_URL = "jdbc:mysql://localhost:3306/" + DATABASE_NAME;
   final String DATABASE_USERNAME = "test";
   final String DATABASE_PASSWORD = "test";
+  final String TABLE_NAME = "id_generator";
 
   //////////////////////////////////////////////////////////////////////
   /**
    * Constructor (no-argument).
    */ 
   public void IDServiceJdbcImpl() {
+  
+    // @TODO Decide when and how to fail at startup, or else to correct
+    // failure conditions automatically, when preconditions are not met.
+    
+    // init();
+  }
+  
+  // @TODO init() and hasTable() are currently UNTESTED as of 2009-08-11T13:00-0700.
+
+  //////////////////////////////////////////////////////////////////////
+  /**
+   * Initializes the service.
+   *
+   * @throws  IllegalStateException if one or more of the required preconditions
+   *          for the service is not present, or is not in its required state.
+   */
+  public void init() throws IllegalStateException {
+  
+    try {
+      boolean hasTable = hasTable(TABLE_NAME);
+      if (! hasTable) {
+        throw new IllegalStateException(
+          "Table " + "\'" + TABLE_NAME + "\'" + " could not be found in the database.");
+      }
+    } catch (IllegalStateException e) {
+      throw e;
+    }
+  
   }
 
+  //////////////////////////////////////////////////////////////////////
+  /**
+   * Identifies whether a specified table exists in the database.
+   *
+   * @param   tablename  The name of a database table.
+   *
+   * @return  True if the specified table exists in the database;
+   *          false if the specified table does not exist in the database.
+   *
+   * @throws  IllegalStateException if an error occurs while checking for the
+   *          existence of the specified table.
+   */
+  public boolean hasTable(String tablename) throws IllegalStateException {
+
+		logger.debug("> in hasTable");
+
+		if (tablename == null || tablename.equals("")) {
+			return false;
+		}
+
+    try {
+      Class.forName(JDBC_DRIVER_CLASSNAME).newInstance();
+    } catch (ClassNotFoundException e) {
+      throw new IllegalStateException(
+        "Error finding JDBC driver class '" +
+        JDBC_DRIVER_CLASSNAME +
+        "' to set up database connection.");
+    } catch (InstantiationException e) {
+      throw new IllegalStateException(
+        "Error instantiating JDBC driver class '" +
+        JDBC_DRIVER_CLASSNAME +
+        "' to set up database connection.");
+     } catch (IllegalAccessException e) {
+      throw new IllegalStateException(
+        "Error accessing JDBC driver class '" +
+        JDBC_DRIVER_CLASSNAME +
+        "' to set up database connection.");
+    }
+    
+    Connection conn = null;
+    try {
+    
+      conn = DriverManager.getConnection(DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD);
+
+      Statement stmt = conn.createStatement();
+      
+      final String CATALOG_NAME = null;
+      final String SCHEMA_NAME_PATTERN = null;
+      final String[] TABLE_TYPES = null;
+      ResultSet tablesMatchingTableName =
+        conn.getMetaData().getTables(
+          CATALOG_NAME, SCHEMA_NAME_PATTERN, tablename, TABLE_TYPES);
+
+			boolean moreRows = tablesMatchingTableName.next();
+			if (! moreRows) {
+        return false;
+      } else {
+        return true;
+      }
+
+    } catch (SQLException e) {
+      throw new IllegalStateException(
+        "Error while checking for existance of tablebase table: " + e.getMessage());
+    } finally {
+      try {
+        if (conn != null) {
+          conn.close();
+        }
+      } catch(SQLException e) {
+        // Do nothing here
+      }
+    }
+    
+  }
+        
   //////////////////////////////////////////////////////////////////////
   /**
    * Generates and returns a new ID associated with a specified ID generator.
@@ -108,6 +217,11 @@ public class IDServiceJdbcImpl implements IDService {
    * @param  csid  An identifier for an ID generator.
    *
    * @return  A new ID associated with the specified ID generator.
+   *
+   * @throws  IllegalArgumentException if the provided csid is null or empty,
+   *          or if the specified ID generator can't be found.
+   *
+   * @throws  IllegalStateException if a storage-related error occurred.
    */
 	public String newID(String csid) throws
 		IllegalArgumentException, IllegalStateException {
