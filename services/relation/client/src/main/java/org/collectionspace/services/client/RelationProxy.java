@@ -8,7 +8,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.relation.Relation;
 import org.collectionspace.services.relation.RelationList;
@@ -24,6 +26,12 @@ public interface RelationProxy {
 
     @GET
     ClientResponse<RelationList> getRelationList();
+    
+	@GET
+	@Path("subject/{subjectCsid}/type/{predicate}/object/{objectCsid}")
+	ClientResponse<RelationList> getRelationList_SPO(@PathParam("subjectCsid") String subjectCsid,
+			@PathParam("predicate") String predicate,
+			@PathParam("objectCsid") String objectCsid);
 
     //(C)reate
     @POST
