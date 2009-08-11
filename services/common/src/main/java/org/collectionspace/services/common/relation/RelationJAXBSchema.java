@@ -53,20 +53,7 @@ public interface RelationJAXBSchema {
 	
 	/** The Constant RELATIONSHIP_TYPE. */
 	final static String RELATIONSHIP_TYPE = "relationshipType";
-	
-	/*
-	 * Relation Types/Predicates Enumerations
-	 */
-	
-	/** The Constant ENUM_RELATIONSHIP_TYPE_ASSOC. */
-	final static String ENUM_REL_TYPE_ASSOC = "association";
-	
-	/** The Constant ENUM_RELATIONSHIP_TYPE_CONTAINS. */
-	final static String ENUM_REL_TYPE_CONTAINS = "contains";
-	
-	/** The Constant ENUM_RELATIONSHIP_TYPE_COLLECTIONOBJECT_INTAKE. */
-	final static String ENUM_REL_TYPE_COLLECTIONOBJECT_INTAKE = "collectionobject-intake";
-	
+		
 }
 
 
