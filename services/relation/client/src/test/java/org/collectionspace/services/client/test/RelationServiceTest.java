@@ -15,6 +15,7 @@ import org.collectionspace.services.relation.RelationList;
 import org.collectionspace.services.relation.RelationshipType;
 
 import org.collectionspace.services.client.RelationClient;
+import org.collectionspace.services.collectionobject.CollectionObject;
 import org.collectionspace.services.common.relation.RelationJAXBSchema;
 
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ import org.slf4j.LoggerFactory;
 public class RelationServiceTest {
 
     /** The relation client. */
-    private RelationClient relationClient = RelationClient.getInstance();
+    private RelationClient relationClient = new RelationClient();
     
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(RelationServiceTest.class);
@@ -39,9 +40,33 @@ public class RelationServiceTest {
     @Test
     public void createRelation() {
         long identifier = this.createIdentifier();
-        this.createRelationEntity(identifier);
+        
+        Relation relation = new Relation();
+        fillRelation(relation, identifier);
+        ClientResponse<Response> res = relationClient.createRelation(relation);
+        verbose("createRelation: status = " + res.getStatus());
+        Assert.assertEquals(res.getStatus(), Response.Status.CREATED.getStatusCode());
     }    
 
+    @Test(dependsOnMethods = { "createRelation" })
+	public void getRelation() {
+    	//
+    	//	First, create a relation object
+    	//
+        Relation relation = new Relation();
+        fillRelation(relation, createIdentifier());
+        ClientResponse<Response> response = relationClient.createRelation(relation);
+        Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
+        String relationCsid = extractId(response);
+
+        ClientResponse<Relation> relationResponse = relationClient.getRelation(relationCsid);
+		verbose("getRelation: status = " + response.getStatus());
+		Assert.assertEquals(relationResponse.getStatus(), Response.Status.OK.getStatusCode());
+
+		Relation returnedRelation = relationResponse.getEntity();
+		Assert.assertEquals(returnedRelation.getCsid(), relationCsid);
+	}
+    
     /**
      * Update relation.
      */
@@ -159,8 +184,7 @@ public class RelationServiceTest {
                 "SubjectType-" + identifier + "-type",
                 "Object-" + identifier,
                 "ObjectType-" + identifier + "-type",
-                RelationshipType.fromValue(
-                		RelationJAXBSchema.ENUM_REL_TYPE_ASSOC));
+                RelationshipType.COLLECTIONOBJECT_INTAKE);
     }
 
     /**
