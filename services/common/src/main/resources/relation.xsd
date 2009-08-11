@@ -29,7 +29,7 @@
                 <xs:element name="documentType1" type="xs:string" minOccurs="1" maxOccurs="1"/>
                 <xs:element name="documentId2" type="xs:string" minOccurs="1" maxOccurs="1"/>
                 <xs:element name="documentType2" type="xs:string" minOccurs="1" maxOccurs="1"/>
-                <!-- type of relatinoship between two entities -->
+                <!-- type of relationship between two entities -->
                 <xs:element name="relationshipType" type="rel:RelationshipType" minOccurs="1" maxOccurs="1"/>
             </xs:sequence>
         </xs:complexType>
