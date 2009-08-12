@@ -63,7 +63,6 @@ public class IDServiceJdbcImplTest extends TestCase {
     // errors until we add working tests to this class.
   }
 
-/* 
   @Test
   public void testAddIDGenerator() {
     jdbc.addIDGenerator(DEFAULT_CSID, getSpectrumEntryNumberGenerator());
@@ -190,6 +189,5 @@ public class IDServiceJdbcImplTest extends TestCase {
     return IDPatternSerializer.serialize(pattern);
     
   }
-*/
 
 }

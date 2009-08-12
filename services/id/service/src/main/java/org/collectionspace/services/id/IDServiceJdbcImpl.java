@@ -37,8 +37,15 @@
 // @TODO Retrieve IDGenerators from the database (via JDBC or
 // Hibernate) at initialization and refresh time.
 
-// @TODO Remove redundancy.  If we're using JDBC, a great deal of JDBC code
-// is replicated in each method below.
+// @TODO Handle both CollectionSpace IDs and URIs as identifiers
+// for ID generators, replacing simple integer IDs.
+//
+// We're currently using simple integer IDs to identify ID generators
+// in this initial iteration.
+//
+// To uniquely identify ID generators in production, we'll need to handle
+// both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
+// other form of identifier to be determined, such as URLs or URNs.
 
 // @TODO Handle concurrency.
 //
@@ -46,11 +53,12 @@
 // a new IDPattern and returning its next ID.  As a result,
 // the generated IDs may well duplicate other, previously-generated IDs.
 //
-// When we start storing ID generators and IDs in a database, the
-// the current ID associated with each generator will be stored
+// When we start storing ID generators and IDs in a database,
+// the state associated with each generator will be stored
 // and modified in a single location.
 //
-// At that point, we'll also need to add code to handle concurrent requests.
+// At that point, we'll also need to add code to handle concurrent
+// requests to modify that state.
 
 // @TODO Verify access (public, protected, or private) to service methods.
 
@@ -96,6 +104,8 @@ public class IDServiceJdbcImpl implements IDService {
   final String DATABASE_USERNAME = "test";
   final String DATABASE_PASSWORD = "test";
   final String TABLE_NAME = "id_generator";
+  
+  boolean hasPreconditions = true;
 
   //////////////////////////////////////////////////////////////////////
   /**
@@ -105,8 +115,12 @@ public class IDServiceJdbcImpl implements IDService {
   
     // @TODO Decide when and how to fail at startup, or else to correct
     // failure conditions automatically, when preconditions are not met.
+    //
+    // Currently, errors at initialization are merely informative and
+    // result in exceptions that can be persistently logged.
     
-    // init();
+    init();
+    
   }
   
   // @TODO init() and hasTable() are currently UNTESTED as of 2009-08-11T13:00-0700.
@@ -119,12 +133,24 @@ public class IDServiceJdbcImpl implements IDService {
    *          for the service is not present, or is not in its required state.
    */
   public void init() throws IllegalStateException {
-  
+
+		logger.debug("> in init");
+
+    try {
+      instantiateJdbcDriver(JDBC_DRIVER_CLASSNAME);
+    } catch (IllegalStateException e) {
+      throw e;
+    }
+    
     try {
       boolean hasTable = hasTable(TABLE_NAME);
       if (! hasTable) {
-        throw new IllegalStateException(
-          "Table " + "\'" + TABLE_NAME + "\'" + " could not be found in the database.");
+        String msg =
+          "Required table " +
+          "\'" + TABLE_NAME + "\'" +
+          " could not be found in the database.";
+		    logger.warn(msg);
+        throw new IllegalStateException(msg);
       }
     } catch (IllegalStateException e) {
       throw e;
@@ -132,6 +158,41 @@ public class IDServiceJdbcImpl implements IDService {
   
   }
 
+  //////////////////////////////////////////////////////////////////////
+  /**
+   * Creates a new instance of the specified JDBC driver class.
+   *
+   * @param   jdbcDriverClassname  The name of a JDBC driver class.
+   *
+   * @throws  IllegalStateException if a new instance of the specified
+   *          JDBC driver class cannot be created.
+   */
+  public void instantiateJdbcDriver(String jdbcDriverClassname)
+    throws IllegalStateException {
+
+		logger.debug("> in instantiateJdbcDriver(String)");
+  
+    try {
+      Class.forName(jdbcDriverClassname).newInstance();
+    } catch (ClassNotFoundException e) {
+      throw new IllegalStateException(
+        "Error finding JDBC driver class '" +
+        JDBC_DRIVER_CLASSNAME +
+        "' to set up database connection.");
+    } catch (InstantiationException e) {
+      throw new IllegalStateException(
+        "Error instantiating JDBC driver class '" +
+        JDBC_DRIVER_CLASSNAME +
+        "' to set up database connection.");
+     } catch (IllegalAccessException e) {
+      throw new IllegalStateException(
+        "Error accessing JDBC driver class '" +
+        JDBC_DRIVER_CLASSNAME +
+        "' to set up database connection.");
+    }
+      
+  }
+  
   //////////////////////////////////////////////////////////////////////
   /**
    * Identifies whether a specified table exists in the database.
@@ -151,33 +212,13 @@ public class IDServiceJdbcImpl implements IDService {
 		if (tablename == null || tablename.equals("")) {
 			return false;
 		}
-
-    try {
-      Class.forName(JDBC_DRIVER_CLASSNAME).newInstance();
-    } catch (ClassNotFoundException e) {
-      throw new IllegalStateException(
-        "Error finding JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-    } catch (InstantiationException e) {
-      throw new IllegalStateException(
-        "Error instantiating JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-     } catch (IllegalAccessException e) {
-      throw new IllegalStateException(
-        "Error accessing JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-    }
-    
+      
     Connection conn = null;
     try {
-    
-      conn = DriverManager.getConnection(DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD);
 
-      Statement stmt = conn.createStatement();
-      
+      conn = getJdbcConnection();
+    
+      // Retrieve a list of tables in the current database. 
       final String CATALOG_NAME = null;
       final String SCHEMA_NAME_PATTERN = null;
       final String[] TABLE_TYPES = null;
@@ -185,6 +226,7 @@ public class IDServiceJdbcImpl implements IDService {
         conn.getMetaData().getTables(
           CATALOG_NAME, SCHEMA_NAME_PATTERN, tablename, TABLE_TYPES);
 
+      // Check whether a table with the specified name is in that list. 
 			boolean moreRows = tablesMatchingTableName.next();
 			if (! moreRows) {
         return false;
@@ -194,7 +236,7 @@ public class IDServiceJdbcImpl implements IDService {
 
     } catch (SQLException e) {
       throw new IllegalStateException(
-        "Error while checking for existance of tablebase table: " + e.getMessage());
+        "Error while checking for existence of tablebase table: " + e.getMessage());
     } finally {
       try {
         if (conn != null) {
@@ -231,13 +273,6 @@ public class IDServiceJdbcImpl implements IDService {
     // @TODO Where relevant, implement logic to check for ID availability,
     // after generating a candidate ID.
    
-    // @TODO We're currently using simple integer IDs to identify ID generators
-    // in this initial iteration.
-    //
-    // To uniquely identify ID generators in production, we'll need to handle
-    // both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
-    // other form of identifier to be determined, such as URLs or URNs.
-    //
     // @TODO: Add checks for authorization to perform this operation.
 
 		String newId = "";
@@ -319,48 +354,21 @@ public class IDServiceJdbcImpl implements IDService {
    * @throws  IllegalArgumentException if the requested ID generator could not be found.
    *
    * @throws  IllegalStateException if a storage-related error occurred.
-   *
-   * @TODO: We're currently using simple integer IDs to identify ID generators
-   * in this initial iteration.
-   *
-   * To uniquely identify ID generators in production, we'll need to handle
-   * both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
-   * other form of identifier to be determined, such as URLs or URNs.
-   *
-   * @TODO: Refactor to remove redundant code that this method shares with other
-   * database-using methods in this class.
-   *
-   * @TODO: Add checks for authorization to perform this operation.
    */
 	public void updateLastID(String csid, String lastId)
 	  throws IllegalArgumentException, IllegalStateException {
     
 		logger.debug("> in updateLastID");
 
-    try {
-      Class.forName(JDBC_DRIVER_CLASSNAME).newInstance();
-    } catch (ClassNotFoundException e) {
-      throw new IllegalStateException(
-        "Error finding JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-    } catch (InstantiationException e) {
-      throw new IllegalStateException(
-        "Error instantiating JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-     } catch (IllegalAccessException e) {
-      throw new IllegalStateException(
-        "Error accessing JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-    }
-    
+    // @TODO Where relevant, implement logic to check for ID availability,
+    // after generating a candidate ID.
+   
+    // @TODO: Add checks for authorization to perform this operation.
+
     Connection conn = null;
     try {
     
-      conn = DriverManager.getConnection(DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD);
-
+      conn = getJdbcConnection();
       Statement stmt = conn.createStatement();
 			
 			int rowsUpdated = stmt.executeUpdate(
@@ -404,44 +412,16 @@ public class IDServiceJdbcImpl implements IDService {
 
 		logger.debug("> in getLastID");
 
-    // @TODO: We're currently using simple integer IDs to identify ID generators
-    // in this initial iteration.
-    //
-    // To uniquely identify ID generators in production, we'll need to handle
-    // both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
-    // other form of identifier to be determined, such as URLs or URNs.
-    //
-    // @TODO: Refactor to remove redundant code that this method shares with other
-    // database-using methods in this class.
-    //
-    // @TODO: Determine whether to add checks for authorization to perform this operation.
+    // @TODO Where relevant, implement logic to check for ID availability,
+    // after generating a candidate ID.
+   
+    // @TODO: Add checks for authorization to perform this operation.
 
     String lastId = null;
-    
-    try {
-      Class.forName(JDBC_DRIVER_CLASSNAME).newInstance();
-    } catch (ClassNotFoundException e) {
-      throw new IllegalStateException(
-        "Error finding JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-    } catch (InstantiationException e) {
-      throw new IllegalStateException(
-        "Error instantiating JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-     } catch (IllegalAccessException e) {
-      throw new IllegalStateException(
-        "Error accessing JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-    }
-
     Connection conn = null;
     try {
-    
-      conn = DriverManager.getConnection(DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD);
 
+      conn = getJdbcConnection();
       Statement stmt = conn.createStatement();
 			
 			ResultSet rs = stmt.executeQuery(
@@ -493,16 +473,6 @@ public class IDServiceJdbcImpl implements IDService {
     
 		logger.debug("> in addIDGenerator(String, IDPattern)");
 
-    // @TODO: We're currently using simple integer IDs to identify ID generators
-    // in this initial iteration.
-    //
-    // To uniquely identify ID generators in production, we'll need to handle
-    // both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
-    // other form of identifier to be determined, such as URLs or URNs.
-
-    // @TODO: Refactor to remove redundant code that this method shares with other
-    // database-using methods in this class.
-
     // @TODO: Add checks for authorization to perform this operation.
 
 	  if (pattern == null) {
@@ -547,16 +517,6 @@ public class IDServiceJdbcImpl implements IDService {
     
 		logger.debug("> in addIDGenerator(String, String)");
 
-    // @TODO We're currently using simple integer IDs to identify ID generators
-    // in this initial iteration.
-    //
-    // To uniquely identify ID generators in production, we'll need to handle
-    // both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
-    // other form of identifier to be determined, such as URLs or URNs.
-    
-    // @TODO Refactor to remove redundant code that this method shares with other
-    // database-using methods in this class.
-    
     // @TODO Add checks for authorization to perform this operation.
 		
 		if (serializedGenerator == null || serializedGenerator.equals("")) {
@@ -564,30 +524,10 @@ public class IDServiceJdbcImpl implements IDService {
 	      "Could not understand or parse this representation of an ID generator.");
     }
 
-    try {
-      Class.forName(JDBC_DRIVER_CLASSNAME).newInstance();
-    } catch (ClassNotFoundException e) {
-      throw new IllegalStateException(
-        "Error finding JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-    } catch (InstantiationException e) {
-      throw new IllegalStateException(
-        "Error instantiating JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-     } catch (IllegalAccessException e) {
-      throw new IllegalStateException(
-        "Error accessing JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-    }
-    
     Connection conn = null;
     try {
     
-      conn = DriverManager.getConnection(DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD);
-
+      conn = getJdbcConnection();
       Statement stmt = conn.createStatement();
 
       // Test whether this ID generator already exists in the database.
@@ -599,16 +539,16 @@ public class IDServiceJdbcImpl implements IDService {
 			  
 			boolean moreRows = rs.next();
 			
-			boolean idPatternFound = true;
+			boolean idGeneratorFound = true;
 			if (! moreRows) {
-        idPatternFound = false;
+        idGeneratorFound = false;
       }
 			
 			// If this ID generator already exists in the database, throw an Exception.
 			//
 			// @TODO This exception needs to convey the meaning that a conflict has
 			// occurred, so that this status can be reported to the client.
-			if (idPatternFound) {
+			if (idGeneratorFound) {
         throw new IllegalStateException(
           "Conflict with existing pattern when attempting to add new ID generator with ID '" +
           csid +
@@ -637,7 +577,7 @@ public class IDServiceJdbcImpl implements IDService {
             "Error adding new ID generator '" + csid + "'" + " to the database.");
         }
         
-       } // end if (idPatternFound)
+       } // end if (idGeneratorFound)
 
 		  logger.debug("> successfully added ID Pattern: " + csid);
 
@@ -665,23 +605,13 @@ public class IDServiceJdbcImpl implements IDService {
    *                  including the values of its constituent parts.
    *
    * @throws  IllegalStateException if a storage-related error occurred.
-   *
-   * @TODO: We're currently using simple integer IDs to identify ID generators
-   * in this initial iteration.
-   *
-   * To uniquely identify ID generators in production, we'll need to handle
-   * both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
-   * other form of identifier to be determined, such as URLs or URNs.
-   *
-   * @TODO: Refactor to remove redundant code that this method shares with other
-   * database-using methods in this class.
-   *
-   * @TODO: Add checks for authorization to perform this operation.
    */
 	public void updateIDGenerator(String csid, IDPattern pattern)
 	  throws IllegalArgumentException, IllegalStateException {
     
 		logger.debug("> in updateIDGenerator(String, IDPattern)");
+
+    // @TODO: Add checks for authorization to perform this operation.
 
 	  if (pattern == null) {
 	    throw new IllegalArgumentException(
@@ -720,53 +650,23 @@ public class IDServiceJdbcImpl implements IDService {
    *                            including the values of its constituent parts.
    *
    * @throws  IllegalStateException if a storage-related error occurred.
-   *
-   * @TODO: We're currently using simple integer IDs to identify ID generators
-   * in this initial iteration.
-   *
-   * To uniquely identify ID generators in production, we'll need to handle
-   * both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
-   * other form of identifier to be determined, such as URLs or URNs.
-   *
-   * @TODO: Refactor to remove redundant code that this method shares with other
-   * database-using methods in this class.
-   *
-   * @TODO: Add checks for authorization to perform this operation.
    */
 	public void updateIDGenerator(String csid, String serializedGenerator)
 	  throws IllegalArgumentException, IllegalStateException {
     
 		logger.debug("> in updateIDGenerator(String, String)");
+
+    // @TODO: Add checks for authorization to perform this operation.
 		
 		if (serializedGenerator == null || serializedGenerator.equals("")) {
 		  throw new IllegalArgumentException(
 	      "Could not understand or parse this representation of an ID generator.");
     }
 
-    try {
-      Class.forName(JDBC_DRIVER_CLASSNAME).newInstance();
-    } catch (ClassNotFoundException e) {
-      throw new IllegalStateException(
-        "Error finding JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-    } catch (InstantiationException e) {
-      throw new IllegalStateException(
-        "Error instantiating JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-     } catch (IllegalAccessException e) {
-      throw new IllegalStateException(
-        "Error accessing JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-    }
-    
     Connection conn = null;
     try {
     
-      conn = DriverManager.getConnection(DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD);
-
+      conn = getJdbcConnection();
       Statement stmt = conn.createStatement();
 
       // Test whether this ID generator already exists in the database.
@@ -840,48 +740,18 @@ public class IDServiceJdbcImpl implements IDService {
    * @param  csid     An identifier for an ID generator.
    *
    * @throws  IllegalStateException if a storage-related error occurred.
-   *
-   * @TODO: We're currently using simple integer IDs to identify ID generators
-   * in this initial iteration.
-   *
-   * To uniquely identify ID generators in production, we'll need to handle
-   * both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
-   * other form of identifier to be determined, such as URLs or URNs.
-   *
-   * @TODO: Refactor to remove redundant code that this method shares with other
-   * database-using methods in this class.
-   *
-   * @TODO: Add checks for authorization to perform this operation.
    */
 	public void deleteIDGenerator(String csid)
 	  throws IllegalArgumentException, IllegalStateException {
     
 		logger.debug("> in deleteIDGenerator");
-		
-    try {
-      Class.forName(JDBC_DRIVER_CLASSNAME).newInstance();
-    } catch (ClassNotFoundException e) {
-      throw new IllegalStateException(
-        "Error finding JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-    } catch (InstantiationException e) {
-      throw new IllegalStateException(
-        "Error instantiating JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-     } catch (IllegalAccessException e) {
-      throw new IllegalStateException(
-        "Error accessing JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-    }
+
+    // @TODO: Add checks for authorization to perform this operation.
     
     Connection conn = null;
     try {
     
-      conn = DriverManager.getConnection(DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD);
-
+      conn = getJdbcConnection();
       Statement stmt = conn.createStatement();
 
       // Test whether this ID generator already exists in the database.
@@ -934,7 +804,32 @@ public class IDServiceJdbcImpl implements IDService {
     }
 
   }
+
+  //////////////////////////////////////////////////////////////////////
+  /**
+   * Opens a connection to the database and returns a JDBC Connection object.
+   *
+   * @return  A JDBC database Connection object.
+   *
+   * @throws  SQLException if a storage-related error occurred.
+   */
+  public Connection getJdbcConnection() throws SQLException {
+  
+    logger.debug("> in getJdbcConnection");
+
+    Connection conn = null;
+    try {
     
+      conn = DriverManager.getConnection(DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD);
+      
+    } catch (SQLException e) {
+      throw e;
+    }
+    
+    return conn;
+    
+  }
+
   //////////////////////////////////////////////////////////////////////
   /**
    * Returns a requested ID generator from persistent storage.
@@ -946,16 +841,6 @@ public class IDServiceJdbcImpl implements IDService {
    * @throws  IllegalArgumentException if the requested ID generator could not be found.
    *
    * @throws  IllegalStateException if a storage-related error occurred.
-   *
-   * @TODO: We're currently using simple integer IDs to identify ID generators
-   * in this initial iteration.
-   *
-   * To uniquely identify ID generators in production, we'll need to handle
-   * both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
-   * other form of identifier to be determined, such as URLs or URNs.
-   *
-   * @TODO: Refactor to remove redundant code that this method shares with other
-   * database-using methods in this class.
    */
 	public String getIDGenerator (String csid) throws IllegalArgumentException, IllegalStateException {
 
@@ -963,30 +848,10 @@ public class IDServiceJdbcImpl implements IDService {
 
     String serializedGenerator = null;
     
-    try {
-      Class.forName(JDBC_DRIVER_CLASSNAME).newInstance();
-    } catch (ClassNotFoundException e) {
-      throw new IllegalStateException(
-        "Error finding JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-    } catch (InstantiationException e) {
-      throw new IllegalStateException(
-        "Error instantiating JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-     } catch (IllegalAccessException e) {
-      throw new IllegalStateException(
-        "Error accessing JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
-    }
-
     Connection conn = null;
     try {
     
-      conn = DriverManager.getConnection(DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD);
-
+      conn = getJdbcConnection();
       Statement stmt = conn.createStatement();
 			
 			ResultSet rs = stmt.executeQuery(
