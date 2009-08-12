@@ -1,8 +1,4 @@
 /**
- * IDPatternSerializer
- *
- * Serializer and deserializer for ID patterns.
- *
  * This document is a part of the source code and related artifacts
  * for CollectionSpace, an open source collections management system
  * for museums and related institutions:
@@ -17,12 +13,6 @@
  *
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
- *
- * Based on work by Richard Millet and Sanjay Dalal.
- *
- * $LastChangedBy: aron $
- * $LastChangedRevision: 414 $
- * $LastChangedDate$
  */
  
 // @TODO: Revise exception handling to return custom Exceptions,
@@ -37,61 +27,76 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
-public class IDPatternSerializer {
+/**
+ * IDGeneratorSerializer
+ *
+ * Serializer and deserializer for ID patterns.
+ *
+ * $LastChangedBy: aron $
+ * $LastChangedRevision: 414 $
+ * $LastChangedDate$
+ */
+public class IDGeneratorSerializer {
+
+  // *IMPORTANT*
+  // @TODO: This class is in an early state of a refactoring to
+  // reflect a change from IDPatterns to IDGenerators at the top level
+  // of the ID Service.  As a result, there will be some naming
+  // inconsistencies throughout this source file.
 
   //////////////////////////////////////////////////////////////////////
   /**
    * Constructor (no-argument).
    */ 
-  public void IDPatternSerializer() {
+  public void IDGeneratorSerializer() {
   }
 
   //////////////////////////////////////////////////////////////////////
   /**
-   * Serializes an ID pattern, converting it from a Java object into an XML representation.
+   * Serializes an ID generator, converting it from a Java object into an XML representation.
    *
-   * @param  pattern  An ID pattern.
+   * @param  pattern  An ID generator.
    *
-   * @return  A serialized representation of that ID pattern.
+   * @return  A serialized representation of that ID generator.
    *
-   * @throws  IllegalArgumentException if the ID pattern cannot be serialized.
+   * @throws  IllegalArgumentException if the ID generator cannot be serialized.
    */
 	public static String serialize(IDPattern pattern) throws IllegalArgumentException {
 	
 	  if (pattern == null) {
-	    throw new IllegalArgumentException("ID pattern cannot be null.");
+	    throw new IllegalArgumentException("ID generator cannot be null.");
 	  }
   
     XStream xstream = new XStream(new DomDriver()); 
     
-    String serializedPattern = "";
+    String serializedGenerator = "";
     try {
-      serializedPattern = xstream.toXML(pattern);
+      serializedGenerator = xstream.toXML(pattern);
     } catch (XStreamException e) {
 	    throw new IllegalArgumentException(
 	      "Could not convert ID pattern to XML for storage in database.");
     }
     
-    return serializedPattern;
+    return serializedGenerator;
   
   }
 
   //////////////////////////////////////////////////////////////////////
   /**
-   * Deserializes an ID pattern, converting it from an XML representation
+   * Deserializes an ID generator, converting it from an XML representation
    * into a Java object.
    *
-   * @param   serializedPattern  A serialized representation of an ID pattern.
+   * @param   serializedGenerator  A serialized representation of an ID generator.
    *
-   * @return  The ID pattern deserialized as a Java object.
+   * @return  The ID generator deserialized as a Java object.
    *
-   * @throws  IllegalArgumentException if the ID pattern cannot be deserialized.
+   * @throws  IllegalArgumentException if the ID generator cannot be deserialized.
    */
-	public static IDPattern deserialize(String serializedPattern)
+	public static IDPattern deserialize(String serializedGenerator)
 	  throws IllegalArgumentException {
 
-	  if (serializedPattern == null || serializedPattern.equals("")) {
-	    throw new IllegalArgumentException("ID pattern cannot be null or empty.");
+	  if (serializedGenerator == null || serializedGenerator.equals("")) {
+	    throw new IllegalArgumentException("ID generator cannot be null or empty.");
 	  }
 
     XStream xstream = new XStream(new DomDriver());
@@ -101,7 +106,7 @@ public class IDPatternSerializer {
       pattern = (IDPattern) xstream.fromXML(serializedPattern);
     } catch (XStreamException e) {
 	    throw new IllegalArgumentException(
-	      "Could not understand or parse this representation of an ID pattern.");
+	      "Could not understand or parse this representation of an ID generator.");
     }
 
     return pattern;
