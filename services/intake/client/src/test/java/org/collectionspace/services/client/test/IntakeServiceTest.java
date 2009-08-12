@@ -404,7 +404,7 @@ public class IntakeServiceTest {
    *
    * Expected status code: 200 OK
    */
-  @Test(dependsOnMethods = {"createIntake", "getIntake"})
+  @Test(dependsOnMethods = {"createIntake", "getIntake", "updateIntake"})
   public void deleteIntake() {
     verbose("Calling deleteIntake: " + knownIntakeId);
     ClientResponse<Response> res = intakeClient.deleteIntake(knownIntakeId);
