@@ -103,7 +103,7 @@ public class IDGeneratorSerializer {
 
     IDPattern pattern;
     try {
-      pattern = (IDPattern) xstream.fromXML(serializedPattern);
+      pattern = (IDPattern) xstream.fromXML(serializedGenerator);
     } catch (XStreamException e) {
 	    throw new IllegalArgumentException(
 	      "Could not understand or parse this representation of an ID generator.");

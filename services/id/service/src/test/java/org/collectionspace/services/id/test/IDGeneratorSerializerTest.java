@@ -1,8 +1,4 @@
 /**
- * IDPatternSerializerTest
- *
- * Unit tests of the ID Service's IDPatternSerializer class.
- *
  * This document is a part of the source code and related artifacts
  * for CollectionSpace, an open source collections management system
  * for museums and related institutions:
@@ -18,9 +14,11 @@
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
  *
- * $LastChangedBy: aron $
- * $LastChangedRevision: 302 $
- * $LastChangedDate$
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.collectionspace.services.id.test;
@@ -30,14 +28,24 @@ import org.collectionspace.services.id.*;
 import junit.framework.TestCase;
 import static org.junit.Assert.*;
 
-public class IDPatternSerializerTest extends TestCase {
+/**
+ * IDGeneratorSerializerTest
+ *
+ * Unit tests of the ID Service's IDGeneratorSerializer class.
+ *
+ *
+ * $LastChangedBy: aron $
+ * $LastChangedRevision: 302 $
+ * $LastChangedDate$
+ */
+public class IDGeneratorSerializerTest extends TestCase {
 
-  String serializedPattern;
+  String serializedGenerator;
   IDPattern pattern;
   
 	final static String DEFAULT_CSID = "TEST-1";
 
-  final static String DEFAULT_SERIALIZED_ID_PATTERN =
+  final static String DEFAULT_SERIALIZED_ID_GENERATOR =
     "<org.collectionspace.services.id.IDPattern>\n" +
     "  <csid>" + DEFAULT_CSID + "</csid>\n" +
     "  <uri></uri>\n" +
@@ -48,40 +56,40 @@ public class IDPatternSerializerTest extends TestCase {
   // @TODO We may want to canonicalize (or otherwise normalize) the expected and
   // actual XML in these tests, to avoid failures resulting from differences in
   // whitespace, etc.
-	public void testSerializeIDPattern() {
+	public void testSerializeIDGenerator() {
 	  IDPattern pattern = new IDPattern(DEFAULT_CSID);
-		assertEquals(DEFAULT_SERIALIZED_ID_PATTERN, IDPatternSerializer.serialize(pattern));
+		assertEquals(DEFAULT_SERIALIZED_ID_GENERATOR, IDGeneratorSerializer.serialize(pattern));
 	}
 
-	public void testSerializeNullIDPattern() {
+	public void testSerializeNullIDGenerator() {
 	  try {
-	    String serializedPattern = IDPatternSerializer.serialize(null);
+	    String serializedPattern = IDGeneratorSerializer.serialize(null);
 			fail("Should have thrown IllegalArgumentException here");
 		} catch (IllegalArgumentException expected) {
 			// This Exception should be thrown, and thus the test should pass.
 		}
 	}
 
-	public void testDeserializeIDPattern() {
+	public void testDeserializeIDGenerator() {
 	  // This test will fail with different hash codes unless we add an IDPattern.equals()
 	  // method that explicitly defines object equality as, for instance, having identical values
 	  // in each of its instance variables.
-	  // IDPattern pattern = IDPatternSerializer.deserialize(DEFAULT_SERIALIZED_ID_PATTERN);
+	  // IDPattern pattern = IDGeneratorSerializer.deserialize(DEFAULT_SERIALIZED_ID_PATTERN);
 	  // assertEquals(pattern, new IDPattern(DEFAULT_CSID));
 	}
 
-	public void testDeserializeNullSerializedIDPattern() {
+	public void testDeserializeNullSerializedIDGenerator() {
 	  try {
-	    IDPattern pattern = IDPatternSerializer.deserialize(null);
+	    IDPattern pattern = IDGeneratorSerializer.deserialize(null);
 			fail("Should have thrown IllegalArgumentException here");
 		} catch (IllegalArgumentException expected) {
 			// This Exception should be thrown, and thus the test should pass.
 		}
 	}
 
-	public void testDeserializeInvalidSerializedIDPattern() {
+	public void testDeserializeInvalidSerializedIDGenerator() {
 	  try {
-	    IDPattern pattern = IDPatternSerializer.deserialize("<invalid_serialized_pattern/>");
+	    IDPattern pattern = IDGeneratorSerializer.deserialize("<invalid_serialized_generator/>");
 			fail("Should have thrown IllegalArgumentException here");
 		} catch (IllegalArgumentException expected) {
 			// This Exception should be thrown, and thus the test should pass.
