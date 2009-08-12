@@ -111,7 +111,7 @@ public class IDServiceJdbcImpl implements IDService {
   /**
    * Constructor (no-argument).
    */ 
-  public void IDServiceJdbcImpl() {
+  public void IDServiceJdbcImpl() throws IllegalStateException {
   
     // @TODO Decide when and how to fail at startup, or else to correct
     // failure conditions automatically, when preconditions are not met.
@@ -119,11 +119,15 @@ public class IDServiceJdbcImpl implements IDService {
     // Currently, errors at initialization are merely informative and
     // result in exceptions that can be persistently logged.
     
-    init();
+    try {
+      init();
+    } catch (IllegalStateException e) {
+      throw e;
+    }
     
   }
   
-  // @TODO init() and hasTable() are currently UNTESTED as of 2009-08-11T13:00-0700.
+  // @TODO init() is currently UNTESTED as of 2009-08-11T13:00-0700.
 
   //////////////////////////////////////////////////////////////////////
   /**
@@ -184,11 +188,11 @@ public class IDServiceJdbcImpl implements IDService {
         "Error instantiating JDBC driver class '" +
         JDBC_DRIVER_CLASSNAME +
         "' to set up database connection.");
-     } catch (IllegalAccessException e) {
-      throw new IllegalStateException(
-        "Error accessing JDBC driver class '" +
-        JDBC_DRIVER_CLASSNAME +
-        "' to set up database connection.");
+    } catch (IllegalAccessException e) {
+    throw new IllegalStateException(
+      "Error accessing JDBC driver class '" +
+      JDBC_DRIVER_CLASSNAME +
+      "' to set up database connection.");
     }
       
   }
@@ -300,7 +304,7 @@ public class IDServiceJdbcImpl implements IDService {
 
     IDPattern pattern;
     try {
-      pattern = IDPatternSerializer.deserialize(serializedGenerator);
+      pattern = IDGeneratorSerializer.deserialize(serializedGenerator);
     } catch (IllegalArgumentException e) {
 	    throw e;
     }
@@ -481,7 +485,7 @@ public class IDServiceJdbcImpl implements IDService {
 
     String serializedGenerator = "";
     try {
-      serializedGenerator = IDPatternSerializer.serialize(pattern);
+      serializedGenerator = IDGeneratorSerializer.serialize(pattern);
     } catch (IllegalArgumentException e) {
 	    throw e;
     }
@@ -620,7 +624,7 @@ public class IDServiceJdbcImpl implements IDService {
 
     String serializedGenerator = "";
     try {
-      serializedGenerator = IDPatternSerializer.serialize(pattern);
+      serializedGenerator = IDGeneratorSerializer.serialize(pattern);
     } catch (IllegalArgumentException e) {
 	    throw e;
     }
@@ -691,7 +695,7 @@ public class IDServiceJdbcImpl implements IDService {
 			    
 			  IDPattern pattern;
         try {
-          pattern = IDPatternSerializer.deserialize(serializedGenerator);
+          pattern = IDGeneratorSerializer.deserialize(serializedGenerator);
         } catch (IllegalArgumentException e) {
           throw e;
         }
