@@ -11,14 +11,6 @@
     <packaging>jar</packaging>
     <version>1.0</version>
     <name>services.common</name>
-
-    <properties>
-        <jboss.version>4.2.3.GA</jboss.version>
-        <jboss.ejb.version>3.0</jboss.ejb.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <nuxeo.version.5.2>5.2-SNAPSHOT</nuxeo.version.5.2>
-        <nuxeo.version.1.5>1.5-SNAPSHOT</nuxeo.version.1.5>
-    </properties>
     
     <dependencies>
         <dependency>

@@ -104,7 +104,7 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="install"
+    <target name="deploy" depends="package"
     description="deploy id service">
         
     </target>
@@ -115,7 +115,7 @@
     </target>
 
     <target name="dist"
-    description="generate distribution for id">
+    description="generate distribution for id" depends="package">
         
     </target>
 

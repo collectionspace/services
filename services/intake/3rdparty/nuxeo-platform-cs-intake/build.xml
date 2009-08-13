@@ -107,7 +107,7 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="install"
+    <target name="deploy" depends="package"
     description="deploy intake doctype in ${jboss.server.nuxeo}">
         <copy file="${basedir}/target/${nuxeo.intake.jar}"
         todir="${jboss.deploy.nuxeo.system}"/>
@@ -120,7 +120,7 @@
 
 
     <target name="dist"
-    description="generate distribution for intake doctype" depends="install">
+    description="generate distribution for intake doctype" depends="package">
         <copy todir="${services.trunk}/${dist.deploy.nuxeo.system}">
             <fileset file="${basedir}/target/${nuxeo.intake.jar}"/>
         </copy>

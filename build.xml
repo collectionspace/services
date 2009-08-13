@@ -24,7 +24,7 @@
         <tstamp/>
     </target>
 
-    <target name="dist" depends="install"
+    <target name="dist" depends="package"
     description="generate cspace service distribution">
         <!-- Create the distribution directory -->
         <mkdir dir="${basedir}/dist"/>
@@ -36,8 +36,8 @@
         <copy todir="${basedir}/${dist.deploy.cspace}">
             <fileset dir="${src}/main/resources/config"/>
         </copy>
-        <ant antfile="3rdparty/build.xml" target="dist" inheritall="false"/>
-        <ant antfile="services/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="3rdparty/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="services/build.xml" target="dist" inheritAll="false"/>
 
         <!-- bundle up everything -->
         <tar destfile="${basedir}/dist/${cspace.services.release}-${jboss.release}.tar.gz" compression="gzip">
@@ -212,7 +212,7 @@
         </sql>
     </target>
 
-    <target name="deploy" depends="install"
+    <target name="deploy" depends="package"
     description="deploy services in ${jboss.server.cspace}">
                 <!-- copy db scripts, etc. -->
         <copy todir="${jboss.server.cspace}/cspace/services">
@@ -222,17 +222,18 @@
         <copy todir="${jboss.deploy.cspace}">
             <fileset dir="${src}/main/resources/config"/>
         </copy>
-        <ant antfile="3rdparty/build.xml" target="deploy" inheritall="false"/>
-        <ant antfile="services/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="3rdparty/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="services/build.xml" target="deploy" inheritAll="false"/>
 
     </target>
 
     <target name="undeploy"
     description="undeploy services from ${jboss.server.cspace}">
-        <ant antfile="services/build.xml" target="undeploy" inheritall="false"/>
-        <ant antfile="3rdparty/build.xml" target="undeploy" inheritall="false"/>
-        <delete file="${jboss.deploy.cspace}/cspace-ds.xml"/>
-        <delete dir="${jboss.server.cspace}/cspace/services"/>
+        <ant antfile="services/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="3rdparty/build.xml" target="undeploy" inheritAll="false"/>
+        <delete failonerror="false"  file="${jboss.deploy.cspace}/cspace-ds.xml"/>
+        <delete failonerror="false" dir="${jboss.server.cspace}/cspace/services"/>
+        <delete failonerror="false" dir="${jboss.server.cspace}/cspace/config/services"/>
     </target>
 
 

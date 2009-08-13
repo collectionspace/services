@@ -106,7 +106,7 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="install"
+    <target name="deploy" depends="package"
     description="deploy intake in ${jboss.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-intake/build.xml" target="deploy" inheritall="false"/>
     </target>
@@ -117,7 +117,7 @@
     </target>
 
     <target name="dist"
-    description="generate distribution for intake">
+    description="generate distribution for intake" depends="package">
         <ant antfile="nuxeo-platform-cs-intake/build.xml" target="dist" inheritall="false"/>
     </target>
 

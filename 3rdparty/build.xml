@@ -112,7 +112,7 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="install"
+    <target name="deploy" depends="package"
     description="deploy 3rdparty in ${jboss.server.cspace}">
         <ant antfile="nuxeo/build.xml" target="deploy" inheritall="false"/>
     </target>

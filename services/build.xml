@@ -105,39 +105,39 @@
     </target>
 
     <!-- this target is called in order based on the dependencies between the services -->
-    <target name="deploy" depends="install"
+    <target name="deploy" depends="package"
     description="deploy services in ${jboss.server.cspace}">
-        <ant antfile="common/build.xml" target="deploy" inheritall="false"/>
-        <ant antfile="authentication/build.xml" target="deploy" inheritall="false"/>
-        <ant antfile="relation/build.xml" target="deploy" inheritall="false"/>
-        <ant antfile="id/build.xml" target="deploy" inheritall="false"/>
-        <ant antfile="collectionobject/build.xml" target="deploy" inheritall="false"/>
-        <ant antfile="intake/build.xml" target="deploy" inheritall="false"/>
-        <ant antfile="JaxRsServiceProvider/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="common/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="authentication/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="relation/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="id/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="collectionobject/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="intake/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="JaxRsServiceProvider/build.xml" target="deploy" inheritAll="false"/>
     </target>
 
     <!-- this target is called in revese order of deploy targets -->
     <target name="undeploy"
     description="undeploy services from ${jboss.server.cspace}">
-        <ant antfile="JaxRsServiceProvider/build.xml" target="undeploy" inheritall="false"/>
-        <ant antfile="intake/build.xml" target="undeploy" inheritall="false"/>
-        <ant antfile="collectionobject/build.xml" target="undeploy" inheritall="false"/>
-        <ant antfile="id/build.xml" target="undeploy" inheritall="false"/>
-        <ant antfile="relation/build.xml" target="undeploy" inheritall="false"/>
-        <ant antfile="authentication/build.xml" target="undeploy" inheritall="false"/>
-        <ant antfile="common/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="JaxRsServiceProvider/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="intake/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="collectionobject/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="id/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="relation/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="authentication/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="common/build.xml" target="undeploy" inheritAll="false"/>
     </target>
 
     <!-- this target is called in order based on the dependencies between the services -->
-    <target name="dist" depends="install"
+    <target name="dist" depends="package"
     description="create distribution for services">
-        <ant antfile="common/build.xml" target="dist" inheritall="false"/>
-        <ant antfile="authentication/build.xml" target="dist" inheritall="false"/>
-        <ant antfile="relation/build.xml" target="dist" inheritall="false"/>
-        <ant antfile="id/build.xml" target="dist" inheritall="false"/>
-        <ant antfile="collectionobject/build.xml" target="dist" inheritall="false"/>
-        <ant antfile="intake/build.xml" target="dist" inheritall="false"/>
-        <ant antfile="JaxRsServiceProvider/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="common/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="authentication/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="relation/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="id/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="collectionobject/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="intake/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="JaxRsServiceProvider/build.xml" target="dist" inheritAll="false"/>
     </target>
 
     

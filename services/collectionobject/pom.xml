@@ -12,11 +12,6 @@
     <packaging>pom</packaging>
     <name>services.collectionobject</name>
 
-    <properties>
-        <nuxeo.version.5.2>5.2-SNAPSHOT</nuxeo.version.5.2>
-        <nuxeo.version.1.5>1.5-SNAPSHOT</nuxeo.version.1.5>
-    </properties>
-
     <modules>
         <module>jaxb</module>
         <module>service</module>

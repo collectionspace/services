@@ -105,7 +105,7 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="install"
+    <target name="deploy" depends="package"
     description="deploy collectionobject service">
         <ant antfile="3rdparty/build.xml" target="deploy" inheritall="false"/>
     </target>
@@ -115,7 +115,7 @@
         <ant antfile="3rdparty/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
-    <target name="dist" depends="install"
+    <target name="dist" depends="package"
     description="distribute collectionobject service}">
         <ant antfile="3rdparty/build.xml" target="dist" inheritall="false"/>
     </target>

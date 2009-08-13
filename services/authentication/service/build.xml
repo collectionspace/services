@@ -108,7 +108,7 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="install"
+    <target name="deploy" depends="package"
     description="deploy authentication service in ${jboss.server.cspace}">
         <copy file="${basedir}/target/${authentication.jar}" todir="${jboss.server.cspace}/lib"/>
         <echo message="Add authentication-policy to ${jboss.server.cspace}/conf/login-config.xml"/>
@@ -122,7 +122,7 @@
     </target>
 
     <target name="dist"
-    description="generate distribution for authentication service" depends="install">
+    description="generate distribution for authentication service" depends="package">
         <copy todir="${services.trunk}/${dist.lib.cspace}">
             <fileset file="${basedir}/target/${authentication.jar}"/>
         </copy>

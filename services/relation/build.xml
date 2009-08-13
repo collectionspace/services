@@ -104,7 +104,7 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="install"
+    <target name="deploy" depends="package"
     description="deploy relation service">
         <ant antfile="3rdparty/build.xml" target="deploy" inheritall="false"/>
     </target>
@@ -115,7 +115,7 @@
     </target>
 
     <target name="dist"
-    description="generate distribution for relation">
+    description="generate distribution for relation" depends="package">
         <ant antfile="3rdparty/build.xml" target="dist" inheritall="false"/>
     </target>
 

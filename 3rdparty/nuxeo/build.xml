@@ -112,10 +112,15 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="install"
+    <target name="deploy" depends="package"
     description="deploy nuxeo client libs to ${jboss.server.cspace}">
-        <copy todir="${jboss.server.cspace}/nuxeo-client">
-            <fileset dir="${basedir}/nuxeo-client"/>
+        <copy todir="${jboss.server.cspace}/nuxeo-client/lib">
+            <fileset dir="${basedir}/nuxeo-client/lib">
+                <include name="*.jar"/>
+            </fileset>
+            <fileset dir="${basedir}/nuxeo-client/lib/${nuxeo.release}">
+                <include name="*.jar"/>
+            </fileset>
         </copy>
     </target>
 
@@ -125,7 +130,7 @@
     </target>
 
     <target name="dist"
-    description="generate distribution for nuxeo client libs">
+    description="generate distribution for nuxeo client libs" depends="package">
         <copy todir="${services.trunk}/${dist.server.cspace}/nuxeo-client">
             <fileset dir="${basedir}/nuxeo-client"/>
         </copy>

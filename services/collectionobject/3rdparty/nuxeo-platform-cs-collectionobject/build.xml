@@ -112,7 +112,7 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="install"
+    <target name="deploy" depends="package"
     description="deploy collectionobject doctype in ${jboss.server.nuxeo}">
         <copy file="${basedir}/target/${nuxeo.collectionobject.jar}"
         todir="${jboss.deploy.nuxeo.system}"/>
@@ -124,7 +124,7 @@
     </target>
 
     <target name="dist"
-    description="generate distribution for collectionobject doctype" depends="install">
+    description="generate distribution for collectionobject doctype" depends="package">
         <copy todir="${services.trunk}/${dist.deploy.nuxeo.system}">
             <fileset file="${basedir}/target/${nuxeo.collectionobject.jar}"/>
         </copy>

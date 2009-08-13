@@ -131,6 +131,7 @@ public class NuxeoConnector {
     }
 
     private void setProperties(NuxeoClientConfig nuxeoClientConfig) {
+        System.setProperty("nuxeo.client.on.jboss", Boolean.TRUE.toString());
         System.setProperty("org.nuxeo.runtime.server.enabled", Boolean.FALSE.toString());
         System.setProperty("org.nuxeo.runtime.server.port", "" + nuxeoClientConfig.getPort());
         System.setProperty("org.nuxeo.runtime.server.host", nuxeoClientConfig.getHost());

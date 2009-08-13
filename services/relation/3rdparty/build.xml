@@ -107,7 +107,7 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="install"
+    <target name="deploy" depends="package"
     description="deploy relation in ${jboss.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-relation/build.xml" target="deploy" inheritall="false"/>
     </target>
@@ -118,7 +118,7 @@
     </target>
 
     <target name="dist"
-    description="generate distribution for relation">
+    description="generate distribution for relation" depends="package">
         <ant antfile="nuxeo-platform-cs-relation/build.xml" target="dist" inheritall="false"/>
     </target>
 

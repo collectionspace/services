@@ -18,8 +18,8 @@
     CollectionSpace relation Nuxeo document type
     </description>
     <properties>
-        <nuxeo.version.5.2>5.2-SNAPSHOT</nuxeo.version.5.2>
-        <nuxeo.version.1.5>1.5-SNAPSHOT</nuxeo.version.1.5>
+        <nuxeo.version.5.2>5.2.1-SNAPSHOT</nuxeo.version.5.2>
+        <nuxeo.version.1.5>1.5.1-SNAPSHOT</nuxeo.version.1.5>
     </properties>
     <dependencies>
         <dependency>

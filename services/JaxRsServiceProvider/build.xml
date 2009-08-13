@@ -108,7 +108,7 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="install"
+    <target name="deploy" depends="package"
     description="deploy cspace services in ${jboss.server.cspace}">
         <copy file="${basedir}/target/${cspace-services.war}" todir="${jboss.server.cspace}/deploy"/>
     </target>
@@ -119,7 +119,7 @@
     </target>
 
     <target name="dist"
-    description="generate distribution for cspace services" depends="install">
+    description="generate distribution for cspace services" depends="package">
         <copy todir="${services.trunk}/${dist.deploy.cspace}">
             <fileset file="${basedir}/target/${cspace-services.war}"/>
         </copy>
