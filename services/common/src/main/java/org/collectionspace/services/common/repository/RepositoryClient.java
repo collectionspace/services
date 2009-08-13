@@ -41,7 +41,8 @@ public interface RepositoryClient {
      * @param serviceName entity service for which document is created. for example
      * this is used to find mapping
      * to a Nuxeo workspace using service-config.xml
-     * @param docType of the document created
+     * @param serviceName entity service for which document is created. this is used to find mapping
+     * to a Nuxeo workspace using service-config.xml
      * @param handler should be used by the caller to provide and transform the document
      * @return id in repository of the newly created document
      * @throws BadRequestException data input is bad
