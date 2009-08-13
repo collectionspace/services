@@ -24,10 +24,7 @@
             <url>http://repo1.maven.org/maven2/</url>
         </repository>
         <!-- For resteasy -->
-        <repository>
-            <id>cspace.local.jboss.client</id>
-            <url>${jboss.client.dir}</url>
-        </repository>
+
         <repository>
             <id>jboss</id>
             <name>jboss repo</name>
@@ -39,14 +36,6 @@
             <url>http://svn.codehaus.org/mojo/trunk/mojo/jboss-maven-plugin</url>
         </repository>
 
-        <repository>
-            <id>cspace.local.nuxeo</id>
-            <url>${nuxeo.local.repo.dir}</url>
-        </repository>
-        <repository>
-            <id>cspace.local.nuxeo.client</id>
-            <url>${nuxeo.local.repo.client.dir}</url>
-        </repository>
         <!--repository>
             <id>public</id>
             <url>http://maven.nuxeo.org/public</url>

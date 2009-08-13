@@ -40,15 +40,7 @@
             <name>Public online Restlet repository</name>
             <url>http://maven.restlet.org</url>
         </repository>
-        
-        <repository>
-            <id>cspace.local.nuxeo</id>
-            <url>${nuxeo.local.repo.dir}</url>
-        </repository>
-        <repository>
-            <id>cspace.local.nuxeo.client</id>
-            <url>${nuxeo.local.repo.client.dir}</url>
-        </repository>
+
         <repository>
             <id>public</id>
             <url>http://maven.nuxeo.org/public</url>
