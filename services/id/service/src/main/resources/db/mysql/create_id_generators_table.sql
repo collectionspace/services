@@ -42,6 +42,7 @@ CREATE TABLE `id_generators` (
 
 GRANT SELECT, INSERT, UPDATE, DELETE
   on `id_generators`
-  to `test`;
+  to `test`@'localhost' IDENTIFIED BY 'test' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
 
 SHOW WARNINGS;
