@@ -51,7 +51,7 @@ public class ServiceTest {
     @Test
     public void servicesExist() {
         //use ID service that should always be present in a working service layer
-        String url = serviceClient.getBaseURL() + "ids";
+        String url = serviceClient.getBaseURL() + "idgenerators";
         OptionsMethod method = new OptionsMethod(url);
         try{
             int statusCode = httpClient.executeMethod(method);
@@ -75,7 +75,7 @@ public class ServiceTest {
     @Test
     public void methodNotAllowed() {
         //get is not allowed on id service
-        String url = serviceClient.getBaseURL() + "ids";
+        String url = serviceClient.getBaseURL() + "idgenerators";
         GetMethod method = new GetMethod(url);
         try{
             int statusCode = httpClient.executeMethod(method);
