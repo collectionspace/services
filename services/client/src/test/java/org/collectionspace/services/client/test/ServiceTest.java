@@ -27,6 +27,7 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.methods.OptionsMethod;
@@ -74,9 +75,9 @@ public class ServiceTest {
 
     @Test
     public void methodNotAllowed() {
-        //get is not allowed on id service
+        //delete is not allowed on the root URL of the id service
         String url = serviceClient.getBaseURL() + "idgenerators";
-        GetMethod method = new GetMethod(url);
+        DeleteMethod method = new DeleteMethod(url);
         try{
             int statusCode = httpClient.executeMethod(method);
             if(logger.isDebugEnabled()){

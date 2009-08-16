@@ -68,6 +68,30 @@ public class IDResource {
 		// do nothing
 	}
 
+
+  //////////////////////////////////////////////////////////////////////
+  /**
+   * Placeholder for retrieving list of available ID Generators.
+   * Currently returns an empty entity body.
+   * 
+   * Implemented to facilitate a HEAD method test in ServicesTest
+   *
+   * @return  An empty entity body (for now).
+   */
+	@GET
+	@Path("")
+  @Produces("text/plain")
+	public Response getIDGenerators() {
+	
+	  logger.debug("> in getIDGenerators()");
+		
+		// @TODO Replace this placeholder code.
+		Response response = Response.status(Response.Status.NO_CONTENT)
+			  .entity("").type(MediaType.TEXT_PLAIN).build();
+				
+		return response;
+  }
+
   //////////////////////////////////////////////////////////////////////
   /**
    * Generates and returns a new ID, from the specified ID generator.
