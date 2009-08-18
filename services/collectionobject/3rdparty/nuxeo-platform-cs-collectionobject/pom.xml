@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!-- parent has to be nuxeo-platform to retain the manifest -->
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-parent</artifactId>
-        <version>5.2-SNAPSHOT</version>
+        <groupId>org.collectionspace.services</groupId>
+        <artifactId>nuxeo-platform-collectionspace</artifactId>
+        <version>1.0</version>
     </parent>
+    
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <version>1.0</version>
@@ -14,23 +14,6 @@
     <packaging>jar</packaging>
     <name>services.collectionobject.3rdparty.nuxeo</name>
     <description>
-    CollectionObject Nuxeo document type
+        CollectionObject Nuxeo document type
     </description>
-    <properties>
-        <nuxeo.version.5.2>5.2.1-SNAPSHOT</nuxeo.version.5.2>
-        <nuxeo.version.1.5>1.5.1-SNAPSHOT</nuxeo.version.1.5>
-    </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.nuxeo.ecm.core</groupId>
-            <artifactId>nuxeo-core-schema</artifactId>
-            <version>${nuxeo.version.1.5}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.nuxeo.ecm.platform</groupId>
-            <artifactId>nuxeo-platform-types-core</artifactId>
-            <version>${nuxeo.version.5.2}</version>
-        </dependency>
-    </dependencies>
-
 </project>

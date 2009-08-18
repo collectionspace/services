@@ -124,8 +124,8 @@
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>osgi-core</artifactId>
-            <version>4.1</version>
+            <artifactId>org.osgi.core</artifactId>
+            <version>4.1.0</version>
         </dependency>
 
         <!-- fixme remove restlet dependencies once REST client is no more used -->

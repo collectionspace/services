@@ -17,13 +17,23 @@
     </properties>
     
     <modules>
+        <module>3rdparty</module>
         <module>services</module>
     </modules>
     <repositories>
         <repository>
+            <id>CollectionSpace</id>
+            <url>http://source.collectionspace.org:8081/artifactory/repo</url>
+        </repository>        
+        <repository>
             <id>maven repo</id>
             <name>maven repo</name>
             <url>http://repo1.maven.org/maven2/</url>
+        </repository>
+        <repository>
+            <id>maven-restlet</id>
+            <name>Public online Restlet repository</name>
+            <url>http://maven.restlet.org</url>
         </repository>
         <repository>
             <id>java.net</id>
