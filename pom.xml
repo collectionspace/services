@@ -14,21 +14,27 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <nuxeo.version.5.2>5.2.1-SNAPSHOT</nuxeo.version.5.2>
         <nuxeo.version.1.5>1.5.1-SNAPSHOT</nuxeo.version.1.5>
-    </properties>
-    
+    </properties>    
     <modules>
         <module>3rdparty</module>
         <module>services</module>
     </modules>
+        
     <repositories>
         <repository>
-            <id>CollectionSpace</id>
-            <url>http://source.collectionspace.org:8081/artifactory/repo</url>
-        </repository>        
+            <id>collectionspace-releases</id>
+            <name>collectionspace-releases</name>
+            <url>http://source.collectionspace.org:8081/artifactory/public-nuxeo</url>
+        </repository>
+        <repository>
+            <id>collectionspace-snapshots</id>
+            <name>collectionspace-snapshots</name>
+            <url>http://source.collectionspace.org:8081/artifactory/public-snapshot-nuxeo</url>
+        </repository>
         <repository>
             <id>maven repo</id>
             <name>maven repo</name>
-            <url>http://repo1.maven.org/maven2/</url>
+            <url>http://repo1.maven.org/maven2</url>
         </repository>
         <repository>
             <id>maven-restlet</id>
@@ -58,8 +64,9 @@
             <id>mojo</id>
             <name>mojo repo</name>
             <url>http://svn.codehaus.org/mojo/trunk/mojo/jboss-maven-plugin</url>
-        </repository>
+        </repository>        
     </repositories>
+    
     <pluginRepositories>
         <pluginRepository>
             <id>java.net</id>
