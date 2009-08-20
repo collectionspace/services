@@ -36,6 +36,25 @@ import org.testng.annotations.Test;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.collectionobject.CollectionObject;
 import org.collectionspace.services.collectionobject.CollectionObjectList;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
+// import org.jboss.resteasy.client.ClientRequest;
+import org.collectionspace.services.client.TestServiceClient;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,11 +67,16 @@ import org.slf4j.LoggerFactory;
  */
 public class CollectionObjectServiceTest {
 
-  private CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-  private String knownCollectionObjectId = null;
-  private final String NON_EXISTENT_ID = createNonExistentIdentifier();
+  // Instance variables specific to this test.
   final Logger logger = LoggerFactory.getLogger(CollectionObjectServiceTest.class);
-  
+  private CollectionObjectClient client = new CollectionObjectClient();
+
+  // Instance variables common to all entity service test classes.
+  private String knownObjectId = null;
+  private final String NON_EXISTENT_ID = createNonExistentIdentifier();
+  private HttpClient httpClient = new HttpClient();
+  private TestServiceClient serviceClient = new TestServiceClient();
+
   
   // ---------------------------------------------------------------
   // Service Discovery tests
@@ -69,44 +93,44 @@ public class CollectionObjectServiceTest {
   // ----------------
   
   /**
-   * Tests creation of a new CollectionObject.
+   * Tests creation of a new object of the specified type.
    *
-   * Expected status code: 201 Created
-   *
-   * Also expected: The 'Location' header contains the URL for the newly created object.
+   * The 'Location' header will contain the URL for the newly created object.
    * This is required by the extractId() utility method, below.
    *
-   * The newly-created CollectionObject is also used by other test(s)
+   * The newly-created object is also used by other test(s)
    * (e.g. update, delete) which follow, below.
    */
   @Test
-  public void createCollectionObject() {
+  public void create() {
+
+    // Expected status code: 201 Created
+    final int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
+
     String identifier = this.createIdentifier();
 
     CollectionObject collectionObject = createCollectionObject(identifier);
-    ClientResponse<Response> res = collectionObjectClient.createCollectionObject(collectionObject);
-    verbose("createCollectionObject: status = " + res.getStatus());
-    Assert.assertEquals(res.getStatus(), Response.Status.CREATED.getStatusCode());
+    ClientResponse<Response> res = client.createCollectionObject(collectionObject);
+    verbose("create: status = " + res.getStatus());
+    Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
 
     // Store the ID returned from this create operation for additional tests below.
-    knownCollectionObjectId = extractId(res);
+    knownObjectId = extractId(res);
   }
 
   /**
-   * Creates two or more new CollectionObjects.
+   * Creates two or more new objects of the specified type.
    *
-   * Repeatedly calls the createCollectionObject test, above, and relies on its
+   * Repeatedly calls the create test, above, and relies on its
    * test assertions.
    *
-   * Expected status code: 201 Created
-   *
-   * The newly-created CollectionObjects are also used by other test(s)
+   * The newly-created objects are also used by other test(s)
    * (e.g. read multiple/list) which follow, below.
    */
-  @Test(dependsOnMethods = {"createCollectionObject"})
-  public void createCollection() {
+  @Test(dependsOnMethods = {"create"})
+  public void createMultiple() {
     for(int i = 0; i < 3; i++){
-      this.createCollectionObject();
+      this.create();
     }
   }
 
@@ -114,60 +138,150 @@ public class CollectionObjectServiceTest {
   // ----------------
 
   /**
-   * Tests creation of a CollectionObject by sending a null to the client proxy.
+   * Tests creation of an object of the specified type by sending a null to the client proxy.
    *
-   * Expected status code: (none)
-   *
-   * Expected result: IllegalArgumentException 
-   * (Make sure this is a reported exception in the called class.)
    */
-  @Test(dependsOnMethods = {"createCollectionObject"}, expectedExceptions = IllegalArgumentException.class)
-  public void createNullCollectionObject() {
-    ClientResponse<Response> res = collectionObjectClient.createCollectionObject(null);
+  @Test(dependsOnMethods = {"create"}, expectedExceptions = IllegalArgumentException.class)
+  public void createNull() {
+
+   // Expected result: IllegalArgumentException   
+    ClientResponse<Response> res = client.createCollectionObject(null);
+  }
+  
+  /**
+   * Tests the HttpClient-based code used to submit data, in various methods below.
+   */
+  @Test(dependsOnMethods = {"create", "read"})
+  public void testSubmitRequest() {
+
+    // Expected status code: 200 OK
+    final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
+
+    String url = getResourceURL(knownObjectId);
+    GetMethod method = new GetMethod(url);
+
+    int statusCode = submitRequest(method);
+    verbose("testSubmitRequest: url=" + url + " status=" + statusCode);
+    
+    // Evaluate the status code in the response.
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE,
+      "expected " + EXPECTED_STATUS_CODE);
+
   }
 		
   /**
-   * Tests creation of a CollectionObject by sending bad data
-   * (e.g. in a format that doesn't match the CollectionObject schema)
+   * Tests creation of an object of the specified type by sending malformed XML data
    * in the entity body of the request.
-   *
-   * Expected status code: 400 Bad Request
    */
 /*
-  @Test(dependsOnMethods = {"createCollectionObject"})
-  public void createCollectionObjectWithBadData() {
+  @Test(dependsOnMethods = {"create", "testSubmitRequest"})
+  public void createWithMalformedXml() {
+
+    // Expected status code: 400 Bad Request
+    final int EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
+
+    // @TODO This test is currently commented out, because it returns a
+    // 500 Internal Server Error status code, rather than the expected status code.
+
+    String url = getServiceRootURL();
+    PostMethod method = new PostMethod(url);
+    // Note missing final angle bracket in text below.
+    final String MALFORMED_XML_DATA = "<malformed_xml>wrong schema contents</malformed_xml";
     
-    // Currently only a stub
+    // Prepare the entity body of the request.
+    StringRequestEntity entity = getXmlEntity(MALFORMED_XML_DATA);
+    
+    // Submit the request.
+    int statusCode = submitRequest(method, entity);
+    verbose("createWithMalformedXml url=" + url + " status=" + statusCode);
+    
+    // Evaluate the status code in the response.
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE,
+      "expected " + EXPECTED_STATUS_CODE);
   }
 */
 
   /**
-   * Tests creation of a CollectionObject by a user who
-   * is not authorized to perform this action.
-   *
-   * Expected status code: 403 Forbidden
+   * Tests creation of an object of the specified type by sending data
+   * in the wrong schema (e.g. in a format that doesn't match the object's schema)
+   * in the entity body of the request.
+    */
+/*
+  @Test(dependsOnMethods = {"create", "testSubmitRequest", "createWithMalformedXml"})
+  public void createWithWrongSchema() {
+  
+    // Expected status code: 400 Bad Request
+    final int EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
+
+    // @TODO This test is currently commented out, because it returns a
+    // 500 Internal Server Error status code, rather than the expected status code.
+   
+    String url = getServiceRootURL();
+    PostMethod method = new PostMethod(url);
+    
+    // Prepare the entity body of the request.
+    final String WRONG_SCHEMA_DATA = "<wrong_schema>wrong schema contents</wrong_schema>";
+    StringRequestEntity entity = getXmlEntity(WRONG_SCHEMA_DATA);
+    
+    // Submit the request.
+    int statusCode = submitRequest(method, entity);
+    verbose("createWithWrongSchema url=" + url + " status=" + statusCode);
+    
+    // Evaluate the status code in the response.
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE,
+      "expected " + EXPECTED_STATUS_CODE);
+  }
+  
+*/
+
+  /**
+   * Tests creation of an object of the specified type,
+   * by a user who is not authorized to perform this action.
    */
 /*
-  @Test(dependsOnMethods = {"createCollectionObject"})
-  public void createCollectionObjectWithUnauthorizedUser() {
-    // Currently only a stub
+  @Test(dependsOnMethods = {"create"})
+  public void createWithoutAuthorization() {
+
+    // Expected status code: 403 Forbidden
+    final int EXPECTED_STATUS_CODE = Response.Status.FORBIDDEN.getStatusCode();
+    
+    // @TODO Currently only a stub.  This test can be implemented
+    // when the service is revised to require authorization. 
   }
 */
 
   /**
-   * Tests creation of a duplicate CollectionObject, whose unique resource identifier
-   * duplicates that of an existing CollectionObject.
-   * 
-   * Expected status code: 409 Conflict
+   * Tests creation of a duplicate object of the specified type,
+   * whose unique resource identifier duplicates that of an existing object.
    */
 /*
-  @Test(dependsOnMethods = {"createCollectionObject"})
-  public void createDuplicateCollectionObject() {
-    CollectionObject collectionObject = createCollectionObject(knownCollectionObjectId);
-    ClientResponse<Response> res = 
-      collectionObjectClient.createCollectionObject(collectionObject);
-    verbose("createDuplicateCollectionObject: status = " + res.getStatus());
-    Assert.assertEquals(res.getStatus(), Response.Status.CONFLICT.getStatusCode());
+  @Test(dependsOnMethods = {"create"})
+  public void createDuplicate() {
+
+    // Expected status code: 409 Conflict
+    final int EXPECTED_STATUS_CODE = Response.Status.CONFLICT.getStatusCode();
+    
+    // @TODO This test is currently commented out because our current
+    // services do not appear to permit creation of duplicate records.
+    // Please see below for more details.
+    
+    // Note: there doesn't appear to be a way to create a duplicate
+    // resource (object) by POSTing:
+    //    
+    // 1. We can't POST to a specific resource by ID; that returns a
+    // response with a 405 Method Not Allowed status code.
+    //
+    // 2. If we POST to the container in which new resources are created,
+    // it doesn't appear that we can specify the CSID that the newly-created
+    // resource (object) will receive.
+    //
+    // If the two points above are accurate, this test is thus unneeded, until
+    // and unless, in our service(s), we begin detecting duplicates via a
+    // technique that isn't dependent on CSIDs; for instance, by checking for
+    // duplicate data in other information units (fields) whose values must be unique.
+    // 
+    // One possible example: checking for duplicate Accession numbers in
+    // the "Object entry" information unit.
   }
 */
 
@@ -179,46 +293,53 @@ public class CollectionObjectServiceTest {
   // ----------------
   
   /**
-   * Tests reading (i.e. retrieval) of a CollectionObject.
-   *
-   * Expected status code: 200 OK
+   * Tests reading (i.e. retrieval) of an object of the specified type.
    */
-  @Test(dependsOnMethods = {"createCollectionObject"})
-  public void getCollectionObject() {
+  @Test(dependsOnMethods = {"create"})
+  public void read() {
+
+    // Expected status code: 200 OK
+    final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
+
     ClientResponse<CollectionObject> res = 
-      collectionObjectClient.getCollectionObject(knownCollectionObjectId);
-    verbose("getCollectionObject: status = " + res.getStatus());
-    Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
+      client.getCollectionObject(knownObjectId);
+    verbose("read: status = " + res.getStatus());
+    Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
   }
 
   // Failure outcomes
   // ----------------
 
   /**
-   * Tests reading (i.e. retrieval) of a CollectionObject by a user who
+   * Tests reading (i.e. retrieval) of an object of the specified type by a user who
    * is not authorized to perform this action.
-   *
-   * Expected status code: 403 Forbidden
    */
 /*
-  @Test(dependsOnMethods = {"getCollectionObject"})
-  public void getCollectionObjectWithUnauthorizedUser() {
-    // Currently only a stub
+  @Test(dependsOnMethods = {"read"})
+  public void readWithoutAuthorization() {
+
+    // Expected status code: 403 Forbidden
+    final int EXPECTED_STATUS_CODE = Response.Status.FORBIDDEN.getStatusCode();
+    
+    // @TODO Currently only a stub.  This test can be implemented
+    // when the service is revised to require authorization. 
   }
 */
 
   /**
-   * Tests reading (i.e. retrieval) of a non-existent CollectionObject,
+   * Tests reading (i.e. retrieval) of a non-existent object of the specified type,
    * whose resource identifier does not exist at the specified URL.
-   *
-   * Expected status code: 404 Not Found
    */
-  @Test(dependsOnMethods = {"getCollectionObject"})
-  public void getNonExistentCollectionObject() {
+  @Test(dependsOnMethods = {"read"})
+  public void readNonExistent() {
+
+    // Expected status code: 404 Not Found
+    final int EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
+
     ClientResponse<CollectionObject> res = 
-      collectionObjectClient.getCollectionObject(NON_EXISTENT_ID);
-    verbose("getNonExistentCollectionObject: status = " + res.getStatus());
-    Assert.assertEquals(res.getStatus(), Response.Status.NOT_FOUND.getStatusCode());
+      client.getCollectionObject(NON_EXISTENT_ID);
+    verbose("readNonExistent: status = " + res.getStatus());
+    Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
   }
 
 
@@ -230,46 +351,53 @@ public class CollectionObjectServiceTest {
   // ----------------
 
   /**
-   * Tests reading (i.e. retrieval) of a list of multiple CollectionObjects.
-   *
-   * Expected status code: 200 OK
+   * Tests reading (i.e. retrieval) of a list of multiple objects of the specified type.
    *
    * Also expected: The entity body in the response contains
-   * a representation of the list of CollectionObjects.
+   * a representation of a list of objects of the specified type.
    */
-  @Test(dependsOnMethods = {"createCollection"})
-  public void getCollectionObjectList() {
-    // The resource method is expected to return at least an empty list
-    ClientResponse<CollectionObjectList> res = collectionObjectClient.getCollectionObjectList();
-    CollectionObjectList coList = res.getEntity();
-    verbose("getCollectionObjectList: status = " + res.getStatus());
-    Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
+  @Test(dependsOnMethods = {"createMultiple"})
+  public void readList() {
 
-    List<CollectionObjectList.CollectionObjectListItem> coItemList =
-      coList.getCollectionObjectListItem();
-    int i = 0;
-    for(CollectionObjectList.CollectionObjectListItem pli : coItemList){
-      verbose("getCollectionObjectList: list-item[" + i + "] csid=" + pli.getCsid());
-      verbose("getCollectionObjectList: list-item[" + i + "] objectNumber=" + pli.getObjectNumber());
-      verbose("getCollectionObjectList: list-item[" + i + "] URI=" + pli.getUri());
-      i++;
+    // Expected status code: 200 OK
+    final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
+  
+    // The 'read' method is expected to return at least an empty list.
+    ClientResponse<CollectionObjectList> res = client.getCollectionObjectList();
+    CollectionObjectList coList = res.getEntity();
+    verbose("readList: status = " + res.getStatus());
+    Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+
+    if (logger.isDebugEnabled()) {
+      List<CollectionObjectList.CollectionObjectListItem> coItemList =
+        coList.getCollectionObjectListItem();
+      int i = 0;
+      for(CollectionObjectList.CollectionObjectListItem pli : coItemList){
+        verbose("readList: list-item[" + i + "] csid=" + pli.getCsid());
+        verbose("readList: list-item[" + i + "] objectNumber=" + pli.getObjectNumber());
+        verbose("readList: list-item[" + i + "] URI=" + pli.getUri());
+        i++;
+      }
     }
+    
   }
 
   /**
-   * Tests reading (i.e. retrieval) of a list of multiple CollectionObjects
+   * Tests reading (i.e. retrieval) of a list of multiple objects of the specified type
    * when the contents of the list are expected to be empty.
    *
-   * Expected status code: 200 OK
-   * (Note: *not* 204 No Content)
-   *
    * Also expected: The entity body in the response contains
-   * a representation of an empty list of CollectionObjects.
+   * a representation of an empty list of objects of the specified type.
    */
 /*
-  @Test(dependsOnMethods = {"getCollectionObjectList"})
-  public void getCollectionObjectEmptyList() {
-    // Currently only a stub.
+  @Test(dependsOnMethods = {"readList"})
+  public void readEmptyList() {
+
+    // Expected status code: 200 OK
+    // (NOTE: *not* 204 No Content)
+    final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
+
+    // @TODO Currently only a stub.
   }
 */
   
@@ -277,32 +405,52 @@ public class CollectionObjectServiceTest {
   // ----------------
 
   /**
-   * Tests reading (i.e. retrieval) of a list of CollectionObjects
+   * Tests reading (i.e. retrieval) of a list of objects of the specified type
    * when sending unrecognized query parameters with the request.
-   *
-   * Expected status code: 400 Bad Request
    */
 /*
-  @Test(dependsOnMethods = {"getCollectionObjectList"})
-  public void getCollectionObjectListWithBadParams() {
-    // Currently only a stub.
+  @Test(dependsOnMethods = {"readList"})
+  public void readListWithBadParams() {
+
+    // Expected status code: 400 Bad Request
+    final int EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
+
+    // @TODO This test is currently commented out, because it returns a
+    // 200 OK status code, rather than the expected status code.
+   
+    // @TODO Another variant of this test should use a URL for the service
+    // root that ends in a trailing slash.
+
+    String url = getServiceRootURL() + "?param=nonexistent";
+    GetMethod method = new GetMethod(url);
+    
+    // Submit the request.
+    int statusCode = submitRequest(method);
+    verbose("readListWithBadParams: url=" + url + " status=" + statusCode);
+    
+    // Evaluate the status code in the response.
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE,
+      "expected " + EXPECTED_STATUS_CODE);
   }
 */
 
   /**
-   * Tests reading (i.e. retrieval) of a list of CollectionObjects by a user who
+   * Tests reading (i.e. retrieval) of a list of objects of the specified type by a user who
    * is not authorized to perform this action.
    *
-   * Expected status code: 403 Forbidden
    */
 /*
-  @Test(dependsOnMethods = {"getCollectionObjectList"})
-  public void getCollectionObjectListWithUnauthorizedUser() {
-    // Currently only a stub.
+  @Test(dependsOnMethods = {"readList"})
+  public void readListWithoutAuthorization() {
+
+    // Expected status code: 403 Forbidden
+    final int EXPECTED_STATUS_CODE = Response.Status.FORBIDDEN.getStatusCode();
+
+    // @TODO Currently only a stub.  This test can be implemented
+    // when the service is revised to require authorization. 
   }
 */
-
-  
+ 
 
   // ---------------------------------------------------------------
   // CRUD tests : UPDATE tests
@@ -312,86 +460,141 @@ public class CollectionObjectServiceTest {
   // ----------------
 
   /**
-   * Tests updating the content of a CollectionObject.
-   *
-   * Expected status code: 200 OK
+   * Tests updating the content of an object of the specified type.
    *
    * Also expected: The entity body in the response contains
-   * a representation of the updated CollectionObject.
+   * a representation of the updated object of the specified type.
    */
-  @Test(dependsOnMethods = {"createCollectionObject"})
-  public void updateCollectionObject() {
+  @Test(dependsOnMethods = {"create"})
+  public void update() {
+
+    // Expected status code: 200 OK
+    final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
+
     ClientResponse<CollectionObject> res = 
-      collectionObjectClient.getCollectionObject(knownCollectionObjectId);
-    verbose("getCollectionObject: status = " + res.getStatus());
-    Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
+      client.getCollectionObject(knownObjectId);
+    verbose("read: status = " + res.getStatus());
+    Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
     CollectionObject collectionObject = res.getEntity();
-    verbose("Got CollectionObject to update with ID: " + knownCollectionObjectId,
+    verbose("Got object to update with ID: " + knownObjectId,
         collectionObject, CollectionObject.class);
 
-    //collectionObject.setCsid("updated-" + knownCollectionObjectId);
+    //collectionObject.setCsid("updated-" + knownObjectId);
     collectionObject.setObjectNumber("updated-" + collectionObject.getObjectNumber());
     collectionObject.setObjectName("updated-" + collectionObject.getObjectName());
 
     // make call to update service
     res = 
-      collectionObjectClient.updateCollectionObject(knownCollectionObjectId, collectionObject);
-    verbose("updateCollectionObject: status = " + res.getStatus());
-    Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
+      client.updateCollectionObject(knownObjectId, collectionObject);
+    verbose("update: status = " + res.getStatus());
+    Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
     
     // check the response
     CollectionObject updatedCollectionObject = res.getEntity();
     Assert.assertEquals(updatedCollectionObject.getObjectName(), 
       collectionObject.getObjectName());
-    verbose("updateCollectionObject: ", updatedCollectionObject, CollectionObject.class);
+    verbose("update: ", updatedCollectionObject, CollectionObject.class);
   }
 
-  // Failure outcomes
-  // ----------------
-
   /**
-   * Tests updating the content of a CollectionObject by sending bad data
-   * (e.g. in a format that doesn't match the CollectionObject schema)
-   * in the entity body of the request.
-   *
-   * Expected status code: 400 Bad Request
+   * Tests updating the content of an object of the specified type
+   * by sending malformed XML data in the entity body of the request.
    */
 /*
-  @Test(dependsOnMethods = {"updateCollectionObject"})
-  public void updateCollectionObjectWithBadData() {
-    // Currently only a stub.
+  @Test(dependsOnMethods = {"create", "testSubmitRequest"})
+  public void updateWithMalformedXml() {
+
+    // Expected status code: 400 Bad Request
+    final int EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
+
+    // @TODO This test is currently commented out, because it returns a
+    // 500 Internal Server Error status code, rather than the expected status code.
+
+    String url = getResourceURL(knownObjectId);
+    PutMethod method = new PutMethod(url);
+    
+    // Prepare the entity body of the request.
+    //
+    // Note missing final angle bracket in text below.
+    final String MALFORMED_XML_DATA = "<malformed_xml>wrong schema contents</malformed_xml";
+    StringRequestEntity entity = getXmlEntity(MALFORMED_XML_DATA);
+    
+    // Submit the request.
+    int statusCode = submitRequest(method, entity);
+    verbose("updateWithMalformedXml: url=" + url + " status=" + statusCode);
+    
+    // Evaluate the status code in the response.
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE,
+      "expected " + EXPECTED_STATUS_CODE);
   }
 */
 
   /**
-   * Tests updating the content of a CollectionObject by a user who
-   * is not authorized to perform this action.
-   *
-   * Expected status code: 403 Forbidden
+   * Tests updating the content of an object of the specified type
+   * by sending data in the wrong schema (e.g. in a format that
+   * doesn't match the object's schema) in the entity body of the request.
    */
 /*
-  @Test(dependsOnMethods = {"updateCollectionObject"})
-  public void updateCollectionObjectWithUnauthorizedUser() {
-    // Currently only a stub.
+  @Test(dependsOnMethods = {"create", "testSubmitRequest", "createWithMalformedXml"})
+  public void updateWithWrongSchema() {
+  
+    // Expected status code: 400 Bad Request
+    final int EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
+    
+    // @TODO This test is currently commented out, because it returns a
+    // 500 Internal Server Error status code, rather than the expected status code.
+   
+    String url = getResourceURL(knownObjectId);
+    PutMethod method = new PutMethod(url);
+    
+    // Prepare the entity body of the request.
+    final String WRONG_SCHEMA_DATA = "<wrong_schema>wrong schema contents</wrong_schema>";
+    StringRequestEntity entity = getXmlEntity(WRONG_SCHEMA_DATA);
+    
+    // Submit the request.
+    int statusCode = submitRequest(method, entity);
+    verbose("updateWithWrongSchema: url=" + url + " status=" + statusCode);
+    
+    // Evaluate the status code in the response.
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE,
+      "expected " + EXPECTED_STATUS_CODE);
   }
 */
 
   /**
-   * Tests updating the content of a non-existent CollectionObject, whose
-   * resource identifier does not exist.
-   *
-   * Expected status code: 404 Not Found
+   * Tests updating the content of an object of the specified type,
+   * by a user who is not authorized to perform this action.
    */
-  @Test(dependsOnMethods = {"updateCollectionObject"})
-  public void updateNonExistentCollectionObject() {
+/*
+  @Test(dependsOnMethods = {"update"})
+  public void updateWithoutAuthorization() {
+
+    // Expected status code: 403 Forbidden
+    final int EXPECTED_STATUS_CODE = Response.Status.FORBIDDEN.getStatusCode();
+
+    // @TODO Currently only a stub.  This test can be implemented
+    // when the service is revised to require authorization. 
+  }
+*/
+
+  /**
+   * Tests updating the content of a non-existent object of the specified type,
+   * whose resource identifier does not exist.
+   */
+  @Test(dependsOnMethods = {"update"})
+  public void updateNonExistent() {
+
+    // Expected status code: 404 Not Found
+    final int EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
+
     // Note: The ID used in this 'create' call may be arbitrary.
     // The only relevant ID may be the one used in updateCollectionObject(), below.
     CollectionObject collectionObject = createCollectionObject(NON_EXISTENT_ID);
     // make call to update service
     ClientResponse<CollectionObject> res =
-      collectionObjectClient.updateCollectionObject(NON_EXISTENT_ID, collectionObject);
-    verbose("createCollectionObject: status = " + res.getStatus());
-    Assert.assertEquals(res.getStatus(), Response.Status.NOT_FOUND.getStatusCode());
+      client.updateCollectionObject(NON_EXISTENT_ID, collectionObject);
+    verbose("updateNonExistent: status = " + res.getStatus());
+    Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
   }
 
 
@@ -403,47 +606,55 @@ public class CollectionObjectServiceTest {
   // ----------------
 
   /**
-   * Tests deleting a CollectionObject.
+   * Tests deleting an object of the specified type.
    *
    * Expected status code: 200 OK
    */
-  @Test(dependsOnMethods = {"createCollectionObject", "getCollectionObject", "updateCollectionObject"})
-  public void deleteCollectionObject() {
-    verbose("Calling deleteCollectionObject:" + knownCollectionObjectId);
-    ClientResponse<Response> res = collectionObjectClient.deleteCollectionObject(knownCollectionObjectId);
-    verbose("deleteCollectionObject: status = " + res.getStatus());
-    Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode());
+  @Test(dependsOnMethods = 
+    {"create", "read", "testSubmitRequest", "update"})
+  public void delete() {
+
+    // Expected status code: 200 OK
+    final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
+
+    ClientResponse<Response> res = client.deleteCollectionObject(knownObjectId);
+    verbose("delete: status = " + res.getStatus());
+    Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
   }
 
   // Failure outcomes
   // ----------------
 
   /**
-   * Tests deleting a CollectionObject by a user who
-   * is not authorized to perform this action.
-   *
-   * Expected status code: 403 Forbidden
+   * Tests deleting an object of the specified type,
+   * by a user who is not authorized to perform this action.
    */
 /*
-  @Test(dependsOnMethods = {"deleteCollectionObject"})
-  public void deleteCollectionObjectWithUnauthorizedUser() {
-    // Currently only a stub.
+  @Test(dependsOnMethods = {"delete"})
+  public void deleteWithoutAuthorization() {
+
+    // Expected status code: 403 Forbidden
+    final int EXPECTED_STATUS_CODE = Response.Status.FORBIDDEN.getStatusCode();
+
+    // @TODO Currently only a stub.  This test can be implemented
+    // when the service is revised to require authorization. 
   }
 */
 
   /**
-   * Tests deleting a non-existent CollectionObject, whose
-   * resource identifier does not exist at the specified URL.
-   *
-   * Expected status code: 404 Not Found
+   * Tests deleting a non-existent object of the specified type,
+   * whose resource identifier does not exist at the specified URL.
    */
-  @Test(dependsOnMethods = {"deleteCollectionObject"})
-  public void deleteNonExistentCollectionObject() {
-    verbose("Calling deleteCollectionObject:" + NON_EXISTENT_ID);
+  @Test(dependsOnMethods = {"delete"})
+  public void deleteNonExistent() {
+
+    // Expected status code: 404 Not Found
+    final int EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
+
     ClientResponse<Response> res =
-      collectionObjectClient.deleteCollectionObject(NON_EXISTENT_ID);
-    verbose("deleteCollectionObject: status = " + res.getStatus());
-    Assert.assertEquals(res.getStatus(), Response.Status.NOT_FOUND.getStatusCode());
+      client.deleteCollectionObject(NON_EXISTENT_ID);
+    verbose("deleteNonExistent: status = " + res.getStatus());
+    Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
   }
 
 
@@ -451,20 +662,100 @@ public class CollectionObjectServiceTest {
   // Utility methods used by tests above
   // ---------------------------------------------------------------
 
+  // Methods specific to this test
+
   private CollectionObject createCollectionObject(String identifier) {
     CollectionObject collectionObject = createCollectionObject("objectNumber-" + identifier,
         "objectName-" + identifier);
-
     return collectionObject;
   }
 
   private CollectionObject createCollectionObject(String objectNumber, String objectName) {
     CollectionObject collectionObject = new CollectionObject();
-
     collectionObject.setObjectNumber(objectNumber);
     collectionObject.setObjectName(objectName);
-
     return collectionObject;
+  }
+  
+  private String getServicePathComponent() {
+    // @TODO Determine if it is possible to obtain this value programmatically.
+    // We set this in an annotation in the CollectionObjectProxy interface, for instance.
+    final String SERVICE_PATH_COMPONENT = "collectionobjects";
+    return SERVICE_PATH_COMPONENT;
+  }
+  
+  // Methods common to all entity service test classes.  These can be
+  // moved out of individual service test classes into a common class,
+  // perhaps at the top-level 'client' module.
+
+/*
+@TODO To be added:
+Utility that asserts various HTTP status codes received for a given type of a request.
+This should be used from any test we write for a service. For example, this utility
+could take the following two params.
+import javax.ws.rs.core.Response;
+final static public boolean checkStatus(String method, Response.Status status);
+Perhaps you could find about method used from org.jboss.resteasy.client.ClientResponse metadata.
+*/
+  
+  private String getServiceRootURL() {
+    return serviceClient.getBaseURL() + getServicePathComponent();
+  }
+
+  private String getResourceURL(String id) {
+    return getServiceRootURL() + "/" + id;
+  }
+
+  private int submitRequest(HttpMethod method) {
+   int statusCode = 0;
+    try {
+      statusCode = httpClient.executeMethod(method);
+    } catch(HttpException e) {
+      logger.error("Fatal protocol violation: ", e);
+    } catch(IOException e) {
+      logger.error("Fatal transport error: ", e);
+    } catch(Exception e) {
+      logger.error("Unknown exception: ", e);
+    } finally {
+      // Release the connection.
+      method.releaseConnection();
+    }
+    return statusCode;
+  }
+  
+  private int submitRequest(EntityEnclosingMethod method, RequestEntity entity) {
+    int statusCode = 0;
+    try {
+      method.setRequestEntity(entity);
+      statusCode = httpClient.executeMethod(method);
+    } catch(HttpException e) {
+      logger.error("Fatal protocol violation: ", e);
+    } catch(IOException e) {
+      logger.error("Fatal transport error: ", e);
+    } catch(Exception e) {
+      logger.error("Unknown exception: ", e);
+    } finally {
+      // Release the connection.
+      method.releaseConnection();
+    }
+    return statusCode;
+  }
+  
+  private StringRequestEntity getXmlEntity(String contents) {
+    if (contents == null) {
+      contents = "";
+    }
+    StringRequestEntity entity = null;
+    final String XML_DECLARATION = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
+    final String XML_CONTENT_TYPE=MediaType.APPLICATION_XML;
+    final String UTF8_CHARSET_NAME = "UTF-8";
+    try {
+      entity =
+        new StringRequestEntity(XML_DECLARATION + contents, XML_CONTENT_TYPE, UTF8_CHARSET_NAME);
+    } catch (UnsupportedEncodingException e) {
+      logger.error("Unsupported character encoding error: ", e);
+    }
+    return entity;
   }
 
   private String extractId(ClientResponse<Response> res) {
@@ -478,10 +769,9 @@ public class CollectionObjectServiceTest {
   }
 
   private void verbose(String msg) {
-//    if(logger.isInfoEnabled()){
-//      logger.debug(msg);
-//    }
-    System.out.println(msg);
+    if (logger.isDebugEnabled()) {
+      logger.debug(msg);
+    }
   }
 
   private void verbose(String msg, Object o, Class clazz) {
