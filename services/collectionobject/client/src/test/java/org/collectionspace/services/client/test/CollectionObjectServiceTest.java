@@ -39,6 +39,8 @@ import org.collectionspace.services.collectionobject.CollectionObjectList;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+import java.util.Set;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 // import org.jboss.resteasy.client.ClientRequest;
@@ -93,26 +95,49 @@ public class CollectionObjectServiceTest {
   // ----------------
   
   /**
-   * Tests creation of a new object of the specified type.
+   * Tests creation of a new resource of the specified type.
    *
    * The 'Location' header will contain the URL for the newly created object.
    * This is required by the extractId() utility method, below.
    *
-   * The newly-created object is also used by other test(s)
+   * The newly-created resource is also used by other test(s)
    * (e.g. update, delete) which follow, below.
    */
   @Test
   public void create() {
 
-    // Expected status code: 201 Created
+     // Expected status code: 201 Created
     final int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
 
+    // Submit the request to the service and store the response.
     String identifier = this.createIdentifier();
-
     CollectionObject collectionObject = createCollectionObject(identifier);
     ClientResponse<Response> res = client.createCollectionObject(collectionObject);
-    verbose("create: status = " + res.getStatus());
-    Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+    int statusCode = res.getStatus();
+
+    // Experiment to determine if we can programmatically obtain the HTTP method
+    // used in the request, from the response headers, so we can provide that to
+    // statusCodeWithinExpectedSet(), below.
+    //
+    // It doesn't appear that we can; tried this also with 'curl -i {url}' without success.
+    //
+    // Need to look into whether this is currently returned from our Java Client Library
+    // 'service access' classes, or whether we can add this functionality there.
+/*
+    MultivaluedMap metadata = res.getMetadata();    
+    Set<String> set = metadata.keySet();
+    for (String key : set) {
+      // Note: values in the metadata (HTTP response headers) are of type List
+      verbose(key + " : " + metadata.get(key).toString());
+    }
+*/    
+
+    // Check the status code of the response: does it match the expected response(s)?
+    verbose("create: status = " + statusCode);
+    final String REQUEST_TYPE="CREATE";  // @TODO Consider replacing with enum.
+    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
+      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
     // Store the ID returned from this create operation for additional tests below.
     knownObjectId = extractId(res);
@@ -138,39 +163,18 @@ public class CollectionObjectServiceTest {
   // ----------------
 
   /**
-   * Tests creation of an object of the specified type by sending a null to the client proxy.
+   * Tests creation of a resource of the specified type by sending a null to the client proxy.
    *
    */
   @Test(dependsOnMethods = {"create"}, expectedExceptions = IllegalArgumentException.class)
   public void createNull() {
 
-   // Expected result: IllegalArgumentException   
+   // Expected result: IllegalArgumentException
     ClientResponse<Response> res = client.createCollectionObject(null);
   }
   
   /**
-   * Tests the HttpClient-based code used to submit data, in various methods below.
-   */
-  @Test(dependsOnMethods = {"create", "read"})
-  public void testSubmitRequest() {
-
-    // Expected status code: 200 OK
-    final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
-
-    String url = getResourceURL(knownObjectId);
-    GetMethod method = new GetMethod(url);
-
-    int statusCode = submitRequest(method);
-    verbose("testSubmitRequest: url=" + url + " status=" + statusCode);
-    
-    // Evaluate the status code in the response.
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE,
-      "expected " + EXPECTED_STATUS_CODE);
-
-  }
-		
-  /**
-   * Tests creation of an object of the specified type by sending malformed XML data
+   * Tests creation of a resource of the specified type by sending malformed XML data
    * in the entity body of the request.
    */
 /*
@@ -183,26 +187,25 @@ public class CollectionObjectServiceTest {
     // @TODO This test is currently commented out, because it returns a
     // 500 Internal Server Error status code, rather than the expected status code.
 
+    // Submit the request to the service and store the response.
     String url = getServiceRootURL();
     PostMethod method = new PostMethod(url);
-    // Note missing final angle bracket in text below.
-    final String MALFORMED_XML_DATA = "<malformed_xml>wrong schema contents</malformed_xml";
-    
-    // Prepare the entity body of the request.
+    final String MALFORMED_XML_DATA =
+      "<malformed_xml>wrong schema contents</malformed_xml"; // Note: intentionally missing bracket.
     StringRequestEntity entity = getXmlEntity(MALFORMED_XML_DATA);
-    
-    // Submit the request.
     int statusCode = submitRequest(method, entity);
-    verbose("createWithMalformedXml url=" + url + " status=" + statusCode);
     
-    // Evaluate the status code in the response.
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE,
-      "expected " + EXPECTED_STATUS_CODE);
+    // Check the status code of the response: does it match the expected response(s)?
+    verbose("createWithMalformedXml url=" + url + " status=" + statusCode);
+    final String REQUEST_TYPE="CREATE";  // @TODO Consider replacing with enum.
+    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
+      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
   }
 */
 
   /**
-   * Tests creation of an object of the specified type by sending data
+   * Tests creation of a resource of the specified type by sending data
    * in the wrong schema (e.g. in a format that doesn't match the object's schema)
    * in the entity body of the request.
     */
@@ -216,26 +219,24 @@ public class CollectionObjectServiceTest {
     // @TODO This test is currently commented out, because it returns a
     // 500 Internal Server Error status code, rather than the expected status code.
    
+    // Submit the request to the service and store the response.
     String url = getServiceRootURL();
     PostMethod method = new PostMethod(url);
-    
-    // Prepare the entity body of the request.
     final String WRONG_SCHEMA_DATA = "<wrong_schema>wrong schema contents</wrong_schema>";
     StringRequestEntity entity = getXmlEntity(WRONG_SCHEMA_DATA);
-    
-    // Submit the request.
     int statusCode = submitRequest(method, entity);
-    verbose("createWithWrongSchema url=" + url + " status=" + statusCode);
     
-    // Evaluate the status code in the response.
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE,
-      "expected " + EXPECTED_STATUS_CODE);
+    // Check the status code of the response: does it match the expected response(s)?
+    verbose("createWithWrongSchema url=" + url + " status=" + statusCode);
+    final String REQUEST_TYPE="CREATE";  // @TODO Consider replacing with enum.
+    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
+      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
   }
-  
-*/
+*/  
 
   /**
-   * Tests creation of an object of the specified type,
+   * Tests creation of a resource of the specified type,
    * by a user who is not authorized to perform this action.
    */
 /*
@@ -280,8 +281,8 @@ public class CollectionObjectServiceTest {
     // technique that isn't dependent on CSIDs; for instance, by checking for
     // duplicate data in other information units (fields) whose values must be unique.
     // 
-    // One possible example: checking for duplicate Accession numbers in
-    // the "Object entry" information unit.
+    // One possible example of the above: checking for duplicate Accession numbers
+    // in the "Object entry" information unit in CollectionObject resources.
   }
 */
 
@@ -293,7 +294,7 @@ public class CollectionObjectServiceTest {
   // ----------------
   
   /**
-   * Tests reading (i.e. retrieval) of an object of the specified type.
+   * Tests reading (i.e. retrieval) of a resource of the specified type.
    */
   @Test(dependsOnMethods = {"create"})
   public void read() {
@@ -301,17 +302,24 @@ public class CollectionObjectServiceTest {
     // Expected status code: 200 OK
     final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
 
+    // Submit the request to the service and store the response.
     ClientResponse<CollectionObject> res = 
       client.getCollectionObject(knownObjectId);
-    verbose("read: status = " + res.getStatus());
-    Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+    int statusCode = res.getStatus();
+      
+    // Check the status code of the response: does it match the expected response(s)?
+    verbose("read: status = " + statusCode);
+    final String REQUEST_TYPE="READ";  // @TODO Consider replacing with enum.
+    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
+      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
   }
 
   // Failure outcomes
   // ----------------
 
   /**
-   * Tests reading (i.e. retrieval) of an object of the specified type by a user who
+   * Tests reading (i.e. retrieval) of a resource of the specified type by a user who
    * is not authorized to perform this action.
    */
 /*
@@ -336,10 +344,17 @@ public class CollectionObjectServiceTest {
     // Expected status code: 404 Not Found
     final int EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
 
+    // Submit the request to the service and store the response.
     ClientResponse<CollectionObject> res = 
       client.getCollectionObject(NON_EXISTENT_ID);
+    int statusCode = res.getStatus();
+
+    // Check the status code of the response: does it match the expected response(s)?
     verbose("readNonExistent: status = " + res.getStatus());
-    Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+    final String REQUEST_TYPE="READ";  // @TODO Consider replacing with enum.
+    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
+      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
   }
 
 
@@ -362,13 +377,21 @@ public class CollectionObjectServiceTest {
     // Expected status code: 200 OK
     final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
   
-    // The 'read' method is expected to return at least an empty list.
+    // Submit the request to the service and store the response.
     ClientResponse<CollectionObjectList> res = client.getCollectionObjectList();
     CollectionObjectList coList = res.getEntity();
-    verbose("readList: status = " + res.getStatus());
-    Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+    int statusCode = res.getStatus();
 
-    if (logger.isDebugEnabled()) {
+    // Check the status code of the response: does it match the expected response(s)?
+    verbose("readList: status = " + res.getStatus());
+    final String REQUEST_TYPE="READ_MULTIPLE";  // @TODO Consider replacing with enum.
+    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
+      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+    // Optionally output additional data about list members for debugging.
+    boolean iterateThroughList = false;
+    if (iterateThroughList && logger.isDebugEnabled()) {
       List<CollectionObjectList.CollectionObjectListItem> coItemList =
         coList.getCollectionObjectListItem();
       int i = 0;
@@ -397,7 +420,7 @@ public class CollectionObjectServiceTest {
     // (NOTE: *not* 204 No Content)
     final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
 
-    // @TODO Currently only a stub.
+    // @TODO Currently only a stub.  Consider how to implement this.
   }
 */
   
@@ -421,16 +444,17 @@ public class CollectionObjectServiceTest {
     // @TODO Another variant of this test should use a URL for the service
     // root that ends in a trailing slash.
 
+    // Submit the request to the service and store the response.
     String url = getServiceRootURL() + "?param=nonexistent";
     GetMethod method = new GetMethod(url);
-    
-    // Submit the request.
     int statusCode = submitRequest(method);
-    verbose("readListWithBadParams: url=" + url + " status=" + statusCode);
     
-    // Evaluate the status code in the response.
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE,
-      "expected " + EXPECTED_STATUS_CODE);
+    // Check the status code of the response: does it match the expected response(s)?
+    verbose("readListWithBadParams: url=" + url + " status=" + statusCode);
+    final String REQUEST_TYPE="READ_MULTIPLE";  // @TODO Consider replacing with enum.
+    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
+      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
   }
 */
 
@@ -460,7 +484,7 @@ public class CollectionObjectServiceTest {
   // ----------------
 
   /**
-   * Tests updating the content of an object of the specified type.
+   * Tests updating the content of a resource of the specified type.
    *
    * Also expected: The entity body in the response contains
    * a representation of the updated object of the specified type.
@@ -471,6 +495,7 @@ public class CollectionObjectServiceTest {
     // Expected status code: 200 OK
     final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
 
+    // Retrieve an existing resource that we can update.
     ClientResponse<CollectionObject> res = 
       client.getCollectionObject(knownObjectId);
     verbose("read: status = " + res.getStatus());
@@ -479,25 +504,31 @@ public class CollectionObjectServiceTest {
     verbose("Got object to update with ID: " + knownObjectId,
         collectionObject, CollectionObject.class);
 
+    // Update the content of this resource.
     //collectionObject.setCsid("updated-" + knownObjectId);
     collectionObject.setObjectNumber("updated-" + collectionObject.getObjectNumber());
     collectionObject.setObjectName("updated-" + collectionObject.getObjectName());
 
-    // make call to update service
-    res = 
-      client.updateCollectionObject(knownObjectId, collectionObject);
-    verbose("update: status = " + res.getStatus());
-    Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-    
-    // check the response
+    // Submit the request to the service and store the response.
+    res = client.updateCollectionObject(knownObjectId, collectionObject);
+    int statusCode = res.getStatus();
     CollectionObject updatedCollectionObject = res.getEntity();
+
+    // Check the status code of the response: does it match the expected response(s)?
+    verbose("update: status = " + res.getStatus());
+    final String REQUEST_TYPE="UPDATE";  // @TODO Consider replacing with enum.
+    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
+      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    
+    // Check the contents of the response: does it match what was submitted?
+    verbose("update: ", updatedCollectionObject, CollectionObject.class);
     Assert.assertEquals(updatedCollectionObject.getObjectName(), 
       collectionObject.getObjectName());
-    verbose("update: ", updatedCollectionObject, CollectionObject.class);
   }
 
   /**
-   * Tests updating the content of an object of the specified type
+   * Tests updating the content of a resource of the specified type
    * by sending malformed XML data in the entity body of the request.
    */
 /*
@@ -510,27 +541,25 @@ public class CollectionObjectServiceTest {
     // @TODO This test is currently commented out, because it returns a
     // 500 Internal Server Error status code, rather than the expected status code.
 
+    // Submit the request to the service and store the response.
     String url = getResourceURL(knownObjectId);
     PutMethod method = new PutMethod(url);
-    
-    // Prepare the entity body of the request.
-    //
-    // Note missing final angle bracket in text below.
-    final String MALFORMED_XML_DATA = "<malformed_xml>wrong schema contents</malformed_xml";
+    final String MALFORMED_XML_DATA =
+      "<malformed_xml>wrong schema contents</malformed_xml"; // Note: intentionally missing bracket.
     StringRequestEntity entity = getXmlEntity(MALFORMED_XML_DATA);
-    
-    // Submit the request.
     int statusCode = submitRequest(method, entity);
-    verbose("updateWithMalformedXml: url=" + url + " status=" + statusCode);
     
-    // Evaluate the status code in the response.
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE,
-      "expected " + EXPECTED_STATUS_CODE);
+    // Check the status code of the response: does it match the expected response(s)?
+    verbose("updateWithMalformedXml: url=" + url + " status=" + statusCode);
+    final String REQUEST_TYPE="UPDATE";  // @TODO Consider replacing with enum.
+    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
+      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
   }
 */
 
   /**
-   * Tests updating the content of an object of the specified type
+   * Tests updating the content of a resource of the specified type
    * by sending data in the wrong schema (e.g. in a format that
    * doesn't match the object's schema) in the entity body of the request.
    */
@@ -543,26 +572,25 @@ public class CollectionObjectServiceTest {
     
     // @TODO This test is currently commented out, because it returns a
     // 500 Internal Server Error status code, rather than the expected status code.
-   
+
+    // Submit the request to the service and store the response.
     String url = getResourceURL(knownObjectId);
     PutMethod method = new PutMethod(url);
-    
-    // Prepare the entity body of the request.
     final String WRONG_SCHEMA_DATA = "<wrong_schema>wrong schema contents</wrong_schema>";
     StringRequestEntity entity = getXmlEntity(WRONG_SCHEMA_DATA);
-    
-    // Submit the request.
     int statusCode = submitRequest(method, entity);
-    verbose("updateWithWrongSchema: url=" + url + " status=" + statusCode);
     
-    // Evaluate the status code in the response.
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE,
-      "expected " + EXPECTED_STATUS_CODE);
+    // Check the status code of the response: does it match the expected response(s)?
+    verbose("updateWithWrongSchema: url=" + url + " status=" + statusCode);
+    final String REQUEST_TYPE="UPDATE";  // @TODO Consider replacing with enum.
+    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
+      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
   }
 */
 
   /**
-   * Tests updating the content of an object of the specified type,
+   * Tests updating the content of a resource of the specified type,
    * by a user who is not authorized to perform this action.
    */
 /*
@@ -587,14 +615,20 @@ public class CollectionObjectServiceTest {
     // Expected status code: 404 Not Found
     final int EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
 
+    // Submit the request to the service and store the response.
     // Note: The ID used in this 'create' call may be arbitrary.
     // The only relevant ID may be the one used in updateCollectionObject(), below.
     CollectionObject collectionObject = createCollectionObject(NON_EXISTENT_ID);
-    // make call to update service
     ClientResponse<CollectionObject> res =
       client.updateCollectionObject(NON_EXISTENT_ID, collectionObject);
+    int statusCode = res.getStatus();
+
+    // Check the status code of the response: does it match the expected response(s)?
     verbose("updateNonExistent: status = " + res.getStatus());
-    Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+    final String REQUEST_TYPE="UPDATE";  // @TODO Consider replacing with enum.
+    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
+      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
   }
 
 
@@ -617,9 +651,16 @@ public class CollectionObjectServiceTest {
     // Expected status code: 200 OK
     final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
 
+    // Submit the request to the service and store the response.
     ClientResponse<Response> res = client.deleteCollectionObject(knownObjectId);
+    int statusCode = res.getStatus();
+
+    // Check the status code of the response: does it match the expected response(s)?
     verbose("delete: status = " + res.getStatus());
-    Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+    final String REQUEST_TYPE="DELETE";  // @TODO Consider replacing with enum.
+    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
+      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
   }
 
   // Failure outcomes
@@ -651,18 +692,56 @@ public class CollectionObjectServiceTest {
     // Expected status code: 404 Not Found
     final int EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
 
+    // Submit the request to the service and store the response.
     ClientResponse<Response> res =
       client.deleteCollectionObject(NON_EXISTENT_ID);
+    int statusCode = res.getStatus();
+
+    // Check the status code of the response: does it match the expected response(s)?
     verbose("deleteNonExistent: status = " + res.getStatus());
-    Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+    final String REQUEST_TYPE="DELETE";  // @TODO Consider replacing with enum.
+    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
+      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
   }
 
 
   // ---------------------------------------------------------------
-  // Utility methods used by tests above
+  // Utility tests : tests of code used in tests above
   // ---------------------------------------------------------------
 
+  /**
+   * Tests the HttpClient-based code used to submit data, in various methods below.
+   */
+  @Test(dependsOnMethods = {"create", "read"})
+  public void testSubmitRequest() {
+
+    // Expected status code: 200 OK
+    final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
+
+    // Submit the request to the service and store the response.
+    String url = getResourceURL(knownObjectId);
+    GetMethod method = new GetMethod(url);
+    int statusCode = submitRequest(method);
+    
+    // Check the status code of the response: does it match the expected response(s)?
+    verbose("testSubmitRequest: url=" + url + " status=" + statusCode);
+    final String REQUEST_TYPE="CREATE";  // @TODO Consider replacing with enum.
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE,
+      "expected " + EXPECTED_STATUS_CODE);
+
+  }
+		
+
+  // ---------------------------------------------------------------
+  // Utility methods used by tests above
+  // ---------------------------------------------------------------
+  
+  // @TODO Add Javadoc comments to all of these methods.
+
+  // -----------------------------
   // Methods specific to this test
+  // -----------------------------
 
   private CollectionObject createCollectionObject(String identifier) {
     CollectionObject collectionObject = createCollectionObject("objectNumber-" + identifier,
@@ -684,26 +763,110 @@ public class CollectionObjectServiceTest {
     return SERVICE_PATH_COMPONENT;
   }
   
-  // Methods common to all entity service test classes.  These can be
-  // moved out of individual service test classes into a common class,
-  // perhaps at the top-level 'client' module.
+  // -------------------------------------------------------------
+  // Methods common to all entity service test classes.
+  //
+  // These can be moved out of individual service test classes
+  // into a common class, perhaps at the top-level 'client' module.
+  // -------------------------------------------------------------
 
 /*
-@TODO To be added:
+Intent of the utility method below, per Sanjay:
 Utility that asserts various HTTP status codes received for a given type of a request.
 This should be used from any test we write for a service. For example, this utility
 could take the following two params.
 import javax.ws.rs.core.Response;
 final static public boolean checkStatus(String method, Response.Status status);
 Perhaps you could find about method used from org.jboss.resteasy.client.ClientResponse metadata.
+
+See comments in the 'create' test, above, regarding finding the method used in the request.
 */
+
+  private boolean statusCodeWithinExpectedSet(String requestType, int statusCode) {
+  
+    // @TODO Consider implementing this via enums for request types,
+    // rather than Strings.  This might also allow us to define their
+    // values in the enum definition class.
+    
+    if (requestType.equalsIgnoreCase("CREATE")) {
+      int[] validStatusCodes = {
+        Response.Status.CREATED.getStatusCode(),
+        Response.Status.BAD_REQUEST.getStatusCode(),
+        Response.Status.FORBIDDEN.getStatusCode(),
+        Response.Status.CONFLICT.getStatusCode(),
+        Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() };
+      if (Arrays.binarySearch(validStatusCodes, statusCode) >= 0) {
+        verbose("status code is IN expected set");
+        return true;
+      } else {
+        verbose("status code is NOT in expected set");
+        return false;
+      }
+    } else if (requestType.equalsIgnoreCase("READ")) {
+      int[] validStatusCodes = {
+        Response.Status.OK.getStatusCode(),
+        Response.Status.FORBIDDEN.getStatusCode(),
+        Response.Status.NOT_FOUND.getStatusCode(),
+        Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() };
+      if (Arrays.binarySearch(validStatusCodes, statusCode) >= 0) {
+        verbose("status code is IN expected set");
+        return true;
+      } else {
+        verbose("status code is NOT in expected set");
+        return false;
+      }
+    } else if (requestType.equalsIgnoreCase("READ_MULTIPLE")) {
+      int[] validStatusCodes = {
+        Response.Status.OK.getStatusCode(),
+        Response.Status.BAD_REQUEST.getStatusCode(),
+        Response.Status.FORBIDDEN.getStatusCode(),
+        Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() };
+      if (Arrays.binarySearch(validStatusCodes, statusCode) >= 0) {
+        verbose("status code is IN expected set");
+        return true;
+      } else {
+        verbose("status code is NOT in expected set");
+        return false;
+      }
+    } else if (requestType.equalsIgnoreCase("UPDATE")) {
+      int[] validStatusCodes = {
+        Response.Status.OK.getStatusCode(),
+        Response.Status.BAD_REQUEST.getStatusCode(),
+        Response.Status.FORBIDDEN.getStatusCode(),
+        Response.Status.NOT_FOUND.getStatusCode(),
+        Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() };
+      if (Arrays.binarySearch(validStatusCodes, statusCode) >= 0) {
+        verbose("status code is IN expected set");
+        return true;
+      } else {
+        verbose("status code is NOT in expected set");
+        return false;
+      }
+    } else if (requestType.equalsIgnoreCase("DELETE")) {
+      int[] validStatusCodes = {
+        Response.Status.OK.getStatusCode(),
+        Response.Status.FORBIDDEN.getStatusCode(),
+        Response.Status.NOT_FOUND.getStatusCode(),
+        Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() };
+      if (Arrays.binarySearch(validStatusCodes, statusCode) >= 0) {
+        verbose("status code is IN expected set");
+        return true;
+      } else {
+        verbose("status code is NOT in expected set");
+        return false;
+      }
+    } else {
+      logger.error("Request type '" + requestType + " must match a recognized type.");
+      return false;
+    }
+  }
   
   private String getServiceRootURL() {
     return serviceClient.getBaseURL() + getServicePathComponent();
   }
 
-  private String getResourceURL(String id) {
-    return getServiceRootURL() + "/" + id;
+  private String getResourceURL(String resourceIdentifier) {
+    return getServiceRootURL() + "/" + resourceIdentifier;
   }
 
   private int submitRequest(HttpMethod method) {
