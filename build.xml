@@ -1,0 +1,260 @@
+
+<project name="services-trunk" default="package" basedir=".">
+    <description>
+        collectionspace services
+    </description>
+  <!-- set global properties for this build -->
+    <property file="build.properties" />
+    <property name="mvn.opts" value="" />
+    <property name="src" location="src"/>
+
+    <property name="db" value="mysql"/>
+    <property name="db.script.dir" location="${basedir}/src/main/resources/scripts/db/${db}"/>
+
+
+    <condition property="osfamily-unix">
+        <os family="unix" />
+    </condition>
+    <condition property="osfamily-windows">
+        <os family="windows" />
+    </condition>
+
+    <target name="init">
+    <!-- Create the time stamp -->
+        <tstamp/>
+    </target>
+
+    <target name="dist" depends="package"
+    description="generate cspace service distribution">
+        <!-- Create the distribution directory -->
+        <mkdir dir="${basedir}/dist"/>
+        <!-- copy db scripts, etc. -->
+        <copy todir="${basedir}/${dist.server.cspace}/cspace/services">
+            <fileset dir="${src}/main/resources/scripts"/>
+        </copy>
+        <!-- copy datasources -->
+        <copy todir="${basedir}/${dist.deploy.cspace}">
+            <fileset dir="${src}/main/resources/config"/>
+        </copy>
+        <ant antfile="3rdparty/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="services/build.xml" target="dist" inheritAll="false"/>
+
+        <!-- bundle up everything -->
+        <tar destfile="${basedir}/dist/${cspace.services.release}-${jboss.release}.tar.gz" compression="gzip">
+            <tarfileset dir="${basedir}/dist/cspace"
+              preserveLeadingSlashes="true">
+            </tarfileset>
+        </tar>
+    </target>
+
+    <target name="dist-jboss-domains" depends="init"
+    description="create jboss distributions for cspace and nuxeo">
+        <antcall target="dist-jboss-cspace"/>
+        <antcall target="dist-jboss-nuxeo"/>
+    </target>
+
+    <target name="dist-jboss-cspace" depends="dist"
+    description="generate jboss distribution for cspace">
+        <fail message="JBoss is not installed or ${jboss.dir} not found">
+            <condition>
+                <not>
+                    <available file="${jboss.dir}" type="dir"/>
+                </not>
+            </condition>
+        </fail>
+
+        <fail message="CSpace is not deployed or ${jboss.deploy.cspace.services} not found">
+            <condition>
+                <not>
+                    <available file="${jboss.deploy.cspace.services}" type="file"/>
+                </not>
+            </condition>
+        </fail>
+
+        <tar destfile="${basedir}/dist/${jboss.release}-${domain.cspace}-${cspace.release}.tar.gz" compression="gzip">
+            <tarfileset dir="${jboss.dir}"
+            prefix="${jboss.release}"
+              preserveLeadingSlashes="true">
+                <exclude name="server/${jboss.domain.nuxeo}/**"/>
+                <exclude name="server/${jboss.domain.cspace}/log/**"/>
+                <exclude name="server/${jboss.domain.cspace}/tmp/**"/>
+            </tarfileset>
+        </tar>
+    </target>
+    
+    <target name="dist-jboss-nuxeo" depends="dist"
+        description="generate nuxeo domain distribution" >
+        <fail message="JBoss is not installed or ${jboss.dir} not found">
+            <condition>
+                <not>
+                    <available file="${jboss.dir}" type="dir"/>
+                </not>
+            </condition>
+        </fail>
+
+        <fail message="Nuxeo is not deployed or ${jboss.deploy.nuxeo.systemy} not found">
+            <condition>
+                <not>
+                    <available file="${jboss.deploy.nuxeo.system}" type="dir"/>
+                </not>
+            </condition>
+        </fail>
+
+        <tar destfile="${basedir}/dist/${jboss.release}-${domain.nuxeo}-${nuxeo.release}.tar.gz" compression="gzip">
+            <tarfileset dir="${jboss.dir}"
+              prefix="${jboss.release}"
+              preserveLeadingSlashes="true">
+                <exclude name="server/${jboss.domain.cspace}/**"/>
+                <exclude name="server/${jboss.domain.nuxeo}/log/**"/>
+                <exclude name="server/${jboss.domain.nuxeo}/tmp/**"/>
+            </tarfileset>
+        </tar>
+    </target>
+
+    <target name="package" depends="package-unix,package-windows"
+  description="mvn package" />
+    <target name="package-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="package" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="package-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="package" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="install" depends="package,install-unix,install-windows"
+  description="mvn install" />
+    <target name="install-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="install" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="install-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="install" />
+            <arg value="-Dmaven.test.skip=true" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+
+    <target name="clean" depends="clean-unix,clean-windows"
+  description="Delete target directories" >
+        <delete dir="${basedir}/build"/>
+        <delete dir="${basedir}/dist"/>
+    </target>
+    <target name="clean-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="clean" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="clean-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="clean" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="test" depends="test-unix,test-windows" description="Run tests" />
+    <target name="test-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="test" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="test-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="test" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+    <target name="create_db"
+    description="create database(s), grant privileges to test users">
+        <sql driver="com.mysql.jdbc.Driver"
+        url="jdbc:mysql://localhost:3306/cspace"
+        userid="root"
+        password="admin"
+        src="${db.script.dir}/init_db.sql"
+        >
+            <classpath>
+                <pathelement path="${jboss.lib.cspace}/mysql-connector-java-5.1.7-bin.jar"/>
+            </classpath>
+        </sql>
+    </target>
+
+    <target name="deploy" depends="package"
+    description="deploy services in ${jboss.server.cspace}">
+                <!-- copy db scripts, etc. -->
+        <copy todir="${jboss.server.cspace}/cspace/services">
+            <fileset dir="${src}/main/resources/scripts"/>
+        </copy>
+        <!-- copy datasources -->
+        <copy todir="${jboss.deploy.cspace}">
+            <fileset dir="${src}/main/resources/config"/>
+        </copy>
+        <ant antfile="3rdparty/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="services/build.xml" target="deploy" inheritAll="false"/>
+
+    </target>
+
+    <target name="undeploy"
+    description="undeploy services from ${jboss.server.cspace}">
+        <ant antfile="services/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="3rdparty/build.xml" target="undeploy" inheritAll="false"/>
+        <delete failonerror="false"  file="${jboss.deploy.cspace}/cspace-ds.xml"/>
+        <delete failonerror="false" dir="${jboss.server.cspace}/cspace/services"/>
+        <delete failonerror="false" dir="${jboss.server.cspace}/cspace/config/services"/>
+    </target>
+
+
+    <target name="eclipse" depends="eclipse-unix,eclipse-windows" description="Generate Eclipse files" />
+    <target name="eclipse-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="eclipse:clean" />
+            <arg value="eclipse:eclipse" />
+            <arg value="${mvn.opts}" />
+        </exec>
+        <exec executable="fixeclipse" failonerror="true" />
+    </target>
+    <target name="eclipse-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="eclipse:clean" />
+            <arg value="eclipse:eclipse" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
+
+</project>

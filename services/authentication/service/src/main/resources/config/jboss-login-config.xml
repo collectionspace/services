@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Copyright 2009 University of California at Berkeley
+    Licensed under the Educational Community License (ECL), Version 2.0.
+    You may not use this file except in compliance with this License.
+    
+    Document   : jboss-login-config.xml
+    Created on : June 19, 2009, 9:58 AM
+    Author     : 
+    Description:
+        jboss config for JAAS DatabaseServerLoginModule
+-->
+<!--
+copy the following snippet into $JBOSS_HOME/server/cspace/conf/login-config.xml
+copy before the "other" application-policy
+-->
+
+    <application-policy name="cspace">
+        <authentication>
+            <login-module code="org.collectionspace.authentication.CSpaceDBLoginModule"
+                             flag="required">
+                <module-option name="dsJndiName">java:/CspaceDS</module-option>
+                <module-option name="hashAlgorithm">SHA-256</module-option>
+                <module-option name="ignorePasswordCase">false</module-option>
+                <module-option name="principalsQuery">
+                    select passwd from users where username=?
+                </module-option>
+                <module-option name="rolesQuery">
+                    select rolename, 'Roles' from users_roles where username=?
+                </module-option>
+            </login-module>
+        </authentication>
+    </application-policy>

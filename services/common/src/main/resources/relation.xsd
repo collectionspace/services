@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+    Copyright 2009 University of California at Berkeley
+    Licensed under the Educational Community License (ECL), Version 2.0.
+    You may not use this file except in compliance with this License.
+    
+    You may obtain a copy of the ECL 2.0 License at
+    https://source.collectionspace.org/collection-space/LICENSE.txt
+
+    Document   : relation.xsd
+    Revision   : $LastChangedRevision: $
+    Created on : $LastChangedDate: $
+    Author     : $LastChangedBy: $
+    Description:
+-->
+<xs:schema
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://services.collectionspace.org/relation"
+    xmlns:rel="http://services.collectionspace.org/relation"
+    targetNamespace="http://services.collectionspace.org/relation"
+    >
+
+    <!-- Relation -->
+    <xs:element name="relation">
+        <xs:complexType>
+            <xs:sequence>
+            	<xs:element name="csid" type="xs:string" />            
+                <xs:element name="documentId1" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                <xs:element name="documentType1" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                <xs:element name="documentId2" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                <xs:element name="documentType2" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                <!-- type of relationship between two entities -->
+                <xs:element name="relationshipType" type="rel:RelationshipType" minOccurs="1" maxOccurs="1"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- enumeration defining the type of relationship between two entities -->
+    <xs:simpleType name="RelationshipType">
+        <xs:restriction base="xs:string">
+            <!-- document with id as document-id-1 is associated with document with id as document-id-2 -->
+            <xs:enumeration value="association"/>
+            <!-- document with id as document-id-1 contains one or more document with id as document-id-2 -->
+            <xs:enumeration value="contains"/>
+            <!-- document with id as document-id-1 contains one or more document with id as document-id-2 -->
+            <xs:enumeration value="collectionobject-intake"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- collection objects as in nuxeo repository -->
+    <xs:element name="relation-list">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="relation-list-item" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <!-- uri to retrive collection object details -->
+                            <xs:element name="uri" type="xs:anyURI" minOccurs="1"/>
+                            <xs:element name="csid" type="xs:string" minOccurs="1"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>
+
+
+
+
+
+

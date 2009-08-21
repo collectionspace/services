@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : service-config.xml
+    Created on : May 19, 2009, 1:31 PM
+    Author     :
+    Copyright 2009 University of California at Berkeley
+    Description:
+        Service layer configuration
+-->
+
+<ns1:service-config  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+   xmlns:ns1='http://collectionspace.org/services/common'
+   xsi:schemaLocation='http://collectionspace.org/services/common ../resources/common.xsd'>
+    <nuxeo-client-config>
+        <!-- ip of network interface to which Nuxeo server is listening on -->
+        <host>127.0.0.1</host>
+        <port>62474</port> <!-- java -->
+        <!--port>8080</port--> <!-- rest -->
+        <client-type>java</client-type>
+        <user>Administrator</user>
+        <password>Administrator</password>
+    </nuxeo-client-config>
+    <nuxeo-workspace>
+        <workspace>
+            <service-name>persons</service-name>
+            <workspace-name>People</workspace-name>
+            <!-- use hard-coded workspace id for REST client -->
+            <!--workspace-id></workspace-id-->
+        </workspace>
+        <workspace>
+            <service-name>collectionobjects</service-name>
+            <workspace-name>CollectionObjects</workspace-name>
+            <!-- use hard-coded workspace id for REST client -->
+            <!--workspace-id></workspace-id-->
+        </workspace>
+        <workspace>
+            <service-name>intakes</service-name>
+            <workspace-name>Intakes</workspace-name>
+            <!-- use hard-coded workspace id for REST client -->
+            <!--workspace-id></workspace-id-->
+        </workspace>
+        <workspace>
+            <service-name>relations</service-name>
+            <workspace-name>Relations</workspace-name>
+        </workspace>        
+    </nuxeo-workspace>
+
+</ns1:service-config>
