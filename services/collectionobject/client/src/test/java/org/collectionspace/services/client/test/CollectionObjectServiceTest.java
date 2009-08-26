@@ -34,6 +34,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import org.collectionspace.services.client.CollectionObjectClient;
+import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.collectionobject.CollectionObject;
 import org.collectionspace.services.collectionobject.CollectionObjectList;
 
@@ -78,8 +79,7 @@ public class CollectionObjectServiceTest {
   private final String NON_EXISTENT_ID = createNonExistentIdentifier();
   private HttpClient httpClient = new HttpClient();
   private TestServiceClient serviceClient = new TestServiceClient();
-
-  
+ 
   // ---------------------------------------------------------------
   // Service Discovery tests
   // ---------------------------------------------------------------
@@ -109,34 +109,19 @@ public class CollectionObjectServiceTest {
      // Expected status code: 201 Created
     final int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
 
+    // Type of service request being tested
+    final ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
+
     // Submit the request to the service and store the response.
     String identifier = this.createIdentifier();
     CollectionObject collectionObject = createCollectionObject(identifier);
     ClientResponse<Response> res = client.createCollectionObject(collectionObject);
     int statusCode = res.getStatus();
 
-    // Experiment to determine if we can programmatically obtain the HTTP method
-    // used in the request, from the response headers, so we can provide that to
-    // statusCodeWithinExpectedSet(), below.
-    //
-    // It doesn't appear that we can; tried this also with 'curl -i {url}' without success.
-    //
-    // Need to look into whether this is currently returned from our Java Client Library
-    // 'service access' classes, or whether we can add this functionality there.
-/*
-    MultivaluedMap metadata = res.getMetadata();    
-    Set<String> set = metadata.keySet();
-    for (String key : set) {
-      // Note: values in the metadata (HTTP response headers) are of type List
-      verbose(key + " : " + metadata.get(key).toString());
-    }
-*/    
-
     // Check the status code of the response: does it match the expected response(s)?
     verbose("create: status = " + statusCode);
-    final String REQUEST_TYPE="CREATE";  // @TODO Consider replacing with enum.
-    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
-      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+      invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
     // Store the ID returned from this create operation for additional tests below.
@@ -184,6 +169,9 @@ public class CollectionObjectServiceTest {
     // Expected status code: 400 Bad Request
     final int EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
 
+    // Type of service request being tested
+    final ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
+
     // @TODO This test is currently commented out, because it returns a
     // 500 Internal Server Error status code, rather than the expected status code.
 
@@ -197,9 +185,8 @@ public class CollectionObjectServiceTest {
     
     // Check the status code of the response: does it match the expected response(s)?
     verbose("createWithMalformedXml url=" + url + " status=" + statusCode);
-    final String REQUEST_TYPE="CREATE";  // @TODO Consider replacing with enum.
-    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
-      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+      invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
   }
 */
@@ -216,6 +203,9 @@ public class CollectionObjectServiceTest {
     // Expected status code: 400 Bad Request
     final int EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
 
+    // Type of service request being tested
+    final ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
+
     // @TODO This test is currently commented out, because it returns a
     // 500 Internal Server Error status code, rather than the expected status code.
    
@@ -228,9 +218,8 @@ public class CollectionObjectServiceTest {
     
     // Check the status code of the response: does it match the expected response(s)?
     verbose("createWithWrongSchema url=" + url + " status=" + statusCode);
-    final String REQUEST_TYPE="CREATE";  // @TODO Consider replacing with enum.
-    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
-      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+      invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
   }
 */  
@@ -261,6 +250,9 @@ public class CollectionObjectServiceTest {
 
     // Expected status code: 409 Conflict
     final int EXPECTED_STATUS_CODE = Response.Status.CONFLICT.getStatusCode();
+
+    // Type of service request being tested
+    final ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
     
     // @TODO This test is currently commented out because our current
     // services do not appear to permit creation of duplicate records.
@@ -302,6 +294,9 @@ public class CollectionObjectServiceTest {
     // Expected status code: 200 OK
     final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
 
+    // Type of service request being tested
+    final ServiceRequestType REQUEST_TYPE = ServiceRequestType.READ;
+
     // Submit the request to the service and store the response.
     ClientResponse<CollectionObject> res = 
       client.getCollectionObject(knownObjectId);
@@ -309,9 +304,8 @@ public class CollectionObjectServiceTest {
       
     // Check the status code of the response: does it match the expected response(s)?
     verbose("read: status = " + statusCode);
-    final String REQUEST_TYPE="READ";  // @TODO Consider replacing with enum.
-    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
-      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+      invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
   }
 
@@ -328,6 +322,9 @@ public class CollectionObjectServiceTest {
 
     // Expected status code: 403 Forbidden
     final int EXPECTED_STATUS_CODE = Response.Status.FORBIDDEN.getStatusCode();
+
+    // Type of service request being tested
+    final ServiceRequestType REQUEST_TYPE = ServiceRequestType.READ;
     
     // @TODO Currently only a stub.  This test can be implemented
     // when the service is revised to require authorization. 
@@ -344,6 +341,9 @@ public class CollectionObjectServiceTest {
     // Expected status code: 404 Not Found
     final int EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
 
+    // Type of service request being tested
+    final ServiceRequestType REQUEST_TYPE = ServiceRequestType.READ;
+
     // Submit the request to the service and store the response.
     ClientResponse<CollectionObject> res = 
       client.getCollectionObject(NON_EXISTENT_ID);
@@ -351,9 +351,8 @@ public class CollectionObjectServiceTest {
 
     // Check the status code of the response: does it match the expected response(s)?
     verbose("readNonExistent: status = " + res.getStatus());
-    final String REQUEST_TYPE="READ";  // @TODO Consider replacing with enum.
-    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
-      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+      invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
   }
 
@@ -376,6 +375,9 @@ public class CollectionObjectServiceTest {
 
     // Expected status code: 200 OK
     final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
+
+    // Type of service request being tested
+    final ServiceRequestType REQUEST_TYPE = ServiceRequestType.READ_MULTIPLE;
   
     // Submit the request to the service and store the response.
     ClientResponse<CollectionObjectList> res = client.getCollectionObjectList();
@@ -384,9 +386,8 @@ public class CollectionObjectServiceTest {
 
     // Check the status code of the response: does it match the expected response(s)?
     verbose("readList: status = " + res.getStatus());
-    final String REQUEST_TYPE="READ_MULTIPLE";  // @TODO Consider replacing with enum.
-    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
-      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+      invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
     // Optionally output additional data about list members for debugging.
@@ -420,6 +421,9 @@ public class CollectionObjectServiceTest {
     // (NOTE: *not* 204 No Content)
     final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
 
+    // Type of service request being tested
+    final ServiceRequestType REQUEST_TYPE = ServiceRequestType.READ_MULTIPLE;
+
     // @TODO Currently only a stub.  Consider how to implement this.
   }
 */
@@ -438,6 +442,9 @@ public class CollectionObjectServiceTest {
     // Expected status code: 400 Bad Request
     final int EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
 
+    // Type of service request being tested
+    final ServiceRequestType REQUEST_TYPE = ServiceRequestType.READ_MULTIPLE;
+
     // @TODO This test is currently commented out, because it returns a
     // 200 OK status code, rather than the expected status code.
    
@@ -451,9 +458,8 @@ public class CollectionObjectServiceTest {
     
     // Check the status code of the response: does it match the expected response(s)?
     verbose("readListWithBadParams: url=" + url + " status=" + statusCode);
-    final String REQUEST_TYPE="READ_MULTIPLE";  // @TODO Consider replacing with enum.
-    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
-      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+      invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
   }
 */
@@ -469,6 +475,9 @@ public class CollectionObjectServiceTest {
 
     // Expected status code: 403 Forbidden
     final int EXPECTED_STATUS_CODE = Response.Status.FORBIDDEN.getStatusCode();
+
+    // Type of service request being tested
+    final ServiceRequestType REQUEST_TYPE = ServiceRequestType.READ_MULTIPLE;
 
     // @TODO Currently only a stub.  This test can be implemented
     // when the service is revised to require authorization. 
@@ -495,6 +504,9 @@ public class CollectionObjectServiceTest {
     // Expected status code: 200 OK
     final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
 
+    // Type of service request being tested
+    final ServiceRequestType REQUEST_TYPE = ServiceRequestType.UPDATE;
+
     // Retrieve an existing resource that we can update.
     ClientResponse<CollectionObject> res = 
       client.getCollectionObject(knownObjectId);
@@ -516,15 +528,14 @@ public class CollectionObjectServiceTest {
 
     // Check the status code of the response: does it match the expected response(s)?
     verbose("update: status = " + res.getStatus());
-    final String REQUEST_TYPE="UPDATE";  // @TODO Consider replacing with enum.
-    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
-      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+      invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     
     // Check the contents of the response: does it match what was submitted?
     verbose("update: ", updatedCollectionObject, CollectionObject.class);
     Assert.assertEquals(updatedCollectionObject.getObjectName(), 
-      collectionObject.getObjectName());
+      collectionObject.getObjectName(), "Data in updated object did not match submitted data.");
   }
 
   /**
@@ -537,6 +548,9 @@ public class CollectionObjectServiceTest {
 
     // Expected status code: 400 Bad Request
     final int EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
+
+    // Type of service request being tested
+    final ServiceRequestType REQUEST_TYPE = ServiceRequestType.UPDATE;
 
     // @TODO This test is currently commented out, because it returns a
     // 500 Internal Server Error status code, rather than the expected status code.
@@ -551,9 +565,8 @@ public class CollectionObjectServiceTest {
     
     // Check the status code of the response: does it match the expected response(s)?
     verbose("updateWithMalformedXml: url=" + url + " status=" + statusCode);
-    final String REQUEST_TYPE="UPDATE";  // @TODO Consider replacing with enum.
-    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
-      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+      invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
   }
 */
@@ -569,6 +582,9 @@ public class CollectionObjectServiceTest {
   
     // Expected status code: 400 Bad Request
     final int EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
+
+    // Type of service request being tested
+    final ServiceRequestType REQUEST_TYPE = ServiceRequestType.UPDATE;
     
     // @TODO This test is currently commented out, because it returns a
     // 500 Internal Server Error status code, rather than the expected status code.
@@ -582,9 +598,8 @@ public class CollectionObjectServiceTest {
     
     // Check the status code of the response: does it match the expected response(s)?
     verbose("updateWithWrongSchema: url=" + url + " status=" + statusCode);
-    final String REQUEST_TYPE="UPDATE";  // @TODO Consider replacing with enum.
-    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
-      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+      invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
   }
 */
@@ -615,6 +630,9 @@ public class CollectionObjectServiceTest {
     // Expected status code: 404 Not Found
     final int EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
 
+    // Type of service request being tested
+    final ServiceRequestType REQUEST_TYPE = ServiceRequestType.UPDATE;
+
     // Submit the request to the service and store the response.
     // Note: The ID used in this 'create' call may be arbitrary.
     // The only relevant ID may be the one used in updateCollectionObject(), below.
@@ -625,9 +643,8 @@ public class CollectionObjectServiceTest {
 
     // Check the status code of the response: does it match the expected response(s)?
     verbose("updateNonExistent: status = " + res.getStatus());
-    final String REQUEST_TYPE="UPDATE";  // @TODO Consider replacing with enum.
-    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
-      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+      invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
   }
 
@@ -651,15 +668,17 @@ public class CollectionObjectServiceTest {
     // Expected status code: 200 OK
     final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
 
+    // Type of service request being tested
+    final ServiceRequestType REQUEST_TYPE = ServiceRequestType.DELETE;
+
     // Submit the request to the service and store the response.
     ClientResponse<Response> res = client.deleteCollectionObject(knownObjectId);
     int statusCode = res.getStatus();
 
     // Check the status code of the response: does it match the expected response(s)?
     verbose("delete: status = " + res.getStatus());
-    final String REQUEST_TYPE="DELETE";  // @TODO Consider replacing with enum.
-    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
-      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+      invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
   }
 
@@ -677,6 +696,9 @@ public class CollectionObjectServiceTest {
     // Expected status code: 403 Forbidden
     final int EXPECTED_STATUS_CODE = Response.Status.FORBIDDEN.getStatusCode();
 
+    // Type of service request being tested
+    final ServiceRequestType REQUEST_TYPE = ServiceRequestType.DELETE;
+
     // @TODO Currently only a stub.  This test can be implemented
     // when the service is revised to require authorization. 
   }
@@ -692,6 +714,9 @@ public class CollectionObjectServiceTest {
     // Expected status code: 404 Not Found
     final int EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
 
+    // Type of service request being tested
+    final ServiceRequestType REQUEST_TYPE = ServiceRequestType.DELETE;
+
     // Submit the request to the service and store the response.
     ClientResponse<Response> res =
       client.deleteCollectionObject(NON_EXISTENT_ID);
@@ -699,9 +724,8 @@ public class CollectionObjectServiceTest {
 
     // Check the status code of the response: does it match the expected response(s)?
     verbose("deleteNonExistent: status = " + res.getStatus());
-    final String REQUEST_TYPE="DELETE";  // @TODO Consider replacing with enum.
-    Assert.assertTrue(statusCodeWithinExpectedSet(REQUEST_TYPE, statusCode),
-      "Status code '" + statusCode + "' in response is NOT within the expected set.");
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+      invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
   }
 
@@ -726,9 +750,7 @@ public class CollectionObjectServiceTest {
     
     // Check the status code of the response: does it match the expected response(s)?
     verbose("testSubmitRequest: url=" + url + " status=" + statusCode);
-    final String REQUEST_TYPE="CREATE";  // @TODO Consider replacing with enum.
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE,
-      "expected " + EXPECTED_STATUS_CODE);
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
   }
 		
@@ -770,95 +792,10 @@ public class CollectionObjectServiceTest {
   // into a common class, perhaps at the top-level 'client' module.
   // -------------------------------------------------------------
 
-/*
-Intent of the utility method below, per Sanjay:
-Utility that asserts various HTTP status codes received for a given type of a request.
-This should be used from any test we write for a service. For example, this utility
-could take the following two params.
-import javax.ws.rs.core.Response;
-final static public boolean checkStatus(String method, Response.Status status);
-Perhaps you could find about method used from org.jboss.resteasy.client.ClientResponse metadata.
-
-See comments in the 'create' test, above, regarding finding the method used in the request.
-*/
-
-  private boolean statusCodeWithinExpectedSet(String requestType, int statusCode) {
-  
-    // @TODO Consider implementing this via enums for request types,
-    // rather than Strings.  This might also allow us to define their
-    // values in the enum definition class.
-    
-    if (requestType.equalsIgnoreCase("CREATE")) {
-      int[] validStatusCodes = {
-        Response.Status.CREATED.getStatusCode(),
-        Response.Status.BAD_REQUEST.getStatusCode(),
-        Response.Status.FORBIDDEN.getStatusCode(),
-        Response.Status.CONFLICT.getStatusCode(),
-        Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() };
-      if (Arrays.binarySearch(validStatusCodes, statusCode) >= 0) {
-        verbose("status code is IN expected set");
-        return true;
-      } else {
-        verbose("status code is NOT in expected set");
-        return false;
-      }
-    } else if (requestType.equalsIgnoreCase("READ")) {
-      int[] validStatusCodes = {
-        Response.Status.OK.getStatusCode(),
-        Response.Status.FORBIDDEN.getStatusCode(),
-        Response.Status.NOT_FOUND.getStatusCode(),
-        Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() };
-      if (Arrays.binarySearch(validStatusCodes, statusCode) >= 0) {
-        verbose("status code is IN expected set");
-        return true;
-      } else {
-        verbose("status code is NOT in expected set");
-        return false;
-      }
-    } else if (requestType.equalsIgnoreCase("READ_MULTIPLE")) {
-      int[] validStatusCodes = {
-        Response.Status.OK.getStatusCode(),
-        Response.Status.BAD_REQUEST.getStatusCode(),
-        Response.Status.FORBIDDEN.getStatusCode(),
-        Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() };
-      if (Arrays.binarySearch(validStatusCodes, statusCode) >= 0) {
-        verbose("status code is IN expected set");
-        return true;
-      } else {
-        verbose("status code is NOT in expected set");
-        return false;
-      }
-    } else if (requestType.equalsIgnoreCase("UPDATE")) {
-      int[] validStatusCodes = {
-        Response.Status.OK.getStatusCode(),
-        Response.Status.BAD_REQUEST.getStatusCode(),
-        Response.Status.FORBIDDEN.getStatusCode(),
-        Response.Status.NOT_FOUND.getStatusCode(),
-        Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() };
-      if (Arrays.binarySearch(validStatusCodes, statusCode) >= 0) {
-        verbose("status code is IN expected set");
-        return true;
-      } else {
-        verbose("status code is NOT in expected set");
-        return false;
-      }
-    } else if (requestType.equalsIgnoreCase("DELETE")) {
-      int[] validStatusCodes = {
-        Response.Status.OK.getStatusCode(),
-        Response.Status.FORBIDDEN.getStatusCode(),
-        Response.Status.NOT_FOUND.getStatusCode(),
-        Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() };
-      if (Arrays.binarySearch(validStatusCodes, statusCode) >= 0) {
-        verbose("status code is IN expected set");
-        return true;
-      } else {
-        verbose("status code is NOT in expected set");
-        return false;
-      }
-    } else {
-      logger.error("Request type '" + requestType + " must match a recognized type.");
-      return false;
-    }
+  protected String invalidStatusCodeMessage(ServiceRequestType requestType, int statusCode) {
+    return 
+      "Status code '" + statusCode + "' in response is NOT within the expected set: " +
+      requestType.validStatusCodesAsString();
   }
   
   private String getServiceRootURL() {
