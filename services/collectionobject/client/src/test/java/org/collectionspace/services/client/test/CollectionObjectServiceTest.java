@@ -25,25 +25,22 @@ package org.collectionspace.services.client.test;
 
 import java.util.List;
 import javax.ws.rs.core.Response;
-import org.jboss.resteasy.client.ClientResponse;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import javax.ws.rs.core.Response.Status;
+
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
 
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.collectionobject.CollectionObject;
 import org.collectionspace.services.collectionobject.CollectionObjectList;
 
-import java.util.Arrays;
-import java.util.Set;
-import javax.ws.rs.core.Response.Status;
-// import org.jboss.resteasy.client.ClientRequest;
+import org.jboss.resteasy.client.ClientResponse;
 
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * CollectionObjectServiceTest, carries out tests against a
@@ -84,7 +81,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         // Check the status code of the response: does it match the expected response(s)?
         //
         // Does it fall within the set of valid status codes?
-        // Does it match the expected status code?
+        // Does it exactly match the expected status code?
         verbose("create: status = " + statusCode);
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -315,9 +312,6 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         // Perform setup.
         super.setupUpdateWithWrongXmlSchema();
         
-        // @TODO This test is currently commented out, because it returns a
-        // 500 Internal Server Error status code, rather than the expected status code.
-
         // Submit the request to the service and store the response.
         String url = getResourceURL(knownObjectId);
         PutMethod method = new PutMethod(url);
@@ -385,12 +379,6 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
         // Perform setup.
         super.setupDeleteNonExistent();
-
-        // Expected status code: 404 Not Found
-        final int EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
-
-        // Type of service request being tested
-        final ServiceRequestType REQUEST_TYPE = ServiceRequestType.DELETE;
 
         // Submit the request to the service and store the response.
         ClientResponse<Response> res =

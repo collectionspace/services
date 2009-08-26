@@ -62,8 +62,13 @@ public abstract class AbstractServiceTest implements ServiceTest {
 
     final Logger logger = LoggerFactory.getLogger(AbstractServiceTest.class);
 
-    private final TestServiceClient serviceClient = new TestServiceClient();
+    // Currently used for performing several negative (failure) tests.
+    //
+    // @TODO To be replaced with RESTeasy's ClientRequest, per Issue CSPACE-386.
     protected HttpClient httpClient = new HttpClient();
+
+    // Used (only) to obtain the base service URL.
+    private final TestServiceClient serviceClient = new TestServiceClient();
 
     // The status code expected to be returned by a test method (where relevant).
     int EXPECTED_STATUS_CODE = 0;
@@ -276,8 +281,8 @@ public abstract class AbstractServiceTest implements ServiceTest {
     // ---------------------------------------------------------------
 
     /**
-     * Reinitializes setup values to guard against unintended reuse
-     * of those values.
+     * Reinitializes setup values, to help expose any unintended reuse
+     * of those values between tests.
      */
     protected void clearSetup() {
         EXPECTED_STATUS_CODE = 0;
