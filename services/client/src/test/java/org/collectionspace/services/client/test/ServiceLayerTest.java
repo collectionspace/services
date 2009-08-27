@@ -39,11 +39,13 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
- * A ServiceTest.
-
- * @version $Revision:$
+ * ServiceLayerTest, tests high-level functionality of
+ * the Services layer.
+ *
+ * $LastChangedRevision: 566 $
+ * $LastChangedDate: 2009-08-26 15:24:17 -0800 (Wed, 26 Aug 2009) $
  */
-public class ServiceTest {
+public class ServiceLayerTest {
 
     final Logger logger = LoggerFactory.getLogger(ServiceTest.class);
     private HttpClient httpClient = new HttpClient();
