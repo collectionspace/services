@@ -62,15 +62,21 @@ public abstract class AbstractServiceTest implements ServiceTest {
 
     final Logger logger = LoggerFactory.getLogger(AbstractServiceTest.class);
 
-    // Currently used for performing several negative (failure) tests.
+    // An HTTP client, used for performing several negative (failure) tests.
     //
-    // @TODO To be replaced with RESTeasy's ClientRequest, per Issue CSPACE-386.
+    // @TODO To be replaced with RESTeasy's ClientRequest (a higher-level API
+    // that is based on HttpClient), per Issue CSPACE-386.
     protected HttpClient httpClient = new HttpClient();
 
-    // Used (only) to obtain the base service URL.
-    private final TestServiceClient serviceClient = new TestServiceClient();
+    // A base-level client, used (only) to obtain the base service URL.
+    private static final TestServiceClient serviceClient = new TestServiceClient();
 
-    // The status code expected to be returned by a test method (where relevant).
+    // A resource identifier believed to be non-existent in actual use,
+    // used when testing service calls that reference non-existent resources.
+    protected final String NON_EXISTENT_ID = createNonExistentIdentifier();
+
+    // The HTTP status code expected to be returned in the response,
+    // from a request made to a service (where relevant).
     int EXPECTED_STATUS_CODE = 0;
     
     // The generic type of service request being tested (e.g. CREATE, UPDATE, DELETE).
@@ -78,7 +84,6 @@ public abstract class AbstractServiceTest implements ServiceTest {
     // This makes it possible to check behavior specific to that type of request,
     // such as the set of valid status codes that may be returned.
     ServiceRequestType REQUEST_TYPE = ServiceRequestType.NON_EXISTENT;
-
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
@@ -345,12 +350,14 @@ public abstract class AbstractServiceTest implements ServiceTest {
             contents = "";
         }
         StringRequestEntity entity = null;
-        final String XML_DECLARATION = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
+        final String XML_DECLARATION =
+          "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
         final String XML_CONTENT_TYPE=MediaType.APPLICATION_XML;
         final String UTF8_CHARSET_NAME = "UTF-8";
         try {
             entity =
-                new StringRequestEntity(XML_DECLARATION + contents, XML_CONTENT_TYPE, UTF8_CHARSET_NAME);
+                new StringRequestEntity(
+                  XML_DECLARATION + contents, XML_CONTENT_TYPE, UTF8_CHARSET_NAME);
         } catch (UnsupportedEncodingException e) {
             logger.error("Unsupported character encoding error: ", e);
         }

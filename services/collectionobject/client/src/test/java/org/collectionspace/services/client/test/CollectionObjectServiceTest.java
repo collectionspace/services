@@ -53,9 +53,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
     // Instance variables specific to this test.
     private CollectionObjectClient client = new CollectionObjectClient();
-
-    // Instance variables common to all entity service test classes.
-    private final String NON_EXISTENT_ID = createNonExistentIdentifier();
+    final String SERVICE_PATH_COMPONENT = "collectionobjects";
     private String knownObjectId = null;
  
     // ---------------------------------------------------------------
@@ -70,7 +68,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
         // Perform setup, such as initializing the type of service request
         // and its valid and expected status codes.
-        super.setupCreate();
+        setupCreate();
 
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
@@ -112,7 +110,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     public void createWithMalformedXml() {
     
         // Perform setup.
-        super.setupCreateWithMalformedXml();
+        setupCreateWithMalformedXml();
 
         // Submit the request to the service and store the response.
         String url = getServiceRootURL();
@@ -134,7 +132,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     public void createWithWrongXmlSchema() {
     
         // Perform setup.
-        super.setupCreateWithWrongXmlSchema();
+        setupCreateWithWrongXmlSchema();
      
         // Submit the request to the service and store the response.
         String url = getServiceRootURL();
@@ -161,7 +159,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     public void read() {
     
         // Perform setup.
-        super.setupRead();
+        setupRead();
 
         // Submit the request to the service and store the response.
         ClientResponse<CollectionObject> res = 
@@ -180,7 +178,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     public void readNonExistent() {
 
         // Perform setup.
-        super.setupReadNonExistent();
+        setupReadNonExistent();
         
         // Submit the request to the service and store the response.
         ClientResponse<CollectionObject> res = 
@@ -206,7 +204,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     public void readList() {
     
         // Perform setup.
-        super.setupReadList();
+        setupReadList();
 
         // Submit the request to the service and store the response.
         ClientResponse<CollectionObjectList> res = client.getCollectionObjectList();
@@ -251,7 +249,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     public void update() {
     
         // Perform setup.
-        super.setupUpdate();
+        setupUpdate();
 
         // Retrieve an existing resource that we can update.
         ClientResponse<CollectionObject> res = 
@@ -289,7 +287,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     public void updateWithMalformedXml() {
 
         // Perform setup.
-        super.setupUpdateWithMalformedXml();
+        setupUpdateWithMalformedXml();
 
         // Submit the request to the service and store the response.
         String url = getResourceURL(knownObjectId);
@@ -306,11 +304,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    @Override
     @Test(dependsOnMethods = {"create", "testSubmitRequest"}) // , "createWithMalformedXml"})
     public void updateWithWrongXmlSchema() {
     
         // Perform setup.
-        super.setupUpdateWithWrongXmlSchema();
+        setupUpdateWithWrongXmlSchema();
         
         // Submit the request to the service and store the response.
         String url = getResourceURL(knownObjectId);
@@ -326,11 +325,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    @Override
     @Test(dependsOnMethods = {"update"})
     public void updateNonExistent() {
 
         // Perform setup.
-        super.setupUpdateNonExistent();
+        setupUpdateNonExistent();
 
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
@@ -354,12 +354,13 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
     // Success outcomes
 
+    @Override
     @Test(dependsOnMethods = 
         {"create", "read", "testSubmitRequest", "update"})
     public void delete() {
 
         // Perform setup.
-        super.setupDelete();
+        setupDelete();
 
         // Submit the request to the service and store the response.
         ClientResponse<Response> res = client.deleteCollectionObject(knownObjectId);
@@ -374,11 +375,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
     // Failure outcomes
 
+    @Override
     @Test(dependsOnMethods = {"delete"})
     public void deleteNonExistent() {
 
         // Perform setup.
-        super.setupDeleteNonExistent();
+        setupDeleteNonExistent();
 
         // Submit the request to the service and store the response.
         ClientResponse<Response> res =
@@ -421,6 +423,14 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+
+    @Override
+    public String getServicePathComponent() {
+        // @TODO Determine if it is possible to obtain this value programmatically.
+        // We set this in an annotation in the CollectionObjectProxy interface, for instance.
+        // We also set service-specific constants in each service module.
+        return SERVICE_PATH_COMPONENT;
+    }
     
     private CollectionObject createCollectionObject(String identifier) {
         CollectionObject collectionObject = createCollectionObject("objectNumber-" + identifier,
@@ -435,13 +445,5 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         return collectionObject;
     }
     
-    @Override
-    public String getServicePathComponent() {
-        // @TODO Determine if it is possible to obtain this value programmatically.
-        // We set this in an annotation in the CollectionObjectProxy interface, for instance.
-        // We also set service-specific constants in each service module.
-        final String SERVICE_PATH_COMPONENT = "collectionobjects";
-        return SERVICE_PATH_COMPONENT;
-    }
     
 }
