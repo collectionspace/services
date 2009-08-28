@@ -37,13 +37,15 @@
             <artifactId>org.collectionspace.services.client</artifactId>
             <version>1.0</version>
         </dependency>
-        <dependency>
+<!-- Needed if/when client test framework files are moved into
+/services/client/src/test from /services/client/src/main -->     
+<!--    <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.client</artifactId>
             <version>1.0</version>
             <scope>test</scope>
             <type>test-jar</type>
-        </dependency>
+        </dependency>-->
         
         <dependency>
             <groupId>org.testng</groupId>
