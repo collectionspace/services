@@ -25,6 +25,7 @@ package org.collectionspace.services.relation.nuxeo;
 
 import org.collectionspace.services.common.NuxeoClientType;
 import org.collectionspace.services.common.repository.DocumentHandler;
+import org.collectionspace.services.common.CollectionSpaceHandlerFactory;
 
 /**
  * CollectionObjectHandlerFactory creates handlers for collectionobject based
@@ -33,7 +34,7 @@ import org.collectionspace.services.common.repository.DocumentHandler;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public class RelationHandlerFactory {
+public class RelationHandlerFactory implements CollectionSpaceHandlerFactory {
 
     private static final RelationHandlerFactory self = new RelationHandlerFactory();
 

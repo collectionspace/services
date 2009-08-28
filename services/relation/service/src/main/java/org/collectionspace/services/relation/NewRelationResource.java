@@ -46,8 +46,10 @@ import javax.xml.bind.Marshaller;
 
 import org.collectionspace.services.relation.RelationList.RelationListItem;
 
+import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.relation.nuxeo.RelationNuxeoConstants;
 import org.collectionspace.services.relation.nuxeo.RelationHandlerFactory;
+import org.collectionspace.services.common.CollectionSpaceHandlerFactory;
 import org.collectionspace.services.common.NuxeoClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.relation.RelationsManager;
@@ -62,33 +64,36 @@ import org.slf4j.LoggerFactory;
 @Path("/relations")
 @Consumes("application/xml")
 @Produces("application/xml")
-public class NewRelationResource {
+public class NewRelationResource extends CollectionSpaceResource {
 
 	public final static String SERVICE_NAME = "relations";
 	final Logger logger = LoggerFactory.getLogger(NewRelationResource.class);
 	// FIXME retrieve client type from configuration
-	final static NuxeoClientType CLIENT_TYPE = ServiceMain.getInstance()
-			.getNuxeoClientType();
-
-	public NewRelationResource() {
-		// do nothing
+//	final static NuxeoClientType CLIENT_TYPE = ServiceMain.getInstance()
+//			.getNuxeoClientType();
+	
+	protected String getClientType() {
+		return ServiceMain.getInstance().getNuxeoClientType().toString();
 	}
+	
+	protected RepositoryClientFactory getDefaultClientFactory() {
+		return RepositoryClientFactory.getInstance();
+	}
+	
+	protected CollectionSpaceHandlerFactory getDefaultHandlerFactory() {
+		return RelationHandlerFactory.getInstance();
+	}
+	
+//	public NewRelationResource() {
+//	}
 
 	@POST
 	public Response createRelation(Relation relation) {
 
 		String csid = null;
 		try {
-			RepositoryClientFactory clientFactory = RepositoryClientFactory
-					.getInstance();
-			RepositoryClient client = clientFactory.getClient(CLIENT_TYPE
-					.toString());
-			RelationHandlerFactory handlerFactory = RelationHandlerFactory
-					.getInstance();
-			DocumentHandler handler = (DocumentHandler) handlerFactory
-					.getHandler(CLIENT_TYPE.toString());
-			handler.setCommonObject(relation);
-			csid = client.create(SERVICE_NAME, handler);
+			getDefaultHandler().setCommonObject(relation);
+			csid = getDefaultClient().create(SERVICE_NAME, getDefaultHandler());
 			relation.setCsid(csid);
 			if (logger.isDebugEnabled()) {
 				verbose("createRelation: ", relation);
@@ -107,6 +112,23 @@ public class NewRelationResource {
 			throw new WebApplicationException(response);
 		}
 	}
+	
+	@GET
+	@Path("query/{queryValue}")
+	public Response getQuery(@PathParam("queryValue") String queryString) {
+		
+		Response result = null;
+		
+		if (logger.isDebugEnabled() == true) {
+			logger.debug("Query string is: " + queryString);
+		}
+				
+		result = Response.status(Response.Status.ACCEPTED).entity(
+						"Query performed. Look in $JBOSS_HOME/server/cspace/log/" +
+						"directory for results ").type("text/plain").build();
+		
+		return result;
+	}
 
 	@GET
 	@Path("{csid}")
@@ -123,16 +145,8 @@ public class NewRelationResource {
 		}
 		Relation relation = null;
 		try {
-			RepositoryClientFactory clientFactory = RepositoryClientFactory
-					.getInstance();
-			RepositoryClient client = clientFactory.getClient(CLIENT_TYPE
-					.toString());
-			RelationHandlerFactory handlerFactory = RelationHandlerFactory
-					.getInstance();
-			DocumentHandler handler = (DocumentHandler) handlerFactory
-					.getHandler(CLIENT_TYPE.toString());
-			client.get(csid, handler);
-			relation = (Relation) handler.getCommonObject();
+			getDefaultClient().get(csid, getDefaultHandler());
+			relation = (Relation) getDefaultHandler().getCommonObject();
 		} catch (DocumentNotFoundException dnfe) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("getRelation", dnfe);
@@ -267,16 +281,8 @@ public class NewRelationResource {
 			verbose("updateRelation with input: ", theUpdate);
 		}
 		try {
-			RepositoryClientFactory clientFactory = RepositoryClientFactory
-					.getInstance();
-			RepositoryClient client = clientFactory.getClient(CLIENT_TYPE
-					.toString());
-			RelationHandlerFactory handlerFactory = RelationHandlerFactory
-					.getInstance();
-			DocumentHandler handler = (DocumentHandler) handlerFactory
-					.getHandler(CLIENT_TYPE.toString());
-			handler.setCommonObject(theUpdate);
-			client.update(csid, handler);
+			getDefaultHandler().setCommonObject(theUpdate);
+			getDefaultClient().update(csid, getDefaultHandler());
 		} catch (DocumentNotFoundException dnfe) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("caugth exception in updateRelation", dnfe);
@@ -309,11 +315,7 @@ public class NewRelationResource {
 			throw new WebApplicationException(response);
 		}
 		try {
-			RepositoryClientFactory clientFactory = RepositoryClientFactory
-					.getInstance();
-			RepositoryClient client = clientFactory.getClient(CLIENT_TYPE
-					.toString());
-			client.delete(csid);
+			getDefaultClient().delete(csid);
 			return Response.status(HttpResponseCodes.SC_OK).build();
 		} catch (DocumentNotFoundException dnfe) {
 			if (logger.isDebugEnabled()) {
@@ -349,22 +351,13 @@ public class NewRelationResource {
 				throws WebApplicationException {
 		RelationList relationList = new RelationList();
 		try {
-			RepositoryClientFactory clientFactory = RepositoryClientFactory
-					.getInstance();
-			RepositoryClient client = clientFactory.getClient(CLIENT_TYPE
-					.toString());
-			RelationHandlerFactory handlerFactory = RelationHandlerFactory
-					.getInstance();
-			DocumentHandler handler = (DocumentHandler) handlerFactory
-					.getHandler(CLIENT_TYPE.toString());
-
-			Map propsFromPath = handler.getProperties();
+			Map propsFromPath = getDefaultHandler().getProperties();
 			propsFromPath.put(RelationsManager.SUBJECT, subjectCsid);
 			propsFromPath.put(RelationsManager.PREDICATE, predicate);
 			propsFromPath.put(RelationsManager.OBJECT, objectCsid);
 
-			client.getAll(SERVICE_NAME, handler);
-			relationList = (RelationList) handler.getCommonObjectList();
+			getDefaultClient().getAll(SERVICE_NAME, getDefaultHandler());
+			relationList = (RelationList) getDefaultHandler().getCommonObjectList();
 		} catch (Exception e) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Caught exception in getRelationList", e);
