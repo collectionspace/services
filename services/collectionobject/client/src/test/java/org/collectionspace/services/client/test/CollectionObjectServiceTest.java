@@ -27,11 +27,6 @@ import java.util.List;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
-
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.collectionobject.CollectionObject;
@@ -67,7 +62,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     public void create() {
 
         // Perform setup, such as initializing the type of service request
-        // and its valid and expected status codes.
+        // (e.g. CREATE, DELETE), its valid and expected status codes, and
+        // its associated HTTP method name (e.g. POST, DELETE).
         setupCreate();
 
         // Submit the request to the service and store the response.
@@ -105,6 +101,11 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         ClientResponse<Response> res = client.createCollectionObject(null);
     }
     
+    // Placeholders until the two tests below can be uncommented.  See Issue CSPACE-401.
+    public void createWithMalformedXml() {}
+    public void createWithWrongXmlSchema() {}
+
+/*
     @Override
     @Test(dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithMalformedXml() {
@@ -113,12 +114,10 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         setupCreateWithMalformedXml();
 
         // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
         String url = getServiceRootURL();
-        PostMethod method = new PostMethod(url);
-        final String MALFORMED_XML_DATA =
-            "<malformed_xml>wrong schema contents</malformed_xml"; // Note: intentionally missing bracket.
-        StringRequestEntity entity = getXmlEntity(MALFORMED_XML_DATA);
-        int statusCode = submitRequest(method, entity);
+        final String entity = MALFORMED_XML_DATA; // Constant from abstract base class.
+        int statusCode = submitRequest(method, url, entity);
         
         // Check the status code of the response: does it match the expected response(s)?
         verbose("createWithMalformedXml url=" + url + " status=" + statusCode);
@@ -128,18 +127,17 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     }
 
     @Override
-    @Test(dependsOnMethods = {"create", "testSubmitRequest"}) //, "createWithMalformedXml"})
+    @Test(dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithWrongXmlSchema() {
     
         // Perform setup.
         setupCreateWithWrongXmlSchema();
      
         // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
         String url = getServiceRootURL();
-        PostMethod method = new PostMethod(url);
-        final String WRONG_SCHEMA_DATA = "<wrong_schema>wrong schema contents</wrong_schema>";
-        StringRequestEntity entity = getXmlEntity(WRONG_SCHEMA_DATA);
-        int statusCode = submitRequest(method, entity);
+        final String entity = WRONG_XML_SCHEMA_DATA;
+        int statusCode = submitRequest(method, url, entity);
         
         // Check the status code of the response: does it match the expected response(s)?
         verbose("createWithWrongSchema url=" + url + " status=" + statusCode);
@@ -147,6 +145,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
+*/
 
     // ---------------------------------------------------------------
     // CRUD tests : READ tests
@@ -279,23 +278,27 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         // Check the contents of the response: does it match what was submitted?
         verbose("update: ", updatedCollectionObject, CollectionObject.class);
         Assert.assertEquals(updatedCollectionObject.getObjectName(), 
-            collectionObject.getObjectName(), "Data in updated object did not match submitted data.");
+            collectionObject.getObjectName(), 
+            "Data in updated object did not match submitted data.");
     }
 
+    // Placeholders until the two tests below can be uncommented.  See Issue CSPACE-401.
+    public void updateWithMalformedXml() {}
+    public void updateWithWrongXmlSchema() {}
+
+/*
     @Override
-    @Test(dependsOnMethods = {"create", "testSubmitRequest"})
+    @Test(dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithMalformedXml() {
 
         // Perform setup.
         setupUpdateWithMalformedXml();
 
         // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
         String url = getResourceURL(knownObjectId);
-        PutMethod method = new PutMethod(url);
-        final String MALFORMED_XML_DATA =
-            "<malformed_xml>wrong schema contents</malformed_xml"; // Note: intentionally missing bracket.
-        StringRequestEntity entity = getXmlEntity(MALFORMED_XML_DATA);
-        int statusCode = submitRequest(method, entity);
+        final String entity = MALFORMED_XML_DATA; // Constant from abstract base class.
+        int statusCode = submitRequest(method, url, entity);
         
         // Check the status code of the response: does it match the expected response(s)?
         verbose("updateWithMalformedXml: url=" + url + " status=" + statusCode);
@@ -305,18 +308,17 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     }
 
     @Override
-    @Test(dependsOnMethods = {"create", "testSubmitRequest"}) // , "createWithMalformedXml"})
+    @Test(dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithWrongXmlSchema() {
     
         // Perform setup.
         setupUpdateWithWrongXmlSchema();
         
         // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
         String url = getResourceURL(knownObjectId);
-        PutMethod method = new PutMethod(url);
-        final String WRONG_SCHEMA_DATA = "<wrong_schema>wrong schema contents</wrong_schema>";
-        StringRequestEntity entity = getXmlEntity(WRONG_SCHEMA_DATA);
-        int statusCode = submitRequest(method, entity);
+        final String entity = WRONG_XML_SCHEMA_DATA; // Constant from abstract base class.
+        int statusCode = submitRequest(method, url, entity);
         
         // Check the status code of the response: does it match the expected response(s)?
         verbose("updateWithWrongSchema: url=" + url + " status=" + statusCode);
@@ -325,8 +327,10 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+*/
+
     @Override
-    @Test(dependsOnMethods = {"update"})
+    @Test(dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent() {
 
         // Perform setup.
@@ -347,7 +351,6 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
-
     // ---------------------------------------------------------------
     // CRUD tests : DELETE tests
     // ---------------------------------------------------------------
@@ -356,7 +359,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
     @Override
     @Test(dependsOnMethods = 
-        {"create", "read", "testSubmitRequest", "update"})
+        {"create", "read", "update"})
     public void delete() {
 
         // Perform setup.
@@ -400,7 +403,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
 
     /**
-     * Tests the HttpClient-based code used to submit data, in various methods below.
+     * Tests the code for manually submitting data that is used by several
+     * of the methods above.
      */
     @Test(dependsOnMethods = {"create", "read"})
     public void testSubmitRequest() {
@@ -409,16 +413,15 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
 
         // Submit the request to the service and store the response.
+        String method = ServiceRequestType.READ.httpMethodName();
         String url = getResourceURL(knownObjectId);
-        GetMethod method = new GetMethod(url);
-        int statusCode = submitRequest(method);
+        int statusCode = submitRequest(method, url);
         
         // Check the status code of the response: does it match the expected response(s)?
         verbose("testSubmitRequest: url=" + url + " status=" + statusCode);
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-    }
-		
+    }		
 
     // ---------------------------------------------------------------
     // Utility methods used by tests above

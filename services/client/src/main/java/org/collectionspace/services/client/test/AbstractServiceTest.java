@@ -26,27 +26,16 @@ package org.collectionspace.services.client.test;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 
 import org.collectionspace.services.client.TestServiceClient;
 import org.collectionspace.services.client.test.ServiceRequestType;
 
+import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 
 import org.slf4j.Logger;
@@ -61,12 +50,6 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractServiceTest implements ServiceTest {
 
     final Logger logger = LoggerFactory.getLogger(AbstractServiceTest.class);
-
-    // An HTTP client, used for performing several negative (failure) tests.
-    //
-    // @TODO To be replaced with RESTeasy's ClientRequest (a higher-level API
-    // that is based on HttpClient), per Issue CSPACE-386.
-    protected HttpClient httpClient = new HttpClient();
 
     // A base-level client, used (only) to obtain the base service URL.
     private static final TestServiceClient serviceClient = new TestServiceClient();
@@ -83,7 +66,23 @@ public abstract class AbstractServiceTest implements ServiceTest {
     //
     // This makes it possible to check behavior specific to that type of request,
     // such as the set of valid status codes that may be returned.
-    ServiceRequestType REQUEST_TYPE = ServiceRequestType.NON_EXISTENT;
+    //
+    // Note that the default value is set to a guard value.
+    protected ServiceRequestType REQUEST_TYPE = ServiceRequestType.NON_EXISTENT;
+
+    // Static data to be submitted in various tests
+    protected final static String XML_DECLARATION =
+      "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
+
+    // Note: this constant is intentionally missing its last angle bracket.
+    protected final static String MALFORMED_XML_DATA =
+      XML_DECLARATION +
+      "<malformed_xml>wrong schema contents</malformed_xml";
+
+    protected final String WRONG_XML_SCHEMA_DATA =
+      XML_DECLARATION +
+      "<wrong_schema>wrong schema contents</wrong_schema>";
+
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
@@ -310,59 +309,48 @@ public abstract class AbstractServiceTest implements ServiceTest {
         return getServiceRootURL() + "/" + resourceIdentifier;
     }
 
-    protected int submitRequest(HttpMethod method) {
-     int statusCode = 0;
-        try {
-            statusCode = httpClient.executeMethod(method);
-        } catch(HttpException e) {
-            logger.error("Fatal protocol violation: ", e);
-        } catch(IOException e) {
-            logger.error("Fatal transport error: ", e);
-        } catch(Exception e) {
-            logger.error("Unknown exception: ", e);
-        } finally {
-            // Release the connection.
-            method.releaseConnection();
-        }
-        return statusCode;
-    }
-    
-    protected int submitRequest(EntityEnclosingMethod method, RequestEntity entity) {
+    protected int submitRequest(String method, String url) {
         int statusCode = 0;
         try {
-            method.setRequestEntity(entity);
-            statusCode = httpClient.executeMethod(method);
-        } catch(HttpException e) {
-            logger.error("Fatal protocol violation: ", e);
-        } catch(IOException e) {
-            logger.error("Fatal transport error: ", e);
-        } catch(Exception e) {
-            logger.error("Unknown exception: ", e);
-        } finally {
-            // Release the connection.
-            method.releaseConnection();
+            ClientRequest request = new ClientRequest(url);
+            if (method.equalsIgnoreCase("DELETE")) {
+                ClientResponse res = request.delete();
+                statusCode = res.getStatus(); 
+            } else if (method.equalsIgnoreCase("GET")) {
+                ClientResponse res = request.get();
+                statusCode = res.getStatus(); 
+            } else {
+                // Do nothing - leave status code at default value.
+            }
+        } catch (Exception e) {
+            logger.error( 
+              "Exception during HTTP " + method + " request to " + url + " :",
+              e);
         }
         return statusCode;
-    }
-    
-    protected StringRequestEntity getXmlEntity(String contents) {
-        if (contents == null) {
-            contents = "";
-        }
-        StringRequestEntity entity = null;
-        final String XML_DECLARATION =
-          "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-        final String XML_CONTENT_TYPE=MediaType.APPLICATION_XML;
-        final String UTF8_CHARSET_NAME = "UTF-8";
+   }
+
+    protected int submitRequest(String method, String url, String entityStr) {
+        int statusCode = 0;
         try {
-            entity =
-                new StringRequestEntity(
-                  XML_DECLARATION + contents, XML_CONTENT_TYPE, UTF8_CHARSET_NAME);
-        } catch (UnsupportedEncodingException e) {
-            logger.error("Unsupported character encoding error: ", e);
+            ClientRequest request = new ClientRequest(url);
+            request.body(MediaType.APPLICATION_XML, entityStr);
+            if (method.equalsIgnoreCase("POST")) {
+                ClientResponse res = request.post();
+                statusCode = res.getStatus(); 
+            } else if (method.equalsIgnoreCase("PUT")) {
+                ClientResponse res = request.put();
+                statusCode = res.getStatus(); 
+            } else {
+                // Do nothing - leave status code at default value.
+            }
+        } catch (Exception e) {
+            logger.error( 
+              "Exception during HTTP " + method + " request to " + url + " :",
+              e);
         }
-        return entity;
-    }
+        return statusCode;
+    } 
 
     protected String extractId(ClientResponse<Response> res) {
         MultivaluedMap mvm = res.getMetadata();

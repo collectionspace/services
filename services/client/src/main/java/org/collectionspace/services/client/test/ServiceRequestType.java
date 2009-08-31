@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate$
  */
 public enum ServiceRequestType {
-    
+   
     // Define each of the service request types and their valid HTTP status codes.
     
     CREATE {
@@ -67,6 +67,10 @@ public enum ServiceRequestType {
         @Override
         public String validStatusCodesAsString() {
               return Arrays.toString(CREATE.validStatusCodes());
+        }
+        @Override
+        public String httpMethodName() {
+            return javax.ws.rs.HttpMethod.POST;
         }
     },  // Note that commas are required at the end of each enum block, except the last.
     
@@ -95,6 +99,10 @@ public enum ServiceRequestType {
         public String validStatusCodesAsString() {
               return Arrays.toString(READ.validStatusCodes());
         }
+        @Override
+        public String httpMethodName() {
+            return javax.ws.rs.HttpMethod.GET;
+        }
     },
     
     
@@ -121,6 +129,10 @@ public enum ServiceRequestType {
         @Override
         public String validStatusCodesAsString() {
               return Arrays.toString(READ_MULTIPLE.validStatusCodes());
+        }
+        @Override
+        public String httpMethodName() {
+            return javax.ws.rs.HttpMethod.GET;
         }
     },
     
@@ -150,6 +162,10 @@ public enum ServiceRequestType {
         public String validStatusCodesAsString() {
               return Arrays.toString(UPDATE.validStatusCodes());
         }
+        @Override
+        public String httpMethodName() {
+            return javax.ws.rs.HttpMethod.PUT;
+        }
     },
     
     
@@ -177,6 +193,10 @@ public enum ServiceRequestType {
         public String validStatusCodesAsString() {
               return Arrays.toString(DELETE.validStatusCodes());
         }
+        @Override
+        public String httpMethodName() {
+            return javax.ws.rs.HttpMethod.DELETE;
+        }
     },
     
     
@@ -196,6 +216,10 @@ public enum ServiceRequestType {
         public String validStatusCodesAsString() {
               return Arrays.toString(NON_EXISTENT.validStatusCodes());
         }
+        @Override
+        public String httpMethodName() {
+              return "";
+        }
     };
     
     // Template methods to be implemented by each ServiceRequestType.
@@ -206,4 +230,5 @@ public enum ServiceRequestType {
     
     public abstract String validStatusCodesAsString();
 
+    public abstract String httpMethodName();
 }
