@@ -43,12 +43,12 @@ public interface ServiceTest {
     public void create(); 
 
     /**
-     * Tests creation of two or more new resources by repeatedly
+     * Tests creation of a list of two or more new resources by repeatedly
      * calling create(), and relies on the latter's test assertion(s).
      *
-     * Relied upon by 'read multiple' tests, below.
+     * Relied upon by 'read list' tests, below.
      */
-    public void createMultiple();
+    public void createList();
 
     // Failure outcomes
 
@@ -114,9 +114,9 @@ public interface ServiceTest {
     // Failure outcomes
     
     // If feasible, implement a negative (failure) test
-    // with unrecognized query parameters, other than
-    // filtering or chunking parameters, etc., recognized
-    // by the service.
+    // of handling of unrecognized query parameters
+    // (e.g. other than filtering or chunking parameters, etc.
+    // that may be supported by the service).
 
     // ---------------------------------------------------------------
     // CRUD tests : UPDATE tests

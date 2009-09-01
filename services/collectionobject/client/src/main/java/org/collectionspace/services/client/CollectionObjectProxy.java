@@ -23,24 +23,24 @@ import org.jboss.resteasy.client.ClientResponse;
 public interface CollectionObjectProxy {
 
     @GET
-    ClientResponse<CollectionObjectList> getCollectionObjectList();
+    ClientResponse<CollectionObjectList> readList();
 
     //(C)reate
     @POST
-    ClientResponse<Response> createCollectionObject(CollectionObject co);
+    ClientResponse<Response> create(CollectionObject co);
 
     //(R)ead
     @GET
     @Path("/{csid}")
-    ClientResponse<CollectionObject> getCollectionObject(@PathParam("csid") String csid);
+    ClientResponse<CollectionObject> read(@PathParam("csid") String csid);
 
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<CollectionObject> updateCollectionObject(@PathParam("csid") String csid, CollectionObject co);
+    ClientResponse<CollectionObject> update(@PathParam("csid") String csid, CollectionObject co);
 
     //(D)elete
     @DELETE
     @Path("/{csid}")
-    ClientResponse<Response> deleteCollectionObject(@PathParam("csid") String csid);
+    ClientResponse<Response> delete(@PathParam("csid") String csid);
 }

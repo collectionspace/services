@@ -102,9 +102,9 @@ public abstract class AbstractServiceTest implements ServiceTest {
     }
 
     @Override
-    public abstract void createMultiple();
+    public abstract void createList();
     
-    // No setup required for createMultiple()
+    // No setup required for createList()
 
     // Failure outcomes
 
@@ -177,7 +177,7 @@ public abstract class AbstractServiceTest implements ServiceTest {
         clearSetup();
         // Expected status code: 200 OK
         EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
-        REQUEST_TYPE = ServiceRequestType.READ_MULTIPLE;
+        REQUEST_TYPE = ServiceRequestType.READ_LIST;
     }
 
     // Failure outcomes
@@ -293,30 +293,58 @@ public abstract class AbstractServiceTest implements ServiceTest {
         REQUEST_TYPE = ServiceRequestType.NON_EXISTENT;
     }
 
-    // @TODO Add Javadoc comments to all methods requiring them, below.
-
+    /**
+     * Returns an error message indicating that the status code returned by a
+     * specific call to a service does not fall within a set of valid status
+     * codes for that service.
+     *
+     * @param serviceRequestType  A type of service request (e.g. CREATE, DELETE).
+     *
+     * @param statusCode  The invalid status code that was returned in the response,
+     *                    from submitting that type of request to the service.
+     *
+     * @return An error message.
+     */
     protected String invalidStatusCodeMessage(ServiceRequestType requestType, int statusCode) {
         return 
             "Status code '" + statusCode + "' in response is NOT within the expected set: " +
             requestType.validStatusCodesAsString();
     }
     
-    protected String getServiceRootURL() {
+    /**
+     * Returns the root URL for a service.
+     *
+     * This URL consists of a base URL for all services, followed by
+     * a path component (or components) for a service.
+     *
+     * @return The root URL for a service.
+     */
+     protected String getServiceRootURL() {
         return serviceClient.getBaseURL() + getServicePathComponent();
     }
 
+    /**
+     * Returns the URL of a specific resource managed by a service, and
+     * designated by an identifier (such as a universally unique ID, or UUID).
+     *
+     * @param  resourceIdentifier  An identifier (such as a UUID) for a resource.
+     *
+     * @return The URL of a specific resource managed by a service.
+     */
     protected String getResourceURL(String resourceIdentifier) {
         return getServiceRootURL() + "/" + resourceIdentifier;
     }
+
+    // @TODO Add Javadoc comments to all methods requiring them, below.
 
     protected int submitRequest(String method, String url) {
         int statusCode = 0;
         try {
             ClientRequest request = new ClientRequest(url);
-            if (method.equalsIgnoreCase("DELETE")) {
+            if (method.equals(javax.ws.rs.HttpMethod.DELETE)) {
                 ClientResponse res = request.delete();
                 statusCode = res.getStatus(); 
-            } else if (method.equalsIgnoreCase("GET")) {
+            } else if (method.equals(javax.ws.rs.HttpMethod.GET)) {
                 ClientResponse res = request.get();
                 statusCode = res.getStatus(); 
             } else {
@@ -324,7 +352,7 @@ public abstract class AbstractServiceTest implements ServiceTest {
             }
         } catch (Exception e) {
             logger.error( 
-              "Exception during HTTP " + method + " request to " + url + " :",
+              "Exception during HTTP " + method + " request to " + url + ":",
               e);
         }
         return statusCode;
@@ -335,10 +363,10 @@ public abstract class AbstractServiceTest implements ServiceTest {
         try {
             ClientRequest request = new ClientRequest(url);
             request.body(MediaType.APPLICATION_XML, entityStr);
-            if (method.equalsIgnoreCase("POST")) {
+            if (method.equals(javax.ws.rs.HttpMethod.POST)) {
                 ClientResponse res = request.post();
                 statusCode = res.getStatus(); 
-            } else if (method.equalsIgnoreCase("PUT")) {
+            } else if (method.equals(javax.ws.rs.HttpMethod.PUT)) {
                 ClientResponse res = request.put();
                 statusCode = res.getStatus(); 
             } else {

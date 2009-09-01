@@ -50,8 +50,8 @@ public class CollectionObjectClient extends BaseServiceClient {
      * @return
      * @see org.collectionspace.hello.client.CollectionObjectProxy#getCollectionObject()
      */
-    public ClientResponse<CollectionObjectList> getCollectionObjectList() {
-        return collectionObjectProxy.getCollectionObjectList();
+    public ClientResponse<CollectionObjectList> readList() {
+        return collectionObjectProxy.readList();
     }
 
     /**
@@ -59,8 +59,8 @@ public class CollectionObjectClient extends BaseServiceClient {
      * @return
      * @see org.collectionspace.hello.client.CollectionObjectProxy#getCollectionObject(java.lang.String)
      */
-    public ClientResponse<CollectionObject> getCollectionObject(String csid) {
-        return collectionObjectProxy.getCollectionObject(csid);
+    public ClientResponse<CollectionObject> read(String csid) {
+        return collectionObjectProxy.read(csid);
     }
 
     /**
@@ -68,8 +68,8 @@ public class CollectionObjectClient extends BaseServiceClient {
      * @return
      * @see org.collectionspace.hello.client.CollectionObjectProxy#createCollectionObject(org.collectionspace.hello.CollectionObject)
      */
-    public ClientResponse<Response> createCollectionObject(CollectionObject collectionObject) {
-        return collectionObjectProxy.createCollectionObject(collectionObject);
+    public ClientResponse<Response> create(CollectionObject collectionObject) {
+        return collectionObjectProxy.create(collectionObject);
     }
 
     /**
@@ -78,8 +78,8 @@ public class CollectionObjectClient extends BaseServiceClient {
      * @return
      * @see org.collectionspace.hello.client.CollectionObjectProxy#updateCollectionObject(java.lang.Long, org.collectionspace.hello.CollectionObject)
      */
-    public ClientResponse<CollectionObject> updateCollectionObject(String csid, CollectionObject collectionObject) {
-        return collectionObjectProxy.updateCollectionObject(csid, collectionObject);
+    public ClientResponse<CollectionObject> update(String csid, CollectionObject collectionObject) {
+        return collectionObjectProxy.update(csid, collectionObject);
     }
 
     /**
@@ -87,7 +87,7 @@ public class CollectionObjectClient extends BaseServiceClient {
      * @return
      * @see org.collectionspace.hello.client.CollectionObjectProxy#deleteCollectionObject(java.lang.Long)
      */
-    public ClientResponse<Response> deleteCollectionObject(String csid) {
-        return collectionObjectProxy.deleteCollectionObject(csid);
+    public ClientResponse<Response> delete(String csid) {
+        return collectionObjectProxy.delete(csid);
     }
 }

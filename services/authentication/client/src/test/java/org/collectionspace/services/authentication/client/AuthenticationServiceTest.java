@@ -67,7 +67,7 @@ public class AuthenticationServiceTest {
             logger.error("auth_createCollectionObject: caught " + e.getMessage());
             return;
         }
-        ClientResponse<Response> res = collectionObjectClient.createCollectionObject(collectionObject);
+        ClientResponse<Response> res = collectionObjectClient.create(collectionObject);
         verbose("auth_createCollectionObject: status = " + res.getStatus());
         Assert.assertEquals(res.getStatus(), Response.Status.CREATED.getStatusCode(),
                 "expected " + Response.Status.CREATED.getStatusCode());
@@ -95,7 +95,7 @@ public class AuthenticationServiceTest {
             logger.error("auth_createCollectionObjectWithoutUser: caught " + e.getMessage());
             return;
         }
-        ClientResponse<Response> res = collectionObjectClient.createCollectionObject(collectionObject);
+        ClientResponse<Response> res = collectionObjectClient.create(collectionObject);
         verbose("auth_createCollectionObjectWithoutUser: status = " + res.getStatus());
         Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(),
                 "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
@@ -120,7 +120,7 @@ public class AuthenticationServiceTest {
             logger.error("auth_createCollectionObjectWithoutPassword: caught " + e.getMessage());
             return;
         }
-        ClientResponse<Response> res = collectionObjectClient.createCollectionObject(collectionObject);
+        ClientResponse<Response> res = collectionObjectClient.create(collectionObject);
         verbose("auth_createCollectionObjectWithoutPassword: status = " + res.getStatus());
         Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(),
                 "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
@@ -145,7 +145,7 @@ public class AuthenticationServiceTest {
             logger.error("auth_createCollectionObjectWithIncorrectPassword: caught " + e.getMessage());
             return;
         }
-        ClientResponse<Response> res = collectionObjectClient.createCollectionObject(collectionObject);
+        ClientResponse<Response> res = collectionObjectClient.create(collectionObject);
         verbose("auth_createCollectionObjectWithIncorrectPassword: status = " + res.getStatus());
         Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(),
                 "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
@@ -170,7 +170,7 @@ public class AuthenticationServiceTest {
             logger.error("auth_createCollectionObjectWithoutUserPassword: caught " + e.getMessage());
             return;
         }
-        ClientResponse<Response> res = collectionObjectClient.createCollectionObject(collectionObject);
+        ClientResponse<Response> res = collectionObjectClient.create(collectionObject);
         verbose("auth_createCollectionObjectWithoutUserPassword: status = " + res.getStatus());
         Assert.assertEquals(res.getStatus(), Response.Status.FORBIDDEN.getStatusCode(),
                 "expected " + Response.Status.FORBIDDEN.getStatusCode());
@@ -195,7 +195,7 @@ public class AuthenticationServiceTest {
             logger.error("auth_createCollectionObjectWithIncorrectUserPassword: caught " + e.getMessage());
             return;
         }
-        ClientResponse<Response> res = collectionObjectClient.createCollectionObject(collectionObject);
+        ClientResponse<Response> res = collectionObjectClient.create(collectionObject);
         verbose("auth_createCollectionObjectWithIncorrectUserPassword: status = " + res.getStatus());
         Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(),
                 "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
@@ -220,7 +220,7 @@ public class AuthenticationServiceTest {
             return;
         }
         verbose("Calling deleteCollectionObject:" + knownCollectionObjectId);
-        ClientResponse<Response> res = collectionObjectClient.deleteCollectionObject(knownCollectionObjectId);
+        ClientResponse<Response> res = collectionObjectClient.delete(knownCollectionObjectId);
         verbose("auth_deleteCollectionObject: status = " + res.getStatus());
         Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode(),
                 "expected " + Response.Status.OK.getStatusCode());

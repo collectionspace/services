@@ -69,7 +69,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
         CollectionObject collectionObject = createCollectionObject(identifier);
-        ClientResponse<Response> res = client.createCollectionObject(collectionObject);
+        ClientResponse<Response> res = client.create(collectionObject);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match the expected response(s)?
@@ -87,7 +87,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
     @Override
     @Test(dependsOnMethods = {"create"})
-    public void createMultiple() {
+    public void createList() {
         for(int i = 0; i < 3; i++){
             create   ();
         }
@@ -98,7 +98,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     @Override
     @Test(dependsOnMethods = {"create"}, expectedExceptions = IllegalArgumentException.class)
     public void createNull() {
-        ClientResponse<Response> res = client.createCollectionObject(null);
+        ClientResponse<Response> res = client.create(null);
     }
     
     // Placeholders until the two tests below can be uncommented.  See Issue CSPACE-401.
@@ -161,8 +161,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         setupRead();
 
         // Submit the request to the service and store the response.
-        ClientResponse<CollectionObject> res = 
-            client.getCollectionObject(knownObjectId);
+        ClientResponse<CollectionObject> res = client.read(knownObjectId);
         int statusCode = res.getStatus();
             
         // Check the status code of the response: does it match the expected response(s)?
@@ -180,8 +179,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         setupReadNonExistent();
         
         // Submit the request to the service and store the response.
-        ClientResponse<CollectionObject> res = 
-            client.getCollectionObject(NON_EXISTENT_ID);
+        ClientResponse<CollectionObject> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match the expected response(s)?
@@ -193,21 +191,21 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
 
     // ---------------------------------------------------------------
-    // CRUD tests : READ (list, or multiple) tests
+    // CRUD tests : READ_LIST tests
     // ---------------------------------------------------------------
 
     // Success outcomes
 
     @Override
-    @Test(dependsOnMethods = {"createMultiple"})
+    @Test(dependsOnMethods = {"createList"})
     public void readList() {
     
         // Perform setup.
         setupReadList();
 
         // Submit the request to the service and store the response.
-        ClientResponse<CollectionObjectList> res = client.getCollectionObjectList();
-        CollectionObjectList coList = res.getEntity();
+        ClientResponse<CollectionObjectList> res = client.readList();
+        CollectionObjectList list = res.getEntity();
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match the expected response(s)?
@@ -219,13 +217,13 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = false;
         if (iterateThroughList && logger.isDebugEnabled()) {
-            List<CollectionObjectList.CollectionObjectListItem> coItemList =
-                coList.getCollectionObjectListItem();
+            List<CollectionObjectList.CollectionObjectListItem> items =
+                list.getCollectionObjectListItem();
             int i = 0;
-            for(CollectionObjectList.CollectionObjectListItem pli : coItemList){
-                verbose("readList: list-item[" + i + "] csid=" + pli.getCsid());
-                verbose("readList: list-item[" + i + "] objectNumber=" + pli.getObjectNumber());
-                verbose("readList: list-item[" + i + "] URI=" + pli.getUri());
+            for(CollectionObjectList.CollectionObjectListItem item : items){
+                verbose("readList: list-item[" + i + "] csid=" + item.getCsid());
+                verbose("readList: list-item[" + i + "] objectNumber=" + item.getObjectNumber());
+                verbose("readList: list-item[" + i + "] URI=" + item.getUri());
                 i++;
             }
         }
@@ -251,8 +249,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         setupUpdate();
 
         // Retrieve an existing resource that we can update.
-        ClientResponse<CollectionObject> res = 
-            client.getCollectionObject(knownObjectId);
+        ClientResponse<CollectionObject> res = client.read(knownObjectId);
         verbose("read: status = " + res.getStatus());
         Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
         CollectionObject collectionObject = res.getEntity();
@@ -265,9 +262,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         collectionObject.setObjectName("updated-" + collectionObject.getObjectName());
 
         // Submit the request to the service and store the response.
-        res = client.updateCollectionObject(knownObjectId, collectionObject);
+        res = client.update(knownObjectId, collectionObject);
         int statusCode = res.getStatus();
-        CollectionObject updatedCollectionObject = res.getEntity();
+        CollectionObject updatedObject = res.getEntity();
 
         // Check the status code of the response: does it match the expected response(s)?
         verbose("update: status = " + res.getStatus());
@@ -276,8 +273,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         
         // Check the contents of the response: does it match what was submitted?
-        verbose("update: ", updatedCollectionObject, CollectionObject.class);
-        Assert.assertEquals(updatedCollectionObject.getObjectName(), 
+        verbose("update: ", updatedObject, CollectionObject.class);
+        Assert.assertEquals(updatedObject.getObjectName(), 
             collectionObject.getObjectName(), 
             "Data in updated object did not match submitted data.");
     }
@@ -326,7 +323,6 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
-
 */
 
     @Override
@@ -338,10 +334,10 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
-        // The only relevant ID may be the one used in updateCollectionObject(), below.
+        // The only relevant ID may be the one used in update(), below.
         CollectionObject collectionObject = createCollectionObject(NON_EXISTENT_ID);
         ClientResponse<CollectionObject> res =
-            client.updateCollectionObject(NON_EXISTENT_ID, collectionObject);
+          client.update(NON_EXISTENT_ID, collectionObject);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match the expected response(s)?
@@ -366,7 +362,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         setupDelete();
 
         // Submit the request to the service and store the response.
-        ClientResponse<Response> res = client.deleteCollectionObject(knownObjectId);
+        ClientResponse<Response> res = client.delete(knownObjectId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match the expected response(s)?
@@ -386,8 +382,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         setupDeleteNonExistent();
 
         // Submit the request to the service and store the response.
-        ClientResponse<Response> res =
-            client.deleteCollectionObject(NON_EXISTENT_ID);
+        ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match the expected response(s)?
@@ -430,14 +425,18 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     @Override
     public String getServicePathComponent() {
         // @TODO Determine if it is possible to obtain this value programmatically.
+        //
         // We set this in an annotation in the CollectionObjectProxy interface, for instance.
-        // We also set service-specific constants in each service module.
+        // We also set service-specific constants in each service module, which might
+        // also return this value.
         return SERVICE_PATH_COMPONENT;
     }
     
     private CollectionObject createCollectionObject(String identifier) {
-        CollectionObject collectionObject = createCollectionObject("objectNumber-" + identifier,
-                "objectName-" + identifier);
+        CollectionObject collectionObject =
+          createCollectionObject(
+            "objectNumber-" + identifier,
+            "objectName-" + identifier);
         return collectionObject;
     }
 

@@ -93,7 +93,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		//
 		CollectionObject co = new CollectionObject();
 		fillCollectionObject(co, createIdentifier());
-	    ClientResponse<Response> coResponse = collectionObjectClient.createCollectionObject(co);
+	    ClientResponse<Response> coResponse = collectionObjectClient.create(co);
 	    Assert.assertEquals(coResponse.getStatus(), Response.Status.CREATED.getStatusCode());
 	    String collectionObjectCsid = extractId(coResponse);
 	    

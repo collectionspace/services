@@ -106,7 +106,7 @@ public enum ServiceRequestType {
     },
     
     
-    READ_MULTIPLE {
+    READ_LIST {
         @Override
         public int[] validStatusCodes() { 
               final int[] STATUS_CODES = {
@@ -120,7 +120,7 @@ public enum ServiceRequestType {
         }
         @Override
         public boolean isValidStatusCode(int statusCode) {
-              if (Arrays.binarySearch(READ_MULTIPLE.validStatusCodes(), statusCode) >= 0) {
+              if (Arrays.binarySearch(READ_LIST.validStatusCodes(), statusCode) >= 0) {
                     return true;
               } else {
                     return false;
@@ -128,7 +128,7 @@ public enum ServiceRequestType {
         }
         @Override
         public String validStatusCodesAsString() {
-              return Arrays.toString(READ_MULTIPLE.validStatusCodes());
+              return Arrays.toString(READ_LIST.validStatusCodes());
         }
         @Override
         public String httpMethodName() {
