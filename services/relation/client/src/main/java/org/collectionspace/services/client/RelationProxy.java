@@ -25,30 +25,30 @@ import org.jboss.resteasy.client.ClientResponse;
 public interface RelationProxy {
 
     @GET
-    ClientResponse<RelationList> getRelationList();
+    ClientResponse<RelationList> readList();
     
 	@GET
 	@Path("subject/{subjectCsid}/type/{predicate}/object/{objectCsid}")
-	ClientResponse<RelationList> getRelationList_SPO(@PathParam("subjectCsid") String subjectCsid,
+	ClientResponse<RelationList> readList_SPO(@PathParam("subjectCsid") String subjectCsid,
 			@PathParam("predicate") String predicate,
 			@PathParam("objectCsid") String objectCsid);
 
     //(C)reate
     @POST
-    ClientResponse<Response> createRelation(Relation co);
+    ClientResponse<Response> create(Relation co);
 
     //(R)ead
     @GET
     @Path("/{csid}")
-    ClientResponse<Relation> getRelation(@PathParam("csid") String csid);
+    ClientResponse<Relation> read(@PathParam("csid") String csid);
 
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<Relation> updateRelation(@PathParam("csid") String csid, Relation co);
+    ClientResponse<Relation> update(@PathParam("csid") String csid, Relation co);
 
     //(D)elete
     @DELETE
     @Path("/{csid}")
-    ClientResponse<Response> deleteRelation(@PathParam("csid") String csid);
+    ClientResponse<Response> delete(@PathParam("csid") String csid);
 }

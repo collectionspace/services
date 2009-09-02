@@ -172,6 +172,8 @@ public class IntakeServiceTest extends AbstractServiceTest {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    // Failure outcomes
+
     @Override
     @Test(dependsOnMethods = {"read"})
     public void readNonExistent() {
@@ -278,6 +280,8 @@ public class IntakeServiceTest extends AbstractServiceTest {
             intake.getEntryDate(), 
             "Data in updated object did not match submitted data.");
     }
+
+    // Failure outcomes
 
     // Placeholders until the two tests below can be uncommented.  See Issue CSPACE-401.
     public void updateWithMalformedXml() {}

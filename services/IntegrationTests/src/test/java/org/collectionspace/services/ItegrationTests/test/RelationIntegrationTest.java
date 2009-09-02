@@ -109,7 +109,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    fillRelation(relation, collectionObjectCsid, CollectionObject.class.getSimpleName(),
 	    		intakeCsid, Intake.class.getSimpleName(),
 	    		RelationshipType.COLLECTIONOBJECT_INTAKE);
-	    ClientResponse<Response> relationResponse = relationClient.createRelation(relation); 
+	    ClientResponse<Response> relationResponse = relationClient.create(relation); 
 	    Assert.assertEquals(relationResponse.getStatus(), Response.Status.CREATED.getStatusCode());
 	    String relationCsid = extractId(relationResponse);
 	    
@@ -117,7 +117,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    // Now try to retrieve the Intake record of the CollectionObject.
 	    //
 	    String predicate = RelationshipType.COLLECTIONOBJECT_INTAKE.value();
-	    ClientResponse<RelationList> resultResponse = relationClient.getRelationList_SPO(collectionObjectCsid,
+	    ClientResponse<RelationList> resultResponse = relationClient.readList_SPO(collectionObjectCsid,
 	    		predicate,
 	    		intakeCsid);
 	    
@@ -134,7 +134,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
         	
         	String foundCsid = listItem.getCsid();
         	try {
-	        	resultRelationResponse = relationClient.getRelation(foundCsid);
+	        	resultRelationResponse = relationClient.read(foundCsid);
 	        	resultRelation = resultRelationResponse.getEntity();
         	} catch (Exception e) {
         		e.printStackTrace();

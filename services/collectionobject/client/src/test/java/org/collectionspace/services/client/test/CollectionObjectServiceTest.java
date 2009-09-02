@@ -170,6 +170,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
+    
+    // Failure outcomes
 
     @Override
     @Test(dependsOnMethods = {"read"})
@@ -278,6 +280,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
             collectionObject.getObjectName(), 
             "Data in updated object did not match submitted data.");
     }
+    
+    // Failure outcomes
 
     // Placeholders until the two tests below can be uncommented.  See Issue CSPACE-401.
     public void updateWithMalformedXml() {}

@@ -53,14 +53,14 @@ public class RelationClient extends BaseServiceClient implements RelationProxy {
      * @return
      * @see org.collectionspace.hello.client.RelationProxy#getRelation()
      */
-    public ClientResponse<RelationList> getRelationList() {
-        return relationProxy.getRelationList();
+    public ClientResponse<RelationList> readList() {
+        return relationProxy.readList();
     }
     
-    public ClientResponse<RelationList> getRelationList_SPO(String subjectCsid,
+    public ClientResponse<RelationList> readList_SPO(String subjectCsid,
 			String predicate,
 			String objectCsid) {
-    	return relationProxy.getRelationList_SPO(subjectCsid, predicate, objectCsid);
+    	return relationProxy.readList_SPO(subjectCsid, predicate, objectCsid);
     }
     
     /**
@@ -68,8 +68,8 @@ public class RelationClient extends BaseServiceClient implements RelationProxy {
      * @return
      * @see org.collectionspace.hello.client.RelationProxy#getRelation(java.lang.String)
      */
-    public ClientResponse<Relation> getRelation(String csid) {
-        return relationProxy.getRelation(csid);
+    public ClientResponse<Relation> read(String csid) {
+        return relationProxy.read(csid);
     }
 
     /**
@@ -77,8 +77,8 @@ public class RelationClient extends BaseServiceClient implements RelationProxy {
      * @return
      * @see org.collectionspace.hello.client.RelationProxy#createRelation(org.collectionspace.hello.Relation)
      */
-    public ClientResponse<Response> createRelation(Relation relation) {
-        return relationProxy.createRelation(relation);
+    public ClientResponse<Response> create(Relation relation) {
+        return relationProxy.create(relation);
     }
 
     /**
@@ -87,8 +87,8 @@ public class RelationClient extends BaseServiceClient implements RelationProxy {
      * @return
      * @see org.collectionspace.hello.client.RelationProxy#updateRelation(java.lang.Long, org.collectionspace.hello.Relation)
      */
-    public ClientResponse<Relation> updateRelation(String csid, Relation relation) {
-        return relationProxy.updateRelation(csid, relation);
+    public ClientResponse<Relation> update(String csid, Relation relation) {
+        return relationProxy.update(csid, relation);
     }
 
     /**
@@ -96,7 +96,7 @@ public class RelationClient extends BaseServiceClient implements RelationProxy {
      * @return
      * @see org.collectionspace.hello.client.RelationProxy#deleteRelation(java.lang.Long)
      */
-    public ClientResponse<Response> deleteRelation(String csid) {
-        return relationProxy.deleteRelation(csid);
+    public ClientResponse<Response> delete(String csid) {
+        return relationProxy.delete(csid);
     }
 }
