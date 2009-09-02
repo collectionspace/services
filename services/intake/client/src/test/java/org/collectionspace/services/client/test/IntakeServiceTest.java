@@ -41,15 +41,15 @@ import org.testng.annotations.Test;
  * IntakeServiceTest, carries out tests against a
  * deployed and running Intake Service.
  * 
- * $LastChangedRevision: 511 $
- * $LastChangedDate: 2009-08-06 20:16:16 +0000 (Thu, 06 Aug 2009) $
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
 public class IntakeServiceTest extends AbstractServiceTest {
 
     // Instance variables specific to this test.
     private IntakeClient client = new IntakeClient();
     final String SERVICE_PATH_COMPONENT = "intakes";
-    private String knownObjectId = null;
+    private String knownResourceId = null;
 
 
     // ---------------------------------------------------------------
@@ -69,12 +69,14 @@ public class IntakeServiceTest extends AbstractServiceTest {
 
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
-        Intake intake = createIntake(identifier);
+        Intake intake = createIntakeInstance(identifier);
         ClientResponse<Response> res = client.create(intake);
         int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         //
+        // Specifically:
         // Does it fall within the set of valid status codes?
         // Does it exactly match the expected status code?
         verbose("create: status = " + statusCode);
@@ -82,8 +84,9 @@ public class IntakeServiceTest extends AbstractServiceTest {
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        // Store the ID returned from this create operation for additional tests below.
-        knownObjectId = extractId(res);
+        // Store the ID returned from this create operation for
+        // additional tests below.
+        knownResourceId = extractId(res);
     }
 
     @Override
@@ -97,12 +100,14 @@ public class IntakeServiceTest extends AbstractServiceTest {
     // Failure outcomes
 
     @Override
-    @Test(dependsOnMethods = {"create"}, expectedExceptions = IllegalArgumentException.class)
+    @Test(dependsOnMethods = {"create"},
+        expectedExceptions = IllegalArgumentException.class)
     public void createNull() {
         ClientResponse<Response> res = client.create(null);
     }
     
-    // Placeholders until the two tests below can be uncommented.  See Issue CSPACE-401.
+    // Placeholders until the two tests below can be uncommented.
+    // See Issue CSPACE-401.
     public void createWithMalformedXml() {}
     public void createWithWrongXmlSchema() {}
 
@@ -117,10 +122,11 @@ public class IntakeServiceTest extends AbstractServiceTest {
         // Submit the request to the service and store the response.
         String method = REQUEST_TYPE.httpMethodName();
         String url = getServiceRootURL();
-        final String entity = MALFORMED_XML_DATA; // Constant from abstract base class.
+        final String entity = MALFORMED_XML_DATA; // Constant from base class.
         int statusCode = submitRequest(method, url, entity);
         
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("createWithMalformedXml url=" + url + " status=" + statusCode);
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -140,7 +146,8 @@ public class IntakeServiceTest extends AbstractServiceTest {
         final String entity = WRONG_XML_SCHEMA_DATA;
         int statusCode = submitRequest(method, url, entity);
         
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("createWithWrongSchema url=" + url + " status=" + statusCode);
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -162,10 +169,11 @@ public class IntakeServiceTest extends AbstractServiceTest {
         setupRead();
 
         // Submit the request to the service and store the response.
-        ClientResponse<Intake> res = client.read(knownObjectId);
+        ClientResponse<Intake> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
             
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("read: status = " + statusCode);
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -185,7 +193,8 @@ public class IntakeServiceTest extends AbstractServiceTest {
         ClientResponse<Intake> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("readNonExistent: status = " + res.getStatus());
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -211,7 +220,8 @@ public class IntakeServiceTest extends AbstractServiceTest {
         IntakeList list = res.getEntity();
         int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("readList: status = " + res.getStatus());
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -224,9 +234,12 @@ public class IntakeServiceTest extends AbstractServiceTest {
                 list.getIntakeListItem();
             int i = 0;
             for(IntakeList.IntakeListItem item : items){
-                verbose("readList: list-item[" + i + "] csid=" + item.getCsid());
-                verbose("readList: list-item[" + i + "] objectNumber=" + item.getEntryNumber());
-                verbose("readList: list-item[" + i + "] URI=" + item.getUri());
+                verbose("readList: list-item[" + i + "] csid=" +
+                    item.getCsid());
+                verbose("readList: list-item[" + i + "] objectNumber=" +
+                    item.getEntryNumber());
+                verbose("readList: list-item[" + i + "] URI=" +
+                    item.getUri());
                 i++;
             }
         }
@@ -252,11 +265,11 @@ public class IntakeServiceTest extends AbstractServiceTest {
         setupUpdate();
 
         // Retrieve an existing resource that we can update.
-        ClientResponse<Intake> res = client.read(knownObjectId);
+        ClientResponse<Intake> res = client.read(knownResourceId);
         verbose("read: status = " + res.getStatus());
         Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
         Intake intake = res.getEntity();
-        verbose("Got object to update with ID: " + knownObjectId,
+        verbose("Got object to update with ID: " + knownResourceId,
                 intake, Intake.class);
 
         // Update the content of this resource.
@@ -264,17 +277,19 @@ public class IntakeServiceTest extends AbstractServiceTest {
         intake.setEntryDate("updated-" + intake.getEntryDate());
     
         // Submit the request to the service and store the response.
-        res = client.update(knownObjectId, intake);
+        res = client.update(knownResourceId, intake);
         int statusCode = res.getStatus();
         Intake updatedObject = res.getEntity();
 
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("update: status = " + res.getStatus());
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         
-        // Check the contents of the response: does it match what was submitted?
+        // Check the contents of the response: does it match
+        // what was submitted?
         verbose("update: ", updatedObject, Intake.class);
         Assert.assertEquals(updatedObject.getEntryDate(), 
             intake.getEntryDate(), 
@@ -283,7 +298,8 @@ public class IntakeServiceTest extends AbstractServiceTest {
 
     // Failure outcomes
 
-    // Placeholders until the two tests below can be uncommented.  See Issue CSPACE-401.
+    // Placeholders until the two tests below can be uncommented.
+    // See Issue CSPACE-401.
     public void updateWithMalformedXml() {}
     public void updateWithWrongXmlSchema() {}
 
@@ -297,11 +313,12 @@ public class IntakeServiceTest extends AbstractServiceTest {
 
         // Submit the request to the service and store the response.
         String method = REQUEST_TYPE.httpMethodName();
-        String url = getResourceURL(knownObjectId);
-        final String entity = MALFORMED_XML_DATA; // Constant from abstract base class.
+        String url = getResourceURL(knownResourceId);
+        final String entity = MALFORMED_XML_DATA;
         int statusCode = submitRequest(method, url, entity);
         
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("updateWithMalformedXml: url=" + url + " status=" + statusCode);
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -317,11 +334,12 @@ public class IntakeServiceTest extends AbstractServiceTest {
         
         // Submit the request to the service and store the response.
         String method = REQUEST_TYPE.httpMethodName();
-        String url = getResourceURL(knownObjectId);
-        final String entity = WRONG_XML_SCHEMA_DATA; // Constant from abstract base class.
+        String url = getResourceURL(knownResourceId);
+        final String entity = WRONG_XML_SCHEMA_DATA;
         int statusCode = submitRequest(method, url, entity);
         
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("updateWithWrongSchema: url=" + url + " status=" + statusCode);
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -339,12 +357,13 @@ public class IntakeServiceTest extends AbstractServiceTest {
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
-        Intake intake = createIntake(NON_EXISTENT_ID);
+        Intake intake = createIntakeInstance(NON_EXISTENT_ID);
         ClientResponse<Intake> res =
           client.update(NON_EXISTENT_ID, intake);
         int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("updateNonExistent: status = " + res.getStatus());
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -366,10 +385,11 @@ public class IntakeServiceTest extends AbstractServiceTest {
         setupDelete();
 
         // Submit the request to the service and store the response.
-        ClientResponse<Response> res = client.delete(knownObjectId);
+        ClientResponse<Response> res = client.delete(knownResourceId);
         int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("delete: status = " + res.getStatus());
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -389,7 +409,8 @@ public class IntakeServiceTest extends AbstractServiceTest {
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("deleteNonExistent: status = " + res.getStatus());
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -413,10 +434,11 @@ public class IntakeServiceTest extends AbstractServiceTest {
 
         // Submit the request to the service and store the response.
         String method = ServiceRequestType.READ.httpMethodName();
-        String url = getResourceURL(knownObjectId);
+        String url = getResourceURL(knownResourceId);
         int statusCode = submitRequest(method, url);
         
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("testSubmitRequest: url=" + url + " status=" + statusCode);
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
@@ -428,25 +450,18 @@ public class IntakeServiceTest extends AbstractServiceTest {
 
     @Override
     public String getServicePathComponent() {
-        // @TODO Determine if it is possible to obtain this
-        // value programmatically.
-        //
-        // We set this in an annotation in the CollectionObjectProxy
-        // interface, for instance.  We also set service-specific
-        // constants in each service module, which might also
-        // return this value.
         return SERVICE_PATH_COMPONENT;
     }
     
-    private Intake createIntake(String identifier) {
+    private Intake createIntakeInstance(String identifier) {
         Intake intake =
-            createIntake(
+            createIntakeInstance(
                 "entryNumber-" + identifier,
                 "entryDate-" + identifier);
         return intake;
     }
     
-    private Intake createIntake(String entryNumber, String entryDate) {
+    private Intake createIntakeInstance(String entryNumber, String entryDate) {
         Intake intake = new Intake();
         intake.setEntryNumber(entryNumber);
         intake.setEntryDate(entryDate);

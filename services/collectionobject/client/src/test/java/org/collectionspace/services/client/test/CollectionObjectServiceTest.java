@@ -49,7 +49,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // Instance variables specific to this test.
     private CollectionObjectClient client = new CollectionObjectClient();
     final String SERVICE_PATH_COMPONENT = "collectionobjects";
-    private String knownObjectId = null; 
+    private String knownResourceId = null; 
  
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
@@ -68,12 +68,15 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
-        CollectionObject collectionObject = createCollectionObject(identifier);
+        CollectionObject collectionObject =
+          createCollectionObjectInstance(identifier);
         ClientResponse<Response> res = client.create(collectionObject);
         int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         //
+        // Specifically:
         // Does it fall within the set of valid status codes?
         // Does it exactly match the expected status code?
         verbose("create: status = " + statusCode);
@@ -81,8 +84,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        // Store the ID returned from this create operation for additional tests below.
-        knownObjectId = extractId(res);
+        // Store the ID returned from this create operation
+        // for additional tests below.
+        knownResourceId = extractId(res);
     }
 
     @Override
@@ -96,12 +100,14 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // Failure outcomes
 
     @Override
-    @Test(dependsOnMethods = {"create"}, expectedExceptions = IllegalArgumentException.class)
+    @Test(dependsOnMethods = {"create"}, 
+      expectedExceptions = IllegalArgumentException.class)
     public void createNull() {
         ClientResponse<Response> res = client.create(null);
     }
     
-    // Placeholders until the two tests below can be uncommented.  See Issue CSPACE-401.
+    // Placeholders until the two tests below can be uncommented.
+    // See Issue CSPACE-401.
     public void createWithMalformedXml() {}
     public void createWithWrongXmlSchema() {}
 
@@ -116,10 +122,11 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         // Submit the request to the service and store the response.
         String method = REQUEST_TYPE.httpMethodName();
         String url = getServiceRootURL();
-        final String entity = MALFORMED_XML_DATA; // Constant from abstract base class.
+        final String entity = MALFORMED_XML_DATA; // Constant from base class.
         int statusCode = submitRequest(method, url, entity);
         
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("createWithMalformedXml url=" + url + " status=" + statusCode);
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -139,7 +146,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         final String entity = WRONG_XML_SCHEMA_DATA;
         int statusCode = submitRequest(method, url, entity);
         
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("createWithWrongSchema url=" + url + " status=" + statusCode);
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -161,10 +169,11 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         setupRead();
 
         // Submit the request to the service and store the response.
-        ClientResponse<CollectionObject> res = client.read(knownObjectId);
+        ClientResponse<CollectionObject> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
             
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("read: status = " + statusCode);
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -184,7 +193,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         ClientResponse<CollectionObject> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("readNonExistent: status = " + res.getStatus());
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -210,7 +220,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         CollectionObjectList list = res.getEntity();
         int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("readList: status = " + res.getStatus());
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -223,9 +234,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
                 list.getCollectionObjectListItem();
             int i = 0;
             for(CollectionObjectList.CollectionObjectListItem item : items){
-                verbose("readList: list-item[" + i + "] csid=" + item.getCsid());
-                verbose("readList: list-item[" + i + "] objectNumber=" + item.getObjectNumber());
-                verbose("readList: list-item[" + i + "] URI=" + item.getUri());
+                verbose("readList: list-item[" + i + "] csid=" +
+                    item.getCsid());
+                verbose("readList: list-item[" + i + "] objectNumber=" +
+                    item.getObjectNumber());
+                verbose("readList: list-item[" + i + "] URI=" +
+                    item.getUri());
                 i++;
             }
         }
@@ -251,30 +265,33 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         setupUpdate();
 
         // Retrieve an existing resource that we can update.
-        ClientResponse<CollectionObject> res = client.read(knownObjectId);
+        ClientResponse<CollectionObject> res = client.read(knownResourceId);
         verbose("read: status = " + res.getStatus());
         Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
         CollectionObject collectionObject = res.getEntity();
-        verbose("Got object to update with ID: " + knownObjectId,
+        verbose("Got object to update with ID: " + knownResourceId,
                 collectionObject, CollectionObject.class);
 
         // Update the content of this resource.
-        //collectionObject.setCsid("updated-" + knownObjectId);
-        collectionObject.setObjectNumber("updated-" + collectionObject.getObjectNumber());
-        collectionObject.setObjectName("updated-" + collectionObject.getObjectName());
+        collectionObject.setObjectNumber("updated-" +
+          collectionObject.getObjectNumber());
+        collectionObject.setObjectName("updated-" +
+          collectionObject.getObjectName());
 
         // Submit the request to the service and store the response.
-        res = client.update(knownObjectId, collectionObject);
+        res = client.update(knownResourceId, collectionObject);
         int statusCode = res.getStatus();
-        CollectionObject updatedObject = res.getEntity();
 
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("update: status = " + res.getStatus());
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         
-        // Check the contents of the response: does it match what was submitted?
+        // Check the contents of the response: does it match
+        // what was submitted?
+        CollectionObject updatedObject = res.getEntity();
         verbose("update: ", updatedObject, CollectionObject.class);
         Assert.assertEquals(updatedObject.getObjectName(), 
             collectionObject.getObjectName(), 
@@ -283,7 +300,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     
     // Failure outcomes
 
-    // Placeholders until the two tests below can be uncommented.  See Issue CSPACE-401.
+    // Placeholders until the two tests below can be uncommented.
+    // See Issue CSPACE-401.
     public void updateWithMalformedXml() {}
     public void updateWithWrongXmlSchema() {}
 
@@ -297,11 +315,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
         // Submit the request to the service and store the response.
         String method = REQUEST_TYPE.httpMethodName();
-        String url = getResourceURL(knownObjectId);
-        final String entity = MALFORMED_XML_DATA; // Constant from abstract base class.
+        String url = getResourceURL(knownResourceId);
+        final String entity = MALFORMED_XML_DATA;
         int statusCode = submitRequest(method, url, entity);
         
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("updateWithMalformedXml: url=" + url + " status=" + statusCode);
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -317,11 +336,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         
         // Submit the request to the service and store the response.
         String method = REQUEST_TYPE.httpMethodName();
-        String url = getResourceURL(knownObjectId);
-        final String entity = WRONG_XML_SCHEMA_DATA; // Constant from abstract base class.
+        String url = getResourceURL(knownResourceId);
+        final String entity = WRONG_XML_SCHEMA_DATA;
         int statusCode = submitRequest(method, url, entity);
         
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("updateWithWrongSchema: url=" + url + " status=" + statusCode);
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -339,12 +359,13 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
-        CollectionObject collectionObject = createCollectionObject(NON_EXISTENT_ID);
+        CollectionObject collectionObject = createCollectionObjectInstance(NON_EXISTENT_ID);
         ClientResponse<CollectionObject> res =
           client.update(NON_EXISTENT_ID, collectionObject);
         int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("updateNonExistent: status = " + res.getStatus());
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -366,10 +387,11 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         setupDelete();
 
         // Submit the request to the service and store the response.
-        ClientResponse<Response> res = client.delete(knownObjectId);
+        ClientResponse<Response> res = client.delete(knownResourceId);
         int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("delete: status = " + res.getStatus());
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -389,7 +411,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("deleteNonExistent: status = " + res.getStatus());
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -413,10 +436,11 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
         // Submit the request to the service and store the response.
         String method = ServiceRequestType.READ.httpMethodName();
-        String url = getResourceURL(knownObjectId);
+        String url = getResourceURL(knownResourceId);
         int statusCode = submitRequest(method, url);
         
-        // Check the status code of the response: does it match the expected response(s)?
+        // Check the status code of the response: does it match
+        // the expected response(s)?
         verbose("testSubmitRequest: url=" + url + " status=" + statusCode);
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
@@ -438,15 +462,16 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         return SERVICE_PATH_COMPONENT;
     }
     
-    private CollectionObject createCollectionObject(String identifier) {
+    private CollectionObject createCollectionObjectInstance(String identifier) {
         CollectionObject collectionObject =
-          createCollectionObject(
+          createCollectionObjectInstance(
               "objectNumber-" + identifier,
               "objectName-" + identifier);
         return collectionObject;
     }
 
-    private CollectionObject createCollectionObject(String objectNumber, String objectName) {
+    private CollectionObject createCollectionObjectInstance(
+      String objectNumber, String objectName) {
         CollectionObject collectionObject = new CollectionObject();
         collectionObject.setObjectNumber(objectNumber);
         collectionObject.setObjectName(objectName);
