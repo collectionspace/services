@@ -100,7 +100,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    // Next, create an Intake record
 	    Intake intake = new Intake();
 	    fillIntake(intake, createIdentifier());
-	    ClientResponse<Response> intakeResponse = intakeClient.createIntake(intake);
+	    ClientResponse<Response> intakeResponse = intakeClient.create(intake);
 	    Assert.assertEquals(intakeResponse.getStatus(), Response.Status.CREATED.getStatusCode());
 	    String intakeCsid = extractId(intakeResponse);
 	    

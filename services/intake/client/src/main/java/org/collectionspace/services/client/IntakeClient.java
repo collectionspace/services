@@ -51,8 +51,8 @@ public class IntakeClient extends BaseServiceClient {
      * @return
      * @see org.collectionspace.hello.client.IntakeProxy#getIntake()
      */
-    public ClientResponse<IntakeList> getIntakeList() {
-        return intakeProxy.getIntakeList();
+    public ClientResponse<IntakeList> readList() {
+        return intakeProxy.readList();
     }
 
     /**
@@ -60,8 +60,8 @@ public class IntakeClient extends BaseServiceClient {
      * @return
      * @see org.collectionspace.hello.client.IntakeProxy#getIntake(java.lang.String)
      */
-    public ClientResponse<Intake> getIntake(String csid) {
-        return intakeProxy.getIntake(csid);
+    public ClientResponse<Intake> read(String csid) {
+        return intakeProxy.read(csid);
     }
 
     /**
@@ -69,8 +69,8 @@ public class IntakeClient extends BaseServiceClient {
      * @return
      * @see org.collectionspace.hello.client.IntakeProxy#createIntake(org.collectionspace.hello.Intake)
      */
-    public ClientResponse<Response> createIntake(Intake intake) {
-        return intakeProxy.createIntake(intake);
+    public ClientResponse<Response> create(Intake intake) {
+        return intakeProxy.create(intake);
     }
 
     /**
@@ -79,8 +79,8 @@ public class IntakeClient extends BaseServiceClient {
      * @return
      * @see org.collectionspace.hello.client.IntakeProxy#updateIntake(java.lang.Long, org.collectionspace.hello.Intake)
      */
-    public ClientResponse<Intake> updateIntake(String csid, Intake intake) {
-        return intakeProxy.updateIntake(csid, intake);
+    public ClientResponse<Intake> update(String csid, Intake intake) {
+        return intakeProxy.update(csid, intake);
     }
 
     /**
@@ -88,7 +88,7 @@ public class IntakeClient extends BaseServiceClient {
      * @return
      * @see org.collectionspace.hello.client.IntakeProxy#deleteIntake(java.lang.Long)
      */
-    public ClientResponse<Response> deleteIntake(String csid) {
-        return intakeProxy.deleteIntake(csid);
+    public ClientResponse<Response> delete(String csid) {
+        return intakeProxy.delete(csid);
     }
 }

@@ -23,24 +23,24 @@ import org.jboss.resteasy.client.ClientResponse;
 public interface IntakeProxy {
 
     @GET
-    ClientResponse<IntakeList> getIntakeList();
+    ClientResponse<IntakeList> readList();
 
     //(C)reate
     @POST
-    ClientResponse<Response> createIntake(Intake co);
+    ClientResponse<Response> create(Intake co);
 
     //(R)ead
     @GET
     @Path("/{csid}")
-    ClientResponse<Intake> getIntake(@PathParam("csid") String csid);
+    ClientResponse<Intake> read(@PathParam("csid") String csid);
 
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<Intake> updateIntake(@PathParam("csid") String csid, Intake co);
+    ClientResponse<Intake> update(@PathParam("csid") String csid, Intake co);
 
     //(D)elete
     @DELETE
     @Path("/{csid}")
-    ClientResponse<Response> deleteIntake(@PathParam("csid") String csid);
+    ClientResponse<Response> delete(@PathParam("csid") String csid);
 }

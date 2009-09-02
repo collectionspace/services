@@ -49,7 +49,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // Instance variables specific to this test.
     private CollectionObjectClient client = new CollectionObjectClient();
     final String SERVICE_PATH_COMPONENT = "collectionobjects";
-    private String knownObjectId = null;
+    private String knownObjectId = null; 
  
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
@@ -89,7 +89,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     @Test(dependsOnMethods = {"create"})
     public void createList() {
         for(int i = 0; i < 3; i++){
-            create   ();
+            create();
         }
     }
 
@@ -424,19 +424,21 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
     @Override
     public String getServicePathComponent() {
-        // @TODO Determine if it is possible to obtain this value programmatically.
+        // @TODO Determine if it is possible to obtain this
+        // value programmatically.
         //
-        // We set this in an annotation in the CollectionObjectProxy interface, for instance.
-        // We also set service-specific constants in each service module, which might
-        // also return this value.
+        // We set this in an annotation in the CollectionObjectProxy
+        // interface, for instance.  We also set service-specific
+        // constants in each service module, which might also
+        // return this value.
         return SERVICE_PATH_COMPONENT;
     }
     
     private CollectionObject createCollectionObject(String identifier) {
         CollectionObject collectionObject =
           createCollectionObject(
-            "objectNumber-" + identifier,
-            "objectName-" + identifier);
+              "objectNumber-" + identifier,
+              "objectName-" + identifier);
         return collectionObject;
     }
 
