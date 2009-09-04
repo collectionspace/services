@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.collectionspace.services.common.relation.RelationJAXBSchema;
-import org.collectionspace.services.common.relation.nuxeo.RelationUtilsNuxeoImpl;
+import org.collectionspace.services.common.relation.nuxeo.RelationsManagerNuxeoImpl;
 import org.collectionspace.services.common.relation.RelationsManager;
 
 import org.collectionspace.services.relation.Relation;
@@ -108,7 +108,7 @@ public class RelationDocumentModelHandler
         DocumentModel docModel = (DocumentModel) wrapDoc.getWrappedObject();
         Relation theRelation = new Relation();
         
-        RelationUtilsNuxeoImpl.fillRelationFromDocModel(theRelation, docModel);
+        RelationsManagerNuxeoImpl.fillRelationFromDocModel(theRelation, docModel);
 
         return theRelation;
     }
@@ -117,7 +117,7 @@ public class RelationDocumentModelHandler
     public void fillCommonObject(Relation relation, DocumentWrapper wrapDoc) throws Exception {
         DocumentModel docModel = (DocumentModel) wrapDoc.getWrappedObject();
 
-        RelationUtilsNuxeoImpl.fillDocModelFromRelation(relation, docModel);
+        RelationsManagerNuxeoImpl.fillDocModelFromRelation(relation, docModel);
     }
 
     @Override
@@ -140,7 +140,7 @@ public class RelationDocumentModelHandler
             if (RelationsManager.isQueryMatch(docModel, subjectCsid,
 					predicate, objectCsid) == true) {
 				RelationListItem coListItem = new RelationListItem();
-				RelationUtilsNuxeoImpl.fillRelationListItemFromDocModel(
+				RelationsManagerNuxeoImpl.fillRelationListItemFromDocModel(
 						coListItem, docModel);
 				list.add(coListItem);
 			}

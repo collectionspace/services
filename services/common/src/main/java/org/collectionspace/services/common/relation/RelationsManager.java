@@ -30,9 +30,9 @@ import java.io.IOException;
 import java.util.List;
 
 import org.collectionspace.services.common.repository.DocumentException;
-import org.collectionspace.services.common.relation.nuxeo.RelationUtilsNuxeoImpl;
+import org.collectionspace.services.common.relation.nuxeo.RelationsManagerNuxeoImpl;
 import org.collectionspace.services.relation.Relation;
-import org.collectionspace.services.common.relation.RelationUtils;
+import org.collectionspace.services.common.relation.IRelationsManager;
 
 import org.dom4j.Document;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -52,7 +52,7 @@ public class RelationsManager {
 	static public final String OBJECT = "objectCsid";
 
 	/** The relation utils. */
-	static private RelationUtils relationUtils = new RelationUtilsNuxeoImpl();
+	static private IRelationsManager relationUtils = new RelationsManagerNuxeoImpl();
 
 	/**
 	 * Gets the relationships.

@@ -37,7 +37,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 /**
  * The Interface RelationUtils.
  */
-public interface RelationUtils {
+public interface IRelationsManager {
 
 	/**
 	 * Gets the relationships.

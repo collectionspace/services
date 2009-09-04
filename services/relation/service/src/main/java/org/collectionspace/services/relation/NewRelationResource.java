@@ -113,6 +113,9 @@ public class NewRelationResource extends CollectionSpaceResource {
 		}
 	}
 	
+	/*
+	 * Prototype for using NXQL -will move away from here once protyping is finished.
+	 */
 	@GET
 	@Path("query/{queryValue}")
 	public Response getQuery(@PathParam("queryValue") String queryString) {
@@ -122,6 +125,8 @@ public class NewRelationResource extends CollectionSpaceResource {
 		if (logger.isDebugEnabled() == true) {
 			logger.debug("Query string is: " + queryString);
 		}
+		
+		//getDefaultClient().
 				
 		result = Response.status(Response.Status.ACCEPTED).entity(
 						"Query performed. Look in $JBOSS_HOME/server/cspace/log/" +

@@ -39,7 +39,7 @@ import java.util.List;
 import org.collectionspace.services.common.repository.DocumentException;
 //import org.collectionspace.services.nuxeo.NuxeoRESTClient;
 import org.collectionspace.services.nuxeo.CollectionSpaceServiceNuxeoImpl;
-import org.collectionspace.services.common.relation.nuxeo.RelationUtilsNuxeoImpl;
+import org.collectionspace.services.common.relation.nuxeo.RelationsManagerNuxeoImpl;
 import org.collectionspace.services.relation.Relation;
 import org.collectionspace.services.relation.RelationService;
 //import org.collectionspace.services.relation.RelationList;
@@ -82,20 +82,20 @@ public class RelationServiceNuxeoImpl extends
 	public Document deleteRelation(String csid) throws DocumentException {
 		Document result = null;
 
-		RepositoryInstance repoSession = null;
-		try {
-			repoSession = getRepositorySession();
-			result = deleteDocument(repoSession, csid);
-		} catch (Exception e) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Caught exception ", e);
-			}
-			throw new DocumentException(e);
-		} finally {
-			if (repoSession != null) {
-				releaseRepositorySession(repoSession);
-			}
-		}
+//		RepositoryInstance repoSession = null;
+//		try {
+//			repoSession = getRepositorySession();
+//			result = deleteDocument(repoSession, csid);
+//		} catch (Exception e) {
+//			if (logger.isDebugEnabled()) {
+//				logger.debug("Caught exception ", e);
+//			}
+//			throw new DocumentException(e);
+//		} finally {
+//			if (repoSession != null) {
+//				releaseRepositorySession(repoSession);
+//			}
+//		}
 
 		return result;
 	}
@@ -142,7 +142,7 @@ public class RelationServiceNuxeoImpl extends
 			repoSession = getRepositorySession();
 			List<Relation> relationList = RelationsManager.getRelationships(repoSession);
 			
-			result = RelationUtilsNuxeoImpl.getDocument(relationList);
+			result = RelationsManagerNuxeoImpl.getDocument(relationList);
 		} catch (Exception e) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Caught exception ", e);
@@ -175,7 +175,7 @@ public class RelationServiceNuxeoImpl extends
 			List<Relation> relationList = RelationsManager.getRelationships(repoSession,
 					subjectCsid, predicate, objectCsid);
 			
-			result = RelationUtilsNuxeoImpl.getDocument(relationList);
+			result = RelationsManagerNuxeoImpl.getDocument(relationList);
 		} catch (Exception e) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Caught exception ", e);
@@ -205,7 +205,7 @@ public class RelationServiceNuxeoImpl extends
 		
 		try {
 			repoSession = getRepositorySession();
-            DocumentModel resultDocModel = RelationUtilsNuxeoImpl.createRelationship(repoSession, co);
+            DocumentModel resultDocModel = RelationsManagerNuxeoImpl.createRelationship(repoSession, co);
             repoSession.save();
             result = NuxeoUtils.getDocument(repoSession, resultDocModel);
 		} catch (Exception e) {
@@ -239,7 +239,7 @@ public class RelationServiceNuxeoImpl extends
             repoSession = getRepositorySession();
             DocumentRef documentRef = new IdRef(csid);
             DocumentModel documentModel = repoSession.getDocument(documentRef);
-            RelationUtilsNuxeoImpl.fillDocModelFromRelation(theUpdate, documentModel);
+            RelationsManagerNuxeoImpl.fillDocModelFromRelation(theUpdate, documentModel);
             repoSession.saveDocument(documentModel);
             repoSession.save();
             result = NuxeoUtils.getDocument(repoSession, documentModel);

@@ -35,7 +35,7 @@ import java.util.Map;
 
 import org.collectionspace.services.common.relation.RelationJAXBSchema;
 import org.collectionspace.services.common.relation.RelationListItemJAXBSchema;
-import org.collectionspace.services.common.relation.RelationUtils;
+import org.collectionspace.services.common.relation.IRelationsManager;
 
 import org.collectionspace.services.relation.Relation;
 import org.collectionspace.services.relation.RelationList;
@@ -65,7 +65,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The Class RelationUtilsNuxeoImpl.
  */
-public class RelationUtilsNuxeoImpl implements RelationUtils {
+public class RelationsManagerNuxeoImpl implements IRelationsManager {
 	
 	/** The C s_ relatio n_ servic e_ name. */
 	static public String CS_RELATION_SERVICE_NAME = "relations";
@@ -87,7 +87,7 @@ public class RelationUtilsNuxeoImpl implements RelationUtils {
 	
 	/** The logger. */
 	private static Logger logger = LoggerFactory
-	.getLogger(RelationUtilsNuxeoImpl.class);	
+	.getLogger(RelationsManagerNuxeoImpl.class);	
 
 
 	/**

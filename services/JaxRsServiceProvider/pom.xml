@@ -37,10 +37,14 @@
             <artifactId>org.collectionspace.services.intake.service</artifactId>
             <version>1.0</version>
         </dependency>
-
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.relation.service</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.query.service</artifactId>
             <version>1.0</version>
         </dependency>
         <dependency>
@@ -169,6 +173,7 @@
                     <port>8180</port>
                 </configuration>
                 <executions>
+                	
                     <execution>
                         <id>jboss-undeploy</id>
                         <phase>pre-integration-test</phase>
@@ -193,6 +198,7 @@
                             </fileNames>
                         </configuration>
                     </execution>
+                    
                 </executions>
             </plugin>
 
