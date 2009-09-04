@@ -1,8 +1,4 @@
-/*	
- * StringIDPartTest
- *
- * Test class for StringIDPart.
- *
+/**
  * This document is a part of the source code and related artifacts
  * for CollectionSpace, an open source collections management system
  * for museums and related institutions:
@@ -17,10 +13,6 @@
  *
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
- *
- * $LastChangedBy$
- * $LastChangedRevision$
- * $LastChangedDate$
  */
 
 package org.collectionspace.services.id;
@@ -28,23 +20,31 @@ package org.collectionspace.services.id;
 import static org.junit.Assert.fail;
 import junit.framework.TestCase;
 
-public class StringIDPartTest extends TestCase {
+/**	
+ * StringIDGeneratorPartTest
+ *
+ * Test class for StringIDGeneratorPart.
+ *
+ * $LastChangedRevision$
+ * $LastChangedDate$
+ */
+public class StringIDGeneratorPartTest extends TestCase {
 
-	IDPart part;
+	IDGeneratorPart part;
 
 	public void testNextID() {
 
-		part = new StringIDPart("E");		
+		part = new StringIDGeneratorPart("E");		
 		assertEquals("E", part.nextID());	
 		
-		part = new StringIDPart("XYZ");		
+		part = new StringIDGeneratorPart("XYZ");		
 		assertEquals("XYZ", part.nextID());		
 		
 	}
 
 	public void testresetID() {
 	
-		part = new StringIDPart(".");
+		part = new StringIDGeneratorPart(".");
 		assertEquals(".", part.nextID());
 		part.resetID();
 		assertEquals(".", part.nextID());
@@ -52,19 +52,19 @@ public class StringIDPartTest extends TestCase {
 	}
 
 	public void testInitialID() {
-		part = new StringIDPart("-");
+		part = new StringIDGeneratorPart("-");
 		assertEquals("-", part.getInitialID());
 	}
 
 	public void testCurrentID() {
-		part = new StringIDPart("- -");
+		part = new StringIDGeneratorPart("- -");
 		assertEquals("- -", part.getCurrentID());
 	}
 	
 	public void testNullInitialValue() {
 	
 		try {
-			part = new StringIDPart(null);
+			part = new StringIDGeneratorPart(null);
 			fail("Should have thrown IllegalArgumentException here");
 		} catch (IllegalArgumentException expected) {
 			// This Exception should be thrown, and thus the test should pass.
@@ -75,7 +75,7 @@ public class StringIDPartTest extends TestCase {
 	public void testEmptyInitialValue() {
 	
 		try {
-			part = new StringIDPart("");
+			part = new StringIDGeneratorPart("");
 			fail("Should have thrown IllegalArgumentException here");
 		} catch (IllegalArgumentException expected) {
 			// This Exception should be thrown, and thus the test should pass.
@@ -85,30 +85,30 @@ public class StringIDPartTest extends TestCase {
 
 	public void testIsValidID() {
 	
-		part = new StringIDPart("-");
+		part = new StringIDGeneratorPart("-");
 		assertTrue(part.isValidID("-"));
 
-		part = new StringIDPart("-");
+		part = new StringIDGeneratorPart("-");
 		assertFalse(part.isValidID("--"));
 
 		// Test chars with special meaning in regexes.
-		part = new StringIDPart(".");
+		part = new StringIDGeneratorPart(".");
 		assertTrue(part.isValidID("."));
 
-		part = new StringIDPart("TE");
+		part = new StringIDGeneratorPart("TE");
 		assertTrue(part.isValidID("TE"));
 
-		part = new StringIDPart("TE");
+		part = new StringIDGeneratorPart("TE");
 		assertFalse(part.isValidID("T"));
 
-		part = new StringIDPart("T");
+		part = new StringIDGeneratorPart("T");
 		assertFalse(part.isValidID("TE"));
 
-    part = new StringIDPart("-");
-    assertFalse(part.isValidID(null));
-
-    part = new StringIDPart("-");
-    assertFalse(part.isValidID(""));
+        part = new StringIDGeneratorPart("-");
+        assertFalse(part.isValidID(null));
+        
+        part = new StringIDGeneratorPart("-");
+        assertFalse(part.isValidID(""));
 	
 	}	
 

@@ -1,7 +1,7 @@
 /**
- * IDPattern
+ * BaseIDGenerator
  *
- * Models an identifier (ID), which consists of multiple IDParts.
+ * Models an identifier (ID), which consists of multiple IDGeneratorParts.
  *
  * This document is a part of the source code and related artifacts
  * for CollectionSpace, an open source collections management system
@@ -25,8 +25,8 @@
 
 // @TODO: Add Javadoc comments
 
-// @TODO: Catch Exceptions thrown by IDPart, then
-// reflect this in the corresponding IDPatternTest class.
+// @TODO: Catch Exceptions thrown by IDGeneratorPart, then
+// reflect this in the corresponding BaseIDGeneratorTest class.
 
 package org.collectionspace.services.id;
 
@@ -36,24 +36,24 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class IDPattern {
+public class BaseIDGenerator implements IDGenerator {
 
 	private String csid = "";
 	private String uri = "";
 	private String description = "";
-	private Vector<IDPart> parts = new Vector<IDPart>();
+	private Vector<IDGeneratorPart> parts = new Vector<IDGeneratorPart>();
 
 	final static int MAX_ID_LENGTH = 50;
 	
 	// Constructor
-	public IDPattern(String csid) {
+	public BaseIDGenerator(String csid) {
 	  if (csid != null && ! csid.equals("")) {
 	    this.csid = csid;
 	  }
 	}
 	
 	// Constructor
-	public IDPattern(String csid, Vector<IDPart> partsList) {
+	public BaseIDGenerator(String csid, Vector<IDGeneratorPart> partsList) {
 	  if (csid != null && ! csid.equals("")) {
 	    this.csid = csid;
 	  }
@@ -93,7 +93,7 @@ public class IDPattern {
     return this.description;
   }
   
-	public void add(IDPart part) {
+	public void add(IDGeneratorPart part) {
 		if (part != null) {
 			this.parts.add(part);
 		}
@@ -102,7 +102,7 @@ public class IDPattern {
 	// Returns the current value of this ID.
 	public String getCurrentID() {
 		StringBuffer sb = new StringBuffer(MAX_ID_LENGTH);
-		for (IDPart part : this.parts) {
+		for (IDGeneratorPart part : this.parts) {
 			sb.append(part.getCurrentID());
 		}
 		return sb.toString();
@@ -122,9 +122,9 @@ public class IDPattern {
 	//
 	// Examples:
 	// * 2009.5." becomes "2009.5.1", in a case where the
-	//   next ID component is an incrementing numeric IDPart.
+	//   next ID component is an incrementing numeric IDGeneratorPart.
 	// * "E55-" becomes "E55-a", where the next ID component
-	//   is an incrementing alphabetic IDPart.
+	//   is an incrementing alphabetic IDGeneratorPart.
 	public String getCurrentID(String value)
 		throws IllegalArgumentException {
 
@@ -134,19 +134,19 @@ public class IDPattern {
 	  // by incrementally appending each part's regex, until no
 	  // (more) matches are found.
 	  //
-	  // In so doing, build a subset of this IDPattern's regex
+	  // In so doing, build a subset of this BaseIDGenerator's regex
 	  // that fully matches the supplied value.
 	  Pattern pattern = null;
 	  Matcher matcher = null;
 	  int matchedParts = 0;
 	  StringBuffer regexToTry = new StringBuffer();
 	  StringBuffer regex = new StringBuffer();
-	  for (IDPart partToTryMatching : this.parts) {
+	  for (IDGeneratorPart partToTryMatching : this.parts) {
 	  	regexToTry.append(partToTryMatching.getRegex());
 	  	pattern = Pattern.compile(regexToTry.toString());
 			matcher = pattern.matcher(value);
 			// If a stem match was found on the current regex,
-			// store a count of matched IDParts and the regex pattern
+			// store a count of matched IDGeneratorParts and the regex pattern
 			// that has matched to this point.
 			if (matcher.lookingAt()) {
 				matchedParts++;
@@ -175,24 +175,24 @@ public class IDPattern {
 		
 		// Otherwise, if the supplied ID matches the pattern,
 		// split the ID into its components and store those
-		// values in each of the pattern's IDParts.
-		IDPart currentPart;
+		// values in each of the pattern's IDGeneratorParts.
+		IDGeneratorPart currentPart;
 		for (int i = 1; i <= matchedParts; i++) {
 		  currentPart = this.parts.get(i - 1);
       currentPart.setCurrentID(matcher.group(i));
 		}
 
-		// Obtain the initial value of the next IDPart, and
+		// Obtain the initial value of the next IDGeneratorPart, and
 		// set the current value of that part to its initial value.
 		//
 		// If the supplied ID fully matches the pattern, there will
-		// be no 'next' IDPart, and we must catch that Exception below. 
+		// be no 'next' IDGeneratorPart, and we must catch that Exception below. 
 		int nextPartNum = matchedParts;
 		try {
 			String initial = this.parts.get(nextPartNum).getInitialID();
 			this.parts.get(nextPartNum).setCurrentID(initial);
 			// Increment the number of matched parts to reflect the
-			// addition of this next IDPart.
+			// addition of this next IDGeneratorPart.
 			matchedParts++;
 		} catch (ArrayIndexOutOfBoundsException e ) {
 			// Do nothing here; we simply won't increment
@@ -200,7 +200,7 @@ public class IDPattern {
 		}
 		
 		// Call the getCurrentID() method on each of the
-		// supplied IDParts, as well as on the added IDPart
+		// supplied IDGeneratorParts, as well as on the added IDGeneratorPart
 		// whose initial value was just obtained, if any.
 		StringBuffer sb = new StringBuffer();
 		for (int i = 1; i <= matchedParts; i++) {
@@ -212,18 +212,18 @@ public class IDPattern {
 	}
 
 	// Returns the next value of this ID, and sets the current value to that ID.
-	public String nextID() throws IllegalStateException {
+	public String newID() throws IllegalStateException {
 	
-		// Obtain the last (least significant) IDPart,
+		// Obtain the last (least significant) IDGeneratorPart,
 		// and call its nextID() method, which will
 		// concurrently set the current value of that ID
 		// to the next ID.
 		int lastPartNum = this.parts.size() - 1;
 		this.parts.get(lastPartNum).nextID();
 		
-		// Then call the getCurrentID() method on all of the IDParts
+		// Then call the getCurrentID() method on all of the IDGeneratorParts
 		StringBuffer sb = new StringBuffer(MAX_ID_LENGTH);
-		for (IDPart part : this.parts) {
+		for (IDGeneratorPart part : this.parts) {
 			sb.append(part.getCurrentID());
 		}
 		
@@ -234,7 +234,7 @@ public class IDPattern {
 	// Returns the next value of this ID, given a
 	// supplied ID that entirely matches the pattern,
 	// and sets the current value to that ID.
-	public String nextID(String value)
+	public String newID(String value)
 		throws IllegalStateException, IllegalArgumentException {
 
 	  if (value == null) { 
@@ -252,14 +252,14 @@ public class IDPattern {
 		
 		// Otherwise, if the supplied ID entirely matches the pattern,
 		// split the ID into its components and store those values in
-		// each of the pattern's IDParts.
-		IDPart currentPart;
+		// each of the pattern's IDGeneratorParts.
+		IDGeneratorPart currentPart;
 		for (int i = 1; i <= (matcher.groupCount() - 1); i++) {
 		  currentPart = this.parts.get(i - 1);
       currentPart.setCurrentID(matcher.group(i));
 		}
 
-		// Obtain the last (least significant) IDPart,
+		// Obtain the last (least significant) IDGeneratorPart,
 		// and call its nextID() method, which will
 		// concurrently set the current value of that ID
 		// to the next ID.
@@ -269,9 +269,9 @@ public class IDPattern {
 		int lastPartNum = this.parts.size() - 1;
 		this.parts.get(lastPartNum).nextID();
 		
-		// Then call the getCurrentID() method on all of the IDParts
+		// Then call the getCurrentID() method on all of the IDGeneratorParts
 		StringBuffer sb = new StringBuffer();
-		for (IDPart part : this.parts) {
+		for (IDGeneratorPart part : this.parts) {
 			sb.append(part.getCurrentID());
 		}
 		
@@ -300,7 +300,7 @@ public class IDPattern {
 	// Returns a regular expression to validate this ID.
 	public String getRegex() {
 		StringBuffer sb = new StringBuffer();
-		for (IDPart part : this.parts) {
+		for (IDGeneratorPart part : this.parts) {
 			sb.append(part.getRegex());
 		}
 		return sb.toString();

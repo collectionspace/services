@@ -1,9 +1,4 @@
-/*	
- * YearIDGenerator
- *
- * Generates identifiers (IDs) that store and returns the current year
- * or a supplied year as a String object.
- *
+/**
  * This document is a part of the source code and related artifacts
  * for CollectionSpace, an open source collections management system
  * for museums and related institutions:
@@ -18,10 +13,6 @@
  *
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
- *
- * $LastChangedBy$
- * $LastChangedRevision$
- * $LastChangedDate$
  */
 
 // @TODO: Add Javadoc comments
@@ -51,12 +42,21 @@ import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class YearIDGenerator implements IDGenerator {
+/**
+ * YearIDGeneratorPart
+ *
+ * Generates identifiers (IDs) that store and returns the current year
+ * or a supplied year as a String object.
+ *
+ * $LastChangedRevision$
+ * $LastChangedDate$
+ */
+public class YearIDGeneratorPart implements IDGeneratorPart {
     
 	private String initialValue = null;
 	private String currentValue = null;
 	
-	public YearIDGenerator() throws IllegalArgumentException {
+	public YearIDGeneratorPart() throws IllegalArgumentException {
 
 		String currentYear = getCurrentYear();
 		this.initialValue = currentYear;
@@ -64,10 +64,12 @@ public class YearIDGenerator implements IDGenerator {
 
 	}
 	
-	public YearIDGenerator(String initialValue) throws IllegalArgumentException {
+	public YearIDGeneratorPart(String initialValue)
+	    throws IllegalArgumentException {
 
 		if (initialValue == null || initialValue.equals("")) {
-			throw new IllegalArgumentException("Initial ID value must not be null or empty");
+			throw new IllegalArgumentException(
+			    "Initial ID value must not be null or empty");
 		}
 		
 		// @TODO: Add regex-based validation here, by calling isValidID().
@@ -114,11 +116,11 @@ public class YearIDGenerator implements IDGenerator {
 	//   to a new instant in time.
 	public String nextID() {
 		return this.currentValue;
-  }
+    }
 
 	public static String getCurrentYear() {
 		Calendar cal = GregorianCalendar.getInstance();
-    int y = cal.get(Calendar.YEAR);
+        int y = cal.get(Calendar.YEAR);
 		return Integer.toString(y);
 	}	
 

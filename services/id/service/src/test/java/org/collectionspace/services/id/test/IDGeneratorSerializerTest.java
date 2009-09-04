@@ -33,67 +33,65 @@ import static org.junit.Assert.*;
  *
  * Unit tests of the ID Service's IDGeneratorSerializer class.
  *
- *
- * $LastChangedBy: aron $
  * $LastChangedRevision: 302 $
  * $LastChangedDate$
  */
 public class IDGeneratorSerializerTest extends TestCase {
 
   String serializedGenerator;
-  IDPattern pattern;
+  BaseIDGenerator generator;
   
-	final static String DEFAULT_CSID = "TEST-1";
+  final static String DEFAULT_CSID = "TEST-1";
 
   final static String DEFAULT_SERIALIZED_ID_GENERATOR =
-    "<org.collectionspace.services.id.IDPattern>\n" +
+    "<org.collectionspace.services.id.BaseIDGenerator>\n" +
     "  <csid>" + DEFAULT_CSID + "</csid>\n" +
     "  <uri></uri>\n" +
     "  <description></description>\n" +
     "  <parts/>\n" +
-    "</org.collectionspace.services.id.IDPattern>";
+    "</org.collectionspace.services.id.BaseIDGenerator>";
 
-  // @TODO We may want to canonicalize (or otherwise normalize) the expected and
-  // actual XML in these tests, to avoid failures resulting from differences in
-  // whitespace, etc.
-	public void testSerializeIDGenerator() {
-	  IDPattern pattern = new IDPattern(DEFAULT_CSID);
-		assertEquals(DEFAULT_SERIALIZED_ID_GENERATOR, IDGeneratorSerializer.serialize(pattern));
-	}
+    // @TODO We may want to canonicalize (or otherwise normalize) the expected and
+    // actual XML in these tests, to avoid failures resulting from differences in
+    // whitespace, etc.
+    public void testSerializeIDGenerator() {
+      BaseIDGenerator generator = new BaseIDGenerator(DEFAULT_CSID);
+        assertEquals(DEFAULT_SERIALIZED_ID_GENERATOR, IDGeneratorSerializer.serialize(generator));
+    }
 
-	public void testSerializeNullIDGenerator() {
-	  try {
-	    String serializedPattern = IDGeneratorSerializer.serialize(null);
-			fail("Should have thrown IllegalArgumentException here");
-		} catch (IllegalArgumentException expected) {
-			// This Exception should be thrown, and thus the test should pass.
-		}
-	}
+    public void testSerializeNullIDGenerator() {
+      try {
+        String serializedPattern = IDGeneratorSerializer.serialize(null);
+            fail("Should have thrown IllegalArgumentException here");
+        } catch (IllegalArgumentException expected) {
+            // This Exception should be thrown, and thus the test should pass.
+        }
+    }
 
-	public void testDeserializeIDGenerator() {
-	  // This test will fail with different hash codes unless we add an IDPattern.equals()
-	  // method that explicitly defines object equality as, for instance, having identical values
-	  // in each of its instance variables.
-	  // IDPattern pattern = IDGeneratorSerializer.deserialize(DEFAULT_SERIALIZED_ID_PATTERN);
-	  // assertEquals(pattern, new IDPattern(DEFAULT_CSID));
-	}
+    public void testDeserializeIDGenerator() {
+      // This test will fail with different hash codes unless we add an IDGenerator.equals()
+      // method that explicitly defines object equality as, for instance, having identical values
+      // in each of its instance variables.
+      // IDGenerator generator = IDGeneratorSerializer.deserialize(DEFAULT_SERIALIZED_ID_PATTERN);
+      // assertEquals(generator, new IDGenerator(DEFAULT_CSID));
+    }
 
-	public void testDeserializeNullSerializedIDGenerator() {
-	  try {
-	    IDPattern pattern = IDGeneratorSerializer.deserialize(null);
-			fail("Should have thrown IllegalArgumentException here");
-		} catch (IllegalArgumentException expected) {
-			// This Exception should be thrown, and thus the test should pass.
-		}
-	}
+    public void testDeserializeNullSerializedIDGenerator() {
+      try {
+        BaseIDGenerator generator = IDGeneratorSerializer.deserialize(null);
+            fail("Should have thrown IllegalArgumentException here");
+        } catch (IllegalArgumentException expected) {
+            // This Exception should be thrown, and thus the test should pass.
+        }
+    }
 
-	public void testDeserializeInvalidSerializedIDGenerator() {
-	  try {
-	    IDPattern pattern = IDGeneratorSerializer.deserialize("<invalid_serialized_generator/>");
-			fail("Should have thrown IllegalArgumentException here");
-		} catch (IllegalArgumentException expected) {
-			// This Exception should be thrown, and thus the test should pass.
-		}
-	}
-	
+    public void testDeserializeInvalidSerializedIDGenerator() {
+      try {
+        IDGenerator generator = IDGeneratorSerializer.deserialize("<invalid_serialized_generator/>");
+            fail("Should have thrown IllegalArgumentException here");
+        } catch (IllegalArgumentException expected) {
+            // This Exception should be thrown, and thus the test should pass.
+        }
+    }
+    
 }

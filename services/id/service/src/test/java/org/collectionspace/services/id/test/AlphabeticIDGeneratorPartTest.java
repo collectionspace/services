@@ -1,8 +1,4 @@
-/*	
- * AlphabeticIDPartTest
- *
- * Test class for AlphabeticIDPart.
- *
+/**	
  * This document is a part of the source code and related artifacts
  * for CollectionSpace, an open source collections management system
  * for museums and related institutions:
@@ -17,10 +13,6 @@
  *
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
- *
- * $LastChangedBy$
- * $LastChangedRevision$
- * $LastChangedDate$
  */
 
 package org.collectionspace.services.id;
@@ -28,17 +20,25 @@ package org.collectionspace.services.id;
 import static org.junit.Assert.fail;
 import junit.framework.TestCase;
 
-public class AlphabeticIDPartTest extends TestCase {
+/**	
+ * AlphabeticIDGeneratorPartTest
+ *
+ * Test class for AlphabeticIDGeneratorPart.
+ *
+ * $LastChangedRevision$
+ * $LastChangedDate$
+ */
+public class AlphabeticIDGeneratorPartTest extends TestCase {
 
-	IDPart part;
+	IDGeneratorPart part;
 	
-	public void testnextIDLowercase() {
+	public void testNextIDLowercase() {
 
-		part = new AlphabeticIDPart("a");
+		part = new AlphabeticIDGeneratorPart("a");
 		assertEquals("b", part.nextID());
 		assertEquals("c", part.nextID());
 
-		part = new AlphabeticIDPart("x");
+		part = new AlphabeticIDGeneratorPart("x");
 		assertEquals("y", part.nextID());
 		assertEquals("z", part.nextID());
 
@@ -46,11 +46,11 @@ public class AlphabeticIDPartTest extends TestCase {
 
 	public void testnextIDLowercase2Chars() {
 
-		part = new AlphabeticIDPart("aa");
+		part = new AlphabeticIDGeneratorPart("aa");
 		assertEquals("ab", part.nextID());
 		assertEquals("ac", part.nextID());
 
-		part = new AlphabeticIDPart("zx");
+		part = new AlphabeticIDGeneratorPart("zx");
 		assertEquals("zy", part.nextID());
 		assertEquals("zz", part.nextID());
 
@@ -58,7 +58,7 @@ public class AlphabeticIDPartTest extends TestCase {
 
 	public void testnextIDLowercase2CharsRolloverFirst() {
 
-		part = new AlphabeticIDPart("ay");
+		part = new AlphabeticIDGeneratorPart("ay");
 		assertEquals("az", part.nextID());
 		assertEquals("ba", part.nextID());
 		assertEquals("bb", part.nextID());
@@ -67,11 +67,11 @@ public class AlphabeticIDPartTest extends TestCase {
 	
 	public void testnextIDUppercase() {
 		
-		part = new AlphabeticIDPart("A", "Z", "A");
+		part = new AlphabeticIDGeneratorPart("A", "Z", "A");
 		assertEquals("B", part.nextID());
 		assertEquals("C", part.nextID());
 
-		part = new AlphabeticIDPart("A", "Z", "X");
+		part = new AlphabeticIDGeneratorPart("A", "Z", "X");
 		assertEquals("Y", part.nextID());
 		assertEquals("Z", part.nextID());
 
@@ -79,11 +79,11 @@ public class AlphabeticIDPartTest extends TestCase {
 
 	public void testnextIDUppercase2Chars() {
 
-		part = new AlphabeticIDPart("A", "Z", "AA");
+		part = new AlphabeticIDGeneratorPart("A", "Z", "AA");
 		assertEquals("AB", part.nextID());
 		assertEquals("AC", part.nextID());
 
-		part = new AlphabeticIDPart("A", "Z", "ZX");
+		part = new AlphabeticIDGeneratorPart("A", "Z", "ZX");
 		assertEquals("ZY", part.nextID());
 		assertEquals("ZZ", part.nextID());
 			
@@ -91,7 +91,7 @@ public class AlphabeticIDPartTest extends TestCase {
 
 	public void testnextIDUppercase2CharsRolloverFirst() {
 
-		part = new AlphabeticIDPart("A", "Z", "AY");
+		part = new AlphabeticIDGeneratorPart("A", "Z", "AY");
 		assertEquals("AZ", part.nextID());
 		assertEquals("BA", part.nextID());
 		assertEquals("BB", part.nextID());
@@ -100,7 +100,7 @@ public class AlphabeticIDPartTest extends TestCase {
   
 	public void testresetIDLowercase() {
 		
-		part = new AlphabeticIDPart("zx");
+		part = new AlphabeticIDGeneratorPart("zx");
 		assertEquals("zy", part.nextID());
 		assertEquals("zz", part.nextID());
 		part.resetID();
@@ -110,7 +110,7 @@ public class AlphabeticIDPartTest extends TestCase {
 
 	public void testresetIDUppercase() {
 		
-		part = new AlphabeticIDPart("A", "Z", "RA");
+		part = new AlphabeticIDGeneratorPart("A", "Z", "RA");
 		assertEquals("RB", part.nextID());
 		assertEquals("RC", part.nextID());
 		part.resetID();
@@ -120,21 +120,21 @@ public class AlphabeticIDPartTest extends TestCase {
 	
 	public void testInitialLowercase() {
 		
-		part = new AlphabeticIDPart("aaa");
+		part = new AlphabeticIDGeneratorPart("aaa");
 		assertEquals("aaa", part.getInitialID());
 		
 	}
 
 	public void testInitialUppercase() {
 		
-		part = new AlphabeticIDPart("A", "Z", "AZ");
+		part = new AlphabeticIDGeneratorPart("A", "Z", "AZ");
 		assertEquals("AZ", part.getInitialID());
 		
 	}
 
 	public void testCurrentLowercase() {
 		
-		part = new AlphabeticIDPart("aaa");
+		part = new AlphabeticIDGeneratorPart("aaa");
 		assertEquals("aaa", part.getCurrentID());
 		assertEquals("aab", part.nextID());
 		assertEquals("aac", part.nextID());
@@ -145,7 +145,7 @@ public class AlphabeticIDPartTest extends TestCase {
 
 	public void testCurrentUppercase() {
 		
-		part = new AlphabeticIDPart("A", "Z", "A");
+		part = new AlphabeticIDGeneratorPart("A", "Z", "A");
 		assertEquals("A", part.getCurrentID());
 		assertEquals("B", part.nextID());
 		assertEquals("C", part.nextID());
@@ -156,7 +156,7 @@ public class AlphabeticIDPartTest extends TestCase {
 	
 	public void testOverflowLowercase() {
 	
-    part = new AlphabeticIDPart("zx");
+    part = new AlphabeticIDGeneratorPart("zx");
     assertEquals("zy", part.nextID());
     assertEquals("zz", part.nextID());
     assertEquals("aaa", part.nextID());
@@ -165,7 +165,7 @@ public class AlphabeticIDPartTest extends TestCase {
 
 	public void testOverflowUppercase() {
 	
-    part = new AlphabeticIDPart("A", "Z", "X");
+    part = new AlphabeticIDGeneratorPart("A", "Z", "X");
     assertEquals("Y", part.nextID());
     assertEquals("Z", part.nextID());
     assertEquals("AA", part.nextID());
@@ -174,7 +174,7 @@ public class AlphabeticIDPartTest extends TestCase {
 
 	public void testNonAlphabeticInitialValue() {
 		try {
-			part = new AlphabeticIDPart("&*432");
+			part = new AlphabeticIDGeneratorPart("&*432");
 			fail("Should have thrown IllegalArgumentException here");
 		} catch (IllegalArgumentException expected) {
 			// This Exception should be thrown, and thus the test should pass.
@@ -183,7 +183,7 @@ public class AlphabeticIDPartTest extends TestCase {
 
 	public void testNullInitialValue() {
 		try {
-			part = new AlphabeticIDPart(null);
+			part = new AlphabeticIDGeneratorPart(null);
 			fail("Should have thrown IllegalArgumentException here");
 		} catch (IllegalArgumentException expected) {
 			// This Exception should be thrown, and thus the test should pass.
@@ -192,7 +192,7 @@ public class AlphabeticIDPartTest extends TestCase {
 
 	public void testEmptyStringInitialValue() {
 		try {
-			part = new AlphabeticIDPart("");
+			part = new AlphabeticIDGeneratorPart("");
 			fail("Should have thrown IllegalArgumentException here");
 		} catch (IllegalArgumentException expected) {
 			// This Exception should be thrown, and thus the test should pass.
@@ -201,7 +201,7 @@ public class AlphabeticIDPartTest extends TestCase {
 
 	public void testAllSpaceCharsInitialValue() {
 		try {
-			part = new AlphabeticIDPart("  ");
+			part = new AlphabeticIDGeneratorPart("  ");
 			fail("Should have thrown IllegalArgumentException here");
 		} catch (IllegalArgumentException expected) {
 			// This Exception should be thrown, and thus the test should pass.
@@ -210,7 +210,7 @@ public class AlphabeticIDPartTest extends TestCase {
 
 	public void testIsValidIDDefaultSeries() {
 	
-		part = new AlphabeticIDPart();
+		part = new AlphabeticIDGeneratorPart();
 
 		assertTrue(part.isValidID("a"));
 		assertTrue(part.isValidID("z"));
@@ -222,7 +222,7 @@ public class AlphabeticIDPartTest extends TestCase {
 
 	public void testIsValidIDConstrainedLowerCaseSeries() {
 	
-		part = new AlphabeticIDPart("a", "f", "a");
+		part = new AlphabeticIDGeneratorPart("a", "f", "a");
 		
 		assertTrue(part.isValidID("a"));
 		assertTrue(part.isValidID("b"));
@@ -237,7 +237,7 @@ public class AlphabeticIDPartTest extends TestCase {
 
 	public void testIsValidIDConstrainedUppercaseSeries() {
 	
-		part = new AlphabeticIDPart("A", "F", "A");
+		part = new AlphabeticIDGeneratorPart("A", "F", "A");
 
 		assertTrue(part.isValidID("A"));
 		assertTrue(part.isValidID("B"));
