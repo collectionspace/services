@@ -20,6 +20,7 @@
         <module>authentication</module>
         <module>relation</module>
         <module>query</module>
+        <module>vocabulary</module>
         <module>id</module>
         <module>collectionobject</module>
         <module>intake</module>
