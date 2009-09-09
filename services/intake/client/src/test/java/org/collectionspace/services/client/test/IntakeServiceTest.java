@@ -24,6 +24,7 @@
  package org.collectionspace.services.client.test;
 
 import java.util.List;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -99,13 +100,6 @@ public class IntakeServiceTest extends AbstractServiceTest {
 
     // Failure outcomes
 
-    @Override
-    @Test(dependsOnMethods = {"create"},
-        expectedExceptions = IllegalArgumentException.class)
-    public void createNull() {
-        ClientResponse<Response> res = client.create(null);
-    }
-    
     // Placeholders until the two tests below can be uncommented.
     // See Issue CSPACE-401.
     public void createWithMalformedXml() {}
@@ -122,8 +116,9 @@ public class IntakeServiceTest extends AbstractServiceTest {
         // Submit the request to the service and store the response.
         String method = REQUEST_TYPE.httpMethodName();
         String url = getServiceRootURL();
+        String mediaType = MediaType.APPLICATION_XML;
         final String entity = MALFORMED_XML_DATA; // Constant from base class.
-        int statusCode = submitRequest(method, url, entity);
+        int statusCode = submitRequest(method, url, mediaType, entity);
         
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -143,8 +138,9 @@ public class IntakeServiceTest extends AbstractServiceTest {
         // Submit the request to the service and store the response.
         String method = REQUEST_TYPE.httpMethodName();
         String url = getServiceRootURL();
+        String mediaType = MediaType.APPLICATION_XML;
         final String entity = WRONG_XML_SCHEMA_DATA;
-        int statusCode = submitRequest(method, url, entity);
+        int statusCode = submitRequest(method, url, mediaType, entity);
         
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -314,8 +310,9 @@ public class IntakeServiceTest extends AbstractServiceTest {
         // Submit the request to the service and store the response.
         String method = REQUEST_TYPE.httpMethodName();
         String url = getResourceURL(knownResourceId);
+        String mediaType = MediaType.APPLICATION_XML;
         final String entity = MALFORMED_XML_DATA;
-        int statusCode = submitRequest(method, url, entity);
+        int statusCode = submitRequest(method, url, mediaType, entity);
         
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -335,8 +332,9 @@ public class IntakeServiceTest extends AbstractServiceTest {
         // Submit the request to the service and store the response.
         String method = REQUEST_TYPE.httpMethodName();
         String url = getResourceURL(knownResourceId);
+        String mediaType = MediaType.APPLICATION_XML;
         final String entity = WRONG_XML_SCHEMA_DATA;
-        int statusCode = submitRequest(method, url, entity);
+        int statusCode = submitRequest(method, url, mediaType, entity);
         
         // Check the status code of the response: does it match
         // the expected response(s)?

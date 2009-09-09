@@ -53,12 +53,6 @@ public interface ServiceTest {
     // Failure outcomes
 
     /**
-     * Tests creation of a null resource via the
-     * Java Client Library. 
-     */
-    public void createNull();
-
-    /**
      * Tests creation of a resource by submitting
      * a representation with malformed XML data. 
      */

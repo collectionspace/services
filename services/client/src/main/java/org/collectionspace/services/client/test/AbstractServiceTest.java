@@ -83,7 +83,6 @@ public abstract class AbstractServiceTest implements ServiceTest {
       XML_DECLARATION +
       "<wrong_schema>wrong schema contents</wrong_schema>";
 
-
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
@@ -107,12 +106,6 @@ public abstract class AbstractServiceTest implements ServiceTest {
     // No setup required for createList()
 
     // Failure outcomes
-
-    @Override
-    public void createNull() {
-    }
-    
-    // No setup required for createNull()
 
     @Override
     public abstract void createWithMalformedXml();
@@ -335,8 +328,17 @@ public abstract class AbstractServiceTest implements ServiceTest {
         return getServiceRootURL() + "/" + resourceIdentifier;
     }
 
-    // @TODO Add Javadoc comments to all methods requiring them, below.
-
+    /**
+     * Submits an HTTP request to a specified URL, and returns the
+     * status code of the response.  Currently accepts GET and DELETE
+     * requests.
+     *
+     * @param  method  An HTTP method.
+     *
+     * @param  url     A String representation of a URL.
+     *
+     * @return The status code received in the HTTP response.
+     */
     protected int submitRequest(String method, String url) {
         int statusCode = 0;
         try {
@@ -358,27 +360,46 @@ public abstract class AbstractServiceTest implements ServiceTest {
         return statusCode;
    }
 
-    protected int submitRequest(String method, String url, String entityStr) {
+    /**
+     * Submits an HTTP request to a specified URL, with the submitted
+     * entity body, and returns the status code of the response.
+     * Currently accepts POST and PUT requests.
+     *
+     * @param  method  An HTTP method.
+     *
+     * @param  url     A String representation of a URL.
+     *
+     * @param  mediaType  The media type of the entity body to be submitted.
+     *
+     * @param  entity     The contents of the entity body to be submitted.
+     *
+     * @return The status code received in the HTTP response.
+     */
+    protected int submitRequest(String method, String url,
+        String mediaType, String entityStr) {
         int statusCode = 0;
         try {
             ClientRequest request = new ClientRequest(url);
-            request.body(MediaType.APPLICATION_XML, entityStr);
+            request.body(mediaType, entityStr);
             if (method.equals(javax.ws.rs.HttpMethod.POST)) {
-                ClientResponse res = request.post();
+                ClientResponse res = request.post(java.lang.String.class);
                 statusCode = res.getStatus(); 
             } else if (method.equals(javax.ws.rs.HttpMethod.PUT)) {
-                ClientResponse res = request.put();
+                ClientResponse res = request.put(java.lang.String.class);
                 statusCode = res.getStatus(); 
             } else {
                 // Do nothing - leave status code at default value.
             }
         } catch (Exception e) {
             logger.error( 
-              "Exception during HTTP " + method + " request to " + url + " :",
+              "Exception during HTTP " + method + " request to " + url + ":",
               e);
         }
         return statusCode;
     } 
+
+    // @TODO Add Javadoc comments to all methods requiring them, below.
+
 
     protected String extractId(ClientResponse<Response> res) {
         MultivaluedMap mvm = res.getMetadata();
