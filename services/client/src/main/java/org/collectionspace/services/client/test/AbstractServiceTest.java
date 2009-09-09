@@ -108,6 +108,15 @@ public abstract class AbstractServiceTest implements ServiceTest {
     // Failure outcomes
 
     @Override
+    public abstract void createWithEmptyEntityBody();
+
+    protected void setupCreateWithEmptyEntityBody() {
+        clearSetup();
+        EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
+        REQUEST_TYPE = ServiceRequestType.CREATE;
+    }
+
+    @Override
     public abstract void createWithMalformedXml();
 
     protected void setupCreateWithMalformedXml() {
@@ -196,6 +205,15 @@ public abstract class AbstractServiceTest implements ServiceTest {
     }
 
     // Failure outcomes
+
+    @Override
+    public abstract void updateWithEmptyEntityBody();
+
+    protected void setupUpdateWithEmptyEntityBody() {
+        clearSetup();
+        EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
+        REQUEST_TYPE = ServiceRequestType.UPDATE;
+    }
 
     @Override
     public abstract void updateWithMalformedXml();

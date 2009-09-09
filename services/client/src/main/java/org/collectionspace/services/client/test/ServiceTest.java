@@ -54,6 +54,12 @@ public interface ServiceTest {
 
     /**
      * Tests creation of a resource by submitting
+     * an empty entity body (aka empty payload). 
+     */
+    public void createWithEmptyEntityBody();
+
+    /**
+     * Tests creation of a resource by submitting
      * a representation with malformed XML data. 
      */
     public void createWithMalformedXml();
@@ -125,6 +131,12 @@ public interface ServiceTest {
     public void update();
 
     // Failure outcomes
+
+    /**
+     * Tests updating the content of a resource
+     * by submitting an empty entity body (aka empty payload).
+     */
+    public void updateWithEmptyEntityBody();
 
     /**
      * Tests updating the content of a resource 

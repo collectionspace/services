@@ -100,12 +100,35 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
     // Failure outcomes
 
-    // Placeholders until the two tests below can be uncommented.
+    // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
+    public void createWithEmptyEntityBody() {}
     public void createWithMalformedXml() {}
     public void createWithWrongXmlSchema() {}
 
 /*
+    @Override
+    @Test(dependsOnMethods = {"create", "testSubmitRequest"})
+    public void createWithEmptyEntityBody() {
+    
+        // Perform setup.
+        setupCreateWithEmptyEntityBody();
+
+        // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
+        String url = getServiceRootURL();
+        String mediaType = MediaType.APPLICATION_XML;
+        final String entity = "";
+        int statusCode = submitRequest(method, url, mediaType, entity);
+        
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        verbose("createWithEmptyEntityBody url=" + url + " status=" + statusCode);
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    }
+
     @Override
     @Test(dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithMalformedXml() {
@@ -296,12 +319,35 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     
     // Failure outcomes
 
-    // Placeholders until the two tests below can be uncommented.
+    // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
+    public void updateWithEmptyEntityBody() {}
     public void updateWithMalformedXml() {}
     public void updateWithWrongXmlSchema() {}
 
 /*
+    @Override
+    @Test(dependsOnMethods = {"create", "update", "testSubmitRequest"})
+    public void updateWithEmptyEntityBody() {
+    
+        // Perform setup.
+        setupUpdateWithEmptyEntityBody();
+
+        // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
+        String url = getResourceURL(knownResourceId);
+        String mediaType = MediaType.APPLICATION_XML;
+        final String entity = "";
+        int statusCode = submitRequest(method, url, mediaType, entity);
+        
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        verbose("updateWithEmptyEntityBody url=" + url + " status=" + statusCode);
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    }
+
     @Override
     @Test(dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithMalformedXml() {
