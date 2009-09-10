@@ -39,23 +39,23 @@ import static org.junit.Assert.*;
 public class IDGeneratorSerializerTest extends TestCase {
 
   String serializedGenerator;
-  BaseIDGenerator generator;
+  SettableIDGenerator generator;
   
   final static String DEFAULT_CSID = "TEST-1";
 
   final static String DEFAULT_SERIALIZED_ID_GENERATOR =
-    "<org.collectionspace.services.id.BaseIDGenerator>\n" +
+    "<org.collectionspace.services.id.SettableIDGenerator>\n" +
     "  <csid>" + DEFAULT_CSID + "</csid>\n" +
     "  <uri></uri>\n" +
     "  <description></description>\n" +
     "  <parts/>\n" +
-    "</org.collectionspace.services.id.BaseIDGenerator>";
+    "</org.collectionspace.services.id.SettableIDGenerator>";
 
     // @TODO We may want to canonicalize (or otherwise normalize) the expected and
     // actual XML in these tests, to avoid failures resulting from differences in
     // whitespace, etc.
     public void testSerializeIDGenerator() {
-      BaseIDGenerator generator = new BaseIDGenerator(DEFAULT_CSID);
+      SettableIDGenerator generator = new SettableIDGenerator(DEFAULT_CSID);
         assertEquals(DEFAULT_SERIALIZED_ID_GENERATOR, IDGeneratorSerializer.serialize(generator));
     }
 
@@ -78,7 +78,7 @@ public class IDGeneratorSerializerTest extends TestCase {
 
     public void testDeserializeNullSerializedIDGenerator() {
       try {
-        BaseIDGenerator generator = IDGeneratorSerializer.deserialize(null);
+        SettableIDGenerator generator = IDGeneratorSerializer.deserialize(null);
             fail("Should have thrown IllegalArgumentException here");
         } catch (IllegalArgumentException expected) {
             // This Exception should be thrown, and thus the test should pass.

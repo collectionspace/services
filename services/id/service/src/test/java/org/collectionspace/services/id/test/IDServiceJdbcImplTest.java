@@ -42,7 +42,7 @@ public class IDServiceJdbcImplTest {
     String csid;
     String nextId;
     String serializedGenerator;
-    BaseIDGenerator generator;
+    SettableIDGenerator generator;
     
     IDServiceJdbcImpl jdbc = new IDServiceJdbcImpl();
     IDService service = jdbc;
@@ -81,7 +81,8 @@ public class IDServiceJdbcImplTest {
         
     }
 
-    @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "addIDGenerator", "readIDGenerator"})
+    @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "addIDGenerator",
+        "readIDGenerator"})
     public void updateIDGenerator() {
 
         final String NEW_DESCRIPTION = "new description";
@@ -108,15 +109,16 @@ public class IDServiceJdbcImplTest {
         jdbc.deleteIDGenerator(DEFAULT_CSID);
     }
 
- 
-    @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "addIDGenerator", "readIDGenerator", 
-    	"updateIDGenerator", "deleteIDGenerator"})
-        public void newIDValidPattern() {
+    @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "addIDGenerator",
+        "readIDGenerator", "updateIDGenerator", "deleteIDGenerator"})
+        public void newID() {
                 
         try {
             jdbc.deleteIDGenerator(DEFAULT_CSID);
         } catch (Exception e) {
-        	// Fail silently; this is guard code.
+        	// This deletion attempt may properly fail silently
+        	// if no ID generator with the specified CSID currently
+        	// exists in the database. 
         }
 
         jdbc.addIDGenerator(DEFAULT_CSID, getSpectrumEntryNumberGenerator());
@@ -150,9 +152,9 @@ public class IDServiceJdbcImplTest {
     // 1. The ID Service is running and accessible to this test; and
     // 2. There is no ID generator retrievable through that service
     //        with the identifier 'non-existent identifier'.
-    @Test(dependsOnMethods = {"hasRequiredDatabaseTable"}, 
+    @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "newID"}, 
         expectedExceptions = IllegalArgumentException.class)
-    public void newIDInvalidPattern() {
+    public void newIDNonExistentGenerator() {
         nextId = service.newID("non-existent identifier");                
     }
 
@@ -164,7 +166,7 @@ public class IDServiceJdbcImplTest {
     
     public String getSpectrumEntryNumberGenerator() {
         
-        generator = new BaseIDGenerator(DEFAULT_CSID);
+        generator = new SettableIDGenerator(DEFAULT_CSID);
         generator.setDescription(
             "SPECTRUM entry number generator");
         generator.setURI(
@@ -178,7 +180,7 @@ public class IDServiceJdbcImplTest {
 
     public String getChinAccessionNumberGenerator() {
 
-        generator = new BaseIDGenerator(DEFAULT_CSID);
+        generator = new SettableIDGenerator(DEFAULT_CSID);
         generator.setDescription(
             "CHIN accession number generator, for items without parts");
         generator.setURI(

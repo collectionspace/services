@@ -32,25 +32,18 @@ package org.collectionspace.services.id;
 public interface IDGenerator {
 
     /**
-     * Returns a new ID.
-     *
-     * @return  A new ID.
-     */
-	public String newID();
-
-    /**
-     * Returns a new ID, based on a supplied identifier.
-     *
-     * @return  A new ID.
-     */
-	public String newID(String id);
-	
-    /**
      * Returns the current ID.
      *
      * @return  The current ID.
      */
 	public String getCurrentID();
+
+    /**
+     * Returns a new ID.
+     *
+     * @return  A new ID.
+     */
+	public String newID();
 
     /**
      * Validates a supplied ID against the format of the IDs

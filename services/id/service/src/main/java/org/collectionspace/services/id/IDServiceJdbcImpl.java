@@ -51,7 +51,7 @@
 // @TODO Handle concurrency.
 //
 // Right now, with each new request we're simply instantiating
-// a new BaseIDGenerator and returning its next ID.  As a result,
+// a new SettableIDGenerator and returning its next ID.  As a result,
 // the generated IDs may well duplicate other, previously-generated IDs.
 //
 // When we start storing ID generators and IDs in a database,
@@ -302,7 +302,7 @@ public class IDServiceJdbcImpl implements IDService {
 				"ID generator " + "\'" + csid + "\'" + " could not be found.");
 		}
 		
-		BaseIDGenerator generator;
+		SettableIDGenerator generator;
 		try {
 			generator = IDGeneratorSerializer.deserialize(serializedGenerator);
 		} catch (IllegalArgumentException e) {
@@ -477,10 +477,10 @@ public class IDServiceJdbcImpl implements IDService {
 	*
 	* @throws  IllegalStateException if a storage-related error occurred.
 	*/
-	public void addIDGenerator(String csid, BaseIDGenerator generator)
+	public void addIDGenerator(String csid, SettableIDGenerator generator)
 	  throws IllegalArgumentException, IllegalStateException {
 	
-		logger.debug("> in addIDGenerator(String, BaseIDGenerator)");
+		logger.debug("> in addIDGenerator(String, SettableIDGenerator)");
 	
 		// @TODO: Add checks for authorization to perform this operation.
 		
@@ -617,10 +617,10 @@ public class IDServiceJdbcImpl implements IDService {
 	*
 	* @throws  IllegalStateException if a storage-related error occurred.
 	*/
-	public void updateIDGenerator(String csid, BaseIDGenerator generator)
+	public void updateIDGenerator(String csid, SettableIDGenerator generator)
 	  throws IllegalArgumentException, IllegalStateException {
 	
-		logger.debug("> in updateIDGenerator(String, BaseIDGenerator)");
+		logger.debug("> in updateIDGenerator(String, SettableIDGenerator)");
 	
 		// @TODO: Add checks for authorization to perform this operation.
 	
@@ -701,7 +701,7 @@ public class IDServiceJdbcImpl implements IDService {
 				   "last_generated_id = ? " + 
 				  "WHERE id_generator_csid = ?";
 				  
-				BaseIDGenerator generator;
+				SettableIDGenerator generator;
 				try {
 					generator = IDGeneratorSerializer.deserialize(serializedGenerator);
 				} catch (IllegalArgumentException e) {
@@ -893,7 +893,7 @@ public class IDServiceJdbcImpl implements IDService {
 			}
 		}
 		
-		logger.debug("> retrieved BaseIDGenerator: " + serializedGenerator);
+		logger.debug("> retrieved SettableIDGenerator: " + serializedGenerator);
 		
 		return serializedGenerator;
 	

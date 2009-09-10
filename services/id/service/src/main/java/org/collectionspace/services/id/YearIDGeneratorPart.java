@@ -159,8 +159,8 @@ public class YearIDGeneratorPart implements IDGeneratorPart {
 
 	public static String getCurrentYear() {
 		Calendar cal = GregorianCalendar.getInstance();
-        int y = cal.get(Calendar.YEAR);
-		return Integer.toString(y);
+        int year = cal.get(Calendar.YEAR);
+		return Integer.toString(year);
 	}	
 	
 }

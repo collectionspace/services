@@ -55,7 +55,7 @@ public class IDGeneratorSerializer {
    *
    * @throws  IllegalArgumentException if the ID generator cannot be serialized.
    */
-	public static String serialize(BaseIDGenerator generator)
+	public static String serialize(SettableIDGenerator generator)
 	    throws IllegalArgumentException {
 	
 	  if (generator == null) {
@@ -87,7 +87,7 @@ public class IDGeneratorSerializer {
    *
    * @throws  IllegalArgumentException if the ID generator cannot be deserialized.
    */
-	public static BaseIDGenerator deserialize(String serializedGenerator)
+	public static SettableIDGenerator deserialize(String serializedGenerator)
 	  throws IllegalArgumentException {
 
 	  if (serializedGenerator == null || serializedGenerator.equals("")) {
@@ -96,9 +96,9 @@ public class IDGeneratorSerializer {
 
     XStream xstream = new XStream(new DomDriver());
 
-    BaseIDGenerator generator;
+    SettableIDGenerator generator;
     try {
-      generator = (BaseIDGenerator) xstream.fromXML(serializedGenerator);
+      generator = (SettableIDGenerator) xstream.fromXML(serializedGenerator);
     } catch (XStreamException e) {
 	    throw new IllegalArgumentException(
 	      "Could not understand or parse this representation of an ID generator.");
