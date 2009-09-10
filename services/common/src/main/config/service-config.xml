@@ -44,6 +44,10 @@
             <service-name>relations</service-name>
             <workspace-name>Relations</workspace-name>
         </workspace>        
+        <workspace>
+            <service-name>acquisitions</service-name>
+            <workspace-name>Acquisitions</workspace-name>
+        </workspace>        
     </nuxeo-workspace>
 
 </ns1:service-config>

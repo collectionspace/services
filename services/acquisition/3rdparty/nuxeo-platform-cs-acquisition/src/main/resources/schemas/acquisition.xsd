@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/acquisition/"
+    xmlns="http://collectionspace.org/acquisition/"
+    targetNamespace="http://collectionspace.org/acquisition/"
+    version="0.1">
+    
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Acquisition+Schema -->
+
+<!--  Object Entry Information Group -->
+    <xs:element name="accessiondate" type="xs:string"/>
+    
+</xs:schema>

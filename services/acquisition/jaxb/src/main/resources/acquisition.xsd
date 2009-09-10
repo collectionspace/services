@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/acquisition"
+  xmlns="http://collectionspace.org/acquisition"
+  targetNamespace="http://services.collectionspace.org/acquisition"
+  version="0.1"
+>
+
+
+<!-- avoid XmlRootElement nightnmare, see http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html-->
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Acquisition+Schema -->    
+    
+    <!-- acquisition  -->
+    <xs:element name="acquisition">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="csid" type="xs:string" />
+                <!--  Object Entry Information Group -->
+                <xs:element name="accessiondate" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- acquisition records, as in nuxeo repository -->
+    <xs:element name="acquisition-list">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="acquisition-list-item" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="accessiondate" type="xs:string"
+                                minOccurs="1" />
+                            <!-- uri to retrive acquisition details -->
+                            <xs:element name="uri" type="xs:anyURI"
+                                minOccurs="1" />
+                            <xs:element name="csid" type="xs:string"
+                                minOccurs="1" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+</xs:schema>
+

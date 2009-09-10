@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>org.collectionspace.services.acquisition</artifactId>
+        <groupId>org.collectionspace.services</groupId>
+        <version>1.0</version>
+    </parent>
+    
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.collectionspace.services</groupId>
+    <artifactId>org.collectionspace.services.acquisition.service</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0</version>
+    <name>services.acquisition.service</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.common</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.acquisition.jaxb</artifactId>
+            <version>1.0</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>5.6</version>
+        </dependency>
+        
+
+      <!-- javax -->
+
+
+        <dependency>
+            <groupId>javax.security</groupId>
+            <artifactId>jaas</artifactId>
+            <version>1.0.01</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.6.1</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <!-- jboss -->
+
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxrs</artifactId>
+            <version>1.0.2.GA</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>tjws</groupId>
+                    <artifactId>webserver</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxb-provider</artifactId>
+            <version>1.0.2.GA</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-multipart-provider</artifactId>
+            <version>1.0.2.GA</version>
+        </dependency>
+        
+        <!-- nuxeo -->
+
+        <dependency>
+            <groupId>org.nuxeo.ecm.core</groupId>
+            <artifactId>nuxeo-core-api</artifactId>
+            <version>${nuxeo.version.1.5}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jboss-remoting</artifactId>
+                    <groupId>jboss</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.restlet</groupId>
+            <artifactId>org.restlet</artifactId>
+            <version>1.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>com.noelios.restlet</groupId>
+            <artifactId>com.noelios.restlet.ext.httpclient</artifactId>
+            <version>1.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>com.noelios.restlet</groupId>
+            <artifactId>com.noelios.restlet</artifactId>
+            <version>1.0.7</version>
+        </dependency>
+
+    </dependencies>
+    
+    <build>
+        <finalName>collectionspace-services-acquisition</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jboss-maven-plugin</artifactId>
+                <configuration>
+                    <jbossHome>${jboss.dir}</jbossHome>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                    <showDeprecation>true</showDeprecation>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+
