@@ -42,8 +42,64 @@ public class NumericIDGeneratorPartTest extends TestCase {
 
     SequenceIDGeneratorPart part;
 
-    public void testNewID() {
+    public void testInitialID() {
+        part = new NumericIDGeneratorPart("0");
+        assertEquals("0", part.getInitialID());
 
+        part = new NumericIDGeneratorPart("25");
+        assertEquals("25", part.getInitialID());
+    }
+
+    public void testNullInitialValue() {
+        try {
+            part = new NumericIDGeneratorPart(null);
+            fail("Should have thrown IllegalArgumentException here");
+        } catch (IllegalArgumentException expected) {
+            // This Exception should be thrown, and thus the test should pass.
+        }
+    }
+
+    public void testNonLongParseableInitialValue() {
+        try {
+            part = new NumericIDGeneratorPart("not a long parseable value");
+            fail("Should have thrown IllegalArgumentException here");
+        } catch (IllegalArgumentException expected) {
+            // This Exception should be thrown, and thus the test should pass.
+        }
+    }
+
+    public void testNonLongParseableMaxLength() {
+        try {
+            part = new NumericIDGeneratorPart("1", "not an int parseable value");
+            fail("Should have thrown IllegalArgumentException here");
+        } catch (IllegalArgumentException expected) {
+            // This Exception should be thrown, and thus the test should pass.
+        }
+    }
+
+    public void testNegativeInitialValue() {
+       try {
+            part = new NumericIDGeneratorPart("-1");
+            fail("Should have thrown IllegalArgumentException here");
+        } catch (IllegalArgumentException expected) {
+            // This Exception should be thrown, and thus the test should pass.
+        }
+    }
+
+    public void testGetCurrentID() {
+        part = new NumericIDGeneratorPart("0");
+        assertEquals("0", part.getCurrentID());
+        assertEquals("0", part.newID());
+        assertEquals("1", part.newID());
+        assertEquals("2", part.newID());
+        assertEquals("2", part.getCurrentID());
+        assertEquals("3", part.newID());
+
+        part = new NumericIDGeneratorPart("25");
+        assertEquals("25", part.getCurrentID());
+    }
+
+    public void testNewID() {
         part = new NumericIDGeneratorPart("0");        
         assertEquals("0", part.newID());
         assertEquals("1", part.newID());
@@ -60,7 +116,6 @@ public class NumericIDGeneratorPartTest extends TestCase {
         assertEquals("1", part.newID());
         assertEquals("2", part.newID());
         assertEquals("3", part.newID());
-            
     }
 
     public void testNewIDOverflow() {
@@ -90,107 +145,28 @@ public class NumericIDGeneratorPartTest extends TestCase {
             
     }
 
-    public void testInitialID() {
-
-        part = new NumericIDGeneratorPart("0");
-        assertEquals("0", part.getInitialID());
-
-        part = new NumericIDGeneratorPart("25");
-        assertEquals("25", part.getInitialID());
-        
-    }
-
-    public void testCurrentID() {
-
-        part = new NumericIDGeneratorPart("0");
-        assertEquals("0", part.getCurrentID());
-        assertEquals("0", part.newID());
-        assertEquals("1", part.newID());
-        assertEquals("2", part.newID());
-        assertEquals("2", part.getCurrentID());
-        assertEquals("3", part.newID());
-
-        part = new NumericIDGeneratorPart("25");
-        assertEquals("25", part.getCurrentID());
-        
-    }
-
-    public void testNullInitialValue() {
-    
-        try {
-            part = new NumericIDGeneratorPart(null);
-            fail("Should have thrown IllegalArgumentException here");
-        } catch (IllegalArgumentException expected) {
-            // This Exception should be thrown, and thus the test should pass.
-        }
-        
-    }
-
-    public void testNonLongParseableInitialValue() {
-    
-        try {
-            part = new NumericIDGeneratorPart("not a long parseable value");
-            fail("Should have thrown IllegalArgumentException here");
-        } catch (IllegalArgumentException expected) {
-            // This Exception should be thrown, and thus the test should pass.
-        }
-
-    }
-
-    public void testNonLongParseableMaxLength() {
-    
-        try {
-            part = new NumericIDGeneratorPart("1", "not an int parseable value");
-            fail("Should have thrown IllegalArgumentException here");
-        } catch (IllegalArgumentException expected) {
-            // This Exception should be thrown, and thus the test should pass.
-        }
-
-    }
-
-    public void testNegativeInitialValue() {
-
-        try {
-            part = new NumericIDGeneratorPart("-1");
-            fail("Should have thrown IllegalArgumentException here");
-        } catch (IllegalArgumentException expected) {
-            // This Exception should be thrown, and thus the test should pass.
-        }
-    }
-
-
     public void testIsValidID() {
-    
         part = new NumericIDGeneratorPart("1");
         assertTrue(part.isValidID("1"));
-
         part = new NumericIDGeneratorPart("1");
         assertTrue(part.isValidID("123"));
-
         part = new NumericIDGeneratorPart("1");
         assertTrue(part.isValidID("123456"));
 
         part = new NumericIDGeneratorPart("1");
         assertFalse(part.isValidID("1234567"));
-        
         part = new NumericIDGeneratorPart("1", "3");
         assertTrue(part.isValidID("123"));
-        
         part = new NumericIDGeneratorPart("1", "3");
         assertFalse(part.isValidID("1234"));
-
         part = new NumericIDGeneratorPart("1");
         assertFalse(part.isValidID("not a parseable long"));
-
         part = new NumericIDGeneratorPart("1", "3");
         assertFalse(part.isValidID("not a parseable long"));
-
         part = new NumericIDGeneratorPart("1", "3");
         assertFalse(part.isValidID(null));
-
         part = new NumericIDGeneratorPart("1", "3");
         assertFalse(part.isValidID(""));
-    
     }    
     
     // @TODO: Add more tests of boundary conditions, exceptions ...

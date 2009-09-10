@@ -84,9 +84,11 @@ public class StringIDGeneratorPart implements IDGeneratorPart,
     @Override
     public boolean isValidID(String id) {
     
-        if (id == null) return false;
+        if (id == null) {
+            return false;
+        }
  
-        // @TODO May potentially throw at least one pattern-related exception.
+        // @TODO May potentially throw java.util.regex.PatternSyntaxException.
         // We'll need to catch and handle this here, as well as in all
         // derived classes and test cases that invoke validation.
 

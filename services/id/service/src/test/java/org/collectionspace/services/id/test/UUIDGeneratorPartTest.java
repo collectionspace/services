@@ -39,7 +39,6 @@ public class UUIDGeneratorPartTest extends TestCase {
     IDGeneratorPart part;
     
     public void testnewID() {
-
         part = new UUIDGeneratorPart(); 
         
         String firstID = part.newID();
@@ -53,23 +52,30 @@ public class UUIDGeneratorPartTest extends TestCase {
         assertTrue(firstID.compareTo(secondID) != 0);
         assertTrue(firstID.compareTo(thirdID) != 0);
         assertTrue(secondID.compareTo(thirdID) != 0);
-             
+        
+        assertTrue(part.isValidID(firstID));
+        assertTrue(part.isValidID(secondID));
+        assertTrue(part.isValidID(thirdID));
     }
 
     public void testIsValidID() {
-    
         part = new UUIDGeneratorPart();
         assertTrue(part.isValidID("2d5ef3cc-bfb2-4383-a4c6-35645cd5dd81"));
 
         part = new UUIDGeneratorPart();
-        assertFalse(part.isValidID("foo"));
-
-        part = new UUIDGeneratorPart();
         assertFalse(part.isValidID(null));
-
         part = new UUIDGeneratorPart();
         assertFalse(part.isValidID(""));
-    
+        part = new UUIDGeneratorPart();
+        assertFalse(part.isValidID("not a UUID"));
+        part = new UUIDGeneratorPart();
+        assertFalse(part.isValidID("12345"));
+        // Invalid character in 15th position (should be '4').
+        part = new UUIDGeneratorPart();
+        assertFalse(part.isValidID("4c9395a8-1669-31f9-806c-920d86e40912"));
+        // Invalid character in 20th position (should be '8', '9', 'a', or 'b').
+        part = new UUIDGeneratorPart();
+        assertFalse(part.isValidID("4c9395a8-1669-41f9-106c-920d86e40912"));
     }    
     
     // @TODO: Add more tests of boundary conditions, exceptions ...

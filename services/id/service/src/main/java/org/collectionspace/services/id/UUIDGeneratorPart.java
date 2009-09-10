@@ -32,7 +32,7 @@ import java.util.regex.PatternSyntaxException;
  * UUIDGeneratorPart
  *
  * Generates universally unique identifiers (UUIDs) in the Version 4 format
- * (random or pseudorandom numbers), described at
+ * (primarily consisting of random or pseudo-random numbers), described at
  * http://en.wikipedia.org/wiki/Universally_Unique_Identifier#Version_4_.28random.29
  *
  * $LastChangedRevision: 625 $
@@ -65,17 +65,23 @@ public class UUIDGeneratorPart implements IDGeneratorPart {
     public UUIDGeneratorPart() {
     }
 
-    public void setCurrentID(String id) {
-        if (id == null || id.equals("") || (! isValidID(id) )) {
-            this.currentValue = newID();
-        } else {
-            this.currentValue = id;
-        }  
+    @Override
+    public void setCurrentID(String idValue) throws IllegalArgumentException {
+		if (idValue == null || idValue.equals("")) {
+			throw new IllegalArgumentException(
+			    "Supplied UUID must not be null or empty");
+		}
+		if (! isValidID(idValue)) {
+			throw new IllegalArgumentException(
+			    "Supplied UUID '" + idValue + "' is not valid.");
+        }
+        this.currentValue = idValue;
     }
 
+    @Override
     public String getCurrentID() {
         if (this.currentValue == null || this.currentValue.equals("")) {
-            return newID();
+            return newID(); // Will also set the current ID to the new ID.
         } else {
             return this.currentValue;
         }
@@ -83,17 +89,19 @@ public class UUIDGeneratorPart implements IDGeneratorPart {
     
     @Override
     public String newID() {
-        String id = UUID.randomUUID().toString();
-        this.currentValue = id;
-        return id;
+        String newID = UUID.randomUUID().toString();
+        setCurrentID(newID);
+        return newID;
     }
 
     @Override
     public boolean isValidID(String id) {
     
-        if (id == null) return false;
+        if (id == null) {
+            return false;
+        }
  
-        // @TODO May potentially throw at least one pattern-related exception.
+        // @TODO May potentially throw java.util.regex.PatternSyntaxException.
         // We'll need to catch and handle this here, as well as in all
         // derived classes and test cases that invoke validation.
 

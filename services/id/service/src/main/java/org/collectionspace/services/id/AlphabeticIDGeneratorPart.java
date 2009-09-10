@@ -21,8 +21,6 @@
  * limitations under the License.
  */
 
-// @TODO: Add Javadoc comments
-
 // @TODO: When auto expanding, we'll need to allow setting of a maximum length to
 // which the generated IDs can grow, likely as an additional parameter to be
 // passed to a constructor, with a default value hard-coded in the class.
@@ -81,35 +79,48 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
     private Vector<Character> initialValue = new Vector<Character>();
     private Vector<Character> currentValue = new Vector<Character>();
 
-    // Constructor using defaults for character sequence and initial value.
-    //
-    // If no start and end characters are provided for the alphabetic character
-    // sequence, default to an 'a-z' sequence, representing the lowercase alphabetic
-    // characters in the USASCII character set (within Java's internal
-    // Unicode UTF-16 representation).
-    //
-    // Additionally defaults to an initial value of "a".
+   /**
+    * Constructor using defaults for character sequence and initial value.
+    *
+    * If no start and end characters are provided for the alphabetic character
+    * sequence, default to an 'a-z' sequence, representing the lowercase alphabetic
+    * characters in the USASCII character set (within Java's internal
+    * Unicode UTF-16 representation).
+    *
+    * Additionally defaults to an initial value of "a".
+    */
     public AlphabeticIDGeneratorPart() throws IllegalArgumentException {
-      
       this(DEFAULT_START_CHAR, DEFAULT_END_CHAR, DEFAULT_INITIAL_VALUE);
-      
     }
 
-    // Constructor using defaults for character sequence.
-    //
-    // If no start and end characters are provided for the alphabetic character
-    // sequence, default to an 'a-z' sequence, representing the lowercase alphabetic
-    // characters in the USASCII character set (within Java's internal
-    // Unicode UTF-16 representation).
-    public AlphabeticIDGeneratorPart(String initial) throws IllegalArgumentException {
-      
+   /**
+    * Constructor using defaults for character sequence and initial value.
+    *
+    * If no start and end characters are provided for the alphabetic character
+    * sequence, default to an 'a-z' sequence, representing the lowercase alphabetic
+    * characters in the USASCII character set (within Java's internal
+    * Unicode UTF-16 representation).
+    *
+    * @param initial  The initial value of the alphabetic ID.  Must be a
+    *                 member of the valid aphabetic sequence.
+    */
+    public AlphabeticIDGeneratorPart(String initial)
+        throws IllegalArgumentException {
       this(DEFAULT_START_CHAR, DEFAULT_END_CHAR, initial);
-      
     }
     
-    // Constructor.
-    public AlphabeticIDGeneratorPart(String sequenceStart, String sequenceEnd, String initial)
-      throws IllegalArgumentException {
+   /**
+    * Constructor
+    *
+    * @param sequenceStart  The start character of the valid alphabetic sequence.
+    *
+    * @param sequenceEnd    The end character of the valid alphabetic sequence.
+    *
+    * @param initial  The initial value of the alphabetic ID.  Must be a
+    *                 member of the valid aphabetic sequence.
+    */
+    public AlphabeticIDGeneratorPart(String sequenceStart, String sequenceEnd,
+        String initial) throws IllegalArgumentException {
       
         // Validate and store the start character in the character sequence.
       
@@ -183,26 +194,14 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
           
         }
 
-        // Initialize the current value from the initial value.
-        // this.currentValue = new Vector<Character>(this.initialValue);
-
     }
 
-    // Returns the initial value.
+    @Override
     public String getInitialID() {
         return getIDString(this.initialValue);
     }
 
-    // Returns the current value.
-    public String getCurrentID() {
-        if (this.currentValue == null || this.currentValue.size() == 0) {
-            return getIDString(this.initialValue);
-        } else {
-            return getIDString(this.currentValue);
-        }
-    }
-
-    // Sets the current value.
+    @Override
     public void setCurrentID(String value) throws IllegalArgumentException {
     
         // @TODO Much of this code is copied from the main constructor,
@@ -243,21 +242,23 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
         
     }
 
-    // Reset the current value to the initial value.
-    public void resetID() {
-        this.currentValue = this.initialValue;
-        // Collections.copy(this.currentValue, this.initialValue);
+    @Override
+    public String getCurrentID() {
+        if (this.currentValue == null || this.currentValue.size() == 0) {
+            return getIDString(this.initialValue);
+        } else {
+            return getIDString(this.currentValue);
+        }
     }
 
-    // Returns the next alphabetic ID in the sequence.
-    //
     // Currently, the number of characters auto-expands as the
     // value of the most significant character rolls over.
-    // E.g. a call to getNextID(), where the current ID is "z",
-    // auto-expands to "aa", and "ZZ" auto-expands to "AAA".
+    // E.g. where the current ID is "z", this is auto-expanded
+    // to "aa".  Similarly, "ZZ" is auto-expanded to "AAA".
     //
     // See the TODOs at the top of this class for additional
-    // functionality that needs to be implemented.
+    // functionality that needs to be implemented regarding auto-expansion.
+    @Override
     public String nextID() throws IllegalStateException {
     
         // Get next values for each character, from right to left
@@ -303,9 +304,6 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
         
     }
     
-    /**
-     * Returns a new identifier.
-     */
     @Override
     public String newID() {
         // If there is no current value, return the initial value
@@ -324,7 +322,7 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
     
         if (id == null) return false;
  
-        // @TODO May potentially throw at least one pattern-related exception.
+        // @TODO May potentially throw java.util.regex.PatternSyntaxException.
         // We'll need to catch and handle this here, as well as in all
         // derived classes and test cases that invoke validation.
 
@@ -369,5 +367,4 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
         return sb.toString();
     }
 
-    
 }

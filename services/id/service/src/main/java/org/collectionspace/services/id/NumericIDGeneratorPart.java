@@ -20,10 +20,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-// @TODO: Add Javadoc comments
-
-// @TODO: Need to set and enforce maximum value.
+ 
+// @TODO Need to handle Exceptions as described in comments below.
  
 package org.collectionspace.services.id;
 
@@ -49,35 +47,62 @@ public class NumericIDGeneratorPart implements SequenceIDGeneratorPart {
     private long initialValue = DEFAULT_INITIAL_VALUE;
     private long currentValue = CURRENT_VALUE_NOT_SET;
 
-    // Constructor using defaults for initial value and maximum length.
+    /**
+     * Constructor using defaults for initial value and maximum length.
+     */
     public NumericIDGeneratorPart() throws IllegalArgumentException {
         this(Integer.toString(DEFAULT_INITIAL_VALUE), 
             Integer.toString(DEFAULT_MAX_LENGTH));
     }
 
-    // Constructor using default maximum length.
+    /**
+     * Constructor using defaults for initial value and maximum length.
+     *
+     * @param initialValue  The initial value of the numeric ID.
+     */
     public NumericIDGeneratorPart(String initialValue)
         throws IllegalArgumentException {
         this(initialValue, Integer.toString(DEFAULT_MAX_LENGTH));
     }
 
-    // Constructor.
+    /**
+     * Constructor.
+     *
+     * @param initialValue  The initial value of the numeric ID.
+     *
+     * @param maxLength  The maximum String length for generated IDs.
+     */
     public NumericIDGeneratorPart(String initialValue, String maxLength)
         throws IllegalArgumentException {
 
+        if (maxLength == null || maxLength.equals("")) {
+            throw new IllegalArgumentException(
+                "Initial ID value must not be null or empty");
+        }
+        try {
+            this.maxLength = Integer.parseInt(maxLength);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                "Maximum ID length must be parseable as a number");
+        }
         if (initialValue == null || initialValue.equals("")) {
             throw new IllegalArgumentException(
                 "Initial ID value must not be null or empty");
         }
         
         try {
-            long l = Long.parseLong(initialValue.trim());
-            if ( l < 0 ) {
+            long initVal = Long.parseLong(initialValue.trim());
+            if ( initVal < 0 ) {
                 throw new IllegalArgumentException(
                     "Initial ID value should be zero (0) or greater");
             }
-            // this.currentValue = l;
-            this.initialValue = l;
+            String initValStr = Long.toString(initVal);
+            if (initValStr.length() > this.maxLength) {
+                throw new IllegalStateException(
+                    "Initial ID cannot exceed maximum length of " +
+                    maxLength + ".");
+            }
+            this.initialValue = initVal;
         } catch (NullPointerException e) {
             throw new IllegalArgumentException(
                 "Initial ID value should not be null");
@@ -86,33 +111,14 @@ public class NumericIDGeneratorPart implements SequenceIDGeneratorPart {
                 "Initial ID value must be parseable as a number");
         }
 
-        if (maxLength == null || maxLength.equals("")) {
-            throw new IllegalArgumentException(
-                "Initial ID value must not be null or empty");
-        }
-
-        try {
-            this.maxLength = Integer.parseInt(maxLength);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
-                "Maximum ID length must be parseable as a number");
-        }
-        
     }
 
+    @Override
     public String getInitialID() {
         return Long.toString(this.initialValue);
     }
 
-    public String getCurrentID() {
-        if (this.currentValue == CURRENT_VALUE_NOT_SET) {
-        	return Long.toString(this.initialValue);
-        } else {
-            return Long.toString(this.currentValue);
-        }
-    }
-
-    // Sets the current value of the ID.
+    @Override
     public void setCurrentID(String value) throws IllegalArgumentException {
 
       // @TODO Much of this code is copied from the main constructor,
@@ -124,12 +130,18 @@ public class NumericIDGeneratorPart implements SequenceIDGeneratorPart {
         }
         
         try {
-            long l = Long.parseLong(value.trim());
-            if ( l < 0 ) {
+            long currVal = Long.parseLong(value.trim());
+            if ( currVal < 0 ) {
                 throw new IllegalArgumentException(
                     "ID value should be zero (0) or greater");
             }
-            this.currentValue = l;
+            String currValStr = Long.toString(currVal);
+            if (currValStr.length() > this.maxLength) {
+                throw new IllegalStateException(
+                    "Current ID cannot exceed maximum length of " +
+                    maxLength + ".");
+            }
+            this.currentValue = currVal;
         } catch (NullPointerException e) {
             throw new IllegalArgumentException(
                 "ID value should not be null");
@@ -137,16 +149,13 @@ public class NumericIDGeneratorPart implements SequenceIDGeneratorPart {
             throw new IllegalArgumentException(
                 "ID value must be parseable as a number");
         }
-        
-        // @TODO An expedient; we may need to check the String length of the
-        // provided ID and calculate a maximum length here.
-        this.maxLength = DEFAULT_MAX_LENGTH;
     }
     
-    // Returns the next ID in the sequence, and sets the current value to that ID.
+
+    @Override
     public String nextID() throws IllegalStateException {
         if (this.currentValue == CURRENT_VALUE_NOT_SET) {
-        		this.currentValue = this.initialValue;
+        	this.currentValue = this.initialValue;
         } else {
         	this.currentValue++;
         }
@@ -157,10 +166,19 @@ public class NumericIDGeneratorPart implements SequenceIDGeneratorPart {
         }
         return nextID;
     }
- 
-    /**
-    * Returns a new identifier.
-    */
+
+    @Override
+    public String getCurrentID() {
+        if (this.currentValue == CURRENT_VALUE_NOT_SET) {
+        	return Long.toString(this.initialValue);
+        } else {
+            return Long.toString(this.currentValue);
+        }
+    }
+    
+    // @TODO Need to handle exceptions thrown by nextID();
+    // currently, newID simply throws an uncaught and unreported exception.
+
     @Override
     public String newID() {
         return nextID();
@@ -169,9 +187,11 @@ public class NumericIDGeneratorPart implements SequenceIDGeneratorPart {
     @Override
     public boolean isValidID(String id) {
     
-        if (id == null) return false;
+        if (id == null) {
+            return false;
+        }
  
-        // @TODO May potentially throw at least one pattern-related exception.
+        // @TODO May potentially throw java.util.regex.PatternSyntaxException.
         // We'll need to catch and handle this here, as well as in all
         // derived classes and test cases that invoke validation.
 

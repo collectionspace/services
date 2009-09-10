@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
  *
  * This generator extends the base ID generator to handle
  * instances where a full or partial ID is supplied,
- * on which a new ID must be generated.
+ * based on which a new ID must be generated.
  *
  * $LastChangedRevision: 647 $
  * $LastChangedDate$

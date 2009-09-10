@@ -21,8 +21,6 @@
  * limitations under the License.
  */
 
-// @TODO: Add Javadoc comments
-
 // @TODO: Need to understand and reflect time zone issues;
 // what happens when a year rollover occurs:
 // - In the time zone of the end user.
@@ -38,7 +36,8 @@
 // http://joda-time.sourceforge.net/
 //
 // There may also be a need to have a structured set of date-time
-// classes related to identifier generation.
+// classes related to identifier generation, which can also be
+// facilitated through the use of Joda-Time.
 
 package org.collectionspace.services.id;
 
@@ -59,7 +58,6 @@ import java.util.regex.Pattern;
  */
 public class YearIDGeneratorPart implements IDGeneratorPart {
     
-	private String initialValue = null;
 	private String currentValue = null;
 	
     // NOTE: Currently hard-coded to accept only a range of
@@ -67,78 +65,47 @@ public class YearIDGeneratorPart implements IDGeneratorPart {
     final static String REGEX_PATTERN = "(\\d{4})";
 
 	public YearIDGeneratorPart() throws IllegalArgumentException {
-
-		String currentYear = getCurrentYear();
-		this.initialValue = currentYear;
-		this.currentValue = currentYear;
-
+		this.currentValue = getCurrentYear();
 	}
 	
-	public YearIDGeneratorPart(String initialValue)
+	public YearIDGeneratorPart(String yearValue)
 	    throws IllegalArgumentException {
+        setCurrentID(yearValue);
+	}
 
-		if (initialValue == null || initialValue.equals("")) {
+    @Override
+	public void setCurrentID(String yearValue) throws IllegalArgumentException {
+		if (yearValue == null || yearValue.equals("")) {
 			throw new IllegalArgumentException(
-			    "Initial ID value must not be null or empty");
+			    "Supplied year must not be null or empty");
 		}
-		
-		// @TODO: Add regex-based validation here, by calling isValidID().
-		// Consider implications for Internationalization when doing so.
-		
-		this.initialValue = initialValue;
-		this.currentValue = initialValue;
-
+		// NOTE: Validation currently is based on a
+		// hard coded year format and calendar system.
+		if (! isValidID(yearValue)) {
+			throw new IllegalArgumentException(
+			    "Supplied year '" + yearValue + "' is not valid.");
+		}
+		this.currentValue = yearValue;
 	}
 
-	public String getInitialID() {
-		return this.initialValue;
-	}
-
+    @Override
 	public String getCurrentID() {
 		return this.currentValue;
 	}
 
-  // Sets the current value.
-	public void setCurrentID(String value) throws IllegalArgumentException {
-
-	  // @TODO This code is copied from the main constructor,
-	  // and thus there may be an opportunity for refactoring.
-
-		if (value == null || value.equals("")) {
-			throw new IllegalArgumentException("ID value must not be null or empty");
-		}
-		
-		// @TODO: Add regex-based validation here, by calling isValidID().
-		// Consider implications for Internationalization when doing so.
-
-		this.currentValue = value;
-
-	}
-	
-	public void resetID() {
-		this.currentValue = this.initialValue;
-	}
-
-	// @TODO: We'll need to decide what a "next" ID means in the context of:
-	// - An initially supplied value.
-	// - A year value that has not changed from its previous value.
-	// - A year value that has changed, as a result of a rollover
-	//   to a new instant in time.
-	public String nextID() {
-		return this.currentValue;
-    }
-    
     @Override
     public String newID() {
-        return getCurrentYear();
+        return this.currentValue;
     }
 
     @Override
     public boolean isValidID(String id) {
     
-        if (id == null) return false;
+        if (id == null) {
+            return false;
+        }
  
-        // @TODO May potentially throw at least one pattern-related exception.
+        // @TODO May potentially throw java.util.regex.PatternSyntaxException.
         // We'll need to catch and handle this here, as well as in all
         // derived classes and test cases that invoke validation.
 
@@ -157,6 +124,7 @@ public class YearIDGeneratorPart implements IDGeneratorPart {
 		return REGEX_PATTERN;
 	}
 
+    // NOTE: Currently hard-coded to use the Gregorian Calendar system.
 	public static String getCurrentYear() {
 		Calendar cal = GregorianCalendar.getInstance();
         int year = cal.get(Calendar.YEAR);
