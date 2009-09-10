@@ -17,6 +17,12 @@
  *
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.collectionspace.services.id;
@@ -34,32 +40,37 @@ import junit.framework.TestCase;
  */
 public class NumericIDGeneratorPartTest extends TestCase {
 
-    IDGeneratorPart part;
+    SequenceIDGeneratorPart part;
 
-    public void testNextID() {
+    public void testNewID() {
 
         part = new NumericIDGeneratorPart("0");        
-        assertEquals("1", part.nextID());
-        assertEquals("2", part.nextID());
-        assertEquals("3", part.nextID());
+        assertEquals("0", part.newID());
+        assertEquals("1", part.newID());
+        assertEquals("2", part.newID());
+        assertEquals("3", part.newID());
     
         part = new NumericIDGeneratorPart("25");
-        assertEquals("26", part.nextID());
-        assertEquals("27", part.nextID());
-        assertEquals("28", part.nextID());
+        assertEquals("25", part.newID());
+        assertEquals("26", part.newID());
+        assertEquals("27", part.newID());
+        assertEquals("28", part.newID());
         
         part = new NumericIDGeneratorPart();
-        assertEquals("2", part.nextID());
+        assertEquals("1", part.newID());
+        assertEquals("2", part.newID());
+        assertEquals("3", part.newID());
             
     }
 
-    public void testNextIDOverflow() {
+    public void testNewIDOverflow() {
 
         try {
             part = new NumericIDGeneratorPart("997", "3");        
-            assertEquals("998", part.nextID());
-            assertEquals("999", part.nextID());
-            assertEquals("1000", part.nextID());
+            assertEquals("997", part.newID());
+            assertEquals("998", part.newID());
+            assertEquals("999", part.newID());
+            assertEquals("1000", part.newID());
             fail("Should have thrown IllegalStateException here");
         } catch (IllegalStateException expected) {
             // This Exception should be thrown, and thus the test should pass.
@@ -68,24 +79,14 @@ public class NumericIDGeneratorPartTest extends TestCase {
         // Tests default MAX_LENGTH value of 6 decimal places
         try {
             part = new NumericIDGeneratorPart("999997");        
-            assertEquals("999998", part.nextID());
-            assertEquals("999999", part.nextID());
-            assertEquals("1000000", part.nextID());
+            assertEquals("999997", part.newID());
+            assertEquals("999998", part.newID());
+            assertEquals("999999", part.newID());
+            assertEquals("1000000", part.newID());
             fail("Should have thrown IllegalStateException here");
         } catch (IllegalStateException expected) {
             // This Exception should be thrown, and thus the test should pass.
         }
-            
-    }
-
-    public void testResetID() {
-    
-        part = new NumericIDGeneratorPart("25");
-        assertEquals("26", part.nextID());
-        assertEquals("27", part.nextID());
-        assertEquals("28", part.nextID());
-        part.resetID();
-        assertEquals("26", part.nextID());
             
     }
 
@@ -103,16 +104,17 @@ public class NumericIDGeneratorPartTest extends TestCase {
 
         part = new NumericIDGeneratorPart("0");
         assertEquals("0", part.getCurrentID());
-        assertEquals("1", part.nextID());
-        assertEquals("2", part.nextID());
+        assertEquals("0", part.newID());
+        assertEquals("1", part.newID());
+        assertEquals("2", part.newID());
         assertEquals("2", part.getCurrentID());
-        assertEquals("3", part.nextID());
+        assertEquals("3", part.newID());
 
         part = new NumericIDGeneratorPart("25");
         assertEquals("25", part.getCurrentID());
         
     }
-    
+
     public void testNullInitialValue() {
     
         try {

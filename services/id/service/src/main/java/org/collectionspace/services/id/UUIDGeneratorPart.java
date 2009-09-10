@@ -21,64 +21,71 @@
  * limitations under the License.
  */
 
-// @TODO: Add Javadoc comments
-
-// @TODO: Need to set and enforce maximum String length.
-
 package org.collectionspace.services.id;
 
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 /**
- * StringIDGeneratorPart
+ * UUIDGeneratorPart
  *
- * Generates identifiers (IDs) that consist of a static String value.
+ * Generates universally unique identifiers (UUIDs) in the Version 4 format
+ * (random or pseudorandom numbers), described at
+ * http://en.wikipedia.org/wiki/Universally_Unique_Identifier#Version_4_.28random.29
  *
- * $LastChangedRevision$
+ * $LastChangedRevision: 625 $
  * $LastChangedDate$
  */
-public class StringIDGeneratorPart implements IDGeneratorPart, 
-    StoredValueIDGeneratorPart {
+public class UUIDGeneratorPart implements IDGeneratorPart {
     
-    private String initialValue = null;
-    private String currentValue = null;
+    String currentValue = "";
     
-    public StringIDGeneratorPart(String initialValue)
-        throws IllegalArgumentException {
-
-        if (initialValue == null || initialValue.equals("")) {
-            throw new IllegalArgumentException(
-                "Initial ID value must not be null or empty");
-        }
+    final static String REGEX_PATTERN =
+        "(" +
+        "[a-z0-9\\-]{8}" +
+        "\\-" +
+        "[a-z0-9\\-]{4}" +
+        "\\-" +
+        "4" +
+        "[a-z0-9\\-]{3}" +
+        "\\-" +
+        "[89ab]" +
+        "[a-z0-9\\-]{3}" +
+        "\\-" +
+        "[a-z0-9\\-]{12}" +
+        ")";
         
-        this.initialValue = initialValue;
-        this.currentValue = initialValue;
-
+    final static int UUID_LENGTH = 36;
+    
+    /**
+     * Constructor (no-argument).
+     */
+    public UUIDGeneratorPart() {
     }
 
-    @Override
-    public String getInitialID() {
-        return this.initialValue;
+    public void setCurrentID(String id) {
+        if (id == null || id.equals("") || (! isValidID(id) )) {
+            this.currentValue = newID();
+        } else {
+            this.currentValue = id;
+        }  
     }
 
-    @Override
     public String getCurrentID() {
-        return this.currentValue;
-    }
-
-    public void setCurrentID(String value) throws IllegalArgumentException {
-        if (value == null || value.equals("")) {
-            throw new IllegalArgumentException(
-            "ID value must not be null or empty");
+        if (this.currentValue == null || this.currentValue.equals("")) {
+            return newID();
+        } else {
+            return this.currentValue;
         }
-        this.currentValue = value;
     }
-
+    
     @Override
     public String newID() {
-        return this.currentValue;
+        String id = UUID.randomUUID().toString();
+        this.currentValue = id;
+        return id;
     }
 
     @Override
@@ -99,25 +106,10 @@ public class StringIDGeneratorPart implements IDGeneratorPart,
         }
         
     }
-
+    
     @Override
     public String getRegex() {
-
-        String initial = this.initialValue;
-        
-        // Escape or otherwise modify various characters that have
-        // significance in regular expressions.
-        //
-        // @TODO Test these thoroughly, add processing of more
-        // special characters as needed.
-        
-        // Escape un-escaped period/full stop characters.
-        Pattern pattern = Pattern.compile("([^\\\\]{0,1})\\.");
-        Matcher matcher = pattern.matcher(initial);
-        String escapedInitial = matcher.replaceAll("$1\\\\.");
-
-        String regex = "(" + escapedInitial + ")";
-        return regex;
+        return REGEX_PATTERN;
     }
     
 }

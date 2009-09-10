@@ -13,6 +13,12 @@
  *
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.collectionspace.services.id;
@@ -30,94 +36,84 @@ import junit.framework.TestCase;
  */
 public class AlphabeticIDGeneratorPartTest extends TestCase {
 
-	IDGeneratorPart part;
+	SequenceIDGeneratorPart part;
 	
 	public void testNextIDLowercase() {
 
 		part = new AlphabeticIDGeneratorPart("a");
-		assertEquals("b", part.nextID());
-		assertEquals("c", part.nextID());
+		assertEquals("a", part.newID());
+		assertEquals("b", part.newID());
+		assertEquals("c", part.newID());
 
 		part = new AlphabeticIDGeneratorPart("x");
-		assertEquals("y", part.nextID());
-		assertEquals("z", part.nextID());
+		assertEquals("x", part.newID());
+		assertEquals("y", part.newID());
+		assertEquals("z", part.newID());
 
 }
 
-	public void testnextIDLowercase2Chars() {
+	public void testnewIDLowercase2Chars() {
 
 		part = new AlphabeticIDGeneratorPart("aa");
-		assertEquals("ab", part.nextID());
-		assertEquals("ac", part.nextID());
+		assertEquals("aa", part.newID());
+		assertEquals("ab", part.newID());
+		assertEquals("ac", part.newID());
 
 		part = new AlphabeticIDGeneratorPart("zx");
-		assertEquals("zy", part.nextID());
-		assertEquals("zz", part.nextID());
+		assertEquals("zx", part.newID());
+		assertEquals("zy", part.newID());
+		assertEquals("zz", part.newID());
 
 	}
 
-	public void testnextIDLowercase2CharsRolloverFirst() {
+	public void testnewIDLowercase2CharsRolloverFirst() {
 
 		part = new AlphabeticIDGeneratorPart("ay");
-		assertEquals("az", part.nextID());
-		assertEquals("ba", part.nextID());
-		assertEquals("bb", part.nextID());
+		assertEquals("ay", part.newID());
+		assertEquals("az", part.newID());
+		assertEquals("ba", part.newID());
+		assertEquals("bb", part.newID());
 
-  }
+    }
 	
-	public void testnextIDUppercase() {
+	public void testnewIDUppercase() {
 		
 		part = new AlphabeticIDGeneratorPart("A", "Z", "A");
-		assertEquals("B", part.nextID());
-		assertEquals("C", part.nextID());
+		assertEquals("A", part.newID());
+		assertEquals("B", part.newID());
+		assertEquals("C", part.newID());
 
 		part = new AlphabeticIDGeneratorPart("A", "Z", "X");
-		assertEquals("Y", part.nextID());
-		assertEquals("Z", part.nextID());
+		assertEquals("X", part.newID());
+		assertEquals("Y", part.newID());
+		assertEquals("Z", part.newID());
 
-}
+    }
 
-	public void testnextIDUppercase2Chars() {
+	public void testnewIDUppercase2Chars() {
 
 		part = new AlphabeticIDGeneratorPart("A", "Z", "AA");
-		assertEquals("AB", part.nextID());
-		assertEquals("AC", part.nextID());
+		assertEquals("AA", part.newID());
+		assertEquals("AB", part.newID());
+		assertEquals("AC", part.newID());
 
 		part = new AlphabeticIDGeneratorPart("A", "Z", "ZX");
-		assertEquals("ZY", part.nextID());
-		assertEquals("ZZ", part.nextID());
+		assertEquals("ZX", part.newID());
+		assertEquals("ZY", part.newID());
+		assertEquals("ZZ", part.newID());
 			
 	}
 
-	public void testnextIDUppercase2CharsRolloverFirst() {
+	public void testnewIDUppercase2CharsRolloverFirst() {
 
 		part = new AlphabeticIDGeneratorPart("A", "Z", "AY");
-		assertEquals("AZ", part.nextID());
-		assertEquals("BA", part.nextID());
-		assertEquals("BB", part.nextID());
+		assertEquals("AY", part.newID());
+		assertEquals("AZ", part.newID());
+		assertEquals("BA", part.newID());
+		assertEquals("BB", part.newID());
 
   }
-  
-	public void testresetIDLowercase() {
-		
-		part = new AlphabeticIDGeneratorPart("zx");
-		assertEquals("zy", part.nextID());
-		assertEquals("zz", part.nextID());
-		part.resetID();
-		assertEquals("zx", part.getCurrentID());
-	
-	}
 
-	public void testresetIDUppercase() {
-		
-		part = new AlphabeticIDGeneratorPart("A", "Z", "RA");
-		assertEquals("RB", part.nextID());
-		assertEquals("RC", part.nextID());
-		part.resetID();
-		assertEquals("RB", part.nextID());
-	
-	}
-	
 	public void testInitialLowercase() {
 		
 		part = new AlphabeticIDGeneratorPart("aaa");
@@ -136,10 +132,11 @@ public class AlphabeticIDGeneratorPartTest extends TestCase {
 		
 		part = new AlphabeticIDGeneratorPart("aaa");
 		assertEquals("aaa", part.getCurrentID());
-		assertEquals("aab", part.nextID());
-		assertEquals("aac", part.nextID());
+		assertEquals("aaa", part.newID());
+		assertEquals("aab", part.newID());
+		assertEquals("aac", part.newID());
 		assertEquals("aac", part.getCurrentID());
-		assertEquals("aad", part.nextID());
+		assertEquals("aad", part.newID());
 		
 	}
 
@@ -147,28 +144,31 @@ public class AlphabeticIDGeneratorPartTest extends TestCase {
 		
 		part = new AlphabeticIDGeneratorPart("A", "Z", "A");
 		assertEquals("A", part.getCurrentID());
-		assertEquals("B", part.nextID());
-		assertEquals("C", part.nextID());
+		assertEquals("A", part.newID());
+		assertEquals("B", part.newID());
+		assertEquals("C", part.newID());
 		assertEquals("C", part.getCurrentID());
-		assertEquals("D", part.nextID());
+		assertEquals("D", part.newID());
 		
 	}	
-	
+
 	public void testOverflowLowercase() {
 	
-    part = new AlphabeticIDGeneratorPart("zx");
-    assertEquals("zy", part.nextID());
-    assertEquals("zz", part.nextID());
-    assertEquals("aaa", part.nextID());
+        part = new AlphabeticIDGeneratorPart("zx");
+        assertEquals("zx", part.newID());
+        assertEquals("zy", part.newID());
+        assertEquals("zz", part.newID());
+        assertEquals("aaa", part.newID());
 		
 	}
 
 	public void testOverflowUppercase() {
 	
-    part = new AlphabeticIDGeneratorPart("A", "Z", "X");
-    assertEquals("Y", part.nextID());
-    assertEquals("Z", part.nextID());
-    assertEquals("AA", part.nextID());
+        part = new AlphabeticIDGeneratorPart("A", "Z", "X");
+        assertEquals("X", part.newID());
+        assertEquals("Y", part.newID());
+        assertEquals("Z", part.newID());
+        assertEquals("AA", part.newID());
 		
 	}
 

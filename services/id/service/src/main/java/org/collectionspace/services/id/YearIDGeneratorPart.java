@@ -13,6 +13,12 @@
  *
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 // @TODO: Add Javadoc comments
@@ -56,6 +62,10 @@ public class YearIDGeneratorPart implements IDGeneratorPart {
 	private String initialValue = null;
 	private String currentValue = null;
 	
+    // NOTE: Currently hard-coded to accept only a range of
+    // four-digit Gregorian Calendar year dates.
+    final static String REGEX_PATTERN = "(\\d{4})";
+
 	public YearIDGeneratorPart() throws IllegalArgumentException {
 
 		String currentYear = getCurrentYear();
@@ -117,34 +127,40 @@ public class YearIDGeneratorPart implements IDGeneratorPart {
 	public String nextID() {
 		return this.currentValue;
     }
+    
+    @Override
+    public String newID() {
+        return getCurrentYear();
+    }
+
+    @Override
+    public boolean isValidID(String id) {
+    
+        if (id == null) return false;
+ 
+        // @TODO May potentially throw at least one pattern-related exception.
+        // We'll need to catch and handle this here, as well as in all
+        // derived classes and test cases that invoke validation.
+
+        Pattern pattern = Pattern.compile(getRegex());
+        Matcher matcher = pattern.matcher(id);
+        if (matcher.matches()) {
+            return true;
+        } else {
+            return false;
+        }
+        
+    }
+
+    @Override
+	public String getRegex() {
+		return REGEX_PATTERN;
+	}
 
 	public static String getCurrentYear() {
 		Calendar cal = GregorianCalendar.getInstance();
         int y = cal.get(Calendar.YEAR);
 		return Integer.toString(y);
 	}	
-
-	public boolean isValidID(String value) throws IllegalArgumentException {
-
-		if (value == null || value.equals("")) {
-			return false;
-		}
-
-		Pattern pattern = Pattern.compile(getRegex());
-		Matcher matcher = pattern.matcher(value);
-		if (matcher.matches()) {
-			return true;
-		} else {
-			return false;
-		}
-		
-	}
-
-	public String getRegex() {
-		// NOTE: Currently hard-coded to accept only a range of
-		// four-digit Gregorian Calendar year dates.
-		String regex = "(\\d{4})";
-		return regex;
-	}
 	
 }

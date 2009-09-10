@@ -13,6 +13,12 @@
  *
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.collectionspace.services.id.test;
@@ -43,6 +49,9 @@ public class IDServiceJdbcImplTest {
     
     final static String TABLE_NAME = "id_generators";
     final static String DEFAULT_CSID = "TEST-1";
+    
+    final static String CURRENT_YEAR = YearIDGeneratorPart.getCurrentYear();
+
 
     @Test
     public void hasRequiredDatabaseTable() {
@@ -55,19 +64,24 @@ public class IDServiceJdbcImplTest {
 
     @Test(dependsOnMethods = {"hasRequiredDatabaseTable"})
     public void addIDGenerator() {
+        try {
+            jdbc.deleteIDGenerator(DEFAULT_CSID);
+        } catch (Exception e) {
+        	// Fail silently; this is guard code.
+        }
         jdbc.addIDGenerator(DEFAULT_CSID, getSpectrumEntryNumberGenerator());
     }
 
-    @Test(dependsOnMethods = {"addIDGenerator"})
+    @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "addIDGenerator"})
     public void readIDGenerator() {
 
         serializedGenerator = jdbc.getIDGenerator(DEFAULT_CSID);
         generator = IDGeneratorSerializer.deserialize(serializedGenerator);
-        Assert.assertEquals(DEFAULT_CSID, generator.getCsid());
+        Assert.assertEquals(generator.getCsid(), DEFAULT_CSID);
         
     }
 
-    @Test(dependsOnMethods = {"addIDGenerator"})
+    @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "addIDGenerator", "readIDGenerator"})
     public void updateIDGenerator() {
 
         final String NEW_DESCRIPTION = "new description";
@@ -84,52 +98,53 @@ public class IDServiceJdbcImplTest {
         serializedGenerator = jdbc.getIDGenerator(DEFAULT_CSID);
         generator = IDGeneratorSerializer.deserialize(serializedGenerator);
         
-        Assert.assertEquals(NEW_DESCRIPTION, generator.getDescription());
+        Assert.assertEquals(generator.getDescription(), NEW_DESCRIPTION);
         
     }
 
-    @Test(dependsOnMethods = {"addIDGenerator", "readIDGenerator"})
+    @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "addIDGenerator",
+    	"readIDGenerator", "updateIDGenerator"})
     public void deleteIDGenerator() {
         jdbc.deleteIDGenerator(DEFAULT_CSID);
     }
+
  
-    @Test(dependsOnMethods = {"addIDGenerator", "deleteIDGenerator"})
+    @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "addIDGenerator", "readIDGenerator", 
+    	"updateIDGenerator", "deleteIDGenerator"})
         public void newIDValidPattern() {
-        
-        csid = DEFAULT_CSID;
+                
+        try {
+            jdbc.deleteIDGenerator(DEFAULT_CSID);
+        } catch (Exception e) {
+        	// Fail silently; this is guard code.
+        }
+
+        jdbc.addIDGenerator(DEFAULT_CSID, getSpectrumEntryNumberGenerator());
+
+        Assert.assertEquals(service.newID(DEFAULT_CSID), "E1");
+        Assert.assertEquals(service.newID(DEFAULT_CSID), "E2");
+        Assert.assertEquals(service.newID(DEFAULT_CSID), "E3");
         
         try {
-            jdbc.deleteIDGenerator(csid);
+            jdbc.deleteIDGenerator(DEFAULT_CSID);
         } catch (Exception e) {
-            // do nothing
+            Assert.fail("Could not delete ID generator '" + DEFAULT_CSID + "'.");
         }
         
-        jdbc.addIDGenerator(csid, getSpectrumEntryNumberGenerator());
+        jdbc.addIDGenerator(DEFAULT_CSID, getChinAccessionNumberGenerator());
 
-        Assert.assertEquals("E1", service.newID(csid));
-        Assert.assertEquals("E2", service.newID(csid));
-        Assert.assertEquals("E3", service.newID(csid));
-        
-        try {
-            jdbc.deleteIDGenerator(csid);
-        } catch (Exception e) {
-            // do nothing
-        }
-        
-        jdbc.addIDGenerator(csid, getChinAccessionNumberGenerator());
-
-        String currentYear = YearIDGeneratorPart.getCurrentYear();
-        Assert.assertEquals(currentYear + ".1.1", service.newID(csid));
-        Assert.assertEquals(currentYear + ".1.2", service.newID(csid));
-        Assert.assertEquals(currentYear + ".1.3", service.newID(csid));
+        Assert.assertEquals(service.newID(DEFAULT_CSID), CURRENT_YEAR + ".1.1");
+        Assert.assertEquals(service.newID(DEFAULT_CSID), CURRENT_YEAR + ".1.2");
+        Assert.assertEquals(service.newID(DEFAULT_CSID), CURRENT_YEAR + ".1.3");
 
         try {
-            jdbc.deleteIDGenerator(csid);
+            jdbc.deleteIDGenerator(DEFAULT_CSID);
         } catch (Exception e) {
-            // do nothing
+            Assert.fail("Could not delete ID generator '" + DEFAULT_CSID + "'.");
         }
 
     }
+
 
     // This test requires that:
     // 1. The ID Service is running and accessible to this test; and

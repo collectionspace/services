@@ -13,6 +13,12 @@
  *
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.collectionspace.services.id;
@@ -30,26 +36,28 @@ import junit.framework.TestCase;
  */
 public class StringIDGeneratorPartTest extends TestCase {
 
-	IDGeneratorPart part;
+	StoredValueIDGeneratorPart part;
 
-	public void testNextID() {
+	public void testnewID() {
 
 		part = new StringIDGeneratorPart("E");		
-		assertEquals("E", part.nextID());	
+		assertEquals("E", part.newID());	
 		
 		part = new StringIDGeneratorPart("XYZ");		
-		assertEquals("XYZ", part.nextID());		
+		assertEquals("XYZ", part.newID());		
 		
 	}
 
+/*
 	public void testresetID() {
 	
 		part = new StringIDGeneratorPart(".");
-		assertEquals(".", part.nextID());
+		assertEquals(".", part.newID());
 		part.resetID();
-		assertEquals(".", part.nextID());
+		assertEquals(".", part.newID());
 			
 	}
+*/
 
 	public void testInitialID() {
 		part = new StringIDGeneratorPart("-");

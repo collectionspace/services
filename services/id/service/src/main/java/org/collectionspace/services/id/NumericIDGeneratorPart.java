@@ -14,9 +14,11 @@
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
  *
- * $LastChangedBy$
- * $LastChangedRevision$
- * $LastChangedDate$
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 // @TODO: Add Javadoc comments
@@ -37,14 +39,15 @@ import java.util.regex.Pattern;
  * $LastChangedRevision$
  * $LastChangedDate$
  */
-public class NumericIDGeneratorPart implements IDGeneratorPart {
+public class NumericIDGeneratorPart implements SequenceIDGeneratorPart {
   
     final static private int DEFAULT_MAX_LENGTH = 6;
     private int maxLength = DEFAULT_MAX_LENGTH;
     
     final static private int DEFAULT_INITIAL_VALUE = 1;
+    final static private long CURRENT_VALUE_NOT_SET = -1;
     private long initialValue = DEFAULT_INITIAL_VALUE;
-    private long currentValue = DEFAULT_INITIAL_VALUE;
+    private long currentValue = CURRENT_VALUE_NOT_SET;
 
     // Constructor using defaults for initial value and maximum length.
     public NumericIDGeneratorPart() throws IllegalArgumentException {
@@ -73,7 +76,7 @@ public class NumericIDGeneratorPart implements IDGeneratorPart {
                 throw new IllegalArgumentException(
                     "Initial ID value should be zero (0) or greater");
             }
-            this.currentValue = l;
+            // this.currentValue = l;
             this.initialValue = l;
         } catch (NullPointerException e) {
             throw new IllegalArgumentException(
@@ -102,7 +105,11 @@ public class NumericIDGeneratorPart implements IDGeneratorPart {
     }
 
     public String getCurrentID() {
-        return Long.toString(this.currentValue);
+        if (this.currentValue == CURRENT_VALUE_NOT_SET) {
+        	return Long.toString(this.initialValue);
+        } else {
+            return Long.toString(this.currentValue);
+        }
     }
 
     // Sets the current value of the ID.
@@ -123,7 +130,6 @@ public class NumericIDGeneratorPart implements IDGeneratorPart {
                     "ID value should be zero (0) or greater");
             }
             this.currentValue = l;
-            this.initialValue = l;
         } catch (NullPointerException e) {
             throw new IllegalArgumentException(
                 "ID value should not be null");
@@ -137,13 +143,13 @@ public class NumericIDGeneratorPart implements IDGeneratorPart {
         this.maxLength = DEFAULT_MAX_LENGTH;
     }
     
-    public void resetID() {
-        this.currentValue = this.initialValue;
-    }
-
     // Returns the next ID in the sequence, and sets the current value to that ID.
     public String nextID() throws IllegalStateException {
-        this.currentValue++;
+        if (this.currentValue == CURRENT_VALUE_NOT_SET) {
+        		this.currentValue = this.initialValue;
+        } else {
+        	this.currentValue++;
+        }
         String nextID = Long.toString(this.currentValue);
         if (nextID.length() > this.maxLength) {
             throw new IllegalStateException(
@@ -151,15 +157,26 @@ public class NumericIDGeneratorPart implements IDGeneratorPart {
         }
         return nextID;
     }
+ 
+    /**
+    * Returns a new identifier.
+    */
+    @Override
+    public String newID() {
+        return nextID();
+    }
 
-    public boolean isValidID(String value) {
-
-        if ( value == null || value == "") {
-            return false;
-        }
+    @Override
+    public boolean isValidID(String id) {
+    
+        if (id == null) return false;
+ 
+        // @TODO May potentially throw at least one pattern-related exception.
+        // We'll need to catch and handle this here, as well as in all
+        // derived classes and test cases that invoke validation.
 
         Pattern pattern = Pattern.compile(getRegex());
-        Matcher matcher = pattern.matcher(value);
+        Matcher matcher = pattern.matcher(id);
         if (matcher.matches()) {
             return true;
         } else {
@@ -168,6 +185,7 @@ public class NumericIDGeneratorPart implements IDGeneratorPart {
         
     }
 
+    @Override
     public String getRegex() {
         String regex =
             "(" + "\\d" + "{1," + Integer.toString(this.maxLength) + "}" + ")";

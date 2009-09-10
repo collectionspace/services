@@ -13,6 +13,12 @@
  *
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.collectionspace.services.id;
@@ -41,6 +47,7 @@ public class YearIDGeneratorPartTest extends TestCase {
         return Integer.toString(y);
     }
 
+/*
     public void testCurrentID() {
 
         part = new YearIDGeneratorPart();
@@ -80,30 +87,43 @@ public class YearIDGeneratorPartTest extends TestCase {
         }
 
   }
-    
-    public void testNextID() {
+*/ 
+
+/*
+    public void testnewID() {
     
         part = new YearIDGeneratorPart("1999");        
-        assertEquals("1999", part.nextID());        
+        assertEquals("1999", part.newID());        
+        
+    }
+*/
+
+    public void testnewID() {
+    
+        part = new YearIDGeneratorPart();        
+        assertEquals(getCurrentYear(), part.newID());        
         
     }
 
+/*
     public void testresetID() {
     
         part = new YearIDGeneratorPart("1999");
-        assertEquals("1999", part.nextID());
+        assertEquals("1999", part.newID());
         part.resetID();
         assertEquals("1999", part.getCurrentID());
             
     }
+*/
 
+/*
     public void testInitialID() {
     
         part = new YearIDGeneratorPart("1999");
         assertEquals("1999", part.getInitialID());
         
     }
-
+*/
 
     public void testNullInitialValue() {
     

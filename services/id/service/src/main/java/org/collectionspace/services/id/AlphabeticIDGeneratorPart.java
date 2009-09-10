@@ -13,6 +13,12 @@
  *
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 // @TODO: Add Javadoc comments
@@ -61,7 +67,7 @@ import java.util.regex.Pattern;
  * $LastChangedRevision$
  * $LastChangedDate$
  */
-public class AlphabeticIDGeneratorPart implements IDGeneratorPart {
+public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
    
     private static final char NULL_CHAR = '\u0000';
     
@@ -178,7 +184,7 @@ public class AlphabeticIDGeneratorPart implements IDGeneratorPart {
         }
 
         // Initialize the current value from the initial value.
-        this.currentValue = new Vector<Character>(this.initialValue);
+        // this.currentValue = new Vector<Character>(this.initialValue);
 
     }
 
@@ -189,7 +195,11 @@ public class AlphabeticIDGeneratorPart implements IDGeneratorPart {
 
     // Returns the current value.
     public String getCurrentID() {
-        return getIDString(this.currentValue);
+        if (this.currentValue == null || this.currentValue.size() == 0) {
+            return getIDString(this.initialValue);
+        } else {
+            return getIDString(this.currentValue);
+        }
     }
 
     // Sets the current value.
@@ -235,10 +245,10 @@ public class AlphabeticIDGeneratorPart implements IDGeneratorPart {
 
     // Reset the current value to the initial value.
     public void resetID() {
-        Collections.copy(this.currentValue, this.initialValue);
+        this.currentValue = this.initialValue;
+        // Collections.copy(this.currentValue, this.initialValue);
     }
 
-    
     // Returns the next alphabetic ID in the sequence.
     //
     // Currently, the number of characters auto-expands as the
@@ -292,25 +302,34 @@ public class AlphabeticIDGeneratorPart implements IDGeneratorPart {
         return getIDString(this.currentValue);
         
     }
-
-    // Returns a String representation of the ID, by appending
-    // the String values of each character.
-    public String getIDString(Vector<Character> v) {
-        StringBuffer sb = new StringBuffer();
-        for ( Character ch : v ) {
-            sb.append(ch.toString());
+    
+    /**
+     * Returns a new identifier.
+     */
+    @Override
+    public String newID() {
+        // If there is no current value, return the initial value
+        // and set the current value to the initial value.
+        if (this.currentValue == null || this.currentValue.size() == 0) {
+            this.currentValue = this.initialValue;
+            return getIDString(this.currentValue);
+        // Otherwise, return a new value.
+        } else {
+            return nextID();
         }
-        return sb.toString();
     }
 
-    public boolean isValidID(String value) {
-
-        if (value == null || value.equals("")) {
-            return false;
-        }
+    @Override
+    public boolean isValidID(String id) {
+    
+        if (id == null) return false;
+ 
+        // @TODO May potentially throw at least one pattern-related exception.
+        // We'll need to catch and handle this here, as well as in all
+        // derived classes and test cases that invoke validation.
 
         Pattern pattern = Pattern.compile(getRegex());
-        Matcher matcher = pattern.matcher(value);
+        Matcher matcher = pattern.matcher(id);
         if (matcher.matches()) {
             return true;
         } else {
@@ -319,15 +338,36 @@ public class AlphabeticIDGeneratorPart implements IDGeneratorPart {
         
     }
 
+    @Override
     public String getRegex() {
-        // @TODO: May need to constrain the number of alphabetic characters based
-        // on a maximum value, TBA.  Currently, this regex simply matches sequences
-        // of one or more characters.
+        // @TODO May need to constrain the number of alphabetic 
+        // characters based on a maximum length value.
+        //
+        // Currently, this regex simply matches any sequence of one
+        // or more alphabetic characters, with no explicit constraint
+        // on length.
         String regex = 
           "(" + "[" + 
           String.valueOf(this.startChar) + "-" + String.valueOf(this.endChar) +
-          "]+" + ")";
+          "]" + "+" + ")";
         return regex;
     }
+
+    /**
+     * Returns a String representation of the ID, by concatenating
+     * the String values of each alphabetic character constituting the ID.
+     *
+     * @param   characters  The alphabetic characters constituting the ID.
+     *
+     * @return  A String representation of the ID.
+     */
+    public String getIDString(Vector<Character> characters) {
+        StringBuffer sb = new StringBuffer();
+        for ( Character ch : characters ) {
+            sb.append(ch.toString());
+        }
+        return sb.toString();
+    }
+
     
 }

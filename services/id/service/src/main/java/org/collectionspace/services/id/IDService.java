@@ -28,44 +28,44 @@ package org.collectionspace.services.id;
  */
 public interface IDService {
 
-	// ----------------------------------------
-	// IDs
-	// ----------------------------------------
+    // ----------------------------------------
+    // IDs
+    // ----------------------------------------
 
-	// Create
+    // Create
 
-	// Read single object
-	
+    // Read single object
+    
     // Generates and returns a new ID from the specified ID generator.
     public String newID(String csid)
       throws IllegalArgumentException, IllegalStateException;
     
     // Returns the last-generated ID associated with the specified ID generator.
     public String getLastID(String csid)
-      throws IllegalArgumentException, IllegalStateException;
+        throws IllegalArgumentException, IllegalStateException;
 
-	// Read a list of objects (aka read multiple)
-	
-	// ----------------------------------------
-	// ID Generators
-	// ----------------------------------------
-	
-	// Create
-	
-	  // Adds a new ID generator.
+    // Read a list of objects (aka read multiple)
+    
+    // ----------------------------------------
+    // ID Generators
+    // ----------------------------------------
+    
+    // Create
+    
+    // Adds a new ID generator.
     public void addIDGenerator(String csid, String serializedIDGenerator)
-      throws IllegalArgumentException, IllegalStateException;
-	
-	  // Read single object
+        throws IllegalArgumentException, IllegalStateException;
+    
+    // Read single object
     public String getIDGenerator(String csid)
-      throws IllegalArgumentException, IllegalStateException;
-	
-	// Read a list of objects (aka read multiple)
-	
-	  // Update (may need to check for changes in the ID generator structure)
+        throws IllegalArgumentException, IllegalStateException;
+    
+    // Read a list of objects (aka read multiple)
+    
+    // Update (may need to check for changes in the ID generator structure)
     public void updateIDGenerator(String csid, String serializedIDGenerator)
-      throws IllegalArgumentException, IllegalStateException;
-	
-	// Delete (possibly not permitted - deactivate instead?)
+        throws IllegalArgumentException, IllegalStateException;
+    
+    // Delete (possibly not permitted - deactivate instead?)
 
 }
