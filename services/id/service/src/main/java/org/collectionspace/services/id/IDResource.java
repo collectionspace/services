@@ -208,13 +208,6 @@ public class IDResource {
     
       logger.debug("> in readIDGenerator(String)");
 
-/*        
-        // @TODO Replace this placeholder code.
-        Response response = Response.status(Response.Status.NO_CONTENT)
-              .entity("").type(MediaType.TEXT_PLAIN).build();
-                
-        return response;
-*/
         Response response = null;
         response = response.ok().build();
         String resourceRepresentation = "";
