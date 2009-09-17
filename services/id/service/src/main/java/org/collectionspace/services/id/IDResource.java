@@ -23,6 +23,9 @@
   
 package org.collectionspace.services.id;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -33,6 +36,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
+
+// May at some point instead use
+// org.jboss.resteasy.spi.NotFoundException
+import org.collectionspace.services.common.repository.DocumentNotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,36 +71,13 @@ public class IDResource {
         // do nothing
     }
 
-
-    //////////////////////////////////////////////////////////////////////
-    /**
-    * Placeholder for retrieving list of available ID Generators.
-    * Currently returns an empty entity body.
-    * 
-    * Implemented to facilitate a HEAD method test in ServicesTest
-    *
-    * @return  An empty entity body (for now).
-    */
-    @GET
-    @Path("")
-    public Response getIDGenerators() {
-    
-      logger.debug("> in getIDGenerators()");
-        
-        // @TODO Replace this placeholder code.
-        Response response = Response.status(Response.Status.NO_CONTENT)
-              .entity("").type(MediaType.TEXT_PLAIN).build();
-                
-        return response;
-  }
-
     //////////////////////////////////////////////////////////////////////
     /**
     * Generates and returns a new ID, from the specified ID generator.
     *
     * @param  csid  An identifier for an ID generator.
     *
-    * @return  A new ID from the specified ID generator.
+    * @return  A new ID created ("generated") by the specified ID generator.
     */
     @POST
     @Path("/{csid}/ids")
@@ -131,7 +115,7 @@ public class IDResource {
         
             // Obtain a new ID from the specified ID generator,
             // and return it in the entity body of the response.
-            newId = service.newID(csid);
+            newId = service.createID(csid);
                 
             if (newId == null || newId.equals("")) {
                 response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -144,13 +128,17 @@ public class IDResource {
             response = Response.status(Response.Status.OK)
               .entity(newId).type(MediaType.TEXT_PLAIN).build();
                 
-            // @TODO Return an XML-based error results format with the
-            // responses below.
-            
-            // @TODO An IllegalStateException often indicates an overflow
-            // of an IDPart.  Consider whether returning a 400 Bad Request
-            // status code is still warranted, or whether returning some other
-            // status would be more appropriate.
+        // @TODO Return an XML-based error results format with the
+        // responses below.
+        
+        // @TODO An IllegalStateException often indicates an overflow
+        // of an IDPart.  Consider whether returning a 400 Bad Request
+        // status code is still warranted, or whether returning some other
+        // status would be more appropriate.
+        
+        } catch (DocumentNotFoundException dnfe) {
+            response = Response.status(Response.Status.NOT_FOUND)
+              .entity(dnfe.getMessage()).type(MediaType.TEXT_PLAIN).build();
         
         } catch (IllegalStateException ise) {
           response = Response.status(Response.Status.BAD_REQUEST)
@@ -169,5 +157,133 @@ public class IDResource {
         return response;
      
     }
+
+    //////////////////////////////////////////////////////////////////////
+    /**
+    * Creates a new ID generator.
+    *
+    * @param  generatorRepresentation  A representation of an ID generator.
+    */
+    @POST
+    @Path("")
+    @Consumes(MediaType.APPLICATION_XML)
+    public Response createIDGenerator() {
+    
+        logger.debug("> in createIDGenerator(String)");
+        
+        // @TODO Implement this stubbed method
+
+        // @TODO Replace this placeholder code.
+        Response response = Response.status(Response.Status.CREATED)
+              .entity("").type(MediaType.TEXT_PLAIN).build();
+
+/*      
+        // @TODO Replace this placeholder code.
+        // Return a URL for the newly-created resource in the
+        // Location header
+        String csid = "TEST-1";
+        String url = "/idgenerators/" + csid;
+        List locationList = Collections.singletonList(url);
+        response.getMetadata()
+            .get("Location")
+            .putSingle("Location", locationList);
+*/
+
+        return response;
+        
+    }
+
+    //////////////////////////////////////////////////////////////////////
+    /**
+    * Returns a representation of a single ID Generator resource.
+    *
+    * @param    csid  An identifier for an ID generator.
+    *
+    * @return  A representation of an ID generator resource.
+    */
+    @GET
+    @Path("/{csid}")
+    @Produces(MediaType.APPLICATION_XML)
+    public Response readIDGenerator(@PathParam("csid") String csid) {
+    
+      logger.debug("> in readIDGenerator(String)");
+
+/*        
+        // @TODO Replace this placeholder code.
+        Response response = Response.status(Response.Status.NO_CONTENT)
+              .entity("").type(MediaType.TEXT_PLAIN).build();
+                
+        return response;
+*/
+        Response response = null;
+        response = response.ok().build();
+        String resourceRepresentation = "";
+        
+        try {
+        
+            resourceRepresentation = service.readIDGenerator(csid);
+            
+            if (resourceRepresentation == null ||
+                resourceRepresentation.equals("")) {
+                response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("ID Service returned null or empty ID Generator")
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+                return response;
+            }
+                    
+            response = Response.status(Response.Status.OK)
+              .entity(resourceRepresentation)
+              .type(MediaType.APPLICATION_XML)
+              .build();
+                
+        // @TODO Return an XML-based error results format with the
+        // responses below.
+        
+        } catch (DocumentNotFoundException dnfe) {
+            response = Response.status(Response.Status.NOT_FOUND)
+              .entity(dnfe.getMessage()).type(MediaType.TEXT_PLAIN).build();
+
+        } catch (IllegalStateException ise) {
+          response = Response.status(Response.Status.BAD_REQUEST)
+              .entity(ise.getMessage()).type(MediaType.TEXT_PLAIN).build();
+        
+        } catch (IllegalArgumentException iae) {
+            response = Response.status(Response.Status.BAD_REQUEST)
+              .entity(iae.getMessage()).type(MediaType.TEXT_PLAIN).build();
+        
+        // This is guard code that should never be reached.
+        } catch (Exception e) {
+          response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+              .entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
+        }
+        
+        return response;
+
+    }
+
+    //////////////////////////////////////////////////////////////////////
+    /**
+    * Placeholder for retrieving a list of available ID Generator resources.
+    * Currently returns an empty entity body.
+    * 
+    * Implemented to facilitate a HEAD method test in ServiceLayerTest.
+    *
+    * @return  An empty entity body (for now).
+    */
+    @GET
+    @Path("")
+    @Produces(MediaType.APPLICATION_XML)
+    public Response readIDGeneratorsList() {
+    
+      logger.debug("> in readIDGeneratorsList()");
+        
+        // @TODO Replace this placeholder code.
+        Response response = Response.status(Response.Status.NO_CONTENT)
+              .entity("").type(MediaType.TEXT_PLAIN).build();
+                
+        return response;
+  }
+
 
 }

@@ -17,6 +17,11 @@
  
 package org.collectionspace.services.id;
 
+// May at some point instead use
+// org.jboss.resteasy.spi.NotFoundException
+import org.collectionspace.services.common.repository.DocumentNotFoundException;
+
+
 /**
  * IDService
  *
@@ -37,11 +42,11 @@ public interface IDService {
     // Read single object
     
     // Generates and returns a new ID from the specified ID generator.
-    public String newID(String csid)
-      throws IllegalArgumentException, IllegalStateException;
+    public String createID(String csid) throws DocumentNotFoundException,
+      IllegalArgumentException, IllegalStateException;
     
     // Returns the last-generated ID associated with the specified ID generator.
-    public String getLastID(String csid)
+    public String readLastID(String csid)
         throws IllegalArgumentException, IllegalStateException;
 
     // Read a list of objects (aka read multiple)
@@ -53,12 +58,12 @@ public interface IDService {
     // Create
     
     // Adds a new ID generator.
-    public void addIDGenerator(String csid, String serializedIDGenerator)
+    public void createIDGenerator(String csid, String serializedIDGenerator)
         throws IllegalArgumentException, IllegalStateException;
     
     // Read single object
-    public String getIDGenerator(String csid)
-        throws IllegalArgumentException, IllegalStateException;
+    public String readIDGenerator(String csid) throws DocumentNotFoundException,
+        IllegalArgumentException, IllegalStateException;
     
     // Read a list of objects (aka read multiple)
     

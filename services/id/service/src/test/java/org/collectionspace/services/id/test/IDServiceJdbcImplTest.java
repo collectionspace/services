@@ -23,6 +23,10 @@
 
 package org.collectionspace.services.id.test;
 
+// May at some point instead use
+// org.jboss.resteasy.spi.NotFoundException
+import org.collectionspace.services.common.repository.DocumentNotFoundException;
+
 import org.collectionspace.services.id.*;
 
 import org.testng.Assert;
@@ -63,55 +67,59 @@ public class IDServiceJdbcImplTest {
     }
 
     @Test(dependsOnMethods = {"hasRequiredDatabaseTable"})
-    public void addIDGenerator() {
+    public void createIDGenerator() throws DocumentNotFoundException,
+        IllegalArgumentException, IllegalStateException {
         try {
             jdbc.deleteIDGenerator(DEFAULT_CSID);
         } catch (Exception e) {
         	// Fail silently; this is guard code.
         }
-        jdbc.addIDGenerator(DEFAULT_CSID, getSpectrumEntryNumberGenerator());
+        jdbc.createIDGenerator(DEFAULT_CSID, getSpectrumEntryNumberGenerator());
     }
 
-    @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "addIDGenerator"})
-    public void readIDGenerator() {
+    @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "createIDGenerator"})
+    public void readIDGenerator() throws DocumentNotFoundException,
+        IllegalArgumentException, IllegalStateException {
 
-        serializedGenerator = jdbc.getIDGenerator(DEFAULT_CSID);
+        serializedGenerator = jdbc.readIDGenerator(DEFAULT_CSID);
         generator = IDGeneratorSerializer.deserialize(serializedGenerator);
         Assert.assertEquals(generator.getCsid(), DEFAULT_CSID);
         
     }
 
-    @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "addIDGenerator",
+    @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "createIDGenerator",
         "readIDGenerator"})
-    public void updateIDGenerator() {
+    public void updateIDGenerator() throws DocumentNotFoundException,
+        IllegalArgumentException, IllegalStateException {
 
         final String NEW_DESCRIPTION = "new description";
         
         // Retrieve an existing generator, deserialize it,
         // update its contents, serialize it, and write it back.
-        serializedGenerator = jdbc.getIDGenerator(DEFAULT_CSID);
+        serializedGenerator = jdbc.readIDGenerator(DEFAULT_CSID);
         generator = IDGeneratorSerializer.deserialize(serializedGenerator);
         generator.setDescription(NEW_DESCRIPTION);
         serializedGenerator = IDGeneratorSerializer.serialize(generator);
         
         jdbc.updateIDGenerator(DEFAULT_CSID, serializedGenerator);
         
-        serializedGenerator = jdbc.getIDGenerator(DEFAULT_CSID);
+        serializedGenerator = jdbc.readIDGenerator(DEFAULT_CSID);
         generator = IDGeneratorSerializer.deserialize(serializedGenerator);
         
         Assert.assertEquals(generator.getDescription(), NEW_DESCRIPTION);
         
     }
 
-    @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "addIDGenerator",
+    @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "createIDGenerator",
     	"readIDGenerator", "updateIDGenerator"})
     public void deleteIDGenerator() {
         jdbc.deleteIDGenerator(DEFAULT_CSID);
     }
 
-    @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "addIDGenerator",
+    @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "createIDGenerator",
         "readIDGenerator", "updateIDGenerator", "deleteIDGenerator"})
-        public void newID() {
+        public void createID() throws DocumentNotFoundException,
+            IllegalArgumentException, IllegalStateException {
                 
         try {
             jdbc.deleteIDGenerator(DEFAULT_CSID);
@@ -121,11 +129,11 @@ public class IDServiceJdbcImplTest {
         	// exists in the database. 
         }
 
-        jdbc.addIDGenerator(DEFAULT_CSID, getSpectrumEntryNumberGenerator());
+        jdbc.createIDGenerator(DEFAULT_CSID, getSpectrumEntryNumberGenerator());
 
-        Assert.assertEquals(service.newID(DEFAULT_CSID), "E1");
-        Assert.assertEquals(service.newID(DEFAULT_CSID), "E2");
-        Assert.assertEquals(service.newID(DEFAULT_CSID), "E3");
+        Assert.assertEquals(service.createID(DEFAULT_CSID), "E1");
+        Assert.assertEquals(service.createID(DEFAULT_CSID), "E2");
+        Assert.assertEquals(service.createID(DEFAULT_CSID), "E3");
         
         try {
             jdbc.deleteIDGenerator(DEFAULT_CSID);
@@ -133,11 +141,11 @@ public class IDServiceJdbcImplTest {
             Assert.fail("Could not delete ID generator '" + DEFAULT_CSID + "'.");
         }
         
-        jdbc.addIDGenerator(DEFAULT_CSID, getChinAccessionNumberGenerator());
+        jdbc.createIDGenerator(DEFAULT_CSID, getChinAccessionNumberGenerator());
 
-        Assert.assertEquals(service.newID(DEFAULT_CSID), CURRENT_YEAR + ".1.1");
-        Assert.assertEquals(service.newID(DEFAULT_CSID), CURRENT_YEAR + ".1.2");
-        Assert.assertEquals(service.newID(DEFAULT_CSID), CURRENT_YEAR + ".1.3");
+        Assert.assertEquals(service.createID(DEFAULT_CSID), CURRENT_YEAR + ".1.1");
+        Assert.assertEquals(service.createID(DEFAULT_CSID), CURRENT_YEAR + ".1.2");
+        Assert.assertEquals(service.createID(DEFAULT_CSID), CURRENT_YEAR + ".1.3");
 
         try {
             jdbc.deleteIDGenerator(DEFAULT_CSID);
@@ -152,10 +160,11 @@ public class IDServiceJdbcImplTest {
     // 1. The ID Service is running and accessible to this test; and
     // 2. There is no ID generator retrievable through that service
     //        with the identifier 'non-existent identifier'.
-    @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "newID"}, 
-        expectedExceptions = IllegalArgumentException.class)
-    public void newIDNonExistentGenerator() {
-        nextId = service.newID("non-existent identifier");                
+    @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "createID"}, 
+        expectedExceptions = DocumentNotFoundException.class)
+    public void createIDNonExistentGenerator() throws DocumentNotFoundException,
+        IllegalArgumentException, IllegalStateException {
+        nextId = service.createID("non-existent identifier");                
     }
 
     // ---------------------------------------------------------------
