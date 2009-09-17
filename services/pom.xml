@@ -27,6 +27,7 @@
         <module>intake</module>
         <module>JaxRsServiceProvider</module>
         <module>client</module>
+        <module>sdk</module>
         <module>IntegrationTests</module>
     </modules>
 
