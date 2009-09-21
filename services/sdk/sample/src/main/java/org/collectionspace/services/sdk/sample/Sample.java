@@ -1,4 +1,4 @@
-package org.collectionspace.services.deploy.pahma;
+package org.collectionspace.services.sdk.sample;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.collectionobject.CollectionObject;
 import org.collectionspace.services.collectionobject.CollectionObjectList;
 
-public class PAHMADeploy {
+public class Sample {
 
 	private static CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
 
