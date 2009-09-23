@@ -27,13 +27,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import java.util.StringTokenizer;
 import org.collectionspace.services.CollectionObjectJAXBSchema;
-import org.collectionspace.services.collectionobject.CollectionObject;
-import org.collectionspace.services.collectionobject.CollectionObjectList;
-import org.collectionspace.services.collectionobject.CollectionObjectList.CollectionObjectListItem;
+import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
+import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
+import org.collectionspace.services.collectionobject.CollectionobjectsCommonList.CollectionObjectListItem;
 import org.collectionspace.services.common.repository.DocumentWrapper;
 import org.collectionspace.services.nuxeo.client.rest.RepresentationHandler;
-import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class CollectionObjectRepresenationHandler
-        extends RepresentationHandler<CollectionObject, CollectionObjectList>
+        extends RepresentationHandler<CollectionobjectsCommon, CollectionobjectsCommonList>
 {
 
     private final Logger logger = LoggerFactory.getLogger(CollectionObjectRepresenationHandler.class);
@@ -55,12 +55,12 @@ public class CollectionObjectRepresenationHandler
      * collectionObject is used to stash JAXB object to use when handle is called
      * for Action.CREATE, Action.UPDATE or Action.GET
      */
-    private CollectionObject collectionObject;
+    private CollectionobjectsCommon collectionObject;
     /**
      * collectionObjectList is stashed when handle is called
      * for ACTION.GET_ALL
      */
-    private CollectionObjectList collectionObjectList;
+    private CollectionobjectsCommonList collectionObjectList;
 
     @Override
     public void prepare(Action action) throws Exception {
@@ -73,7 +73,7 @@ public class CollectionObjectRepresenationHandler
 
     private void prepare() {
         Map<String, String> queryParams = getQueryParams();
-        CollectionObject co = getCommonObject();
+        CollectionobjectsCommon co = getCommonPart();
         // todo: intelligent merge needed
         if(co.getObjectNumber() != null){
             queryParams.put(CollectionObjectConstants.NUXEO_SCHEMA_NAME +
@@ -117,10 +117,10 @@ public class CollectionObjectRepresenationHandler
     }
 
     @Override
-    public CollectionObject extractCommonObject(DocumentWrapper wrapDoc)
+    public CollectionobjectsCommon extractCommonPart(DocumentWrapper wrapDoc)
             throws Exception {
         Document document = (Document) wrapDoc.getWrappedObject();
-        CollectionObject co = new CollectionObject();
+        CollectionobjectsCommon co = new CollectionobjectsCommon();
 
         //FIXME property get should be dynamically set using schema inspection
         //so it does not require hard coding
@@ -177,20 +177,20 @@ public class CollectionObjectRepresenationHandler
     }
 
     @Override
-    public void fillCommonObject(CollectionObject co, DocumentWrapper wrapDoc)
+    public void fillCommonPart(CollectionobjectsCommon co, DocumentWrapper wrapDoc)
             throws Exception {
         //Nuxeo REST takes create/update through queryParams, nothing to do here
     }
 
     @Override
-    public CollectionObjectList extractCommonObjectList(DocumentWrapper wrapDoc) throws Exception {
+    public CollectionobjectsCommonList extractCommonPartList(DocumentWrapper wrapDoc) throws Exception {
         Document document = (Document) wrapDoc.getWrappedObject();
         // debug
         if(logger.isDebugEnabled()){
             logger.debug(document.asXML());
         }
-        CollectionObjectList coList = new CollectionObjectList();
-        List<CollectionObjectList.CollectionObjectListItem> list = coList.getCollectionObjectListItem();
+        CollectionobjectsCommonList coList = new CollectionobjectsCommonList();
+        List<CollectionobjectsCommonList.CollectionObjectListItem> list = coList.getCollectionObjectListItem();
         Element root = document.getRootElement();
         for(Iterator i = root.elementIterator(); i.hasNext();){
 
@@ -210,29 +210,24 @@ public class CollectionObjectRepresenationHandler
         return coList;
     }
 
-    @Override
-    public void fillCommonObjectList(CollectionObjectList obj, DocumentWrapper wrapDoc)
-            throws Exception {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
-    public CollectionObject getCommonObject() {
+    public CollectionobjectsCommon getCommonPart() {
         return collectionObject;
     }
 
     @Override
-    public void setCommonObject(CollectionObject obj) {
+    public void setCommonPart(CollectionobjectsCommon obj) {
         this.collectionObject = obj;
     }
 
     @Override
-    public CollectionObjectList getCommonObjectList() {
+    public CollectionobjectsCommonList getCommonPartList() {
         return collectionObjectList;
     }
 
     @Override
-    public void setCommonObjectList(CollectionObjectList obj) {
+    public void setCommonPartList(CollectionobjectsCommonList obj) {
         this.collectionObjectList = obj;
     }
     
@@ -240,13 +235,11 @@ public class CollectionObjectRepresenationHandler
     	return CollectionObjectConstants.NUXEO_DOCTYPE;
     }
 
-    /**
-     * getQProperty converts the given property to qualified schema property
-     * @param prop
-     * @return
-     */
-    private String getQProperty(String prop) {
+
+    @Override
+    public String getQProperty(String prop) {
         return CollectionObjectConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
+
 }
 

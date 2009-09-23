@@ -10,34 +10,36 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.acquisition.Acquisition;
-import org.collectionspace.services.acquisition.AcquisitionList;
+import org.collectionspace.services.acquisition.AcquisitionsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
  * @version $Revision:$
  */
 @Path("/acquisitions/")
-@Produces({"application/xml"})
-@Consumes({"application/xml"})
+@Produces({"multipart/mixed"})
+@Consumes({"multipart/mixed"})
 public interface AcquisitionProxy {
 
     @GET
-    ClientResponse<AcquisitionList> readList();
+    @Produces({"application/xml"})
+    ClientResponse<AcquisitionsCommonList> readList();
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(Acquisition co);
+    ClientResponse<Response> create(MultipartOutput multipart);
 
     //(R)ead
     @GET
     @Path("/{csid}")
-    ClientResponse<Acquisition> read(@PathParam("csid") String csid);
+    ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
 
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<Acquisition> update(@PathParam("csid") String csid, Acquisition co);
+    ClientResponse<MultipartInput> update(@PathParam("csid") String csid, MultipartOutput multipart);
 
     //(D)elete
     @DELETE

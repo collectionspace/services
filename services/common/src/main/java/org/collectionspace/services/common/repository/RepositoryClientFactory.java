@@ -23,33 +23,39 @@
  */
 package org.collectionspace.services.common.repository;
 
+import java.lang.ClassLoader;
 import java.util.Hashtable;
-import org.collectionspace.services.common.NuxeoClientType;
+import org.collectionspace.services.common.RepositoryClientConfigType;
+import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.config.ServicesConfigReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * RepositoryClientFactory is a singleton factory that provides required Nuxeo client
- * it does not create clients as the clients are singletons
+ * RepositoryClientFactory is a singleton factory that creates required repository
+ * clients. Repository clients are singletons.
  *
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
 public class RepositoryClientFactory {
 
-    
     private static final RepositoryClientFactory self = new RepositoryClientFactory();
+    final Logger logger = LoggerFactory.getLogger(RepositoryClientFactory.class);
+    //clients key=client name, value=repository client
     private Hashtable<String, RepositoryClient> clients = new Hashtable<String, RepositoryClient>();
 
     private RepositoryClientFactory() {
         try{
+            ServicesConfigReader scReader = ServiceMain.getInstance().getServicesConfigReader();
+            RepositoryClientConfigType repositoryClientConfig = scReader.getConfiguration().getRepositoryClient();
+            String clientClassName = repositoryClientConfig.getClientClass();
+            String clientName = repositoryClientConfig.getName();
             ClassLoader cloader = Thread.currentThread().getContextClassLoader();
 
-            Class jclazz = cloader.loadClass("org.collectionspace.services.nuxeo.client.java.RepositoryJavaClient");
+            Class jclazz = cloader.loadClass(clientClassName);
             Object jclient = jclazz.newInstance();
-            clients.put(NuxeoClientType.JAVA.toString(), (RepositoryClient) jclient);
-
-            Class rclazz = cloader.loadClass("org.collectionspace.services.nuxeo.client.rest.RepositoryRESTClient");
-            Object rclient = rclazz.newInstance();
-            clients.put(NuxeoClientType.REST.toString(), (RepositoryClient) rclient);
+            clients.put(clientName, (RepositoryClient) jclient);
 
         }catch(Exception e){
             throw new RuntimeException(e);
@@ -60,7 +66,12 @@ public class RepositoryClientFactory {
         return self;
     }
 
-    public RepositoryClient getClient(String clientType) {
-        return clients.get(clientType);
+    /**
+     * get repository client
+     * @param clientName name of the client as found in service binding
+     * @return
+     */
+    public RepositoryClient getClient(String clientName) {
+        return clients.get(clientName);
     }
 }

@@ -1,3 +1,26 @@
+/**
+ *  This document is a part of the source code and related artifacts
+ *  for CollectionSpace, an open source collections management system
+ *  for museums and related institutions:
+
+ *  http://www.collectionspace.org
+ *  http://wiki.collectionspace.org
+
+ *  Copyright 2009 University of California at Berkeley
+
+ *  Licensed under the Educational Community License (ECL), Version 2.0.
+ *  You may not use this file except in compliance with this License.
+
+ *  You may obtain a copy of the ECL 2.0 License at
+
+ *  https://source.collectionspace.org/collection-space/LICENSE.txt
+
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package org.collectionspace.services.collectionobject;
 
 import javax.ws.rs.Consumes;
@@ -13,53 +36,53 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 
-import org.collectionspace.services.collectionobject.CollectionObjectList.*;
 
-import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectHandlerFactory;
-import org.collectionspace.services.common.NuxeoClientType;
-import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.AbstractCollectionSpaceResource;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.repository.DocumentNotFoundException;
 import org.collectionspace.services.common.repository.DocumentHandler;
-import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.common.repository.RepositoryClientFactory;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Path("/collectionobjects")
-@Consumes("application/xml")
-@Produces("application/xml")
-public class CollectionObjectResource {
+@Consumes("multipart/mixed")
+@Produces("multipart/mixed")
+public class CollectionObjectResource
+        extends AbstractCollectionSpaceResource {
 
-    public final static String CO_SERVICE_NAME = "collectionobjects";
+    final private String serviceName = "collectionobjects";
     final Logger logger = LoggerFactory.getLogger(CollectionObjectResource.class);
-    //FIXME retrieve client type from configuration
-    final static NuxeoClientType CLIENT_TYPE = ServiceMain.getInstance().getNuxeoClientType();
 
-    public CollectionObjectResource() {
-        // do nothing
+    @Override
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    @Override
+    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
+        DocumentHandler docHandler = CollectionObjectHandlerFactory.getInstance().getHandler(
+                ctx.getRepositoryClientType().toString());
+        docHandler.setServiceContext(ctx);
+        if(ctx.getInput() != null){
+            Object obj = ctx.getInputPart(ctx.getCommonPartLabel(), CollectionobjectsCommon.class);
+            if(obj != null){
+                docHandler.setCommonPart((CollectionobjectsCommon) obj);
+            }
+        }
+        return docHandler;
     }
 
     @POST
-    public Response createCollectionObject(
-            CollectionObject collectionObject) {
-
-        String csid = null;
+    public Response createCollectionObject(MultipartInput input) {
         try{
-            RepositoryClientFactory clientFactory = RepositoryClientFactory.getInstance();
-            RepositoryClient client = clientFactory.getClient(CLIENT_TYPE.toString());
-            CollectionObjectHandlerFactory handlerFactory = CollectionObjectHandlerFactory.getInstance();
-            DocumentHandler handler = (DocumentHandler) handlerFactory.getHandler(CLIENT_TYPE.toString());
-            handler.setCommonObject(collectionObject);
-            csid = client.create(CO_SERVICE_NAME, handler);
-            collectionObject.setCsid(csid);
-            if(logger.isDebugEnabled()){
-                verbose("createCollectionObject: ", collectionObject);
-            }
+            ServiceContext ctx = createServiceContext(input);
+            DocumentHandler handler = createDocumentHandler(ctx);
+            String csid = getRepositoryClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(CollectionObjectResource.class);
             path.path("" + csid);
             Response response = Response.created(path.build()).build();
@@ -76,10 +99,10 @@ public class CollectionObjectResource {
 
     @GET
     @Path("{csid}")
-    public CollectionObject getCollectionObject(
+    public MultipartOutput getCollectionObject(
             @PathParam("csid") String csid) {
         if(logger.isDebugEnabled()){
-            verbose("getCollectionObject with csid=" + csid);
+            logger.debug("getCollectionObject with csid=" + csid);
         }
         if(csid == null || "".equals(csid)){
             logger.error("getCollectionObject: missing csid!");
@@ -88,14 +111,12 @@ public class CollectionObjectResource {
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        CollectionObject collectionObject = null;
+        MultipartOutput result = null;
         try{
-            RepositoryClientFactory clientFactory = RepositoryClientFactory.getInstance();
-            RepositoryClient client = clientFactory.getClient(CLIENT_TYPE.toString());
-            CollectionObjectHandlerFactory handlerFactory = CollectionObjectHandlerFactory.getInstance();
-            DocumentHandler handler = (DocumentHandler) handlerFactory.getHandler(CLIENT_TYPE.toString());
-            client.get(csid, handler);
-            collectionObject = (CollectionObject) handler.getCommonObject();
+            ServiceContext ctx = createServiceContext(null);
+            DocumentHandler handler = createDocumentHandler(ctx);
+            getRepositoryClient(ctx).get(ctx, csid, handler);
+            result = ctx.getOutput();
         }catch(DocumentNotFoundException dnfe){
             if(logger.isDebugEnabled()){
                 logger.debug("getCollectionObject", dnfe);
@@ -113,28 +134,24 @@ public class CollectionObjectResource {
             throw new WebApplicationException(response);
         }
 
-        if(collectionObject == null){
+        if(result == null){
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Get failed, the requested CollectionObject CSID:" + csid + ": was not found.").type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        if(logger.isDebugEnabled()){
-            verbose("getCollectionObject: ", collectionObject);
-        }
-        return collectionObject;
+        return result;
     }
 
     @GET
-    public CollectionObjectList getCollectionObjectList(@Context UriInfo ui) {
-        CollectionObjectList collectionObjectList = new CollectionObjectList();
+    @Produces("application/xml")
+    public CollectionobjectsCommonList getCollectionObjectList(@Context UriInfo ui) {
+        CollectionobjectsCommonList collectionObjectList = new CollectionobjectsCommonList();
         try{
-            RepositoryClientFactory clientFactory = RepositoryClientFactory.getInstance();
-            RepositoryClient client = clientFactory.getClient(CLIENT_TYPE.toString());
-            CollectionObjectHandlerFactory handlerFactory = CollectionObjectHandlerFactory.getInstance();
-            DocumentHandler handler = (DocumentHandler) handlerFactory.getHandler(CLIENT_TYPE.toString());
-            client.getAll(CO_SERVICE_NAME, handler);
-            collectionObjectList = (CollectionObjectList) handler.getCommonObjectList();
+            ServiceContext ctx = createServiceContext(null);
+            DocumentHandler handler = createDocumentHandler(ctx);
+            getRepositoryClient(ctx).getAll(ctx, handler);
+            collectionObjectList = (CollectionobjectsCommonList) handler.getCommonPartList();
         }catch(Exception e){
             if(logger.isDebugEnabled()){
                 logger.debug("Caught exception in getCollectionObjectList", e);
@@ -148,11 +165,11 @@ public class CollectionObjectResource {
 
     @PUT
     @Path("{csid}")
-    public CollectionObject updateCollectionObject(
+    public MultipartOutput updateCollectionObject(
             @PathParam("csid") String csid,
-            CollectionObject theUpdate) {
+            MultipartInput theUpdate) {
         if(logger.isDebugEnabled()){
-            verbose("updateCollectionObject with csid=" + csid);
+            logger.debug("updateCollectionObject with csid=" + csid);
         }
         if(csid == null || "".equals(csid)){
             logger.error("updateCollectionObject: missing csid!");
@@ -161,16 +178,12 @@ public class CollectionObjectResource {
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        if(logger.isDebugEnabled()){
-            verbose("updateCollectionObject with input: ", theUpdate);
-        }
+        MultipartOutput result = null;
         try{
-            RepositoryClientFactory clientFactory = RepositoryClientFactory.getInstance();
-            RepositoryClient client = clientFactory.getClient(CLIENT_TYPE.toString());
-            CollectionObjectHandlerFactory handlerFactory = CollectionObjectHandlerFactory.getInstance();
-            DocumentHandler handler = (DocumentHandler) handlerFactory.getHandler(CLIENT_TYPE.toString());
-            handler.setCommonObject(theUpdate);
-            client.update(csid, handler);
+            ServiceContext ctx = createServiceContext(theUpdate);
+            DocumentHandler handler = createDocumentHandler(ctx);
+            getRepositoryClient(ctx).update(ctx, csid, handler);
+            result = ctx.getOutput();
         }catch(DocumentNotFoundException dnfe){
             if(logger.isDebugEnabled()){
                 logger.debug("caugth exception in updateCollectionObject", dnfe);
@@ -184,7 +197,7 @@ public class CollectionObjectResource {
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return theUpdate;
+        return result;
     }
 
     @DELETE
@@ -192,7 +205,7 @@ public class CollectionObjectResource {
     public Response deleteCollectionObject(@PathParam("csid") String csid) {
 
         if(logger.isDebugEnabled()){
-            verbose("deleteCollectionObject with csid=" + csid);
+            logger.debug("deleteCollectionObject with csid=" + csid);
         }
         if(csid == null || "".equals(csid)){
             logger.error("deleteCollectionObject: missing csid!");
@@ -202,9 +215,8 @@ public class CollectionObjectResource {
             throw new WebApplicationException(response);
         }
         try{
-            RepositoryClientFactory clientFactory = RepositoryClientFactory.getInstance();
-            RepositoryClient client = clientFactory.getClient(CLIENT_TYPE.toString());
-            client.delete(csid);
+            ServiceContext ctx = createServiceContext(null);
+            getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         }catch(DocumentNotFoundException dnfe){
             if(logger.isDebugEnabled()){
@@ -220,24 +232,5 @@ public class CollectionObjectResource {
             throw new WebApplicationException(response);
         }
 
-    }
-
-    private void verbose(String msg, CollectionObject collectionObject) {
-        try{
-            verbose(msg);
-            JAXBContext jc = JAXBContext.newInstance(
-                    CollectionObject.class);
-
-            Marshaller m = jc.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            m.marshal(collectionObject, System.out);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-
-    }
-
-    private void verbose(String msg) {
-        System.out.println("CollectionObjectResource. " + msg);
     }
 }

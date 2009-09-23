@@ -10,34 +10,37 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.collectionobject.CollectionObject;
-import org.collectionspace.services.collectionobject.CollectionObjectList;
+import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
+
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
  * @version $Revision:$
  */
 @Path("/collectionobjects/")
-@Produces({"application/xml"})
-@Consumes({"application/xml"})
+@Produces({"multipart/mixed"})
+@Consumes({"multipart/mixed"})
 public interface CollectionObjectProxy {
 
     @GET
-    ClientResponse<CollectionObjectList> readList();
+    @Produces({"application/xml"})
+    ClientResponse<CollectionobjectsCommonList> readList();
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(CollectionObject co);
+    ClientResponse<Response> create(MultipartOutput multipart);
 
     //(R)ead
     @GET
     @Path("/{csid}")
-    ClientResponse<CollectionObject> read(@PathParam("csid") String csid);
+    ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
 
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<CollectionObject> update(@PathParam("csid") String csid, CollectionObject co);
+    ClientResponse<MultipartInput> update(@PathParam("csid") String csid, MultipartOutput multipart);
 
     //(D)elete
     @DELETE

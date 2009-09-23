@@ -18,8 +18,8 @@
         <!-- add modules below in the order based on dependencies -->
         <module>common</module>
         <module>authentication</module>
-        <module>relation</module>
-        <module>query</module>
+        <!--module>relation</module-->
+        <!--module>query</module-->
         <module>acquisition</module>
         <module>vocabulary</module>
         <module>id</module>
@@ -27,8 +27,8 @@
         <module>intake</module>
         <module>JaxRsServiceProvider</module>
         <module>client</module>
-        <module>sdk</module>
-        <module>IntegrationTests</module>
+        <!--module>sdk</module-->
+        <!--module>IntegrationTests</module-->
     </modules>
 
     <repositories> </repositories>
@@ -148,7 +148,7 @@
             <dependency>
                 <groupId>org.jboss.resteasy</groupId>
                 <artifactId>jaxrs-api</artifactId>
-                <version>1.0.2.GA</version>
+                <version>1.1.GA</version>
             </dependency>
             <dependency>
                 <groupId>net.java.dev.jaxb2-commons</groupId>
@@ -168,7 +168,7 @@
             <dependency>
                 <groupId>org.jboss.resteasy</groupId>
                 <artifactId>resteasy-jaxrs</artifactId>
-                <version>1.0.2.GA</version>
+                <version>1.1.GA</version>
             </dependency>
             <dependency>
                 <groupId>commons-httpclient</groupId>
@@ -178,7 +178,7 @@
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-impl</artifactId>
-                <version>2.1.7</version>
+                <version>2.1.9</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>

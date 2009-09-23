@@ -11,8 +11,8 @@ import org.testng.Assert;
 import org.jboss.resteasy.client.ClientResponse;
 
 import org.collectionspace.services.client.CollectionObjectClient;
-import org.collectionspace.services.collectionobject.CollectionObject;
-import org.collectionspace.services.collectionobject.CollectionObjectList;
+import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
+import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 
 public class Sample {
 
@@ -25,15 +25,15 @@ public class Sample {
 		String csid = createCollectionObject();
 		System.out.println("Created a new collection object with CSID=" + csid);
 		
-		CollectionObject co = readCollectionObject(csid);
+		CollectionobjectsCommon co = readCollectionObject(csid);
 		System.out.println("Got a collection object with CSID=" + csid);
 	}
 	
 	static String createCollectionObject() {
 		String result = null;
 
-		CollectionObject co = new CollectionObject();
-		co.setObjectName("Keiko CollectionObject");
+		CollectionobjectsCommon co = new CollectionobjectsCommon();
+		co.setObjectName("Keiko CollectionobjectsCommon");
 		
 	    ClientResponse<Response> response = collectionObjectClient.create(co);
 	    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
@@ -42,10 +42,10 @@ public class Sample {
 	    return result;
 	}
 	
-	static CollectionObject readCollectionObject(String csid) {
-		CollectionObject result = null;
+	static CollectionobjectsCommon readCollectionObject(String csid) {
+		CollectionobjectsCommon result = null;
 		
-		ClientResponse<CollectionObject> response = collectionObjectClient.read(csid);
+		ClientResponse<CollectionobjectsCommon> response = collectionObjectClient.read(csid);
 		Assert.assertEquals(response.getStatus(), Response.Status.OK.getStatusCode());
 		result = response.getEntity();
 		

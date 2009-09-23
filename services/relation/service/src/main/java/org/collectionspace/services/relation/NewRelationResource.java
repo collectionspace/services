@@ -16,7 +16,7 @@
  * http://www.collectionspace.org
  * http://wiki.collectionspace.org
  *
- * Copyright © 2009 {Contributing Institution}
+ * Copyright ï¿½ 2009 {Contributing Institution}
  *
  * Licensed under the Educational Community License (ECL), Version 2.0.
  * You may not use this file except in compliance with this License.
@@ -44,45 +44,45 @@ import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
-import org.collectionspace.services.relation.RelationList.RelationListItem;
 
-import org.collectionspace.services.common.CollectionSpaceResource;
-import org.collectionspace.services.relation.nuxeo.RelationNuxeoConstants;
-import org.collectionspace.services.relation.nuxeo.RelationHandlerFactory;
-import org.collectionspace.services.common.CollectionSpaceHandlerFactory;
+import org.collectionspace.services.common.AbstractCollectionSpaceResource;
 import org.collectionspace.services.common.NuxeoClientType;
-import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.relation.RelationsManager;
 import org.collectionspace.services.common.repository.DocumentNotFoundException;
 import org.collectionspace.services.common.repository.DocumentHandler;
-import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Path("/relations")
-@Consumes("application/xml")
-@Produces("application/xml")
-public class NewRelationResource extends CollectionSpaceResource {
+@Consumes("multipart/mixed")
+@Produces("multipart/mixed")
+public class NewRelationResource extends AbstractCollectionSpaceResource {
 
-	public final static String SERVICE_NAME = "relations";
+	public final static String serviceName = "relations";
 	final Logger logger = LoggerFactory.getLogger(NewRelationResource.class);
-	// FIXME retrieve client type from configuration
-//	final static NuxeoClientType CLIENT_TYPE = ServiceMain.getInstance()
-//			.getNuxeoClientType();
 	
-	protected String getClientType() {
-		return ServiceMain.getInstance().getNuxeoClientType().toString();
-	}
-	
-	protected RepositoryClientFactory getDefaultClientFactory() {
-		return RepositoryClientFactory.getInstance();
-	}
-	
-	protected CollectionSpaceHandlerFactory getDefaultHandlerFactory() {
-		return RelationHandlerFactory.getInstance();
-	}
+
+    @Override
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    @Override
+    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
+        DocumentHandler docHandler = RelationHandlerFactory.getInstance().getHandler(
+                ctx.getRepositoryClientType().toString());
+        docHandler.setServiceContext(ctx);
+        if(ctx.getInput() != null){
+            Object obj = ctx.getInputPart(ctx.getCommonPartLabel(), CollectionobjectsCommon.class);
+            if(obj != null){
+                docHandler.setCommonPart((CollectionobjectsCommon) obj);
+            }
+        }
+        return docHandler;
+    }
+
 	
 //	public NewRelationResource() {
 //	}

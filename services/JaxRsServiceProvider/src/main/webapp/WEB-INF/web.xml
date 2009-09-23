@@ -30,7 +30,7 @@
 
     <listener>
         <listener-class>
-            org.collectionspace.services.common.ServiceContextListener
+            org.collectionspace.services.common.CollectionSpaceServiceContextListener
         </listener-class>
     </listener>
 

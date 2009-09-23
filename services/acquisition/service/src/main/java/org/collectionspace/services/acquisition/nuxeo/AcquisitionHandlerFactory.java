@@ -23,7 +23,7 @@
  */
 package org.collectionspace.services.acquisition.nuxeo;
 
-import org.collectionspace.services.common.NuxeoClientType;
+import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.repository.DocumentHandler;
 
 /**
@@ -45,7 +45,7 @@ public class AcquisitionHandlerFactory {
     }
 
     public DocumentHandler getHandler(String clientType) {
-        if(NuxeoClientType.JAVA.toString().equals(clientType)){
+        if(ClientType.JAVA.toString().equals(clientType)){
             return new AcquisitionDocumentModelHandler();
         }
         

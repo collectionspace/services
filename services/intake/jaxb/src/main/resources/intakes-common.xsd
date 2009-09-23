@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema 
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:ns="http://collectionspace.org/intake"
-  xmlns="http://collectionspace.org/intake"
-  targetNamespace="http://services.collectionspace.org/intake"
+  xmlns:ns="http://collectionspace.org/services/intake"
+  xmlns="http://collectionspace.org/services/intake"
+  targetNamespace="http://collectionspace.org/services/intake"
   version="0.1"
 >
 
@@ -12,7 +12,7 @@
 <!-- See http://wiki.collectionspace.org/display/collectionspace/Intake+Schema -->    
     
     <!-- intake  -->
-    <xs:element name="intake">
+    <xs:element name="intakes-common">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="csid" type="xs:string" />
@@ -87,7 +87,7 @@
     </xs:element>
     
     <!-- intake records, as in nuxeo repository -->
-    <xs:element name="intake-list">
+    <xs:element name="intakes-common-list">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="intake-list-item" maxOccurs="unbounded">

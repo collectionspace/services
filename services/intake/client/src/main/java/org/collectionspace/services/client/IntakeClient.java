@@ -2,12 +2,13 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.intake.Intake;
-import org.collectionspace.services.intake.IntakeList;
+import org.collectionspace.services.intake.IntakesCommonList;
 
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
@@ -51,7 +52,7 @@ public class IntakeClient extends BaseServiceClient {
      * @return
      * @see org.collectionspace.hello.client.IntakeProxy#getIntake()
      */
-    public ClientResponse<IntakeList> readList() {
+    public ClientResponse<IntakesCommonList> readList() {
         return intakeProxy.readList();
     }
 
@@ -60,7 +61,8 @@ public class IntakeClient extends BaseServiceClient {
      * @return
      * @see org.collectionspace.hello.client.IntakeProxy#getIntake(java.lang.String)
      */
-    public ClientResponse<Intake> read(String csid) {
+
+    public ClientResponse<MultipartInput> read(String csid) {
         return intakeProxy.read(csid);
     }
 
@@ -69,8 +71,8 @@ public class IntakeClient extends BaseServiceClient {
      * @return
      * @see org.collectionspace.hello.client.IntakeProxy#createIntake(org.collectionspace.hello.Intake)
      */
-    public ClientResponse<Response> create(Intake intake) {
-        return intakeProxy.create(intake);
+    public ClientResponse<Response> create(MultipartOutput multipart) {
+        return intakeProxy.create(multipart);
     }
 
     /**
@@ -79,8 +81,9 @@ public class IntakeClient extends BaseServiceClient {
      * @return
      * @see org.collectionspace.hello.client.IntakeProxy#updateIntake(java.lang.Long, org.collectionspace.hello.Intake)
      */
-    public ClientResponse<Intake> update(String csid, Intake intake) {
-        return intakeProxy.update(csid, intake);
+    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
+        return intakeProxy.update(csid, multipart);
+
     }
 
     /**

@@ -1,33 +1,34 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema 
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:ns="http://collectionspace.org/collectionobject"
-  xmlns="http://collectionspace.org/collectionobject"
-  targetNamespace="http://services.collectionspace.org/collectionobject"
+  xmlns:ns="http://collectionspace.org/servics/collectionobject"
+  xmlns="http://collectionspace.org/services/collectionobject"
+  targetNamespace="http://collectionspace.org/services/collectionobject"
   version="0.1"
 >
 
 <!-- avoid XmlRootElement nightnmare, see http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html-->
-        
-    <!-- collection-object  -->
-    <xs:element name="collection-object">
+
+    <!-- collectionobjects-common -->
+    <!-- convention: <servicename>-common  -->
+    <xs:element name="collectionobjects-common">
         <xs:complexType>
             <xs:sequence>
-			    <xs:element name="csid" type="xs:string" />
-			    <xs:element name="objectNumber" type="xs:string"/>
-			    <xs:element name="otherNumber" type="xs:string"/>
-			    <xs:element name="briefDescription" type="xs:string"/>
-			    <xs:element name="comments" type="xs:string"/>
-			    <xs:element name="distFeatures" type="xs:string"/>
-			    <xs:element name="objectName" type="xs:string"/>
-			    <xs:element name="responsibleDept" type="xs:string"/>
-			    <xs:element name="title" type="xs:string"/>
+                <xs:element name="csid" type="xs:string" />
+                <xs:element name="objectNumber" type="xs:string"/>
+                <xs:element name="otherNumber" type="xs:string"/>
+                <xs:element name="briefDescription" type="xs:string"/>
+                <xs:element name="comments" type="xs:string"/>
+                <xs:element name="distFeatures" type="xs:string"/>
+                <xs:element name="objectName" type="xs:string"/>
+                <xs:element name="responsibleDept" type="xs:string"/>
+                <xs:element name="title" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
     
     <!-- collection objects as in nuxeo repository -->
-    <xs:element name="collection-object-list">
+    <xs:element name="collectionobjects-common-list">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="collection-object-list-item" maxOccurs="unbounded">

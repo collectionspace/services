@@ -43,8 +43,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.collectionspace.services.common.ServiceConfig;
-import org.collectionspace.services.common.ServiceConfig.NuxeoClientConfig;
+import org.collectionspace.services.common.RepositoryClientConfigType;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.config.TenantBindingConfigReader;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.repository.BadRequestException;
 import org.collectionspace.services.common.repository.DocumentNotFoundException;
 import org.collectionspace.services.common.repository.DocumentHandler.Action;
@@ -78,20 +80,17 @@ public class RepositoryRESTClient implements RepositoryClient {
     }
 
     @Override
-    public String create(String serviceName, DocumentHandler handler) throws BadRequestException, DocumentException {
-        if(serviceName == null){
-            throw new IllegalArgumentException("RepositoryRESTClient.create: serviceName is missing");
-        }
+    public String create(ServiceContext ctx, DocumentHandler handler) throws BadRequestException, DocumentException {
+
         if(handler.getDocumentType() == null){
             throw new IllegalArgumentException("RepositoryRESTClient.create: docType is missing");
         }
         if(handler == null){
             throw new IllegalArgumentException("RepositoryRESTClient.create: handler is missing");
         }
-        ServiceMain smain = ServiceMain.getInstance();
-        String nuxeoWspaceId = smain.getWorkspaceId(serviceName);
+        String nuxeoWspaceId = ctx.getRepositoryWorkspaceId();
         if(nuxeoWspaceId == null){
-            throw new DocumentNotFoundException("Unable to find workspace for service " + serviceName +
+            throw new DocumentNotFoundException("Unable to find workspace for service " + ctx.getServiceName() +
                     " check if the mapping exists in service-config.xml or " +
                     " the the mapped workspace exists in the Nuxeo repository");
         }
@@ -142,6 +141,7 @@ public class RepositoryRESTClient implements RepositoryClient {
             //Nuxeo does not set 201 SUCCESS_CREATED on successful creation
             Document document = executeRequest(request, completeURL, Status.SUCCESS_OK);
             //handle is not needed on create as queryparams have all data
+            repHandler.complete(Action.CREATE, wrapDoc);
             return extractId(document);
 
         }catch(Exception e){
@@ -154,7 +154,7 @@ public class RepositoryRESTClient implements RepositoryClient {
     }
 
     @Override
-    public void get(String id, DocumentHandler handler) throws DocumentNotFoundException, DocumentException {
+    public void get(ServiceContext ctx, String id, DocumentHandler handler) throws DocumentNotFoundException, DocumentException {
 
         if(handler == null){
             throw new IllegalArgumentException("RepositoryRESTClient.get: handler is missing");
@@ -183,6 +183,7 @@ public class RepositoryRESTClient implements RepositoryClient {
             Document document = executeRequest(request, completeURL, Status.SUCCESS_OK);
             RepresentationWrapper wrapDoc = new RepresentationWrapper(document);
             repHandler.handle(Action.GET, wrapDoc);
+            repHandler.complete(Action.GET, wrapDoc);
         }catch(Exception e){
             if(logger.isDebugEnabled()){
                 logger.debug("Caught exception ", e);
@@ -193,17 +194,13 @@ public class RepositoryRESTClient implements RepositoryClient {
     }
 
     @Override
-    public void getAll(String serviceName, DocumentHandler handler) throws DocumentNotFoundException, DocumentException {
-        if(serviceName == null){
-            throw new IllegalArgumentException("RepositoryRESTClient.getAll: serviceName is missing");
-        }
+    public void getAll(ServiceContext ctx, DocumentHandler handler) throws DocumentNotFoundException, DocumentException {
         if(handler == null){
             throw new IllegalArgumentException("RepositoryRESTClient.getAll: handler is missing");
         }
-        ServiceMain smain = ServiceMain.getInstance();
-        String nuxeoWspaceId = smain.getWorkspaceId(serviceName);
+        String nuxeoWspaceId = ctx.getRepositoryWorkspaceId();
         if(nuxeoWspaceId == null){
-            throw new DocumentNotFoundException("Unable to find workspace for service " + serviceName +
+            throw new DocumentNotFoundException("Unable to find workspace for service " + ctx.getServiceName() +
                     " check if the mapping exists in service-config.xml or " +
                     " the the mapped workspace exists in the Nuxeo repository");
         }
@@ -225,6 +222,7 @@ public class RepositoryRESTClient implements RepositoryClient {
             Document document = executeRequest(request, completeURL, Status.SUCCESS_OK);
             RepresentationWrapper wrapDoc = new RepresentationWrapper(document);
             repHandler.handle(Action.GET_ALL, wrapDoc);
+            repHandler.complete(Action.GET_ALL, wrapDoc);
         }catch(Exception e){
             if(logger.isDebugEnabled()){
                 logger.debug("Caught exception ", e);
@@ -235,7 +233,7 @@ public class RepositoryRESTClient implements RepositoryClient {
     }
 
     @Override
-    public void update(String id, DocumentHandler handler) throws BadRequestException, DocumentNotFoundException, DocumentException {
+    public void update(ServiceContext ctx, String id, DocumentHandler handler) throws BadRequestException, DocumentNotFoundException, DocumentException {
         if(handler == null){
             throw new IllegalArgumentException("RepositoryRESTClient.update: handler is missing");
         }
@@ -259,7 +257,7 @@ public class RepositoryRESTClient implements RepositoryClient {
             repHandler.handle(Action.UPDATE, wrapDoc);
             Request request = buildRequest(Method.PUT, completeURL);
             Document document = executeRequest(request, completeURL, Status.SUCCESS_OK);
-
+            repHandler.complete(Action.UPDATE, wrapDoc);
         }catch(Exception e){
             if(logger.isDebugEnabled()){
                 logger.debug("Caught exception ", e);
@@ -270,7 +268,7 @@ public class RepositoryRESTClient implements RepositoryClient {
     }
 
     @Override
-    public void delete(String id) throws DocumentNotFoundException, DocumentException {
+    public void delete(ServiceContext ctx, String id) throws DocumentNotFoundException, DocumentException {
 
         if(logger.isDebugEnabled()){
             logger.debug("deleting document with id=" + id);
@@ -379,15 +377,16 @@ public class RepositoryRESTClient implements RepositoryClient {
     private NuxeoRESTClient getNuxeoRestClient() {
         if(nuxeoRestClient == null){
             ServiceConfig sconfig = ServiceMain.getInstance().getServiceConfig();
-            NuxeoClientConfig nxConfig = sconfig.getNuxeoClientConfig();
+            //assumption: there is only one client and that also is rest
+            RepositoryClientConfigType repConfig = sconfig.getRepositoryClient();
             String protocol = "http";
-            if(nxConfig.getProtocol() != null && !"".equals(nxConfig.getProtocol())){
-                protocol = nxConfig.getProtocol();
+            if(repConfig.getProtocol() != null && !"".equals(repConfig.getProtocol())){
+                protocol = repConfig.getProtocol();
             }
             NuxeoRESTClient tempClient = new NuxeoRESTClient(protocol,
-                    nxConfig.getHost(), "" + nxConfig.getPort());
+                    repConfig.getHost(), "" + repConfig.getPort());
 
-            tempClient.setBasicAuthentication(nxConfig.getUser(), nxConfig.getPassword());
+            tempClient.setBasicAuthentication(repConfig.getUser(), repConfig.getPassword());
 
             nuxeoRestClient = tempClient;
 

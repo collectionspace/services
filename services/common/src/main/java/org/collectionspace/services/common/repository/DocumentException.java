@@ -20,7 +20,7 @@ package org.collectionspace.services.common.repository;
 
 /**
  * DocumentException
- * Nuxeo document handling exception
+ * document handling exception
  */
 public class DocumentException extends Exception {
 

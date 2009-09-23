@@ -2,12 +2,12 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.acquisition.Acquisition;
-import org.collectionspace.services.acquisition.AcquisitionList;
-
+import org.collectionspace.services.acquisition.AcquisitionsCommonList;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
@@ -51,7 +51,7 @@ public class AcquisitionClient extends BaseServiceClient {
      * @return
      * @see org.collectionspace.hello.client.IntakeProxy#getIntake()
      */
-    public ClientResponse<AcquisitionList> readList() {
+    public ClientResponse<AcquisitionsCommonList> readList() {
         return acquisitionProxy.readList();
     }
 
@@ -60,7 +60,7 @@ public class AcquisitionClient extends BaseServiceClient {
      * @return
      * @see org.collectionspace.hello.client.IntakeProxy#getIntake(java.lang.String)
      */
-    public ClientResponse<Acquisition> read(String csid) {
+    public ClientResponse<MultipartInput> read(String csid) {
         return acquisitionProxy.read(csid);
     }
 
@@ -69,8 +69,8 @@ public class AcquisitionClient extends BaseServiceClient {
      * @return
      * @see org.collectionspace.hello.client.IntakeProxy#createIntake(org.collectionspace.hello.Intake)
      */
-    public ClientResponse<Response> create(Acquisition intake) {
-        return acquisitionProxy.create(intake);
+    public ClientResponse<Response> create(MultipartOutput multipart) {
+        return acquisitionProxy.create(multipart);
     }
 
     /**
@@ -79,8 +79,8 @@ public class AcquisitionClient extends BaseServiceClient {
      * @return
      * @see org.collectionspace.hello.client.IntakeProxy#updateIntake(java.lang.Long, org.collectionspace.hello.Intake)
      */
-    public ClientResponse<Acquisition> update(String csid, Acquisition intake) {
-        return acquisitionProxy.update(csid, intake);
+    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
+        return acquisitionProxy.update(csid, multipart);
     }
 
     /**

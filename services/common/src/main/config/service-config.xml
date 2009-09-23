@@ -12,22 +12,25 @@
 <ns1:service-config  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
    xmlns:ns1='http://collectionspace.org/services/common'
    xsi:schemaLocation='http://collectionspace.org/services/common ../resources/common.xsd'>
-    <nuxeo-client-config>
+
+    <!-- name of the repository client is referred in each service binding -->
+    <repository-client name="nuxeo-java" default="true">
         <!-- ip of network interface to which Nuxeo server is listening on -->
         <host>127.0.0.1</host>
         <port>62474</port> <!-- java -->
         <!--port>8080</port--> <!-- rest -->
-        <client-type>java</client-type>
         <user>Administrator</user>
         <password>Administrator</password>
-    </nuxeo-client-config>
-    <nuxeo-workspace>
-        <workspace>
+        <client-type>java</client-type>
+        <client-class>org.collectionspace.services.nuxeo.client.java.RepositoryJavaClient</client-class>
+    </repository-client>
+
+    <!-- TODO: remove once all the services start using service bindings -->
+    <repository-workspace>
+        <!--workspace>
             <service-name>persons</service-name>
             <workspace-name>People</workspace-name>
-            <!-- use hard-coded workspace id for REST client -->
-            <!--workspace-id></workspace-id-->
-        </workspace>
+        </workspace-->
         <workspace>
             <service-name>collectionobjects</service-name>
             <workspace-name>CollectionObjects</workspace-name>
@@ -37,17 +40,15 @@
         <workspace>
             <service-name>intakes</service-name>
             <workspace-name>Intakes</workspace-name>
-            <!-- use hard-coded workspace id for REST client -->
-            <!--workspace-id></workspace-id-->
         </workspace>
         <workspace>
             <service-name>relations</service-name>
             <workspace-name>Relations</workspace-name>
-        </workspace>        
+        </workspace>
         <workspace>
             <service-name>acquisitions</service-name>
             <workspace-name>Acquisitions</workspace-name>
-        </workspace>        
-    </nuxeo-workspace>
+        </workspace>
+    </repository-workspace>
 
 </ns1:service-config>

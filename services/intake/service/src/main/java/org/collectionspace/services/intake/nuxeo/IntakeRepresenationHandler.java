@@ -29,9 +29,9 @@ import java.util.Map;
 
 import org.collectionspace.services.IntakeJAXBSchema;
 import org.collectionspace.services.common.repository.DocumentWrapper;
-import org.collectionspace.services.intake.Intake;
-import org.collectionspace.services.intake.IntakeList;
-import org.collectionspace.services.intake.IntakeList.IntakeListItem;
+import org.collectionspace.services.intake.IntakesCommon;
+import org.collectionspace.services.intake.IntakesCommonList;
+import org.collectionspace.services.intake.IntakesCommonList.IntakeListItem;
 import org.collectionspace.services.nuxeo.client.rest.RepresentationHandler;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -45,19 +45,19 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class IntakeRepresenationHandler
-        extends RepresentationHandler<Intake, IntakeList> {
+        extends RepresentationHandler<IntakesCommon, IntakesCommonList> {
 
     private final Logger logger = LoggerFactory.getLogger(IntakeRepresenationHandler.class);
     /**
      * intakeObj is used to stash JAXB object to use when handle is called
      * for Action.CREATE, Action.UPDATE or Action.GET
      */
-    private Intake intake;
+    private IntakesCommon intake;
     /**
      * intakeListObject is stashed when handle is called
      * for ACTION.GET_ALL
      */
-    private IntakeList intakeList;
+    private IntakesCommonList intakeList;
 
     @Override
     public void prepare(Action action) throws Exception {
@@ -70,7 +70,7 @@ public class IntakeRepresenationHandler
 
     private void prepare() {
         Map<String, String> queryParams = getQueryParams();
-        Intake intakeObject = getCommonObject();
+        IntakesCommon intakeObject = getCommonPart();
         if(intakeObject.getCurrentOwner() != null){
             queryParams.put(IntakeConstants.NUXEO_SCHEMA_NAME + ":" +
                     IntakeJAXBSchema.CURRENT_OWNER, intakeObject.getCurrentOwner());
@@ -123,10 +123,10 @@ public class IntakeRepresenationHandler
     }
 
     @Override
-    public Intake extractCommonObject(DocumentWrapper wrapDoc)
+    public IntakesCommon extractCommonPart(DocumentWrapper wrapDoc)
             throws Exception {
         Document document = (Document) wrapDoc.getWrappedObject();
-        Intake intakeObj = new Intake();
+        IntakesCommon intakeObj = new IntakesCommon();
 
         //FIXME property get should be dynamically set using schema inspection
         //so it does not require hard coding
@@ -191,19 +191,19 @@ public class IntakeRepresenationHandler
     }
 
     @Override
-    public void fillCommonObject(Intake co, DocumentWrapper wrapDoc)
+    public void fillCommonPart(IntakesCommon co, DocumentWrapper wrapDoc)
             throws Exception {
         //Nuxeo REST takes create/update through queryParams, nothing to do here
     }
 
     @Override
-    public IntakeList extractCommonObjectList(DocumentWrapper wrapDoc) throws Exception {
+    public IntakesCommonList extractCommonPartList(DocumentWrapper wrapDoc) throws Exception {
         Document document = (Document) wrapDoc.getWrappedObject();
         if(logger.isDebugEnabled()){
             logger.debug(document.asXML());
         }
-        IntakeList intakeListObject = new IntakeList();
-        List<IntakeList.IntakeListItem> list = intakeListObject.getIntakeListItem();
+        IntakesCommonList intakeListObject = new IntakesCommonList();
+        List<IntakesCommonList.IntakeListItem> list = intakeListObject.getIntakeListItem();
         Element root = document.getRootElement();
         for(Iterator i = root.elementIterator(); i.hasNext();){
 
@@ -222,45 +222,42 @@ public class IntakeRepresenationHandler
         return intakeListObject;
     }
 
-    @Override
-    public void fillCommonObjectList(IntakeList obj, DocumentWrapper wrapDoc)
-            throws Exception {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
-    public Intake getCommonObject() {
+    public IntakesCommon getCommonPart() {
         return intake;
     }
 
     @Override
-    public void setCommonObject(Intake obj) {
+    public void setCommonPart(IntakesCommon obj) {
         this.intake = obj;
     }
 
     @Override
-    public IntakeList getCommonObjectList() {
+    public IntakesCommonList getCommonPartList() {
         return intakeList;
     }
 
     @Override
-    public void setCommonObjectList(IntakeList obj) {
+    public void setCommonPartList(IntakesCommonList obj) {
         this.intakeList = obj;
     }
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#getDocumentType()
      */
+    @Override
     public String getDocumentType() {
-    	return IntakeConstants.NUXEO_DOCTYPE;
+        return IntakeConstants.NUXEO_DOCTYPE;
     }
-    
+
     /**
      * getQProperty converts the given property to qualified schema property
      * @param prop
      * @return
      */
-    private String getQProperty(String prop) {
+    @Override
+    public String getQProperty(String prop) {
         return IntakeConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
 }

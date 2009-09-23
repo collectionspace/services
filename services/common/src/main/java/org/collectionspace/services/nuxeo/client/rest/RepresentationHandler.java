@@ -23,16 +23,15 @@
  */
 package org.collectionspace.services.nuxeo.client.rest;
 
-import org.collectionspace.services.common.repository.DocumentHandler;
 import org.collectionspace.services.common.repository.DocumentWrapper;
-import org.collectionspace.services.common.repository.DocumentException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.collectionspace.services.common.repository.AbstractDocumentHandler;
 import org.collectionspace.services.nuxeo.client.*;
-import org.dom4j.Document;
+import org.w3c.dom.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,98 +43,72 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public abstract class RepresentationHandler<T, TL>
-        implements DocumentHandler<T, TL> {
+        extends AbstractDocumentHandler<T, TL> {
 
     private final Logger logger = LoggerFactory.getLogger(RepresentationHandler.class);
-    private Map<String, Object> properties = new HashMap<String, Object>();
     private List<String> pathParams = new ArrayList<String>();
     private Map<String, String> queryParams = new HashMap<String, String>();
     private Document document;
     private InputStream inputStream = null;
 
     @Override
-    public abstract void prepare(Action action) throws Exception;
-
-    @Override
-    public void handle(Action action, DocumentWrapper wrapDoc) throws Exception {
-        switch(action){
-            case CREATE:
-                handleCreate(wrapDoc);
-                break;
-            case UPDATE:
-                handleUpdate(wrapDoc);
-                break;
-            case GET:
-                handleGet(wrapDoc);
-                break;
-            case GET_ALL:
-                handleGetAll(wrapDoc);
-                break;
-        }
-    }
-
-    @Override
     public void handleCreate(DocumentWrapper wrapDoc) throws Exception {
-        if(getCommonObject() == null){
-            String msg = "Error creating document: Missing input data";
-            logger.error(msg);
-            throw new IllegalStateException(msg);
-        }
-        //FIXME set other parts as well
-        fillCommonObject(getCommonObject(), wrapDoc);
+        fillAllParts(wrapDoc);
     }
 
     @Override
     public void handleUpdate(DocumentWrapper wrapDoc) throws Exception {
-        if(getCommonObject() == null){
-            String msg = "Error updating document: Missing input data";
-            logger.error(msg);
-            throw new IllegalStateException(msg);
-        }
-        //FIXME set other parts as well
-        fillCommonObject(getCommonObject(), wrapDoc);
+        fillAllParts(wrapDoc);
     }
 
     @Override
     public void handleGet(DocumentWrapper wrapDoc) throws Exception {
-        setCommonObject(extractCommonObject(wrapDoc));
+        extractAllParts(wrapDoc);
+    }
+
+    @Override
+    public void handleGetAll(DocumentWrapper wrapDoc) throws Exception {
+        setCommonPartList(extractCommonPartList(wrapDoc));
+    }
+
+    @Override
+    public void extractAllParts(DocumentWrapper wrapDoc) throws Exception {
+        setCommonPart(extractCommonPart(wrapDoc));
 
         //FIXME retrive other parts as well
     }
 
     @Override
-    public void handleGetAll(DocumentWrapper wrapDoc) throws Exception {
-        setCommonObjectList(extractCommonObjectList(wrapDoc));
+    public abstract T extractCommonPart(DocumentWrapper wrapDoc) throws Exception;
+
+    @Override
+    public void fillAllParts(DocumentWrapper wrapDoc) throws Exception {
+        if(getCommonPart() == null){
+            String msg = "Error creating document: Missing input data";
+            logger.error(msg);
+            throw new IllegalStateException(msg);
+        }
+        //FIXME set other parts as well
+        fillCommonPart(getCommonPart(), wrapDoc);
     }
 
     @Override
-    public abstract T extractCommonObject(DocumentWrapper wrapDoc) throws Exception;
+    public abstract void fillCommonPart(T obj, DocumentWrapper wrapDoc) throws Exception;
 
     @Override
-    public abstract void fillCommonObject(T obj, DocumentWrapper wrapDoc) throws Exception;
+    public abstract TL extractCommonPartList(DocumentWrapper wrapDoc) throws Exception;
 
     @Override
-    public abstract TL extractCommonObjectList(DocumentWrapper wrapDoc) throws Exception;
+    public abstract T getCommonPart();
 
     @Override
-    public abstract void fillCommonObjectList(TL obj, DocumentWrapper wrapDoc) throws Exception;
+    public abstract void setCommonPart(T obj);
 
     @Override
-    public abstract T getCommonObject();
+    public abstract TL getCommonPartList();
 
     @Override
-    public abstract void setCommonObject(T obj);
-
-    @Override
-    public abstract TL getCommonObjectList();
-
-    @Override
-    public abstract void setCommonObjectList(TL obj);
-
-    @Override
-    public Document getDocument(DocumentWrapper wrapDoc) throws DocumentException {
-        throw new UnsupportedOperationException("DocumentHandler.getDocument(wrapDoc)");
-    }
+    public abstract void setCommonPartList(TL obj);
 
     /**
      * @return the pathParams
@@ -193,21 +166,5 @@ public abstract class RepresentationHandler<T, TL>
      */
     public void setDocument(Document document) {
         this.document = document;
-    }
-
-    /**
-     * @return the properties
-     */
-    @Override
-    public Map<String, Object> getProperties() {
-        return properties;
-    }
-
-    /**
-     * @param properties the properties to set
-     */
-    @Override
-    public void setProperties(Map<String, Object> properties) {
-        this.properties = properties;
     }
 }

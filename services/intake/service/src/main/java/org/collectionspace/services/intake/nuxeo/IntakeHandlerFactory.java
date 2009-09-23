@@ -23,7 +23,7 @@
  */
 package org.collectionspace.services.intake.nuxeo;
 
-import org.collectionspace.services.common.NuxeoClientType;
+import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.repository.DocumentHandler;
 
 /**
@@ -45,9 +45,9 @@ public class IntakeHandlerFactory {
     }
 
     public DocumentHandler getHandler(String clientType) {
-        if(NuxeoClientType.JAVA.toString().equals(clientType)){
+        if(ClientType.JAVA.toString().equals(clientType)){
             return new IntakeDocumentModelHandler();
-        } else if(NuxeoClientType.REST.toString().equals(clientType)) {
+        } else if(ClientType.REST.toString().equals(clientType)) {
             return new IntakeRepresenationHandler();
         }
         throw new IllegalArgumentException("Not supported client=" + clientType);

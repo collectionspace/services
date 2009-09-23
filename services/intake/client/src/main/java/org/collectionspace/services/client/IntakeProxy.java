@@ -10,34 +10,36 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.intake.Intake;
-import org.collectionspace.services.intake.IntakeList;
+import org.collectionspace.services.intake.IntakesCommonList;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
  * @version $Revision:$
  */
 @Path("/intakes/")
-@Produces({"application/xml"})
-@Consumes({"application/xml"})
+@Produces({"multipart/mixed"})
+@Consumes({"multipart/mixed"})
 public interface IntakeProxy {
 
     @GET
-    ClientResponse<IntakeList> readList();
+    @Produces({"application/xml"})
+    ClientResponse<IntakesCommonList> readList();
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(Intake co);
+    ClientResponse<Response> create(MultipartOutput multipart);
 
     //(R)ead
     @GET
     @Path("/{csid}")
-    ClientResponse<Intake> read(@PathParam("csid") String csid);
+    ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
 
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<Intake> update(@PathParam("csid") String csid, Intake co);
+    ClientResponse<MultipartInput> update(@PathParam("csid") String csid, MultipartOutput multipart);
 
     //(D)elete
     @DELETE

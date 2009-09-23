@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema 
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:ns="http://collectionspace.org/acquisition"
-  xmlns="http://collectionspace.org/acquisition"
-  targetNamespace="http://services.collectionspace.org/acquisition"
+  xmlns:ns="http://collectionspace.org/services/acquisition"
+  xmlns="http://collectionspace.org/services/acquisition"
+  targetNamespace="http://collectionspace.org/services/acquisition"
   version="0.1"
 >
 
@@ -12,7 +12,7 @@
     <!-- See http://wiki.collectionspace.org/display/collectionspace/Acquisition+Schema -->    
     
     <!-- acquisition  -->
-    <xs:element name="acquisition">
+    <xs:element name="acquisitions-common">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="csid" type="xs:string" />
@@ -23,7 +23,7 @@
     </xs:element>
     
     <!-- acquisition records, as in nuxeo repository -->
-    <xs:element name="acquisition-list">
+    <xs:element name="acquisitions-common-list">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="acquisition-list-item" maxOccurs="unbounded">

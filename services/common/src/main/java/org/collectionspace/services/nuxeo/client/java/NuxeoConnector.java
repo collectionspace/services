@@ -27,7 +27,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
-import org.collectionspace.services.common.ServiceConfig.NuxeoClientConfig;
+import org.collectionspace.services.common.RepositoryClientConfigType;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
@@ -48,7 +48,7 @@ public class NuxeoConnector {
     private NuxeoApp app;
     private NuxeoClient client;
     private volatile boolean initialized = false; //use volatile for lazy initialization in singleton
-    private NuxeoClientConfig nuxeoClientConfig;
+    private RepositoryClientConfigType repositoryClientConfig;
 
     private NuxeoConnector() {
     }
@@ -62,17 +62,17 @@ public class NuxeoConnector {
      * is initialized in a thread-safe manner and not initialized more than once.
      * Initialization involves starting Nuxeo runtime, loading Nuxeo APIs jars
      * in OSGI container as well as establishing initial connection.
-     * @param nuxeoClientConfig
+     * @param repositoryClientConfig
      * @throws java.lang.Exception
      */
-    public void initialize(NuxeoClientConfig nuxeoClientConfig) throws Exception {
+    public void initialize(RepositoryClientConfigType repositoryClientConfig) throws Exception {
 
         if(initialized == false){
             synchronized(this){
                 if(initialized == false){
                     try{
-                        this.nuxeoClientConfig = nuxeoClientConfig;
-                        setProperties(nuxeoClientConfig);
+                        this.repositoryClientConfig = repositoryClientConfig;
+                        setProperties(repositoryClientConfig);
                         app = new NuxeoApp();
                         app.start();
                         if(logger.isDebugEnabled()){
@@ -130,13 +130,13 @@ public class NuxeoConnector {
         }
     }
 
-    private void setProperties(NuxeoClientConfig nuxeoClientConfig) {
+    private void setProperties(RepositoryClientConfigType repositoryClientConfig) {
         System.setProperty("nuxeo.client.on.jboss", Boolean.TRUE.toString());
         System.setProperty("org.nuxeo.runtime.server.enabled", Boolean.FALSE.toString());
-        System.setProperty("org.nuxeo.runtime.server.port", "" + nuxeoClientConfig.getPort());
-        System.setProperty("org.nuxeo.runtime.server.host", nuxeoClientConfig.getHost());
+        System.setProperty("org.nuxeo.runtime.server.port", "" + repositoryClientConfig.getPort());
+        System.setProperty("org.nuxeo.runtime.server.host", repositoryClientConfig.getHost());
         //System.setProperty("org.nuxeo.runtime.1.3.3.streaming.port", "3233");
-        System.setProperty("org.nuxeo.runtime.streaming.serverLocator", "socket://" + nuxeoClientConfig.getHost() + ":3233");
+        System.setProperty("org.nuxeo.runtime.streaming.serverLocator", "socket://" + repositoryClientConfig.getHost() + ":3233");
         System.setProperty("org.nuxeo.runtime.streaming.isServer", Boolean.FALSE.toString());
         //org.nuxeo.client.remote is part of the fix to Nuxeo Runtime to use Java Remote APIs
         //from JBoss
@@ -156,10 +156,10 @@ public class NuxeoConnector {
 //            }else{
             //authentication failure error comes when reusing the client
             //force connect for now
-            client.forceConnect(nuxeoClientConfig.getHost(), nuxeoClientConfig.getPort());
+            client.forceConnect(repositoryClientConfig.getHost(), repositoryClientConfig.getPort());
             if(logger.isDebugEnabled()){
                 logger.debug("getClient(): connection successful port=" +
-                        nuxeoClientConfig.getPort());
+                        repositoryClientConfig.getPort());
             }
             return client;
 //            }
@@ -199,23 +199,31 @@ public class NuxeoConnector {
 
     /**
      * retrieveWorkspaceIds retrieves all workspace ids from default repository
-     * @return
+     * @param tenantDomain domain representing tenant
+     * @return 
      * @throws java.lang.Exception
      */
-    public Hashtable<String, String> retrieveWorkspaceIds() throws Exception {
+    public Hashtable<String, String> retrieveWorkspaceIds(String tenantDomain) throws Exception {
         RepositoryInstance repoSession = null;
         Hashtable<String, String> workspaceIds = new Hashtable<String, String>();
         try{
             repoSession = getRepositorySession();
             DocumentModel rootDoc = repoSession.getRootDocument();
             DocumentModelList rootChildrenList = repoSession.getChildren(rootDoc.getRef());
-            Iterator<DocumentModel> riter = rootChildrenList.iterator();
-            if(riter.hasNext()){
-                DocumentModel domain = riter.next();
+            Iterator<DocumentModel> diter = rootChildrenList.iterator();
+            while(diter.hasNext()){
+                DocumentModel domain = diter.next();
+                String domainPath = "/" + tenantDomain;
+                if(!domain.getPathAsString().equalsIgnoreCase(domainPath)) {
+                    continue;
+                }
+                if(logger.isDebugEnabled()) {
+                    logger.debug("domain=" + domain.toString());
+                }
                 DocumentModelList domainChildrenList = repoSession.getChildren(domain.getRef());
-                Iterator<DocumentModel> diter = domainChildrenList.iterator();
-                while(diter.hasNext()){
-                    DocumentModel childNode = diter.next();
+                Iterator<DocumentModel> witer = domainChildrenList.iterator();
+                while(witer.hasNext()){
+                    DocumentModel childNode = witer.next();
                     if("Workspaces".equalsIgnoreCase(childNode.getName())){
                         DocumentModelList workspaceList = repoSession.getChildren(childNode.getRef());
                         Iterator<DocumentModel> wsiter = workspaceList.iterator();

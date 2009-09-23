@@ -29,6 +29,21 @@ package org.collectionspace.services.client.test;
  */
 public interface ServiceTest {
 
+
+    /**
+     * Returns the URL path component of the service.
+     *
+     * This component will follow directly after the
+     * base path, if any.
+     */
+    public String getServicePathComponent();
+
+    /**
+     * getCommonPartName get common part name for the service request
+     * @return
+     */
+    public String getCommonPartName();
+
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
@@ -40,7 +55,7 @@ public interface ServiceTest {
      *
      * Relied upon by 'read', 'update' and 'delete' tests, below.
      */
-    public void create(); 
+    public void create();
 
     /**
      * Tests creation of a list of two or more new resources by repeatedly
@@ -54,23 +69,23 @@ public interface ServiceTest {
 
     /**
      * Tests creation of a resource by submitting
-     * an empty entity body (aka empty payload). 
+     * an empty entity body (aka empty payload).
      */
     public void createWithEmptyEntityBody();
 
     /**
      * Tests creation of a resource by submitting
-     * a representation with malformed XML data. 
+     * a representation with malformed XML data.
      */
     public void createWithMalformedXml();
 
     /**
      * Tests creation of a resource by submitting
      * a representation in the wrong XML schema
-     * (e.g. not matching the object's schema). 
+     * (e.g. not matching the object's schema).
      */
     public void createWithWrongXmlSchema();
-        
+
     // @TODO If feasible, implement a negative (failure)
     // test for creation of duplicate resources.
 
@@ -80,9 +95,9 @@ public interface ServiceTest {
     // ---------------------------------------------------------------
 
     // Success outcomes
-    
+
     /**
-     * Tests reading (i.e. retrieval) of a resource. 
+     * Tests reading (i.e. retrieval) of a resource.
      */
     public void read();
 
@@ -93,7 +108,7 @@ public interface ServiceTest {
      * resource, whose resource identifier does not exist
      * at the specified URL.
      */
-    public void readNonExistent(); 
+    public void readNonExistent();
 
 
     // ---------------------------------------------------------------
@@ -106,13 +121,13 @@ public interface ServiceTest {
      * Tests reading (i.e. retrieval) of a list of
      * multiple resources.
      */
-    public void readList(); 
+    public void readList();
 
     // If feasible, implement a test for reading
     // an empty list returned by the service.
 
     // Failure outcomes
-    
+
     // If feasible, implement a negative (failure) test
     // of handling of unrecognized query parameters
     // (e.g. other than filtering or chunking parameters, etc.
@@ -126,7 +141,7 @@ public interface ServiceTest {
     // ----------------
 
     /**
-     * Tests updating the content of a resource. 
+     * Tests updating the content of a resource.
      */
     public void update();
 
@@ -139,16 +154,16 @@ public interface ServiceTest {
     public void updateWithEmptyEntityBody();
 
     /**
-     * Tests updating the content of a resource 
+     * Tests updating the content of a resource
      * by submitting a representation with malformed
-     * XML data. 
+     * XML data.
      */
     public void updateWithMalformedXml();
 
     /**
      * Tests updating the content of a resource
      * by submitting a representation in the wrong
-     * XML schema (e.g. not matching the object's schema). 
+     * XML schema (e.g. not matching the object's schema).
      */
     public void updateWithWrongXmlSchema();
 
@@ -168,16 +183,16 @@ public interface ServiceTest {
     /**
      * Tests deleting a resource.
      */
-    public void delete(); 
-    
+    public void delete();
+
     // Failure outcomes
-    
+
     /**
      * Tests deleting a non-existent resource, whose resource
      * identifier does not exist at the specified URL.
      */
     public void deleteNonExistent();
-    
+
 }
 
 

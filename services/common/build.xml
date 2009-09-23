@@ -109,19 +109,20 @@
 
     <target name="deploy" depends="package"
     description="deploy common elements in ${jboss.server.cspace}">
-        <copy file="${basedir}/src/main/config/service-config.xml"
-        todir="${jboss.server.cspace}/cspace/config/services"/>
+        <copy todir="${jboss.server.cspace}/cspace/config/services">
+            <fileset dir="${basedir}/src/main/config"/>
+        </copy>
     </target>
 
     <target name="undeploy"
     description="undeploy common elements from ${jboss.server.cspace}">
-        <delete failonerror="false" file="${jboss.server.cspace}/cspace/config/services/service-config.xml"/>
+        <delete failonerror="false" dir="${jboss.server.cspace}/cspace/config/services"/>
     </target>
 
     <target name="dist"
     description="generate distribution for common elements" depends="package">
         <copy todir="${services.trunk}/${dist.server.cspace}/cspace/config/services">
-            <fileset file="${basedir}/src/main/config/service-config.xml"/>
+            <fileset dir="${basedir}/src/main/config"/>
         </copy>
     </target>
 

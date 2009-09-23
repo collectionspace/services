@@ -17,46 +17,50 @@
     <xs:element name="service-config">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="nuxeo-client-config" minOccurs="1"  maxOccurs="1">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element name="host" type="xs:string" minOccurs="1"  maxOccurs="1" />
-                            <xs:element name="port" type="xs:int" minOccurs="1"  maxOccurs="1" />
-                            <!-- protocol (http/https) is only applicable for rest client -->
-                            <xs:element name="protocol" type="xs:string" minOccurs="0"  maxOccurs="1" />
-                                           <!-- default client is java -->
-                            <xs:element name="client-type" type="NuxeoClientType" minOccurs="0"  maxOccurs="1" />
-
-                            <xs:element name="user" type="xs:string" minOccurs="1"  maxOccurs="1" />
-                <!-- password should not be in cleartext -->
-                            <xs:element name="password" type="xs:string" minOccurs="1"  maxOccurs="1" />
-             
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
-                <xs:element name="nuxeo-workspace" minOccurs="0"  maxOccurs="1" >
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element name="workspace" maxOccurs="unbounded" >
-                                <xs:complexType>
-                                    <xs:sequence>
-                                        <xs:element name="service-name" type="xs:string" minOccurs="1"  maxOccurs="1" />
-                                        <!-- workspace name is required for Nuxeo Java client -->
-                                        <xs:element name="workspace-name" type="xs:string" minOccurs="1"  maxOccurs="1" />
-                                        <!-- workspace ids are required only for Nuxeo REST client -->
-                                        <xs:element name="workspace-id" type="xs:string" minOccurs="1"  maxOccurs="1" />
-                                    </xs:sequence>
-                                </xs:complexType>
-                            </xs:element>
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
+                <!-- assumption: there is only one type of repository client used  -->
+                <xs:element name="repository-client" type="RepositoryClientConfigType" minOccurs="1"  maxOccurs="1"/>
+                <xs:element name="repository-workspace" type="RepositoryWorkspaceType" minOccurs="0"  maxOccurs="1" />
             </xs:sequence>
         </xs:complexType>
     </xs:element>
 
-    <!-- enumeration defining the type nuxeo client -->
-    <xs:simpleType name="NuxeoClientType">
+    <xs:complexType name="RepositoryClientConfigType">
+        <xs:sequence>
+            <xs:element name="host" type="xs:string" minOccurs="1"  maxOccurs="1" />
+            <xs:element name="port" type="xs:int" minOccurs="1"  maxOccurs="1" />
+            <!-- protocol (http/https) is only applicable for rest client -->
+            <xs:element name="protocol" type="xs:string" minOccurs="0"  maxOccurs="1" />
+            <xs:element name="user" type="xs:string" minOccurs="1"  maxOccurs="1" />
+            <!-- password should not be in cleartext -->
+            <xs:element name="password" type="xs:string" minOccurs="1"  maxOccurs="1" />
+            <!-- default client is java -->
+            <xs:element name="client-type" type="ClientType" minOccurs="1"  maxOccurs="1" />
+            <!-- default client is org.collectionspace.services.nuxeo.client.java.RepositoryJavaClient -->
+            <xs:element name="client-class" type="xs:string" minOccurs="1"  maxOccurs="1" />
+        </xs:sequence>
+        <!-- name of the client -->
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="default" type="xs:boolean" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="RepositoryWorkspaceType">
+        <xs:sequence>
+            <xs:element name="workspace" maxOccurs="unbounded" >
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="service-name" type="xs:string" minOccurs="1"  maxOccurs="1" />
+                        <!-- workspace name is required for Repository Java client -->
+                        <xs:element name="workspace-name" type="xs:string" minOccurs="1"  maxOccurs="1" />
+                        <!-- workspace ids are required only for Repository REST client -->
+                        <xs:element name="workspace-id" type="xs:string" minOccurs="1"  maxOccurs="1" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <!-- enumeration defining the type repository client -->
+    <xs:simpleType name="ClientType">
         <xs:restriction base="xs:string">
             <xs:enumeration value="java" />
             <xs:enumeration value="rest" />

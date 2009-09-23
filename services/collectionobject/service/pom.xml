@@ -80,7 +80,7 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <version>1.0.2.GA</version>
+            <version>1.1.GA</version>
             <exclusions>
                 <exclusion>
                     <groupId>tjws</groupId>
@@ -91,12 +91,12 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxb-provider</artifactId>
-            <version>1.0.2.GA</version>
+            <version>1.1.GA</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-multipart-provider</artifactId>
-            <version>1.0.2.GA</version>
+            <version>1.1.GA</version>
         </dependency>
         
         <!-- nuxeo -->

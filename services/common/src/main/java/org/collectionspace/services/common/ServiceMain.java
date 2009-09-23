@@ -3,13 +3,9 @@
  */
 package org.collectionspace.services.common;
 
-import java.io.File;
 import java.util.Hashtable;
-import java.util.List;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import org.collectionspace.services.common.ServiceConfig.NuxeoWorkspace;
-import org.collectionspace.services.common.ServiceConfig.NuxeoWorkspace.Workspace;
+import org.collectionspace.services.common.config.ServicesConfigReader;
+import org.collectionspace.services.common.config.TenantBindingConfigReader;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,16 +17,15 @@ import org.slf4j.LoggerFactory;
  */
 public class ServiceMain {
 
+    /**
+     * volatile is used here to assume about ordering (post JDK 1.5)
+     */
     private static volatile ServiceMain instance = null;
-    final public static String CSPACE_DIR_NAME = "cspace";
-    final public static String CONFIG_DIR_NAME = "config" + File.separator + "services";
-    final private static String CONFIG_FILE_NAME = "service-config.xml";
     final Logger logger = LoggerFactory.getLogger(ServiceMain.class);
-    private ServiceConfig serviceConfig;
-    private Hashtable<String, String> serviceWorkspaces = new Hashtable<String, String>();
     private NuxeoConnector nuxeoConnector;
     private String serverRootDir = null;
-    private NuxeoClientType nuxeoClientType = null;
+    private ServicesConfigReader servicesConfigReader;
+    private TenantBindingConfigReader tenantBindingConfigReader;
 
     private ServiceMain() {
     }
@@ -64,10 +59,11 @@ public class ServiceMain {
 
     private void initialize() throws Exception {
         setServerRootDir();
-        serviceConfig = readConfig();
-        if(getNuxeoClientType().equals(NuxeoClientType.JAVA)){
+        readConfig();
+        if(getClientType().equals(ClientType.JAVA)){
             nuxeoConnector = NuxeoConnector.getInstance();
-            nuxeoConnector.initialize(serviceConfig.getNuxeoClientConfig());
+            nuxeoConnector.initialize(
+                    getServicesConfigReader().getConfiguration().getRepositoryClient());
         }
     }
 
@@ -80,7 +76,6 @@ public class ServiceMain {
             if(nuxeoConnector != null){
                 nuxeoConnector.release();
             }
-            serviceWorkspaces.clear();
             instance = null;
         }catch(Exception e){
             e.printStackTrace();
@@ -88,74 +83,28 @@ public class ServiceMain {
         }
     }
 
-    private ServiceConfig readConfig() throws Exception {
-        JAXBContext jc = JAXBContext.newInstance(ServiceConfig.class);
-        Unmarshaller um = jc.createUnmarshaller();
-        String configFileName = getServerRootDir() +
-                File.separator + CSPACE_DIR_NAME +
-                File.separator + CONFIG_DIR_NAME +
-                File.separator + CONFIG_FILE_NAME;
-        File configFile = new File(configFileName);
-        if(!configFile.exists()){
-            String msg = "Could not find configuration file " + configFileName;
-            logger.error(msg);
-            throw new RuntimeException(msg);
-        }
-        ServiceConfig sconfig = (ServiceConfig) um.unmarshal(configFile);
-        if(logger.isDebugEnabled()){
-            logger.debug("readConfig() read config file " + configFile.getAbsolutePath());
-        }
-        nuxeoClientType = sconfig.getNuxeoClientConfig().getClientType();
-        if(logger.isDebugEnabled()) {
-            logger.debug("using Nuxeo client=" + nuxeoClientType.toString());
-        }
-        return sconfig;
+    private void readConfig() throws Exception {
+        //read service config
+        servicesConfigReader = new ServicesConfigReader(getServerRootDir());
+        getServicesConfigReader().read();
+
+        tenantBindingConfigReader = new TenantBindingConfigReader(getServerRootDir());
+        getTenantBindingConfigReader().read();
     }
 
-    synchronized public void getWorkspaceIds() throws Exception {
-        Hashtable<String, String> workspaceIds = new Hashtable<String, String>();
-
-        if(getNuxeoClientType().equals(NuxeoClientType.JAVA)){
-            workspaceIds = nuxeoConnector.retrieveWorkspaceIds();
-        }
-        NuxeoWorkspace nuxeoWorkspace = serviceConfig.getNuxeoWorkspace();
-        List<Workspace> workspaces = nuxeoWorkspace.getWorkspace();
-        String workspaceId = null;
-        for(Workspace workspace : workspaces){
-            if(getNuxeoClientType().equals(NuxeoClientType.JAVA)){
-                workspaceId = workspaceIds.get(workspace.getWorkspaceName().toLowerCase());
-                if(workspaceId == null){
-                    logger.warn("failed to retrieve workspace id for " + workspace.getWorkspaceName());
-                    //FIXME: should we throw an exception here?
-                    continue;
-                }
-            }else{
-                workspaceId = workspace.getWorkspaceId();
-                if(workspaceId == null || "".equals(workspaceId)){
-                    logger.error("could not find workspace id for " + workspace.getWorkspaceName());
-                    //FIXME: should we throw an exception here?
-                    continue;
-                }
-            }
-
-            serviceWorkspaces.put(workspace.getServiceName(), workspaceId);
-            if(logger.isDebugEnabled()){
-                logger.debug("retrieved workspace id=" + workspaceId +
-                        " service=" + workspace.getServiceName() +
-                        " workspace=" + workspace.getWorkspaceName());
-            }
-        }
+    void retrieveAllWorkspaceIds() throws Exception {
+        //all configs are read, connector is initialized, retrieve workspaceids
+        getTenantBindingConfigReader().retrieveAllWorkspaceIds();
     }
 
     /**
-     * @return the serviceConfig
+     * retrieveWorkspaceIds for given tenant domain. 
+     * @param tenantDomain
+     * @return Hashtable<String, String> key=workspace name, value=workspace id
+     * @throws Exception
      */
-    public ServiceConfig getServiceConfig() {
-        return serviceConfig;
-    }
-
-    synchronized public String getWorkspaceId(String serviceName) {
-        return serviceWorkspaces.get(serviceName);
+    public Hashtable<String, String> retrieveWorkspaceIds(String tenantDomain) throws Exception {
+        return nuxeoConnector.retrieveWorkspaceIds(tenantDomain);
     }
 
     /**
@@ -180,9 +129,30 @@ public class ServiceMain {
     }
 
     /**
-     * @return the nuxeoClientType
+     * @return the serviceConfig
      */
-    public NuxeoClientType getNuxeoClientType() {
-        return nuxeoClientType;
+    public ServiceConfig getServiceConfig() {
+        return getServicesConfigReader().getConfiguration();
+    }
+
+    /**
+     * @return the clientType
+     */
+    public ClientType getClientType() {
+        return getServicesConfigReader().getClientType();
+    }
+
+    /**
+     * @return the servicesConfigReader
+     */
+    public ServicesConfigReader getServicesConfigReader() {
+        return servicesConfigReader;
+    }
+
+    /**
+     * @return the tenantBindingConfigReader
+     */
+    public TenantBindingConfigReader getTenantBindingConfigReader() {
+        return tenantBindingConfigReader;
     }
 }

@@ -20,28 +20,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
- package org.collectionspace.services.client.test;
+package org.collectionspace.services.client.test;
 
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.collectionspace.services.client.IntakeClient;
-import org.collectionspace.services.client.test.ServiceRequestType;
-import org.collectionspace.services.intake.Intake;
-import org.collectionspace.services.intake.IntakeList;
+import org.collectionspace.services.intake.IntakesCommon;
+import org.collectionspace.services.intake.IntakesCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
  * IntakeServiceTest, carries out tests against a
  * deployed and running Intake Service.
- * 
+ *
  * $LastChangedRevision$
  * $LastChangedDate$
  */
@@ -52,13 +52,10 @@ public class IntakeServiceTest extends AbstractServiceTest {
     final String SERVICE_PATH_COMPONENT = "intakes";
     private String knownResourceId = null;
 
-
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
-
     // Success outcomes
-    
     @Override
     @Test
     public void create() {
@@ -70,8 +67,10 @@ public class IntakeServiceTest extends AbstractServiceTest {
 
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
-        Intake intake = createIntakeInstance(identifier);
-        ClientResponse<Response> res = client.create(intake);
+
+        MultipartOutput multipart = createIntakeInstance(identifier);
+        ClientResponse<Response> res = client.create(multipart);
+
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -82,12 +81,13 @@ public class IntakeServiceTest extends AbstractServiceTest {
         // Does it exactly match the expected status code?
         verbose("create: status = " + statusCode);
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        // Store the ID returned from this create operation for
-        // additional tests below.
+        // Store the ID returned from this create operation
+        // for additional tests below.
         knownResourceId = extractId(res);
+        verbose("create: knownResourceId=" + knownResourceId);
     }
 
     @Override
@@ -99,298 +99,316 @@ public class IntakeServiceTest extends AbstractServiceTest {
     }
 
     // Failure outcomes
-
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
-    public void createWithEmptyEntityBody() {}
-    public void createWithMalformedXml() {}
-    public void createWithWrongXmlSchema() {}
+    public void createWithEmptyEntityBody() {
+    }
 
-/*
+    public void createWithMalformedXml() {
+    }
+
+    public void createWithWrongXmlSchema() {
+    }
+
+    /*
     @Override
     @Test(dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithEmptyEntityBody() {
-    
-        // Perform setup.
-        setupCreateWithEmptyEntityBody();
 
-        // Submit the request to the service and store the response.
-        String method = REQUEST_TYPE.httpMethodName();
-        String url = getServiceRootURL();
-        String mediaType = MediaType.APPLICATION_XML;
-        final String entity = "";
-        int statusCode = submitRequest(method, url, mediaType, entity);
-        
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        verbose("createWithEmptyEntityBody url=" + url + " status=" + statusCode);
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    // Perform setup.
+    setupCreateWithEmptyEntityBody();
+
+    // Submit the request to the service and store the response.
+    String method = REQUEST_TYPE.httpMethodName();
+    String url = getServiceRootURL();
+    String mediaType = MediaType.APPLICATION_XML;
+    final String entity = "";
+    int statusCode = submitRequest(method, url, mediaType, entity);
+
+    // Check the status code of the response: does it match
+    // the expected response(s)?
+    verbose("createWithEmptyEntityBody url=" + url + " status=" + statusCode);
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
     @Test(dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithMalformedXml() {
-    
-        // Perform setup.
-        setupCreateWithMalformedXml();
 
-        // Submit the request to the service and store the response.
-        String method = REQUEST_TYPE.httpMethodName();
-        String url = getServiceRootURL();
-        String mediaType = MediaType.APPLICATION_XML;
-        final String entity = MALFORMED_XML_DATA; // Constant from base class.
-        int statusCode = submitRequest(method, url, mediaType, entity);
-        
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        verbose("createWithMalformedXml url=" + url + " status=" + statusCode);
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    // Perform setup.
+    setupCreateWithMalformedXml();
+
+    // Submit the request to the service and store the response.
+    String method = REQUEST_TYPE.httpMethodName();
+    String url = getServiceRootURL();
+    String mediaType = MediaType.APPLICATION_XML;
+    final String entity = MALFORMED_XML_DATA; // Constant from base class.
+    int statusCode = submitRequest(method, url, mediaType, entity);
+
+    // Check the status code of the response: does it match
+    // the expected response(s)?
+    verbose("createWithMalformedXml url=" + url + " status=" + statusCode);
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
     @Test(dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithWrongXmlSchema() {
-    
-        // Perform setup.
-        setupCreateWithWrongXmlSchema();
-     
-        // Submit the request to the service and store the response.
-        String method = REQUEST_TYPE.httpMethodName();
-        String url = getServiceRootURL();
-        String mediaType = MediaType.APPLICATION_XML;
-        final String entity = WRONG_XML_SCHEMA_DATA;
-        int statusCode = submitRequest(method, url, mediaType, entity);
-        
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        verbose("createWithWrongSchema url=" + url + " status=" + statusCode);
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-*/
 
+    // Perform setup.
+    setupCreateWithWrongXmlSchema();
+
+    // Submit the request to the service and store the response.
+    String method = REQUEST_TYPE.httpMethodName();
+    String url = getServiceRootURL();
+    String mediaType = MediaType.APPLICATION_XML;
+    final String entity = WRONG_XML_SCHEMA_DATA;
+    int statusCode = submitRequest(method, url, mediaType, entity);
+
+    // Check the status code of the response: does it match
+    // the expected response(s)?
+    verbose("createWithWrongSchema url=" + url + " status=" + statusCode);
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    }
+     */
     // ---------------------------------------------------------------
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
-
     // Success outcomes
-
     @Override
     @Test(dependsOnMethods = {"create"})
     public void read() {
-    
+
         // Perform setup.
         setupRead();
 
         // Submit the request to the service and store the response.
-        ClientResponse<Intake> res = client.read(knownResourceId);
+        ClientResponse<MultipartInput> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
-            
+
         // Check the status code of the response: does it match
         // the expected response(s)?
         verbose("read: status = " + statusCode);
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        //FIXME: remove the following try catch once Aron fixes signatures
+        try{
+            MultipartInput input = (MultipartInput) res.getEntity();
+            IntakesCommon intake = (IntakesCommon) extractPart(input,
+                    getCommonPartName(), IntakesCommon.class);
+            Assert.assertNotNull(intake);
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
     }
 
     // Failure outcomes
-
     @Override
     @Test(dependsOnMethods = {"read"})
     public void readNonExistent() {
 
         // Perform setup.
         setupReadNonExistent();
-        
+
         // Submit the request to the service and store the response.
-        ClientResponse<Intake> res = client.read(NON_EXISTENT_ID);
+        ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
         // the expected response(s)?
         verbose("readNonExistent: status = " + res.getStatus());
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
-
 
     // ---------------------------------------------------------------
     // CRUD tests : READ_LIST tests
     // ---------------------------------------------------------------
-
     // Success outcomes
-
     @Override
-    @Test(dependsOnMethods = {"createList"})
+    @Test(dependsOnMethods = {"read"})
     public void readList() {
-    
+
         // Perform setup.
         setupReadList();
 
         // Submit the request to the service and store the response.
-        ClientResponse<IntakeList> res = client.readList();
-        IntakeList list = res.getEntity();
+        ClientResponse<IntakesCommonList> res = client.readList();
+        IntakesCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
         // the expected response(s)?
         verbose("readList: status = " + res.getStatus());
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = false;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            List<IntakeList.IntakeListItem> items =
-                list.getIntakeListItem();
+        if(iterateThroughList && logger.isDebugEnabled()){
+            List<IntakesCommonList.IntakeListItem> items =
+                    list.getIntakeListItem();
             int i = 0;
-            for(IntakeList.IntakeListItem item : items){
+            for(IntakesCommonList.IntakeListItem item : items){
                 verbose("readList: list-item[" + i + "] csid=" +
-                    item.getCsid());
+                        item.getCsid());
                 verbose("readList: list-item[" + i + "] objectNumber=" +
-                    item.getEntryNumber());
+                        item.getEntryNumber());
                 verbose("readList: list-item[" + i + "] URI=" +
-                    item.getUri());
+                        item.getUri());
                 i++;
             }
         }
-        
+
     }
 
     // Failure outcomes
-    
     // None at present.
-
-
     // ---------------------------------------------------------------
     // CRUD tests : UPDATE tests
     // ---------------------------------------------------------------
-
     // Success outcomes
-
     @Override
-    @Test(dependsOnMethods = {"create"})
+    @Test(dependsOnMethods = {"read"})
     public void update() {
-    
+
         // Perform setup.
         setupUpdate();
 
-        // Retrieve an existing resource that we can update.
-        ClientResponse<Intake> res = client.read(knownResourceId);
-        verbose("read: status = " + res.getStatus());
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-        Intake intake = res.getEntity();
-        verbose("Got object to update with ID: " + knownResourceId,
-                intake, Intake.class);
+        try{ //ideally, just remove try-catch and let the exception bubble up
+            // Retrieve an existing resource that we can update.
+            ClientResponse<MultipartInput> res =
+                    client.read(knownResourceId);
+            verbose("update: read status = " + res.getStatus());
+            Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
 
-        // Update the content of this resource.
-        intake.setEntryNumber("updated-" + intake.getEntryNumber());
-        intake.setEntryDate("updated-" + intake.getEntryDate());
-    
-        // Submit the request to the service and store the response.
-        res = client.update(knownResourceId, intake);
-        int statusCode = res.getStatus();
-        Intake updatedObject = res.getEntity();
+            verbose("got object to update with ID: " + knownResourceId);
+            MultipartInput input = (MultipartInput) res.getEntity();
+            IntakesCommon intake = (IntakesCommon) extractPart(input,
+                    getCommonPartName(), IntakesCommon.class);
+            Assert.assertNotNull(intake);
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        verbose("update: status = " + res.getStatus());
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        
-        // Check the contents of the response: does it match
-        // what was submitted?
-        verbose("update: ", updatedObject, Intake.class);
-        Assert.assertEquals(updatedObject.getEntryDate(), 
-            intake.getEntryDate(), 
-            "Data in updated object did not match submitted data.");
+            // Update the content of this resource.
+            // Update the content of this resource.
+            intake.setEntryNumber("updated-" + intake.getEntryNumber());
+            intake.setEntryDate("updated-" + intake.getEntryDate());
+            verbose("to be updated object", intake, IntakesCommon.class);
+            // Submit the request to the service and store the response.
+            MultipartOutput output = new MultipartOutput();
+            OutputPart commonPart = output.addPart(intake, MediaType.APPLICATION_XML_TYPE);
+            commonPart.getHeaders().add("label", getCommonPartName());
+
+            res = client.update(knownResourceId, output);
+            int statusCode = res.getStatus();
+            // Check the status code of the response: does it match the expected response(s)?
+            verbose("update: status = " + res.getStatus());
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+
+            input = (MultipartInput) res.getEntity();
+            IntakesCommon updatedIntake =
+                    (IntakesCommon) extractPart(input,
+                    getCommonPartName(), IntakesCommon.class);
+            Assert.assertNotNull(updatedIntake);
+
+            Assert.assertEquals(updatedIntake.getEntryDate(),
+                    intake.getEntryDate(),
+                    "Data in updated object did not match submitted data.");
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     // Failure outcomes
-
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
-    public void updateWithEmptyEntityBody() {}
-    public void updateWithMalformedXml() {}
-    public void updateWithWrongXmlSchema() {}
+    public void updateWithEmptyEntityBody() {
+    }
 
-/*
+    public void updateWithMalformedXml() {
+    }
+
+    public void updateWithWrongXmlSchema() {
+    }
+
+    /*
     @Override
     @Test(dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithEmptyEntityBody() {
-    
-        // Perform setup.
-        setupUpdateWithEmptyEntityBody();
 
-        // Submit the request to the service and store the response.
-        String method = REQUEST_TYPE.httpMethodName();
-        String url = getResourceURL(knownResourceId);
-        String mediaType = MediaType.APPLICATION_XML;
-        final String entity = "";
-        int statusCode = submitRequest(method, url, mediaType, entity);
-        
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        verbose("updateWithEmptyEntityBody url=" + url + " status=" + statusCode);
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    // Perform setup.
+    setupUpdateWithEmptyEntityBody();
+
+    // Submit the request to the service and store the response.
+    String method = REQUEST_TYPE.httpMethodName();
+    String url = getResourceURL(knownResourceId);
+    String mediaType = MediaType.APPLICATION_XML;
+    final String entity = "";
+    int statusCode = submitRequest(method, url, mediaType, entity);
+
+    // Check the status code of the response: does it match
+    // the expected response(s)?
+    verbose("updateWithEmptyEntityBody url=" + url + " status=" + statusCode);
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
     @Test(dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithMalformedXml() {
 
-        // Perform setup.
-        setupUpdateWithMalformedXml();
+    // Perform setup.
+    setupUpdateWithMalformedXml();
 
-        // Submit the request to the service and store the response.
-        String method = REQUEST_TYPE.httpMethodName();
-        String url = getResourceURL(knownResourceId);
-        String mediaType = MediaType.APPLICATION_XML;
-        final String entity = MALFORMED_XML_DATA;
-        int statusCode = submitRequest(method, url, mediaType, entity);
-        
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        verbose("updateWithMalformedXml: url=" + url + " status=" + statusCode);
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    // Submit the request to the service and store the response.
+    String method = REQUEST_TYPE.httpMethodName();
+    String url = getResourceURL(knownResourceId);
+    String mediaType = MediaType.APPLICATION_XML;
+    final String entity = MALFORMED_XML_DATA;
+    int statusCode = submitRequest(method, url, mediaType, entity);
+
+    // Check the status code of the response: does it match
+    // the expected response(s)?
+    verbose("updateWithMalformedXml: url=" + url + " status=" + statusCode);
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
     @Test(dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithWrongXmlSchema() {
-    
-        // Perform setup.
-        setupUpdateWithWrongXmlSchema();
-        
-        // Submit the request to the service and store the response.
-        String method = REQUEST_TYPE.httpMethodName();
-        String url = getResourceURL(knownResourceId);
-        String mediaType = MediaType.APPLICATION_XML;
-        final String entity = WRONG_XML_SCHEMA_DATA;
-        int statusCode = submitRequest(method, url, mediaType, entity);
-        
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        verbose("updateWithWrongSchema: url=" + url + " status=" + statusCode);
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-*/
 
+    // Perform setup.
+    setupUpdateWithWrongXmlSchema();
+
+    // Submit the request to the service and store the response.
+    String method = REQUEST_TYPE.httpMethodName();
+    String url = getResourceURL(knownResourceId);
+    String mediaType = MediaType.APPLICATION_XML;
+    final String entity = WRONG_XML_SCHEMA_DATA;
+    int statusCode = submitRequest(method, url, mediaType, entity);
+
+    // Check the status code of the response: does it match
+    // the expected response(s)?
+    verbose("updateWithWrongSchema: url=" + url + " status=" + statusCode);
+    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    }
+     */
     @Override
     @Test(dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent() {
@@ -401,28 +419,27 @@ public class IntakeServiceTest extends AbstractServiceTest {
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
-        Intake intake = createIntakeInstance(NON_EXISTENT_ID);
-        ClientResponse<Intake> res =
-          client.update(NON_EXISTENT_ID, intake);
+
+        // The only relevant ID may be the one used in update(), below.
+        MultipartOutput multipart = createIntakeInstance(NON_EXISTENT_ID);
+        ClientResponse<MultipartInput> res =
+                client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
         // the expected response(s)?
         verbose("updateNonExistent: status = " + res.getStatus());
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     // ---------------------------------------------------------------
     // CRUD tests : DELETE tests
     // ---------------------------------------------------------------
-
     // Success outcomes
-
     @Override
-    @Test(dependsOnMethods = 
-        {"create", "read", "update"})
+    @Test(dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
     public void delete() {
 
         // Perform setup.
@@ -436,12 +453,11 @@ public class IntakeServiceTest extends AbstractServiceTest {
         // the expected response(s)?
         verbose("delete: status = " + res.getStatus());
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     // Failure outcomes
-
     @Override
     @Test(dependsOnMethods = {"delete"})
     public void deleteNonExistent() {
@@ -457,15 +473,13 @@ public class IntakeServiceTest extends AbstractServiceTest {
         // the expected response(s)?
         verbose("deleteNonExistent: status = " + res.getStatus());
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
-
 
     // ---------------------------------------------------------------
     // Utility tests : tests of code used in tests above
     // ---------------------------------------------------------------
-
     /**
      * Tests the code for manually submitting data that is used by several
      * of the methods above.
@@ -480,36 +494,38 @@ public class IntakeServiceTest extends AbstractServiceTest {
         String method = ServiceRequestType.READ.httpMethodName();
         String url = getResourceURL(knownResourceId);
         int statusCode = submitRequest(method, url);
-        
+
         // Check the status code of the response: does it match
         // the expected response(s)?
         verbose("testSubmitRequest: url=" + url + " status=" + statusCode);
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-    }		
+    }
 
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-
     @Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
     }
-    
-    private Intake createIntakeInstance(String identifier) {
-        Intake intake =
-            createIntakeInstance(
+
+    private MultipartOutput createIntakeInstance(String identifier) {
+        return createIntakeInstance(
                 "entryNumber-" + identifier,
                 "entryDate-" + identifier);
-        return intake;
-    }
-    
-    private Intake createIntakeInstance(String entryNumber, String entryDate) {
-        Intake intake = new Intake();
-        intake.setEntryNumber(entryNumber);
-        intake.setEntryDate(entryDate);
-        return intake;
     }
 
+    private MultipartOutput createIntakeInstance(String entryNumber, String entryDate) {
+        IntakesCommon intake = new IntakesCommon();
+        intake.setEntryNumber(entryNumber);
+        intake.setEntryDate(entryDate);
+        MultipartOutput multipart = new MultipartOutput();
+        OutputPart commonPart = multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", getCommonPartName());
+
+        verbose("to be created, intake common ", intake, IntakesCommon.class);
+
+        return multipart;
+    }
 }

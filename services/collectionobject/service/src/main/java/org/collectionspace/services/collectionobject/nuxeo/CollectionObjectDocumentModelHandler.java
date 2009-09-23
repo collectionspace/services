@@ -26,11 +26,10 @@ package org.collectionspace.services.collectionobject.nuxeo;
 import java.util.Iterator;
 import java.util.List;
 
-import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.CollectionObjectJAXBSchema;
-import org.collectionspace.services.collectionobject.CollectionObject;
-import org.collectionspace.services.collectionobject.CollectionObjectList;
-import org.collectionspace.services.collectionobject.CollectionObjectList.CollectionObjectListItem;
+import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
+import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
+import org.collectionspace.services.collectionobject.CollectionobjectsCommonList.CollectionObjectListItem;
 import org.collectionspace.services.common.repository.DocumentWrapper;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -45,146 +44,69 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class CollectionObjectDocumentModelHandler
-        extends DocumentModelHandler<CollectionObject, CollectionObjectList> {
+        extends DocumentModelHandler<CollectionobjectsCommon, CollectionobjectsCommonList> {
 
     private final Logger logger = LoggerFactory.getLogger(CollectionObjectDocumentModelHandler.class);
     /**
      * collectionObject is used to stash JAXB object to use when handle is called
      * for Action.CREATE, Action.UPDATE or Action.GET
      */
-    private CollectionObject collectionObject;
+    private CollectionobjectsCommon collectionObject;
     /**
      * collectionObjectList is stashed when handle is called
      * for ACTION.GET_ALL
      */
-    private CollectionObjectList collectionObjectList;
-
-    @Override
-    public void prepare(Action action) throws Exception {
-        //no specific action needed
-    }
-
+    private CollectionobjectsCommonList collectionObjectList;
 
     /**
-     * getCommonObject get associated CollectionObject
+     * getCommonPart get associated CollectionobjectsCommon
      * @return
      */
     @Override
-    public CollectionObject getCommonObject() {
+    public CollectionobjectsCommon getCommonPart() {
         return collectionObject;
     }
 
     /**
-     * setCommonObject set associated collectionobject
+     * setCommonPart set associated collectionobject
      * @param collectionObject
      */
     @Override
-    public void setCommonObject(CollectionObject collectionObject) {
+    public void setCommonPart(CollectionobjectsCommon collectionObject) {
         this.collectionObject = collectionObject;
     }
 
     /**
-     * getCollectionObjectList get associated CollectionObject (for index/GET_ALL)
+     * getCollectionobjectsCommonList get associated CollectionobjectsCommon (for index/GET_ALL)
      * @return
      */
     @Override
-    public CollectionObjectList getCommonObjectList() {
+    public CollectionobjectsCommonList getCommonPartList() {
         return collectionObjectList;
     }
 
     @Override
-    public void setCommonObjectList(CollectionObjectList collectionObjectList) {
+    public void setCommonPartList(CollectionobjectsCommonList collectionObjectList) {
         this.collectionObjectList = collectionObjectList;
     }
 
     @Override
-    public CollectionObject extractCommonObject(DocumentWrapper wrapDoc)
+    public CollectionobjectsCommon extractCommonPart(DocumentWrapper wrapDoc)
             throws Exception {
-        DocumentModel docModel = (DocumentModel) wrapDoc.getWrappedObject();
-        CollectionObject co = new CollectionObject();
-
-        //FIXME property get should be dynamically set using schema inspection
-        //so it does not require hard coding
-
-        // CollectionObject core values
-        co.setObjectNumber((String) docModel.getPropertyValue(
-                getQProperty(CollectionObjectJAXBSchema.OBJECT_NUMBER)));
-        co.setOtherNumber((String) docModel.getPropertyValue(
-                getQProperty(CollectionObjectJAXBSchema.OTHER_NUMBER)));
-        co.setBriefDescription((String) docModel.getPropertyValue(
-                getQProperty(CollectionObjectJAXBSchema.BRIEF_DESCRIPTION)));
-        co.setComments((String) docModel.getPropertyValue(
-                getQProperty(CollectionObjectJAXBSchema.COMMENTS)));
-        co.setDistFeatures((String) docModel.getPropertyValue(
-                getQProperty(CollectionObjectJAXBSchema.DIST_FEATURES)));
-        co.setObjectName((String) docModel.getPropertyValue(
-                getQProperty(CollectionObjectJAXBSchema.OBJECT_NAME)));
-        co.setResponsibleDept((String) docModel.getPropertyValue(
-                getQProperty(CollectionObjectJAXBSchema.RESPONSIBLE_DEPT)));
-        co.setTitle((String) docModel.getPropertyValue(
-                getQProperty(CollectionObjectJAXBSchema.TITLE)));
-
-        return co;
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public void fillCommonObject(CollectionObject co, DocumentWrapper wrapDoc) throws Exception {
-        DocumentModel docModel = (DocumentModel) wrapDoc.getWrappedObject();
-        //FIXME property setter should be dynamically set using schema inspection
-        //so it does not require hard coding
-
-        // a default title for the Dublin Core schema
-        docModel.setPropertyValue("dublincore:title", CollectionObjectConstants.NUXEO_DC_TITLE);
-
-        // CollectionObject core values
-        if(co.getObjectNumber() != null){
-            docModel.setPropertyValue(
-                    getQProperty(CollectionObjectJAXBSchema.OBJECT_NUMBER),
-                    co.getObjectNumber());
-        }
-        if(co.getOtherNumber() != null){
-            docModel.setPropertyValue(
-                    getQProperty(CollectionObjectJAXBSchema.OTHER_NUMBER),
-                    co.getOtherNumber());
-        }
-        if(co.getBriefDescription() != null){
-            docModel.setPropertyValue(
-                    getQProperty(CollectionObjectJAXBSchema.BRIEF_DESCRIPTION),
-                    co.getBriefDescription());
-        }
-        if(co.getComments() != null){
-            docModel.setPropertyValue(
-                    getQProperty(CollectionObjectJAXBSchema.COMMENTS),
-                    co.getComments());
-        }
-        if(co.getDistFeatures() != null){
-            docModel.setPropertyValue(
-                    getQProperty(CollectionObjectJAXBSchema.DIST_FEATURES),
-                    co.getDistFeatures());
-        }
-        if(co.getObjectName() != null){
-            docModel.setPropertyValue(
-                    getQProperty(CollectionObjectJAXBSchema.OBJECT_NAME),
-                    co.getObjectName());
-        }
-        if(co.getResponsibleDept() != null){
-            docModel.setPropertyValue(
-                    getQProperty(CollectionObjectJAXBSchema.RESPONSIBLE_DEPT),
-                    co.getResponsibleDept());
-        }
-        if(co.getTitle() != null){
-            docModel.setPropertyValue(
-                    getQProperty(CollectionObjectJAXBSchema.TITLE),
-                    co.getTitle());
-        }
+    public void fillCommonPart(CollectionobjectsCommon co, DocumentWrapper wrapDoc) throws Exception {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public CollectionObjectList extractCommonObjectList(DocumentWrapper wrapDoc) throws Exception {
+    public CollectionobjectsCommonList extractCommonPartList(DocumentWrapper wrapDoc) throws Exception {
         DocumentModelList docList = (DocumentModelList) wrapDoc.getWrappedObject();
 
-        CollectionObjectList coList = new CollectionObjectList();
-        List<CollectionObjectList.CollectionObjectListItem> list = coList.getCollectionObjectListItem();
+        CollectionobjectsCommonList coList = new CollectionobjectsCommonList();
+        List<CollectionobjectsCommonList.CollectionObjectListItem> list = coList.getCollectionObjectListItem();
 
         //FIXME: iterating over a long list of documents is not a long term
         //strategy...need to change to more efficient iterating in future
@@ -192,10 +114,9 @@ public class CollectionObjectDocumentModelHandler
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
             CollectionObjectListItem coListItem = new CollectionObjectListItem();
-            coListItem.setObjectNumber((String) docModel.getPropertyValue(
-                    getQProperty(CollectionObjectJAXBSchema.OBJECT_NUMBER)));
-            //need fully qualified context for URI
-            coListItem.setUri("/collectionobjects/" + docModel.getId());
+            coListItem.setObjectNumber((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+                    CollectionObjectJAXBSchema.OBJECT_NUMBER));
+            coListItem.setUri(getServiceContextPath() + docModel.getId());
             coListItem.setCsid(docModel.getId());
             list.add(coListItem);
         }
@@ -204,20 +125,26 @@ public class CollectionObjectDocumentModelHandler
     }
 
     @Override
-    public void fillCommonObjectList(CollectionObjectList obj, DocumentWrapper wrapDoc) throws Exception {
-        throw new UnsupportedOperationException();
-    }
-    
-    public String getDocumentType() {
-    	return CollectionObjectConstants.NUXEO_DOCTYPE;
+    public void fillAllParts(DocumentWrapper wrapDoc) throws Exception {
+
+        super.fillAllParts(wrapDoc);
+        fillDublinCoreObject(wrapDoc); //dublincore might not be needed in future
     }
 
-    /**
-     * getQProperty converts the given property to qualified schema property
-     * @param prop
-     * @return
-     */
-    private String getQProperty(String prop) {
+    private void fillDublinCoreObject(DocumentWrapper wrapDoc) throws Exception {
+        DocumentModel docModel = (DocumentModel) wrapDoc.getWrappedObject();
+        //FIXME property setter should be dynamically set using schema inspection
+        //so it does not require hard coding
+        // a default title for the Dublin Core schema
+        docModel.setPropertyValue("dublincore:title", CollectionObjectConstants.NUXEO_DC_TITLE);
+    }
+
+    public String getDocumentType() {
+        return CollectionObjectConstants.NUXEO_DOCTYPE;
+    }
+
+    @Override
+    public String getQProperty(String prop) {
         return CollectionObjectConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
 }

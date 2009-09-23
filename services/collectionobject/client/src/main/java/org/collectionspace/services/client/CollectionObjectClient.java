@@ -2,12 +2,13 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.collectionobject.CollectionObject;
-import org.collectionspace.services.collectionobject.CollectionObjectList;
 
+import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
@@ -48,10 +49,11 @@ public class CollectionObjectClient extends BaseServiceClient {
 
     /**
      * @return
-     * @see org.collectionspace.hello.client.CollectionObjectProxy#getCollectionObject()
+     * @see org.collectionspace.hello.client.CollectionObjectProxy#readList()
      */
-    public ClientResponse<CollectionObjectList> readList() {
+    public ClientResponse<CollectionobjectsCommonList> readList() {
         return collectionObjectProxy.readList();
+
     }
 
     /**
@@ -59,27 +61,27 @@ public class CollectionObjectClient extends BaseServiceClient {
      * @return
      * @see org.collectionspace.hello.client.CollectionObjectProxy#getCollectionObject(java.lang.String)
      */
-    public ClientResponse<CollectionObject> read(String csid) {
+    public ClientResponse<MultipartInput> read(String csid) {
         return collectionObjectProxy.read(csid);
     }
 
     /**
      * @param collectionobject
      * @return
-     * @see org.collectionspace.hello.client.CollectionObjectProxy#createCollectionObject(org.collectionspace.hello.CollectionObject)
+     * @see org.collectionspace.hello.client.CollectionObjectProxy#create(org.collectionspace.services.collectionobject.CollectionobjectsCommon)
      */
-    public ClientResponse<Response> create(CollectionObject collectionObject) {
-        return collectionObjectProxy.create(collectionObject);
+    public ClientResponse<Response> create(MultipartOutput multipart) {
+        return collectionObjectProxy.create(multipart);
     }
 
     /**
      * @param csid
      * @param collectionobject
      * @return
-     * @see org.collectionspace.hello.client.CollectionObjectProxy#updateCollectionObject(java.lang.Long, org.collectionspace.hello.CollectionObject)
+     * @see org.collectionspace.hello.client.CollectionObjectProxy#updateCollectionObject(java.lang.Long, org.collectionspace.services.collectionobject.CollectionobjectsCommon)
      */
-    public ClientResponse<CollectionObject> update(String csid, CollectionObject collectionObject) {
-        return collectionObjectProxy.update(csid, collectionObject);
+    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
+        return collectionObjectProxy.update(csid, multipart);
     }
 
     /**

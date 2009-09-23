@@ -104,75 +104,75 @@ public class NuxeoUtils {
         }
         return doc;
     }
-    
-/**
- * Gets the document.
- * 
- * @param repoSession the repo session
- * @param csid the csid
- * 
- * @return the document
- * 
- * @throws DocumentException the document exception
- */
-public static Document getDocument(RepositoryInstance repoSession, String csid)
-	throws DocumentException {
-		Document result = null;
-		
-		DocumentModel docModel = getDocumentModel(repoSession, csid);
-		result = getDocument(repoSession, docModel);
-		
-		return result;
-	}
-	
-	/**
-	 * Gets the workspace model.
-	 * 
-	 * @param repoSession the repo session
-	 * @param workspaceName the workspace name
-	 * 
-	 * @return the workspace model
-	 * 
-	 * @throws DocumentException the document exception
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 * @throws ClientException the client exception
-	 */
-	public static DocumentModel getWorkspaceModel(
-			RepositoryInstance repoSession, String workspaceName)
-			throws DocumentException, IOException, ClientException {
-		DocumentModel result = null;
 
-		String workspaceUUID = ServiceMain.getInstance().getWorkspaceId(
-				workspaceName);
-		DocumentRef workspaceRef = new IdRef(workspaceUUID);
-		result = repoSession.getDocument(workspaceRef);
+    /**
+     * Gets the document.
+     *
+     * @param repoSession the repo session
+     * @param csid the csid
+     *
+     * @return the document
+     *
+     * @throws DocumentException the document exception
+     */
+    public static Document getDocument(RepositoryInstance repoSession, String csid)
+            throws DocumentException {
+        Document result = null;
 
-		return result;
-	}
+        DocumentModel docModel = getDocumentModel(repoSession, csid);
+        result = getDocument(repoSession, docModel);
 
-	/**
-	 * Gets the document model.
-	 * 
-	 * @param repoSession the repo session
-	 * @param csid the csid
-	 * 
-	 * @return the document model
-	 * 
-	 * @throws DocumentException the document exception
-	 */
-	public static DocumentModel getDocumentModel(
-			RepositoryInstance repoSession, String csid)
-			throws DocumentException {
-		DocumentModel result = null;
+        return result;
+    }
 
-		try {
-			DocumentRef documentRef = new IdRef(csid);
-			result = repoSession.getDocument(documentRef);
-		} catch (ClientException e) {
-			e.printStackTrace();
-		}
+    /**
+     * Gets the workspace model.
+     *
+     * @param repoSession the repo session
+     * @param workspaceName the workspace name
+     *
+     * @return the workspace model
+     *
+     * @throws DocumentException the document exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ClientException the client exception
+     */
+    public static DocumentModel getWorkspaceModel(
+            RepositoryInstance repoSession, String workspaceName)
+            throws DocumentException, IOException, ClientException {
+        DocumentModel result = null;
+        //FIXME: commented out as this does not work without tenant qualification
+        String workspaceUUID = null;
+//		String workspaceUUID = ServiceMain.getInstance().getWorkspaceId(
+//				workspaceName);
+        DocumentRef workspaceRef = new IdRef(workspaceUUID);
+        result = repoSession.getDocument(workspaceRef);
 
-		return result;
-	}
-	    
+        return result;
+    }
+
+    /**
+     * Gets the document model.
+     *
+     * @param repoSession the repo session
+     * @param csid the csid
+     *
+     * @return the document model
+     *
+     * @throws DocumentException the document exception
+     */
+    public static DocumentModel getDocumentModel(
+            RepositoryInstance repoSession, String csid)
+            throws DocumentException {
+        DocumentModel result = null;
+
+        try{
+            DocumentRef documentRef = new IdRef(csid);
+            result = repoSession.getDocument(documentRef);
+        }catch(ClientException e){
+            e.printStackTrace();
+        }
+
+        return result;
+    }
 }

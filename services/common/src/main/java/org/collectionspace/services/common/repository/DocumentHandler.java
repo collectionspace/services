@@ -17,15 +17,17 @@
  */
 package org.collectionspace.services.common.repository;
 
-import org.collectionspace.services.common.repository.DocumentWrapper;
-import org.collectionspace.services.common.repository.DocumentException;
+import java.io.IOException;
 import java.util.Map;
-import org.dom4j.Document;
+import org.collectionspace.services.common.context.ServiceContext;
+import org.w3c.dom.Document;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
  *
  * DocumentHandler provides document processing methods. It is an interface
- * between Nuxeo repository client and CollectionSpace service resource. It provides
+ * between repository client and CollectionSpace service resource. It provides
  * methods to setup request via repository client and handle its response.
  *
  * Typical call sequence is:
@@ -43,8 +45,26 @@ public interface DocumentHandler<T, TL> {
     }
 
     /**
-     * prepare is called by the Nuxeo client to prepare required parameters to set
-     * before invoking repository operation. this is mainly useful for create and 
+     * getServiceContext returns service context
+     * @return
+     */
+    public ServiceContext getServiceContext();
+
+    /**
+     * getServiceContextPath such as "/collectionobjects/"
+     * @return
+     */
+    public String getServiceContextPath();
+
+    /**
+     * setServiceContext sets service contex to the handler
+     * @param ctx
+     */
+    public void setServiceContext(ServiceContext ctx);
+
+    /**
+     * prepare is called by the client for preparation of stuff before
+     * invoking repository operation. this is mainly useful for create and 
      * update kind of actions
      * @param action
      * @throws Exception
@@ -52,108 +72,117 @@ public interface DocumentHandler<T, TL> {
     public void prepare(Action action) throws Exception;
 
     /**
-     * handle is called by the Nuxeo client to hand over the document processing on create
-     * function to the CollectionSpace service
+     * handle is called by the client to hand over the document processing task
      * @param action 
-     * @param doc wrapped Nuxeo doc
+     * @param doc wrapped doc
      * @throws Exception
      */
     public void handle(Action action, DocumentWrapper docWrap) throws Exception;
 
-        /**
-     * handleCreate processes create operation response
+    /**
+     * handleCreate processes documents before creating document in repository
      * @param wrapDoc
      * @throws Exception
      */
     public void handleCreate(DocumentWrapper wrapDoc) throws Exception;
 
     /**
-     * handleUpdate processes update operation response
+     * handleUpdate processes documents for the update of document in repository
      * @param wrapDoc
      * @throws Exception
      */
     public void handleUpdate(DocumentWrapper wrapDoc) throws Exception;
 
     /**
-     * handleGet processes get operation response
+     * handleGet processes documents from repository before responding to consumer
      * @param wrapDoc
      * @throws Exception
      */
     public void handleGet(DocumentWrapper wrapDoc) throws Exception;
 
     /**
-     * handleGetAll processes index operation response
+     * handleGetAll processes documents from repository before responding to consumer
      * @param wrapDoc
      * @throws Exception
      */
     public void handleGetAll(DocumentWrapper wrapDoc) throws Exception;
-    
+
     /**
-     * extractCommonObject extracts common part of a CS document from given Nuxeo document.
-     * @param docWrap nuxeo document
+     * complete is called by the client to provide an opportunity to the handler
+     * to take care of stuff before closing session with the repository. example
+     * could be to reclaim resources or to populate response to the consumer
+     * @param wrapDoc
+     * @throws Exception
+     */
+    public void complete(Action action, DocumentWrapper wrapDoc) throws Exception;
+
+    /**
+     * completeUpdate is called by the client to indicate completion of the update call.
+     * this gives opportunity to prepare updated object that should be sent back to the consumer
+     * @param wrapDoc
+     * @throws Exception
+     */
+    public void completeUpdate(DocumentWrapper wrapDoc) throws Exception;
+
+    /**
+     * extractAllParts extracts all parts of a CS object from given document.
+     * this is usually called AFTER the get operation is invoked on the repository
+     * Called in handle GET/GET_ALL actions.
+     * @param docWrap document
+     * @throws Exception
+     */
+    public void extractAllParts(DocumentWrapper docWrap) throws Exception;
+
+    /**
+     * fillAllParts sets parts of CS object into given document
+     * this is usually called BEFORE create/update operations are invoked on the
+     * repository. Called in handle CREATE/UPDATE actions.
+     * @param obj input object
+     * @param docWrap target document
+     * @throws Exception
+     */
+    public void fillAllParts(DocumentWrapper docWrap) throws Exception;
+
+    /**
+     * extractCommonPart extracts common part of a CS object from given document.
+     * this is usually called AFTER the get operation is invoked on the repository.
+     * Called in handle GET/GET_ALL actions.
+     * @param docWrap document
      * @return common part of CS object
      * @throws Exception
      */
-    public T extractCommonObject(DocumentWrapper docWrap) throws Exception;
+    public T extractCommonPart(DocumentWrapper docWrap) throws Exception;
 
     /**
-     * fillCommonObject sets common part of CS object into given Nuxeo document
+     * fillCommonPart sets common part of CS object into given document
+     * this is usually called BEFORE create/update operations are invoked on the
+     * repository. Called in handle CREATE/UPDATE actions.
      * @param obj input object
-     * @param docWrap target Nuxeo document
+     * @param docWrap target document
      * @throws Exception
      */
-    public void fillCommonObject(T obj, DocumentWrapper docWrap) throws Exception;
+    public void fillCommonPart(T obj, DocumentWrapper docWrap) throws Exception;
 
-        /**
-     * extractCommonObject extracts common part of a CS document from given Nuxeo document.
-     * @param docWrap nuxeo document
+    /**
+     * extractCommonPart extracts common part of a CS object from given document.
+     * this is usually called AFTER bulk get (index/list) operation is invoked on
+     * the repository
+     * @param docWrap document
      * @return common part of CS object
      * @throws Exception
      */
-    public TL extractCommonObjectList(DocumentWrapper docWrap) throws Exception;
+    public TL extractCommonPartList(DocumentWrapper docWrap) throws Exception;
 
     /**
-     * fillCommonObject sets common part of CS object into given Nuxeo document
+     * fillCommonPartList sets list common part of CS object into given document
+     * this is usually called BEFORE bulk create/update on the repository
+     * (not yet supported)
      * @param obj input object
-     * @param docWrap target Nuxeo document
+     * @param docWrap target document
      * @throws Exception
      */
-    public void fillCommonObjectList(TL obj, DocumentWrapper docWrap) throws Exception;
+    public void fillCommonPartList(TL obj, DocumentWrapper docWrap) throws Exception;
 
-    /**
-     * getCommonObject provides the common part of a CS document.
-     * @return common part of CS document
-     */
-    public T getCommonObject();
-
-    /**
-     * setCommonObject sets common part of CS document as input for operation on
-     * Nuxeo repository
-     * @param obj input object
-     */
-    public void setCommonObject(T obj);
-
-    /**
-     * getCommonObjectList provides the default list object of a CS document.
-     * @return default list of CS document
-     */
-    public TL getCommonObjectList();
-
-    /**
-     * setCommonObjectList sets default list object for CS document as input for operation on
-     * Nuxeo repository
-     * @param default list of CS document
-     */
-    public void setCommonObjectList(TL obj);
-
-    /**
-     * getDocument get org.dom4j.Document from given DocumentModel
-     * @param Nuxeo document wrapper
-     * @return
-     * @throws DocumentException
-     */
-    public Document getDocument(DocumentWrapper docWrap) throws DocumentException;
-    
     /**
      * Gets the document type.
      * 
@@ -169,8 +198,48 @@ public interface DocumentHandler<T, TL> {
 
     /**
      * setProperties provides means to the CollectionSpace service resource to
-     * set up parameters before invoking create request via the Nuxeo client.
+     * set up parameters before invoking any request via the client.
      * @param properties
      */
     public void setProperties(Map<String, Object> properties);
+
+    /**
+     * getCommonPart provides the common part of a CS object.
+     * @return common part of CS object
+     */
+    public T getCommonPart();
+
+    /**
+     * setCommonPart sets common part of CS object as input for operation on
+     * repository
+     * @param obj input object
+     */
+    public void setCommonPart(T obj);
+
+    /**
+     * getCommonPartList provides the default list object of a CS object.
+     * @return default list of CS object
+     */
+    public TL getCommonPartList();
+
+    /**
+     * setCommonPartList sets common part list entry for CS object as input for operation on
+     * repository
+     * @param default list of CS object
+     */
+    public void setCommonPartList(TL obj);
+
+    /**
+     * getQProperty get qualified property (useful for mapping to repository document property)
+     * @param prop
+     * @return
+     */
+    public String getQProperty(String prop);
+
+    /**
+     * getUnQProperty unqualifies document property from repository
+     * @param qProp qualifeid property
+     * @return unqualified property
+     */
+    public String getUnQProperty(String qProp);
 }
