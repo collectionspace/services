@@ -21,10 +21,6 @@
     targetNamespace="http://collectionspace.org/relation/"
     version="0.1">
 
-    <!-- Note: Nuxeo creates a table with the name of the complextype instead of the name of the element -->
-    <xs:element name="relationtype" type="rel:relation"/>
-    <xs:complexType name="relation">
-        <xs:sequence>
             <!-- Note: nuxeo ecm types does not support xs:anyURI type -->
             <!-- if xs:anyURI is used, it fails to register that doctype -->
 
@@ -41,15 +37,14 @@
             <!-- document-type-1 would be the doc-type of the container collectionobject -->
             <!-- document-id-2 would be the id of the contained (or child) collectionobject -->
             <!-- document-type-2 would be the doc-type of the collectionobejct -->
-            <xs:element name="documentId1" type="xs:string"  minOccurs="1" maxOccurs="1"/>
-            <xs:element name="documentType1" type="xs:string"  minOccurs="1" maxOccurs="1"/>
-            <xs:element name="documentId2" type="xs:string"  minOccurs="1" maxOccurs="1"/>
-            <xs:element name="documentType2" type="xs:string"  minOccurs="1" maxOccurs="1"/>
+    <xs:element name="documentId1" type="xs:string"  minOccurs="1" maxOccurs="1"/>
+    <xs:element name="documentType1" type="xs:string"  minOccurs="1" maxOccurs="1"/>
+    <xs:element name="documentId2" type="xs:string"  minOccurs="1" maxOccurs="1"/>
+    <xs:element name="documentType2" type="xs:string"  minOccurs="1" maxOccurs="1"/>
 
             <!-- type of relatinoship between two entities -->
-            <xs:element name="relationshipType" type="rel:RelationshipType" minOccurs="1" maxOccurs="1"/>
-        </xs:sequence>
-    </xs:complexType>
+    <xs:element name="relationshipType" type="rel:RelationshipType" minOccurs="1" maxOccurs="1"/>
+
 
 
     <!-- enumeration defining the type of relationship between two entities -->

@@ -21,8 +21,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import java.io.Serializable;
+import java.util.Map;
 import org.collectionspace.services.common.repository.DocumentException;
-import org.collectionspace.services.common.ServiceMain;
 
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
@@ -32,6 +33,7 @@ import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
+import org.nuxeo.ecm.core.api.model.DocumentPart;
 import org.nuxeo.ecm.core.io.DocumentPipe;
 import org.nuxeo.ecm.core.io.DocumentReader;
 import org.nuxeo.ecm.core.io.DocumentWriter;
@@ -174,5 +176,22 @@ public class NuxeoUtils {
         }
 
         return result;
+    }
+
+    public static void printDocumentModel(DocumentModel docModel) throws Exception {
+        String[] schemas = docModel.getDeclaredSchemas();
+        for(int i = 0; schemas != null && i < schemas.length; i++){
+            logger.debug("Schema-" + i + "=" + schemas[i]);
+        }
+
+        DocumentPart[] parts = docModel.getParts();
+        Map<String, Serializable> propertyValues = null;
+        for(int i = 0; parts != null && i < parts.length; i++){
+            logger.debug("Part-" + i + " name =" + parts[i].getName());
+            logger.debug("Part-" + i + " path =" + parts[i].getPath());
+            logger.debug("Part-" + i + " schema =" + parts[i].getSchema().getName());
+            propertyValues = parts[i].exportValues();
+        }
+
     }
 }

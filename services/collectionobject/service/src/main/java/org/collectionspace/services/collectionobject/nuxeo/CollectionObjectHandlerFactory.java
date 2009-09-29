@@ -47,9 +47,7 @@ public class CollectionObjectHandlerFactory {
     public DocumentHandler getHandler(String clientType) {
         if(ClientType.JAVA.toString().equals(clientType)){
             return new CollectionObjectDocumentModelHandler();
-        } else if(ClientType.REST.toString().equals(clientType)) {
-            return new CollectionObjectRepresenationHandler();
-        }
+        } 
         throw new IllegalArgumentException("Not supported client=" + clientType);
     }
 }

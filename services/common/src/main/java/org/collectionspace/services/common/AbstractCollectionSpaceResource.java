@@ -23,8 +23,9 @@
  */
 package org.collectionspace.services.common;
 
+import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.context.ServiceContextImpl;
+import org.collectionspace.services.common.context.RemoteServiceContextImpl;
 import org.collectionspace.services.common.repository.DocumentHandler;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
@@ -59,12 +60,12 @@ public abstract class AbstractCollectionSpaceResource
     }
 
     @Override
-    public ServiceContext createServiceContext(MultipartInput input) throws Exception {
-        ServiceContext ctx = new ServiceContextImpl(getServiceName());
+    public RemoteServiceContext createServiceContext(MultipartInput input) throws Exception {
+        RemoteServiceContext ctx = new RemoteServiceContextImpl(getServiceName());
         ctx.setInput(input);
         return ctx;
     }
 
     @Override
-    abstract public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception ;
+    abstract public DocumentHandler createDocumentHandler(RemoteServiceContext ctx) throws Exception ;
 }

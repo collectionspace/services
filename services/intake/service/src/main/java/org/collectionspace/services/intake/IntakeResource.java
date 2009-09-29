@@ -43,6 +43,7 @@ import org.collectionspace.services.intake.IntakesCommonList.*;
 import org.collectionspace.services.intake.nuxeo.IntakeHandlerFactory;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.repository.DocumentNotFoundException;
 import org.collectionspace.services.common.repository.DocumentHandler;
@@ -72,7 +73,7 @@ public class IntakeResource extends AbstractCollectionSpaceResource {
     }
 
     @Override
-    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
+    public DocumentHandler createDocumentHandler(RemoteServiceContext ctx) throws Exception {
         DocumentHandler docHandler = IntakeHandlerFactory.getInstance().getHandler(
                 ctx.getRepositoryClientType().toString());
         docHandler.setServiceContext(ctx);
@@ -88,7 +89,7 @@ public class IntakeResource extends AbstractCollectionSpaceResource {
     @POST
     public Response createIntake(MultipartInput input) {
         try{
-            ServiceContext ctx = createServiceContext(input);
+            RemoteServiceContext ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             //intakeObject.setCsid(csid);
@@ -122,7 +123,7 @@ public class IntakeResource extends AbstractCollectionSpaceResource {
         }
         MultipartOutput result = null;
         try{
-            ServiceContext ctx = createServiceContext(null);
+            RemoteServiceContext ctx = createServiceContext(null);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = ctx.getOutput();
@@ -156,7 +157,7 @@ public class IntakeResource extends AbstractCollectionSpaceResource {
     public IntakesCommonList getIntakeList(@Context UriInfo ui) {
         IntakesCommonList intakeObjectList = new IntakesCommonList();
         try{
-            ServiceContext ctx = createServiceContext(null);
+            RemoteServiceContext ctx = createServiceContext(null);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getAll(ctx, handler);
             intakeObjectList = (IntakesCommonList) handler.getCommonPartList();
@@ -188,7 +189,7 @@ public class IntakeResource extends AbstractCollectionSpaceResource {
         }
         MultipartOutput result = null;
         try{
-            ServiceContext ctx = createServiceContext(theUpdate);
+            RemoteServiceContext ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = ctx.getOutput();

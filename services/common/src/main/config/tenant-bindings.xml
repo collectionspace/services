@@ -54,7 +54,7 @@
         <!-- begin intake service meta-data -->
         <tenant:serviceBindings name="Intakes" version="0.1">
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>nuxeo-java</service:repositoryClient>
-            <service:object id="2" name="Intake" version="0.1"
+            <service:object id="1" name="Intake" version="0.1"
             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
                             versionable="true" auditable="false"
@@ -82,7 +82,7 @@
                 <!-- begin acquisition service meta-data -->
         <tenant:serviceBindings name="Acquisitions" version="0.1">
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>nuxeo-java</service:repositoryClient>
-            <service:object id="2" name="Acquisition" version="0.1"
+            <service:object id="1" name="Acquisition" version="0.1"
             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
                             versionable="true" auditable="false"
@@ -107,6 +107,34 @@
             </service:object>
         </tenant:serviceBindings>
         <!-- end acquisition service meta-data -->
+        <!-- begin relation service meta-data -->
+        <tenant:serviceBindings name="Relations" version="0.1">
+            <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>nuxeo-java</service:repositoryClient>
+            <service:object id="1" name="Relation" version="0.1"
+            xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:part id="0" control_group="Managed"
+                            versionable="true" auditable="false"
+                            label="relations-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                        namespaceURI="http://collectionspace.org/services/common/system"
+                        schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed"
+                            versionable="true" auditable="false"
+                            label="relations-common" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                        namespaceURI="http://collectionspace.org/services/relation"
+                        schemaLocation="http://collectionspace.org/services/relation http://services.collectionspace.org/relation/relations-common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end relation service meta-data -->
     </tenant:tenantBinding>
     <!-- end movinimages.us tenant meta-data -->
 </tenant:TenantBindingConfig>

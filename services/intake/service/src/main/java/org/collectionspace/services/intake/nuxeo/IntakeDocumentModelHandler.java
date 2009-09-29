@@ -27,12 +27,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.collectionspace.services.IntakeJAXBSchema;
+import org.collectionspace.services.common.repository.DocumentHandler.Action;
 import org.collectionspace.services.common.repository.DocumentWrapper;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.IntakesCommonList;
 import org.collectionspace.services.intake.IntakesCommonList.IntakeListItem;
-import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 
+import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandler;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
@@ -45,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class IntakeDocumentModelHandler
-        extends DocumentModelHandler<IntakesCommon, IntakesCommonList> {
+        extends RemoteDocumentModelHandler<IntakesCommon, IntakesCommonList> {
 
     private final Logger logger = LoggerFactory.getLogger(IntakeDocumentModelHandler.class);
     /**

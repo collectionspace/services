@@ -1,16 +1,14 @@
 package org.collectionspace.services.client;
 
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.relation.Relation;
-import org.collectionspace.services.relation.RelationList;
+import org.collectionspace.services.relation.RelationsCommonList;
 
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
@@ -53,11 +51,11 @@ public class RelationClient extends BaseServiceClient implements RelationProxy {
      * @return
      * @see org.collectionspace.hello.client.RelationProxy#getRelation()
      */
-    public ClientResponse<RelationList> readList() {
+    public ClientResponse<RelationsCommonList> readList() {
         return relationProxy.readList();
     }
     
-    public ClientResponse<RelationList> readList_SPO(String subjectCsid,
+    public ClientResponse<RelationsCommonList> readList_SPO(String subjectCsid,
 			String predicate,
 			String objectCsid) {
     	return relationProxy.readList_SPO(subjectCsid, predicate, objectCsid);
@@ -68,7 +66,7 @@ public class RelationClient extends BaseServiceClient implements RelationProxy {
      * @return
      * @see org.collectionspace.hello.client.RelationProxy#getRelation(java.lang.String)
      */
-    public ClientResponse<Relation> read(String csid) {
+    public ClientResponse<MultipartInput> read(String csid) {
         return relationProxy.read(csid);
     }
 
@@ -77,8 +75,8 @@ public class RelationClient extends BaseServiceClient implements RelationProxy {
      * @return
      * @see org.collectionspace.hello.client.RelationProxy#createRelation(org.collectionspace.hello.Relation)
      */
-    public ClientResponse<Response> create(Relation relation) {
-        return relationProxy.create(relation);
+    public ClientResponse<Response> create(MultipartOutput multipart) {
+        return relationProxy.create(multipart);
     }
 
     /**
@@ -87,8 +85,8 @@ public class RelationClient extends BaseServiceClient implements RelationProxy {
      * @return
      * @see org.collectionspace.hello.client.RelationProxy#updateRelation(java.lang.Long, org.collectionspace.hello.Relation)
      */
-    public ClientResponse<Relation> update(String csid, Relation relation) {
-        return relationProxy.update(csid, relation);
+    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
+        return relationProxy.update(csid, multipart);
     }
 
     /**

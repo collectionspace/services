@@ -18,7 +18,7 @@
         <!-- add modules below in the order based on dependencies -->
         <module>common</module>
         <module>authentication</module>
-        <!--module>relation</module-->
+        <module>relation</module>
         <!--module>query</module-->
         <module>acquisition</module>
         <module>vocabulary</module>

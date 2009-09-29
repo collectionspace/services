@@ -15,13 +15,13 @@
 -->
 <xs:schema
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns="http://services.collectionspace.org/relation"
-    xmlns:rel="http://services.collectionspace.org/relation"
-    targetNamespace="http://services.collectionspace.org/relation"
+    xmlns="http://collectionspace.org/services/relation"
+    xmlns:rel="http://collectionspace.org/services/relation"
+    targetNamespace="http://collectionspace.org/services/relation"
     >
 
     <!-- Relation -->
-    <xs:element name="relation">
+    <xs:element name="relations-common">
         <xs:complexType>
             <xs:sequence>
             	<xs:element name="csid" type="xs:string" />            
@@ -48,7 +48,7 @@
     </xs:simpleType>
 
     <!-- collection objects as in nuxeo repository -->
-    <xs:element name="relation-list">
+    <xs:element name="relations-common-list">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="relation-list-item" maxOccurs="unbounded">

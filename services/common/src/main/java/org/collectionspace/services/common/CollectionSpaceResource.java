@@ -24,6 +24,7 @@
 
 package org.collectionspace.services.common;
 
+import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.repository.DocumentHandler;
 import org.collectionspace.services.common.repository.RepositoryClient;
@@ -59,7 +60,7 @@ public interface CollectionSpaceResource {
      * @param input
      * @return
      */
-    public ServiceContext createServiceContext(MultipartInput input) throws Exception;
+    public RemoteServiceContext createServiceContext(MultipartInput input) throws Exception;
 
     /**
      * createDocumentHandler creates a document handler and populates it with given
@@ -69,5 +70,5 @@ public interface CollectionSpaceResource {
      * @param ctx
      * @return
      */
-    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception ;
+    public DocumentHandler createDocumentHandler(RemoteServiceContext ctx) throws Exception ;
 }

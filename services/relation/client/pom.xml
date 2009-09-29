@@ -33,11 +33,6 @@
             <version>1.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.relation.service</artifactId>
-            <version>1.0</version>
-        </dependency>
 
         <dependency>
             <groupId>org.testng</groupId>
@@ -93,7 +88,7 @@
                     <systemProperties>
                         <property>
                             <name>log4j.configuration</name>
-                            <value>log4j.xml</value>
+                            <value>file:target/test-classes/log4j.properties</value>
                         </property>
                     </systemProperties>
                 </configuration>

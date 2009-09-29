@@ -31,7 +31,7 @@ import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList.CollectionObjectListItem;
 import org.collectionspace.services.common.repository.DocumentWrapper;
-import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
+import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandler;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class CollectionObjectDocumentModelHandler
-        extends DocumentModelHandler<CollectionobjectsCommon, CollectionobjectsCommonList> {
+        extends RemoteDocumentModelHandler<CollectionobjectsCommon, CollectionobjectsCommonList> {
 
     private final Logger logger = LoggerFactory.getLogger(CollectionObjectDocumentModelHandler.class);
     /**
@@ -139,6 +139,7 @@ public class CollectionObjectDocumentModelHandler
         docModel.setPropertyValue("dublincore:title", CollectionObjectConstants.NUXEO_DC_TITLE);
     }
 
+    @Override
     public String getDocumentType() {
         return CollectionObjectConstants.NUXEO_DOCTYPE;
     }

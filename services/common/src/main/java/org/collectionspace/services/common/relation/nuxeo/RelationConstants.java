@@ -21,33 +21,17 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.collectionspace.services.intake.nuxeo;
-
-import org.collectionspace.services.common.ClientType;
-import org.collectionspace.services.common.repository.DocumentHandler;
+package org.collectionspace.services.common.relation.nuxeo;
 
 /**
- * IntakeHandlerFactory creates handlers for collectionobject based
- * on type of Nuxeo client used
+ * CollectionObjectConstants processes CollectionObject document
  *
- * $LastChangedRevision: $
- * $LastChangedDate: $
  */
-public class IntakeHandlerFactory {
+public class RelationConstants {
 
-    private static final IntakeHandlerFactory self = new IntakeHandlerFactory();
-
-    private IntakeHandlerFactory() {
-    }
-
-    public static IntakeHandlerFactory getInstance() {
-        return self;
-    }
-
-    public DocumentHandler getHandler(String clientType) {
-        if(ClientType.JAVA.toString().equals(clientType)){
-            return new IntakeDocumentModelHandler();
-        } 
-        throw new IllegalArgumentException("Not supported client=" + clientType);
-    }
+    public final static String NUXEO_DOCTYPE = "Relation";
+    public final static String NUXEO_SCHEMA_NAME = "relation";
+    public final static String NUXEO_DC_TITLE = "CollectionSpace-Relation";
+    /** The Constant REL_NUXEO_SCHEMA_ROOT_ELEMENT. */
+    final public static String NUXEO_SCHEMA_ROOT_ELEMENT = "relationtype";
 }

@@ -23,7 +23,6 @@
  */
 package org.collectionspace.services.common.repository;
 
-import java.lang.ClassLoader;
 import java.util.Hashtable;
 import org.collectionspace.services.common.RepositoryClientConfigType;
 import org.collectionspace.services.common.ServiceMain;

@@ -4,7 +4,7 @@ import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.id.IDResource;
 import org.collectionspace.services.intake.IntakeResource;
 ////import org.collectionspace.services.relation.RelationResource;
-//import org.collectionspace.services.relation.NewRelationResource;
+import org.collectionspace.services.relation.NewRelationResource;
 import org.collectionspace.services.acquisition.AcquisitionResource;
 //import org.collectionspace.services.query.QueryResource;
 
@@ -24,7 +24,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new IntakeResource());
         singletons.add(new AcquisitionResource());
 //        singletons.add(new RelationResource());
-        //singletons.add(new NewRelationResource());
+        singletons.add(new NewRelationResource());
 //        singletons.add(new QueryResource());
 //        singletons.add(new DomainIdentifierResource());
 //        singletons.add(new PingResource());

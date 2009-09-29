@@ -17,12 +17,8 @@
  */
 package org.collectionspace.services.common.repository;
 
-import java.io.IOException;
 import java.util.Map;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.w3c.dom.Document;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
  *

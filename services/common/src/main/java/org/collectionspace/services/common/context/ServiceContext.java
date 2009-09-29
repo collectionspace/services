@@ -23,14 +23,10 @@
  */
 package org.collectionspace.services.common.context;
 
-import java.io.IOException;
 import java.util.Map;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.service.ServiceBindingType;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.w3c.dom.Document;
 
 /**
  *
@@ -38,7 +34,7 @@ import org.w3c.dom.Document;
  * between various components of the service framework while processing
  * a service request.
  */
-public interface ServiceContext {
+public interface ServiceContext<T1, T2> {
 
     /**
      * getTenantId get tenant id
@@ -109,40 +105,30 @@ public interface ServiceContext {
     public String getRepositoryWorkspaceId();
 
     /**
-     * setInput is used to set (multipart) request input before starting to
-     * process input data
-     * @param input multipart data input
-     * @exception IOException
-     */
-    public void setInput(MultipartInput input) throws IOException;
-
-    /**
      * Get input parts as received over the wire from service consumer
      * @return the input
      */
-    public MultipartInput getInput();
+    public T1 getInput();
+
+    /**
+     * setInput is used to set request input before starting to
+     * process input data
+     * @param input
+     * @exception Exception
+     */
+    public void setInput(T1 input) throws Exception;
 
     /**
      * Get output parts to send over the wire to service consumer
      * @return the output
      */
-    public MultipartOutput getOutput();
+    public T2 getOutput();
 
     /**
-     * getInputPart returns part for given label from input
-     * @param label
-     * @param clazz class of the object
-     * @return part
+     * setOutput set output
+     * @param output
      */
-    public Object getInputPart(String label, Class clazz) throws IOException;
-
-    /**
-     * addOutputPart adds given XML part with given label and content type to output
-     * @param label
-     * @param document
-     * @param contentType media type
-     */
-    public void addOutputPart(String label, Document doc, String contentType) throws Exception;
+    public void setOutput(T2 output) throws Exception;
 
     /**
      * getPartsMetadata returns metadata for object parts used by the service

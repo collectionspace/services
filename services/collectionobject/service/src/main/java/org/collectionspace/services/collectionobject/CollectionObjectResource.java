@@ -40,6 +40,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectHandlerFactory;
 import org.collectionspace.services.common.AbstractCollectionSpaceResource;
+import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.repository.DocumentNotFoundException;
 import org.collectionspace.services.common.repository.DocumentHandler;
@@ -64,7 +65,7 @@ public class CollectionObjectResource
     }
 
     @Override
-    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
+    public DocumentHandler createDocumentHandler(RemoteServiceContext ctx) throws Exception {
         DocumentHandler docHandler = CollectionObjectHandlerFactory.getInstance().getHandler(
                 ctx.getRepositoryClientType().toString());
         docHandler.setServiceContext(ctx);
@@ -80,7 +81,7 @@ public class CollectionObjectResource
     @POST
     public Response createCollectionObject(MultipartInput input) {
         try{
-            ServiceContext ctx = createServiceContext(input);
+            RemoteServiceContext ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(CollectionObjectResource.class);
@@ -113,7 +114,7 @@ public class CollectionObjectResource
         }
         MultipartOutput result = null;
         try{
-            ServiceContext ctx = createServiceContext(null);
+            RemoteServiceContext ctx = createServiceContext(null);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = ctx.getOutput();
@@ -148,7 +149,7 @@ public class CollectionObjectResource
     public CollectionobjectsCommonList getCollectionObjectList(@Context UriInfo ui) {
         CollectionobjectsCommonList collectionObjectList = new CollectionobjectsCommonList();
         try{
-            ServiceContext ctx = createServiceContext(null);
+            RemoteServiceContext ctx = createServiceContext(null);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getAll(ctx, handler);
             collectionObjectList = (CollectionobjectsCommonList) handler.getCommonPartList();
@@ -180,7 +181,7 @@ public class CollectionObjectResource
         }
         MultipartOutput result = null;
         try{
-            ServiceContext ctx = createServiceContext(theUpdate);
+            RemoteServiceContext ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = ctx.getOutput();

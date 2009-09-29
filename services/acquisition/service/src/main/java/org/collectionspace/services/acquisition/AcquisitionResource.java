@@ -39,6 +39,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.acquisition.nuxeo.AcquisitionHandlerFactory;
 import org.collectionspace.services.common.AbstractCollectionSpaceResource;
+import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.repository.DocumentNotFoundException;
 import org.collectionspace.services.common.repository.DocumentHandler;
@@ -63,7 +64,7 @@ public class AcquisitionResource
     }
 
     @Override
-    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
+    public DocumentHandler createDocumentHandler(RemoteServiceContext ctx) throws Exception {
         DocumentHandler docHandler = AcquisitionHandlerFactory.getInstance().getHandler(
                 ctx.getRepositoryClientType().toString());
         docHandler.setServiceContext(ctx);
@@ -84,7 +85,7 @@ public class AcquisitionResource
     public Response createAcquisition(MultipartInput input) {
 
         try{
-            ServiceContext ctx = createServiceContext(input);
+            RemoteServiceContext ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(AcquisitionResource.class);
@@ -117,7 +118,7 @@ public class AcquisitionResource
         }
         MultipartOutput result = null;
         try{
-            ServiceContext ctx = createServiceContext(null);
+            RemoteServiceContext ctx = createServiceContext(null);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = ctx.getOutput();
@@ -152,7 +153,7 @@ public class AcquisitionResource
     public AcquisitionsCommonList getAcquisitionList(@Context UriInfo ui) {
         AcquisitionsCommonList acquisitionObjectList = new AcquisitionsCommonList();
         try{
-            ServiceContext ctx = createServiceContext(null);
+            RemoteServiceContext ctx = createServiceContext(null);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getAll(ctx, handler);
             acquisitionObjectList = (AcquisitionsCommonList) handler.getCommonPartList();
@@ -187,7 +188,7 @@ public class AcquisitionResource
         }
         MultipartOutput result = null;
         try{
-            ServiceContext ctx = createServiceContext(theUpdate);
+            RemoteServiceContext ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = ctx.getOutput();
