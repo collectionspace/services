@@ -25,6 +25,7 @@ package org.collectionspace.services.acquisition.nuxeo;
 
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.repository.DocumentHandler;
+import org.collectionspace.services.common.repository.DocumentHandlerFactory;
 
 /**
  * AcquisitionHandlerFactory creates handlers for acquisition based
@@ -33,7 +34,7 @@ import org.collectionspace.services.common.repository.DocumentHandler;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public class AcquisitionHandlerFactory {
+public class AcquisitionHandlerFactory  implements DocumentHandlerFactory {
 
     private static final AcquisitionHandlerFactory self = new AcquisitionHandlerFactory();
 
@@ -44,6 +45,7 @@ public class AcquisitionHandlerFactory {
         return self;
     }
 
+    @Override
     public DocumentHandler getHandler(String clientType) {
         if(ClientType.JAVA.toString().equals(clientType)){
             return new AcquisitionDocumentModelHandler();

@@ -25,6 +25,7 @@ package org.collectionspace.services.collectionobject.nuxeo;
 
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.repository.DocumentHandler;
+import org.collectionspace.services.common.repository.DocumentHandlerFactory;
 
 /**
  * CollectionObjectHandlerFactory creates handlers for collectionobject based
@@ -33,7 +34,7 @@ import org.collectionspace.services.common.repository.DocumentHandler;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public class CollectionObjectHandlerFactory {
+public class CollectionObjectHandlerFactory implements DocumentHandlerFactory {
 
     private static final CollectionObjectHandlerFactory self = new CollectionObjectHandlerFactory();
 
@@ -44,6 +45,7 @@ public class CollectionObjectHandlerFactory {
         return self;
     }
 
+    @Override
     public DocumentHandler getHandler(String clientType) {
         if(ClientType.JAVA.toString().equals(clientType)){
             return new CollectionObjectDocumentModelHandler();
