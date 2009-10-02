@@ -92,8 +92,8 @@
                 </xs:restriction>
             </xs:simpleType>
         </xs:attribute>
-        <xs:attribute name="versionable" type="xs:boolean" use="optional" default="true"/>
-        <xs:attribute name="auditable" type="xs:boolean" use="optional" default="true"/>
+        <xs:attribute name="versionable" type="xs:boolean" use="optional" default="false"/>
+        <xs:attribute name="auditable" type="xs:boolean" use="optional" default="false"/>
         <!-- application defined label to identify the part, e.g. collectionobject.ucmp.berkeley -->
         <xs:attribute name="label" type="xs:string" use="optional"/>
         <xs:attribute name="updated" type="xs:dateTime" use="optional"/>
