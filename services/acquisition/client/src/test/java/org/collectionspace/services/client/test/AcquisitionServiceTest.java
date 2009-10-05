@@ -509,7 +509,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
         OutputPart commonPart = multipart.addPart(acquisition, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", getCommonPartName());
 
-        verbose("to be created, collectionobject common ", acquisition, AcquisitionsCommon.class);
+        verbose("to be created, acquisition common ", acquisition, AcquisitionsCommon.class);
         return multipart;
     }
 }
