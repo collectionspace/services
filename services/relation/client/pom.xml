@@ -16,6 +16,17 @@
     <name>services.relation.client</name>
     
     <dependencies>
+                <!-- keep slf4j dependencies on the top -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
+        </dependency>
 <!--        <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.relation.jaxb</artifactId>
@@ -38,16 +49,6 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>5.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.5.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.5.2</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
