@@ -58,9 +58,9 @@ public abstract class RemoteDocumentModelHandler<T, TL>
     public void setServiceContext(ServiceContext ctx) {
         if(ctx instanceof RemoteServiceContext){
             super.setServiceContext(ctx);
-        } else {
-        throw new IllegalArgumentException("setServiceContext requires instance of " +
-                RemoteServiceContext.class.getName());
+        }else{
+            throw new IllegalArgumentException("setServiceContext requires instance of " +
+                    RemoteServiceContext.class.getName());
         }
     }
 
@@ -122,20 +122,33 @@ public abstract class RemoteDocumentModelHandler<T, TL>
             if(!partsMetaMap.containsKey(partLabel)){
                 continue;
             }
-            InputStream payload = part.getBody(InputStream.class, null);
-
-            //check if this is an xml part
-            if(part.getMediaType().equals(MediaType.APPLICATION_XML_TYPE)){
-                if(payload != null){
-                    Document document = DocumentUtils.parseDocument(payload);
-                    //TODO: callback to handler if registered to validate the
-                    //document
-                    Map<String, Object> objectProps = DocumentUtils.parseProperties(document);
-                    docModel.setProperties(partLabel, objectProps);
-                }
-            }
+            ObjectPartType partMeta = partsMetaMap.get(partLabel);
+            fillPart(part, docModel, partMeta);
         }//rof
 
+    }
+
+    /**
+     * fillPart fills an XML part into given document model
+     * @param part to fill
+     * @param docModel for the given object
+     * @param partMeta metadata for the object to fill
+     * @throws Exception
+     */
+    protected void fillPart(InputPart part, DocumentModel docModel, ObjectPartType partMeta)
+            throws Exception {
+        InputStream payload = part.getBody(InputStream.class, null);
+
+        //check if this is an xml part
+        if(part.getMediaType().equals(MediaType.APPLICATION_XML_TYPE)){
+            if(payload != null){
+                Document document = DocumentUtils.parseDocument(payload);
+                //TODO: callback to handler if registered to validate the
+                //document
+                Map<String, Object> objectProps = DocumentUtils.parseProperties(document);
+                docModel.setProperties(partMeta.getLabel(), objectProps);
+            }
+        }
     }
 
     /**
