@@ -25,30 +25,5 @@
         <client-class>org.collectionspace.services.nuxeo.client.java.RepositoryJavaClient</client-class>
     </repository-client>
 
-    <!-- TODO: remove once all the services start using service bindings -->
-    <repository-workspace>
-        <!--workspace>
-            <service-name>persons</service-name>
-            <workspace-name>People</workspace-name>
-        </workspace-->
-        <workspace>
-            <service-name>collectionobjects</service-name>
-            <workspace-name>CollectionObjects</workspace-name>
-            <!-- use hard-coded workspace id for REST client -->
-            <!--workspace-id></workspace-id-->
-        </workspace>
-        <workspace>
-            <service-name>intakes</service-name>
-            <workspace-name>Intakes</workspace-name>
-        </workspace>
-        <workspace>
-            <service-name>relations</service-name>
-            <workspace-name>Relations</workspace-name>
-        </workspace>
-        <workspace>
-            <service-name>acquisitions</service-name>
-            <workspace-name>Acquisitions</workspace-name>
-        </workspace>
-    </repository-workspace>
 
 </ns1:service-config>
