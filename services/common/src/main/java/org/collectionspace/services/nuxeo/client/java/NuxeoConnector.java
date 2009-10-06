@@ -31,6 +31,7 @@ import org.collectionspace.services.common.RepositoryClientConfigType;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.ecm.core.client.DefaultLoginHandler;
 import org.nuxeo.ecm.core.client.NuxeoApp;
 import org.nuxeo.ecm.core.client.NuxeoClient;
 import org.slf4j.Logger;
@@ -80,6 +81,15 @@ public class NuxeoConnector {
                         }
                         loadBundles();
                         client = NuxeoClient.getInstance();
+                        DefaultLoginHandler loginHandler = new DefaultLoginHandler(
+                                repositoryClientConfig.getUser(), repositoryClientConfig.getPassword());
+                        client.setLoginHandler(loginHandler);
+                        client.connect(repositoryClientConfig.getHost(),
+                                repositoryClientConfig.getPort());
+                        if(logger.isDebugEnabled()){
+                            logger.debug("initialize(): connection successful port=" +
+                                    repositoryClientConfig.getPort());
+                        }
                         initialized = true;
                     }catch(Exception e){
                         if(logger.isDebugEnabled()){
@@ -151,18 +161,17 @@ public class NuxeoConnector {
      */
     public NuxeoClient getClient() throws Exception {
         if(initialized == true){
-//            if(client.isConnected()){
-//                return client;
-//            }else{
-            //authentication failure error comes when reusing the client
-            //force connect for now
-            client.forceConnect(repositoryClientConfig.getHost(), repositoryClientConfig.getPort());
-            if(logger.isDebugEnabled()){
-                logger.debug("getClient(): connection successful port=" +
-                        repositoryClientConfig.getPort());
+            if(client.isConnected()){
+                client.login();
+                return client;
+            }else{
+                client.forceConnect(repositoryClientConfig.getHost(), repositoryClientConfig.getPort());
+                if(logger.isDebugEnabled()){
+                    logger.debug("getClient(): connection successful port=" +
+                            repositoryClientConfig.getPort());
+                }
+                return client;
             }
-            return client;
-//            }
         }
         String msg = "NuxeoConnector is not initialized!";
         logger.error(msg);
@@ -214,10 +223,10 @@ public class NuxeoConnector {
             while(diter.hasNext()){
                 DocumentModel domain = diter.next();
                 String domainPath = "/" + tenantDomain;
-                if(!domain.getPathAsString().equalsIgnoreCase(domainPath)) {
+                if(!domain.getPathAsString().equalsIgnoreCase(domainPath)){
                     continue;
                 }
-                if(logger.isDebugEnabled()) {
+                if(logger.isDebugEnabled()){
                     logger.debug("domain=" + domain.toString());
                 }
                 DocumentModelList domainChildrenList = repoSession.getChildren(domain.getRef());
