@@ -25,10 +25,12 @@
  * limitations under the License.
  */
 
-package org.collectionspace.services.id;
+package org.collectionspace.services.id.test;
 
-import static org.junit.Assert.fail;
 import junit.framework.TestCase;
+
+import org.collectionspace.services.id.NumericIDGeneratorPart;
+import org.collectionspace.services.id.SequenceIDGeneratorPart;
 
 /**
  * NumericIDGeneratorPartTest

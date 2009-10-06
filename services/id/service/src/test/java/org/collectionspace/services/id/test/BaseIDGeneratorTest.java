@@ -21,15 +21,18 @@
  * limitations under the License.
  */
 
-package org.collectionspace.services.id;
+package org.collectionspace.services.id.test;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.Vector;
 
 import junit.framework.TestCase;
-import static org.junit.Assert.fail;
 
+import org.collectionspace.services.id.AlphabeticIDGeneratorPart;
+import org.collectionspace.services.id.BaseIDGenerator;
+import org.collectionspace.services.id.IDGeneratorPart;
+import org.collectionspace.services.id.NumericIDGeneratorPart;
+import org.collectionspace.services.id.StringIDGeneratorPart;
+import org.collectionspace.services.id.UUIDGeneratorPart;
 import org.collectionspace.services.id.YearIDGeneratorPart;
 
 /**    

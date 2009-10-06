@@ -57,7 +57,7 @@ public class UUIDGeneratorPart implements IDGeneratorPart {
         "[a-z0-9\\-]{12}" +
         ")";
         
-    final static int UUID_LENGTH = 36;
+    public final static int UUID_LENGTH = 36;
     
     /**
      * Constructor (no-argument).
