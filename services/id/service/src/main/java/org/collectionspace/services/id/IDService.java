@@ -20,6 +20,7 @@ package org.collectionspace.services.id;
 // May at some point instead use
 // org.jboss.resteasy.spi.NotFoundException
 import org.collectionspace.services.common.repository.DocumentNotFoundException;
+import org.collectionspace.services.common.repository.BadRequestException;
 
 
 /**
@@ -43,7 +44,7 @@ public interface IDService {
     
     // Generates and returns a new ID from the specified ID generator.
     public String createID(String csid) throws DocumentNotFoundException,
-      IllegalArgumentException, IllegalStateException;
+      BadRequestException, IllegalArgumentException, IllegalStateException;
     
     // Returns the last-generated ID associated with the specified ID generator.
     public String readLastID(String csid)
@@ -69,7 +70,8 @@ public interface IDService {
     
     // Update (may need to check for changes in the ID generator structure)
     public void updateIDGenerator(String csid, String serializedIDGenerator)
-        throws IllegalArgumentException, IllegalStateException;
+        throws DocumentNotFoundException, BadRequestException,
+        IllegalArgumentException, IllegalStateException;
     
     // Delete (possibly not permitted - deactivate instead?)
 

@@ -24,8 +24,6 @@
 package org.collectionspace.services.id.test;
 
 import junit.framework.TestCase;
-import org.collectionspace.services.id.IDGeneratorPart;
-import org.collectionspace.services.id.UUIDGeneratorPart;
 
 import org.collectionspace.services.id.IDGeneratorPart;
 import org.collectionspace.services.id.UUIDGeneratorPart;

@@ -23,9 +23,6 @@
   
 package org.collectionspace.services.id;
 
-import java.util.Collections;
-import java.util.List;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -34,11 +31,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 
 // May at some point instead use
 // org.jboss.resteasy.spi.NotFoundException
+import org.collectionspace.services.common.repository.BadRequestException;
 import org.collectionspace.services.common.repository.DocumentNotFoundException;
 
 import org.slf4j.Logger;
@@ -139,7 +135,11 @@ public class IDResource {
         } catch (DocumentNotFoundException dnfe) {
             response = Response.status(Response.Status.NOT_FOUND)
               .entity(dnfe.getMessage()).type(MediaType.TEXT_PLAIN).build();
-        
+
+        } catch (BadRequestException bre) {
+            response = Response.status(Response.Status.BAD_REQUEST)
+              .entity(bre.getMessage()).type(MediaType.TEXT_PLAIN).build();
+
         } catch (IllegalStateException ise) {
           response = Response.status(Response.Status.BAD_REQUEST)
               .entity(ise.getMessage()).type(MediaType.TEXT_PLAIN).build();
@@ -206,7 +206,7 @@ public class IDResource {
     @Produces(MediaType.APPLICATION_XML)
     public Response readIDGenerator(@PathParam("csid") String csid) {
     
-      logger.debug("> in readIDGenerator(String)");
+        logger.debug("> in readIDGenerator(String)");
 
         Response response = null;
         response = response.ok().build();

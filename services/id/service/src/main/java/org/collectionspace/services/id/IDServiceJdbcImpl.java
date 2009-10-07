@@ -86,6 +86,7 @@ import java.sql.Statement;
 
 // May at some point instead use
 // org.jboss.resteasy.spi.NotFoundException
+import org.collectionspace.services.common.repository.BadRequestException;
 import org.collectionspace.services.common.repository.DocumentNotFoundException;
 
 import org.slf4j.Logger;
@@ -190,7 +191,7 @@ public class IDServiceJdbcImpl implements IDService {
 	*/
 	@Override
 	public String createID(String csid) throws DocumentNotFoundException,
-		IllegalArgumentException, IllegalStateException {
+		BadRequestException, IllegalArgumentException, IllegalStateException {
 		
 		logger.debug("> in createID");
 		
@@ -220,7 +221,7 @@ public class IDServiceJdbcImpl implements IDService {
 		
 		// Guard code - should not be needed.
 		if (serializedGenerator == null || serializedGenerator.equals("")) {
-			throw new IllegalArgumentException(
+			throw new BadRequestException(
 				"ID generator " + "\'" + csid + "\'" + " could not be found.");
 		}
 		
@@ -555,9 +556,10 @@ public class IDServiceJdbcImpl implements IDService {
 	*
 	* @throws  IllegalStateException if a storage-related error occurred.
 	*/
+    @Override
 	public String readIDGenerator (String csid) throws
 	    DocumentNotFoundException, IllegalArgumentException,
-	    IllegalStateException {
+        IllegalStateException {
 	
 		logger.debug("> in readIDGenerator");
 		
@@ -618,14 +620,14 @@ public class IDServiceJdbcImpl implements IDService {
 	* @throws  IllegalStateException if a storage-related error occurred.
 	*/
 	public void updateIDGenerator(String csid, SettableIDGenerator generator)
-	  throws IllegalArgumentException, IllegalStateException {
+	  throws BadRequestException, IllegalArgumentException, IllegalStateException, DocumentNotFoundException {
 	
 		logger.debug("> in updateIDGenerator(String, SettableIDGenerator)");
 	
 		// @TODO: Add checks for authorization to perform this operation.
 	
 		if (generator == null) {
-			throw new IllegalArgumentException(
+			throw new BadRequestException(
 				"ID generator provided in update operation cannot be null.");
 		}
 		
@@ -638,7 +640,9 @@ public class IDServiceJdbcImpl implements IDService {
 	
 		try {
 			updateIDGenerator(csid, serializedGenerator);
-		} catch (IllegalArgumentException e ) {
+		} catch (DocumentNotFoundException e ) {
+			throw e;
+		} catch (BadRequestException e ) {
 			throw e;
 		} catch (IllegalStateException e ) {
 			throw e;
@@ -665,14 +669,15 @@ public class IDServiceJdbcImpl implements IDService {
 	*/
 	@Override
 	public void updateIDGenerator(String csid, String serializedGenerator)
-	  throws IllegalArgumentException, IllegalStateException {
+	  throws DocumentNotFoundException, BadRequestException,
+        IllegalArgumentException, IllegalStateException {
 	
 		logger.debug("> in updateIDGenerator(String, String)");
 	
 		// @TODO: Add checks for authorization to perform this operation.
 		
 		if (serializedGenerator == null || serializedGenerator.equals("")) {
-		  throw new IllegalArgumentException(
+		  throw new BadRequestException(
 		  	"Could not understand or parse this representation of an ID generator.");
 		}
 	
@@ -728,7 +733,7 @@ public class IDServiceJdbcImpl implements IDService {
 			// Otherwise, throw an exception, which indicates that the requested
 			// ID generator was not found.
 			} else {
-				throw new IllegalArgumentException(
+				throw new DocumentNotFoundException(
 				  "Error updating ID generator '" + csid +
 				  "': generator could not be found in the database.");
 			} // end if (idGeneratorFound)
@@ -759,7 +764,8 @@ public class IDServiceJdbcImpl implements IDService {
 	* @throws  IllegalStateException if a storage-related error occurred.
 	*/
 	public void deleteIDGenerator(String csid)
-	  throws IllegalArgumentException, IllegalStateException {
+	  throws DocumentNotFoundException, IllegalArgumentException,
+        IllegalStateException {
 	
 		logger.debug("> in deleteIDGenerator");
 		
@@ -803,7 +809,7 @@ public class IDServiceJdbcImpl implements IDService {
 			// Otherwise, throw an exception, which indicates that the requested
 			// ID generator was not found.
 			} else {
-				throw new IllegalArgumentException(
+				throw new DocumentNotFoundException(
 				  "Error deleting ID generator '" + csid +
 				  "': generator could not be found in the database.");
 			} // end if (idGeneratorFound)

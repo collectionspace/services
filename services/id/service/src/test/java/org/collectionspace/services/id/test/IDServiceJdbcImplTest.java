@@ -23,8 +23,7 @@
 
 package org.collectionspace.services.id.test;
 
-// May at some point instead use
-// org.jboss.resteasy.spi.NotFoundException
+import org.collectionspace.services.common.repository.BadRequestException;
 import org.collectionspace.services.common.repository.DocumentNotFoundException;
 
 import org.collectionspace.services.id.*;
@@ -89,7 +88,7 @@ public class IDServiceJdbcImplTest {
     @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "createIDGenerator",
         "readIDGenerator"})
     public void updateIDGenerator() throws DocumentNotFoundException,
-        IllegalArgumentException, IllegalStateException {
+        BadRequestException, IllegalArgumentException, IllegalStateException {
 
         final String NEW_DESCRIPTION = "new description";
         
@@ -99,9 +98,9 @@ public class IDServiceJdbcImplTest {
         generator = IDGeneratorSerializer.deserialize(serializedGenerator);
         generator.setDescription(NEW_DESCRIPTION);
         serializedGenerator = IDGeneratorSerializer.serialize(generator);
-        
+
         jdbc.updateIDGenerator(DEFAULT_CSID, serializedGenerator);
-        
+
         serializedGenerator = jdbc.readIDGenerator(DEFAULT_CSID);
         generator = IDGeneratorSerializer.deserialize(serializedGenerator);
         
@@ -111,14 +110,15 @@ public class IDServiceJdbcImplTest {
 
     @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "createIDGenerator",
     	"readIDGenerator", "updateIDGenerator"})
-    public void deleteIDGenerator() {
+    public void deleteIDGenerator() throws DocumentNotFoundException {
         jdbc.deleteIDGenerator(DEFAULT_CSID);
     }
 
     @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "createIDGenerator",
         "readIDGenerator", "updateIDGenerator", "deleteIDGenerator"})
         public void createID() throws DocumentNotFoundException,
-            IllegalArgumentException, IllegalStateException {
+            BadRequestException, IllegalArgumentException,
+            IllegalStateException {
                 
         try {
             jdbc.deleteIDGenerator(DEFAULT_CSID);
@@ -162,7 +162,7 @@ public class IDServiceJdbcImplTest {
     @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "createID"}, 
         expectedExceptions = DocumentNotFoundException.class)
     public void createIDNonExistentGenerator() throws DocumentNotFoundException,
-        IllegalArgumentException, IllegalStateException {
+        BadRequestException, IllegalArgumentException, IllegalStateException {
         nextId = service.createID("non-existent identifier");                
     }
 
