@@ -24,16 +24,8 @@
 package org.collectionspace.services.id.test;
 
 import java.util.Vector;
-
 import junit.framework.TestCase;
-
-import org.collectionspace.services.id.AlphabeticIDGeneratorPart;
-import org.collectionspace.services.id.BaseIDGenerator;
-import org.collectionspace.services.id.IDGeneratorPart;
-import org.collectionspace.services.id.NumericIDGeneratorPart;
-import org.collectionspace.services.id.StringIDGeneratorPart;
-import org.collectionspace.services.id.UUIDGeneratorPart;
-import org.collectionspace.services.id.YearIDGeneratorPart;
+import org.collectionspace.services.id.*;
 
 /**    
  * BaseIDGeneratorTest, Test class for BaseIDGenerator.

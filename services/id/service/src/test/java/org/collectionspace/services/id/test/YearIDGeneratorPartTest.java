@@ -23,15 +23,14 @@
 
 package org.collectionspace.services.id.test;
 
+import static org.junit.Assert.fail;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-
 import junit.framework.TestCase;
-
 import org.collectionspace.services.id.IDGeneratorPart;
 import org.collectionspace.services.id.YearIDGeneratorPart;
 
-/*    
+/**
  * YearIDGeneratorPartTest
  *
  * Test class for YearIDGeneratorPart.
@@ -50,7 +49,7 @@ public class YearIDGeneratorPartTest extends TestCase {
         return Integer.toString(y);
     }
 
-/*
+
     public void testCurrentID() {
 
         part = new YearIDGeneratorPart();
@@ -90,7 +89,6 @@ public class YearIDGeneratorPartTest extends TestCase {
         }
 
   }
-*/ 
 
 /*
     public void testnewID() {

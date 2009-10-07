@@ -930,7 +930,7 @@ public class IDServiceJdbcImpl implements IDService {
 		
 		} catch (SQLException e) {
 			throw new IllegalStateException(
-				"Error while checking for existence of tablebase table: " +
+				"Error while checking for existence of database table: " +
 				e.getMessage());
 		} finally {
 			try {

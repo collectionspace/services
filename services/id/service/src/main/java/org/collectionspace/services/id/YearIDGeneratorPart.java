@@ -90,12 +90,16 @@ public class YearIDGeneratorPart implements IDGeneratorPart {
 
     @Override
 	public String getCurrentID() {
+        if (this.currentValue == null || this.currentValue.equals("")) {
+            setCurrentID(getCurrentYear());
+        }
 		return this.currentValue;
 	}
 
     @Override
     public String newID() {
-        return this.currentValue;
+        setCurrentID(getCurrentYear());
+		return getCurrentID();
     }
 
     @Override

@@ -130,7 +130,8 @@ public class SettableIDGenerator extends BaseIDGenerator {
         // If the supplied ID doesn't partly match the pattern,
         // throw an Exception.
         if (matchedParts == 0) {
-            throw new IllegalArgumentException("Supplied ID does not match this ID pattern.");
+            throw new IllegalArgumentException("Supplied ID does not match " +
+                "this ID pattern.");
         }
 
         pattern = Pattern.compile(regex.toString());
@@ -140,7 +141,8 @@ public class SettableIDGenerator extends BaseIDGenerator {
         // throw an Exception.  (This error condition should likely
         // never be reached, but it's here as a guard.)
         if (! matcher.matches()) {
-            throw new IllegalArgumentException("Supplied ID does not match this ID pattern.");
+            throw new IllegalArgumentException("Supplied ID does not match " +
+                "this ID pattern.");
         }
         
         // Otherwise, if the supplied ID matches the pattern,

@@ -24,7 +24,8 @@
 package org.collectionspace.services.id.test;
 
 import junit.framework.TestCase;
-
+import org.collectionspace.services.id.StoredValueIDGeneratorPart;
+import org.collectionspace.services.id.StringIDGeneratorPart;
 import org.collectionspace.services.id.StoredValueIDGeneratorPart;
 import org.collectionspace.services.id.StringIDGeneratorPart;
 

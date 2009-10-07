@@ -24,13 +24,7 @@
 package org.collectionspace.services.id.test;
 
 import junit.framework.TestCase;
-
-import org.collectionspace.services.id.AlphabeticIDGeneratorPart;
-import org.collectionspace.services.id.IDGeneratorPart;
-import org.collectionspace.services.id.NumericIDGeneratorPart;
-import org.collectionspace.services.id.SettableIDGenerator;
-import org.collectionspace.services.id.StringIDGeneratorPart;
-import org.collectionspace.services.id.YearIDGeneratorPart;
+import org.collectionspace.services.id.*;
 
 /**    
  * SettableIDGeneratorTest, Test class for SettableIDGenerator.

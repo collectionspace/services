@@ -102,7 +102,7 @@ public class BaseIDGenerator implements IDGenerator {
         }
         // Validate that this is a legal URI.
         try {
-            URI uri = new URI(uriStr);
+            URI tempUri = new URI(uriStr);
         } catch (URISyntaxException e) {
             // Fail silently without setting the URI.
             return;

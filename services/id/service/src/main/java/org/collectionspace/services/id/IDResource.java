@@ -125,7 +125,7 @@ public class IDResource {
                 return response;
             }
                     
-            response = Response.status(Response.Status.OK)
+            response = Response.status(Response.Status.CREATED)
               .entity(newId).type(MediaType.TEXT_PLAIN).build();
                 
         // @TODO Return an XML-based error results format with the

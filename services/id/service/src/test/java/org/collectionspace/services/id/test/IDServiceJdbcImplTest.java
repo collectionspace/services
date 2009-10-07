@@ -30,7 +30,6 @@ import org.collectionspace.services.common.repository.DocumentNotFoundException;
 import org.collectionspace.services.id.*;
 
 import org.testng.Assert;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 /**        

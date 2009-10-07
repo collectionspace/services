@@ -50,7 +50,6 @@
 
 package org.collectionspace.services.id;
 
-import java.util.Collections;
 import java.util.Vector;
 
 import java.util.regex.Matcher;
