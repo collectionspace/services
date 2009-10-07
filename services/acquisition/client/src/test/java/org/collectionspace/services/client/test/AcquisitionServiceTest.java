@@ -52,6 +52,11 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
     final String SERVICE_PATH_COMPONENT = "acquisitions";
     private String knownResourceId = null;
 
+    //FIXME: Remove this method once ALL the services use "_common" instead of "-common"
+    public String getCommonPartName() {
+        return getServicePathComponent() + "_common";
+    }
+    
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
@@ -273,7 +278,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
             Assert.assertNotNull(acquisition);
 
             // Update the content of this resource.
-            acquisition.setAccessiondate("updated-" + acquisition.getAccessiondate());
+            acquisition.setAccessionDate("updated-" + acquisition.getAccessionDate());
             verbose("updated object", acquisition, AcquisitionsCommon.class);
             // Submit the request to the service and store the response.
             MultipartOutput output = new MultipartOutput();
@@ -295,8 +300,8 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
                     getCommonPartName(), AcquisitionsCommon.class);
             Assert.assertNotNull(updatedAcquisition);
 
-            Assert.assertEquals(updatedAcquisition.getAccessiondate(),
-                    acquisition.getAccessiondate(),
+            Assert.assertEquals(updatedAcquisition.getAccessionDate(),
+                    acquisition.getAccessionDate(),
                     "Data in updated object did not match submitted data.");
         }catch(Exception e){
             e.printStackTrace();
@@ -504,7 +509,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
     private MultipartOutput createAcquisitionInstance(String identifier) {
         AcquisitionsCommon acquisition = new AcquisitionsCommon();
-        acquisition.setAccessiondate("accessionDate-"  + identifier);
+        acquisition.setAccessionDate("accessionDate-"  + identifier);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(acquisition, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", getCommonPartName());

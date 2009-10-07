@@ -96,11 +96,11 @@
                 </service:part>
                 <service:part id="1" control_group="Managed"
                             versionable="true" auditable="false"
-                            label="acquisitions-common" updated="" order="1">
+                            label="acquisitions_common" updated="" order="1">
                     <service:content contentType="application/xml">
                         <service:xmlContent
                         namespaceURI="http://collectionspace.org/services/acquisition"
-                        schemaLocation="http://collectionspace.org/services/acquisition http://services.collectionspace.org/acquisition/acquisitions-common.xsd">
+                        schemaLocation="http://collectionspace.org/services/acquisition http://services.collectionspace.org/acquisition/acquisitions_common.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>

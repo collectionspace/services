@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/acquisition/"
+    xmlns="http://collectionspace.org/acquisition/"
+    targetNamespace="http://collectionspace.org/acquisition/"
+    version="0.1">
+    
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Acquisition+Schema -->
+
+<!--  Object Entry Information Group -->
+    <xs:element name="accessionDate" type="xs:string"/>
+    <xs:element name="acquisitionAuthorizer" type="xs:string"/>
+    <xs:element name="AcquisitionAuthorizerDate" type="xs:string"/>
+    <xs:element name="AcquisitionDate" type="xs:string"/>
+    <xs:element name="AcquisitionFunding" type="xs:string"/>
+    <xs:element name="AcquisitionFundingSource" type="xs:string"/>
+    <xs:element name="AcquisitionFundingSourceProvisos" type="xs:string"/>
+    <xs:element name="AcquisitionMethod" type="xs:string"/>
+    <xs:element name="AcquisitionNote" type="xs:string"/>
+    <xs:element name="AcquisitionProvisos" type="xs:string"/>
+    <xs:element name="AcquisitionReason" type="xs:string"/>
+    <xs:element name="AcquisitionReferenceNumber" type="xs:string"/>
+    <xs:element name="AcquisitionSource" type="xs:string"/>
+    <xs:element name="GroupPurchasePrice" type="xs:string"/>
+    <xs:element name="ObjectOfferPrice" type="xs:string"/>
+    <xs:element name="ObjectPurchaseOfferPrice" type="xs:string"/>
+    <xs:element name="ObjectPurchasePrice" type="xs:string"/>
+    <xs:element name="OriginalObjectPurchasePrice" type="xs:string"/>
+    <xs:element name="OriginalObjectPurchasePriceDenomination" type="xs:string"/>
+    <xs:element name="TransferOfTitleNumber" type="xs:string"/>                
+    
+</xs:schema>
