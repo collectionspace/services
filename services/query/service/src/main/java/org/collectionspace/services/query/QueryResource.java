@@ -40,7 +40,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
 import org.collectionspace.services.common.query.QueryManager;
-import org.collectionspace.services.common.NuxeoClientType;
+//import org.collectionspace.services.common.NuxeoClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.repository.DocumentNotFoundException;
 import org.collectionspace.services.common.repository.DocumentHandler;
@@ -58,7 +58,7 @@ public class QueryResource {
     public final static String SERVICE_NAME = "query";
     final Logger logger = LoggerFactory.getLogger(QueryResource.class);
     //FIXME retrieve client type from configuration
-    final static NuxeoClientType CLIENT_TYPE = ServiceMain.getInstance().getNuxeoClientType();
+    //final static NuxeoClientType CLIENT_TYPE = ServiceMain.getInstance().getNuxeoClientType();
 
     public QueryResource() {
         // do nothing
