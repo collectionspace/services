@@ -6,6 +6,7 @@ import org.collectionspace.services.intake.IntakeResource;
 ////import org.collectionspace.services.relation.RelationResource;
 import org.collectionspace.services.relation.NewRelationResource;
 import org.collectionspace.services.acquisition.AcquisitionResource;
+import org.collectionspace.services.vocabulary.VocabularyResource;
 //import org.collectionspace.services.query.QueryResource;
 
 import javax.ws.rs.core.Application;
@@ -25,6 +26,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new AcquisitionResource());
 //        singletons.add(new RelationResource());
         singletons.add(new NewRelationResource());
+        singletons.add(new VocabularyResource());
 //        singletons.add(new QueryResource());
 //        singletons.add(new DomainIdentifierResource());
 //        singletons.add(new PingResource());

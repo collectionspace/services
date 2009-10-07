@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/vocabulary"
+  xmlns="http://collectionspace.org/services/vocabulary"
+  targetNamespace="http://collectionspace.org/services/vocabulary"
+  version="0.1"
+>
+
+
+<!-- avoid XmlRootElement nightnmare, see http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html-->
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Vocabulary+Schema -->    
+    
+    <!-- Vocabulary  -->
+    <xs:element name="vocabularies-common">
+        <xs:complexType>
+            <xs:sequence>
+                <!--  Common identifier -->
+                <xs:element name="csid" type="xs:string" />
+                
+                <!--  Vocabulary Information Group -->
+                <xs:element name="displayName" type="xs:string"/>
+                <xs:element name="vocabType" type="xs:string"/>
+
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- Vocabulary instances, as in nuxeo repository -->
+    <xs:element name="vocabularies-common-list">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="vocabulary-list-item" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="displayName" type="xs:string"
+                                minOccurs="1" />
+                            <xs:element name="vocabType" type="xs:string"
+                                minOccurs="1" />
+                            <!-- uri to retrieve vocabulary details -->
+                            <xs:element name="uri" type="xs:anyURI"
+                                minOccurs="1" />
+                            <xs:element name="csid" type="xs:string"
+                                minOccurs="1" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>
+

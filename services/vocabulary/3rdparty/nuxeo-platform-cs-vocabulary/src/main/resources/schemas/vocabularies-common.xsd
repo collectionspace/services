@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/vocabulary"
+  xmlns="http://collectionspace.org/services/vocabulary"
+  targetNamespace="http://collectionspace.org/services/vocabulary"
+  version="0.1"
+>
+
+<!-- Flattened version of jaxb schema for nuxeo -->
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Vocabulary+Schema -->    
+
+		<!--  Vocabulary Information Group -->
+		<xs:element name="displayName" type="xs:string"/>
+		<xs:element name="vocabType" type="xs:string"/>
+
+</xs:schema>
+

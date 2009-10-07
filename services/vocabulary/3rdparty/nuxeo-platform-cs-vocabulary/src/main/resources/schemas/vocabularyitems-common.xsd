@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/vocabulary"
+  xmlns="http://collectionspace.org/services/vocabulary"
+  targetNamespace="http://collectionspace.org/services/vocabulary"
+  version="0.1"
+>
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Vocabulary+Schema -->    
+
+		<!--  VocabularyItem Information Group -->
+		<!--  inVocabulary is the csid of the owning Vocabulary -->
+		<xs:element name="inVocabulary" type="xs:string" />
+		<xs:element name="displayName" type="xs:string"/>
+
+</xs:schema>
+
