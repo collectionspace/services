@@ -26,7 +26,7 @@ package org.collectionspace.services.collectionobject.nuxeo;
 import java.util.Iterator;
 import java.util.List;
 
-import org.collectionspace.services.CollectionObjectJAXBSchema;
+import org.collectionspace.services.CollectionObjectListItemJAXBSchema;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList.CollectionObjectListItem;
@@ -115,7 +115,7 @@ public class CollectionObjectDocumentModelHandler
             DocumentModel docModel = iter.next();
             CollectionObjectListItem coListItem = new CollectionObjectListItem();
             coListItem.setObjectNumber((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-                    CollectionObjectJAXBSchema.OBJECT_NUMBER));
+            		CollectionObjectListItemJAXBSchema.OBJECT_NUMBER));
             coListItem.setUri(getServiceContextPath() + docModel.getId());
             coListItem.setCsid(docModel.getId());
             list.add(coListItem);
