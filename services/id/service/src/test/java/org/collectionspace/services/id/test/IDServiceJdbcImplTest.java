@@ -1,4 +1,4 @@
-/**        
+/**
  * This document is a part of the source code and related artifacts
  * for CollectionSpace, an open source collections management system
  * for museums and related institutions:
@@ -89,7 +89,19 @@ public class IDServiceJdbcImplTest {
 
     @Test(dependsOnMethods =
         {"hasRequiredDatabaseTable", "createIDGenerator", "readIDGenerator"})
-    public void readIDGeneratorList() throws IllegalStateException {
+    public void readIDGeneratorsList() throws IllegalStateException {
+
+        List generators = jdbc.readIDGeneratorsList();
+
+        // @TODO Replace this placeholder test, which just
+        // verifies that no error occurred while retrieving the list,
+        // with a more meaningful test.
+        Assert.assertTrue(generators.size() > 0);
+    }
+    @Test(dependsOnMethods =
+        {"hasRequiredDatabaseTable", "createIDGenerator", "readIDGenerator",
+          "readIDGeneratorsList"})
+    public void readIDGeneratorsSummaryList() throws IllegalStateException {
 
         List generators = jdbc.readIDGeneratorsList();
 
@@ -123,7 +135,8 @@ public class IDServiceJdbcImplTest {
     }
 
     @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "createIDGenerator",
-    	"readIDGenerator", "updateIDGenerator"})
+    	"readIDGenerator", "readIDGeneratorsList",
+        "readIDGeneratorsSummaryList", "updateIDGenerator"})
     public void deleteIDGenerator() throws DocumentNotFoundException {
         jdbc.deleteIDGenerator(DEFAULT_CSID);
     }

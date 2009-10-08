@@ -623,7 +623,7 @@ public class IDServiceJdbcImpl implements IDService {
     @Override
     public List readIDGeneratorsList() throws IllegalStateException {
 
-		logger.debug("> in readIDGeneratorList");
+		logger.debug("> in readIDGeneratorsList");
 
 		List<String> generators = new ArrayList<String>();
 
@@ -635,6 +635,65 @@ public class IDServiceJdbcImpl implements IDService {
 
 			ResultSet rs = stmt.executeQuery(
 			  "SELECT id_generator_state FROM id_generators");
+
+			boolean moreRows = rs.next();
+			if (! moreRows) {
+				return generators;
+			}
+
+            while (moreRows = rs.next()) {
+                generators.add(rs.getString(1));
+            }
+
+			rs.close();
+
+		} catch (SQLException e) {
+			throw new IllegalStateException(
+				"Error retrieving ID generators " +
+				" from database: " + e.getMessage());
+		} finally {
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+			} catch(SQLException e) {
+				// Do nothing here
+			}
+		}
+
+		logger.debug("> retrieved list: ");
+        for (String generator : generators) {
+            logger.debug("generator=\n" + generator);
+        }
+
+		return generators;
+    }
+
+        //////////////////////////////////////////////////////////////////////
+   /**
+    * Returns a list of ID generator instances from persistent storage.
+	*
+	* @return  A list of ID generator instances, with each list item
+    *          constituting a serialized representation of an
+    *          ID generator instance.
+	*
+	* @throws  IllegalStateException if a storage-related error occurred.
+	*/
+    @Override
+    public List readIDGeneratorsSummaryList() throws IllegalStateException {
+
+		logger.debug("> in readIDGeneratorsSummaryList");
+
+		List<String> generators = new ArrayList<String>();
+
+		Connection conn = null;
+		try {
+
+			conn = getJdbcConnection();
+			Statement stmt = conn.createStatement();
+
+			ResultSet rs = stmt.executeQuery(
+			  "SELECT id_generator_csid FROM id_generators");
 
 			boolean moreRows = rs.next();
 			if (! moreRows) {

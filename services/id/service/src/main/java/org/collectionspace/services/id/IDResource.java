@@ -30,6 +30,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -264,14 +265,21 @@ public class IDResource {
     * 
     * Required to facilitate a HEAD method test in ServiceLayerTest.
     *
+    * @param   format  A representation ("format") in which to return list items,
+    *                  such as a "full" or "summary" format.
+    *
     * @return  A list of representations of ID generator instance resources.
     */
     @GET
     @Path("")
     @Produces(MediaType.APPLICATION_XML)
-    public Response readIDGeneratorsList() {
+    public Response readIDGeneratorsList(@QueryParam("format") String format) {
             
         logger.debug("> in readIDGeneratorsList()");
+
+        // @TODO The name of the query parameter above is arbitrary, as
+        // is the type of result returned.  These should be standardized
+        // project-wide, and referenced as project-wide constants/enums.
 
         Response response = null;
         response = response.ok().build();
@@ -284,17 +292,38 @@ public class IDResource {
         final String LIST_ITEM_START = "<item>";
         final String LIST_ITEM_END = "</item>";
 
+        final String LIST_FORMAT_FULL = "full";
+        final String LIST_FORMAT_SUMMARY = "summary";
+
         try {
 
-            List<String> generators = service.readIDGeneratorsList();
+            List<String> generators = null;
+            if (format == null || format.equals("")) {
+                generators = service.readIDGeneratorsSummaryList();
+            } else if (format.equalsIgnoreCase(LIST_FORMAT_SUMMARY)) {
+                generators = service.readIDGeneratorsSummaryList();
+            } else if (format.equalsIgnoreCase(LIST_FORMAT_FULL)) {
+                generators = service.readIDGeneratorsList();
+            } else {
+                // @TODO Return an appropriate XML-based entity body upon error.
+                String msg = "Query parameter '" + format + "' was not recognized.";
+                logger.debug(msg);
+                response = Response.status(Response.Status.BAD_REQUEST)
+                    .entity("").type(MediaType.TEXT_PLAIN).build();
+            }
 
             // @TODO Replace this placeholder/expedient, as per above
             StringBuffer sb = new StringBuffer("");
             sb.append(LIST_ROOT_START);
-            for (String generator : generators) {
-                sb.append(LIST_ITEM_START);
-                sb.append(generator);
-                sb.append(LIST_ITEM_END);
+            
+            // @TODO Summary list should return relative URLs,
+            // possibly also human-readable descriptions.
+            if (generators != null) {
+                for (String generator : generators) {
+                    sb.append(LIST_ITEM_START);
+                    sb.append(generator);
+                    sb.append(LIST_ITEM_END);
+                }
             }
             sb.append(LIST_ROOT_END);
 

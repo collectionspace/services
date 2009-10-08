@@ -68,9 +68,14 @@ public interface IDService {
         IllegalArgumentException, IllegalStateException;
     
     // Read a list of objects (aka read multiple)
-    // Read single object
+    // and return in a full list format.
     public List<String> readIDGeneratorsList() throws IllegalStateException;
-    
+
+    // Read a list of objects (aka read multiple)
+    // and return in a summary list format.
+    public List<String> readIDGeneratorsSummaryList() throws BadRequestException,
+       IllegalStateException;
+
     // Update (may need to check for changes in the ID generator structure)
     public void updateIDGenerator(String csid, String serializedIDGenerator)
         throws DocumentNotFoundException, BadRequestException,
