@@ -23,6 +23,7 @@
   
 package org.collectionspace.services.id;
 
+import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -160,9 +161,10 @@ public class IDResource {
 
     //////////////////////////////////////////////////////////////////////
     /**
-    * Creates a new ID generator.
+    * Creates a new ID generator instance.
     *
-    * @param  generatorRepresentation  A representation of an ID generator.
+    * @param  generatorRepresentation 
+    *         A representation of an ID generator instance.
     */
     @POST
     @Path("")
@@ -195,11 +197,11 @@ public class IDResource {
 
     //////////////////////////////////////////////////////////////////////
     /**
-    * Returns a representation of a single ID Generator resource.
+    * Returns a representation of a single ID generator instance resource.
     *
-    * @param    csid  An identifier for an ID generator.
+    * @param    csid  An identifier for an ID generator instance.
     *
-    * @return  A representation of an ID generator resource.
+    * @return  A representation of an ID generator instance resource.
     */
     @GET
     @Path("/{csid}")
@@ -257,26 +259,67 @@ public class IDResource {
 
     //////////////////////////////////////////////////////////////////////
     /**
-    * Placeholder for retrieving a list of available ID Generator resources.
-    * Currently returns an empty entity body.
+    * Placeholder for retrieving a list of available ID Generator
+    * instance resources.
     * 
-    * Implemented to facilitate a HEAD method test in ServiceLayerTest.
+    * Required to facilitate a HEAD method test in ServiceLayerTest.
     *
-    * @return  An empty entity body (for now).
+    * @return  A list of representations of ID generator instance resources.
     */
     @GET
     @Path("")
     @Produces(MediaType.APPLICATION_XML)
     public Response readIDGeneratorsList() {
-    
-      logger.debug("> in readIDGeneratorsList()");
-        
-        // @TODO Replace this placeholder code.
-        Response response = Response.status(Response.Status.NO_CONTENT)
-              .entity("").type(MediaType.TEXT_PLAIN).build();
-                
+            
+        logger.debug("> in readIDGeneratorsList()");
+
+        Response response = null;
+        response = response.ok().build();
+        String resourceRepresentation = "";
+
+        // @TODO Replace these placeholders/expedients
+        // with a schema-defined list format.
+        final String LIST_ROOT_START = "<list>";
+        final String LIST_ROOT_END = "</list>";
+        final String LIST_ITEM_START = "<item>";
+        final String LIST_ITEM_END = "</item>";
+
+        try {
+
+            List<String> generators = service.readIDGeneratorsList();
+
+            // @TODO Replace this placeholder/expedient, as per above
+            StringBuffer sb = new StringBuffer("");
+            sb.append(LIST_ROOT_START);
+            for (String generator : generators) {
+                sb.append(LIST_ITEM_START);
+                sb.append(generator);
+                sb.append(LIST_ITEM_END);
+            }
+            sb.append(LIST_ROOT_END);
+
+            resourceRepresentation = sb.toString();
+
+            response = Response.status(Response.Status.OK)
+              .entity(resourceRepresentation)
+              .type(MediaType.APPLICATION_XML)
+              .build();
+
+        // @TODO Return an XML-based error results format with the
+        // responses below.
+
+         } catch (IllegalStateException ise) {
+          response = Response.status(Response.Status.BAD_REQUEST)
+              .entity(ise.getMessage()).type(MediaType.TEXT_PLAIN).build();
+
+        // This is guard code that should never be reached.
+        } catch (Exception e) {
+          response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+              .entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
+        }
+
         return response;
-  }
+    }
 
 
 }

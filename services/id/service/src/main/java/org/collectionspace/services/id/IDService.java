@@ -19,6 +19,7 @@ package org.collectionspace.services.id;
 
 // May at some point instead use
 // org.jboss.resteasy.spi.NotFoundException
+import java.util.List;
 import org.collectionspace.services.common.repository.DocumentNotFoundException;
 import org.collectionspace.services.common.repository.BadRequestException;
 
@@ -67,6 +68,8 @@ public interface IDService {
         IllegalArgumentException, IllegalStateException;
     
     // Read a list of objects (aka read multiple)
+    // Read single object
+    public List<String> readIDGeneratorsList() throws IllegalStateException;
     
     // Update (may need to check for changes in the ID generator structure)
     public void updateIDGenerator(String csid, String serializedIDGenerator)

@@ -86,6 +86,8 @@ import java.sql.Statement;
 
 // May at some point instead use
 // org.jboss.resteasy.spi.NotFoundException
+import java.util.ArrayList;
+import java.util.List;
 import org.collectionspace.services.common.repository.BadRequestException;
 import org.collectionspace.services.common.repository.DocumentNotFoundException;
 
@@ -607,7 +609,67 @@ public class IDServiceJdbcImpl implements IDService {
 		return serializedGenerator;
 		  
 	}
-	
+
+    //////////////////////////////////////////////////////////////////////
+   /**
+    * Returns a list of ID generator instances from persistent storage.
+	*
+	* @return  A list of ID generator instances, with each list item
+    *          constituting a serialized representation of an
+    *          ID generator instance.
+	*
+	* @throws  IllegalStateException if a storage-related error occurred.
+	*/
+    @Override
+    public List readIDGeneratorsList() throws IllegalStateException {
+
+		logger.debug("> in readIDGeneratorList");
+
+		List<String> generators = new ArrayList<String>();
+
+		Connection conn = null;
+		try {
+
+			conn = getJdbcConnection();
+			Statement stmt = conn.createStatement();
+
+			ResultSet rs = stmt.executeQuery(
+			  "SELECT id_generator_state FROM id_generators");
+
+			boolean moreRows = rs.next();
+			if (! moreRows) {
+				return generators;
+			}
+
+            while (moreRows = rs.next()) {
+                generators.add(rs.getString(1));
+            }
+
+			rs.close();
+
+		} catch (SQLException e) {
+			throw new IllegalStateException(
+				"Error retrieving ID generators " +
+				" from database: " + e.getMessage());
+		} finally {
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+			} catch(SQLException e) {
+				// Do nothing here
+			}
+		}
+
+		logger.debug("> retrieved list: ");
+        for (String generator : generators) {
+            logger.debug("generator=\n" + generator);
+        }
+
+		return generators;
+    }
+
+
 	//////////////////////////////////////////////////////////////////////
 	/**
 	* Updates an existing ID generator in persistent storage.
@@ -949,5 +1011,6 @@ public class IDServiceJdbcImpl implements IDService {
 		}
 	
 	}
+
 		
 }

@@ -23,6 +23,7 @@
 
 package org.collectionspace.services.id.test;
 
+import java.util.List;
 import org.collectionspace.services.common.repository.BadRequestException;
 import org.collectionspace.services.common.repository.DocumentNotFoundException;
 
@@ -75,6 +76,7 @@ public class IDServiceJdbcImplTest {
         jdbc.createIDGenerator(DEFAULT_CSID, getSpectrumEntryNumberGenerator());
     }
 
+
     @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "createIDGenerator"})
     public void readIDGenerator() throws DocumentNotFoundException,
         IllegalArgumentException, IllegalStateException {
@@ -82,7 +84,19 @@ public class IDServiceJdbcImplTest {
         serializedGenerator = jdbc.readIDGenerator(DEFAULT_CSID);
         generator = IDGeneratorSerializer.deserialize(serializedGenerator);
         Assert.assertEquals(generator.getCsid(), DEFAULT_CSID);
-        
+    }
+
+
+    @Test(dependsOnMethods =
+        {"hasRequiredDatabaseTable", "createIDGenerator", "readIDGenerator"})
+    public void readIDGeneratorList() throws IllegalStateException {
+
+        List generators = jdbc.readIDGeneratorsList();
+
+        // @TODO Replace this placeholder test, which just
+        // verifies that no error occurred while retrieving the list,
+        // with a more meaningful test.
+        Assert.assertTrue(generators.size() > 0);
     }
 
     @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "createIDGenerator",
