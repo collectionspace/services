@@ -20,7 +20,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-  
 package org.collectionspace.services.id;
 
 import java.util.List;
@@ -58,31 +57,31 @@ import org.slf4j.LoggerFactory;
 public class IDResource {
 
     final Logger logger = LoggerFactory.getLogger(IDResource.class);
-
     final static IDService service = new IDServiceJdbcImpl();
+    final static String BASE_URL_PATH = "/idgenerators";
 
     //////////////////////////////////////////////////////////////////////
     /**
-    * Constructor (no argument).
-    */
+     * Constructor (no argument).
+     */
     public IDResource() {
         // do nothing
     }
 
     //////////////////////////////////////////////////////////////////////
     /**
-    * Generates and returns a new ID, from the specified ID generator.
-    *
-    * @param  csid  An identifier for an ID generator.
-    *
-    * @return  A new ID created ("generated") by the specified ID generator.
-    */
+     * Generates and returns a new ID, from the specified ID generator.
+     *
+     * @param  csid  An identifier for an ID generator.
+     *
+     * @return  A new ID created ("generated") by the specified ID generator.
+     */
     @POST
     @Path("/{csid}/ids")
     public Response newID(@PathParam("csid") String csid) {
-    
+
         logger.debug("> in newID(String)");
-    
+
         // @TODO The JavaDoc description reflects an as-yet-to-be-carried out
         // refactoring, in which the highest object type in the ID service
         // is that of an IDGenerator, some or all of which may be composed
@@ -90,97 +89,104 @@ public class IDResource {
         // which may be composed in part of incrementing numeric or alphabetic
         // components, while others may not (e.g. UUIDs, web services-based
         // responses).
-        
+
         // @TODO We're currently using simple integer IDs to identify ID generators
         // in this initial iteration.
         //
         // To uniquely identify ID generators in production, we'll need to handle
         // both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
         // other form of identifier to be determined, such as URLs or URNs.
-        
+
         // @TODO We're currently returning IDs in plain text.  Identify whether
         // there is a requirement to return an XML representation, and/or any
         // other representations.
-          
+
         // Unless the 'response' variable is explicitly initialized here,
         // the compiler gives the error: "variable response might not have
         // been initialized."
         Response response = null;
         response = response.ok().build();
         String newId = "";
-        
+
         try {
-        
+
             // Obtain a new ID from the specified ID generator,
             // and return it in the entity body of the response.
             newId = service.createID(csid);
-                
+
             if (newId == null || newId.equals("")) {
-                response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("ID Service returned null or empty ID")
-                    .type(MediaType.TEXT_PLAIN)
-                    .build();
+                response =
+                    Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .entity("ID Service returned null or empty ID")
+                        .type(MediaType.TEXT_PLAIN)
+                        .build();
                 return response;
             }
-                    
-            response = Response.status(Response.Status.CREATED)
-              .entity(newId).type(MediaType.TEXT_PLAIN).build();
-                
-        // @TODO Return an XML-based error results format with the
-        // responses below.
-        
-        // @TODO An IllegalStateException often indicates an overflow
-        // of an IDPart.  Consider whether returning a 400 Bad Request
-        // status code is still warranted, or whether returning some other
-        // status would be more appropriate.
-        
+
+            response =
+                Response.status(Response.Status.CREATED)
+                    .entity(newId)
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+
+            // @TODO Return an XML-based error results format with the
+            // responses below.
+
+            // @TODO An IllegalStateException often indicates an overflow
+            // of an IDPart.  Consider whether returning a 400 Bad Request
+            // status code is still warranted, or whether returning some other
+            // status would be more appropriate.
+
         } catch (DocumentNotFoundException dnfe) {
             response = Response.status(Response.Status.NOT_FOUND)
-              .entity(dnfe.getMessage()).type(MediaType.TEXT_PLAIN).build();
+                .entity(dnfe.getMessage()).type(MediaType.TEXT_PLAIN).build();
 
         } catch (BadRequestException bre) {
             response = Response.status(Response.Status.BAD_REQUEST)
-              .entity(bre.getMessage()).type(MediaType.TEXT_PLAIN).build();
+                .entity(bre.getMessage()).type(MediaType.TEXT_PLAIN).build();
 
         } catch (IllegalStateException ise) {
-          response = Response.status(Response.Status.BAD_REQUEST)
-              .entity(ise.getMessage()).type(MediaType.TEXT_PLAIN).build();
-        
+            response = Response.status(Response.Status.BAD_REQUEST)
+                .entity(ise.getMessage()).type(MediaType.TEXT_PLAIN).build();
+
         } catch (IllegalArgumentException iae) {
             response = Response.status(Response.Status.BAD_REQUEST)
-              .entity(iae.getMessage()).type(MediaType.TEXT_PLAIN).build();
-        
-        // This is guard code that should never be reached.
+                .entity(iae.getMessage()).type(MediaType.TEXT_PLAIN).build();
+
+            // This is guard code that should never be reached.
         } catch (Exception e) {
-          response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-              .entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
+            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
         }
-        
+
         return response;
-     
+
     }
 
     //////////////////////////////////////////////////////////////////////
     /**
-    * Creates a new ID generator instance.
-    *
-    * @param  generatorRepresentation 
-    *         A representation of an ID generator instance.
-    */
+     * Creates a new ID generator instance.
+     *
+     * @param  generatorRepresentation
+     *         A representation of an ID generator instance.
+     */
     @POST
     @Path("")
     @Consumes(MediaType.APPLICATION_XML)
     public Response createIDGenerator() {
-    
+
         logger.debug("> in createIDGenerator(String)");
-        
+
         // @TODO Implement this stubbed method
 
         // @TODO Replace this placeholder code.
-        Response response = Response.status(Response.Status.CREATED)
-              .entity("").type(MediaType.TEXT_PLAIN).build();
+        Response response =
+            Response.status(Response.Status.CREATED)
+                .entity("")
+                .type(MediaType.TEXT_PLAIN)
+                .build();
 
-/*      
+        /*
         // @TODO Replace this placeholder code.
         // Return a URL for the newly-created resource in the
         // Location header
@@ -188,98 +194,116 @@ public class IDResource {
         String url = "/idgenerators/" + csid;
         List locationList = Collections.singletonList(url);
         response.getMetadata()
-            .get("Location")
-            .putSingle("Location", locationList);
-*/
+        .get("Location")
+        .putSingle("Location", locationList);
+         */
 
         return response;
-        
+
     }
 
     //////////////////////////////////////////////////////////////////////
     /**
-    * Returns a representation of a single ID generator instance resource.
-    *
-    * @param    csid  An identifier for an ID generator instance.
-    *
-    * @return  A representation of an ID generator instance resource.
-    */
+     * Returns a representation of a single ID generator instance resource.
+     *
+     * @param    csid  An identifier for an ID generator instance.
+     *
+     * @return  A representation of an ID generator instance resource.
+     */
     @GET
     @Path("/{csid}")
     @Produces(MediaType.APPLICATION_XML)
     public Response readIDGenerator(@PathParam("csid") String csid) {
-    
+
         logger.debug("> in readIDGenerator(String)");
 
         Response response = null;
         response = response.ok().build();
         String resourceRepresentation = "";
-        
+
         try {
-        
+
             resourceRepresentation = service.readIDGenerator(csid);
-            
-            if (resourceRepresentation == null ||
-                resourceRepresentation.equals("")) {
-                response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("ID Service returned null or empty ID Generator")
-                    .type(MediaType.TEXT_PLAIN)
-                    .build();
+
+            if (
+                resourceRepresentation == null ||
+                resourceRepresentation.equals("")
+            ) {
+                response =
+                    Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .entity("ID Service returned null or empty ID Generator")
+                        .type(MediaType.TEXT_PLAIN)
+                        .build();
                 return response;
             }
-                    
-            response = Response.status(Response.Status.OK)
-              .entity(resourceRepresentation)
-              .type(MediaType.APPLICATION_XML)
-              .build();
-                
+
+            response =
+                Response.status(Response.Status.OK)
+                    .entity(resourceRepresentation)
+                    .type(MediaType.APPLICATION_XML)
+                    .build();
+
         // @TODO Return an XML-based error results format with the
         // responses below.
-        
+
         } catch (DocumentNotFoundException dnfe) {
-            response = Response.status(Response.Status.NOT_FOUND)
-              .entity(dnfe.getMessage()).type(MediaType.TEXT_PLAIN).build();
+            response =
+                Response.status(Response.Status.NOT_FOUND)
+                    .entity(dnfe.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
 
         } catch (IllegalStateException ise) {
-          response = Response.status(Response.Status.BAD_REQUEST)
-              .entity(ise.getMessage()).type(MediaType.TEXT_PLAIN).build();
-        
+            response =
+                Response.status(Response.Status.BAD_REQUEST)
+                    .entity(ise.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+
         } catch (IllegalArgumentException iae) {
-            response = Response.status(Response.Status.BAD_REQUEST)
-              .entity(iae.getMessage()).type(MediaType.TEXT_PLAIN).build();
-        
-        // This is guard code that should never be reached.
+            response =
+                Response.status(Response.Status.BAD_REQUEST)
+                    .entity(iae.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+
+            // This is guard code that should never be reached.
         } catch (Exception e) {
-          response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-              .entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
+            response =
+                Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
         }
-        
+
         return response;
 
     }
 
     //////////////////////////////////////////////////////////////////////
     /**
-    * Placeholder for retrieving a list of available ID Generator
-    * instance resources.
-    * 
-    * Required to facilitate a HEAD method test in ServiceLayerTest.
-    *
-    * @param   format  A representation ("format") in which to return list items,
-    *                  such as a "full" or "summary" format.
-    *
-    * @return  A list of representations of ID generator instance resources.
-    */
+     * Placeholder for retrieving a list of available ID Generator
+     * instance resources.
+     *
+     * Required to facilitate a HEAD method test in ServiceLayerTest.
+     *
+     * @param   format  A representation ("format") in which to return list items,
+     *                  such as a "full" or "summary" format.
+     *
+     * @return  A list of representations of ID generator instance resources.
+     */
     @GET
     @Path("")
     @Produces(MediaType.APPLICATION_XML)
-    public Response readIDGeneratorsList(@QueryParam("format") String format) {
-            
+    public Response readIDGeneratorsList(
+            @QueryParam("format") String format, @QueryParam("role") String role) {
+
         logger.debug("> in readIDGeneratorsList()");
 
-        // @TODO The name of the query parameter above is arbitrary, as
-        // is the type of result returned.  These should be standardized
-        // project-wide, and referenced as project-wide constants/enums.
+        // @TODO The names of the query parameters above ("format"
+        // and "role") are arbitrary, as are the format of the
+        // results returned.  These should be standardized and
+        // referenced project-wide.
 
         Response response = null;
         response = response.ok().build();
@@ -295,6 +319,10 @@ public class IDResource {
         final String LIST_FORMAT_FULL = "full";
         final String LIST_FORMAT_SUMMARY = "summary";
 
+        // @TODO We're currently overloading the String items in
+        // the 'generators' list with distinctly different types of
+        // list data, depending on the list format requested.  This may
+        // or may not be a good idea.
         try {
 
             List<String> generators = null;
@@ -308,47 +336,105 @@ public class IDResource {
                 // @TODO Return an appropriate XML-based entity body upon error.
                 String msg = "Query parameter '" + format + "' was not recognized.";
                 logger.debug(msg);
-                response = Response.status(Response.Status.BAD_REQUEST)
-                    .entity("").type(MediaType.TEXT_PLAIN).build();
+                response =
+                    Response.status(Response.Status.BAD_REQUEST)
+                        .entity("")
+                        .type(MediaType.TEXT_PLAIN)
+                        .build();
             }
 
             // @TODO Replace this placeholder/expedient, as per above
             StringBuffer sb = new StringBuffer("");
             sb.append(LIST_ROOT_START);
-            
-            // @TODO Summary list should return relative URLs,
-            // possibly also human-readable descriptions.
-            if (generators != null) {
-                for (String generator : generators) {
-                    sb.append(LIST_ITEM_START);
-                    sb.append(generator);
-                    sb.append(LIST_ITEM_END);
+
+            // Filter list by role
+            //
+            // @TODO Checking for roles here is a short-term expedient;
+            // this should likely be done through a database join on a
+            // table that associates ID generator roles to ID generator
+            // instances.
+
+            // @TODO The summary list currently returns only CSIDs.
+            // It should additionally return relative URLs,
+            // and possibly also human-readable descriptions.
+
+            // If the request didn't filter by role, return all
+            // ID generator instances.
+            if (role == null || role.equals("")) {
+                if (generators != null) {
+                    for (String generator : generators) {
+                        sb.append(LIST_ITEM_START);
+                        sb.append(generator);
+                        sb.append(LIST_ITEM_END);
+                    }
                 }
+                // Otherwise, return only ID generator instances
+                // matching the requested role.
+            } else {
+                if (generators != null) {
+                    for (String generator : generators) {
+                        if (generatorInRole(generator, role)) {
+                            sb.append(LIST_ITEM_START);
+                            sb.append(generator);
+                            sb.append(LIST_ITEM_END);
+                        }
+                    }
+                }
+
             }
+
             sb.append(LIST_ROOT_END);
 
             resourceRepresentation = sb.toString();
 
-            response = Response.status(Response.Status.OK)
-              .entity(resourceRepresentation)
-              .type(MediaType.APPLICATION_XML)
-              .build();
+            response =
+                Response.status(Response.Status.OK)
+                    .entity(resourceRepresentation)
+                    .type(MediaType.APPLICATION_XML)
+                    .build();
 
-        // @TODO Return an XML-based error results format with the
-        // responses below.
+            // @TODO Return an XML-based error results format with the
+            // responses below.
 
-         } catch (IllegalStateException ise) {
-          response = Response.status(Response.Status.BAD_REQUEST)
-              .entity(ise.getMessage()).type(MediaType.TEXT_PLAIN).build();
+        } catch (IllegalStateException ise) {
+            response =
+                Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(ise.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
 
-        // This is guard code that should never be reached.
+            // This is guard code that should never be reached.
         } catch (Exception e) {
-          response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-              .entity(e.getMessage()).type(MediaType.TEXT_PLAIN).build();
+            response =
+                Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
         }
 
         return response;
     }
 
+    private boolean generatorInRole(String generator, String role) {
 
+        // @TODO Short term expedient, relying on the incidental
+        // and transient fact that as of 2009-10-08, CSIDs for
+        // ID generator instances are identical to role names.
+        //
+        // This will work only for summary lists; in full lists,
+        // the CSID is not currently returned, and so any filtering
+        // by role will cause zero (0) items to be returned in the list.
+
+        // @TODO Replace this with a lookup of associations of
+        // ID generator instances to ID generator roles;
+        // perhaps in the short term with an external configuration
+        // file and ultimately in a database table.
+
+        if (generator.equalsIgnoreCase(role)) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
 }
