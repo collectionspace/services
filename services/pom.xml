@@ -22,8 +22,7 @@
         <!--module>query</module-->
         <module>acquisition</module>
         
-<!-- //FIXME: COLLECTIONSPACE1-SERVICESTRUNK1-22 -->        
-<!--        <module>vocabulary</module> -->
+        <module>vocabulary</module>
 
         <module>id</module>
         <module>collectionobject</module>

@@ -113,8 +113,7 @@
         <ant antfile="id/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="deploy" inheritAll="false"/>
-<!-- //FIXME: COLLECTIONSPACE1-SERVICESTRUNK1-22 -->
-<!--        <ant antfile="vocabulary/build.xml" target="deploy" inheritAll="false"/> -->
+        <ant antfile="vocabulary/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="acquisition/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="JaxRsServiceProvider/build.xml" target="deploy" inheritAll="false"/>
     </target>
