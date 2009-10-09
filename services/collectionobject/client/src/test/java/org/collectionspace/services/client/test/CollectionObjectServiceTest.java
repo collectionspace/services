@@ -53,6 +53,11 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     final String SERVICE_PATH_COMPONENT = "collectionobjects";
     private String knownResourceId = null; 
     
+    //FIXME: Remove this method once ALL the services use "_common" instead of "-common"
+    public String getCommonPartName() {
+        return getServicePathComponent() + "_common";
+    }
+
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------

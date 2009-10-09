@@ -173,7 +173,7 @@ public abstract class AbstractDocumentHandler<T, TL>
         StringTokenizer tkz = new StringTokenizer(qProp, ":");
         if(tkz.countTokens() != 2){
             String msg = "Property must be in the form xxx:yyy, " +
-                    "e.g. collectionobjects-common:objectNumber";
+                    "e.g. collectionobjects_common:objectNumber";
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }

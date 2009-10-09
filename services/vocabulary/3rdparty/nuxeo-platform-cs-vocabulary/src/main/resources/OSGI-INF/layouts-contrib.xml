@@ -20,7 +20,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="vocabulary">displayName</field>
+          <field schema="vocabularies_common">displayName</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -33,7 +33,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="vocabulary">vocabType</field>
+          <field schema="vocabularies_common">vocabType</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -60,7 +60,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="vocabularyitem">displayName</field>
+          <field schema="vocabularyitems_common">displayName</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -73,7 +73,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="vocabularyitem">inVocabulary</field>
+          <field schema="vocabularyitems_common">inVocabulary</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>

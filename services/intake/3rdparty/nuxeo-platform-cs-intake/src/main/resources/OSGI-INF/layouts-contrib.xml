@@ -28,7 +28,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="intake">currentOwner</field>
+          <field schema="intakes_common">currentOwner</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -41,7 +41,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="intake">depositor</field>
+          <field schema="intakes_common">depositor</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -54,7 +54,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="intake">depositorsRequirements</field>
+          <field schema="intakes_common">depositorsRequirements</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -67,7 +67,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="intake">entryDate</field>
+          <field schema="intakes_common">entryDate</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -80,7 +80,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="intake">entryMethod</field>
+          <field schema="intakes_common">entryMethod</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -93,7 +93,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="intake">entryNote</field>
+          <field schema="intakes_common">entryNote</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -106,7 +106,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="intake">entryNumber</field>
+          <field schema="intakes_common">entryNumber</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -119,7 +119,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="intake">entryReason</field>
+          <field schema="intakes_common">entryReason</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -132,7 +132,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="intake">packingNote</field>
+          <field schema="intakes_common">packingNote</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -145,7 +145,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="intake">returnDate</field>
+          <field schema="intakes_common">returnDate</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>

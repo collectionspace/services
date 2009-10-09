@@ -37,6 +37,12 @@ import org.collectionspace.services.common.service.ServiceBindingType;
 public interface ServiceContext<T1, T2> {
 
     /**
+     * The charactor used to separtate the words in a part label
+     */
+    public static final String PART_LABEL_SEPERATOR = "_";
+    public static final String PART_COMMON_LABEL = "common";
+	
+    /**
      * getTenantId get tenant id
      * @return tenant id
      */

@@ -12,7 +12,7 @@
 <!-- See http://wiki.collectionspace.org/display/collectionspace/Vocabulary+Schema -->    
     
     <!-- Vocabulary  -->
-    <xs:element name="vocabularies-common">
+    <xs:element name="vocabularies_common">
         <xs:complexType>
             <xs:sequence>
                 <!--  Common identifier -->

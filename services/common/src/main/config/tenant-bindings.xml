@@ -30,21 +30,21 @@
                 </service:part>
                 <service:part id="1" control_group="Managed"
                             versionable="true" auditable="false"
-                            label="collectionobjects-common" updated="" order="1">
+                            label="collectionobjects_common" updated="" order="1">
                     <service:content contentType="application/xml">
                         <service:xmlContent
                         namespaceURI="http://collectionspace.org/services/collectionobject"
-                        schemaLocation="http://collectionspace.org/services/collectionobject http://services.collectionspace.org/collectionobject/collectionobjects-common.xsd">
+                        schemaLocation="http://collectionspace.org/services/collectionobject http://services.collectionspace.org/collectionobject/collectionobjects_common.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
                 <service:part id="2" control_group="Managed"
                             versionable="true" auditable="false"
-                            label="collectionobjects-naturalhistory" updated="" order="2">
+                            label="collectionobjects_naturalhistory" updated="" order="2">
                     <service:content contentType="application/xml">
                         <service:xmlContent
                         namespaceURI="http://collectionspace.org/services/collectionobject/domain/naturalhistory"
-                        schemaLocation="http://collectionspace.org/services/collectionobject/domain/naturalhistory http://collectionspace.org/services/collectionobject/domain/collectionobjects-naturalhistory.xsd">
+                        schemaLocation="http://collectionspace.org/services/collectionobject/domain/naturalhistory http://collectionspace.org/services/collectionobject/domain/collectionobjects_naturalhistory.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -68,11 +68,11 @@
                 </service:part>
                 <service:part id="1" control_group="Managed"
                             versionable="true" auditable="false"
-                            label="intakes-common" updated="" order="1">
+                            label="intakes_common" updated="" order="1">
                     <service:content contentType="application/xml">
                         <service:xmlContent
                         namespaceURI="http://collectionspace.org/services/intake"
-                        schemaLocation="http://collectionspace.org/services/intake http://services.collectionspace.org/intake/intakes-common.xsd">
+                        schemaLocation="http://collectionspace.org/services/intake http://services.collectionspace.org/intake/intakes_common.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -96,11 +96,11 @@
                 </service:part>
                 <service:part id="1" control_group="Managed"
                             versionable="true" auditable="false"
-                            label="vocabularies-common" updated="" order="1">
+                            label="vocabularies_common" updated="" order="1">
                     <service:content contentType="application/xml">
                         <service:xmlContent
                         namespaceURI="http://collectionspace.org/services/vocabulary"
-                        schemaLocation="http://collectionspace.org/services/vocabulary http://services.collectionspace.org/vocabulary/vocabularies-common.xsd">
+                        schemaLocation="http://collectionspace.org/services/vocabulary http://services.collectionspace.org/vocabulary/vocabularies_common.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -152,11 +152,11 @@
                 </service:part>
                 <service:part id="1" control_group="Managed"
                             versionable="true" auditable="false"
-                            label="relations-common" updated="" order="1">
+                            label="relations_common" updated="" order="1">
                     <service:content contentType="application/xml">
                         <service:xmlContent
                         namespaceURI="http://collectionspace.org/services/relation"
-                        schemaLocation="http://collectionspace.org/services/relation http://services.collectionspace.org/relation/relations-common.xsd">
+                        schemaLocation="http://collectionspace.org/services/relation http://services.collectionspace.org/relation/relations_common.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>

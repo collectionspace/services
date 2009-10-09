@@ -22,81 +22,80 @@
         <layout name="relation">
             <templates>
                 <template mode="any">/layouts/layout_default_template.xhtml</template>
-            </templates>
-            
+            </templates>            
             <rows>
-                <row>
-                    <widget>relationtype</widget>
-                </row>
+                <row><widget>relationshipType</widget></row>
+                <row><widget>documentId1</widget></row>
+                <row><widget>documentType1</widget></row>
+                <row><widget>documentId2</widget></row>
+                <row><widget>documentType2</widget></row>
             </rows>
             
-            <widget name="relationtype" type="template">
+            <widget name="relationshipType" type="text">
+                <labels>
+                    <label mode="any">Relationship Type</label>
+                </labels>
+                <translated>true</translated>
                 <fields>
-                    <field>rel:relationtype</field>
+                    <field schema="relations_common">relationshipType</field>
                 </fields>
-                <properties mode="any">
-                    <property name="template">
-                        /widgets/complex_widget_template.xhtml
-                    </property>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
                 </properties>
-                
-                <subWidgets>
-                    
-                    <widget name="documentId1" type="text">
-                        <labels>
-                            <label mode="any">Document ID 1</label>
-                        </labels>
-                        <translated>true</translated>
-                        <fields>
-                            <field>documentId1</field>
-                        </fields>
-                        <properties widgetMode="edit">
-                            <property name="styleClass">dataInputText</property>
-                        </properties>
-                    </widget>
-                    
-                    <widget name="documentType1" type="text">
-                        <labels>
-                            <label mode="any">Document Type 1</label>
-                        </labels>
-                        <translated>true</translated>
-                        <fields>
-                            <field>documentType1</field>
-                        </fields>
-                        <properties widgetMode="edit">
-                            <property name="styleClass">dataInputText</property>
-                        </properties>
-                    </widget>
-                    
-                    <widget name="documentId2" type="text">
-                        <labels>
-                            <label mode="any">Document ID 2</label>
-                        </labels>
-                        <translated>true</translated>
-                        <fields>
-                            <field>documentId2</field>
-                        </fields>
-                        <properties widgetMode="edit">
-                            <property name="styleClass">dataInputText</property>
-                        </properties>
-                    </widget>
-                    
-                    <widget name="documentType2" type="text">
-                        <labels>
-                            <label mode="any">Document Type 2</label>
-                        </labels>
-                        <translated>true</translated>
-                        <fields>
-                            <field>documentType2</field>
-                        </fields>
-                        <properties widgetMode="edit">
-                            <property name="styleClass">dataInputText</property>
-                        </properties>
-                    </widget>
-                    
-                </subWidgets>
             </widget>
             
+            <widget name="documentId1" type="text">
+                <labels>
+                    <label mode="any">Document ID 1</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="relations_common">documentId1</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+            
+            <widget name="documentType1" type="text">
+                <labels>
+                    <label mode="any">Document Type 1</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="relations_common">documentType1</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+            
+            <widget name="documentId2" type="text">
+                <labels>
+                    <label mode="any">Document ID 2</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="relations_common">documentId2</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+            
+            <widget name="documentType2" type="text">
+                <labels>
+                    <label mode="any">Document Type 2</label>
+                </labels>
+                <translated>true</translated>
+                <fields>
+                    <field schema="relations_common">documentType2</field>
+                </fields>
+                <properties widgetMode="edit">
+                    <property name="styleClass">dataInputText</property>
+                </properties>
+            </widget>
+                    
         </layout>
     </extension>
 </component>

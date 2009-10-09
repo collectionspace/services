@@ -12,7 +12,7 @@
 <!-- See http://wiki.collectionspace.org/display/collectionspace/Intake+Schema -->    
     
     <!-- intake  -->
-    <xs:element name="intakes-common">
+    <xs:element name="intakes_common">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="csid" type="xs:string" />

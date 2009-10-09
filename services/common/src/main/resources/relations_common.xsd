@@ -21,7 +21,7 @@
     >
 
     <!-- Relation -->
-    <xs:element name="relations-common">
+    <xs:element name="relations_common">
         <xs:complexType>
             <xs:sequence>
             	<xs:element name="csid" type="xs:string" />            

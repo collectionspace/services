@@ -121,7 +121,7 @@ public class AcquisitionDocumentModelHandler
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
             AcquisitionListItem listItem = new AcquisitionListItem();
-            listItem.setAccessiondate((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+            listItem.setAccessionDate((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     AcquisitionJAXBSchema.ACCESSIONDATE));
             //need fully qualified context for URI
             String id = docModel.getId();

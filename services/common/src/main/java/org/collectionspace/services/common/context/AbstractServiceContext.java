@@ -49,7 +49,7 @@ public abstract class AbstractServiceContext<T1, T2>
     Map<String, ObjectPartType> objectPartMap = new HashMap<String, ObjectPartType>();
     private ServiceBindingType serviceBinding;
     private TenantBindingType tenantBinding;
-
+    
     public AbstractServiceContext(String serviceName) {
         TenantBindingConfigReader tReader =
                 ServiceMain.getInstance().getTenantBindingConfigReader();
@@ -82,7 +82,7 @@ public abstract class AbstractServiceContext<T1, T2>
      */
     @Override
     public String getCommonPartLabel() {
-        return getServiceName().toLowerCase() + "-common";
+        return getServiceName().toLowerCase() + PART_LABEL_SEPERATOR + PART_COMMON_LABEL;
     }
 
     @Override

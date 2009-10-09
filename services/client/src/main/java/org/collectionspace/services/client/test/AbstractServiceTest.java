@@ -33,6 +33,7 @@ import javax.xml.bind.Marshaller;
 
 import javax.xml.bind.Unmarshaller;
 import org.collectionspace.services.client.TestServiceClient;
+import org.collectionspace.services.common.context.ServiceContext;
 
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
@@ -266,7 +267,8 @@ public abstract class AbstractServiceTest implements ServiceTest {
 
     @Override
     public String getCommonPartName() {
-        return getServicePathComponent() + "-common";
+        return getServicePathComponent() + ServiceContext.PART_LABEL_SEPERATOR + 
+        	ServiceContext.PART_COMMON_LABEL;
     }
 
     // ---------------------------------------------------------------

@@ -52,11 +52,6 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
     final String SERVICE_PATH_COMPONENT = "acquisitions";
     private String knownResourceId = null;
 
-    //FIXME: Remove this method once ALL the services use "_common" instead of "-common"
-    public String getCommonPartName() {
-        return getServicePathComponent() + "_common";
-    }
-    
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
@@ -243,7 +238,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
                 verbose("readList: list-item[" + i + "] csid=" +
                         item.getCsid());
                 verbose("readList: list-item[" + i + "] objectNumber=" +
-                        item.getAccessiondate());
+                        item.getAccessionDate());
                 verbose("readList: list-item[" + i + "] URI=" +
                         item.getUri());
                 i++;
