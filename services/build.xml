@@ -122,7 +122,7 @@
     <target name="undeploy"
     description="undeploy services from ${jboss.server.cspace}">
         <ant antfile="JaxRsServiceProvider/build.xml" target="undeploy" inheritAll="false"/>
-        <ant antfile="vocabulary/build.xml" target="undeploy" inheritAll="false"/>
+        <!-- ant antfile="vocabulary/build.xml" target="undeploy" inheritAll="false"/ -->
         <ant antfile="acquisition/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="undeploy" inheritAll="false"/>
@@ -141,7 +141,7 @@
         <ant antfile="id/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="dist" inheritAll="false"/>
-        <ant antfile="vocabulary/build.xml" target="dist" inheritAll="false"/>
+        <!-- ant antfile="vocabulary/build.xml" target="dist" inheritAll="false"/ -->
         <ant antfile="acquisition/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="JaxRsServiceProvider/build.xml" target="dist" inheritAll="false"/>
     </target>
