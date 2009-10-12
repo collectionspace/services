@@ -262,14 +262,7 @@ public abstract class AbstractServiceTest implements ServiceTest {
      * This component will follow directly after the
      * base path, if any.
      */
-    @Override
-    public abstract String getServicePathComponent();
-
-    @Override
-    public String getCommonPartName() {
-        return getServicePathComponent() + ServiceContext.PART_LABEL_SEPERATOR + 
-        	ServiceContext.PART_COMMON_LABEL;
-    }
+    protected abstract String getServicePathComponent();
 
     // ---------------------------------------------------------------
     // Utility methods

@@ -2,6 +2,7 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.vocabulary.VocabulariesCommonList;
 
 import org.jboss.resteasy.client.ProxyFactory;
@@ -18,6 +19,12 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  */
 public class VocabularyClient extends BaseServiceClient {
 
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
+	 */
+	public String getServicePathComponent() {
+		return "vocabularies";
+	}
 
     /**
      *

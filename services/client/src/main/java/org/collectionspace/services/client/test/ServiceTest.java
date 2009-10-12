@@ -36,13 +36,13 @@ public interface ServiceTest {
      * This component will follow directly after the
      * base path, if any.
      */
-    public String getServicePathComponent();
-
-    /**
-     * getCommonPartName get common part name for the service request
-     * @return
-     */
-    public String getCommonPartName();
+//    public String getServicePathComponent();
+//
+//    /**
+//     * getCommonPartName get common part name for the service request
+//     * @return
+//     */
+//    public String getCommonPartName();
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests

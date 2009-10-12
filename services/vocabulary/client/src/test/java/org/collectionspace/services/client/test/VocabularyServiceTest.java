@@ -202,7 +202,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
         try{
             MultipartInput input = (MultipartInput) res.getEntity();
             VocabulariesCommon vocabulary = (VocabulariesCommon) extractPart(input,
-                    getCommonPartName(), VocabulariesCommon.class);
+            		client.getCommonPartName(), VocabulariesCommon.class);
             Assert.assertNotNull(vocabulary);
         }catch(Exception e){
             throw new RuntimeException(e);
@@ -294,7 +294,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
             verbose("got object to update with ID: " + knownResourceId);
             MultipartInput input = (MultipartInput) res.getEntity();
             VocabulariesCommon vocabulary = (VocabulariesCommon) extractPart(input,
-                    getCommonPartName(), VocabulariesCommon.class);
+            		client.getCommonPartName(), VocabulariesCommon.class);
             Assert.assertNotNull(vocabulary);
 
             // Update the content of this resource.
@@ -304,7 +304,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
             // Submit the request to the service and store the response.
             MultipartOutput output = new MultipartOutput();
             OutputPart commonPart = output.addPart(vocabulary, MediaType.APPLICATION_XML_TYPE);
-            commonPart.getHeaders().add("label", getCommonPartName());
+            commonPart.getHeaders().add("label", client.getCommonPartName());
 
             res = client.update(knownResourceId, output);
             int statusCode = res.getStatus();
@@ -318,7 +318,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
             input = (MultipartInput) res.getEntity();
             VocabulariesCommon updatedVocabulary =
                     (VocabulariesCommon) extractPart(input,
-                    getCommonPartName(), VocabulariesCommon.class);
+                    		client.getCommonPartName(), VocabulariesCommon.class);
             Assert.assertNotNull(updatedVocabulary);
 
             Assert.assertEquals(updatedVocabulary.getDisplayName(),
@@ -521,7 +521,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
         vocabulary.setVocabType(vocabType);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(vocabulary, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", getCommonPartName());
+        commonPart.getHeaders().add("label", client.getCommonPartName());
 
         verbose("to be created, vocabulary common ", vocabulary, VocabulariesCommon.class);
 

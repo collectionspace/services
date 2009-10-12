@@ -38,279 +38,404 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * AuthenticationServiceTest uses CollectionObject service to test authentication
+ * AuthenticationServiceTest uses CollectionObject service to test
+ * authentication
  * 
- * $LastChangedRevision: 434 $
- * $LastChangedDate: 2009-07-28 14:34:15 -0700 (Tue, 28 Jul 2009) $
+ * $LastChangedRevision: 434 $ $LastChangedDate: 2009-07-28 14:34:15 -0700 (Tue,
+ * 28 Jul 2009) $
  */
 public class AuthenticationServiceTest extends AbstractServiceTest {
 
-    final String SERVICE_PATH_COMPONENT = "collectionobjects";
-    private String knownResourceId = null;
-    final Logger logger = LoggerFactory.getLogger(AuthenticationServiceTest.class);
+	/** The known resource id. */
+	private String knownResourceId = null;
+	
+	/** The logger. */
+	final Logger logger = LoggerFactory
+			.getLogger(AuthenticationServiceTest.class);
 
-    @Override
-    public String getServicePathComponent() {
-        // @TODO Determine if it is possible to obtain this
-        // value programmatically.
-        //
-        // We set this in an annotation in the CollectionObjectProxy
-        // interface, for instance.  We also set service-specific
-        // constants in each service module, which might also
-        // return this value.
-        return SERVICE_PATH_COMPONENT;
-    }
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.AbstractServiceTest#getServicePathComponent()
+	 */
+	protected String getServicePathComponent() {
+		// no need to return anything but null since no auth resources are
+		// accessed
+		return null;
+	}
 
-    @Test
-    @Override
-    public void create() {
-        String identifier = this.createIdentifier();
-        MultipartOutput multipart = createCollectionObjectInstance(identifier);
-        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        if(!collectionObjectClient.isServerSecure()){
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
-        collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY, "true");
-        collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY, "test");
-        collectionObjectClient.setProperty(CollectionSpaceClient.PASSWORD_PROPERTY, "test");
-        try{
-            collectionObjectClient.setupHttpClient();
-            collectionObjectClient.setProxy();
-        }catch(Exception e){
-            logger.error("create: caught " + e.getMessage());
-            return;
-        }
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        verbose("create: status = " + res.getStatus());
-        Assert.assertEquals(res.getStatus(), Response.Status.CREATED.getStatusCode(),
-                "expected " + Response.Status.CREATED.getStatusCode());
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.AbstractServiceTest#create()
+	 */
+	@Test
+	@Override
+	public void create() {
+		CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+		String identifier = this.createIdentifier();
+		MultipartOutput multipart = createCollectionObjectInstance(
+				collectionObjectClient.getCommonPartName(), identifier);
 
-        // Store the ID returned from this create operation for additional tests below.
-        knownResourceId = extractId(res);
-    }
+		if (!collectionObjectClient.isServerSecure()) {
+			logger
+					.warn("set -Dcspace.server.secure=true to run security tests");
+			return;
+		}
+		collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
+				"true");
+		collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
+				"test");
+		collectionObjectClient.setProperty(
+				CollectionSpaceClient.PASSWORD_PROPERTY, "test");
+		try {
+			collectionObjectClient.setupHttpClient();
+			collectionObjectClient.setProxy();
+		} catch (Exception e) {
+			logger.error("create: caught " + e.getMessage());
+			return;
+		}
+		ClientResponse<Response> res = collectionObjectClient.create(multipart);
+		verbose("create: status = " + res.getStatus());
+		Assert.assertEquals(res.getStatus(), Response.Status.CREATED
+				.getStatusCode(), "expected "
+				+ Response.Status.CREATED.getStatusCode());
 
-    @Test(dependsOnMethods = {"create"})
-    public void createWithoutUser() {
-        String identifier = this.createIdentifier();
-        MultipartOutput multipart = createCollectionObjectInstance(identifier);
-        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        if(!collectionObjectClient.isServerSecure()){
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
-        collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY, "true");
-        collectionObjectClient.removeProperty(CollectionSpaceClient.USER_PROPERTY);
-        collectionObjectClient.setProperty(CollectionSpaceClient.PASSWORD_PROPERTY, "test");
-        try{
-            collectionObjectClient.setupHttpClient();
-            collectionObjectClient.setProxy();
-        }catch(Exception e){
-            logger.error("createWithoutUser: caught " + e.getMessage());
-            return;
-        }
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        verbose("createWithoutUser: status = " + res.getStatus());
-        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(),
-                "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
-    }
+		// Store the ID returned from this create operation for additional tests
+		// below.
+		knownResourceId = extractId(res);
+	}
 
-    @Test(dependsOnMethods = {"createWithoutUser"})
-    public void createWithoutPassword() {
-        String identifier = this.createIdentifier();
-        MultipartOutput multipart = createCollectionObjectInstance(identifier);
-        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        if(!collectionObjectClient.isServerSecure()){
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
-        collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY, "true");
-        collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY, "test");
-        collectionObjectClient.removeProperty(CollectionSpaceClient.PASSWORD_PROPERTY);
-        try{
-            collectionObjectClient.setupHttpClient();
-            collectionObjectClient.setProxy();
-        }catch(Exception e){
-            logger.error("createWithoutPassword: caught " + e.getMessage());
-            return;
-        }
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        verbose("createWithoutPassword: status = " + res.getStatus());
-        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(),
-                "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
-    }
+	/**
+	 * Creates the without user.
+	 */
+	@Test(dependsOnMethods = { "create" })
+	public void createWithoutUser() {
+		CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+		String identifier = this.createIdentifier();
+		MultipartOutput multipart = createCollectionObjectInstance(
+				collectionObjectClient.getCommonPartName(), identifier);
+		if (!collectionObjectClient.isServerSecure()) {
+			logger
+					.warn("set -Dcspace.server.secure=true to run security tests");
+			return;
+		}
+		collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
+				"true");
+		collectionObjectClient
+				.removeProperty(CollectionSpaceClient.USER_PROPERTY);
+		collectionObjectClient.setProperty(
+				CollectionSpaceClient.PASSWORD_PROPERTY, "test");
+		try {
+			collectionObjectClient.setupHttpClient();
+			collectionObjectClient.setProxy();
+		} catch (Exception e) {
+			logger.error("createWithoutUser: caught " + e.getMessage());
+			return;
+		}
+		ClientResponse<Response> res = collectionObjectClient.create(multipart);
+		verbose("createWithoutUser: status = " + res.getStatus());
+		Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED
+				.getStatusCode(), "expected "
+				+ Response.Status.UNAUTHORIZED.getStatusCode());
+	}
 
-    @Test(dependsOnMethods = {"createWithoutPassword"})
-    public void createWithIncorrectPassword() {
-        String identifier = this.createIdentifier();
-        MultipartOutput multipart = createCollectionObjectInstance(identifier);
-        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        if(!collectionObjectClient.isServerSecure()){
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
-        collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY, "true");
-        collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY, "test");
-        collectionObjectClient.setProperty(CollectionSpaceClient.PASSWORD_PROPERTY, "bar");
-        try{
-            collectionObjectClient.setupHttpClient();
-            collectionObjectClient.setProxy();
-        }catch(Exception e){
-            logger.error("createWithIncorrectPassword: caught " + e.getMessage());
-            return;
-        }
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        verbose("createWithIncorrectPassword: status = " + res.getStatus());
-        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(),
-                "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
-    }
+	/**
+	 * Creates the without password.
+	 */
+	@Test(dependsOnMethods = { "createWithoutUser" })
+	public void createWithoutPassword() {
+		CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+		String identifier = this.createIdentifier();
+		MultipartOutput multipart = createCollectionObjectInstance(
+				collectionObjectClient.getCommonPartName(), identifier);
+		if (!collectionObjectClient.isServerSecure()) {
+			logger
+					.warn("set -Dcspace.server.secure=true to run security tests");
+			return;
+		}
+		collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
+				"true");
+		collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
+				"test");
+		collectionObjectClient
+				.removeProperty(CollectionSpaceClient.PASSWORD_PROPERTY);
+		try {
+			collectionObjectClient.setupHttpClient();
+			collectionObjectClient.setProxy();
+		} catch (Exception e) {
+			logger.error("createWithoutPassword: caught " + e.getMessage());
+			return;
+		}
+		ClientResponse<Response> res = collectionObjectClient.create(multipart);
+		verbose("createWithoutPassword: status = " + res.getStatus());
+		Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED
+				.getStatusCode(), "expected "
+				+ Response.Status.UNAUTHORIZED.getStatusCode());
+	}
 
-    @Test(dependsOnMethods = {"createWithoutPassword"})
-    public void createWithoutUserPassword() {
-        String identifier = this.createIdentifier();
-        MultipartOutput multipart = createCollectionObjectInstance(identifier);
-        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        if(!collectionObjectClient.isServerSecure()){
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
-        collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY, "true");
-        collectionObjectClient.removeProperty(CollectionSpaceClient.USER_PROPERTY);
-        collectionObjectClient.removeProperty(CollectionSpaceClient.PASSWORD_PROPERTY);
-        try{
-            collectionObjectClient.setupHttpClient();
-            collectionObjectClient.setProxy();
-        }catch(Exception e){
-            logger.error("createWithoutUserPassword: caught " + e.getMessage());
-            return;
-        }
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        verbose("createWithoutUserPassword: status = " + res.getStatus());
-        Assert.assertEquals(res.getStatus(), Response.Status.FORBIDDEN.getStatusCode(),
-                "expected " + Response.Status.FORBIDDEN.getStatusCode());
-    }
+	/**
+	 * Creates the with incorrect password.
+	 */
+	@Test(dependsOnMethods = { "createWithoutPassword" })
+	public void createWithIncorrectPassword() {
+		CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+		String identifier = this.createIdentifier();
+		MultipartOutput multipart = createCollectionObjectInstance(
+				collectionObjectClient.getCommonPartName(), identifier);
+		if (!collectionObjectClient.isServerSecure()) {
+			logger
+					.warn("set -Dcspace.server.secure=true to run security tests");
+			return;
+		}
+		collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
+				"true");
+		collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
+				"test");
+		collectionObjectClient.setProperty(
+				CollectionSpaceClient.PASSWORD_PROPERTY, "bar");
+		try {
+			collectionObjectClient.setupHttpClient();
+			collectionObjectClient.setProxy();
+		} catch (Exception e) {
+			logger.error("createWithIncorrectPassword: caught "
+					+ e.getMessage());
+			return;
+		}
+		ClientResponse<Response> res = collectionObjectClient.create(multipart);
+		verbose("createWithIncorrectPassword: status = " + res.getStatus());
+		Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED
+				.getStatusCode(), "expected "
+				+ Response.Status.UNAUTHORIZED.getStatusCode());
+	}
 
-    @Test(dependsOnMethods = {"createWithoutPassword"})
-    public void createWithIncorrectUserPassword() {
-        String identifier = this.createIdentifier();
-        MultipartOutput multipart = createCollectionObjectInstance(identifier);
-        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        if(!collectionObjectClient.isServerSecure()){
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
-        collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY, "true");
-        collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY, "foo");
-        collectionObjectClient.setProperty(CollectionSpaceClient.PASSWORD_PROPERTY, "bar");
-        try{
-            collectionObjectClient.setupHttpClient();
-            collectionObjectClient.setProxy();
-        }catch(Exception e){
-            logger.error("createWithIncorrectUserPassword: caught " + e.getMessage());
-            return;
-        }
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        verbose("createWithIncorrectUserPassword: status = " + res.getStatus());
-        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(),
-                "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
-    }
+	/**
+	 * Creates the without user password.
+	 */
+	@Test(dependsOnMethods = { "createWithoutPassword" })
+	public void createWithoutUserPassword() {
+		CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+		String identifier = this.createIdentifier();
+		MultipartOutput multipart = createCollectionObjectInstance(
+				collectionObjectClient.getCommonPartName(), identifier);
+		if (!collectionObjectClient.isServerSecure()) {
+			logger.warn("set -Dcspace.server.secure=true to run security tests");
+			return;
+		}
+		collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
+				"true");
+		collectionObjectClient
+				.removeProperty(CollectionSpaceClient.USER_PROPERTY);
+		collectionObjectClient
+				.removeProperty(CollectionSpaceClient.PASSWORD_PROPERTY);
+		try {
+			collectionObjectClient.setupHttpClient();
+			collectionObjectClient.setProxy();
+		} catch (Exception e) {
+			logger.error("createWithoutUserPassword: caught " + e.getMessage());
+			return;
+		}
+		ClientResponse<Response> res = collectionObjectClient.create(multipart);
+		verbose("createWithoutUserPassword: status = " + res.getStatus());
+		Assert.assertEquals(res.getStatus(), Response.Status.FORBIDDEN
+				.getStatusCode(), "expected "
+				+ Response.Status.FORBIDDEN.getStatusCode());
+	}
 
-    @Override
-    @Test(dependsOnMethods = {"createWithIncorrectUserPassword"})
-    public void delete() {
-        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        collectionObjectClient = new CollectionObjectClient();
-        if(!collectionObjectClient.isServerSecure()){
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
-        collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY, "true");
-        collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY, "test");
-        collectionObjectClient.setProperty(CollectionSpaceClient.PASSWORD_PROPERTY, "test");
-        try{
-            collectionObjectClient.setupHttpClient();
-            collectionObjectClient.setProxy();
-        }catch(Exception e){
-            logger.error("deleteCollectionObject: caught " + e.getMessage());
-            return;
-        }
-        verbose("Calling deleteCollectionObject:" + knownResourceId);
-        ClientResponse<Response> res = collectionObjectClient.delete(knownResourceId);
-        verbose("deleteCollectionObject: status = " + res.getStatus());
-        Assert.assertEquals(res.getStatus(), Response.Status.OK.getStatusCode(),
-                "expected " + Response.Status.OK.getStatusCode());
-    }
+	/**
+	 * Creates the with incorrect user password.
+	 */
+	@Test(dependsOnMethods = { "createWithoutPassword" })
+	public void createWithIncorrectUserPassword() {
+		CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+		String identifier = this.createIdentifier();
+		MultipartOutput multipart = createCollectionObjectInstance(
+				collectionObjectClient.getCommonPartName(), identifier);
+		if (!collectionObjectClient.isServerSecure()) {
+			logger.warn("set -Dcspace.server.secure=true to run security tests");
+			return;
+		}
+		collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
+				"true");
+		collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
+				"foo");
+		collectionObjectClient.setProperty(
+				CollectionSpaceClient.PASSWORD_PROPERTY, "bar");
+		try {
+			collectionObjectClient.setupHttpClient();
+			collectionObjectClient.setProxy();
+		} catch (Exception e) {
+			logger.error("createWithIncorrectUserPassword: caught "
+					+ e.getMessage());
+			return;
+		}
+		ClientResponse<Response> res = collectionObjectClient.create(multipart);
+		verbose("createWithIncorrectUserPassword: status = " + res.getStatus());
+		Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED
+				.getStatusCode(), "expected "
+				+ Response.Status.UNAUTHORIZED.getStatusCode());
+	}
 
-    // ---------------------------------------------------------------
-    // Utility methods used by tests above
-    // ---------------------------------------------------------------
-    private MultipartOutput createCollectionObjectInstance(String identifier) {
-        return createCollectionObjectInstance("objectNumber-" + identifier,
-                "objectName-" + identifier);
-    }
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.AbstractServiceTest#delete()
+	 */
+	@Override
+	@Test(dependsOnMethods = { "createWithIncorrectUserPassword" })
+	public void delete() {
+		CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+		collectionObjectClient = new CollectionObjectClient();
+		if (!collectionObjectClient.isServerSecure()) {
+			logger.warn("set -Dcspace.server.secure=true to run security tests");
+			return;
+		}
+		collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
+				"true");
+		collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
+				"test");
+		collectionObjectClient.setProperty(
+				CollectionSpaceClient.PASSWORD_PROPERTY, "test");
+		try {
+			collectionObjectClient.setupHttpClient();
+			collectionObjectClient.setProxy();
+		} catch (Exception e) {
+			logger.error("deleteCollectionObject: caught " + e.getMessage());
+			return;
+		}
+		verbose("Calling deleteCollectionObject:" + knownResourceId);
+		ClientResponse<Response> res = collectionObjectClient
+				.delete(knownResourceId);
+		verbose("deleteCollectionObject: status = " + res.getStatus());
+		Assert.assertEquals(res.getStatus(),
+				Response.Status.OK.getStatusCode(), "expected "
+						+ Response.Status.OK.getStatusCode());
+	}
 
-    private MultipartOutput createCollectionObjectInstance(String objectNumber, String objectName) {
-        CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
+	// ---------------------------------------------------------------
+	// Utility methods used by tests above
+	// ---------------------------------------------------------------
+	/**
+	 * Creates the collection object instance.
+	 * 
+	 * @param commonPartName the common part name
+	 * @param identifier the identifier
+	 * 
+	 * @return the multipart output
+	 */
+	private MultipartOutput createCollectionObjectInstance(
+			String commonPartName, String identifier) {
+		return createCollectionObjectInstance(commonPartName, "objectNumber-"
+				+ identifier, "objectName-" + identifier);
+	}
 
-        collectionObject.setObjectNumber(objectNumber);
-        collectionObject.setObjectName(objectName);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(collectionObject, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", getCommonPartName());
+	/**
+	 * Creates the collection object instance.
+	 * 
+	 * @param commonPartName the common part name
+	 * @param objectNumber the object number
+	 * @param objectName the object name
+	 * 
+	 * @return the multipart output
+	 */
+	private MultipartOutput createCollectionObjectInstance(
+			String commonPartName, String objectNumber, String objectName) {
+		CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
 
-        verbose("to be created, collectionobject common ", collectionObject, CollectionobjectsCommon.class);
-        return multipart;
-    }
+		collectionObject.setObjectNumber(objectNumber);
+		collectionObject.setObjectName(objectName);
+		MultipartOutput multipart = new MultipartOutput();
+		OutputPart commonPart = multipart.addPart(collectionObject,
+				MediaType.APPLICATION_XML_TYPE);
+		commonPart.getHeaders().add("label", commonPartName);
 
-    @Override
-    public void createList() {
-    }
+		verbose("to be created, collectionobject common ", collectionObject,
+				CollectionobjectsCommon.class);
+		return multipart;
+	}
 
-    @Override
-    public void createWithEmptyEntityBody() {
-    }
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.AbstractServiceTest#createList()
+	 */
+	@Override
+	public void createList() {
+	}
 
-    @Override
-    public void createWithMalformedXml() {
-    }
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.AbstractServiceTest#createWithEmptyEntityBody()
+	 */
+	@Override
+	public void createWithEmptyEntityBody() {
+	}
 
-    @Override
-    public void createWithWrongXmlSchema() {
-    }
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.AbstractServiceTest#createWithMalformedXml()
+	 */
+	@Override
+	public void createWithMalformedXml() {
+	}
 
-    @Override
-    public void read() {
-    }
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.AbstractServiceTest#createWithWrongXmlSchema()
+	 */
+	@Override
+	public void createWithWrongXmlSchema() {
+	}
 
-    @Override
-    public void readNonExistent() {
-    }
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.AbstractServiceTest#read()
+	 */
+	@Override
+	public void read() {
+	}
 
-    @Override
-    public void readList() {
-    }
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.AbstractServiceTest#readNonExistent()
+	 */
+	@Override
+	public void readNonExistent() {
+	}
 
-    @Override
-    public void update() {
-    }
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.AbstractServiceTest#readList()
+	 */
+	@Override
+	public void readList() {
+	}
 
-    @Override
-    public void updateWithEmptyEntityBody() {
-    }
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.AbstractServiceTest#update()
+	 */
+	@Override
+	public void update() {
+	}
 
-    @Override
-    public void updateWithMalformedXml() {
-    }
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.AbstractServiceTest#updateWithEmptyEntityBody()
+	 */
+	@Override
+	public void updateWithEmptyEntityBody() {
+	}
 
-    @Override
-    public void updateWithWrongXmlSchema() {
-    }
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.AbstractServiceTest#updateWithMalformedXml()
+	 */
+	@Override
+	public void updateWithMalformedXml() {
+	}
 
-    @Override
-    public void updateNonExistent() {
-    }
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.AbstractServiceTest#updateWithWrongXmlSchema()
+	 */
+	@Override
+	public void updateWithWrongXmlSchema() {
+	}
 
-    @Override
-    public void deleteNonExistent() {
-    }
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.AbstractServiceTest#updateNonExistent()
+	 */
+	@Override
+	public void updateNonExistent() {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.AbstractServiceTest#deleteNonExistent()
+	 */
+	@Override
+	public void deleteNonExistent() {
+	}
 }

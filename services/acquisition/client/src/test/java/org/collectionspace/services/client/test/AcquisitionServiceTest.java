@@ -49,7 +49,6 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
     // Instance variables specific to this test.
     private AcquisitionClient client = new AcquisitionClient();
-    final String SERVICE_PATH_COMPONENT = "acquisitions";
     private String knownResourceId = null;
 
     // ---------------------------------------------------------------
@@ -178,7 +177,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
         try{
             MultipartInput input = (MultipartInput) res.getEntity();
             AcquisitionsCommon acquistionObject = (AcquisitionsCommon) extractPart(input,
-                    getCommonPartName(), AcquisitionsCommon.class);
+            		client.getCommonPartName(), AcquisitionsCommon.class);
             Assert.assertNotNull(acquistionObject);
         }catch(Exception e){
             throw new RuntimeException(e);
@@ -269,7 +268,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
             verbose("got object to update with ID: " + knownResourceId);
             MultipartInput input = (MultipartInput) res.getEntity();
             AcquisitionsCommon acquisition = (AcquisitionsCommon) extractPart(input,
-                    getCommonPartName(), AcquisitionsCommon.class);
+            		client.getCommonPartName(), AcquisitionsCommon.class);
             Assert.assertNotNull(acquisition);
 
             // Update the content of this resource.
@@ -278,7 +277,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
             // Submit the request to the service and store the response.
             MultipartOutput output = new MultipartOutput();
             OutputPart commonPart = output.addPart(acquisition, MediaType.APPLICATION_XML_TYPE);
-            commonPart.getHeaders().add("label", getCommonPartName());
+            commonPart.getHeaders().add("label", client.getCommonPartName());
 
             res = client.update(knownResourceId, output);
             int statusCode = res.getStatus();
@@ -292,7 +291,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
             input = (MultipartInput) res.getEntity();
             AcquisitionsCommon updatedAcquisition =
                     (AcquisitionsCommon) extractPart(input,
-                    getCommonPartName(), AcquisitionsCommon.class);
+                    		client.getCommonPartName(), AcquisitionsCommon.class);
             Assert.assertNotNull(updatedAcquisition);
 
             Assert.assertEquals(updatedAcquisition.getAccessionDate(),
@@ -498,7 +497,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     @Override
     public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
+        return client.getServicePathComponent();
     }
 
 
@@ -507,7 +506,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
         acquisition.setAccessionDate("accessionDate-"  + identifier);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(acquisition, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", getCommonPartName());
+        commonPart.getHeaders().add("label", client.getCommonPartName());
 
         verbose("to be created, acquisition common ", acquisition, AcquisitionsCommon.class);
         return multipart;

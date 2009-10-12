@@ -3,6 +3,7 @@ package org.collectionspace.services.client;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.acquisition.AcquisitionsCommonList;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
@@ -17,7 +18,14 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  */
 public class AcquisitionClient extends BaseServiceClient {
 
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
+	 */
+	public String getServicePathComponent() {
+		return "acquisitions";
+	}
 
+	// FIXME: Is the "instance" member still needed/used?
     /**
      *
      */
@@ -39,7 +47,7 @@ public class AcquisitionClient extends BaseServiceClient {
     }
 
     /**
-     * FIXME Comment this
+     * FIXME Is this method still needed/used?
      *
      * @return
      */

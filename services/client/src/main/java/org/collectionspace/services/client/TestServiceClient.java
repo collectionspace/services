@@ -23,16 +23,12 @@
 
 package org.collectionspace.services.client;
 
-
-
 /**
  * A CollectionObjectClient.
 
  * @version $Revision:$
  */
 public class TestServiceClient extends BaseServiceClient {
-
-
     /**
      *
      * Default constructor for CollectionObjectClient class.
@@ -40,6 +36,14 @@ public class TestServiceClient extends BaseServiceClient {
      */
     public TestServiceClient() {
     }
-
     
+    /**
+    *
+    * Returning NULL since this class is a base-level client, used (only) 
+    * to obtain the base service URL.
+    *
+    */    
+	public String getServicePathComponent() {
+		return null;
+	}  
 }

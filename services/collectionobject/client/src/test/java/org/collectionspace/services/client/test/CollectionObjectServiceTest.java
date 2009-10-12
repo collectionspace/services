@@ -50,12 +50,14 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
     // Instance variables specific to this test.
     private CollectionObjectClient client = new CollectionObjectClient();
-    final String SERVICE_PATH_COMPONENT = "collectionobjects";
     private String knownResourceId = null; 
     
-    //FIXME: Remove this method once ALL the services use "_common" instead of "-common"
-    public String getCommonPartName() {
-        return getServicePathComponent() + "_common";
+    /*
+     * This method is called only by the parent class, AbstractServiceTest
+     */
+    @Override
+    public String getServicePathComponent() {
+        return client.getServicePathComponent();
     }
 
     // ---------------------------------------------------------------
@@ -74,7 +76,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
 
-        MultipartOutput multipart = createCollectionObjectInstance(identifier);
+        MultipartOutput multipart = createCollectionObjectInstance(client.getCommonPartName(), identifier);
         ClientResponse<Response> res = client.create(multipart);
 
         int statusCode = res.getStatus();
@@ -204,7 +206,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         try{
             MultipartInput input = (MultipartInput) res.getEntity();
             CollectionobjectsCommon collectionObject = (CollectionobjectsCommon) extractPart(input,
-                    getCommonPartName(), CollectionobjectsCommon.class);
+                    client.getCommonPartName(), CollectionobjectsCommon.class);
             Assert.assertNotNull(collectionObject);
         }catch(Exception e){
             throw new RuntimeException(e);
@@ -296,7 +298,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
             verbose("got object to update with ID: " + knownResourceId);
             MultipartInput input = (MultipartInput) res.getEntity();
             CollectionobjectsCommon collectionObject = (CollectionobjectsCommon) extractPart(input,
-                    getCommonPartName(), CollectionobjectsCommon.class);
+            		client.getCommonPartName(), CollectionobjectsCommon.class);
             Assert.assertNotNull(collectionObject);
 
             // Update the content of this resource.
@@ -306,7 +308,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
             // Submit the request to the service and store the response.
             MultipartOutput output = new MultipartOutput();
             OutputPart commonPart = output.addPart(collectionObject, MediaType.APPLICATION_XML_TYPE);
-            commonPart.getHeaders().add("label", getCommonPartName());
+            commonPart.getHeaders().add("label", client.getCommonPartName());
 
             res = client.update(knownResourceId, output);
             int statusCode = res.getStatus();
@@ -320,7 +322,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
             input = (MultipartInput) res.getEntity();
             CollectionobjectsCommon updatedCollectionObject =
                     (CollectionobjectsCommon) extractPart(input,
-                    getCommonPartName(), CollectionobjectsCommon.class);
+                    		client.getCommonPartName(), CollectionobjectsCommon.class);
             Assert.assertNotNull(updatedCollectionObject);
 
             Assert.assertEquals(updatedCollectionObject.getObjectName(),
@@ -419,7 +421,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         // Note: The ID used in this 'create' call may be arbitrary.
 
         // The only relevant ID may be the one used in updateCollectionObject(), below.
-        MultipartOutput multipart = createCollectionObjectInstance(NON_EXISTENT_ID);
+        MultipartOutput multipart = createCollectionObjectInstance(client.getCommonPartName(), NON_EXISTENT_ID);
         ClientResponse<MultipartInput> res =
                 client.update(NON_EXISTENT_ID, multipart);
 
@@ -504,31 +506,20 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-    @Override
-    public String getServicePathComponent() {
-        // @TODO Determine if it is possible to obtain this
-        // value programmatically.
-        //
-        // We set this in an annotation in the CollectionObjectProxy
-        // interface, for instance.  We also set service-specific
-        // constants in each service module, which might also
-        // return this value.
-        return SERVICE_PATH_COMPONENT;
-    }
 
-    private MultipartOutput createCollectionObjectInstance(String identifier) {
-        return createCollectionObjectInstance("objectNumber-" + identifier,
+    private MultipartOutput createCollectionObjectInstance(String commonPartName, String identifier) {
+        return createCollectionObjectInstance(commonPartName, "objectNumber-" + identifier,
                 "objectName-" + identifier);
     }
 
-    private MultipartOutput createCollectionObjectInstance(String objectNumber, String objectName) {
+    private MultipartOutput createCollectionObjectInstance(String commonPartName, String objectNumber, String objectName) {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
 
         collectionObject.setObjectNumber(objectNumber);
         collectionObject.setObjectName(objectName);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(collectionObject, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", getCommonPartName());
+        commonPart.getHeaders().add("label", commonPartName);
 
         verbose("to be created, collectionobject common ", collectionObject, CollectionobjectsCommon.class);
 

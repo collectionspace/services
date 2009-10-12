@@ -201,9 +201,9 @@ public class RelationServiceTest extends AbstractServiceTest {
         try{
             MultipartInput input = (MultipartInput) res.getEntity();
             RelationsCommon relation = (RelationsCommon) extractPart(input,
-                    getCommonPartName(), RelationsCommon.class);
+                    client.getCommonPartName(), RelationsCommon.class);
             Assert.assertNotNull(relation);
-        }catch(Exception e){
+        } catch(Exception e){
             throw new RuntimeException(e);
         }
 
@@ -290,7 +290,7 @@ public class RelationServiceTest extends AbstractServiceTest {
             verbose("Got object to update with ID: " + knownResourceId);
             MultipartInput input = (MultipartInput) res.getEntity();
             RelationsCommon relation = (RelationsCommon) extractPart(input,
-                    getCommonPartName(), RelationsCommon.class);
+            		client.getCommonPartName(), RelationsCommon.class);
             Assert.assertNotNull(relation);
 
             // Update the content of this resource.
@@ -303,7 +303,7 @@ public class RelationServiceTest extends AbstractServiceTest {
             // Submit the request to the service and store the response.
             MultipartOutput output = new MultipartOutput();
             OutputPart commonPart = output.addPart(relation, MediaType.APPLICATION_XML_TYPE);
-            commonPart.getHeaders().add("label", getCommonPartName());
+            commonPart.getHeaders().add("label", client.getCommonPartName());
             res = client.update(knownResourceId, output);
             int statusCode = res.getStatus();
             // Check the status code of the response: does it match the expected response(s)?
@@ -312,11 +312,11 @@ public class RelationServiceTest extends AbstractServiceTest {
                     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
             Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-            input = (MultipartInput) res.getEntity();
-            RelationsCommon updatedObject =
-                    (RelationsCommon) extractPart(input,
-                    getCommonPartName(), RelationsCommon.class);
-            Assert.assertNotNull(updatedObject);
+			input = (MultipartInput) res.getEntity();
+			RelationsCommon updatedObject = (RelationsCommon) extractPart(
+					input, client.getCommonPartName(),
+					RelationsCommon.class);
+			Assert.assertNotNull(updatedObject);
 
             final String msg =
                     "Data in updated object did not match submitted data.";
@@ -525,7 +525,7 @@ public class RelationServiceTest extends AbstractServiceTest {
 
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(relation, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", getCommonPartName());
+        commonPart.getHeaders().add("label", client.getCommonPartName());
         verbose("to be created, relation common ", relation, RelationsCommon.class);
 
         return multipart;

@@ -2,6 +2,7 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.relation.RelationsCommonList;
 
 import org.jboss.resteasy.client.ProxyFactory;
@@ -18,6 +19,13 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  */
 public class RelationClient extends BaseServiceClient implements RelationProxy {
 
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
+	 */
+	public String getServicePathComponent() {
+		return "relations";
+	}
+	
     /**
      *
      */

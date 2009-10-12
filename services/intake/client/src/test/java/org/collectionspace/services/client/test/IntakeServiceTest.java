@@ -202,7 +202,7 @@ public class IntakeServiceTest extends AbstractServiceTest {
         try{
             MultipartInput input = (MultipartInput) res.getEntity();
             IntakesCommon intake = (IntakesCommon) extractPart(input,
-                    getCommonPartName(), IntakesCommon.class);
+                    client.getCommonPartName(), IntakesCommon.class);
             Assert.assertNotNull(intake);
         }catch(Exception e){
             throw new RuntimeException(e);
@@ -294,7 +294,7 @@ public class IntakeServiceTest extends AbstractServiceTest {
             verbose("got object to update with ID: " + knownResourceId);
             MultipartInput input = (MultipartInput) res.getEntity();
             IntakesCommon intake = (IntakesCommon) extractPart(input,
-                    getCommonPartName(), IntakesCommon.class);
+            		client.getCommonPartName(), IntakesCommon.class);
             Assert.assertNotNull(intake);
 
             // Update the content of this resource.
@@ -305,7 +305,7 @@ public class IntakeServiceTest extends AbstractServiceTest {
             // Submit the request to the service and store the response.
             MultipartOutput output = new MultipartOutput();
             OutputPart commonPart = output.addPart(intake, MediaType.APPLICATION_XML_TYPE);
-            commonPart.getHeaders().add("label", getCommonPartName());
+            commonPart.getHeaders().add("label", client.getCommonPartName());
 
             res = client.update(knownResourceId, output);
             int statusCode = res.getStatus();
@@ -319,7 +319,7 @@ public class IntakeServiceTest extends AbstractServiceTest {
             input = (MultipartInput) res.getEntity();
             IntakesCommon updatedIntake =
                     (IntakesCommon) extractPart(input,
-                    getCommonPartName(), IntakesCommon.class);
+                    		client.getCommonPartName(), IntakesCommon.class);
             Assert.assertNotNull(updatedIntake);
 
             Assert.assertEquals(updatedIntake.getEntryDate(),
@@ -522,7 +522,7 @@ public class IntakeServiceTest extends AbstractServiceTest {
         intake.setEntryDate(entryDate);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", getCommonPartName());
+        commonPart.getHeaders().add("label", client.getCommonPartName());
 
         verbose("to be created, intake common ", intake, IntakesCommon.class);
 

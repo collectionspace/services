@@ -29,6 +29,7 @@ import java.util.Properties;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +43,14 @@ public abstract class BaseServiceClient implements CollectionSpaceClient {
     private URL url;
     private HttpClient httpClient;
 
+	public String getCommonPartName() {
+		return getServicePathComponent()
+		+ ServiceContext.PART_LABEL_SEPERATOR
+		+ ServiceContext.PART_COMMON_LABEL;
+	}
+
+	abstract public String getServicePathComponent();
+    
     protected BaseServiceClient() {
         readProperties();
         setupHttpClient();
@@ -68,7 +77,7 @@ public abstract class BaseServiceClient implements CollectionSpaceClient {
             logger.trace("begin property name=" + key + " value=" + properties.get(key));
         }
     }
-
+    
     @Override
     public String getBaseURL() {
         return properties.getProperty(URL_PROPERTY);
