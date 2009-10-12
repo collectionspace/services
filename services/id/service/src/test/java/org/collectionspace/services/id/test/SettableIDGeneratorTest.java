@@ -34,11 +34,10 @@ import org.collectionspace.services.id.*;
  */
 public class SettableIDGeneratorTest extends TestCase {
 
-    SettableIDGenerator generator = new SettableIDGenerator(DEFAULT_CSID);
+    SettableIDGenerator generator = new SettableIDGenerator();
     IDGeneratorPart part;
     
     final static String CURRENT_YEAR = YearIDGeneratorPart.getCurrentYear();
-    final static String DEFAULT_CSID = "1";
 
     // Note: tests may fail with IllegalArgumentException
     // if any initialization of new IDParts fails

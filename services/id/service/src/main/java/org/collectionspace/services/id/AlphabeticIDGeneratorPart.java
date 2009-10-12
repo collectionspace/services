@@ -6,7 +6,7 @@
  * http://www.collectionspace.org
  * http://wiki.collectionspace.org
  *
- * Copyright (c)) 2009 Regents of the University of California
+ * Copyright © 2009 Regents of the University of California
  *
  * Licensed under the Educational Community License (ECL), Version 2.0.
  * You may not use this file except in compliance with this License.
@@ -21,13 +21,14 @@
  * limitations under the License.
  */
 
-// @TODO: When auto expanding, we'll need to allow setting of a maximum length to
-// which the generated IDs can grow, likely as an additional parameter to be
+// @TODO: When auto expanding, we'll need to allow setting of a maximum length
+// to which the generated IDs can grow, likely as an additional parameter to be
 // passed to a constructor, with a default value hard-coded in the class.
-// If that length is exceeded, nextID() should throw an IllegalStateException.
+// If that length is exceeded, nextID() should throw an Exception.
 
-// @TODO: Consider handling escaped characters or sequences which represent Unicode
-// code points, both in the start and end characters of the sequence, and in the initial value.
+// @TODO: Consider handling escaped characters or sequences which represent
+// Unicode code points, both in the start and end characters of the sequence,
+// and in the initial value.
 // (Example: '\u0072' for the USASCII 'r' character; see
 // http://www.fileformat.info/info/unicode/char/0072/index.htm)
 //
@@ -37,12 +38,13 @@
 //
 // Some initial research on this:
 // http://www.velocityreviews.com/forums/t367758-unescaping-unicode-code-points-in-a-java-string.html
-// We might also look into the (protected) source code for java.util.Properties.load()
-// which reads escaped Unicode values.
+// We might also look into the (protected) source code for
+// java.util.Properties.load() which reads escaped Unicode values.
 //
-// Note also that, if the goal is to cycle through a sequence of alphabetic identifiers,
-// such as the sequence of characters used in a particular human language, it may or may not
-// be the case that any contiguous Unicode code point sequence reflects such a character sequence.
+// Note also that, if the goal is to cycle through a sequence of alphabetic
+// identifiers, such as the sequence of characters used in a particular
+// human language, it may or may not be the case that any contiguous Unicode
+// code point sequence reflects such a character sequence.
 
 // NOTE: This class currently hard-codes the assumption that the values in
 // alphabetic identifiers are ordered in significance from left-to-right;
@@ -82,8 +84,8 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
     * Constructor using defaults for character sequence and initial value.
     *
     * If no start and end characters are provided for the alphabetic character
-    * sequence, default to an 'a-z' sequence, representing the lowercase alphabetic
-    * characters in the USASCII character set (within Java's internal
+    * sequence, defaults to an 'a-z' sequence, representing the lowercase
+    * alphabetic characters in the USASCII character set (within Java's internal
     * Unicode UTF-16 representation).
     *
     * Additionally defaults to an initial value of "a".
@@ -96,12 +98,12 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
     * Constructor using defaults for character sequence and initial value.
     *
     * If no start and end characters are provided for the alphabetic character
-    * sequence, default to an 'a-z' sequence, representing the lowercase alphabetic
-    * characters in the USASCII character set (within Java's internal
+    * sequence, default to an 'a-z' sequence, representing the lowercase
+    * alphabetic characters in the USASCII character set (within Java's internal
     * Unicode UTF-16 representation).
     *
     * @param initial  The initial value of the alphabetic ID.  Must be a
-    *                 member of the valid aphabetic sequence.
+    *                 member of the valid alphabetic sequence.
     */
     public AlphabeticIDGeneratorPart(String initial)
         throws IllegalArgumentException {
@@ -125,7 +127,8 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
       
         if (sequenceStart == null || sequenceStart.equals("")) {
             throw new IllegalArgumentException(
-              "Start character in the character sequence must not be null or empty");
+              "Start character in the character sequence must not be " +
+              "null or empty");
         }
       
         if (sequenceStart.length() == 1) {
@@ -143,7 +146,8 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
         
         if (sequenceEnd == null || sequenceEnd.equals("")) {
             throw new IllegalArgumentException(
-                "End character in the character sequence must not be null or empty");
+                "End character in the character sequence must not be " +
+                "null or empty");
         }
           
         if (sequenceEnd.length() == 1) {
@@ -159,13 +163,15 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
     
         if (this.endChar <= this.startChar) {
             throw new IllegalArgumentException(
-              "End (last) character in the character sequence must be greater than the start character");
+              "End (last) character in the character sequence must be " +
+              "greater than the start character");
         }
         
         // Validate and store the initial value of this identifier.
 
         if (initial == null || initial.equals("")) {
-            throw new IllegalArgumentException("Initial value must not be null or empty");
+            throw new IllegalArgumentException("Initial value must not be " +
+                "null or empty");
         }
         
         // @TODO: Add a check for maximum length of the initial value here.
@@ -197,7 +203,7 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
 
     @Override
     public String getInitialID() {
-        return getIDString(this.initialValue);
+        return toIDString(this.initialValue);
     }
 
     @Override
@@ -207,7 +213,8 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
         // and may be ripe for refactoring.
       
         if (value == null || value.equals("")) {
-            throw new IllegalArgumentException("Initial value must not be null or empty");
+            throw new IllegalArgumentException("Initial value must not be " +
+                "null or empty");
         }
         
         // @TODO: Add a check for maximum length of the value here.
@@ -244,9 +251,9 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
     @Override
     public String getCurrentID() {
         if (this.currentValue == null || this.currentValue.size() == 0) {
-            return getIDString(this.initialValue);
+            return toIDString(this.initialValue);
         } else {
-            return getIDString(this.currentValue);
+            return toIDString(this.currentValue);
         }
     }
 
@@ -277,7 +284,8 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
                 // set a flag to later expand the size of the identifier.
                 //
                 // @TODO: Set another flag to enable or disable this behavior,
-                // as well as a mechanism for setting the maximum expansion permitted.
+                // as well as a mechanism for setting the maximum expansion
+                // permitted.
                 if (i == 0) {
                   expandIdentifier = true;
                 }
@@ -299,7 +307,7 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
             this.currentValue.add(0, Character.valueOf(this.startChar));
         }
         
-        return getIDString(this.currentValue);
+        return toIDString(this.currentValue);
         
     }
     
@@ -309,7 +317,7 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
         // and set the current value to the initial value.
         if (this.currentValue == null || this.currentValue.size() == 0) {
             this.currentValue = this.initialValue;
-            return getIDString(this.currentValue);
+            return toIDString(this.currentValue);
         // Otherwise, return a new value.
         } else {
             return nextID();
@@ -351,14 +359,14 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
     }
 
     /**
-     * Returns a String representation of the ID, by concatenating
+     * Returns a String representation of a provided ID, by concatenating
      * the String values of each alphabetic character constituting the ID.
      *
      * @param   characters  The alphabetic characters constituting the ID.
      *
      * @return  A String representation of the ID.
      */
-    public String getIDString(Vector<Character> characters) {
+    public String toIDString(Vector<Character> characters) {
         StringBuffer sb = new StringBuffer();
         for ( Character ch : characters ) {
             sb.append(ch.toString());

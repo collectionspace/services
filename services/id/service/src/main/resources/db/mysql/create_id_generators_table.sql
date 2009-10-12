@@ -1,9 +1,4 @@
 /*	
- * create_id_generators_table.sql
- *
- * Creates the "id_generators" table, which stores ID patterns and their state.
- * Also sets the access permissions of that table.
- *
  * This document is a part of the source code and related artifacts
  * for CollectionSpace, an open source collections management system
  * for museums and related institutions:
@@ -18,26 +13,38 @@
  *
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
+ */
+
+/*
+ * create_id_generators_table.sql
  *
- * $LastChangedBy: aron $
+ * Creates the "id_generators" table, used by the ID Service,
+ * and sets the access permissions of that table.
+ *
  * $LastChangedRevision: 302 $
  * $LastChangedDate: 2009-07-15 17:42:23 -0700 (Wed, 15 Jul 2009) $
  */
+
+/*
+ * Note: due to the use of the FLUSH PRIVILEGES command, below,
+ * this script must be executed by a database user (such as
+ * the root user) who has RELOAD privileges.
+*/
 
 CREATE DATABASE IF NOT EXISTS `cspace`;
 USE `cspace`;
 
 DROP TABLE IF EXISTS `id_generators`;
 CREATE TABLE `id_generators` (
-  `id_generator_csid`        varchar(80) PRIMARY KEY,
-  -- `id_generator_uri`      varchar(200),
-  `id_generator_state`       varchar(8000),
-  `last_generated_id`      varchar(255),
-  `modified`               timestamp NOT NULL
-                           default CURRENT_TIMESTAMP
-                           on update CURRENT_TIMESTAMP,
-  INDEX `id_generator_csid_index` (`id_generator_csid`)
-  -- INDEX `id_generator_uri_index` (`id_generator_uri`)
+  `csid`                varchar(80) PRIMARY KEY,
+  `displayname`         varchar(80),
+  `description`         varchar(500),
+  `id_generator_state`  varchar(8000),
+  `last_generated_id`   varchar(255),
+  `modified`            timestamp NOT NULL
+                        default CURRENT_TIMESTAMP
+                        on update CURRENT_TIMESTAMP,
+  INDEX `csid_index` (`csid`)
 ) ENGINE=InnoDB;
 
 GRANT SELECT, INSERT, UPDATE, DELETE

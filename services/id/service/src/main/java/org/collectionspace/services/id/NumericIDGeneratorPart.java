@@ -6,7 +6,7 @@
  * http://www.collectionspace.org
  * http://wiki.collectionspace.org
  *
- * Copyright (c)) 2009 Regents of the University of California
+ * Copyright © 2009 Regents of the University of California
  *
  * Licensed under the Educational Community License (ECL), Version 2.0.
  * You may not use this file except in compliance with this License.
@@ -22,6 +22,8 @@
  */
  
 // @TODO Need to handle Exceptions as described in comments below.
+
+// @TODO Need to add optional capability to pad with leading zeros.
  
 package org.collectionspace.services.id;
 
@@ -39,10 +41,10 @@ import java.util.regex.Pattern;
  */
 public class NumericIDGeneratorPart implements SequenceIDGeneratorPart {
   
-    final static private int DEFAULT_MAX_LENGTH = 6;
-    private int maxLength = DEFAULT_MAX_LENGTH;
+    final static private long DEFAULT_MAX_LENGTH = 6;
+    private long maxLength = DEFAULT_MAX_LENGTH;
     
-    final static private int DEFAULT_INITIAL_VALUE = 1;
+    final static private long DEFAULT_INITIAL_VALUE = 1;
     final static private long CURRENT_VALUE_NOT_SET = -1;
     private long initialValue = DEFAULT_INITIAL_VALUE;
     private long currentValue = CURRENT_VALUE_NOT_SET;
@@ -51,8 +53,8 @@ public class NumericIDGeneratorPart implements SequenceIDGeneratorPart {
      * Constructor using defaults for initial value and maximum length.
      */
     public NumericIDGeneratorPart() throws IllegalArgumentException {
-        this(Integer.toString(DEFAULT_INITIAL_VALUE), 
-            Integer.toString(DEFAULT_MAX_LENGTH));
+        this(Long.toString(DEFAULT_INITIAL_VALUE),
+            Long.toString(DEFAULT_MAX_LENGTH));
     }
 
     /**
@@ -62,7 +64,7 @@ public class NumericIDGeneratorPart implements SequenceIDGeneratorPart {
      */
     public NumericIDGeneratorPart(String initialValue)
         throws IllegalArgumentException {
-        this(initialValue, Integer.toString(DEFAULT_MAX_LENGTH));
+        this(initialValue, Long.toString(DEFAULT_MAX_LENGTH));
     }
 
     /**
@@ -80,7 +82,7 @@ public class NumericIDGeneratorPart implements SequenceIDGeneratorPart {
                 "Initial ID value must not be null or empty");
         }
         try {
-            this.maxLength = Integer.parseInt(maxLength);
+            this.maxLength = Long.parseLong(maxLength);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
                 "Maximum ID length must be parseable as a number");
@@ -208,7 +210,7 @@ public class NumericIDGeneratorPart implements SequenceIDGeneratorPart {
     @Override
     public String getRegex() {
         String regex =
-            "(" + "\\d" + "{1," + Integer.toString(this.maxLength) + "}" + ")";
+            "(" + "\\d" + "{1," + Long.toString(this.maxLength) + "}" + ")";
         return regex;
     }
     

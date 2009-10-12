@@ -35,11 +35,10 @@ import org.collectionspace.services.id.*;
  */
 public class BaseIDGeneratorTest extends TestCase {
 
-    BaseIDGenerator generator = new BaseIDGenerator(DEFAULT_CSID);
+    BaseIDGenerator generator = new BaseIDGenerator();
     IDGeneratorPart part;
     
     final static String CURRENT_YEAR = YearIDGeneratorPart.getCurrentYear();
-    final static String DEFAULT_CSID = "1";
 
     // Note: tests may fail with IllegalArgumentException
     // if any initialization of new IDParts fails
@@ -63,29 +62,29 @@ public class BaseIDGeneratorTest extends TestCase {
 
         parts.clear();
         parts.add(new AlphabeticIDGeneratorPart("a"));
-        gen = new BaseIDGenerator(DEFAULT_CSID, parts);
+        gen = new BaseIDGenerator(parts);
         assertEquals("a", gen.getCurrentID());
 
         parts.clear();
         parts.add(new NumericIDGeneratorPart("1"));
-        gen = new BaseIDGenerator(DEFAULT_CSID, parts);
+        gen = new BaseIDGenerator(parts);
         assertEquals("1", gen.getCurrentID());
 
         parts.clear();
         parts.add(new StringIDGeneratorPart("PREFIX"));
         parts.add(new StringIDGeneratorPart("-"));
         parts.add(new StringIDGeneratorPart("SUFFIX"));
-        gen = new BaseIDGenerator(DEFAULT_CSID, parts);
+        gen = new BaseIDGenerator(parts);
         assertEquals("PREFIX-SUFFIX", gen.getCurrentID());
 
         parts.clear();
         parts.add(new YearIDGeneratorPart());
-        gen = new BaseIDGenerator(DEFAULT_CSID, parts);
+        gen = new BaseIDGenerator(parts);
         assertEquals(CURRENT_YEAR, gen.getCurrentID());
 
         parts.clear();
         parts.add(new UUIDGeneratorPart());
-        gen = new BaseIDGenerator(DEFAULT_CSID, parts);
+        gen = new BaseIDGenerator(parts);
         assertTrue(gen.getCurrentID().length() ==
             UUIDGeneratorPart.UUID_LENGTH);
 
@@ -95,7 +94,7 @@ public class BaseIDGeneratorTest extends TestCase {
         parts.add(new NumericIDGeneratorPart("1"));
         parts.add(new StringIDGeneratorPart("-"));
         parts.add(new AlphabeticIDGeneratorPart("a"));
-        gen = new BaseIDGenerator(DEFAULT_CSID, parts);
+        gen = new BaseIDGenerator(parts);
         assertEquals("2009.1-a", gen.getCurrentID());
     }
 
@@ -317,7 +316,5 @@ public class BaseIDGeneratorTest extends TestCase {
         generator.add(new NumericIDGeneratorPart("1"));
         assertEquals("(\\d{4})(\\.)(\\d{1,6})", generator.getRegex());
     }
-
-    // @TODO: Add more tests of boundary conditions, exceptions ...
  
 }

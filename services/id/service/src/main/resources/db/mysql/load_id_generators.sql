@@ -1,8 +1,4 @@
 /*	
- * load_id_generators_table.sql
- *
- * Loads an initial set of ID patterns into the "id_generators" table.
- *
  * This document is a part of the source code and related artifacts
  * for CollectionSpace, an open source collections management system
  * for museums and related institutions:
@@ -17,10 +13,26 @@
  *
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
+ */
+
+/*
+ * load_id_generators_table.sql
  *
- * $LastChangedBy: aron $
+ * Loads a default set of data into the "id_generators" table,
+ * used by the ID Service.
+ *
  * $LastChangedRevision: 302 $
  * $LastChangedDate: 2009-09-25 15:51:39 -0700 (Fri, 25 Sep 2009) $
+ */
+
+/*
+ * NOTE: For numeric sequence parts whose first generated
+ * value is expected to start at the initial value (such as '1'),
+ * enter '-1' for the current value.
+ *
+ * Otherwise, the first generated value will be the next value
+ * in the sequence after the initial value (e.g. '2', if the
+ * initial value is '1').
  */
 
 USE `cspace`;
@@ -28,16 +40,15 @@ USE `cspace`;
 -- ACCESSION_LOT_NUMBER
 
 INSERT INTO `id_generators`
-    (id_generator_csid, last_generated_id, id_generator_state)
+    (csid, displayname, description, last_generated_id, id_generator_state)
   VALUES 
-    ('ACCESSION_LOT_NUMBER', 
+    ('1a67470b-19b1-4ae3-88d4-2a0aa936270e',
+     'Accession Activity Number',
+     'Generates accession lot or activity numbers, to identify accession
+activities in which a lot of one or more collection objects is
+acquired by the institution.',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
-  <csid>ACCESSION_LOT_NUMBER</csid>
-  <uri></uri>
-  <description>Generates accession numbers, identifying accession 
-events in which a lot of one or more collection objects are 
-acquired by the museum.</description>
   <parts>
     <org.collectionspace.services.id.YearIDGeneratorPart>
       <currentValue></currentValue>
@@ -49,7 +60,7 @@ acquired by the museum.</description>
     <org.collectionspace.services.id.NumericIDGeneratorPart>
       <maxLength>6</maxLength>
       <initialValue>1</initialValue>
-      <currentValue>1</currentValue>
+      <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
 </org.collectionspace.services.id.SettableIDGenerator>');
@@ -57,16 +68,15 @@ acquired by the museum.</description>
 -- ACCESSION_NUMBER
 
 INSERT INTO `id_generators`
-    (id_generator_csid, last_generated_id, id_generator_state)
+    (csid, displayname, description, last_generated_id, id_generator_state)
   VALUES 
-    ('ACCESSION_NUMBER', 
+    ('9dd92952-c384-44dc-a736-95e435c1759c',
+     'Accession Number',
+     'Generates accession numbers, to identify individual
+collection objects individually acquired by the museum.  This
+generator is used for collection objects without parts.',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
-  <csid>ACCESSION_NUMBER</csid>
-  <uri></uri>
-  <description>Generates accession numbers, to identify individual 
-collection objects individually acquired by the museum.  This 
-generator is used for collection objects without parts.</description>
   <parts>
     <org.collectionspace.services.id.YearIDGeneratorPart>
       <currentValue></currentValue>
@@ -78,7 +88,7 @@ generator is used for collection objects without parts.</description>
     <org.collectionspace.services.id.NumericIDGeneratorPart>
       <maxLength>6</maxLength>
       <initialValue>1</initialValue>
-      <currentValue>1</currentValue>
+      <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
     <org.collectionspace.services.id.StringIDGeneratorPart>
       <initialValue>.</initialValue>
@@ -87,7 +97,7 @@ generator is used for collection objects without parts.</description>
     <org.collectionspace.services.id.NumericIDGeneratorPart>
       <maxLength>6</maxLength>
       <initialValue>1</initialValue>
-      <currentValue>1</currentValue>
+      <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
 </org.collectionspace.services.id.SettableIDGenerator>');
@@ -95,14 +105,15 @@ generator is used for collection objects without parts.</description>
 -- ARCHIVES_NUMBER
 
 INSERT INTO `id_generators`
-    (id_generator_csid, last_generated_id, id_generator_state)
+    (csid, displayname, description, last_generated_id, id_generator_state)
   VALUES 
-    ('ARCHIVES_NUMBER', 
+    ('70586d30-9dca-4a07-a3a2-1976fe898028',
+     'Archives Number',
+     'Generates archives numbers, to identify accession activities
+in which a lot of one or more collection objects is formally
+acquired for the archives.',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
-  <csid>ARCHIVES_NUMBER</csid>
-  <uri></uri>
-  <description>Generates archives numbers.</description>
   <parts>
     <org.collectionspace.services.id.StringIDGeneratorPart>
       <initialValue>AR</initialValue>
@@ -118,7 +129,7 @@ INSERT INTO `id_generators`
     <org.collectionspace.services.id.NumericIDGeneratorPart>
       <maxLength>6</maxLength>
       <initialValue>1</initialValue>
-      <currentValue>1</currentValue>
+      <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
 </org.collectionspace.services.id.SettableIDGenerator>');
@@ -126,14 +137,15 @@ INSERT INTO `id_generators`
 -- EVALUATION_NUMBER
 
 INSERT INTO `id_generators`
-    (id_generator_csid, last_generated_id, id_generator_state)
+    (csid, displayname, description, last_generated_id, id_generator_state)
   VALUES 
-    ('EVALUATION_NUMBER', 
+    ('d2d80822-25c7-4c7c-a105-fc40cdb0c50f',
+     'Evaluation Number',
+     'Generates evaluation numbers, to identify intake activities
+in which a lot of one or more collection objects is formally
+acquired for evaluation.',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
-  <csid>EVALUATION_NUMBER</csid>
-  <uri></uri>
-  <description>Generates evaluation numbers.</description>
   <parts>
     <org.collectionspace.services.id.StringIDGeneratorPart>
       <initialValue>EV</initialValue>
@@ -149,7 +161,7 @@ INSERT INTO `id_generators`
     <org.collectionspace.services.id.NumericIDGeneratorPart>
       <maxLength>6</maxLength>
       <initialValue>1</initialValue>
-      <currentValue>1</currentValue>
+      <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
 </org.collectionspace.services.id.SettableIDGenerator>');
@@ -157,15 +169,16 @@ INSERT INTO `id_generators`
 -- INTAKE_NUMBER
 
 INSERT INTO `id_generators`
-    (id_generator_csid, last_generated_id, id_generator_state)
+    (csid, displayname, description, last_generated_id, id_generator_state)
   VALUES 
-    ('INTAKE_NUMBER', 
+    ('8088cfa5-c743-4824-bb4d-fb11b12847f7',
+     'Intake Number',
+     'Generates intake activity numbers, to identify intake activities
+in which a lot of one or more collection objects enters
+the institution for evaluation.',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
-  <csid>INTAKE_NUMBER</csid>
-  <uri></uri>
-  <description>Generates intake numbers.</description>
-  <parts>
+   <parts>
     <org.collectionspace.services.id.StringIDGeneratorPart>
       <initialValue>IN</initialValue>
       <currentValue>IN</currentValue>
@@ -180,7 +193,7 @@ INSERT INTO `id_generators`
     <org.collectionspace.services.id.NumericIDGeneratorPart>
       <maxLength>6</maxLength>
       <initialValue>1</initialValue>
-      <currentValue>1</currentValue>
+      <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
 </org.collectionspace.services.id.SettableIDGenerator>');
@@ -188,14 +201,16 @@ INSERT INTO `id_generators`
 -- INTAKE_OBJECT_NUMBER
 
 INSERT INTO `id_generators`
-    (id_generator_csid, last_generated_id, id_generator_state)
+    (csid, displayname, description, last_generated_id, id_generator_state)
   VALUES 
-    ('INTAKE_OBJECT_NUMBER', 
+    ('a91db555-5c53-4996-9918-6712351397a0',
+     'Intake Object Number',
+     'Generates intake numbers, to identify individual
+collection objects that enter the institution through
+intake activities, before they are either returned to
+their owner or formally acquired by the institution.',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
-  <csid>INTAKE_OBJECT_NUMBER</csid>
-  <uri></uri>
-  <description>Generates intake numbers.</description>
   <parts>
     <org.collectionspace.services.id.StringIDGeneratorPart>
       <initialValue>IN</initialValue>
@@ -211,7 +226,7 @@ INSERT INTO `id_generators`
     <org.collectionspace.services.id.NumericIDGeneratorPart>
       <maxLength>6</maxLength>
       <initialValue>1</initialValue>
-      <currentValue>1</currentValue>
+      <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
     <org.collectionspace.services.id.StringIDGeneratorPart>
       <initialValue>.</initialValue>
@@ -220,7 +235,7 @@ INSERT INTO `id_generators`
     <org.collectionspace.services.id.NumericIDGeneratorPart>
       <maxLength>6</maxLength>
       <initialValue>1</initialValue>
-      <currentValue>1</currentValue>
+      <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
 </org.collectionspace.services.id.SettableIDGenerator>');
@@ -228,15 +243,15 @@ INSERT INTO `id_generators`
 -- LIBRARY_NUMBER
 
 INSERT INTO `id_generators`
-    (id_generator_csid, last_generated_id, id_generator_state)
+    (csid, displayname, description, last_generated_id, id_generator_state)
   VALUES 
-    ('LIBRARY_NUMBER', 
+    ('80fedaf6-1647-4f30-9f53-a75a3cac2ffd',
+     'Library Number',
+     'Generates library numbers, in which a lot of one or more
+collection objects is formally acquired for the library.',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
-  <csid>LIBRARY_NUMBER</csid>
-  <uri></uri>
-  <description>Generates library numbers.</description>
-  <parts>
+   <parts>
     <org.collectionspace.services.id.StringIDGeneratorPart>
       <initialValue>LIB</initialValue>
       <currentValue>LIB</currentValue>
@@ -251,7 +266,7 @@ INSERT INTO `id_generators`
     <org.collectionspace.services.id.NumericIDGeneratorPart>
       <maxLength>6</maxLength>
       <initialValue>1</initialValue>
-      <currentValue>1</currentValue>
+      <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
 </org.collectionspace.services.id.SettableIDGenerator>');
@@ -259,14 +274,14 @@ INSERT INTO `id_generators`
 -- LOANS_IN_NUMBER
 
 INSERT INTO `id_generators`
-    (id_generator_csid, last_generated_id, id_generator_state)
+    (csid, displayname, description, last_generated_id, id_generator_state)
   VALUES 
-    ('LOANS_IN_NUMBER', 
+    ('ed87e7c6-0678-4f42-9d33-f671835586ef',
+     'Loans-in Number',
+     'Generates loans-in numbers, to identify individual
+collection objects that are received on loan.',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
-  <csid>LOANS_IN_NUMBER</csid>
-  <uri></uri>
-  <description>Generates loans-in numbers.</description>
   <parts>
     <org.collectionspace.services.id.StringIDGeneratorPart>
       <initialValue>LI</initialValue>
@@ -282,7 +297,7 @@ INSERT INTO `id_generators`
     <org.collectionspace.services.id.NumericIDGeneratorPart>
       <maxLength>6</maxLength>
       <initialValue>1</initialValue>
-      <currentValue>1</currentValue>
+      <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
     <org.collectionspace.services.id.StringIDGeneratorPart>
       <initialValue>.</initialValue>
@@ -291,7 +306,7 @@ INSERT INTO `id_generators`
     <org.collectionspace.services.id.NumericIDGeneratorPart>
       <maxLength>6</maxLength>
       <initialValue>1</initialValue>
-      <currentValue>1</currentValue>
+      <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
 </org.collectionspace.services.id.SettableIDGenerator>');
@@ -299,15 +314,16 @@ INSERT INTO `id_generators`
 -- STUDY_NUMBER
 
 INSERT INTO `id_generators`
-    (id_generator_csid, last_generated_id, id_generator_state)
+    (csid, displayname, description, last_generated_id, id_generator_state)
   VALUES 
-    ('STUDY_NUMBER', 
+    ('0518132e-dd8c-4773-8fa9-07c9af4444ee',
+     'Study Number',
+     'Generates study numbers, to identify intake activities
+in which a lot of one or more collection objects is formally
+acquired for study.',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
-  <csid>STUDY_NUMBER</csid>
-  <uri></uri>
-  <description>Generates study numbers.</description>
-  <parts>
+   <parts>
     <org.collectionspace.services.id.StringIDGeneratorPart>
       <initialValue>ST</initialValue>
       <currentValue>ST</currentValue>
@@ -322,7 +338,7 @@ INSERT INTO `id_generators`
     <org.collectionspace.services.id.NumericIDGeneratorPart>
       <maxLength>6</maxLength>
       <initialValue>1</initialValue>
-      <currentValue>1</currentValue>
+      <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
   </parts>
 </org.collectionspace.services.id.SettableIDGenerator>');
@@ -330,16 +346,15 @@ INSERT INTO `id_generators`
 -- UUID
 
 INSERT INTO `id_generators`
-    (id_generator_csid, last_generated_id, id_generator_state)
+    (csid, displayname, description, last_generated_id, id_generator_state)
   VALUES 
-    ('UUID', 
+    ('1fa40353-05b8-4ae6-82a6-44a18b4f3c12',
+     'UUID',
+     'Generates universally unique identifiers (UUIDs), which may be
+used for CollectionSpace IDs (CSIDs) and other purposes. (These are
+Type 4 UUIDs, whose generation is based on random and pseudo-random parts.)',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
-  <csid>UUID</csid>
-  <uri></uri>
-  <description>Generates universally unique identifiers (UUIDs), 
-as used for CollectionSpace IDs (CSIDs). These are Type 4 UUIDs,
-based on random and pseudo-random parts.</description>
   <parts>
     <org.collectionspace.services.id.UUIDGeneratorPart>
     </org.collectionspace.services.id.UUIDGeneratorPart>

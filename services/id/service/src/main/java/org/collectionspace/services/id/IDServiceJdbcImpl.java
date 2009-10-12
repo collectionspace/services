@@ -6,7 +6,7 @@
  * http://www.collectionspace.org
  * http://wiki.collectionspace.org
  *
- * Copyright (c)) 2009 Regents of the University of California
+ * Copyright © 2009 Regents of the University of California
  *
  * Licensed under the Educational Community License (ECL), Version 2.0.
  * You may not use this file except in compliance with this License.
@@ -87,7 +87,9 @@ import java.sql.Statement;
 // May at some point instead use
 // org.jboss.resteasy.spi.NotFoundException
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.collectionspace.services.common.repository.BadRequestException;
 import org.collectionspace.services.common.repository.DocumentNotFoundException;
 
@@ -303,7 +305,7 @@ public class IDServiceJdbcImpl implements IDService {
 			
 			int rowsUpdated = stmt.executeUpdate(
 			  "UPDATE id_generators SET last_generated_id='" + lastId +
-			  "' WHERE id_generator_csid='" + csid + "'");
+			  "' WHERE csid='" + csid + "'");
 			  
 			if (rowsUpdated != 1) {
 				throw new IllegalStateException(
@@ -361,7 +363,7 @@ public class IDServiceJdbcImpl implements IDService {
 			
 			ResultSet rs = stmt.executeQuery(
 			  "SELECT last_generated_id FROM id_generators " + 
-			  "WHERE id_generator_csid='" + csid + "'");
+			  "WHERE csid='" + csid + "'");
 			  
 			boolean moreRows = rs.next();
 			if (! moreRows) {
@@ -479,8 +481,8 @@ public class IDServiceJdbcImpl implements IDService {
 			// of the generator, such as its URI, if any, and its structure,
 			// so we avoid duplication based on content as well as identifier.
 			ResultSet rs = stmt.executeQuery(
-			  "SELECT id_generator_csid FROM id_generators " + 
-			  "WHERE id_generator_csid='" + csid + "'");
+			  "SELECT csid FROM id_generators " +
+			  "WHERE csid='" + csid + "'");
 			  
 			boolean moreRows = rs.next();
 			
@@ -508,7 +510,7 @@ public class IDServiceJdbcImpl implements IDService {
 				final String SQL_STATEMENT_STRING =
 					"INSERT INTO id_generators " +
 					"(" +
-					  "id_generator_csid, " +
+					  "csid, " +
 					  "id_generator_state, " + 
 					  "last_generated_id" +
 					")" +
@@ -575,7 +577,7 @@ public class IDServiceJdbcImpl implements IDService {
 			
 			ResultSet rs = stmt.executeQuery(
 			  "SELECT id_generator_state FROM id_generators " + 
-			  "WHERE id_generator_csid='" + csid + "'");
+			  "WHERE csid='" + csid + "'");
 			  
 			boolean moreRows = rs.next();
 			if (! moreRows) {
@@ -621,11 +623,11 @@ public class IDServiceJdbcImpl implements IDService {
 	* @throws  IllegalStateException if a storage-related error occurred.
 	*/
     @Override
-    public List readIDGeneratorsList() throws IllegalStateException {
+    public Map<String,String> readIDGeneratorsList() throws IllegalStateException {
 
 		logger.debug("> in readIDGeneratorsList");
 
-		List<String> generators = new ArrayList<String>();
+		Map<String,String> generators = new HashMap<String,String>();
 
 		Connection conn = null;
 		try {
@@ -634,7 +636,7 @@ public class IDServiceJdbcImpl implements IDService {
 			Statement stmt = conn.createStatement();
 
 			ResultSet rs = stmt.executeQuery(
-			  "SELECT id_generator_state FROM id_generators");
+			  "SELECT csid, id_generator_state FROM id_generators");
 
 			boolean moreRows = rs.next();
 			if (! moreRows) {
@@ -642,7 +644,7 @@ public class IDServiceJdbcImpl implements IDService {
 			}
 
             while (moreRows = rs.next()) {
-                generators.add(rs.getString(1));
+                generators.put(rs.getString(1), rs.getString(2));
             }
 
 			rs.close();
@@ -660,70 +662,6 @@ public class IDServiceJdbcImpl implements IDService {
 				// Do nothing here
 			}
 		}
-
-		logger.debug("> retrieved list: ");
-        for (String generator : generators) {
-            logger.debug("generator=\n" + generator);
-        }
-
-		return generators;
-    }
-
-        //////////////////////////////////////////////////////////////////////
-   /**
-    * Returns a list of ID generator instances from persistent storage.
-	*
-	* @return  A list of ID generator instances, with each list item
-    *          constituting a serialized representation of an
-    *          ID generator instance.
-	*
-	* @throws  IllegalStateException if a storage-related error occurred.
-	*/
-    @Override
-    public List readIDGeneratorsSummaryList() throws IllegalStateException {
-
-		logger.debug("> in readIDGeneratorsSummaryList");
-
-		List<String> generators = new ArrayList<String>();
-
-		Connection conn = null;
-		try {
-
-			conn = getJdbcConnection();
-			Statement stmt = conn.createStatement();
-
-			ResultSet rs = stmt.executeQuery(
-			  "SELECT id_generator_csid FROM id_generators");
-
-			boolean moreRows = rs.next();
-			if (! moreRows) {
-				return generators;
-			}
-
-            while (moreRows = rs.next()) {
-                generators.add(rs.getString(1));
-            }
-
-			rs.close();
-
-		} catch (SQLException e) {
-			throw new IllegalStateException(
-				"Error retrieving ID generators " +
-				" from database: " + e.getMessage());
-		} finally {
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch(SQLException e) {
-				// Do nothing here
-			}
-		}
-
-		logger.debug("> retrieved list: ");
-        for (String generator : generators) {
-            logger.debug("generator=\n" + generator);
-        }
 
 		return generators;
     }
@@ -810,8 +748,8 @@ public class IDServiceJdbcImpl implements IDService {
 		
 		  	// Test whether this ID generator already exists in the database.
 			ResultSet rs = stmt.executeQuery(
-				"SELECT id_generator_csid FROM id_generators " +
-				"WHERE id_generator_csid='" +
+				"SELECT csid FROM id_generators " +
+				"WHERE csid='" +
 				csid + "'");
 				  
 			boolean moreRows = rs.next();
@@ -829,7 +767,7 @@ public class IDServiceJdbcImpl implements IDService {
 				  "UPDATE id_generators SET " + 
 				   "id_generator_state = ?, " + 
 				   "last_generated_id = ? " + 
-				  "WHERE id_generator_csid = ?";
+				  "WHERE csid = ?";
 				  
 				SettableIDGenerator generator;
 				try {
@@ -900,8 +838,8 @@ public class IDServiceJdbcImpl implements IDService {
 			
 			// Test whether this ID generator already exists in the database.
 			ResultSet rs = stmt.executeQuery(
-			  "SELECT id_generator_csid FROM id_generators " +
-			  "WHERE id_generator_csid='" +
+			  "SELECT csid FROM id_generators " +
+			  "WHERE csid='" +
 			  csid + "'");
 			boolean moreRows = rs.next();
 			
@@ -915,7 +853,7 @@ public class IDServiceJdbcImpl implements IDService {
 			if (idGeneratorFound) {
 		
 			   final String SQL_STATEMENT_STRING =
-			       "DELETE FROM id_generators WHERE id_generator_csid = ?";
+			       "DELETE FROM id_generators WHERE csid = ?";
 				
 				PreparedStatement ps = conn.prepareStatement(SQL_STATEMENT_STRING);
 				ps.setString(1, csid);

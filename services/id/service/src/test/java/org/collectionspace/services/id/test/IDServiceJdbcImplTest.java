@@ -6,7 +6,7 @@
  * http://www.collectionspace.org
  * http://wiki.collectionspace.org
  *
- * Copyright (c)) 2009 Regents of the University of California
+ * Copyright © 2009 Regents of the University of California
  *
  * Licensed under the Educational Community License (ECL), Version 2.0.
  * You may not use this file except in compliance with this License.
@@ -24,6 +24,7 @@
 package org.collectionspace.services.id.test;
 
 import java.util.List;
+import java.util.Map;
 import org.collectionspace.services.common.repository.BadRequestException;
 import org.collectionspace.services.common.repository.DocumentNotFoundException;
 
@@ -82,20 +83,22 @@ public class IDServiceJdbcImplTest {
         IllegalArgumentException, IllegalStateException {
 
         serializedGenerator = jdbc.readIDGenerator(DEFAULT_CSID);
+        Assert.assertTrue(serializedGenerator != null);
+        Assert.assertTrue(! serializedGenerator.equals(""));
         generator = IDGeneratorSerializer.deserialize(serializedGenerator);
-        Assert.assertEquals(generator.getCsid(), DEFAULT_CSID);
-    }
+     }
 
 
     @Test(dependsOnMethods =
         {"hasRequiredDatabaseTable", "createIDGenerator", "readIDGenerator"})
     public void readIDGeneratorsList() throws IllegalStateException {
 
-        List generators = jdbc.readIDGeneratorsList();
+        Map<String,String> generators = jdbc.readIDGeneratorsList();
 
         // @TODO Replace this placeholder test, which just
         // verifies that no error occurred while retrieving the list,
         // with a more meaningful test.
+        Assert.assertTrue(generators != null);
         Assert.assertTrue(generators.size() > 0);
     }
     @Test(dependsOnMethods =
@@ -103,7 +106,7 @@ public class IDServiceJdbcImplTest {
           "readIDGeneratorsList"})
     public void readIDGeneratorsSummaryList() throws IllegalStateException {
 
-        List generators = jdbc.readIDGeneratorsList();
+        Map<String,String> generators = jdbc.readIDGeneratorsList();
 
         // @TODO Replace this placeholder test, which just
         // verifies that no error occurred while retrieving the list,
@@ -111,6 +114,7 @@ public class IDServiceJdbcImplTest {
         Assert.assertTrue(generators.size() > 0);
     }
 
+/*
     @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "createIDGenerator",
         "readIDGenerator"})
     public void updateIDGenerator() throws DocumentNotFoundException,
@@ -133,16 +137,17 @@ public class IDServiceJdbcImplTest {
         Assert.assertEquals(generator.getDescription(), NEW_DESCRIPTION);
         
     }
+*/
 
     @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "createIDGenerator",
     	"readIDGenerator", "readIDGeneratorsList",
-        "readIDGeneratorsSummaryList", "updateIDGenerator"})
+        "readIDGeneratorsSummaryList"})
     public void deleteIDGenerator() throws DocumentNotFoundException {
         jdbc.deleteIDGenerator(DEFAULT_CSID);
     }
 
     @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "createIDGenerator",
-        "readIDGenerator", "updateIDGenerator", "deleteIDGenerator"})
+        "readIDGenerator", "deleteIDGenerator"})
         public void createID() throws DocumentNotFoundException,
             BadRequestException, IllegalArgumentException,
             IllegalStateException {
@@ -201,11 +206,7 @@ public class IDServiceJdbcImplTest {
     
     public String getSpectrumEntryNumberGenerator() {
         
-        generator = new SettableIDGenerator(DEFAULT_CSID);
-        generator.setDescription(
-            "SPECTRUM entry number generator");
-        generator.setURI(
-            "urn:collectionspace:idpattern:spectrum-entry-number");
+        generator = new SettableIDGenerator();
         generator.add(new StringIDGeneratorPart("E"));
         generator.add(new NumericIDGeneratorPart("1"));
         
@@ -215,11 +216,7 @@ public class IDServiceJdbcImplTest {
 
     public String getChinAccessionNumberGenerator() {
 
-        generator = new SettableIDGenerator(DEFAULT_CSID);
-        generator.setDescription(
-            "CHIN accession number generator, for items without parts");
-        generator.setURI(
-            "urn:collectionspace:idpattern:chin-accession-number-no-parts");
+        generator = new SettableIDGenerator();
         generator.add(new YearIDGeneratorPart());
         generator.add(new StringIDGeneratorPart("."));
         generator.add(new NumericIDGeneratorPart("1"));

@@ -6,7 +6,7 @@
  * http://www.collectionspace.org
  * http://wiki.collectionspace.org
  *
- * Copyright (c)) 2009 Regents of the University of California
+ * Copyright © 2009 Regents of the University of California
  *
  * Licensed under the Educational Community License (ECL), Version 2.0.
  * You may not use this file except in compliance with this License.
@@ -45,103 +45,27 @@ import java.util.regex.Pattern;
  */
 public class BaseIDGenerator implements IDGenerator {
 
-    protected String csid = "";
-    protected String uri = "";
-    protected String description = "";
     protected Vector<IDGeneratorPart> parts = new Vector<IDGeneratorPart>();
 
     final static int MAX_ID_LENGTH = 50;
     
     /**
-     * Constructor.
-     *
-     * @param csid  A CollectionSpace ID (CSID) identifying this ID generator.
-     *
-     */
-    public BaseIDGenerator(String csid) {
-      if (csid != null && ! csid.equals("")) {
-        this.csid = csid;
-      }
+     * Constructor (no argument)
+      */
+    public BaseIDGenerator() {
     }
     
     /**
      * Constructor.
      *
-     * @param csid  A CollectionSpace ID (CSID) identifying this ID generator.
-     *
      * @param parts A collection of ID generator parts.
-     *
      */
-    public BaseIDGenerator(String csid, Vector<IDGeneratorPart> parts) {
-        if (csid != null && ! csid.equals("")) {
-            this.csid = csid;
-        }
+    public BaseIDGenerator(Vector<IDGeneratorPart> parts) {
         if (parts != null) {
             this.parts = parts;
         }
     }
 
-    /**
-     * Returns the CollectionSpace ID (CSID) identifying this ID generator.
-     *
-     * @return  A CollectionSpace ID (CSID) identifying this ID generator.
-     */
-    public String getCsid() {
-        return this.csid;
-    }
-
-    /**
-     * Sets a URI as a second type of identifier for this ID generator,
-     * in addition to its CollectionSpace ID (CSID).
-     *
-     * @param uriStr A String representation of a URI.
-     */
-    public void setURI(String uriStr) {
-        if (uriStr == null || uriStr.equals("")) {
-            return;
-        }
-        // Validate that this is a legal URI.
-        try {
-            URI tempUri = new URI(uriStr);
-        } catch (URISyntaxException e) {
-            // Fail silently without setting the URI.
-            return;
-        }
-        this.uri = uriStr;
-    }
-
-    /**
-     * Returns a String representation of the URI, if any,
-     * that is used as a second type of identifier for this
-     * ID generator, in addition to its CollectionSpace ID (CSID).
-     *
-     * @return  A String representation of the URI identifying this
-     *          ID generator.
-     */
-    public String getURI() {
-        return this.uri;
-    }
-
-    /**
-     * Sets an optional, human-readable description of this ID generator.
-     *
-     * @param description A human-readable description of this ID generator.
-     */
-    public void setDescription(String description) {
-        if (description != null) {
-            this.description = description;
-        }
-    }
-
-    /**
-     * Returns the human-readable description of this ID generator, if any.
-     *
-     * @return  description  A human-readable description of this ID generator.
-     */
-    public String getDescription() {
-        return this.description;
-    }
-  
     /**
      * Adds a single ID generator part.
      *

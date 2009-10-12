@@ -6,7 +6,7 @@
  * http://www.collectionspace.org
  * http://wiki.collectionspace.org
  *
- * Copyright (c)) 2009 Regents of the University of California
+ * Copyright © 2009 Regents of the University of California
  *
  * Licensed under the Educational Community License (ECL), Version 2.0.
  * You may not use this file except in compliance with this License.
@@ -19,7 +19,7 @@ package org.collectionspace.services.id;
 
 // May at some point instead use
 // org.jboss.resteasy.spi.NotFoundException
-import java.util.List;
+import java.util.Map;
 import org.collectionspace.services.common.repository.DocumentNotFoundException;
 import org.collectionspace.services.common.repository.BadRequestException;
 
@@ -68,16 +68,11 @@ public interface IDService {
         IllegalArgumentException, IllegalStateException;
     
     // Read a list of objects (aka read multiple)
-    // and return in a full list format.
-    public List<String> readIDGeneratorsList() throws IllegalStateException;
+    // and return a list (map) of those objects and their identifiers.
+    public Map<String,String> readIDGeneratorsList() throws IllegalStateException;
 
-    // Read a list of objects (aka read multiple)
-    // and return in a summary list format.
-    public List<String> readIDGeneratorsSummaryList() throws BadRequestException,
-       IllegalStateException;
-
-    // Update (may need to check for changes in the ID generator structure)
-    public void updateIDGenerator(String csid, String serializedIDGenerator)
+    // Update
+     public void updateIDGenerator(String csid, String serializedIDGenerator)
         throws DocumentNotFoundException, BadRequestException,
         IllegalArgumentException, IllegalStateException;
     

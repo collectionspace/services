@@ -45,9 +45,6 @@ public class IDGeneratorSerializerTest extends TestCase {
 
   final static String DEFAULT_SERIALIZED_ID_GENERATOR =
     "<org.collectionspace.services.id.SettableIDGenerator>\n" +
-    "  <csid>" + DEFAULT_CSID + "</csid>\n" +
-    "  <uri></uri>\n" +
-    "  <description></description>\n" +
     "  <parts/>\n" +
     "</org.collectionspace.services.id.SettableIDGenerator>";
 
@@ -55,7 +52,7 @@ public class IDGeneratorSerializerTest extends TestCase {
     // expected and actual XML in these tests, to avoid failures resulting
     // from differences in whitespace, etc.
     public void testSerializeIDGenerator() {
-      SettableIDGenerator tempGenerator = new SettableIDGenerator(DEFAULT_CSID);
+      SettableIDGenerator tempGenerator = new SettableIDGenerator();
         assertEquals(DEFAULT_SERIALIZED_ID_GENERATOR,
             IDGeneratorSerializer.serialize(tempGenerator));
     }

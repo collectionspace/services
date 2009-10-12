@@ -6,7 +6,7 @@
  * http://www.collectionspace.org
  * http://wiki.collectionspace.org
  *
- * Copyright (c)) 2009 Regents of the University of California
+ * Copyright © 2009 Regents of the University of California
  *
  * Licensed under the Educational Community License (ECL), Version 2.0.
  * You may not use this file except in compliance with this License.
@@ -48,25 +48,20 @@ import java.util.regex.Pattern;
 public class SettableIDGenerator extends BaseIDGenerator {
 
     /**
-     * Constructor.
-     *
-     * @param csid  A CollectionSpace ID (CSID) identifying this ID generator.
-     *
+     * Constructor (no argument)
      */
-    public SettableIDGenerator(String csid) {
-      super(csid);
+    public SettableIDGenerator() {
+      super();
     }
     
     /**
      * Constructor.
      *
-     * @param csid  A CollectionSpace ID (CSID) identifying this ID generator.
-     *
      * @param parts A collection of ID generator parts.
      *
      */
-    public SettableIDGenerator(String csid, Vector<IDGeneratorPart> parts) {
-        super(csid, parts);
+    public SettableIDGenerator(Vector<IDGeneratorPart> parts) {
+        super(parts);
     }
 
    /**
