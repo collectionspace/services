@@ -6,7 +6,7 @@
     <packaging>jar</packaging>
     <version>1.0</version>
     <name>client.sample</name>
-
+    
     <dependencies>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
@@ -21,7 +21,7 @@
     </dependencies>
     
     <repositories>
-    	  <repository>
+        <repository>
             <id>libs-releases-local</id>
             <name>libs-releases-local</name>
             <url>http://source.collectionspace.org:8081/artifactory/libs-releases-local</url>
@@ -43,9 +43,31 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>            
-        </repository>    
+        </repository>
+        <repository>
+            <id>collectionspace-releases</id>
+            <name>collectionspace-releases</name>
+            <url>http://source.collectionspace.org:8081/artifactory/public-nuxeo</url>            
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>            
+        </repository>
+        <repository>
+            <id>collectionspace-snapshots</id>
+            <name>collectionspace-snapshots</name>
+            <url>http://source.collectionspace.org:8081/artifactory/public-snapshot-nuxeo</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
     </repositories>    
-
+    
     <build>
         <finalName>client-sample</finalName>
         <plugins>
