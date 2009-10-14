@@ -3,6 +3,8 @@
     Document   : system-response.xsd
     Created on : May 26, 2009, 1:31 PM
     Author     :
+    $LastChangedRevision$
+    $LastChangedDate$
     Copyright 2009 University of California at Berkeley
     Description:
         Schema for system specific information for service response envelope.

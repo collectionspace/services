@@ -3,10 +3,13 @@
     Document   : service-config.xsd
     Created on : May 19, 2009, 1:31 PM
     Author     :
+    $LastChangedRevision$
+    $LastChangedDate$
     Copyright 2009 University of California at Berkeley
     Description:
         Schema for service layer configuration
 -->
+
 <xs:schema 
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns="http://collectionspace.org/services/common"

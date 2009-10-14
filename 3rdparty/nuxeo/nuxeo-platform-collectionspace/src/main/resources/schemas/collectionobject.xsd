@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Older (?) CollectionObject Schema for Nuxeo EP
+
+    $LastChangedRevision$
+    $LastChangedDate$
+-->
+
 <xs:schema 
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:ns="http://collectionspace.org/collectionobject/"

@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<!--
-    Copyright 2009 University of California at Berkeley
-    Licensed under the Educational Community License (ECL), Version 2.0.
-    You may not use this file except in compliance with this License.
-    
-    You may obtain a copy of the ECL 2.0 License at
-    https://source.collectionspace.org/collection-space/LICENSE.txt
 
-    Document   : relation.xsd
-    Revision   : $LastChangedRevision: $
-    Created on : $LastChangedDate: $
-    Author     : $LastChangedBy: $
-    Description:
+<!--
+    Relation schema (XSD)
+    
+    Entity  : Relation
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+            
+    $LastChangedRevision$
+    $LastChangedDate$
 -->
+
 <xs:schema
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns="http://collectionspace.org/services/relation"

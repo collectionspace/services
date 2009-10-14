@@ -8,8 +8,8 @@
     https://source.collectionspace.org/collection-space/LICENSE.txt
 
     Document   : service.xsd
-    Revision   : $LastChangedRevision: $
-    Created on : $LastChangedDate: $
+    Revision   : $LastChangedRevision$
+    Created on : $LastChangedDate$
     Author     : $LastChangedBy: $
     Description: ServiceBinding desribes how a possibly tenant-specific service is
                  bound to corresponding service framework at runtime

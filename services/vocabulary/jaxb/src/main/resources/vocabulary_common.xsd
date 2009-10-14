@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Vocabulary schema (XSD)
+    
+    Entity  : Vocabulary
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+    
+    $LastChangedRevision$
+    $LastChangedDate$
+-->
+
 <xs:schema 
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:ns="http://collectionspace.org/services/vocabulary"
@@ -7,8 +19,10 @@
   version="0.1"
 >
 
-
-<!-- avoid XmlRootElement nightnmare, see http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html-->
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
 <!-- See http://wiki.collectionspace.org/display/collectionspace/Vocabulary+Schema -->    
     
     <!-- Vocabulary  -->

@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    VocabularyItem schema (XSD)
+    
+    Entity  : VocabularyItem
+    Part    : Common
+    Used for: Nuxeo EP core document type
+    
+    $LastChangedRevision$
+    $LastChangedDate$
+-->
+
 <xs:schema 
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:ns="http://collectionspace.org/services/vocabulary"
