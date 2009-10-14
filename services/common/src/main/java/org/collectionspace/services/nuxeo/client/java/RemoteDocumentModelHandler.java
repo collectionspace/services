@@ -118,6 +118,12 @@ public abstract class RemoteDocumentModelHandler<T, TL>
         for(InputPart part : inputParts){
 
             String partLabel = part.getHeaders().getFirst("label");
+            if (partLabel == null) {
+                String msg = "Part label is missing or empty!";
+                logger.error(msg + "Ctx=" + getServiceContext().toString());
+                throw new BadRequestException(msg);
+            }
+            
             //skip if the part is not in metadata
             if(!partsMetaMap.containsKey(partLabel)){
                 continue;

@@ -30,7 +30,7 @@ package org.collectionspace.services.common.relation.nuxeo;
 public class RelationConstants {
 
     public final static String NUXEO_DOCTYPE = "Relation";
-    public final static String NUXEO_SCHEMA_NAME = "relation";
+    public final static String NUXEO_SCHEMA_NAME = "relations_common";
     public final static String NUXEO_DC_TITLE = "CollectionSpace-Relation";
     /** The Constant REL_NUXEO_SCHEMA_ROOT_ELEMENT. */
     final public static String NUXEO_SCHEMA_ROOT_ELEMENT = "relationtype";
