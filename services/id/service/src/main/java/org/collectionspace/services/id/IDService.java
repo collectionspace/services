@@ -69,7 +69,8 @@ public interface IDService {
     
     // Read a list of objects (aka read multiple)
     // and return a list (map) of those objects and their identifiers.
-    public Map<String,String> readIDGeneratorsList() throws IllegalStateException;
+    public Map<String,IDGeneratorInstance> readIDGeneratorsList()
+        throws IllegalStateException;
 
     // Update
      public void updateIDGenerator(String csid, String serializedIDGenerator)

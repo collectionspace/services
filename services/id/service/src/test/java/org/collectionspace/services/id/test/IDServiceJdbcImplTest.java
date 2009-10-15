@@ -93,7 +93,7 @@ public class IDServiceJdbcImplTest {
         {"hasRequiredDatabaseTable", "createIDGenerator", "readIDGenerator"})
     public void readIDGeneratorsList() throws IllegalStateException {
 
-        Map<String,String> generators = jdbc.readIDGeneratorsList();
+        Map<String,IDGeneratorInstance> generators = jdbc.readIDGeneratorsList();
 
         // @TODO Replace this placeholder test, which just
         // verifies that no error occurred while retrieving the list,
@@ -106,7 +106,7 @@ public class IDServiceJdbcImplTest {
           "readIDGeneratorsList"})
     public void readIDGeneratorsSummaryList() throws IllegalStateException {
 
-        Map<String,String> generators = jdbc.readIDGeneratorsList();
+        Map<String,IDGeneratorInstance> generators = jdbc.readIDGeneratorsList();
 
         // @TODO Replace this placeholder test, which just
         // verifies that no error occurred while retrieving the list,

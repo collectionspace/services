@@ -623,11 +623,13 @@ public class IDServiceJdbcImpl implements IDService {
 	* @throws  IllegalStateException if a storage-related error occurred.
 	*/
     @Override
-    public Map<String,String> readIDGeneratorsList() throws IllegalStateException {
+    public Map<String,IDGeneratorInstance> readIDGeneratorsList()
+            throws IllegalStateException {
 
 		logger.debug("> in readIDGeneratorsList");
 
-		Map<String,String> generators = new HashMap<String,String>();
+		Map<String,IDGeneratorInstance> generators =
+            new HashMap<String,IDGeneratorInstance>();
 
 		Connection conn = null;
 		try {
@@ -636,15 +638,21 @@ public class IDServiceJdbcImpl implements IDService {
 			Statement stmt = conn.createStatement();
 
 			ResultSet rs = stmt.executeQuery(
-			  "SELECT csid, id_generator_state FROM id_generators");
+			  "SELECT csid, displayname, description, " +
+              "id_generator_state FROM id_generators");
 
 			boolean moreRows = rs.next();
 			if (! moreRows) {
 				return generators;
 			}
 
+            IDGeneratorInstance instance = null;
             while (moreRows = rs.next()) {
-                generators.put(rs.getString(1), rs.getString(2));
+                instance = new IDGeneratorInstance();
+                instance.setDisplayName(rs.getString(2));
+                instance.setDescription(rs.getString(3));
+                instance.setGeneratorState(rs.getString(4));
+                generators.put(rs.getString(1), instance);
             }
 
 			rs.close();

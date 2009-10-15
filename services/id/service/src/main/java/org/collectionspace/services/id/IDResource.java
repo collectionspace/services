@@ -340,7 +340,8 @@ public class IDResource {
         // or may not be a good idea.
         try {
 
-            Map<String,String> generators = service.readIDGeneratorsList();
+            Map<String,IDGeneratorInstance> generators =
+                    service.readIDGeneratorsList();
 
             // @TODO Filtering by role will likely take place here ...
 
@@ -474,7 +475,8 @@ public class IDResource {
      *
      * @return  A summary list of ID generator instances.
      */
-    private String formattedSummaryList(Map<String,String> generators) {
+    private String formattedSummaryList(
+        Map<String,IDGeneratorInstance> generators) {
 
         Document doc = DocumentHelper.createDocument();
         Element root = doc.addElement(ID_GENERATOR_LIST_NAME);
@@ -517,7 +519,8 @@ public class IDResource {
      *
      * @return  A full list of ID generator instances.
      */
-    private String formattedFullList(Map<String,String> generators) {
+    private String formattedFullList(
+        Map<String,IDGeneratorInstance> generators) {
 
         Document doc = DocumentHelper.createDocument();
         Element root = doc.addElement(ID_GENERATOR_LIST_NAME);
@@ -528,10 +531,13 @@ public class IDResource {
         Element listitem = null;
         Element csid = null;
         Element uri = null;
+        Element displayname = null;
+        Element description = null;
         Element generator = null;
         Element generatorRoot = null;
         String generatorStr = "";
         Document generatorDoc = null;
+        IDGeneratorInstance instance = null;
         for (String csidValue : generators.keySet() )
         {
             listitem = root.addElement(ID_GENERATOR_LIST_ITEM_NAME);
@@ -539,10 +545,15 @@ public class IDResource {
             csid.addText(csidValue);
             uri = listitem.addElement("uri");
             uri.addText(getRelativePath(csidValue));
+            instance = generators.get(csidValue);
+            displayname = listitem.addElement("displayname");
+            displayname.addText(instance.getDisplayName());
+            description = listitem.addElement("description");
+            description.addText(instance.getDescription());
             generator = listitem.addElement("idgenerator");
             // Using the CSID as a key, get the XML string
             // representation of the ID generator.
-            generatorStr = generators.get(csidValue);
+            generatorStr = instance.getGeneratorState();
             // Convert the XML string representation of the
             // ID generator to a new XML document, copy its
             // root element, and append it to the relevant location
