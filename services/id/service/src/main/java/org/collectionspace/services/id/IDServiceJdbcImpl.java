@@ -640,7 +640,7 @@ public class IDServiceJdbcImpl implements IDService {
 			ResultSet rs = stmt.executeQuery(
 			  "SELECT csid, displayname, description, " +
               "id_generator_state FROM id_generators " +
-              "ORDER BY displayname ASC, priority ASC");
+              "ORDER BY displayname ASC"); // , priority ASC");
 
 			boolean moreRows = rs.next();
 			if (! moreRows) {
