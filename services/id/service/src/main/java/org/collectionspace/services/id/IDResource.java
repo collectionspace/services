@@ -537,7 +537,6 @@ public class IDResource {
         Element generatorRoot = null;
         String generatorStr = "";
         Document generatorDoc = null;
-        IDGeneratorInstance instance = null;
         for (String csidValue : generators.keySet() )
         {
             listitem = root.addElement(ID_GENERATOR_LIST_ITEM_NAME);
@@ -545,15 +544,16 @@ public class IDResource {
             csid.addText(csidValue);
             uri = listitem.addElement("uri");
             uri.addText(getRelativePath(csidValue));
-            instance = generators.get(csidValue);
             displayname = listitem.addElement("displayname");
-            displayname.addText(instance.getDisplayName());
+            // Retrieve the matching ID generator instance by CSID,
+            // and then pull out several of its values.
+            displayname.addText(generators.get(csidValue).getDisplayName());
             description = listitem.addElement("description");
-            description.addText(instance.getDescription());
+            description.addText(generators.get(csidValue).getDescription());
             generator = listitem.addElement("idgenerator");
             // Using the CSID as a key, get the XML string
             // representation of the ID generator.
-            generatorStr = instance.getGeneratorState();
+            generatorStr = generators.get(csidValue).getGeneratorState();
             // Convert the XML string representation of the
             // ID generator to a new XML document, copy its
             // root element, and append it to the relevant location

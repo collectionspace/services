@@ -21,14 +21,19 @@
  * Loads a default set of data into the "id_generators" table,
  * used by the ID Service.
  *
- * $LastChangedRevision: 302 $
- * $LastChangedDate: 2009-09-25 15:51:39 -0700 (Fri, 25 Sep 2009) $
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
 
 /*
- * NOTE: For numeric sequence parts whose first generated
- * value is expected to start at the initial value (such as '1'),
- * enter '-1' for the current value.
+ * Note: in the priority column, values range from  '1' (highest)
+ * to '9' (lowest).
+ */
+
+/*
+ * NOTE: In the id_generator_state column, for numeric sequence parts
+ * whose first generated value should start at the initial value
+ * (such as '1'), enter '-1' for the <currentValue>
  *
  * Otherwise, the first generated value will be the next value
  * in the sequence after the initial value (e.g. '2', if the
@@ -40,13 +45,13 @@ USE `cspace`;
 -- ACCESSION_LOT_NUMBER
 
 INSERT INTO `id_generators`
-    (csid, displayname, description, last_generated_id, id_generator_state)
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES 
     ('1a67470b-19b1-4ae3-88d4-2a0aa936270e',
      'Accession Activity Number',
-     'Generates accession lot or activity numbers, to identify accession
-activities in which a lot of one or more collection objects is
-acquired by the institution.',
+     'Identifies accession activities, in which a lot of
+one or more collection objects is acquired by the institution.',
+     '9',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
   <parts>
@@ -68,13 +73,14 @@ acquired by the institution.',
 -- ACCESSION_NUMBER
 
 INSERT INTO `id_generators`
-    (csid, displayname, description, last_generated_id, id_generator_state)
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES 
     ('9dd92952-c384-44dc-a736-95e435c1759c',
      'Accession Number',
-     'Generates accession numbers, to identify individual
-collection objects individually acquired by the museum.  This
-generator is used for collection objects without parts.',
+     'Identifies individual collection objects formally
+acquired by the institution. Used for collection objects
+without parts.',
+     '9',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
   <parts>
@@ -105,13 +111,14 @@ generator is used for collection objects without parts.',
 -- ARCHIVES_NUMBER
 
 INSERT INTO `id_generators`
-    (csid, displayname, description, last_generated_id, id_generator_state)
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES 
     ('70586d30-9dca-4a07-a3a2-1976fe898028',
      'Archives Number',
-     'Generates archives numbers, to identify accession activities
+     'Identifies archives-related accession activities,
 in which a lot of one or more collection objects is formally
 acquired for the archives.',
+     '9',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
   <parts>
@@ -137,13 +144,14 @@ acquired for the archives.',
 -- EVALUATION_NUMBER
 
 INSERT INTO `id_generators`
-    (csid, displayname, description, last_generated_id, id_generator_state)
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES 
     ('d2d80822-25c7-4c7c-a105-fc40cdb0c50f',
      'Evaluation Number',
-     'Generates evaluation numbers, to identify intake activities
+     'Identifies evaluation-related intake activities,
 in which a lot of one or more collection objects is formally
 acquired for evaluation.',
+     '9',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
   <parts>
@@ -169,13 +177,13 @@ acquired for evaluation.',
 -- INTAKE_NUMBER
 
 INSERT INTO `id_generators`
-    (csid, displayname, description, last_generated_id, id_generator_state)
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES 
     ('8088cfa5-c743-4824-bb4d-fb11b12847f7',
      'Intake Number',
-     'Generates intake activity numbers, to identify intake activities
-in which a lot of one or more collection objects enters
-the institution for evaluation.',
+     'Identifies intake activities, in which a lot of one
+or more collection objects enters the institution.',
+     '9',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
    <parts>
@@ -201,14 +209,14 @@ the institution for evaluation.',
 -- INTAKE_OBJECT_NUMBER
 
 INSERT INTO `id_generators`
-    (csid, displayname, description, last_generated_id, id_generator_state)
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES 
     ('a91db555-5c53-4996-9918-6712351397a0',
      'Intake Object Number',
-     'Generates intake numbers, to identify individual
-collection objects that enter the institution through
-intake activities, before they are either returned to
-their owner or formally acquired by the institution.',
+     'Identifies individual collection objects that enter
+the institution through intake activities, before they are 
+either returned to their owner or formally acquired.',
+     '9',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
   <parts>
@@ -243,12 +251,14 @@ their owner or formally acquired by the institution.',
 -- LIBRARY_NUMBER
 
 INSERT INTO `id_generators`
-    (csid, displayname, description, last_generated_id, id_generator_state)
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES 
     ('80fedaf6-1647-4f30-9f53-a75a3cac2ffd',
      'Library Number',
-     'Generates library numbers, in which a lot of one or more
-collection objects is formally acquired for the library.',
+     'Identifies library-related accession activities,
+in which a lot of one or more collection objects is
+formally acquired for the library.',
+     '9',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
    <parts>
@@ -274,12 +284,13 @@ collection objects is formally acquired for the library.',
 -- LOANS_IN_NUMBER
 
 INSERT INTO `id_generators`
-    (csid, displayname, description, last_generated_id, id_generator_state)
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES 
     ('ed87e7c6-0678-4f42-9d33-f671835586ef',
      'Loans-in Number',
-     'Generates loans-in numbers, to identify individual
-collection objects that are received on loan.',
+     'Identifies individual collection objects that are
+received on loan.',
+     '9',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
   <parts>
@@ -314,13 +325,14 @@ collection objects that are received on loan.',
 -- STUDY_NUMBER
 
 INSERT INTO `id_generators`
-    (csid, displayname, description, last_generated_id, id_generator_state)
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES 
     ('0518132e-dd8c-4773-8fa9-07c9af4444ee',
      'Study Number',
-     'Generates study numbers, to identify intake activities
-in which a lot of one or more collection objects is formally
-acquired for study.',
+     'Identifies study-related intake activities,
+in which a lot of one or more collection objects is
+formally acquired for study.',
+     '9',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
    <parts>
@@ -345,14 +357,20 @@ acquired for study.',
 
 -- UUID
 
+/*
+ * Note: these are Type 4 UUIDs, whose generation is based on
+ * random and pseudo-random parts.
+ */
+
 INSERT INTO `id_generators`
-    (csid, displayname, description, last_generated_id, id_generator_state)
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES 
     ('1fa40353-05b8-4ae6-82a6-44a18b4f3c12',
      'UUID',
-     'Generates universally unique identifiers (UUIDs), which may be
-used for CollectionSpace IDs (CSIDs) and other purposes. (These are
-Type 4 UUIDs, whose generation is based on random and pseudo-random parts.)',
+     'Universally unique identifiers (UUIDs), which may be
+used for CollectionSpace IDs (CSIDs) and any other relevant
+purposes.',
+     '9',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
   <parts>

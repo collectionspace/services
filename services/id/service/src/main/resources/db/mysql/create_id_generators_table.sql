@@ -21,8 +21,8 @@
  * Creates the "id_generators" table, used by the ID Service,
  * and sets the access permissions of that table.
  *
- * $LastChangedRevision: 302 $
- * $LastChangedDate: 2009-07-15 17:42:23 -0700 (Wed, 15 Jul 2009) $
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
 
 /*
@@ -39,7 +39,8 @@ CREATE TABLE `id_generators` (
   `csid`                varchar(80) PRIMARY KEY,
   `displayname`         varchar(80),
   `description`         varchar(500),
-  `id_generator_state`  varchar(8000),
+  `priority`            smallint(1) DEFAULT 9 NOT NULL,
+  `id_generator_state`  varchar(8000) NOT NULL,
   `last_generated_id`   varchar(255),
   `modified`            timestamp NOT NULL
                         default CURRENT_TIMESTAMP
