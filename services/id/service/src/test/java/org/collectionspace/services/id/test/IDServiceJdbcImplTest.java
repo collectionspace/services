@@ -23,7 +23,6 @@
 
 package org.collectionspace.services.id.test;
 
-import java.util.List;
 import java.util.Map;
 import org.collectionspace.services.common.repository.BadRequestException;
 import org.collectionspace.services.common.repository.DocumentNotFoundException;

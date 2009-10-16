@@ -82,6 +82,7 @@ public class IDResource {
     
     // Names of elements for ID generator instances, lists and list items.
     final static String ID_GENERATOR_NAME = "idgenerator";
+    final static String ID_GENERATOR_COMPONENTS_NAME = "idgenerator-components";
     final static String ID_GENERATOR_LIST_NAME = "idgenerator-list";
     final static String ID_GENERATOR_LIST_ITEM_NAME = "idgenerator-list-item";
 
@@ -121,9 +122,6 @@ public class IDResource {
         // components, while others may not (e.g. UUIDs, web services-based
         // responses).
 
-        // @TODO We're currently using simple integer IDs to identify ID generators
-        // in this initial iteration.
-        //
         // To uniquely identify ID generators in production, we'll need to handle
         // both CollectionSpace IDs (csids) - a form of UUIDs/GUIDs - and some
         // other form of identifier to be determined, such as URLs or URNs.
@@ -259,12 +257,9 @@ public class IDResource {
                 new Namespace(ID_SERVICE_NAMESPACE_PREFIX, ID_SERVICE_NAMESPACE);
             doc.getRootElement().add(namespace);
 
-            Element generatorElement = root.addElement(ID_GENERATOR_NAME);
-            // Add summary data about this ID generator instance.
-            generatorElement = addInstanceElementSummary(generatorElement, csid);
-            // Add detailed data about this ID generator instance.
-            generatorElement =
-                addInstanceElementDetails(generatorElement, csid, instance);
+            // Make a new element for the components of this ID generator
+            // instance, and attach it to the root element.
+            root = appendDetailedIDGeneratorInformation(root, instance);
 
             try {
                 resourceRepresentation = prettyPrintXML(doc);
@@ -335,8 +330,8 @@ public class IDResource {
      * Note: This REST method is required by a HEAD method test
      * in org.collectionspace.services.client.test.ServiceLayerTest.
      *
-     * @param   format  A representation ("format") in which to return list items,
-     *                  such as a "full" or "summary" format.
+     * @param   format  A representation ("format") in which to return
+     *                  list items, such as a "full" or "summary" format.
      *
      * @return  A list of representations of ID generator instance resources.
      */
@@ -358,36 +353,22 @@ public class IDResource {
         Response response = builder.build();
 
         String resourceRepresentation = "";
-
-        // @TODO We're currently overloading the String items in
-        // the 'generators' list with distinctly different types of
-        // list data, depending on the list format requested.  This may
-        // or may not be a good idea.
         try {
 
             Map<String,IDGeneratorInstance> generators =
                     service.readIDGeneratorsList();
 
-            // @TODO Filtering by role will likely take place here ...
+            // If no ID generator instances were found, return an empty list.
+            if (generators == null || generators.size() == 0) {
 
-            // Default to summary list if no list format is specified.
-            if (listFormat == null || listFormat.trim().isEmpty()) {
-                resourceRepresentation = formattedSummaryList(generators);
-            } else if (listFormat.equalsIgnoreCase(LIST_FORMAT_SUMMARY)) {
-                resourceRepresentation = formattedSummaryList(generators);
-            } else if (listFormat.equalsIgnoreCase(LIST_FORMAT_FULL)) {
-                resourceRepresentation = formattedFullList(generators);
-            // Return an error if the value of the query parameter
-            // is unrecognized.
-            } else {
-                // @TODO Return an appropriate XML-based entity body upon error.
-                String msg = "Query parameter '" + listFormat + "' was not recognized.";
-                logger.debug(msg);
+                Document doc = baseListDocument();
+                resourceRepresentation = doc.asXML();
                 response =
-                    Response.status(Response.Status.BAD_REQUEST)
-                        .entity("")
-                        .type(MediaType.TEXT_PLAIN)
+                    Response.status(Response.Status.OK)
+                        .entity(resourceRepresentation)
+                        .type(MediaType.APPLICATION_XML)
                         .build();
+                return response;
             }
 
             // Filter list by role
@@ -404,14 +385,36 @@ public class IDResource {
             // If the request didn't filter by role, return all
             // ID generator instances.
             if (role == null || role.trim().isEmpty()) {
-                if (generators != null) {
-                    // Do nothing
-                }
-                // Otherwise, return only ID generator instances
-                // matching the requested role.
+                // Do nothing
+            // Otherwise, return only ID generator instances
+            // matching the requested role.
             } else {
-                // @TODO Implement this stubbed code.
-            }          
+                // @TODO Implement this stubbed code, by
+                // iterating over generator instances and
+                // calling generatorHasRole().
+            }
+
+            // Default to summary list if no list format is specified.
+            if (listFormat == null || listFormat.trim().isEmpty()) {
+                resourceRepresentation = formattedSummaryList(generators);
+            } else if (listFormat.equalsIgnoreCase(LIST_FORMAT_SUMMARY)) {
+                resourceRepresentation = formattedSummaryList(generators);
+            } else if (listFormat.equalsIgnoreCase(LIST_FORMAT_FULL)) {
+                resourceRepresentation = formattedFullList(generators);
+            // Return an error if the value of the query parameter
+            // is unrecognized.
+            } else {
+                // @TODO Return an appropriate XML-based entity body upon error.
+                String msg =
+                    "Query parameter '" + listFormat + "' was not recognized.";
+                logger.debug(msg);
+                response =
+                    Response.status(Response.Status.BAD_REQUEST)
+                        .entity("")
+                        .type(MediaType.TEXT_PLAIN)
+                        .build();
+            }
+
 
             response =
                 Response.status(Response.Status.OK)
@@ -468,40 +471,17 @@ public class IDResource {
 
         return true;
 
-        // Pseudocode (with static string examples) of what we might
-        // want to do instead:
-        //
-        // getCSID(), below, would retrieve the value of the <csid> element,
-        // present in all list formats for ID generator instances,
-        // via xpath or similar.
-        //
-        // if (csid.equals("1a67470b-19b1-4ae3-88d4-2a0aa936270e")
-        //        && role.equalsIgnoreCase("ID_ROLE_ACCESSION_NUMBER")) {
-        //     // Return true if the ID generator instance identified by
-        //     // the provided CSID is associated with the provided role.
-        //     return true;
-        // } else {
-        //     return false;
-        // }
-
     }
 
     //////////////////////////////////////////////////////////////////////
     /**
-     * Returns a summary list of ID generator instances.
+     * Returns a base XML document representing a list of
+     * ID generator instances.
      *
-     * This is an XML-based list format that returns only
-     * basic data about each ID generator instance, along
-     * with relative URIs that may be used to retrieve more
-     * data about each instance.
-     *
-     * @param   generators A list of ID generator instances, each
-     *                     containing a CollectionSpace ID (CSID).
-     *
-     * @return  A summary list of ID generator instances.
+     * @return  A base XML document representing a list
+     *          of ID generator instances.
      */
-    private String formattedSummaryList(
-        Map<String,IDGeneratorInstance> generators) {
+    private Document baseListDocument() {
 
         Document doc = DocumentHelper.createDocument();
         Element root = doc.addElement(ID_GENERATOR_LIST_NAME);
@@ -509,13 +489,36 @@ public class IDResource {
             new Namespace(ID_SERVICE_NAMESPACE_PREFIX, ID_SERVICE_NAMESPACE);
         doc.getRootElement().add(namespace);
 
+        return doc;
+    }
+
+    //////////////////////////////////////////////////////////////////////
+    /**
+     * Returns a list with summary information about ID generator instances.
+     *
+     * This format returns summary data about ID generator
+     * instances, along with relative URIs that may be used
+     * to retrieve more data about each instance.
+     *
+     * @param   generators A list of ID generator instances.
+     *
+     * @return  A summary list of ID generator instances.
+     */
+    private String formattedSummaryList(
+        Map<String,IDGeneratorInstance> generators) {
+
+        Document doc = baseListDocument();
+
         Element listitem = null;
+        // Retrieve the CSIDs from each ID generator instance,
+        // and use these to return summary information about
         for (String csid : generators.keySet() )
         {
-            listitem = root.addElement(ID_GENERATOR_LIST_ITEM_NAME);
-            // Add summary data about this ID generator instance.
-            listitem = addInstanceElementSummary(listitem, csid);
-        }
+            listitem =
+                doc.getRootElement().addElement(ID_GENERATOR_LIST_ITEM_NAME);
+            // Append summary information about this ID generator instance.
+            listitem = appendSummaryIDGeneratorInformation(listitem, csid);
+       }
 
         String summaryList = "";
         try {
@@ -530,10 +533,7 @@ public class IDResource {
 
     //////////////////////////////////////////////////////////////////////
     /**
-     * Returns a full list of ID generator instances.
-     *
-     * This is an XML-based list format that returns
-     * full data about each ID generator instance.
+     * Returns a list with full information about ID generator instances.
      *
      * @param   generators A list of ID generator instances, each
      *                     containing a CollectionSpace ID (CSID).
@@ -543,21 +543,19 @@ public class IDResource {
     private String formattedFullList(
         Map<String,IDGeneratorInstance> generators) {
 
-        Document doc = DocumentHelper.createDocument();
-        Element root = doc.addElement(ID_GENERATOR_LIST_NAME);
-        Namespace namespace =
-            new Namespace(ID_SERVICE_NAMESPACE_PREFIX, ID_SERVICE_NAMESPACE);
-        doc.getRootElement().add(namespace);
+        Document doc = baseListDocument();
 
         Element listitem = null;
         for (String csid : generators.keySet() )
         {
-            listitem = root.addElement(ID_GENERATOR_LIST_ITEM_NAME);
-            // Add summary data about this ID generator instance.
-            listitem = addInstanceElementSummary(listitem, csid);
-            // Add detailed data about this ID generator instance.
             listitem =
-                addInstanceElementDetails(listitem, csid, generators.get(csid));
+                doc.getRootElement().addElement(ID_GENERATOR_LIST_ITEM_NAME);
+            // Append summary information about this ID generator instance.
+            listitem = appendSummaryIDGeneratorInformation(listitem, csid);
+            // Append details of this ID generator instance.
+            Element instance = listitem.addElement(ID_GENERATOR_NAME);
+            listitem = appendDetailedIDGeneratorInformation(instance,
+                generators.get(csid));
         }
 
         String summaryList = "";
@@ -571,35 +569,61 @@ public class IDResource {
         return summaryList;
     }
 
-    private Element addInstanceElementSummary(Element instanceElement,
+    //////////////////////////////////////////////////////////////////////
+    /**
+     * Appends summary information to an element representing
+     * an ID generator instance.
+     *
+     * @param   instanceElement  An XML element representing an
+     *                           ID generator instance.
+     *
+     * @param   csid             A CollectionSpace ID (CISD) associated with
+     *                           the resource representing that instance.
+     *
+     * @return  The XML element representing an ID generator instance,
+     *          with summary information appended.
+     */
+   private Element appendSummaryIDGeneratorInformation(Element instanceElement,
         String csidValue) {
 
-        Element csid = null;
-        Element uri = null;
-        csid = instanceElement.addElement("csid");
-        csid.addText(csidValue);
-        uri = instanceElement.addElement("uri");
+        Element uri = instanceElement.addElement("uri");
         uri.addText(getRelativePath(csidValue));
+        Element csid = instanceElement.addElement("csid");
+        csid.addText(csidValue);
 
         return instanceElement;
     }
 
+    //////////////////////////////////////////////////////////////////////
+    /**
+     * Appends detailed information about an ID generator instance,
+     * to an element representing that ID generator instance.
+     *
+     * @param   instanceElement    An XML element representing an
+     *                             ID generator instance.
+     *
+     * @param   generatorInstance  An instance of an ID generator.
+     *
+     * @return  The XML element representing an ID generator instance,
+     *          with detailed information appended.
+     */
+    private Element appendDetailedIDGeneratorInformation(
+        Element instanceElement, IDGeneratorInstance generatorInstance) {
 
-    private Element addInstanceElementDetails(Element instanceElement,
-        String csidValue, IDGeneratorInstance generatorInstance) {
-
+        // Append naming and description information.
         Element displayname = instanceElement.addElement("displayname");
         displayname.addText(generatorInstance.getDisplayName());
         Element description = instanceElement.addElement("description");
         description.addText(generatorInstance.getDescription());
-        Element generator = instanceElement.addElement("idgenerator");
-        // Using the CSID as a key, get the XML string
-        // representation of the ID generator.
+
+        // Append components information.
+        Element generator =
+            instanceElement.addElement(ID_GENERATOR_COMPONENTS_NAME);
+        // Get an XML string representation of the ID generator's components.
         String generatorStr = generatorInstance.getGeneratorState();
-        // Convert the XML string representation of the
-        // ID generator to a new XML document, copy its
-        // root element, and append it to the relevant location
-        // in the current list item.
+        // Convert the XML string representation of the ID generator's
+        // components to a new XML document, copy its root element, and
+        // append it to the relevant location within the current element.
         try {
             Document generatorDoc = textToXMLDocument(generatorStr);
             Element generatorRoot = generatorDoc.getRootElement();
@@ -615,7 +639,7 @@ public class IDResource {
 
 
     // @TODO Refactoring opportunity: the utility methods below
-    // might be moved into the 'common' module.
+    // could potentially be moved into the 'common' module.
 
     //////////////////////////////////////////////////////////////////////
     /**

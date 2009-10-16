@@ -28,8 +28,6 @@
 
 package org.collectionspace.services.id;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
