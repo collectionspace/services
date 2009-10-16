@@ -86,6 +86,10 @@ public class IDResource {
     final static String ID_GENERATOR_LIST_NAME = "idgenerator-list";
     final static String ID_GENERATOR_LIST_ITEM_NAME = "idgenerator-list-item";
 
+    // Output format for XML pretty printing.
+    final static OutputFormat PRETTY_PRINT_OUTPUT_FORMAT =
+        defaultPrettyPrintOutputFormat();
+
     // Base URL path for REST-based requests to the ID Service.
     //
     // @TODO Investigate whether this can be obtained from the
@@ -111,8 +115,6 @@ public class IDResource {
     @POST
     @Path("/{csid}/ids")
     public Response newID(@PathParam("csid") String csid) {
-
-        logger.debug("> in newID(String)");
 
         // @TODO The JavaDoc description reflects an as-yet-to-be-carried out
         // refactoring, in which the highest object type in the ID service
@@ -201,8 +203,6 @@ public class IDResource {
     @Consumes(MediaType.APPLICATION_XML)
     public Response createIDGenerator() {
 
-        logger.debug("> in createIDGenerator(String)");
-
         // @TODO Implement this stubbed method
 
         // @TODO Replace this placeholder code.
@@ -217,7 +217,7 @@ public class IDResource {
         // Return a URL for the newly-created resource in the
         // Location header
         String csid = "TEST-1";
-        String url = "/idgenerators/" + csid;
+        String url = BASE_URL_PATH + "/" + csid;
         List locationList = Collections.singletonList(url);
         response.getMetadata()
         .get("Location")
@@ -225,7 +225,6 @@ public class IDResource {
          */
 
         return response;
-
     }
 
     //////////////////////////////////////////////////////////////////////
@@ -240,8 +239,6 @@ public class IDResource {
     @Path("/{csid}")
     @Produces(MediaType.APPLICATION_XML)
     public Response readIDGenerator(@PathParam("csid") String csid) {
-
-        logger.debug("> in readIDGenerator(String)");
 
         ResponseBuilder builder = Response.ok();
         Response response = builder.build();
@@ -264,7 +261,9 @@ public class IDResource {
             try {
                 resourceRepresentation = prettyPrintXML(doc);
             } catch(Exception e) {
-                logger.debug("Error pretty-printing XML: " + e.getMessage());
+                if (logger.isDebugEnabled()) {
+                  logger.debug("Error pretty-printing XML: " + e.getMessage());
+                }
                 resourceRepresentation = doc.asXML();
             }
 
@@ -320,7 +319,6 @@ public class IDResource {
         }
 
         return response;
-
     }
 
     //////////////////////////////////////////////////////////////////////
@@ -341,8 +339,6 @@ public class IDResource {
     public Response readIDGeneratorsList(
         @QueryParam(QUERY_PARAM_LIST_FORMAT) String listFormat,
         @QueryParam(QUERY_PARAM_ID_GENERATOR_ROLE) String role) {
-
-        logger.debug("> in readIDGeneratorsList()");
 
         // @TODO The names and values of the query parameters above
         // ("format"and "role") are arbitrary, as are the format of the
@@ -403,18 +399,20 @@ public class IDResource {
                 resourceRepresentation = formattedFullList(generators);
             // Return an error if the value of the query parameter
             // is unrecognized.
+            //
+            // @TODO Return an appropriate XML-based entity body upon error.
             } else {
-                // @TODO Return an appropriate XML-based entity body upon error.
                 String msg =
                     "Query parameter '" + listFormat + "' was not recognized.";
-                logger.debug(msg);
+                if (logger.isDebugEnabled()) {
+                    logger.debug(msg);
+                }
                 response =
                     Response.status(Response.Status.BAD_REQUEST)
                         .entity("")
                         .type(MediaType.TEXT_PLAIN)
                         .build();
             }
-
 
             response =
                 Response.status(Response.Status.OK)
@@ -470,7 +468,6 @@ public class IDResource {
         // and ultimately in a database table.
 
         return true;
-
     }
 
     //////////////////////////////////////////////////////////////////////
@@ -511,7 +508,8 @@ public class IDResource {
 
         Element listitem = null;
         // Retrieve the CSIDs from each ID generator instance,
-        // and use these to return summary information about
+        // and use these in summary information returned about
+        // each instance.
         for (String csid : generators.keySet() )
         {
             listitem =
@@ -524,7 +522,9 @@ public class IDResource {
         try {
             summaryList = prettyPrintXML(doc);
         } catch(Exception e) {
-            logger.debug("Error pretty-printing XML: " + e.getMessage());
+            if (logger.isDebugEnabled()) {
+              logger.debug("Error pretty-printing XML: " + e.getMessage());
+            }
             summaryList = doc.asXML();
         }
 
@@ -558,15 +558,17 @@ public class IDResource {
                 generators.get(csid));
         }
 
-        String summaryList = "";
+        String fullList = "";
         try {
-            summaryList = prettyPrintXML(doc);
+            fullList = prettyPrintXML(doc);
         } catch(Exception e) {
-            logger.debug("Error pretty-printing XML: " + e.getMessage());
-            summaryList = doc.asXML();
+            if (logger.isDebugEnabled()) {
+              logger.debug("Error pretty-printing XML: " + e.getMessage());
+            }
+            fullList = doc.asXML();
         }
 
-        return summaryList;
+        return fullList;
     }
 
     //////////////////////////////////////////////////////////////////////
@@ -629,9 +631,11 @@ public class IDResource {
             Element generatorRoot = generatorDoc.getRootElement();
             generator.add(generatorRoot.createCopy());
         // If an error occurs parsing the XML string representation,
-        // the text of the ID generator element will remain empty.
+        // the text of the components element will remain empty.
         } catch (Exception e) {
-            logger.warn("Error parsing XML text: " + generatorStr);
+            if (logger.isDebugEnabled()) {
+              logger.debug("Error parsing XML text: " + generatorStr);
+            }
         }
 
         return instanceElement;
@@ -639,29 +643,65 @@ public class IDResource {
 
 
     // @TODO Refactoring opportunity: the utility methods below
-    // could potentially be moved into the 'common' module.
+    // could potentially be moved into the 'common' module,
+    // and made static and public.
 
     //////////////////////////////////////////////////////////////////////
     /**
-     * Returns a 'pretty printed' String representation of
-     * an XML document.
+     * Returns a default output format for pretty printing an XML document.
      *
      * Uses the default settings for indentation, whitespace, etc.
      * of a pre-defined dom4j output format.
      *
-     * @param   doc  A dom4j XML Document.
-     *
-     * @return  A pretty-printed String representation of that document.
+     * @return  A default output format for pretty printing an XML document.
      */
-    private String prettyPrintXML(Document doc)
+    private static OutputFormat defaultPrettyPrintOutputFormat() {
+
+        // Use the default pretty print output format in dom4j.
+        OutputFormat outformat = OutputFormat.createPrettyPrint();
+        // Supress the extra newline added after the XML declaration
+        // in that output format.
+        outformat.setNewLineAfterDeclaration(false);
+        return outformat;
+    }
+
+    //////////////////////////////////////////////////////////////////////
+    /**
+     * Returns a pretty printed String representation of an XML document.
+     *
+     * @param   doc        A dom4j XML Document.
+     *
+     * @return  A pretty printed String representation of an XML document.
+     */
+    private String prettyPrintXML(Document doc) throws Exception {
+
+        String xmlStr = "";
+        try {
+          xmlStr = formatXML(doc, PRETTY_PRINT_OUTPUT_FORMAT);
+        } catch (Exception e) {
+           throw e;
+        }
+        return xmlStr;
+    }
+
+    //////////////////////////////////////////////////////////////////////
+    /**
+     * Returns a String representation of an XML document,
+     * formatted according to a specified output format.
+     *
+     * @param   doc        A dom4j XML Document.
+     *
+     * @param   outformat  A dom4j output format.
+     *
+     * @return  A String representation of an XML document,
+     *          formatted according to the specified output format.
+     */
+    private String formatXML(Document doc, OutputFormat outformat)
        throws Exception {
 
         StringWriter sw = new StringWriter();
         try {
-            final OutputFormat PRETTY_PRINT_FORMAT =
-                OutputFormat.createPrettyPrint();
-            final XMLWriter writer =
-                new XMLWriter(sw, PRETTY_PRINT_FORMAT);
+            final XMLWriter writer = new XMLWriter(sw, outformat);
             // Print the document to the current writer.
             writer.write(doc);
         }
@@ -702,6 +742,10 @@ public class IDResource {
      *          represents an ID generator instance.
      */
     private String getRelativePath(String csid) {
+
+      // @TODO Verify that this is the correct relative path.
+      // Do we need to check the path provided in the original request?
+        
       if (csid !=null && ! csid.trim().isEmpty()) {
         return BASE_URL_PATH + "/" + csid;
       } else {
