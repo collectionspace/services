@@ -69,12 +69,19 @@ public class IDResource {
     final Logger logger = LoggerFactory.getLogger(IDResource.class);
     final static IDService service = new IDServiceJdbcImpl();
 
+    // Query parameter names and values.
+    final static String QUERY_PARAM_LIST_FORMAT = "format";
+    final static String LIST_FORMAT_SUMMARY = "summary";
+    final static String LIST_FORMAT_FULL = "full";
+    final static String QUERY_PARAM_ID_GENERATOR_ROLE = "role";
+
     // XML namespace for the ID Service.
     final static String ID_SERVICE_NAMESPACE =
        "http://collectionspace.org/services/id";
     final static String ID_SERVICE_NAMESPACE_PREFIX = "ns2";
     
-    // Names of elements for ID generator lists and list items.
+    // Names of elements for ID generator instances, lists and list items.
+    final static String ID_GENERATOR_NAME = "idgenerator";
     final static String ID_GENERATOR_LIST_NAME = "idgenerator-list";
     final static String ID_GENERATOR_LIST_ITEM_NAME = "idgenerator-list-item";
 
@@ -244,7 +251,27 @@ public class IDResource {
         String resourceRepresentation = "";
         try {
 
-            resourceRepresentation = service.readIDGenerator(csid);
+            IDGeneratorInstance instance = service.readIDGenerator(csid);
+
+            Document doc = DocumentHelper.createDocument();
+            Element root = doc.addElement(ID_GENERATOR_NAME);
+            Namespace namespace =
+                new Namespace(ID_SERVICE_NAMESPACE_PREFIX, ID_SERVICE_NAMESPACE);
+            doc.getRootElement().add(namespace);
+
+            Element generatorElement = root.addElement(ID_GENERATOR_NAME);
+            // Add summary data about this ID generator instance.
+            generatorElement = addInstanceElementSummary(generatorElement, csid);
+            // Add detailed data about this ID generator instance.
+            generatorElement =
+                addInstanceElementDetails(generatorElement, csid, instance);
+
+            try {
+                resourceRepresentation = prettyPrintXML(doc);
+            } catch(Exception e) {
+                logger.debug("Error pretty-printing XML: " + e.getMessage());
+                resourceRepresentation = doc.asXML();
+            }
 
             if (
                 resourceRepresentation == null ||
@@ -317,7 +344,8 @@ public class IDResource {
     @Path("")
     @Produces(MediaType.APPLICATION_XML)
     public Response readIDGeneratorsList(
-            @QueryParam("format") String format, @QueryParam("role") String role) {
+        @QueryParam(QUERY_PARAM_LIST_FORMAT) String listFormat,
+        @QueryParam(QUERY_PARAM_ID_GENERATOR_ROLE) String role) {
 
         logger.debug("> in readIDGeneratorsList()");
 
@@ -331,9 +359,6 @@ public class IDResource {
 
         String resourceRepresentation = "";
 
-        final String LIST_FORMAT_SUMMARY = "summary";
-        final String LIST_FORMAT_FULL = "full";
-
         // @TODO We're currently overloading the String items in
         // the 'generators' list with distinctly different types of
         // list data, depending on the list format requested.  This may
@@ -346,17 +371,17 @@ public class IDResource {
             // @TODO Filtering by role will likely take place here ...
 
             // Default to summary list if no list format is specified.
-            if (format == null || format.trim().isEmpty()) {
+            if (listFormat == null || listFormat.trim().isEmpty()) {
                 resourceRepresentation = formattedSummaryList(generators);
-            } else if (format.equalsIgnoreCase(LIST_FORMAT_SUMMARY)) {
+            } else if (listFormat.equalsIgnoreCase(LIST_FORMAT_SUMMARY)) {
                 resourceRepresentation = formattedSummaryList(generators);
-            } else if (format.equalsIgnoreCase(LIST_FORMAT_FULL)) {
+            } else if (listFormat.equalsIgnoreCase(LIST_FORMAT_FULL)) {
                 resourceRepresentation = formattedFullList(generators);
             // Return an error if the value of the query parameter
             // is unrecognized.
             } else {
                 // @TODO Return an appropriate XML-based entity body upon error.
-                String msg = "Query parameter '" + format + "' was not recognized.";
+                String msg = "Query parameter '" + listFormat + "' was not recognized.";
                 logger.debug(msg);
                 response =
                     Response.status(Response.Status.BAD_REQUEST)
@@ -485,15 +510,11 @@ public class IDResource {
         doc.getRootElement().add(namespace);
 
         Element listitem = null;
-        Element csid = null;
-        Element uri = null;
-        for (String csidValue : generators.keySet() )
+        for (String csid : generators.keySet() )
         {
             listitem = root.addElement(ID_GENERATOR_LIST_ITEM_NAME);
-            csid = listitem.addElement("csid");
-            csid.addText(csidValue);
-            uri = listitem.addElement("uri");
-            uri.addText(getRelativePath(csidValue));
+            // Add summary data about this ID generator instance.
+            listitem = addInstanceElementSummary(listitem, csid);
         }
 
         String summaryList = "";
@@ -529,45 +550,14 @@ public class IDResource {
         doc.getRootElement().add(namespace);
 
         Element listitem = null;
-        Element csid = null;
-        Element uri = null;
-        Element displayname = null;
-        Element description = null;
-        Element generator = null;
-        Element generatorRoot = null;
-        String generatorStr = "";
-        Document generatorDoc = null;
-        for (String csidValue : generators.keySet() )
+        for (String csid : generators.keySet() )
         {
             listitem = root.addElement(ID_GENERATOR_LIST_ITEM_NAME);
-            csid = listitem.addElement("csid");
-            csid.addText(csidValue);
-            uri = listitem.addElement("uri");
-            uri.addText(getRelativePath(csidValue));
-            displayname = listitem.addElement("displayname");
-            // Retrieve the matching ID generator instance by CSID,
-            // and then pull out several of its values.
-            displayname.addText(generators.get(csidValue).getDisplayName());
-            description = listitem.addElement("description");
-            description.addText(generators.get(csidValue).getDescription());
-            generator = listitem.addElement("idgenerator");
-            // Using the CSID as a key, get the XML string
-            // representation of the ID generator.
-            generatorStr = generators.get(csidValue).getGeneratorState();
-            // Convert the XML string representation of the
-            // ID generator to a new XML document, copy its
-            // root element, and append it to the relevant location
-            // in the current list item.
-            try {
-                generatorDoc = textToXMLDocument(generatorStr);
-                generatorRoot = generatorDoc.getRootElement();
-                generator.add(generatorRoot.createCopy());
-            // If an error occurs parsing the XML string representation,
-            // the text of the ID generator element will remain empty.
-            } catch (Exception e) {
-                logger.warn("Error parsing XML text: " + generatorStr);
-            }
-
+            // Add summary data about this ID generator instance.
+            listitem = addInstanceElementSummary(listitem, csid);
+            // Add detailed data about this ID generator instance.
+            listitem =
+                addInstanceElementDetails(listitem, csid, generators.get(csid));
         }
 
         String summaryList = "";
@@ -580,6 +570,49 @@ public class IDResource {
 
         return summaryList;
     }
+
+    private Element addInstanceElementSummary(Element instanceElement,
+        String csidValue) {
+
+        Element csid = null;
+        Element uri = null;
+        csid = instanceElement.addElement("csid");
+        csid.addText(csidValue);
+        uri = instanceElement.addElement("uri");
+        uri.addText(getRelativePath(csidValue));
+
+        return instanceElement;
+    }
+
+
+    private Element addInstanceElementDetails(Element instanceElement,
+        String csidValue, IDGeneratorInstance generatorInstance) {
+
+        Element displayname = instanceElement.addElement("displayname");
+        displayname.addText(generatorInstance.getDisplayName());
+        Element description = instanceElement.addElement("description");
+        description.addText(generatorInstance.getDescription());
+        Element generator = instanceElement.addElement("idgenerator");
+        // Using the CSID as a key, get the XML string
+        // representation of the ID generator.
+        String generatorStr = generatorInstance.getGeneratorState();
+        // Convert the XML string representation of the
+        // ID generator to a new XML document, copy its
+        // root element, and append it to the relevant location
+        // in the current list item.
+        try {
+            Document generatorDoc = textToXMLDocument(generatorStr);
+            Element generatorRoot = generatorDoc.getRootElement();
+            generator.add(generatorRoot.createCopy());
+        // If an error occurs parsing the XML string representation,
+        // the text of the ID generator element will remain empty.
+        } catch (Exception e) {
+            logger.warn("Error parsing XML text: " + generatorStr);
+        }
+
+        return instanceElement;
+    }
+
 
     // @TODO Refactoring opportunity: the utility methods below
     // might be moved into the 'common' module.
@@ -614,7 +647,7 @@ public class IDResource {
         return sw.toString();
     }
 
-    //////////////////////////////////////////////////////////////////////
+     //////////////////////////////////////////////////////////////////////
     /**
      * Returns an XML document, when provided with a String
      * representation of that XML document.

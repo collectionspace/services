@@ -214,7 +214,7 @@ public class IDServiceJdbcImpl implements IDService {
 		
 		String serializedGenerator = "";
 		try {
-			serializedGenerator = readIDGenerator(csid);
+			serializedGenerator = readIDGenerator(csid).getGeneratorState();
 		} catch (DocumentNotFoundException e ) {
 			throw e;
 		} catch (IllegalArgumentException e ) {
@@ -561,22 +561,23 @@ public class IDServiceJdbcImpl implements IDService {
 	* @throws  IllegalStateException if a storage-related error occurred.
 	*/
     @Override
-	public String readIDGenerator (String csid) throws
+	public IDGeneratorInstance readIDGenerator (String csid) throws
 	    DocumentNotFoundException, IllegalArgumentException,
         IllegalStateException {
 	
 		logger.debug("> in readIDGenerator");
 		
-		String serializedGenerator = null;
+		IDGeneratorInstance instance = null;
 		
 		Connection conn = null;
 		try {
 		
 			conn = getJdbcConnection();
 			Statement stmt = conn.createStatement();
-			
-			ResultSet rs = stmt.executeQuery(
-			  "SELECT id_generator_state FROM id_generators " + 
+
+            ResultSet rs = stmt.executeQuery(
+			  "SELECT csid, displayname, description, " +
+              "id_generator_state FROM id_generators " +
 			  "WHERE csid='" + csid + "'");
 			  
 			boolean moreRows = rs.next();
@@ -587,7 +588,10 @@ public class IDServiceJdbcImpl implements IDService {
 				    " could not be found.");
 			}
 		
-			serializedGenerator = rs.getString(1);
+            instance = new IDGeneratorInstance();
+            instance.setDisplayName(rs.getString(2));
+            instance.setDescription(rs.getString(3));
+            instance.setGeneratorState(rs.getString(4));
 			
 			rs.close();
 		
@@ -606,9 +610,10 @@ public class IDServiceJdbcImpl implements IDService {
 			}
 		}
 		
-		logger.debug("> retrieved SettableIDGenerator: " + serializedGenerator);
+		logger.debug("> retrieved SettableIDGenerator: " +
+            instance.getGeneratorState());
 		
-		return serializedGenerator;
+		return instance;
 		  
 	}
 

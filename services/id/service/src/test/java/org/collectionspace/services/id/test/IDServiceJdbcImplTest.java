@@ -47,6 +47,7 @@ public class IDServiceJdbcImplTest {
     String nextId;
     String serializedGenerator;
     SettableIDGenerator generator;
+    IDGeneratorInstance instance;
     
     IDServiceJdbcImpl jdbc = new IDServiceJdbcImpl();
     IDService service = jdbc;
@@ -82,8 +83,9 @@ public class IDServiceJdbcImplTest {
     public void readIDGenerator() throws DocumentNotFoundException,
         IllegalArgumentException, IllegalStateException {
 
-        serializedGenerator = jdbc.readIDGenerator(DEFAULT_CSID);
-        Assert.assertTrue(serializedGenerator != null);
+        instance = jdbc.readIDGenerator(DEFAULT_CSID);
+        Assert.assertTrue(instance != null);
+        serializedGenerator = instance.getGeneratorState();
         Assert.assertTrue(! serializedGenerator.equals(""));
         generator = IDGeneratorSerializer.deserialize(serializedGenerator);
      }

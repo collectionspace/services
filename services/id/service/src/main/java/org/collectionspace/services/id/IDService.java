@@ -64,8 +64,9 @@ public interface IDService {
         throws IllegalArgumentException, IllegalStateException;
     
     // Read single object
-    public String readIDGenerator(String csid) throws DocumentNotFoundException,
-        IllegalArgumentException, IllegalStateException;
+    public IDGeneratorInstance readIDGenerator(String csid)
+        throws DocumentNotFoundException, IllegalArgumentException,
+        IllegalStateException;
     
     // Read a list of objects (aka read multiple)
     // and return a list (map) of those objects and their identifiers.
