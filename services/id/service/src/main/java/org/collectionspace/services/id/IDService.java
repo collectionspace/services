@@ -45,11 +45,11 @@ public interface IDService {
     
     // Generates and returns a new ID from the specified ID generator.
     public String createID(String csid) throws DocumentNotFoundException,
-      BadRequestException, IllegalArgumentException, IllegalStateException;
+      BadRequestException, IllegalStateException;
     
     // Returns the last-generated ID associated with the specified ID generator.
     public String readLastID(String csid)
-        throws IllegalArgumentException, IllegalStateException;
+        throws DocumentNotFoundException, IllegalStateException;
 
     // Read a list of objects (aka read multiple)
     
@@ -61,12 +61,11 @@ public interface IDService {
     
     // Adds a new ID generator.
     public void createIDGenerator(String csid, String serializedIDGenerator)
-        throws IllegalArgumentException, IllegalStateException;
+        throws BadRequestException, IllegalStateException;
     
     // Read single object
     public IDGeneratorInstance readIDGenerator(String csid)
-        throws DocumentNotFoundException, IllegalArgumentException,
-        IllegalStateException;
+        throws DocumentNotFoundException, IllegalStateException;
     
     // Read a list of objects (aka read multiple)
     // and return a list (map) of those objects and their identifiers.

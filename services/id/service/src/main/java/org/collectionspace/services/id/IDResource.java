@@ -177,10 +177,6 @@ public class IDResource {
             response = Response.status(Response.Status.BAD_REQUEST)
                 .entity(ise.getMessage()).type(MediaType.TEXT_PLAIN).build();
 
-        } catch (IllegalArgumentException iae) {
-            response = Response.status(Response.Status.BAD_REQUEST)
-                .entity(iae.getMessage()).type(MediaType.TEXT_PLAIN).build();
-
             // This is guard code that should never be reached.
         } catch (Exception e) {
             response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -258,27 +254,7 @@ public class IDResource {
             // instance, and attach it to the root element.
             root = appendDetailedIDGeneratorInformation(root, instance);
 
-            try {
-                resourceRepresentation = prettyPrintXML(doc);
-            } catch(Exception e) {
-                if (logger.isDebugEnabled()) {
-                  logger.debug("Error pretty-printing XML: " + e.getMessage());
-                }
-                resourceRepresentation = doc.asXML();
-            }
-
-            if (
-                resourceRepresentation == null ||
-                resourceRepresentation.trim().isEmpty()
-            ) {
-                response =
-                    Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .entity("ID Service returned null or empty ID Generator")
-                        .type(MediaType.TEXT_PLAIN)
-                        .build();
-                return response;
-            }
-
+            resourceRepresentation = prettyPrintXML(doc);
             response =
                 Response.status(Response.Status.OK)
                     .entity(resourceRepresentation)
@@ -302,14 +278,7 @@ public class IDResource {
                     .type(MediaType.TEXT_PLAIN)
                     .build();
 
-        } catch (IllegalArgumentException iae) {
-            response =
-                Response.status(Response.Status.BAD_REQUEST)
-                    .entity(iae.getMessage())
-                    .type(MediaType.TEXT_PLAIN)
-                    .build();
-
-            // This is guard code that should never be reached.
+        // This is guard code that should never be reached.
         } catch (Exception e) {
             response =
                 Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -518,17 +487,7 @@ public class IDResource {
             listitem = appendSummaryIDGeneratorInformation(listitem, csid);
        }
 
-        String summaryList = "";
-        try {
-            summaryList = prettyPrintXML(doc);
-        } catch(Exception e) {
-            if (logger.isDebugEnabled()) {
-              logger.debug("Error pretty-printing XML: " + e.getMessage());
-            }
-            summaryList = doc.asXML();
-        }
-
-        return summaryList;
+       return prettyPrintXML(doc);
     }
 
     //////////////////////////////////////////////////////////////////////
@@ -558,17 +517,7 @@ public class IDResource {
                 generators.get(csid));
         }
 
-        String fullList = "";
-        try {
-            fullList = prettyPrintXML(doc);
-        } catch(Exception e) {
-            if (logger.isDebugEnabled()) {
-              logger.debug("Error pretty-printing XML: " + e.getMessage());
-            }
-            fullList = doc.asXML();
-        }
-
-        return fullList;
+        return prettyPrintXML(doc);
     }
 
     //////////////////////////////////////////////////////////////////////
@@ -673,14 +622,20 @@ public class IDResource {
      *
      * @return  A pretty printed String representation of an XML document.
      */
-    private String prettyPrintXML(Document doc) throws Exception {
+    private String prettyPrintXML(Document doc) {
 
         String xmlStr = "";
         try {
           xmlStr = formatXML(doc, PRETTY_PRINT_OUTPUT_FORMAT);
+        // If an error occurs during pretty printing, fall back to
+        // returning a default String representation of the XML document.
         } catch (Exception e) {
-           throw e;
+            if (logger.isDebugEnabled()) {
+              logger.debug("Error pretty-printing XML: " + e.getMessage());
+            }
+            xmlStr = doc.asXML();
         }
+
         return xmlStr;
     }
 
@@ -695,6 +650,9 @@ public class IDResource {
      *
      * @return  A String representation of an XML document,
      *          formatted according to the specified output format.
+     *
+     * @throws  An Exception if an error occurs in printing
+     *          the XML document to a String.
      */
     private String formatXML(Document doc, OutputFormat outformat)
        throws Exception {

@@ -68,7 +68,7 @@ public class IDServiceJdbcImplTest {
 
     @Test(dependsOnMethods = {"hasRequiredDatabaseTable"})
     public void createIDGenerator() throws DocumentNotFoundException,
-        IllegalArgumentException, IllegalStateException {
+        BadRequestException, IllegalStateException {
         try {
             jdbc.deleteIDGenerator(DEFAULT_CSID);
         } catch (Exception e) {
@@ -119,7 +119,7 @@ public class IDServiceJdbcImplTest {
     @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "createIDGenerator",
         "readIDGenerator"})
     public void updateIDGenerator() throws DocumentNotFoundException,
-        BadRequestException, IllegalArgumentException, IllegalStateException {
+        BadRequestException, IllegalStateException {
 
         final String NEW_DESCRIPTION = "new description";
         
@@ -150,8 +150,7 @@ public class IDServiceJdbcImplTest {
     @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "createIDGenerator",
         "readIDGenerator", "deleteIDGenerator"})
         public void createID() throws DocumentNotFoundException,
-            BadRequestException, IllegalArgumentException,
-            IllegalStateException {
+            BadRequestException, IllegalStateException {
                 
         try {
             jdbc.deleteIDGenerator(DEFAULT_CSID);

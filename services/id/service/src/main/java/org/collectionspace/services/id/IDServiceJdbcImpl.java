@@ -339,12 +339,13 @@ public class IDServiceJdbcImpl implements IDService {
 	*
 	* @return  The last ID generated that corresponds to the requested ID generator.
 	*
-	* @throws  IllegalArgumentException if the requested ID generator could not be found.
+	* @throws  DocumentNotFoundException if the requested ID generator
+    *          could not be found.
 	*
 	* @throws  IllegalStateException if a storage-related error occurred.
 	*/
     @Override
-	public String readLastID(String csid) throws IllegalArgumentException,
+	public String readLastID(String csid) throws DocumentNotFoundException,
 		IllegalStateException {
 	
 		logger.debug("> in readLastID");
@@ -367,7 +368,7 @@ public class IDServiceJdbcImpl implements IDService {
 			  
 			boolean moreRows = rs.next();
 			if (! moreRows) {
-			throw new IllegalArgumentException(
+			throw new DocumentNotFoundException(
 				"ID generator " + "\'" + csid + "\'" + " could not be found.");
 			}
 		
@@ -401,24 +402,28 @@ public class IDServiceJdbcImpl implements IDService {
 	
 	//////////////////////////////////////////////////////////////////////
    /**
-	* Adds a new ID generator to persistent storage.
+	* Adds a new ID generator instance to persistent storage.
 	*
 	* @param  csid     An identifier for an ID generator.
 	*
 	* @param  generator  An ID generator, reflecting its current state,
 	*                  including the values of its constituent parts.
 	*
+    * @throws  BadRequestException if the provided representation of an
+    *          ID generator instance is not in the correct format, contains
+    *          invalid values, or otherwise cannot be used.
+    *
 	* @throws  IllegalStateException if a storage-related error occurred.
 	*/
 	public void createIDGenerator(String csid, SettableIDGenerator generator)
-	  throws IllegalArgumentException, IllegalStateException {
+	  throws BadRequestException, IllegalStateException {
 	
 		logger.debug("> in createIDGenerator(String, SettableIDGenerator)");
 	
 		// @TODO: Add checks for authorization to perform this operation.
 		
 		if (generator == null) {
-			throw new IllegalArgumentException("New ID generator " + 
+			throw new BadRequestException("New ID generator " +
 			    "to add cannot be null.");
 		}
 		
@@ -426,7 +431,7 @@ public class IDServiceJdbcImpl implements IDService {
 		try {
 			serializedGenerator = IDGeneratorSerializer.serialize(generator);
 		} catch (IllegalArgumentException e) {
-			throw e;
+			throw new BadRequestException(e);
 		}
 		
 		try {
@@ -439,7 +444,7 @@ public class IDServiceJdbcImpl implements IDService {
 	
 	}
 	
-	//////////////////////////////////////////////////////////////////////
+   //////////////////////////////////////////////////////////////////////
    /**
 	* Adds a new ID generator to persistent storage, from a serialization
 	* of that generator.
@@ -453,18 +458,22 @@ public class IDServiceJdbcImpl implements IDService {
 	* @param  serializedGenerator  A serialized ID generator, reflecting its current state,
 	*                              including the values of its constituent parts.
 	*
-	* @throws  IllegalStateException if a storage-related error occurred.
+    * @throws  BadRequestException if the provided representation of an
+    *          ID generator instance is not in the correct format, contains
+    *          invalid values, or otherwise cannot be used.
+    *
+    * @throws  IllegalStateException if a storage-related error occurred.
 	*/
 	@Override
 	public void createIDGenerator(String csid, String serializedGenerator)
-	  throws IllegalArgumentException, IllegalStateException {
+	  throws BadRequestException, IllegalStateException {
 	
 		logger.debug("> in createIDGenerator(String, String)");
 	
 		// @TODO Add checks for authorization to perform this operation.
 			
 		if (serializedGenerator == null || serializedGenerator.equals("")) {
-			throw new IllegalArgumentException(
+			throw new BadRequestException(
 				"Could not understand or parse this representation " + 
 				"of an ID generator.");
 		}
@@ -504,7 +513,8 @@ public class IDServiceJdbcImpl implements IDService {
 					csid +
 					"' to the database.");
 			  
-			// Otherwise, add this new ID generator, as a new record to the database.
+			// Otherwise, add this new ID generator, as a new record to
+            // the database.
 			} else {
 			
 				final String SQL_STATEMENT_STRING =
@@ -555,15 +565,14 @@ public class IDServiceJdbcImpl implements IDService {
 	*
 	* @return  A serialized representation of the requested ID generator.
 	*
-	* @throws  IllegalArgumentException if the requested ID generator could
+	* @throws  DocumentNotFoundException if the requested ID generator could
 	*          not be found.
 	*
 	* @throws  IllegalStateException if a storage-related error occurred.
 	*/
     @Override
 	public IDGeneratorInstance readIDGenerator (String csid) throws
-	    DocumentNotFoundException, IllegalArgumentException,
-        IllegalStateException {
+	    DocumentNotFoundException, IllegalStateException {
 	
 		logger.debug("> in readIDGenerator");
 		
@@ -617,7 +626,7 @@ public class IDServiceJdbcImpl implements IDService {
 		  
 	}
 
-    //////////////////////////////////////////////////////////////////////
+   //////////////////////////////////////////////////////////////////////
    /**
     * Returns a list of ID generator instances from persistent storage.
 	*
@@ -690,10 +699,18 @@ public class IDServiceJdbcImpl implements IDService {
 	* @param  generator  An ID generator, reflecting its current state,
 	*                  including the values of its constituent parts.
 	*
-	* @throws  IllegalStateException if a storage-related error occurred.
+	* @throws  DocumentNotFoundException if the requested ID generator could
+	*          not be found.
+    *
+    * @throws  BadRequestException if the provided representation of an
+    *          ID generator instance is not in the correct format, contains
+    *          invalid values, or otherwise cannot be used.
+    *
+    * @throws  IllegalStateException if a storage-related error occurred.
 	*/
 	public void updateIDGenerator(String csid, SettableIDGenerator generator)
-	  throws BadRequestException, IllegalArgumentException, IllegalStateException, DocumentNotFoundException {
+	  throws BadRequestException, DocumentNotFoundException,
+      IllegalStateException {
 	
 		logger.debug("> in updateIDGenerator(String, SettableIDGenerator)");
 	
@@ -708,7 +725,7 @@ public class IDServiceJdbcImpl implements IDService {
 		try {
 			serializedGenerator = IDGeneratorSerializer.serialize(generator);
 		} catch (IllegalArgumentException e) {
-			throw e;
+			throw new BadRequestException(e);
 		}
 	
 		try {
@@ -738,12 +755,19 @@ public class IDServiceJdbcImpl implements IDService {
 	*           A serialized ID generator, reflecting its current state,
 	*           including the values of its constituent parts.
 	*
-	* @throws  IllegalStateException if a storage-related error occurred.
+	* @throws  DocumentNotFoundException if the requested ID generator could
+	*          not be found.
+    *
+    * @throws  BadRequestException if the provided representation of an
+    *          ID generator instance is not in the correct format, contains
+    *          invalid values, or otherwise cannot be used.
+    *
+    * @throws  IllegalStateException if a storage-related error occurred.
 	*/
 	@Override
 	public void updateIDGenerator(String csid, String serializedGenerator)
 	  throws DocumentNotFoundException, BadRequestException,
-        IllegalArgumentException, IllegalStateException {
+      IllegalStateException {
 	
 		logger.debug("> in updateIDGenerator(String, String)");
 	
@@ -834,11 +858,13 @@ public class IDServiceJdbcImpl implements IDService {
 	*
 	* @param  csid     An identifier for an ID generator.
 	*
-	* @throws  IllegalStateException if a storage-related error occurred.
+	* @throws  DocumentNotFoundException if the requested ID generator could
+	*          not be found.
+    *
+   	* @throws  IllegalStateException if a storage-related error occurred.
 	*/
 	public void deleteIDGenerator(String csid)
-	  throws DocumentNotFoundException, IllegalArgumentException,
-        IllegalStateException {
+	  throws DocumentNotFoundException, IllegalStateException {
 	
 		logger.debug("> in deleteIDGenerator");
 		
@@ -966,7 +992,7 @@ public class IDServiceJdbcImpl implements IDService {
 	
 	}
 		
-    //////////////////////////////////////////////////////////////////////
+   //////////////////////////////////////////////////////////////////////
    /**
 	* Identifies whether a specified table exists in the database.
 	*
@@ -1023,5 +1049,4 @@ public class IDServiceJdbcImpl implements IDService {
 	
 	}
 
-		
 }
