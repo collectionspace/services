@@ -55,12 +55,22 @@ public interface CollectionSpaceResource {
     public RepositoryClient getRepositoryClient(ServiceContext ctx);
 
     /**
-     * createServiceContext is a facotry method to create a service context
-     * a service contex is created on every service request call
+     * createServiceContext is a factory method to create a service context
+     * a service context is created on every service request call
+     * This form uses the serviceName as the default context
      * @param input
      * @return
      */
     public RemoteServiceContext createServiceContext(MultipartInput input) throws Exception;
+
+    /**
+     * createServiceContext is a factory method to create a service context
+     * a service context is created on every service request call
+     * @param input
+     * @param serviceName which service/repository context to use
+     * @return
+     */
+    public RemoteServiceContext createServiceContext(MultipartInput input, String serviceName) throws Exception;
 
     /**
      * createDocumentHandler creates a document handler and populates it with given

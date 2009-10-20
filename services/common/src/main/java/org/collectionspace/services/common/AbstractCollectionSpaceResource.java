@@ -61,7 +61,12 @@ public abstract class AbstractCollectionSpaceResource
 
     @Override
     public RemoteServiceContext createServiceContext(MultipartInput input) throws Exception {
-        RemoteServiceContext ctx = new RemoteServiceContextImpl(getServiceName());
+        return createServiceContext(input,getServiceName());
+    }
+
+    @Override
+    public RemoteServiceContext createServiceContext(MultipartInput input, String serviceName) throws Exception {
+        RemoteServiceContext ctx = new RemoteServiceContextImpl(serviceName);
         ctx.setInput(input);
         return ctx;
     }

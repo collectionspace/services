@@ -82,7 +82,15 @@ public abstract class AbstractServiceContext<T1, T2>
      */
     @Override
     public String getCommonPartLabel() {
-        return getServiceName().toLowerCase() + PART_LABEL_SEPERATOR + PART_COMMON_LABEL;
+        return getCommonPartLabel(getServiceName());
+    }
+
+    /**
+     * getCommonPartLabel get common part label
+     * @return
+     */
+    public String getCommonPartLabel(String schemaName) {
+        return schemaName.toLowerCase() + PART_LABEL_SEPERATOR + PART_COMMON_LABEL;
     }
 
     @Override

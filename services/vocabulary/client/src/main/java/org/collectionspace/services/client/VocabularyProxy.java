@@ -11,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.vocabulary.VocabulariesCommonList;
+import org.collectionspace.services.vocabulary.VocabularyitemsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -23,6 +24,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 @Consumes({"multipart/mixed"})
 public interface VocabularyProxy {
 
+    // List Vocabularies
     @GET
     @Produces({"application/xml"})
     ClientResponse<VocabulariesCommonList> readList();
@@ -45,4 +47,30 @@ public interface VocabularyProxy {
     @DELETE
     @Path("/{csid}")
     ClientResponse<Response> delete(@PathParam("csid") String csid);
+
+    // List Items
+    @GET
+    @Produces({"application/xml"})
+    @Path("/{vcsid}/items/")
+    ClientResponse<VocabularyitemsCommonList> readItemList(@PathParam("vcsid") String vcsid);
+
+    //(C)reate Item
+    @POST
+    @Path("/{vcsid}/items/")
+    ClientResponse<Response> createItem(@PathParam("vcsid") String vcsid, MultipartOutput multipart);
+
+    //(R)ead
+    @GET
+    @Path("/{vcsid}/items/{csid}")
+    ClientResponse<MultipartInput> readItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
+
+    //(U)pdate
+    @PUT
+    @Path("/{vcsid}/items/{csid}")
+    ClientResponse<MultipartInput> updateItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid, MultipartOutput multipart);
+
+    //(D)elete
+    @DELETE
+    @Path("/{vcsid}/items/{csid}")
+    ClientResponse<Response> deleteItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
 }

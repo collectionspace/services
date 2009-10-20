@@ -29,27 +29,27 @@ import org.collectionspace.services.common.repository.DocumentHandlerFactory;
 
 
 /**
- * VocabularyHandlerFactory creates handlers for vocabulary based
+ * VocabularyItemHandlerFactory creates handlers for vocabularyitem based
  * on type of Nuxeo client used
  *
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public class VocabularyHandlerFactory implements DocumentHandlerFactory {
+public class VocabularyItemHandlerFactory implements DocumentHandlerFactory {
 
-    private static final VocabularyHandlerFactory self = new VocabularyHandlerFactory();
+    private static final VocabularyItemHandlerFactory self = new VocabularyItemHandlerFactory();
 
-    private VocabularyHandlerFactory() {
+    private VocabularyItemHandlerFactory() {
     }
 
-    public static VocabularyHandlerFactory getInstance() {
+    public static VocabularyItemHandlerFactory getInstance() {
         return self;
     }
 
 		@Override
     public DocumentHandler getHandler(String clientType) {
         if(ClientType.JAVA.toString().equals(clientType)){
-            return new VocabularyDocumentModelHandler();
+            return new VocabularyItemDocumentModelHandler();
         } 
         throw new IllegalArgumentException("Not supported client=" + clientType);
     }

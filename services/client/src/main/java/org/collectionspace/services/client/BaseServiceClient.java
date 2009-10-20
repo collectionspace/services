@@ -44,7 +44,11 @@ public abstract class BaseServiceClient implements CollectionSpaceClient {
     private HttpClient httpClient;
 
 	public String getCommonPartName() {
-		return getServicePathComponent()
+		return getCommonPartName(getServicePathComponent());
+	}
+
+	public String getCommonPartName(String servicePathComponent) {
+		return servicePathComponent
 		+ ServiceContext.PART_LABEL_SEPERATOR
 		+ ServiceContext.PART_COMMON_LABEL;
 	}

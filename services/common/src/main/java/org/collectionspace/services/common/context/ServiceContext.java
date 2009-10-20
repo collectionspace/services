@@ -143,10 +143,17 @@ public interface ServiceContext<T1, T2> {
     public Map<String, ObjectPartType> getPartsMetadata();
 
     /**
-     * getCommonPartLabel retruns label for common part of a service 
+     * getCommonPartLabel returns label for common part of a service 
      * @return label
      */
     public String getCommonPartLabel();
+
+    /**
+     * getCommonPartLabel returns label for common part of a specified schema.
+     * This is useful for sub-resources. 
+     * @return label
+     */
+    public String getCommonPartLabel(String schemaName);
 }
 
 

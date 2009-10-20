@@ -53,7 +53,7 @@ public abstract class AbstractServiceTest implements ServiceTest {
 
     final Logger logger = LoggerFactory.getLogger(AbstractServiceTest.class);
     // A base-level client, used (only) to obtain the base service URL.
-    private static final TestServiceClient serviceClient = new TestServiceClient();
+    protected static final TestServiceClient serviceClient = new TestServiceClient();
     // A resource identifier believed to be non-existent in actual use,
     // used when testing service calls that reference non-existent resources.
     protected final String NON_EXISTENT_ID = createNonExistentIdentifier();
@@ -88,7 +88,11 @@ public abstract class AbstractServiceTest implements ServiceTest {
     }
 
     protected void setupCreate() {
-        clearSetup("Create");
+    	setupCreate("Create");
+    }
+    
+    protected void setupCreate(String label) {
+        clearSetup(label);
         // Expected status code: 201 Created
         EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
         // Type of service request being tested
@@ -104,7 +108,11 @@ public abstract class AbstractServiceTest implements ServiceTest {
     public abstract void createWithEmptyEntityBody();
 
     protected void setupCreateWithEmptyEntityBody() {
-        clearSetup("CreateWithEmptyEntityBody");
+    	setupCreateWithEmptyEntityBody("CreateWithEmptyEntityBody");
+    }
+    
+    protected void setupCreateWithEmptyEntityBody(String label) {
+        clearSetup(label);
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.CREATE;
     }
@@ -113,7 +121,11 @@ public abstract class AbstractServiceTest implements ServiceTest {
     public abstract void createWithMalformedXml();
 
     protected void setupCreateWithMalformedXml() {
-        clearSetup("CreateWithMalformedXml");
+    	setupCreateWithMalformedXml("CreateWithMalformedXml");
+    }
+    
+    protected void setupCreateWithMalformedXml(String label) {
+        clearSetup(label);
         // Expected status code: 400 Bad Request
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.CREATE;
@@ -123,7 +135,11 @@ public abstract class AbstractServiceTest implements ServiceTest {
     public abstract void createWithWrongXmlSchema();
 
     protected void setupCreateWithWrongXmlSchema() {
-        clearSetup("CreateWithWrongXmlSchema");
+    	setupCreateWithWrongXmlSchema("CreateWithWrongXmlSchema");
+    }
+    
+    protected void setupCreateWithWrongXmlSchema(String label) {
+        clearSetup(label);
         // Expected status code: 400 Bad Request
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.CREATE;
@@ -137,7 +153,11 @@ public abstract class AbstractServiceTest implements ServiceTest {
     public abstract void read();
 
     protected void setupRead() {
-        clearSetup("Read");
+    	setupRead("Read");
+    }
+    
+    protected void setupRead(String label) {
+        clearSetup(label);
         // Expected status code: 200 OK
         EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.READ;
@@ -148,7 +168,10 @@ public abstract class AbstractServiceTest implements ServiceTest {
     public abstract void readNonExistent();
 
     protected void setupReadNonExistent() {
-        clearSetup("ReadNonExistent");
+    	setupReadNonExistent("ReadNonExistent");
+    }
+    protected void setupReadNonExistent(String label) {
+        clearSetup(label);
         // Expected status code: 404 Not Found
         EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.READ;
@@ -162,7 +185,11 @@ public abstract class AbstractServiceTest implements ServiceTest {
     public abstract void readList();
 
     protected void setupReadList() {
-        clearSetup("ReadList");
+    	setupReadList("ReadList");
+    }
+    
+    protected void setupReadList(String label) {
+        clearSetup(label);
         // Expected status code: 200 OK
         EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.READ_LIST;
@@ -179,7 +206,11 @@ public abstract class AbstractServiceTest implements ServiceTest {
     public abstract void update();
 
     protected void setupUpdate() {
-        clearSetup("Update");
+    	setupUpdate("Update");
+    }
+    
+    protected void setupUpdate(String label) {
+        clearSetup(label);
         // Expected status code: 200 OK
         EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.UPDATE;
@@ -190,7 +221,11 @@ public abstract class AbstractServiceTest implements ServiceTest {
     public abstract void updateWithEmptyEntityBody();
 
     protected void setupUpdateWithEmptyEntityBody() {
-        clearSetup("UpdateWithEmptyEntityBody");
+    	setupUpdateWithEmptyEntityBody("UpdateWithEmptyEntityBody");
+    }
+    
+    protected void setupUpdateWithEmptyEntityBody(String label) {
+        clearSetup(label);
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.UPDATE;
     }
@@ -199,7 +234,11 @@ public abstract class AbstractServiceTest implements ServiceTest {
     public abstract void updateWithMalformedXml();
 
     protected void setupUpdateWithMalformedXml() {
-        clearSetup("UpdateWithMalformedXml");
+    	setupUpdateWithMalformedXml("UpdateWithMalformedXml");
+    }
+    
+    protected void setupUpdateWithMalformedXml(String label) {
+        clearSetup(label);
         // Expected status code: 400 Bad Request
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.UPDATE;
@@ -209,7 +248,11 @@ public abstract class AbstractServiceTest implements ServiceTest {
     public abstract void updateWithWrongXmlSchema();
 
     protected void setupUpdateWithWrongXmlSchema() {
-        clearSetup("UpdateWithWrongXmlSchema");
+    	setupUpdateWithWrongXmlSchema("UpdateWithWrongXmlSchema");
+    }
+    
+    protected void setupUpdateWithWrongXmlSchema(String label) {
+        clearSetup(label);
         // Expected status code: 400 Bad Request
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.UPDATE;
@@ -219,7 +262,11 @@ public abstract class AbstractServiceTest implements ServiceTest {
     public abstract void updateNonExistent();
 
     protected void setupUpdateNonExistent() {
-        clearSetup("UpdateNonExistent");
+    	setupUpdateNonExistent("UpdateNonExistent");
+    }
+    
+    protected void setupUpdateNonExistent(String label) {
+        clearSetup(label);
         // Expected status code: 404 Not Found
         EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.UPDATE;
@@ -233,7 +280,11 @@ public abstract class AbstractServiceTest implements ServiceTest {
     public abstract void delete();
 
     protected void setupDelete() {
-        clearSetup("Delete");
+    	setupDelete("Delete");
+    }
+    
+    protected void setupDelete(String label) {
+        clearSetup(label);
         // Expected status code: 200 OK
         EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.DELETE;
@@ -244,7 +295,11 @@ public abstract class AbstractServiceTest implements ServiceTest {
     public abstract void deleteNonExistent();
 
     protected void setupDeleteNonExistent() {
-        clearSetup("DeleteNonExistent");
+    	setupDeleteNonExistent("DeleteNonExistent");
+    }
+    
+    protected void setupDeleteNonExistent(String label) {
+        clearSetup(label);
         // Expected status code: 404 Not Found
         EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.DELETE;
