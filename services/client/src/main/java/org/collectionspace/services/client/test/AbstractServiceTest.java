@@ -33,7 +33,6 @@ import javax.xml.bind.Marshaller;
 
 import javax.xml.bind.Unmarshaller;
 import org.collectionspace.services.client.TestServiceClient;
-import org.collectionspace.services.common.context.ServiceContext;
 
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
@@ -51,16 +50,19 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractServiceTest implements ServiceTest {
 
-    final Logger logger = LoggerFactory.getLogger(AbstractServiceTest.class);
+    private final Logger logger =
+         LoggerFactory.getLogger(AbstractServiceTest.class);
     // A base-level client, used (only) to obtain the base service URL.
-    protected static final TestServiceClient serviceClient = new TestServiceClient();
+    protected static final TestServiceClient serviceClient =
+        new TestServiceClient();
     // A resource identifier believed to be non-existent in actual use,
     // used when testing service calls that reference non-existent resources.
     protected final String NON_EXISTENT_ID = createNonExistentIdentifier();
     // The HTTP status code expected to be returned in the response,
     // from a request made to a service (where relevant).
     int EXPECTED_STATUS_CODE = 0;
-    // The generic type of service request being tested (e.g. CREATE, UPDATE, DELETE).
+    // The generic type of service request being tested
+    // (e.g. CREATE, UPDATE, DELETE).
     //
     // This makes it possible to check behavior specific to that type of request,
     // such as the set of valid status codes that may be returned.
@@ -81,10 +83,10 @@ public abstract class AbstractServiceTest implements ServiceTest {
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
+
     // Success outcomes
     @Override
-    public void create() {
-        
+    public void create() throws Exception {
     }
 
     protected void setupCreate() {
@@ -92,217 +94,269 @@ public abstract class AbstractServiceTest implements ServiceTest {
     }
     
     protected void setupCreate(String label) {
-        clearSetup(label);
+        clearSetup();
         // Expected status code: 201 Created
         EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
         // Type of service request being tested
         REQUEST_TYPE = ServiceRequestType.CREATE;
+        // Print a banner identifying the test that will be run.
+        if (logger.isDebugEnabled()) {
+            printBanner(label);
+        }
     }
 
     @Override
-    public abstract void createList();
+    public abstract void createList() throws Exception;
 
     // No setup required for createList()
+
     // Failure outcomes
+
     @Override
-    public abstract void createWithEmptyEntityBody();
+    public abstract void createWithEmptyEntityBody()
+        throws Exception;
 
     protected void setupCreateWithEmptyEntityBody() {
     	setupCreateWithEmptyEntityBody("CreateWithEmptyEntityBody");
     }
     
     protected void setupCreateWithEmptyEntityBody(String label) {
-        clearSetup(label);
+        clearSetup();
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.CREATE;
-    }
+        if (logger.isDebugEnabled()) {
+            printBanner(label);
+        }
+   }
 
     @Override
-    public abstract void createWithMalformedXml();
+    public abstract void createWithMalformedXml() throws Exception;
 
     protected void setupCreateWithMalformedXml() {
     	setupCreateWithMalformedXml("CreateWithMalformedXml");
     }
     
     protected void setupCreateWithMalformedXml(String label) {
-        clearSetup(label);
+        clearSetup();
         // Expected status code: 400 Bad Request
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.CREATE;
+        if (logger.isDebugEnabled()) {
+            printBanner(label);
+        }
     }
 
     @Override
-    public abstract void createWithWrongXmlSchema();
+    public abstract void createWithWrongXmlSchema() throws Exception;
 
     protected void setupCreateWithWrongXmlSchema() {
     	setupCreateWithWrongXmlSchema("CreateWithWrongXmlSchema");
     }
     
     protected void setupCreateWithWrongXmlSchema(String label) {
-        clearSetup(label);
+        clearSetup();
         // Expected status code: 400 Bad Request
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.CREATE;
+        if (logger.isDebugEnabled()) {
+            printBanner(label);
+        }
     }
 
     // ---------------------------------------------------------------
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
+
     // Success outcomes
     @Override
-    public abstract void read();
+    public abstract void read() throws Exception;
 
     protected void setupRead() {
     	setupRead("Read");
     }
     
     protected void setupRead(String label) {
-        clearSetup(label);
+        clearSetup();
         // Expected status code: 200 OK
         EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.READ;
+        if (logger.isDebugEnabled()) {
+            printBanner(label);
+        }
     }
 
     // Failure outcomes
     @Override
-    public abstract void readNonExistent();
+    public abstract void readNonExistent() throws Exception;
 
     protected void setupReadNonExistent() {
     	setupReadNonExistent("ReadNonExistent");
     }
+
     protected void setupReadNonExistent(String label) {
-        clearSetup(label);
+        clearSetup();
         // Expected status code: 404 Not Found
         EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.READ;
+        if (logger.isDebugEnabled()) {
+            printBanner(label);
+        }
     }
 
     // ---------------------------------------------------------------
     // CRUD tests : READ (list, or multiple) tests
     // ---------------------------------------------------------------
+
     // Success outcomes
     @Override
-    public abstract void readList();
+    public abstract void readList() throws Exception;
 
     protected void setupReadList() {
     	setupReadList("ReadList");
     }
     
     protected void setupReadList(String label) {
-        clearSetup(label);
+        clearSetup();
         // Expected status code: 200 OK
         EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.READ_LIST;
+        if (logger.isDebugEnabled()) {
+            printBanner(label);
+        }
     }
 
     // Failure outcomes
     // None tested at present.
+
     // ---------------------------------------------------------------
     // CRUD tests : UPDATE tests
     // ---------------------------------------------------------------
+
     // Success outcomes
-    // ----------------
     @Override
-    public abstract void update();
+    public abstract void update() throws Exception;
 
     protected void setupUpdate() {
     	setupUpdate("Update");
     }
     
     protected void setupUpdate(String label) {
-        clearSetup(label);
+        clearSetup();
         // Expected status code: 200 OK
         EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.UPDATE;
+        if (logger.isDebugEnabled()) {
+            printBanner(label);
+        }
     }
 
     // Failure outcomes
     @Override
-    public abstract void updateWithEmptyEntityBody();
+    public abstract void updateWithEmptyEntityBody() throws Exception;
 
     protected void setupUpdateWithEmptyEntityBody() {
     	setupUpdateWithEmptyEntityBody("UpdateWithEmptyEntityBody");
     }
     
     protected void setupUpdateWithEmptyEntityBody(String label) {
-        clearSetup(label);
+        clearSetup();
+        // Expected status code: 400 Bad Request
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.UPDATE;
+        if (logger.isDebugEnabled()) {
+            printBanner(label);
+        }
     }
 
     @Override
-    public abstract void updateWithMalformedXml();
+    public abstract void updateWithMalformedXml() throws Exception;
 
     protected void setupUpdateWithMalformedXml() {
     	setupUpdateWithMalformedXml("UpdateWithMalformedXml");
     }
     
     protected void setupUpdateWithMalformedXml(String label) {
-        clearSetup(label);
+        clearSetup();
         // Expected status code: 400 Bad Request
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.UPDATE;
+        if (logger.isDebugEnabled()) {
+            printBanner(label);
+        }
     }
 
     @Override
-    public abstract void updateWithWrongXmlSchema();
+    public abstract void updateWithWrongXmlSchema() throws Exception;
 
     protected void setupUpdateWithWrongXmlSchema() {
     	setupUpdateWithWrongXmlSchema("UpdateWithWrongXmlSchema");
     }
     
     protected void setupUpdateWithWrongXmlSchema(String label) {
-        clearSetup(label);
+        clearSetup();
         // Expected status code: 400 Bad Request
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.UPDATE;
+        if (logger.isDebugEnabled()) {
+            printBanner(label);
+        }
     }
 
     @Override
-    public abstract void updateNonExistent();
+    public abstract void updateNonExistent() throws Exception;
 
     protected void setupUpdateNonExistent() {
     	setupUpdateNonExistent("UpdateNonExistent");
     }
     
     protected void setupUpdateNonExistent(String label) {
-        clearSetup(label);
+        clearSetup();
         // Expected status code: 404 Not Found
         EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.UPDATE;
+        if (logger.isDebugEnabled()) {
+            printBanner(label);
+        }
     }
 
     // ---------------------------------------------------------------
     // CRUD tests : DELETE tests
     // ---------------------------------------------------------------
+
     // Success outcomes
     @Override
-    public abstract void delete();
+    public abstract void delete() throws Exception;
 
     protected void setupDelete() {
     	setupDelete("Delete");
     }
     
     protected void setupDelete(String label) {
-        clearSetup(label);
+        clearSetup();
         // Expected status code: 200 OK
         EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.DELETE;
+        if (logger.isDebugEnabled()) {
+            printBanner(label);
+        }
     }
 
     // Failure outcomes
     @Override
-    public abstract void deleteNonExistent();
+    public abstract void deleteNonExistent() throws Exception;
 
     protected void setupDeleteNonExistent() {
     	setupDeleteNonExistent("DeleteNonExistent");
     }
     
     protected void setupDeleteNonExistent(String label) {
-        clearSetup(label);
+        clearSetup();
         // Expected status code: 404 Not Found
         EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.DELETE;
+        if (logger.isDebugEnabled()) {
+            printBanner(label);
+        }
     }
 
     // ---------------------------------------------------------------
@@ -326,12 +380,9 @@ public abstract class AbstractServiceTest implements ServiceTest {
      * Reinitializes setup values, to help expose any unintended reuse
      * of those values between tests.
      */
-    protected void clearSetup(String testName) {
+    protected void clearSetup() {
         EXPECTED_STATUS_CODE = 0;
         REQUEST_TYPE = ServiceRequestType.NON_EXISTENT;
-        logger.debug("========================================================");
-        logger.debug(" Test = " + testName);
-        logger.debug("========================================================");
     }
 
     /**
@@ -401,8 +452,8 @@ public abstract class AbstractServiceTest implements ServiceTest {
             }
         }catch(Exception e){
             logger.error(
-                    "Exception during HTTP " + method + " request to " + url + ":",
-                    e);
+                "Exception during HTTP " + method + " request to " +
+                url + ":", e);
         }
         return statusCode;
     }
@@ -439,8 +490,8 @@ public abstract class AbstractServiceTest implements ServiceTest {
             }
         }catch(Exception e){
             logger.error(
-                    "Exception during HTTP " + method + " request to " + url + ":",
-                    e);
+                "Exception during HTTP " + method + " request to " +
+                url + ":", e);
         }
         return statusCode;
     }
@@ -455,6 +506,55 @@ public abstract class AbstractServiceTest implements ServiceTest {
         verbose("id=" + id);
         return id;
     }
+
+     protected String createIdentifier() {
+        long identifier = System.currentTimeMillis();
+        return Long.toString(identifier);
+    }
+
+    protected String createNonExistentIdentifier() {
+        return Long.toString(Long.MAX_VALUE);
+    }
+
+    protected Object extractPart(MultipartInput input, String label,
+        Class clazz) throws Exception {
+        Object obj = null;
+        for(InputPart part : input.getParts()){
+            String partLabel = part.getHeaders().getFirst("label");
+            if(label.equalsIgnoreCase(partLabel)){
+                String partStr = part.getBodyAsString();
+                verbose("extracted part str=\n" + partStr);
+                obj = part.getBody(clazz, null);
+                verbose("extracted part obj=\n", obj, clazz);
+                break;
+            }
+        }
+        return obj;
+    }
+
+    protected Object getPartObject(String partStr, Class clazz)
+        throws JAXBException {
+        JAXBContext jc = JAXBContext.newInstance(clazz);
+        ByteArrayInputStream bais = null;
+        Object obj = null;
+        try{
+            bais = new ByteArrayInputStream(partStr.getBytes());
+            Unmarshaller um = jc.createUnmarshaller();
+            obj = um.unmarshal(bais);
+        }finally{
+            if(bais != null){
+                try{
+                    bais.close();
+                }catch(Exception e){
+                }
+            }
+        }
+        return obj;
+    }
+
+    // @TODO Some of the methods below may be candidates
+    // to be moved to a utilities module, suitable for use
+    // by both client-side and server-side code.
 
     protected void verbose(String msg) {
         if(logger.isDebugEnabled()){
@@ -482,47 +582,12 @@ public abstract class AbstractServiceTest implements ServiceTest {
         }
     }
 
-    protected String createIdentifier() {
-        long identifier = System.currentTimeMillis();
-        return Long.toString(identifier);
-    }
-
-    protected String createNonExistentIdentifier() {
-        return Long.toString(Long.MAX_VALUE);
-    }
-
-    protected Object extractPart(MultipartInput input, String label, Class clazz) throws Exception {
-        Object obj = null;
-        for(InputPart part : input.getParts()){
-            String partLabel = part.getHeaders().getFirst("label");
-            if(label.equalsIgnoreCase(partLabel)){
-                String partStr = part.getBodyAsString();
-                verbose("extracted part str=\n" + partStr);
-                obj = part.getBody(clazz, null);
-                verbose("extracted part obj=\n", obj, clazz);
-                break;
-            }
+    private void printBanner(String label) {
+        if(logger.isDebugEnabled()){
+            logger.debug("===================================================");
+            logger.debug(" Test = " + label);
+            logger.debug("===================================================");
         }
-        return obj;
-    }
-
-    protected Object getPartObject(String partStr, Class clazz) throws JAXBException {
-        JAXBContext jc = JAXBContext.newInstance(clazz);
-        ByteArrayInputStream bais = null;
-        Object obj = null;
-        try{
-            bais = new ByteArrayInputStream(partStr.getBytes());
-            Unmarshaller um = jc.createUnmarshaller();
-            obj = um.unmarshal(bais);
-        }finally{
-            if(bais != null){
-                try{
-                    bais.close();
-                }catch(Exception e){
-                }
-            }
-        }
-        return obj;
     }
 }
 

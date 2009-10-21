@@ -55,7 +55,7 @@ public interface ServiceTest {
      *
      * Relied upon by 'read', 'update' and 'delete' tests, below.
      */
-    public void create();
+    public void create() throws Exception;
 
     /**
      * Tests creation of a list of two or more new resources by repeatedly
@@ -63,7 +63,7 @@ public interface ServiceTest {
      *
      * Relied upon by 'read list' tests, below.
      */
-    public void createList();
+    public void createList() throws Exception;
 
     // Failure outcomes
 
@@ -71,20 +71,20 @@ public interface ServiceTest {
      * Tests creation of a resource by submitting
      * an empty entity body (aka empty payload).
      */
-    public void createWithEmptyEntityBody();
+    public void createWithEmptyEntityBody() throws Exception;
 
     /**
      * Tests creation of a resource by submitting
      * a representation with malformed XML data.
      */
-    public void createWithMalformedXml();
+    public void createWithMalformedXml() throws Exception;
 
     /**
      * Tests creation of a resource by submitting
      * a representation in the wrong XML schema
      * (e.g. not matching the object's schema).
      */
-    public void createWithWrongXmlSchema();
+    public void createWithWrongXmlSchema() throws Exception;
 
     // @TODO If feasible, implement a negative (failure)
     // test for creation of duplicate resources.
@@ -99,7 +99,7 @@ public interface ServiceTest {
     /**
      * Tests reading (i.e. retrieval) of a resource.
      */
-    public void read();
+    public void read() throws Exception;
 
     // Failure outcomes
 
@@ -108,7 +108,7 @@ public interface ServiceTest {
      * resource, whose resource identifier does not exist
      * at the specified URL.
      */
-    public void readNonExistent();
+    public void readNonExistent() throws Exception;
 
 
     // ---------------------------------------------------------------
@@ -121,7 +121,7 @@ public interface ServiceTest {
      * Tests reading (i.e. retrieval) of a list of
      * multiple resources.
      */
-    public void readList();
+    public void readList() throws Exception;
 
     // If feasible, implement a test for reading
     // an empty list returned by the service.
@@ -143,7 +143,7 @@ public interface ServiceTest {
     /**
      * Tests updating the content of a resource.
      */
-    public void update();
+    public void update() throws Exception;
 
     // Failure outcomes
 
@@ -151,27 +151,27 @@ public interface ServiceTest {
      * Tests updating the content of a resource
      * by submitting an empty entity body (aka empty payload).
      */
-    public void updateWithEmptyEntityBody();
+    public void updateWithEmptyEntityBody() throws Exception;
 
     /**
      * Tests updating the content of a resource
      * by submitting a representation with malformed
      * XML data.
      */
-    public void updateWithMalformedXml();
+    public void updateWithMalformedXml() throws Exception;
 
     /**
      * Tests updating the content of a resource
      * by submitting a representation in the wrong
      * XML schema (e.g. not matching the object's schema).
      */
-    public void updateWithWrongXmlSchema();
+    public void updateWithWrongXmlSchema() throws Exception;
 
     /**
      * Tests updating the content of a non-existent
      * resource, whose resource identifier does not exist.
      */
-    public void updateNonExistent();
+    public void updateNonExistent() throws Exception;
 
 
     // ---------------------------------------------------------------
@@ -183,7 +183,7 @@ public interface ServiceTest {
     /**
      * Tests deleting a resource.
      */
-    public void delete();
+    public void delete() throws Exception;
 
     // Failure outcomes
 
@@ -191,7 +191,7 @@ public interface ServiceTest {
      * Tests deleting a non-existent resource, whose resource
      * identifier does not exist at the specified URL.
      */
-    public void deleteNonExistent();
+    public void deleteNonExistent() throws Exception;
 
 }
 

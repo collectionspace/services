@@ -56,6 +56,7 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#getServicePathComponent()
 	 */
+    @Override
 	protected String getServicePathComponent() {
 		// no need to return anything but null since no auth resources are
 		// accessed
@@ -74,8 +75,7 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
 				collectionObjectClient.getCommonPartName(), identifier);
 
 		if (!collectionObjectClient.isServerSecure()) {
-			logger
-					.warn("set -Dcspace.server.secure=true to run security tests");
+			logger.warn("set -Dcspace.server.secure=true to run security tests");
 			return;
 		}
 		collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
@@ -92,7 +92,9 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
 			return;
 		}
 		ClientResponse<Response> res = collectionObjectClient.create(multipart);
-		verbose("create: status = " + res.getStatus());
+		if(logger.isDebugEnabled()){
+            logger.debug("create: status = " + res.getStatus());
+        }
 		Assert.assertEquals(res.getStatus(), Response.Status.CREATED
 				.getStatusCode(), "expected "
 				+ Response.Status.CREATED.getStatusCode());
@@ -103,7 +105,7 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
 	}
 
 	/**
-	 * Creates the without user.
+	 * Creates the collection object instance without user.
 	 */
 	@Test(dependsOnMethods = { "create" })
 	public void createWithoutUser() {
@@ -130,14 +132,16 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
 			return;
 		}
 		ClientResponse<Response> res = collectionObjectClient.create(multipart);
-		verbose("createWithoutUser: status = " + res.getStatus());
+		if(logger.isDebugEnabled()){
+            logger.debug("createWithoutUser: status = " + res.getStatus());
+        }
 		Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED
 				.getStatusCode(), "expected "
 				+ Response.Status.UNAUTHORIZED.getStatusCode());
 	}
 
 	/**
-	 * Creates the without password.
+	 * Creates the collection object instance without password.
 	 */
 	@Test(dependsOnMethods = { "createWithoutUser" })
 	public void createWithoutPassword() {
@@ -164,14 +168,16 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
 			return;
 		}
 		ClientResponse<Response> res = collectionObjectClient.create(multipart);
-		verbose("createWithoutPassword: status = " + res.getStatus());
+		if(logger.isDebugEnabled()){
+            logger.debug("createWithoutPassword: status = " + res.getStatus());
+        }
 		Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED
 				.getStatusCode(), "expected "
 				+ Response.Status.UNAUTHORIZED.getStatusCode());
 	}
 
 	/**
-	 * Creates the with incorrect password.
+	 * Creates the collection object instance with incorrect password.
 	 */
 	@Test(dependsOnMethods = { "createWithoutPassword" })
 	public void createWithIncorrectPassword() {
@@ -199,14 +205,16 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
 			return;
 		}
 		ClientResponse<Response> res = collectionObjectClient.create(multipart);
-		verbose("createWithIncorrectPassword: status = " + res.getStatus());
+		if(logger.isDebugEnabled()){
+            logger.debug("createWithIncorrectPassword: status = " + res.getStatus());
+        }
 		Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED
 				.getStatusCode(), "expected "
 				+ Response.Status.UNAUTHORIZED.getStatusCode());
 	}
 
 	/**
-	 * Creates the without user password.
+	 * Creates the collection object instance without user password.
 	 */
 	@Test(dependsOnMethods = { "createWithoutPassword" })
 	public void createWithoutUserPassword() {
@@ -232,14 +240,16 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
 			return;
 		}
 		ClientResponse<Response> res = collectionObjectClient.create(multipart);
-		verbose("createWithoutUserPassword: status = " + res.getStatus());
+		if(logger.isDebugEnabled()){
+            logger.debug("createWithoutUserPassword: status = " + res.getStatus());
+        }
 		Assert.assertEquals(res.getStatus(), Response.Status.FORBIDDEN
 				.getStatusCode(), "expected "
 				+ Response.Status.FORBIDDEN.getStatusCode());
 	}
 
 	/**
-	 * Creates the with incorrect user password.
+	 * Creates the collection object instance with incorrect user password.
 	 */
 	@Test(dependsOnMethods = { "createWithoutPassword" })
 	public void createWithIncorrectUserPassword() {
@@ -266,7 +276,10 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
 			return;
 		}
 		ClientResponse<Response> res = collectionObjectClient.create(multipart);
-		verbose("createWithIncorrectUserPassword: status = " + res.getStatus());
+		if(logger.isDebugEnabled()){
+            logger.debug("createWithIncorrectUserPassword: status = " +
+                res.getStatus());
+        }
 		Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED
 				.getStatusCode(), "expected "
 				+ Response.Status.UNAUTHORIZED.getStatusCode());
@@ -297,10 +310,14 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
 			logger.error("deleteCollectionObject: caught " + e.getMessage());
 			return;
 		}
-		verbose("Calling deleteCollectionObject:" + knownResourceId);
+		if(logger.isDebugEnabled()){
+            logger.debug("Calling deleteCollectionObject:" + knownResourceId);
+        }
 		ClientResponse<Response> res = collectionObjectClient
 				.delete(knownResourceId);
-		verbose("deleteCollectionObject: status = " + res.getStatus());
+		if(logger.isDebugEnabled()){
+            logger.debug("deleteCollectionObject: status = " + res.getStatus());
+        }
 		Assert.assertEquals(res.getStatus(),
 				Response.Status.OK.getStatusCode(), "expected "
 						+ Response.Status.OK.getStatusCode());
@@ -343,8 +360,10 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
 				MediaType.APPLICATION_XML_TYPE);
 		commonPart.getHeaders().add("label", commonPartName);
 
-		verbose("to be created, collectionobject common ", collectionObject,
-				CollectionobjectsCommon.class);
+		if(logger.isDebugEnabled()){
+            logger.debug("to be created, collectionobject common ",
+                collectionObject, CollectionobjectsCommon.class);
+        }
 		return multipart;
 	}
 
@@ -352,90 +371,90 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#createList()
 	 */
 	@Override
-	public void createList() {
+	public void createList() throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#createWithEmptyEntityBody()
 	 */
 	@Override
-	public void createWithEmptyEntityBody() {
+	public void createWithEmptyEntityBody() throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#createWithMalformedXml()
 	 */
 	@Override
-	public void createWithMalformedXml() {
+	public void createWithMalformedXml() throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#createWithWrongXmlSchema()
 	 */
 	@Override
-	public void createWithWrongXmlSchema() {
+	public void createWithWrongXmlSchema() throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#read()
 	 */
 	@Override
-	public void read() {
+	public void read() throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#readNonExistent()
 	 */
 	@Override
-	public void readNonExistent() {
+	public void readNonExistent() throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#readList()
 	 */
 	@Override
-	public void readList() {
+	public void readList() throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#update()
 	 */
 	@Override
-	public void update() {
+	public void update() throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#updateWithEmptyEntityBody()
 	 */
 	@Override
-	public void updateWithEmptyEntityBody() {
+	public void updateWithEmptyEntityBody() throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#updateWithMalformedXml()
 	 */
 	@Override
-	public void updateWithMalformedXml() {
+	public void updateWithMalformedXml() throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#updateWithWrongXmlSchema()
 	 */
 	@Override
-	public void updateWithWrongXmlSchema() {
+	public void updateWithWrongXmlSchema() throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#updateNonExistent()
 	 */
 	@Override
-	public void updateNonExistent() {
+	public void updateNonExistent() throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#deleteNonExistent()
 	 */
 	@Override
-	public void deleteNonExistent() {
+	public void deleteNonExistent() throws Exception {
 	}
 }

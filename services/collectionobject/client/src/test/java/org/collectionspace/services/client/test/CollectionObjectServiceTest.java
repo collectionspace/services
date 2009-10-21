@@ -39,6 +39,9 @@ import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * CollectionObjectServiceTest, carries out tests against a
  * deployed and running CollectionObject Service.
@@ -47,6 +50,9 @@ import org.testng.annotations.Test;
  * $LastChangedDate$
  */
 public class CollectionObjectServiceTest extends AbstractServiceTest {
+
+    private final Logger logger =
+        LoggerFactory.getLogger(CollectionObjectServiceTest.class);
 
     // Instance variables specific to this test.
     private CollectionObjectClient client = new CollectionObjectClient();
@@ -63,10 +69,11 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
+
     // Success outcomes
     @Override
     @Test
-    public void create() {
+    public void create() throws Exception {
 
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
@@ -87,7 +94,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         // Specifically:
         // Does it fall within the set of valid status codes?
         // Does it exactly match the expected status code?
-        verbose("create: status = " + statusCode);
+        if(logger.isDebugEnabled()){
+            logger.debug("create: status = " + statusCode);
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -95,28 +104,38 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         // Store the ID returned from this create operation
         // for additional tests below.
         knownResourceId = extractId(res);
-        verbose("create: knownResourceId=" + knownResourceId);
+        if(logger.isDebugEnabled()){
+            logger.debug("create: knownResourceId=" + knownResourceId);
+        }
     }
 
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.AbstractServiceTest#createList()
+	 */
     @Override
     @Test(dependsOnMethods = {"create"})
-    public void createList() {
+    public void createList() throws Exception {
         for(int i = 0; i < 3; i++){
             create();
         }
     }
 
     // Failure outcomes
+
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
-    public void createWithEmptyEntityBody() {}
-    public void createWithMalformedXml() {}
-    public void createWithWrongXmlSchema() {}
+    @Override
+    public void createWithEmptyEntityBody() throws Exception {}
+    @Override
+    public void createWithMalformedXml() throws Exception {}
+    @Override
+    public void createWithWrongXmlSchema() throws Exception {}
+
 
 /*
     @Override
     @Test(dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithEmptyEntityBody() {
+    public void createWithEmptyEntityBody() throwsException {
     
         // Perform setup.
         setupCreateWithEmptyEntityBody();
@@ -130,7 +149,10 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("createWithEmptyEntityBody url=" + url + " status=" + statusCode);
+        if(logger.isDebugEnabled()){
+            logger.debug("createWithEmptyEntityBody url=" + url +
+                " status=" + statusCode);
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -138,7 +160,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
     @Override
     @Test(dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithMalformedXml() {
+    public void createWithMalformedXml() throws Exception {
     
         // Perform setup.
         setupCreateWithMalformedXml();
@@ -152,7 +174,10 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("createWithMalformedXml url=" + url + " status=" + statusCode);
+        if(logger.isDebugEnabled()){
+            logger.debug("createWithMalformedXml url=" + url +
+                " status=" + statusCode);
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -160,7 +185,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
     @Override
     @Test(dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithWrongXmlSchema() {
+    public void createWithWrongXmlSchema() throws Exception {
     
         // Perform setup.
         setupCreateWithWrongXmlSchema();
@@ -174,7 +199,10 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("createWithWrongSchema url=" + url + " status=" + statusCode);
+        if(logger.isDebugEnabled()){
+            logger.debug("createWithWrongXmlSchema url=" + url +
+                " status=" + statusCode);
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -184,10 +212,11 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
+
     // Success outcomes
     @Override
     @Test(dependsOnMethods = {"create"})
-    public void read() {
+    public void read() throws Exception {
 
         // Perform setup.
         setupRead();
@@ -198,26 +227,25 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("read: status = " + statusCode);
+        if(logger.isDebugEnabled()){
+            logger.debug("read: status = " + statusCode);
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        //FIXME: remove the following try catch once Aron fixes signatures
-        try{
-            MultipartInput input = (MultipartInput) res.getEntity();
-            CollectionobjectsCommon collectionObject = (CollectionobjectsCommon) extractPart(input,
-                    client.getCommonPartName(), CollectionobjectsCommon.class);
-            Assert.assertNotNull(collectionObject);
-        }catch(Exception e){
-            throw new RuntimeException(e);
-        }
+        
+        MultipartInput input = (MultipartInput) res.getEntity();
+        CollectionobjectsCommon collectionObject =
+            (CollectionobjectsCommon) extractPart(input,
+            client.getCommonPartName(), CollectionobjectsCommon.class);
+        Assert.assertNotNull(collectionObject);
     }
     
     // Failure outcomes
 
     @Override
     @Test(dependsOnMethods = {"read"})
-    public void readNonExistent() {
+    public void readNonExistent() throws Exception {
 
         // Perform setup.
         setupReadNonExistent();
@@ -228,7 +256,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("readNonExistent: status = " + res.getStatus());
+        if(logger.isDebugEnabled()){
+            logger.debug("readNonExistent: status = " + res.getStatus());
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -240,7 +270,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // Success outcomes
     @Override
     @Test(dependsOnMethods = {"createList", "read"})
-    public void readList() {
+    public void readList() throws Exception {
         // Perform setup.
         setupReadList();
 
@@ -252,7 +282,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("readList: status = " + res.getStatus());
+        if(logger.isDebugEnabled()){
+            logger.debug("readList: status = " + res.getStatus());
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -265,13 +297,14 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
             int i = 0;
 
             for(CollectionobjectsCommonList.CollectionObjectListItem item : items){
-                verbose("readList: list-item[" + i + "] csid=" +
+                logger.debug("readList: list-item[" + i + "] csid=" +
                     item.getCsid());
-                verbose("readList: list-item[" + i + "] objectNumber=" +
+                logger.debug("readList: list-item[" + i + "] objectNumber=" +
                     item.getObjectNumber());
-                verbose("readList: list-item[" + i + "] URI=" +
+                logger.debug("readList: list-item[" + i + "] URI=" +
                     item.getUri());
                 i++;
+
             }
         }
     }
@@ -284,68 +317,78 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // Success outcomes
     @Override
     @Test(dependsOnMethods = {"read"})
-    public void update() {
+    public void update() throws Exception {
 
         // Perform setup.
         setupUpdate();
-        try{ //ideally, just remove try-catch and let the exception bubble up
-            // Retrieve an existing resource that we can update.
-            ClientResponse<MultipartInput> res =
-                    client.read(knownResourceId);
-            verbose("update: read status = " + res.getStatus());
-            Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
 
-            verbose("got object to update with ID: " + knownResourceId);
-            MultipartInput input = (MultipartInput) res.getEntity();
-            CollectionobjectsCommon collectionObject = (CollectionobjectsCommon) extractPart(input,
-            		client.getCommonPartName(), CollectionobjectsCommon.class);
-            Assert.assertNotNull(collectionObject);
-
-            // Update the content of this resource.
-            collectionObject.setObjectNumber("updated-" + collectionObject.getObjectNumber());
-            collectionObject.setObjectName("updated-" + collectionObject.getObjectName());
-            verbose("updated object", collectionObject, CollectionobjectsCommon.class);
-            // Submit the request to the service and store the response.
-            MultipartOutput output = new MultipartOutput();
-            OutputPart commonPart = output.addPart(collectionObject, MediaType.APPLICATION_XML_TYPE);
-            commonPart.getHeaders().add("label", client.getCommonPartName());
-
-            res = client.update(knownResourceId, output);
-            int statusCode = res.getStatus();
-            // Check the status code of the response: does it match the expected response(s)?
-            verbose("update: status = " + res.getStatus());
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-
-            input = (MultipartInput) res.getEntity();
-            CollectionobjectsCommon updatedCollectionObject =
-                    (CollectionobjectsCommon) extractPart(input,
-                    		client.getCommonPartName(), CollectionobjectsCommon.class);
-            Assert.assertNotNull(updatedCollectionObject);
-
-            Assert.assertEquals(updatedCollectionObject.getObjectName(),
-                    collectionObject.getObjectName(),
-                    "Data in updated object did not match submitted data.");
-        }catch(Exception e){
-            e.printStackTrace();
+        ClientResponse<MultipartInput> res =
+                client.read(knownResourceId);
+        if(logger.isDebugEnabled()){
+            logger.debug("update: read status = " + res.getStatus());
         }
+        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+
+        if(logger.isDebugEnabled()){
+            logger.debug("got object to update with ID: " + knownResourceId);
+        }
+        MultipartInput input = (MultipartInput) res.getEntity();
+        CollectionobjectsCommon collectionObject =
+            (CollectionobjectsCommon) extractPart(input,
+                client.getCommonPartName(), CollectionobjectsCommon.class);
+        Assert.assertNotNull(collectionObject);
+
+        // Update the content of this resource.
+        collectionObject.setObjectNumber("updated-" + collectionObject.getObjectNumber());
+        collectionObject.setObjectName("updated-" + collectionObject.getObjectName());
+        if(logger.isDebugEnabled()){
+            verbose("updated object", collectionObject,
+                CollectionobjectsCommon.class);
+        }
+        // Submit the request to the service and store the response.
+        MultipartOutput output = new MultipartOutput();
+        OutputPart commonPart = output.addPart(collectionObject, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", client.getCommonPartName());
+
+        res = client.update(knownResourceId, output);
+        int statusCode = res.getStatus();
+        // Check the status code of the response: does it match the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug("update: status = " + res.getStatus());
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+
+        input = (MultipartInput) res.getEntity();
+        CollectionobjectsCommon updatedCollectionObject =
+                (CollectionobjectsCommon) extractPart(input,
+                        client.getCommonPartName(), CollectionobjectsCommon.class);
+        Assert.assertNotNull(updatedCollectionObject);
+
+        Assert.assertEquals(updatedCollectionObject.getObjectName(),
+                collectionObject.getObjectName(),
+                "Data in updated object did not match submitted data.");
+
     }
     
     // Failure outcomes
 
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
-    public void updateWithEmptyEntityBody() {}
-    public void updateWithMalformedXml() {}
-    public void updateWithWrongXmlSchema() {}
+    @Override
+    public void updateWithEmptyEntityBody() throws Exception {}
+    @Override
+    public void updateWithMalformedXml() throws Exception {}
+    @Override
+    public void updateWithWrongXmlSchema() throws Exception {}
 
 /*
     @Override
 
     @Test(dependsOnMethods = {"create", "update", "testSubmitRequest"})
-    public void updateWithEmptyEntityBody() {
+    public void updateWithEmptyEntityBody() throws Exception {
     
         // Perform setup.
         setupUpdateWithEmptyEntityBody();
@@ -359,7 +402,10 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("updateWithEmptyEntityBody url=" + url + " status=" + statusCode);
+        if(logger.isDebugEnabled()){
+            logger.debug("updateWithEmptyEntityBody url=" + url +
+                " status=" + statusCode);
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -367,7 +413,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
     @Override
     @Test(dependsOnMethods = {"create", "update", "testSubmitRequest"})
-    public void updateWithMalformedXml() {
+    public void updateWithMalformedXml() throws Exception {
 
         // Perform setup.
         setupUpdateWithMalformedXml();
@@ -381,7 +427,10 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("updateWithMalformedXml: url=" + url + " status=" + statusCode);
+        if(logger.isDebugEnabled()){
+            logger.debug("updateWithMalformedXml: url=" + url +
+                " status=" + statusCode);
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -389,7 +438,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
     @Override
     @Test(dependsOnMethods = {"create", "update", "testSubmitRequest"})
-    public void updateWithWrongXmlSchema() {
+    public void updateWithWrongXmlSchema() throws Exception {
     
         // Perform setup.
         setupUpdateWithWrongXmlSchema();
@@ -403,7 +452,10 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("updateWithWrongSchema: url=" + url + " status=" + statusCode);
+        if(logger.isDebugEnabled()){
+            logger.debug("updateWithWrongXmlSchema: url=" + url +
+                " status=" + statusCode);
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -412,7 +464,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
     @Override
     @Test(dependsOnMethods = {"update", "testSubmitRequest"})
-    public void updateNonExistent() {
+    public void updateNonExistent() throws Exception {
 
         // Perform setup.
         setupUpdateNonExistent();
@@ -421,15 +473,19 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         // Note: The ID used in this 'create' call may be arbitrary.
 
         // The only relevant ID may be the one used in updateCollectionObject(), below.
-        MultipartOutput multipart = createCollectionObjectInstance(client.getCommonPartName(), NON_EXISTENT_ID);
+        MultipartOutput multipart =
+            createCollectionObjectInstance(client.getCommonPartName(),
+                NON_EXISTENT_ID);
         ClientResponse<MultipartInput> res =
-                client.update(NON_EXISTENT_ID, multipart);
+            client.update(NON_EXISTENT_ID, multipart);
 
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("updateNonExistent: status = " + res.getStatus());
+        if(logger.isDebugEnabled()){
+            logger.debug("updateNonExistent: status = " + res.getStatus());
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -441,7 +497,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // Success outcomes
     @Override
     @Test(dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
-    public void delete() {
+    public void delete() throws Exception {
 
         // Perform setup.
         setupDelete();
@@ -452,7 +508,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("delete: status = " + res.getStatus());
+        if(logger.isDebugEnabled()){
+            logger.debug("delete: status = " + res.getStatus());
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -461,7 +519,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // Failure outcomes
     @Override
     @Test(dependsOnMethods = {"delete"})
-    public void deleteNonExistent() {
+    public void deleteNonExistent() throws Exception {
 
         // Perform setup.
         setupDeleteNonExistent();
@@ -472,7 +530,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("deleteNonExistent: status = " + res.getStatus());
+        if(logger.isDebugEnabled()){
+            logger.debug("deleteNonExistent: status = " + res.getStatus());
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -486,10 +546,10 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
      * of the methods above.
      */
     @Test(dependsOnMethods = {"create", "read"})
-    public void testSubmitRequest() {
+    public void testSubmitRequest() throws Exception {
 
         // Expected status code: 200 OK
-        final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
+        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
 
         // Submit the request to the service and store the response.
         String method = ServiceRequestType.READ.httpMethodName();
@@ -498,8 +558,11 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("testSubmitRequest: url=" + url + " status=" + statusCode);
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        if(logger.isDebugEnabled()){
+            logger.debug("testSubmitRequest: url=" + url +
+                " status=" + statusCode);
+        }
+        Assert.assertEquals(statusCode, EXPECTED_STATUS);
 
     }		
 
@@ -507,21 +570,28 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // Utility methods used by tests above
     // ---------------------------------------------------------------
 
-    private MultipartOutput createCollectionObjectInstance(String commonPartName, String identifier) {
-        return createCollectionObjectInstance(commonPartName, "objectNumber-" + identifier,
-                "objectName-" + identifier);
+    private MultipartOutput createCollectionObjectInstance(String commonPartName,
+        String identifier) {
+        return createCollectionObjectInstance(commonPartName,
+            "objectNumber-" + identifier,
+            "objectName-" + identifier);
     }
 
-    private MultipartOutput createCollectionObjectInstance(String commonPartName, String objectNumber, String objectName) {
+    private MultipartOutput createCollectionObjectInstance(String commonPartName,
+        String objectNumber, String objectName) {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
 
         collectionObject.setObjectNumber(objectNumber);
         collectionObject.setObjectName(objectName);
         MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(collectionObject, MediaType.APPLICATION_XML_TYPE);
+        OutputPart commonPart = multipart.addPart(collectionObject,
+            MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", commonPartName);
 
-        verbose("to be created, collectionobject common ", collectionObject, CollectionobjectsCommon.class);
+        if(logger.isDebugEnabled()){
+            verbose("to be created, collectionobject common ",
+               collectionObject, CollectionobjectsCommon.class);
+        }
 
         CollectionObjectNaturalhistory conh = new CollectionObjectNaturalhistory();
         conh.setNhString("test-string");
@@ -530,7 +600,10 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         OutputPart nhPart = multipart.addPart(conh, MediaType.APPLICATION_XML_TYPE);
         nhPart.getHeaders().add("label", getNHPartName());
 
-        verbose("to be created, collectionobject nhistory", conh, CollectionObjectNaturalhistory.class);
+        if(logger.isDebugEnabled()){
+            verbose("to be created, collectionobject nhistory",
+                conh, CollectionObjectNaturalhistory.class);
+        }
         return multipart;
 
     }

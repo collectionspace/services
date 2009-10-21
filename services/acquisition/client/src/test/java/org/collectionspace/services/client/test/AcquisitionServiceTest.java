@@ -38,6 +38,9 @@ import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * AcquisitionServiceTest, carries out tests against a
  * deployed and running Acquisition Service.
@@ -46,6 +49,9 @@ import org.testng.annotations.Test;
  * $LastChangedDate: 2009-09-02 16:49:01 -0700 (Wed, 02 Sep 2009) $
  */
 public class AcquisitionServiceTest extends AbstractServiceTest {
+
+    private final Logger logger =
+        LoggerFactory.getLogger(AcquisitionServiceTest.class);
 
     // Instance variables specific to this test.
     private AcquisitionClient client = new AcquisitionClient();
@@ -57,7 +63,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
     // Success outcomes
     @Override
     @Test
-    public void create() {
+    public void create() throws Exception {
 
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
@@ -78,7 +84,9 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
         // Specifically:
         // Does it fall within the set of valid status codes?
         // Does it exactly match the expected status code?
-        verbose("create: status = " + statusCode);
+        if(logger.isDebugEnabled()){
+            logger.debug("create: status = " + statusCode);
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -86,12 +94,14 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
         // Store the ID returned from this create operation for
         // additional tests below.
         knownResourceId = extractId(res);
-        verbose("create: knownResourceId=" + knownResourceId);
+        if(logger.isDebugEnabled()){
+            logger.debug("create: knownResourceId=" + knownResourceId);
+        }
     }
 
     @Override
     @Test(dependsOnMethods = {"create"})
-    public void createList() {
+    public void createList() throws Exception {
         for(int i = 0; i < 3; i++){
             create();
         }
@@ -100,19 +110,22 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
-    public void createWithEmptyEntityBody() {
+    @Override
+    public void createWithEmptyEntityBody() throws Exception {
     }
 
-    public void createWithMalformedXml() {
+    @Override
+    public void createWithMalformedXml() throws Exception {
     }
 
-    public void createWithWrongXmlSchema() {
+    @Override
+    public void createWithWrongXmlSchema() throws Exception {
     }
 
     /*
     @Override
     @Test(dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithMalformedXml() {
+    public void createWithMalformedXml() throws Exception {
     
     // Perform setup.
     setupCreateWithMalformedXml();
@@ -125,7 +138,10 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
     // Check the status code of the response: does it match
     // the expected response(s)?
-    verbose("createWithMalformedXml url=" + url + " status=" + statusCode);
+    if(logger.isDebugEnabled()){
+        logger.debug("createWithMalformedXml url=" + url +
+            " status=" + statusCode);
+     }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -133,7 +149,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
     @Override
     @Test(dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithWrongXmlSchema() {
+    public void createWithWrongXmlSchema() throws Exception {
     
     // Perform setup.
     setupCreateWithWrongXmlSchema();
@@ -146,19 +162,23 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
     // Check the status code of the response: does it match
     // the expected response(s)?
-    verbose("createWithWrongSchema url=" + url + " status=" + statusCode);
+    if(logger.isDebugEnabled()){
+        logger.debug("createWithWrongXmlSchema url=" + url +
+            " status=" + statusCode);
+     }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
      */
+
     // ---------------------------------------------------------------
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
     @Test(dependsOnMethods = {"create"})
-    public void read() {
+    public void read() throws Exception {
 
         // Perform setup.
         setupRead();
@@ -169,25 +189,24 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("read: status = " + statusCode);
+        if(logger.isDebugEnabled()){
+            logger.debug("read: status = " + statusCode);
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        //FIXME: remove the following try catch once Aron fixes signatures
-        try{
-            MultipartInput input = (MultipartInput) res.getEntity();
-            AcquisitionsCommon acquistionObject = (AcquisitionsCommon) extractPart(input,
-            		client.getCommonPartName(), AcquisitionsCommon.class);
-            Assert.assertNotNull(acquistionObject);
-        }catch(Exception e){
-            throw new RuntimeException(e);
-        }
+
+        MultipartInput input = (MultipartInput) res.getEntity();
+        AcquisitionsCommon acquistionObject = (AcquisitionsCommon) extractPart(input,
+                client.getCommonPartName(), AcquisitionsCommon.class);
+        Assert.assertNotNull(acquistionObject);
+
     }
 
     // Failure outcomes
     @Override
     @Test(dependsOnMethods = {"read"})
-    public void readNonExistent() {
+    public void readNonExistent() throws Exception {
 
         // Perform setup.
         setupReadNonExistent();
@@ -198,7 +217,9 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("readNonExistent: status = " + res.getStatus());
+        if(logger.isDebugEnabled()){
+            logger.debug("readNonExistent: status = " + res.getStatus());
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -210,7 +231,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
     // Success outcomes
     @Override
     @Test(dependsOnMethods = {"createList", "read"})
-    public void readList() {
+    public void readList() throws Exception {
 
         // Perform setup.
         setupReadList();
@@ -222,7 +243,9 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("readList: status = " + res.getStatus());
+        if(logger.isDebugEnabled()){
+            logger.debug("readList: status = " + res.getStatus());
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -234,11 +257,11 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
                     list.getAcquisitionListItem();
             int i = 0;
             for(AcquisitionsCommonList.AcquisitionListItem item : items){
-                verbose("readList: list-item[" + i + "] csid=" +
+                logger.debug("readList: list-item[" + i + "] csid=" +
                         item.getCsid());
-                verbose("readList: list-item[" + i + "] objectNumber=" +
+                logger.debug("readList: list-item[" + i + "] objectNumber=" +
                         item.getAccessionDate());
-                verbose("readList: list-item[" + i + "] URI=" +
+                logger.debug("readList: list-item[" + i + "] URI=" +
                         item.getUri());
                 i++;
             }
@@ -248,76 +271,83 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
     // Failure outcomes
     // None at present.
+
     // ---------------------------------------------------------------
     // CRUD tests : UPDATE tests
     // ---------------------------------------------------------------
+
     // Success outcomes
     @Override
     @Test(dependsOnMethods = {"read"})
-    public void update() {
+    public void update() throws Exception {
 
         // Perform setup.
         setupUpdate();
-        try{ //ideally, just remove try-catch and let the exception bubble up
-            // Retrieve an existing resource that we can update.
-            ClientResponse<MultipartInput> res =
-                    client.read(knownResourceId);
-            verbose("update: read status = " + res.getStatus());
-            Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
 
-            verbose("got object to update with ID: " + knownResourceId);
-            MultipartInput input = (MultipartInput) res.getEntity();
-            AcquisitionsCommon acquisition = (AcquisitionsCommon) extractPart(input,
-            		client.getCommonPartName(), AcquisitionsCommon.class);
-            Assert.assertNotNull(acquisition);
-
-            // Update the content of this resource.
-            acquisition.setAccessionDate("updated-" + acquisition.getAccessionDate());
-            verbose("updated object", acquisition, AcquisitionsCommon.class);
-            // Submit the request to the service and store the response.
-            MultipartOutput output = new MultipartOutput();
-            OutputPart commonPart = output.addPart(acquisition, MediaType.APPLICATION_XML_TYPE);
-            commonPart.getHeaders().add("label", client.getCommonPartName());
-
-            res = client.update(knownResourceId, output);
-            int statusCode = res.getStatus();
-            // Check the status code of the response: does it match the expected response(s)?
-            verbose("update: status = " + res.getStatus());
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-
-            input = (MultipartInput) res.getEntity();
-            AcquisitionsCommon updatedAcquisition =
-                    (AcquisitionsCommon) extractPart(input,
-                    		client.getCommonPartName(), AcquisitionsCommon.class);
-            Assert.assertNotNull(updatedAcquisition);
-
-            Assert.assertEquals(updatedAcquisition.getAccessionDate(),
-                    acquisition.getAccessionDate(),
-                    "Data in updated object did not match submitted data.");
-        }catch(Exception e){
-            e.printStackTrace();
+        ClientResponse<MultipartInput> res =
+                client.read(knownResourceId);
+        if(logger.isDebugEnabled()){
+            logger.debug("update: read status = " + res.getStatus());
         }
+        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+
+        if(logger.isDebugEnabled()){
+            logger.debug("got object to update with ID: " + knownResourceId);
+        }
+        MultipartInput input = (MultipartInput) res.getEntity();
+        AcquisitionsCommon acquisition = (AcquisitionsCommon) extractPart(input,
+                client.getCommonPartName(), AcquisitionsCommon.class);
+        Assert.assertNotNull(acquisition);
+
+        // Update the content of this resource.
+        acquisition.setAccessionDate("updated-" + acquisition.getAccessionDate());
+        if(logger.isDebugEnabled()){
+            verbose("updated object", acquisition, AcquisitionsCommon.class);
+        }
+        // Submit the request to the service and store the response.
+        MultipartOutput output = new MultipartOutput();
+        OutputPart commonPart = output.addPart(acquisition, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", client.getCommonPartName());
+
+        res = client.update(knownResourceId, output);
+        int statusCode = res.getStatus();
+        // Check the status code of the response: does it match the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug("update: status = " + res.getStatus());
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+
+        input = (MultipartInput) res.getEntity();
+        AcquisitionsCommon updatedAcquisition =
+                (AcquisitionsCommon) extractPart(input,
+                        client.getCommonPartName(), AcquisitionsCommon.class);
+        Assert.assertNotNull(updatedAcquisition);
+
+        Assert.assertEquals(updatedAcquisition.getAccessionDate(),
+                acquisition.getAccessionDate(),
+                "Data in updated object did not match submitted data.");
+
     }
 
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
-    public void updateWithEmptyEntityBody() {
+    public void updateWithEmptyEntityBody() throws Exception {
     }
 
-    public void updateWithMalformedXml() {
+    public void updateWithMalformedXml() throws Exception {
     }
 
-    public void updateWithWrongXmlSchema() {
+    public void updateWithWrongXmlSchema() throws Exception {
     }
 
     /*
     @Override
     @Test(dependsOnMethods = {"create", "update", "testSubmitRequest"})
-    public void updateWithEmptyEntityBody() {
+    public void updateWithEmptyEntityBody() throws Exception {
     
     // Perform setup.
     setupUpdateWithEmptyEntityBody();
@@ -331,7 +361,9 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
     // Check the status code of the response: does it match
     // the expected response(s)?
-    verbose("updateWithEmptyEntityBody url=" + url + " status=" + statusCode);
+    if(logger.isDebugEnabled()){
+        ("updateWithEmptyEntityBody url=" + url + " status=" + statusCode);
+     }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -339,7 +371,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
     @Override
     @Test(dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithEmptyEntityBody() {
+    public void createWithEmptyEntityBody() throws Exception {
     
     // Perform setup.
     setupCreateWithEmptyEntityBody();
@@ -353,7 +385,10 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
     // Check the status code of the response: does it match
     // the expected response(s)?
-    verbose("createWithEmptyEntityBody url=" + url + " status=" + statusCode);
+    if(logger.isDebugEnabled()){
+        logger.debug("createWithEmptyEntityBody url=" + url +
+            " status=" + statusCode);
+     }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -361,7 +396,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
     @Override
     @Test(dependsOnMethods = {"create", "update", "testSubmitRequest"})
-    public void updateWithMalformedXml() {
+    public void updateWithMalformedXml() throws Exception {
 
     // Perform setup.
     setupUpdateWithMalformedXml();
@@ -374,7 +409,10 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
     // Check the status code of the response: does it match
     // the expected response(s)?
-    verbose("updateWithMalformedXml: url=" + url + " status=" + statusCode);
+    if(logger.isDebugEnabled()){
+        logger.debug("updateWithMalformedXml: url=" + url +
+            " status=" + statusCode);
+     }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -395,15 +433,19 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
     // Check the status code of the response: does it match
     // the expected response(s)?
-    verbose("updateWithWrongSchema: url=" + url + " status=" + statusCode);
+    if(logger.isDebugEnabled()){
+        logger.debug("updateWithWrongXmlSchema: url=" + url +
+            " status=" + statusCode);
+     }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
      */
+    
     @Override
     @Test(dependsOnMethods = {"update", "testSubmitRequest"})
-    public void updateNonExistent() {
+    public void updateNonExistent() throws Exception {
 
         // Perform setup.
         setupUpdateNonExistent();
@@ -418,7 +460,9 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("updateNonExistent: status = " + res.getStatus());
+        if(logger.isDebugEnabled()){
+            logger.debug("updateNonExistent: status = " + res.getStatus());
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -430,7 +474,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
     // Success outcomes
     @Override
     @Test(dependsOnMethods = {"create", "read", "update"})
-    public void delete() {
+    public void delete() throws Exception {
 
         // Perform setup.
         setupDelete();
@@ -441,7 +485,9 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("delete: status = " + res.getStatus());
+        if(logger.isDebugEnabled()){
+            logger.debug("delete: status = " + res.getStatus());
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -450,7 +496,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
     // Failure outcomes
     @Override
     @Test(dependsOnMethods = {"delete"})
-    public void deleteNonExistent() {
+    public void deleteNonExistent() throws Exception {
 
         // Perform setup.
         setupDeleteNonExistent();
@@ -461,7 +507,9 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("deleteNonExistent: status = " + res.getStatus());
+        if(logger.isDebugEnabled()){
+            logger.debug("deleteNonExistent: status = " + res.getStatus());
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -475,10 +523,10 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
      * of the methods above.
      */
     @Test(dependsOnMethods = {"create", "read"})
-    public void testSubmitRequest() {
+    public void testSubmitRequest() throws Exception {
 
         // Expected status code: 200 OK
-        final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
+        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
 
         // Submit the request to the service and store the response.
         String method = ServiceRequestType.READ.httpMethodName();
@@ -487,8 +535,11 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("testSubmitRequest: url=" + url + " status=" + statusCode);
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        if(logger.isDebugEnabled()){
+            logger.debug("testSubmitRequest: url=" + url +
+                " status=" + statusCode);
+        }
+        Assert.assertEquals(statusCode, EXPECTED_STATUS);
 
     }
 
@@ -505,10 +556,14 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
         AcquisitionsCommon acquisition = new AcquisitionsCommon();
         acquisition.setAccessionDate("accessionDate-"  + identifier);
         MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(acquisition, MediaType.APPLICATION_XML_TYPE);
+        OutputPart commonPart = multipart.addPart(acquisition,
+            MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getCommonPartName());
 
-        verbose("to be created, acquisition common ", acquisition, AcquisitionsCommon.class);
+        if(logger.isDebugEnabled()){
+            verbose("to be created, acquisition common ",
+                acquisition, AcquisitionsCommon.class);
+        }
         return multipart;
     }
 }

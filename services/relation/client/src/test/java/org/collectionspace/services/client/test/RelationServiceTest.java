@@ -39,6 +39,9 @@ import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * RelationServiceTest, carries out tests against a
  * deployed and running Relation Service.
@@ -47,6 +50,9 @@ import org.testng.annotations.Test;
  * $LastChangedDate$
  */
 public class RelationServiceTest extends AbstractServiceTest {
+
+   private final Logger logger =
+        LoggerFactory.getLogger(RelationServiceTest.class);
 
     private RelationClient client = new RelationClient();
     final String SERVICE_PATH_COMPONENT = "relations";
@@ -58,7 +64,7 @@ public class RelationServiceTest extends AbstractServiceTest {
     // Success outcomes
     @Override
     @Test
-    public void create() {
+    public void create() throws Exception {
 
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
@@ -76,7 +82,9 @@ public class RelationServiceTest extends AbstractServiceTest {
         //
         // Does it fall within the set of valid status codes?
         // Does it exactly match the expected status code?
-        verbose("create: status = " + statusCode);
+        if(logger.isDebugEnabled()){
+            logger.debug("create: status = " + statusCode);
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -84,12 +92,14 @@ public class RelationServiceTest extends AbstractServiceTest {
         // Store the ID returned from this create operation for
         // additional tests below.
         knownResourceId = extractId(res);
-        verbose("create: knownResourceId=" + knownResourceId);
+        if(logger.isDebugEnabled()){
+            logger.debug("create: knownResourceId=" + knownResourceId);
+        }
     }
 
     @Override
     @Test(dependsOnMethods = {"create"})
-    public void createList() {
+    public void createList() throws Exception {
         for(int i = 0; i < 3; i++){
             create();
         }
@@ -98,19 +108,19 @@ public class RelationServiceTest extends AbstractServiceTest {
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
-    public void createWithEmptyEntityBody() {
+    public void createWithEmptyEntityBody() throws Exception {
     }
 
-    public void createWithMalformedXml() {
+    public void createWithMalformedXml() throws Exception {
     }
 
-    public void createWithWrongXmlSchema() {
+    public void createWithWrongXmlSchema() throws Exception {
     }
 
     /*
     @Override
     @Test(dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithEmptyEntityBody() {
+    public void createWithEmptyEntityBody() throws Exception {
     
     // Perform setup.
     setupCreateWithEmptyEntityBody();
@@ -124,7 +134,10 @@ public class RelationServiceTest extends AbstractServiceTest {
 
     // Check the status code of the response: does it match
     // the expected response(s)?
-    verbose("createWithEmptyEntityBody url=" + url + " status=" + statusCode);
+    if(logger.isDebugEnabled()){
+        logger.debug("createWithEmptyEntityBody url=" + url +
+            " status=" + statusCode);
+     }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -132,7 +145,7 @@ public class RelationServiceTest extends AbstractServiceTest {
 
     @Override
     @Test(dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithMalformedXml() {
+    public void createWithMalformedXml() throws Exception {
     
     // Perform setup.
     setupCreateWithMalformedXml();
@@ -146,7 +159,10 @@ public class RelationServiceTest extends AbstractServiceTest {
 
     // Check the status code of the response: does it match
     // the expected response(s)?
-    verbose("createWithMalformedXml url=" + url + " status=" + statusCode);
+    if(logger.isDebugEnabled()){
+        logger.debug("createWithMalformedXml url=" + url +
+            " status=" + statusCode);
+     }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -154,7 +170,7 @@ public class RelationServiceTest extends AbstractServiceTest {
 
     @Override
     @Test(dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithWrongXmlSchema() {
+    public void createWithWrongXmlSchema()n throws Exception {
     
     // Perform setup.
     setupCreateWithWrongXmlSchema();
@@ -168,19 +184,23 @@ public class RelationServiceTest extends AbstractServiceTest {
 
     // Check the status code of the response: does it match
     // the expected response(s)?
-    verbose("createWithWrongSchema url=" + url + " status=" + statusCode);
+    if(logger.isDebugEnabled()){
+      logger.debug("createWithWrongSchema url=" + url +
+          " status=" + statusCode);
+     }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
      */
+
     // ---------------------------------------------------------------
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
     @Test(dependsOnMethods = {"create"})
-    public void read() {
+    public void read() throws Exception {
 
         // Perform setup.
         setupRead();
@@ -191,28 +211,25 @@ public class RelationServiceTest extends AbstractServiceTest {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("read: status = " + statusCode);
+        if(logger.isDebugEnabled()){
+            logger.debug("read: status = " + statusCode);
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        // Verify that the resource identifier 
-        //FIXME: remove the following try catch once Aron fixes signatures
-        try{
-            MultipartInput input = (MultipartInput) res.getEntity();
-            RelationsCommon relation = (RelationsCommon) extractPart(input,
-                    client.getCommonPartName(), RelationsCommon.class);
-            Assert.assertNotNull(relation);
-        } catch(Exception e){
-            throw new RuntimeException(e);
-        }
+        // Verify that the resource identifier ...
+        MultipartInput input = (MultipartInput) res.getEntity();
+        RelationsCommon relation = (RelationsCommon) extractPart(input,
+                client.getCommonPartName(), RelationsCommon.class);
+        Assert.assertNotNull(relation);
 
     }
 
     // Failure outcomes
     @Override
     @Test(dependsOnMethods = {"read"})
-    public void readNonExistent() {
+    public void readNonExistent() throws Exception {
 
         // Perform setup.
         setupReadNonExistent();
@@ -223,7 +240,9 @@ public class RelationServiceTest extends AbstractServiceTest {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("readNonExistent: status = " + res.getStatus());
+        if(logger.isDebugEnabled()){
+            logger.debug("readNonExistent: status = " + res.getStatus());
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -235,7 +254,7 @@ public class RelationServiceTest extends AbstractServiceTest {
     // Success outcomes
     @Override
     @Test(dependsOnMethods = {"createList", "read"})
-    public void readList() {
+    public void readList() throws Exception {
 
         // Perform setup.
         setupReadList();
@@ -247,7 +266,9 @@ public class RelationServiceTest extends AbstractServiceTest {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("readList: status = " + res.getStatus());
+        if(logger.isDebugEnabled()){
+            logger.debug("readList: status = " + res.getStatus());
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -259,9 +280,9 @@ public class RelationServiceTest extends AbstractServiceTest {
                     list.getRelationListItem();
             int i = 0;
             for(RelationsCommonList.RelationListItem item : items){
-                verbose("readList: list-item[" + i + "] csid=" +
+                logger.debug("readList: list-item[" + i + "] csid=" +
                         item.getCsid());
-                verbose("readList: list-item[" + i + "] URI=" +
+                logger.debug("readList: list-item[" + i + "] URI=" +
                         item.getUri());
                 i++;
             }
@@ -271,85 +292,92 @@ public class RelationServiceTest extends AbstractServiceTest {
 
     // Failure outcomes
     // None at present.
+
     // ---------------------------------------------------------------
     // CRUD tests : UPDATE tests
     // ---------------------------------------------------------------
+
     // Success outcomes
     @Override
     @Test(dependsOnMethods = {"read"})
-    public void update() {
+    public void update() throws Exception {
 
         // Perform setup.
         setupUpdate();
-        try{
-            // Retrieve an existing resource that we can update.
-            ClientResponse<MultipartInput> res =
-                    client.read(knownResourceId);
-            verbose("update: read status = " + res.getStatus());
-            Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-            verbose("Got object to update with ID: " + knownResourceId);
-            MultipartInput input = (MultipartInput) res.getEntity();
-            RelationsCommon relation = (RelationsCommon) extractPart(input,
-            		client.getCommonPartName(), RelationsCommon.class);
-            Assert.assertNotNull(relation);
 
-            // Update the content of this resource.
-            relation.setDocumentId1("updated-" + relation.getDocumentId1());
-            relation.setDocumentType1("updated-" + relation.getDocumentType1());
-            relation.setDocumentId2("updated-" + relation.getDocumentId2());
-            relation.setDocumentType2("updated-" + relation.getDocumentType2());
-            verbose("updated object", relation, RelationsCommon.class);
-
-            // Submit the request to the service and store the response.
-            MultipartOutput output = new MultipartOutput();
-            OutputPart commonPart = output.addPart(relation, MediaType.APPLICATION_XML_TYPE);
-            commonPart.getHeaders().add("label", client.getCommonPartName());
-            res = client.update(knownResourceId, output);
-            int statusCode = res.getStatus();
-            // Check the status code of the response: does it match the expected response(s)?
-            verbose("update: status = " + res.getStatus());
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-			input = (MultipartInput) res.getEntity();
-			RelationsCommon updatedObject = (RelationsCommon) extractPart(
-					input, client.getCommonPartName(),
-					RelationsCommon.class);
-			Assert.assertNotNull(updatedObject);
-
-            final String msg =
-                    "Data in updated object did not match submitted data.";
-            Assert.assertEquals(
-                    updatedObject.getDocumentId1(), relation.getDocumentId1(), msg);
-            Assert.assertEquals(
-                    updatedObject.getDocumentType1(), relation.getDocumentType1(), msg);
-            Assert.assertEquals(
-                    updatedObject.getDocumentId2(), relation.getDocumentId2(), msg);
-            Assert.assertEquals(
-                    updatedObject.getDocumentType2(), relation.getDocumentType2(), msg);
-        }catch(Exception e){
-            e.printStackTrace();
+        // Retrieve an existing resource that we can update.
+        ClientResponse<MultipartInput> res =
+                client.read(knownResourceId);
+        if(logger.isDebugEnabled()){
+            logger.debug("update: read status = " + res.getStatus());
         }
+        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+        if(logger.isDebugEnabled()){
+            logger.debug("Got object to update with ID: " + knownResourceId);
+        }
+        MultipartInput input = (MultipartInput) res.getEntity();
+        RelationsCommon relation = (RelationsCommon) extractPart(input,
+                client.getCommonPartName(), RelationsCommon.class);
+        Assert.assertNotNull(relation);
+
+        // Update the content of this resource.
+        relation.setDocumentId1("updated-" + relation.getDocumentId1());
+        relation.setDocumentType1("updated-" + relation.getDocumentType1());
+        relation.setDocumentId2("updated-" + relation.getDocumentId2());
+        relation.setDocumentType2("updated-" + relation.getDocumentType2());
+        if(logger.isDebugEnabled()){
+            verbose("updated object", relation, RelationsCommon.class);
+        }
+
+        // Submit the request to the service and store the response.
+        MultipartOutput output = new MultipartOutput();
+        OutputPart commonPart = output.addPart(relation, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", client.getCommonPartName());
+        res = client.update(knownResourceId, output);
+        int statusCode = res.getStatus();
+        // Check the status code of the response: does it match the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug("update: status = " + res.getStatus());
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        input = (MultipartInput) res.getEntity();
+        RelationsCommon updatedObject = (RelationsCommon) extractPart(
+                input, client.getCommonPartName(),
+                RelationsCommon.class);
+        Assert.assertNotNull(updatedObject);
+
+        final String msg =
+                "Data in updated object did not match submitted data.";
+        Assert.assertEquals(
+                updatedObject.getDocumentId1(), relation.getDocumentId1(), msg);
+        Assert.assertEquals(
+                updatedObject.getDocumentType1(), relation.getDocumentType1(), msg);
+        Assert.assertEquals(
+                updatedObject.getDocumentId2(), relation.getDocumentId2(), msg);
+        Assert.assertEquals(
+                updatedObject.getDocumentType2(), relation.getDocumentType2(), msg);
 
     }
 
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
-    public void updateWithEmptyEntityBody() {
+    public void updateWithEmptyEntityBody() throws Exception {
     }
 
-    public void updateWithMalformedXml() {
+    public void updateWithMalformedXml() throws Exception {
     }
 
-    public void updateWithWrongXmlSchema() {
+    public void updateWithWrongXmlSchema() throws Exception {
     }
 
     /*
     @Override
     @Test(dependsOnMethods = {"create", "update", "testSubmitRequest"})
-    public void updateWithEmptyEntityBody() {
+    public void updateWithEmptyEntityBody() throws Exception {
     
     // Perform setup.
     setupUpdateWithEmptyEntityBody();
@@ -363,7 +391,10 @@ public class RelationServiceTest extends AbstractServiceTest {
 
     // Check the status code of the response: does it match
     // the expected response(s)?
-    verbose("updateWithEmptyEntityBody url=" + url + " status=" + statusCode);
+    if(logger.isDebugEnabled()){
+       logger.debug("updateWithEmptyEntityBody url=" + url +
+           " status=" + statusCode);
+     }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -371,7 +402,7 @@ public class RelationServiceTest extends AbstractServiceTest {
 
     @Override
     @Test(dependsOnMethods = {"create", "update", "testSubmitRequest"})
-    public void updateWithMalformedXml() {
+    public void updateWithMalformedXml() throws Exception {
 
     // Perform setup.
     setupUpdateWithMalformedXml();
@@ -385,7 +416,10 @@ public class RelationServiceTest extends AbstractServiceTest {
 
     // Check the status code of the response: does it match
     // the expected response(s)?
-    verbose("updateWithMalformedXml: url=" + url + " status=" + statusCode);
+    if(logger.isDebugEnabled()){
+        logger.debug("updateWithMalformedXml: url=" + url +
+        " status=" + statusCode);
+     }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -393,7 +427,7 @@ public class RelationServiceTest extends AbstractServiceTest {
 
     @Override
     @Test(dependsOnMethods = {"create", "update", "testSubmitRequest"})
-    public void updateWithWrongXmlSchema() {
+    public void updateWithWrongXmlSchema() throws Exception {
     
     // Perform setup.
     setupUpdateWithWrongXmlSchema();
@@ -407,15 +441,19 @@ public class RelationServiceTest extends AbstractServiceTest {
 
     // Check the status code of the response: does it match
     // the expected response(s)?
-    verbose("updateWithWrongSchema: url=" + url + " status=" + statusCode);
+    if(logger.isDebugEnabled()){
+        logger.debug("updateWithWrongXmlSchema: url=" + url +
+        " status=" + statusCode);
+     }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
      */
+
     @Override
     @Test(dependsOnMethods = {"update", "testSubmitRequest"})
-    public void updateNonExistent() {
+    public void updateNonExistent() throws Exception {
 
         // Perform setup.
         setupUpdateNonExistent();
@@ -430,7 +468,9 @@ public class RelationServiceTest extends AbstractServiceTest {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("updateNonExistent: status = " + res.getStatus());
+        if(logger.isDebugEnabled()){
+            logger.debug("updateNonExistent: status = " + res.getStatus());
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -442,7 +482,7 @@ public class RelationServiceTest extends AbstractServiceTest {
     // Success outcomes
     @Override
     @Test(dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
-    public void delete() {
+    public void delete() throws Exception {
 
         // Perform setup.
         setupDelete();
@@ -453,7 +493,9 @@ public class RelationServiceTest extends AbstractServiceTest {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("delete: status = " + res.getStatus());
+        if(logger.isDebugEnabled()){
+            logger.debug("delete: status = " + res.getStatus());
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -462,7 +504,7 @@ public class RelationServiceTest extends AbstractServiceTest {
     // Failure outcomes
     @Override
     @Test(dependsOnMethods = {"delete"})
-    public void deleteNonExistent() {
+    public void deleteNonExistent() throws Exception {
 
         // Perform setup.
         setupDeleteNonExistent();
@@ -473,7 +515,9 @@ public class RelationServiceTest extends AbstractServiceTest {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("deleteNonExistent: status = " + res.getStatus());
+        if(logger.isDebugEnabled()){
+            logger.debug("deleteNonExistent: status = " + res.getStatus());
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -497,7 +541,7 @@ public class RelationServiceTest extends AbstractServiceTest {
     public void testSubmitRequest() {
 
         // Expected status code: 200 OK
-        final int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
+        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
 
         // Submit the request to the service and store the response.
         String method = ServiceRequestType.READ.httpMethodName();
@@ -506,8 +550,11 @@ public class RelationServiceTest extends AbstractServiceTest {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        verbose("testSubmitRequest: url=" + url + " status=" + statusCode);
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        if(logger.isDebugEnabled()){
+            logger.debug("testSubmitRequest: url=" + url +
+                " status=" + statusCode);
+        }
+        Assert.assertEquals(statusCode, EXPECTED_STATUS);
 
     }
 
@@ -524,10 +571,13 @@ public class RelationServiceTest extends AbstractServiceTest {
         fillRelation(relation, identifier);
 
         MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(relation, MediaType.APPLICATION_XML_TYPE);
+        OutputPart commonPart =
+                multipart.addPart(relation, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getCommonPartName());
-        verbose("to be created, relation common ", relation, RelationsCommon.class);
-
+        if(logger.isDebugEnabled()){
+          verbose("to be created, relation common ", relation,
+              RelationsCommon.class);
+        }
         return multipart;
     }
 
