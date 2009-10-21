@@ -79,8 +79,7 @@ public class RepositoryJavaClient implements RepositoryClient {
         if(nuxeoWspaceId == null){
             throw new DocumentNotFoundException(
                     "Unable to find workspace for service " + ctx.getServiceName() +
-                    " check if the mapping exists in service-config.xml or" +
-                    " the the mapped workspace exists in the Nuxeo repository");
+                    " check if the workspace exists in the Nuxeo repository");
         }
         RepositoryInstance repoSession = null;
         try{
@@ -191,8 +190,8 @@ public class RepositoryJavaClient implements RepositoryClient {
         if(nuxeoWspaceId == null){
             throw new DocumentNotFoundException(
                     "Unable to find workspace for service " + 
-                    ctx.getServiceName() + " check if the mapping exists in service-config.xml or " +
-                    " the the mapped workspace exists in the Nuxeo repository");
+                    ctx.getServiceName() + 
+                    " check if the workspace exists in the Nuxeo repository");
         }
         RepositoryInstance repoSession = null;
 
