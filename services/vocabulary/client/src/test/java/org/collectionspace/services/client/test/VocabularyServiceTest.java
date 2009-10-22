@@ -36,6 +36,8 @@ import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -48,6 +50,8 @@ import org.testng.annotations.Test;
  */
 public class VocabularyServiceTest extends AbstractServiceTest {
 
+    private final Logger logger =
+            LoggerFactory.getLogger(VocabularyServiceTest.class);
     // Instance variables specific to this test.
     private VocabularyClient client = new VocabularyClient();
     final String SERVICE_PATH_COMPONENT = "vocabularies";
@@ -92,7 +96,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
         knownResourceId = extractId(res);
         verbose("create: knownResourceId=" + knownResourceId);
     }
-    
+
     @Test(dependsOnMethods = {"create"})
     public void createItem() {
         setupCreate("Create Item");
@@ -100,7 +104,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
         knownItemResourceId = createItemInVocab(knownResourceId);
         verbose("createItem: knownItemResourceId=" + knownItemResourceId);
     }
-    
+
     private String createItemInVocab(String vcsid) {
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
@@ -128,11 +132,11 @@ public class VocabularyServiceTest extends AbstractServiceTest {
     @Override
     @Test(dependsOnMethods = {"create", "createItem"})
     public void createList() {
-        for(int i = 0; i < 3; i++){
+        for (int i = 0; i < 3; i++) {
             create();
             // Add 3 items to each vocab
-            for(int j = 0; j < 3; j++){
-            	createItem();
+            for (int j = 0; j < 3; j++) {
+                createItem();
             }
         }
     }
@@ -215,7 +219,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
-    */
+     */
     // ---------------------------------------------------------------
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
@@ -238,12 +242,12 @@ public class VocabularyServiceTest extends AbstractServiceTest {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         //FIXME: remove the following try catch once Aron fixes signatures
-        try{
+        try {
             MultipartInput input = (MultipartInput) res.getEntity();
             VocabulariesCommon vocabulary = (VocabulariesCommon) extractPart(input,
-            		client.getCommonPartName(), VocabulariesCommon.class);
+                    client.getCommonPartName(), VocabulariesCommon.class);
             Assert.assertNotNull(vocabulary);
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -265,12 +269,12 @@ public class VocabularyServiceTest extends AbstractServiceTest {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         //FIXME: remove the following try catch once Aron fixes signatures
-        try{
+        try {
             MultipartInput input = (MultipartInput) res.getEntity();
             VocabularyitemsCommon vocabularyItem = (VocabularyitemsCommon) extractPart(input,
-            		client.getItemCommonPartName(), VocabularyitemsCommon.class);
+                    client.getItemCommonPartName(), VocabularyitemsCommon.class);
             Assert.assertNotNull(vocabularyItem);
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -316,6 +320,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
     // CRUD tests : READ_LIST tests
     // ---------------------------------------------------------------
     // Success outcomes
+
     @Override
     @Test(dependsOnMethods = {"read"})
     public void readList() {
@@ -337,12 +342,12 @@ public class VocabularyServiceTest extends AbstractServiceTest {
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = false;
-        if(iterateThroughList && logger.isDebugEnabled()){
+        if (iterateThroughList && logger.isDebugEnabled()) {
             List<VocabulariesCommonList.VocabularyListItem> items =
                     list.getVocabularyListItem();
             int i = 0;
-            for(VocabulariesCommonList.VocabularyListItem item : items){
-            	String csid = item.getCsid();
+            for (VocabulariesCommonList.VocabularyListItem item : items) {
+                String csid = item.getCsid();
                 verbose("readList: list-item[" + i + "] csid=" +
                         csid);
                 verbose("readList: list-item[" + i + "] displayName=" +
@@ -354,10 +359,10 @@ public class VocabularyServiceTest extends AbstractServiceTest {
             }
         }
     }
-    
+
     @Test(dependsOnMethods = {"readItem"})
     public void readItemList() {
-    	readItemList(knownResourceId);
+        readItemList(knownResourceId);
     }
 
     private void readItemList(String vcsid) {
@@ -365,8 +370,8 @@ public class VocabularyServiceTest extends AbstractServiceTest {
         setupReadList("Read Item List");
 
         // Submit the request to the service and store the response.
-        ClientResponse<VocabularyitemsCommonList> res = 
-        	client.readItemList(vcsid);
+        ClientResponse<VocabularyitemsCommonList> res =
+                client.readItemList(vcsid);
         VocabularyitemsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
@@ -379,11 +384,11 @@ public class VocabularyServiceTest extends AbstractServiceTest {
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = false;
-        if(iterateThroughList && logger.isDebugEnabled()){
+        if (iterateThroughList && logger.isDebugEnabled()) {
             List<VocabularyitemsCommonList.VocabularyitemListItem> items =
                     list.getVocabularyitemListItem();
             int i = 0;
-            for(VocabularyitemsCommonList.VocabularyitemListItem item : items){
+            for (VocabularyitemsCommonList.VocabularyitemListItem item : items) {
                 verbose("  readItemList: list-item[" + i + "] csid=" +
                         item.getCsid());
                 verbose("  readItemList: list-item[" + i + "] displayName=" +
@@ -408,7 +413,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
         // Perform setup.
         setupUpdate();
 
-        try{ //ideally, just remove try-catch and let the exception bubble up
+        try { //ideally, just remove try-catch and let the exception bubble up
             // Retrieve an existing resource that we can update.
             ClientResponse<MultipartInput> res =
                     client.read(knownResourceId);
@@ -418,7 +423,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
             verbose("got Vocabulary to update with ID: " + knownResourceId);
             MultipartInput input = (MultipartInput) res.getEntity();
             VocabulariesCommon vocabulary = (VocabulariesCommon) extractPart(input,
-            		client.getCommonPartName(), VocabulariesCommon.class);
+                    client.getCommonPartName(), VocabulariesCommon.class);
             Assert.assertNotNull(vocabulary);
 
             // Update the content of this resource.
@@ -442,13 +447,13 @@ public class VocabularyServiceTest extends AbstractServiceTest {
             input = (MultipartInput) res.getEntity();
             VocabulariesCommon updatedVocabulary =
                     (VocabulariesCommon) extractPart(input,
-                    		client.getCommonPartName(), VocabulariesCommon.class);
+                    client.getCommonPartName(), VocabulariesCommon.class);
             Assert.assertNotNull(updatedVocabulary);
 
             Assert.assertEquals(updatedVocabulary.getDisplayName(),
                     vocabulary.getDisplayName(),
                     "Data in updated object did not match submitted data.");
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -459,18 +464,17 @@ public class VocabularyServiceTest extends AbstractServiceTest {
         // Perform setup.
         setupUpdate("Update Item");
 
-        try{ //ideally, just remove try-catch and let the exception bubble up
+        try { //ideally, just remove try-catch and let the exception bubble up
             // Retrieve an existing resource that we can update.
             ClientResponse<MultipartInput> res =
                     client.readItem(knownResourceId, knownItemResourceId);
             verbose("updateItem: read status = " + res.getStatus());
             Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
 
-            verbose("got VocabularyItem to update with ID: " + knownItemResourceId 
-            		+ " in Vocab: " + knownResourceId );
+            verbose("got VocabularyItem to update with ID: " + knownItemResourceId + " in Vocab: " + knownResourceId);
             MultipartInput input = (MultipartInput) res.getEntity();
             VocabularyitemsCommon vocabularyItem = (VocabularyitemsCommon) extractPart(input,
-            		client.getItemCommonPartName(), VocabularyitemsCommon.class);
+                    client.getItemCommonPartName(), VocabularyitemsCommon.class);
             Assert.assertNotNull(vocabularyItem);
 
             // Update the content of this resource.
@@ -493,13 +497,13 @@ public class VocabularyServiceTest extends AbstractServiceTest {
             input = (MultipartInput) res.getEntity();
             VocabularyitemsCommon updatedVocabularyItem =
                     (VocabularyitemsCommon) extractPart(input,
-                    		client.getItemCommonPartName(), VocabularyitemsCommon.class);
+                    client.getItemCommonPartName(), VocabularyitemsCommon.class);
             Assert.assertNotNull(updatedVocabularyItem);
 
             Assert.assertEquals(updatedVocabularyItem.getDisplayName(),
-            		vocabularyItem.getDisplayName(),
+                    vocabularyItem.getDisplayName(),
                     "Data in updated VocabularyItem did not match submitted data.");
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -583,7 +587,6 @@ public class VocabularyServiceTest extends AbstractServiceTest {
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
      */
-
     @Override
     @Test(dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent() {
@@ -611,7 +614,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
 
     @Test(dependsOnMethods = {"updateItem", "testItemSubmitRequest"})
     public void updateNonExistentItem() {
-    	
+
         // Perform setup.
         setupUpdateNonExistent("Update Non-Existent Item");
 
@@ -777,7 +780,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
      * @return The root URL for a service.
      */
     protected String getItemServiceRootURL(String parentResourceIdentifier) {
-        return getResourceURL(parentResourceIdentifier)+"/"+getItemServicePathComponent();
+        return getResourceURL(parentResourceIdentifier) + "/" + getItemServicePathComponent();
     }
 
     /**
@@ -812,9 +815,9 @@ public class VocabularyServiceTest extends AbstractServiceTest {
     }
 
     private MultipartOutput createVocabularyItemInstance(String inVocabulary, String displayName) {
-    	VocabularyitemsCommon vocabularyItem = new VocabularyitemsCommon();
-    	vocabularyItem.setInVocabulary(inVocabulary);
-    	vocabularyItem.setDisplayName(displayName);
+        VocabularyitemsCommon vocabularyItem = new VocabularyitemsCommon();
+        vocabularyItem.setInVocabulary(inVocabulary);
+        vocabularyItem.setDisplayName(displayName);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(vocabularyItem, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getItemCommonPartName());
