@@ -26,23 +26,14 @@ package org.collectionspace.services.client.test;
 /**
  * ServiceTest, interface specifying the client tests to be performed
  * to test an entity or relation service.
+ *
+ * The 'testName' parameter will receive the name of the currently
+ * running test by means of reflection, from a TestNG DataProvider.
+ *
+ * @see org.collectionspace.services.client.test.AbstractServiceTest#testName
  */
 public interface ServiceTest {
 
-
-    /**
-     * Returns the URL path component of the service.
-     *
-     * This component will follow directly after the
-     * base path, if any.
-     */
-//    public String getServicePathComponent();
-//
-//    /**
-//     * getCommonPartName get common part name for the service request
-//     * @return
-//     */
-//    public String getCommonPartName();
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
@@ -55,7 +46,7 @@ public interface ServiceTest {
      *
      * Relied upon by 'read', 'update' and 'delete' tests, below.
      */
-    public void create() throws Exception;
+    public void create(String testName) throws Exception;
 
     /**
      * Tests creation of a list of two or more new resources by repeatedly
@@ -63,7 +54,7 @@ public interface ServiceTest {
      *
      * Relied upon by 'read list' tests, below.
      */
-    public void createList() throws Exception;
+    public void createList(String testName) throws Exception;
 
     // Failure outcomes
 
@@ -71,20 +62,20 @@ public interface ServiceTest {
      * Tests creation of a resource by submitting
      * an empty entity body (aka empty payload).
      */
-    public void createWithEmptyEntityBody() throws Exception;
+    public void createWithEmptyEntityBody(String testName) throws Exception;
 
     /**
      * Tests creation of a resource by submitting
      * a representation with malformed XML data.
      */
-    public void createWithMalformedXml() throws Exception;
+    public void createWithMalformedXml(String testName) throws Exception;
 
     /**
      * Tests creation of a resource by submitting
      * a representation in the wrong XML schema
      * (e.g. not matching the object's schema).
      */
-    public void createWithWrongXmlSchema() throws Exception;
+    public void createWithWrongXmlSchema(String testName) throws Exception;
 
     // @TODO If feasible, implement a negative (failure)
     // test for creation of duplicate resources.
@@ -99,7 +90,7 @@ public interface ServiceTest {
     /**
      * Tests reading (i.e. retrieval) of a resource.
      */
-    public void read() throws Exception;
+    public void read(String testName) throws Exception;
 
     // Failure outcomes
 
@@ -108,7 +99,7 @@ public interface ServiceTest {
      * resource, whose resource identifier does not exist
      * at the specified URL.
      */
-    public void readNonExistent() throws Exception;
+    public void readNonExistent(String testName) throws Exception;
 
 
     // ---------------------------------------------------------------
@@ -121,7 +112,7 @@ public interface ServiceTest {
      * Tests reading (i.e. retrieval) of a list of
      * multiple resources.
      */
-    public void readList() throws Exception;
+    public void readList(String testName) throws Exception;
 
     // If feasible, implement a test for reading
     // an empty list returned by the service.
@@ -143,7 +134,7 @@ public interface ServiceTest {
     /**
      * Tests updating the content of a resource.
      */
-    public void update() throws Exception;
+    public void update(String testName) throws Exception;
 
     // Failure outcomes
 
@@ -151,27 +142,27 @@ public interface ServiceTest {
      * Tests updating the content of a resource
      * by submitting an empty entity body (aka empty payload).
      */
-    public void updateWithEmptyEntityBody() throws Exception;
+    public void updateWithEmptyEntityBody(String testName) throws Exception;
 
     /**
      * Tests updating the content of a resource
      * by submitting a representation with malformed
      * XML data.
      */
-    public void updateWithMalformedXml() throws Exception;
+    public void updateWithMalformedXml(String testName) throws Exception;
 
     /**
      * Tests updating the content of a resource
      * by submitting a representation in the wrong
      * XML schema (e.g. not matching the object's schema).
      */
-    public void updateWithWrongXmlSchema() throws Exception;
+    public void updateWithWrongXmlSchema(String testName) throws Exception;
 
     /**
      * Tests updating the content of a non-existent
      * resource, whose resource identifier does not exist.
      */
-    public void updateNonExistent() throws Exception;
+    public void updateNonExistent(String testName) throws Exception;
 
 
     // ---------------------------------------------------------------
@@ -183,7 +174,7 @@ public interface ServiceTest {
     /**
      * Tests deleting a resource.
      */
-    public void delete() throws Exception;
+    public void delete(String testName) throws Exception;
 
     // Failure outcomes
 
@@ -191,7 +182,7 @@ public interface ServiceTest {
      * Tests deleting a non-existent resource, whose resource
      * identifier does not exist at the specified URL.
      */
-    public void deleteNonExistent() throws Exception;
+    public void deleteNonExistent(String testName) throws Exception;
 
 }
 

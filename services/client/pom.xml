@@ -52,11 +52,12 @@
             <artifactId>resteasy-multipart-provider</artifactId>
             <version>1.0.2.GA</version>
         </dependency>
+        <!-- Set TestNG scope to default (compile), rather than test -->
+        <!-- to allow import(s) in AbstractServiceTest class -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>5.6</version>
-            <scope>test</scope>
         </dependency>
 
       <!-- javax -->

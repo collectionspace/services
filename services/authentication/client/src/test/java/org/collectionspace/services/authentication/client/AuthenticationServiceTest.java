@@ -66,9 +66,9 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#create()
 	 */
-	@Test
+	@Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class)
 	@Override
-	public void create() {
+	public void create(String testName) {
 		CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
 		String identifier = this.createIdentifier();
 		MultipartOutput multipart = createCollectionObjectInstance(
@@ -289,8 +289,9 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#delete()
 	 */
 	@Override
-	@Test(dependsOnMethods = { "createWithIncorrectUserPassword" })
-	public void delete() {
+	@Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+        dependsOnMethods = { "createWithIncorrectUserPassword" })
+	public void delete(String testName) {
 		CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
 		collectionObjectClient = new CollectionObjectClient();
 		if (!collectionObjectClient.isServerSecure()) {
@@ -371,90 +372,90 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#createList()
 	 */
 	@Override
-	public void createList() throws Exception {
+	public void createList(String testName) throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#createWithEmptyEntityBody()
 	 */
 	@Override
-	public void createWithEmptyEntityBody() throws Exception {
+	public void createWithEmptyEntityBody(String testName) throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#createWithMalformedXml()
 	 */
 	@Override
-	public void createWithMalformedXml() throws Exception {
+	public void createWithMalformedXml(String testName) throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#createWithWrongXmlSchema()
 	 */
 	@Override
-	public void createWithWrongXmlSchema() throws Exception {
+	public void createWithWrongXmlSchema(String testName) throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#read()
 	 */
 	@Override
-	public void read() throws Exception {
+	public void read(String testName) throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#readNonExistent()
 	 */
 	@Override
-	public void readNonExistent() throws Exception {
+	public void readNonExistent(String testName) throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#readList()
 	 */
 	@Override
-	public void readList() throws Exception {
+	public void readList(String testName) throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#update()
 	 */
 	@Override
-	public void update() throws Exception {
+	public void update(String testName) throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#updateWithEmptyEntityBody()
 	 */
 	@Override
-	public void updateWithEmptyEntityBody() throws Exception {
+	public void updateWithEmptyEntityBody(String testName) throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#updateWithMalformedXml()
 	 */
 	@Override
-	public void updateWithMalformedXml() throws Exception {
+	public void updateWithMalformedXml(String testName) throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#updateWithWrongXmlSchema()
 	 */
 	@Override
-	public void updateWithWrongXmlSchema() throws Exception {
+	public void updateWithWrongXmlSchema(String testName) throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#updateNonExistent()
 	 */
 	@Override
-	public void updateNonExistent() throws Exception {
+	public void updateNonExistent(String testName) throws Exception {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.test.AbstractServiceTest#deleteNonExistent()
 	 */
 	@Override
-	public void deleteNonExistent() throws Exception {
+	public void deleteNonExistent(String testName) throws Exception {
 	}
 }

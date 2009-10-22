@@ -63,13 +63,13 @@ public class IntakeServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test
-    public void create() throws Exception {
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class)
+    public void create(String testName) throws Exception {
 
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
-        setupCreate();
+        setupCreate(testName);
 
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
@@ -86,7 +86,7 @@ public class IntakeServiceTest extends AbstractServiceTest {
         // Does it fall within the set of valid status codes?
         // Does it exactly match the expected status code?
         if(logger.isDebugEnabled()){
-            logger.debug("create: status = " + statusCode);
+            logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -96,15 +96,16 @@ public class IntakeServiceTest extends AbstractServiceTest {
         // for additional tests below.
         knownResourceId = extractId(res);
         if(logger.isDebugEnabled()){
-            logger.debug("create: knownResourceId=" + knownResourceId);
+            logger.debug(testName + ": knownResourceId=" + knownResourceId);
         }
     }
 
     @Override
-    @Test(dependsOnMethods = {"create"})
-    public void createList() throws Exception {
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+        dependsOnMethods = {"create"})
+    public void createList(String testName) throws Exception {
         for(int i = 0; i < 3; i++){
-            create();
+            create(testName);
         }
     }
 
@@ -112,24 +113,25 @@ public class IntakeServiceTest extends AbstractServiceTest {
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
     @Override
-    public void createWithEmptyEntityBody() throws Exception {
+    public void createWithEmptyEntityBody(String testName) throws Exception {
     }
 
     @Override
-    public void createWithMalformedXml() throws Exception {
+    public void createWithMalformedXml(String testName) throws Exception {
     }
 
     @Override
-    public void createWithWrongXmlSchema() throws Exception {
+    public void createWithWrongXmlSchema(String testName) throws Exception {
     }
 
     /*
     @Override
-    @Test(dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithEmptyEntityBody() throws Exception {
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+        dependsOnMethods = {"create", "testSubmitRequest"})
+    public void createWithEmptyEntityBody(String testName) throws Exception {
 
     // Perform setup.
-    setupCreateWithEmptyEntityBody();
+    setupCreateWithEmptyEntityBody(testName);
 
     // Submit the request to the service and store the response.
     String method = REQUEST_TYPE.httpMethodName();
@@ -150,11 +152,12 @@ public class IntakeServiceTest extends AbstractServiceTest {
     }
 
     @Override
-    @Test(dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithMalformedXml() throws Exception {
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+        dependsOnMethods = {"create", "testSubmitRequest"})
+    public void createWithMalformedXml(String testName) throws Exception {
 
     // Perform setup.
-    setupCreateWithMalformedXml();
+    setupCreateWithMalformedXml(testName);
 
     // Submit the request to the service and store the response.
     String method = REQUEST_TYPE.httpMethodName();
@@ -166,7 +169,7 @@ public class IntakeServiceTest extends AbstractServiceTest {
     // Check the status code of the response: does it match
     // the expected response(s)?
     if(logger.isDebugEnabled()){
-        logger.debug("createWithMalformedXml url=" + url +
+        logger.debug(testName + ": url=" + url +
             " status=" + statusCode);
      }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -175,11 +178,12 @@ public class IntakeServiceTest extends AbstractServiceTest {
     }
 
     @Override
-    @Test(dependsOnMethods = {"create", "testSubmitRequest"})
-    public void createWithWrongXmlSchema() throws Exception {
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+        dependsOnMethods = {"create", "testSubmitRequest"})
+    public void createWithWrongXmlSchema(String testName) throws Exception {
 
     // Perform setup.
-    setupCreateWithWrongXmlSchema();
+    setupCreateWithWrongXmlSchema(testName);
 
     // Submit the request to the service and store the response.
     String method = REQUEST_TYPE.httpMethodName();
@@ -191,7 +195,7 @@ public class IntakeServiceTest extends AbstractServiceTest {
     // Check the status code of the response: does it match
     // the expected response(s)?
     if(logger.isDebugEnabled()){
-        logger.debug("createWithWrongSchema url=" + url +
+        logger.debug(testName + ": url=" + url +
             " status=" + statusCode);
      }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -205,11 +209,12 @@ public class IntakeServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dependsOnMethods = {"create"})
-    public void read() throws Exception {
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+        dependsOnMethods = {"create"})
+    public void read(String testName) throws Exception {
 
         // Perform setup.
-        setupRead();
+        setupRead(testName);
 
         // Submit the request to the service and store the response.
         ClientResponse<MultipartInput> res = client.read(knownResourceId);
@@ -218,7 +223,7 @@ public class IntakeServiceTest extends AbstractServiceTest {
         // Check the status code of the response: does it match
         // the expected response(s)?
         if(logger.isDebugEnabled()){
-            logger.debug("read: status = " + statusCode);
+            logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -232,11 +237,12 @@ public class IntakeServiceTest extends AbstractServiceTest {
 
     // Failure outcomes
     @Override
-    @Test(dependsOnMethods = {"read"})
-    public void readNonExistent() throws Exception {
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+        dependsOnMethods = {"read"})
+    public void readNonExistent(String testName) throws Exception {
 
         // Perform setup.
-        setupReadNonExistent();
+        setupReadNonExistent(testName);
 
         // Submit the request to the service and store the response.
         ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
@@ -245,7 +251,7 @@ public class IntakeServiceTest extends AbstractServiceTest {
         // Check the status code of the response: does it match
         // the expected response(s)?
         if(logger.isDebugEnabled()){
-            logger.debug("readNonExistent: status = " + res.getStatus());
+            logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -257,11 +263,12 @@ public class IntakeServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dependsOnMethods = {"read"})
-    public void readList() throws Exception {
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+        dependsOnMethods = {"read"})
+    public void readList(String testName) throws Exception {
 
         // Perform setup.
-        setupReadList();
+        setupReadList(testName);
 
         // Submit the request to the service and store the response.
         ClientResponse<IntakesCommonList> res = client.readList();
@@ -271,7 +278,7 @@ public class IntakeServiceTest extends AbstractServiceTest {
         // Check the status code of the response: does it match
         // the expected response(s)?
         if(logger.isDebugEnabled()){
-            logger.debug("readList: status = " + res.getStatus());
+            logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -284,11 +291,11 @@ public class IntakeServiceTest extends AbstractServiceTest {
                     list.getIntakeListItem();
             int i = 0;
             for(IntakesCommonList.IntakeListItem item : items){
-                logger.debug("readList: list-item[" + i + "] csid=" +
+                logger.debug(testName + ": list-item[" + i + "] csid=" +
                         item.getCsid());
-                logger.debug("readList: list-item[" + i + "] objectNumber=" +
+                logger.debug(testName + ": list-item[" + i + "] objectNumber=" +
                         item.getEntryNumber());
-                logger.debug("readList: list-item[" + i + "] URI=" +
+                logger.debug(testName + ": list-item[" + i + "] URI=" +
                         item.getUri());
                 i++;
             }
@@ -303,16 +310,17 @@ public class IntakeServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dependsOnMethods = {"read"})
-    public void update() throws Exception {
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+        dependsOnMethods = {"read"})
+    public void update(String testName) throws Exception {
 
         // Perform setup.
-        setupUpdate();
+        setupUpdate(testName);
 
         ClientResponse<MultipartInput> res =
                 client.read(knownResourceId);
         if(logger.isDebugEnabled()){
-            logger.debug("update: read status = " + res.getStatus());
+            logger.debug(testName + ": read status = " + res.getStatus());
         }
         Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
 
@@ -340,7 +348,7 @@ public class IntakeServiceTest extends AbstractServiceTest {
         int statusCode = res.getStatus();
         // Check the status code of the response: does it match the expected response(s)?
         if(logger.isDebugEnabled()){
-            logger.debug("update: status = " + res.getStatus());
+            logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -363,22 +371,23 @@ public class IntakeServiceTest extends AbstractServiceTest {
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
     @Override
-    public void updateWithEmptyEntityBody() throws Exception{
+    public void updateWithEmptyEntityBody(String testName) throws Exception{
     }
     @Override
-    public void updateWithMalformedXml() throws Exception {
+    public void updateWithMalformedXml(String testName) throws Exception {
     }
     @Override
-    public void updateWithWrongXmlSchema() throws Exception {
+    public void updateWithWrongXmlSchema(String testName) throws Exception {
     }
 
     /*
     @Override
-    @Test(dependsOnMethods = {"create", "update", "testSubmitRequest"})
-    public void updateWithEmptyEntityBody() throws Exception {
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+        dependsOnMethods = {"create", "update", "testSubmitRequest"})
+    public void updateWithEmptyEntityBody(String testName) throws Exception {
 
     // Perform setup.
-    setupUpdateWithEmptyEntityBody();
+    setupUpdateWithEmptyEntityBody(testName);
 
     // Submit the request to the service and store the response.
     String method = REQUEST_TYPE.httpMethodName();
@@ -390,7 +399,7 @@ public class IntakeServiceTest extends AbstractServiceTest {
     // Check the status code of the response: does it match
     // the expected response(s)?
     if(logger.isDebugEnabled()){
-        logger.debug("updateWithEmptyEntityBody url=" + url +
+        logger.debug(testName + ": url=" + url +
             " status=" + statusCode);
      }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -399,11 +408,12 @@ public class IntakeServiceTest extends AbstractServiceTest {
     }
 
     @Override
-    @Test(dependsOnMethods = {"create", "update", "testSubmitRequest"})
-    public void updateWithMalformedXml() throws Exception {
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+        dependsOnMethods = {"create", "update", "testSubmitRequest"})
+    public void updateWithMalformedXml(String testName) throws Exception {
 
     // Perform setup.
-    setupUpdateWithMalformedXml();
+    setupUpdateWithMalformedXml(testName);
 
     // Submit the request to the service and store the response.
     String method = REQUEST_TYPE.httpMethodName();
@@ -415,7 +425,7 @@ public class IntakeServiceTest extends AbstractServiceTest {
     // Check the status code of the response: does it match
     // the expected response(s)?
     if(logger.isDebugEnabled()){
-        logger.debug("updateWithMalformedXml: url=" + url +
+        logger.debug(testName + ": url=" + url +
          " status=" + statusCode);
      }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -424,11 +434,12 @@ public class IntakeServiceTest extends AbstractServiceTest {
     }
 
     @Override
-    @Test(dependsOnMethods = {"create", "update", "testSubmitRequest"})
-    public void updateWithWrongXmlSchema() throws Exception {
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+        dependsOnMethods = {"create", "update", "testSubmitRequest"})
+    public void updateWithWrongXmlSchema(String testName) throws Exception {
 
     // Perform setup.
-    setupUpdateWithWrongXmlSchema();
+    setupUpdateWithWrongXmlSchema(testName);
 
     // Submit the request to the service and store the response.
     String method = REQUEST_TYPE.httpMethodName();
@@ -440,7 +451,7 @@ public class IntakeServiceTest extends AbstractServiceTest {
     // Check the status code of the response: does it match
     // the expected response(s)?
     if(logger.isDebugEnabled()){
-        logger.debug("updateWithWrongXmlSchema: url=" + url +
+        logger.debug(testName + ": url=" + url +
         " status=" + statusCode);
      }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -450,11 +461,12 @@ public class IntakeServiceTest extends AbstractServiceTest {
      */
 
     @Override
-    @Test(dependsOnMethods = {"update", "testSubmitRequest"})
-    public void updateNonExistent() throws Exception {
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+        dependsOnMethods = {"update", "testSubmitRequest"})
+    public void updateNonExistent(String testName) throws Exception {
 
         // Perform setup.
-        setupUpdateNonExistent();
+        setupUpdateNonExistent(testName);
 
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
@@ -469,7 +481,7 @@ public class IntakeServiceTest extends AbstractServiceTest {
         // Check the status code of the response: does it match
         // the expected response(s)?
         if(logger.isDebugEnabled()){
-            logger.debug("updateNonExistent: status = " + res.getStatus());
+            logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -481,11 +493,12 @@ public class IntakeServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
-    public void delete() throws Exception {
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+        dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
+    public void delete(String testName) throws Exception {
 
         // Perform setup.
-        setupDelete();
+        setupDelete(testName);
 
         // Submit the request to the service and store the response.
         ClientResponse<Response> res = client.delete(knownResourceId);
@@ -494,7 +507,7 @@ public class IntakeServiceTest extends AbstractServiceTest {
         // Check the status code of the response: does it match
         // the expected response(s)?
         if(logger.isDebugEnabled()){
-            logger.debug("delete: status = " + res.getStatus());
+            logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -503,11 +516,12 @@ public class IntakeServiceTest extends AbstractServiceTest {
 
     // Failure outcomes
     @Override
-    @Test(dependsOnMethods = {"delete"})
-    public void deleteNonExistent() throws Exception {
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+        dependsOnMethods = {"delete"})
+    public void deleteNonExistent(String testName) throws Exception {
 
         // Perform setup.
-        setupDeleteNonExistent();
+        setupDeleteNonExistent(testName);
 
         // Submit the request to the service and store the response.
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
@@ -516,7 +530,7 @@ public class IntakeServiceTest extends AbstractServiceTest {
         // Check the status code of the response: does it match
         // the expected response(s)?
         if(logger.isDebugEnabled()){
-            logger.debug("deleteNonExistent: status = " + res.getStatus());
+            logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));

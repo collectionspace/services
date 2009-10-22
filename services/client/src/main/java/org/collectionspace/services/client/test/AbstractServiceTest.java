@@ -24,6 +24,7 @@
 package org.collectionspace.services.client.test;
 
 import java.io.ByteArrayInputStream;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -39,6 +40,9 @@ import org.jboss.resteasy.client.ClientResponse;
 
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+
+import org.testng.annotations.DataProvider;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,13 +84,14 @@ public abstract class AbstractServiceTest implements ServiceTest {
             XML_DECLARATION +
             "<wrong_schema>wrong schema contents</wrong_schema>";
 
+
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
 
     // Success outcomes
     @Override
-    public void create() throws Exception {
+    public void create(String testName) throws Exception {
     }
 
     protected void setupCreate() {
@@ -101,19 +106,19 @@ public abstract class AbstractServiceTest implements ServiceTest {
         REQUEST_TYPE = ServiceRequestType.CREATE;
         // Print a banner identifying the test that will be run.
         if (logger.isDebugEnabled()) {
-            printBanner(label);
+            banner(label);
         }
     }
 
     @Override
-    public abstract void createList() throws Exception;
+    public abstract void createList(String testName) throws Exception;
 
     // No setup required for createList()
 
     // Failure outcomes
 
     @Override
-    public abstract void createWithEmptyEntityBody()
+    public abstract void createWithEmptyEntityBody(String testName)
         throws Exception;
 
     protected void setupCreateWithEmptyEntityBody() {
@@ -125,12 +130,12 @@ public abstract class AbstractServiceTest implements ServiceTest {
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.CREATE;
         if (logger.isDebugEnabled()) {
-            printBanner(label);
+            banner(label);
         }
    }
 
     @Override
-    public abstract void createWithMalformedXml() throws Exception;
+    public abstract void createWithMalformedXml(String testName) throws Exception;
 
     protected void setupCreateWithMalformedXml() {
     	setupCreateWithMalformedXml("CreateWithMalformedXml");
@@ -142,12 +147,12 @@ public abstract class AbstractServiceTest implements ServiceTest {
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.CREATE;
         if (logger.isDebugEnabled()) {
-            printBanner(label);
+            banner(label);
         }
     }
 
     @Override
-    public abstract void createWithWrongXmlSchema() throws Exception;
+    public abstract void createWithWrongXmlSchema(String testName) throws Exception;
 
     protected void setupCreateWithWrongXmlSchema() {
     	setupCreateWithWrongXmlSchema("CreateWithWrongXmlSchema");
@@ -159,7 +164,7 @@ public abstract class AbstractServiceTest implements ServiceTest {
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.CREATE;
         if (logger.isDebugEnabled()) {
-            printBanner(label);
+            banner(label);
         }
     }
 
@@ -169,7 +174,7 @@ public abstract class AbstractServiceTest implements ServiceTest {
 
     // Success outcomes
     @Override
-    public abstract void read() throws Exception;
+    public abstract void read(String testName) throws Exception;
 
     protected void setupRead() {
     	setupRead("Read");
@@ -181,13 +186,13 @@ public abstract class AbstractServiceTest implements ServiceTest {
         EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.READ;
         if (logger.isDebugEnabled()) {
-            printBanner(label);
+            banner(label);
         }
     }
 
     // Failure outcomes
     @Override
-    public abstract void readNonExistent() throws Exception;
+    public abstract void readNonExistent(String testName) throws Exception;
 
     protected void setupReadNonExistent() {
     	setupReadNonExistent("ReadNonExistent");
@@ -199,7 +204,7 @@ public abstract class AbstractServiceTest implements ServiceTest {
         EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.READ;
         if (logger.isDebugEnabled()) {
-            printBanner(label);
+            banner(label);
         }
     }
 
@@ -209,7 +214,7 @@ public abstract class AbstractServiceTest implements ServiceTest {
 
     // Success outcomes
     @Override
-    public abstract void readList() throws Exception;
+    public abstract void readList(String testName) throws Exception;
 
     protected void setupReadList() {
     	setupReadList("ReadList");
@@ -221,7 +226,7 @@ public abstract class AbstractServiceTest implements ServiceTest {
         EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.READ_LIST;
         if (logger.isDebugEnabled()) {
-            printBanner(label);
+            banner(label);
         }
     }
 
@@ -234,7 +239,7 @@ public abstract class AbstractServiceTest implements ServiceTest {
 
     // Success outcomes
     @Override
-    public abstract void update() throws Exception;
+    public abstract void update(String testName) throws Exception;
 
     protected void setupUpdate() {
     	setupUpdate("Update");
@@ -246,13 +251,13 @@ public abstract class AbstractServiceTest implements ServiceTest {
         EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.UPDATE;
         if (logger.isDebugEnabled()) {
-            printBanner(label);
+            banner(label);
         }
     }
 
     // Failure outcomes
     @Override
-    public abstract void updateWithEmptyEntityBody() throws Exception;
+    public abstract void updateWithEmptyEntityBody(String testName) throws Exception;
 
     protected void setupUpdateWithEmptyEntityBody() {
     	setupUpdateWithEmptyEntityBody("UpdateWithEmptyEntityBody");
@@ -264,12 +269,12 @@ public abstract class AbstractServiceTest implements ServiceTest {
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.UPDATE;
         if (logger.isDebugEnabled()) {
-            printBanner(label);
+            banner(label);
         }
     }
 
     @Override
-    public abstract void updateWithMalformedXml() throws Exception;
+    public abstract void updateWithMalformedXml(String testName) throws Exception;
 
     protected void setupUpdateWithMalformedXml() {
     	setupUpdateWithMalformedXml("UpdateWithMalformedXml");
@@ -281,12 +286,12 @@ public abstract class AbstractServiceTest implements ServiceTest {
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.UPDATE;
         if (logger.isDebugEnabled()) {
-            printBanner(label);
+            banner(label);
         }
     }
 
     @Override
-    public abstract void updateWithWrongXmlSchema() throws Exception;
+    public abstract void updateWithWrongXmlSchema(String testName) throws Exception;
 
     protected void setupUpdateWithWrongXmlSchema() {
     	setupUpdateWithWrongXmlSchema("UpdateWithWrongXmlSchema");
@@ -298,12 +303,12 @@ public abstract class AbstractServiceTest implements ServiceTest {
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.UPDATE;
         if (logger.isDebugEnabled()) {
-            printBanner(label);
+            banner(label);
         }
     }
 
     @Override
-    public abstract void updateNonExistent() throws Exception;
+    public abstract void updateNonExistent(String testName) throws Exception;
 
     protected void setupUpdateNonExistent() {
     	setupUpdateNonExistent("UpdateNonExistent");
@@ -315,7 +320,7 @@ public abstract class AbstractServiceTest implements ServiceTest {
         EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.UPDATE;
         if (logger.isDebugEnabled()) {
-            printBanner(label);
+            banner(label);
         }
     }
 
@@ -325,7 +330,7 @@ public abstract class AbstractServiceTest implements ServiceTest {
 
     // Success outcomes
     @Override
-    public abstract void delete() throws Exception;
+    public abstract void delete(String testName) throws Exception;
 
     protected void setupDelete() {
     	setupDelete("Delete");
@@ -337,13 +342,13 @@ public abstract class AbstractServiceTest implements ServiceTest {
         EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.DELETE;
         if (logger.isDebugEnabled()) {
-            printBanner(label);
+            banner(label);
         }
     }
 
     // Failure outcomes
     @Override
-    public abstract void deleteNonExistent() throws Exception;
+    public abstract void deleteNonExistent(String testName) throws Exception;
 
     protected void setupDeleteNonExistent() {
     	setupDeleteNonExistent("DeleteNonExistent");
@@ -355,7 +360,7 @@ public abstract class AbstractServiceTest implements ServiceTest {
         EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.DELETE;
         if (logger.isDebugEnabled()) {
-            printBanner(label);
+            banner(label);
         }
     }
 
@@ -370,8 +375,19 @@ public abstract class AbstractServiceTest implements ServiceTest {
      *
      * This component will follow directly after the
      * base path, if any.
+     *
+     * @return The URL path component of the service.
      */
     protected abstract String getServicePathComponent();
+
+    /**
+     * Returns the common part name for the service request.
+     *
+     * @return The common part name for the service request.
+     */
+/*
+    public String getCommonPartName();
+*/
 
     // ---------------------------------------------------------------
     // Utility methods
@@ -383,6 +399,23 @@ public abstract class AbstractServiceTest implements ServiceTest {
     protected void clearSetup() {
         EXPECTED_STATUS_CODE = 0;
         REQUEST_TYPE = ServiceRequestType.NON_EXISTENT;
+    }
+
+   /**
+    * Returns the name of the currently running test.
+    *
+    * Note: although the return type is listed as Object[][],
+    * this method instead returns a String.
+    *
+    * @param   m  The currently running test method.
+    *
+    * @return  The name of the currently running test method.
+    */
+    @DataProvider(name="testName")
+    public static Object[][] testName(Method m){
+        return new Object[][]{
+            new Object[] { m.getName() }
+        };
     }
 
     /**
@@ -500,10 +533,14 @@ public abstract class AbstractServiceTest implements ServiceTest {
     protected String extractId(ClientResponse<Response> res) {
         MultivaluedMap mvm = res.getMetadata();
         String uri = (String) ((ArrayList) mvm.get("Location")).get(0);
-        verbose("extractId:uri=" + uri);
+        if(logger.isDebugEnabled()){
+            logger.debug("extractId:uri=" + uri);
+        }
         String[] segments = uri.split("/");
         String id = segments[segments.length - 1];
-        verbose("id=" + id);
+        if(logger.isDebugEnabled()){
+            logger.debug("id=" + id);
+        }
         return id;
     }
 
@@ -523,9 +560,13 @@ public abstract class AbstractServiceTest implements ServiceTest {
             String partLabel = part.getHeaders().getFirst("label");
             if(label.equalsIgnoreCase(partLabel)){
                 String partStr = part.getBodyAsString();
-                verbose("extracted part str=\n" + partStr);
+                if(logger.isDebugEnabled()){
+                    logger.debug("extracted part str=\n" + partStr);
+                }
                 obj = part.getBody(clazz, null);
-                verbose("extracted part obj=\n", obj, clazz);
+                if(logger.isDebugEnabled()){
+                    logger.debug("extracted part obj=\n", obj, clazz);
+                }
                 break;
             }
         }
@@ -564,7 +605,9 @@ public abstract class AbstractServiceTest implements ServiceTest {
 
     protected void verbose(String msg, Object o, Class clazz) {
         try{
-            verbose(msg);
+            if(logger.isDebugEnabled()){
+                logger.debug(msg);
+            }
             JAXBContext jc = JAXBContext.newInstance(clazz);
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
@@ -578,11 +621,14 @@ public abstract class AbstractServiceTest implements ServiceTest {
     protected void verboseMap(MultivaluedMap map) {
         for(Object entry : map.entrySet()){
             MultivaluedMap.Entry mentry = (MultivaluedMap.Entry) entry;
-            verbose("    name=" + mentry.getKey() + " value=" + mentry.getValue());
+            if(logger.isDebugEnabled()){
+                logger.debug("    name=" + mentry.getKey() +
+                    " value=" + mentry.getValue());
+            }
         }
     }
 
-    private void printBanner(String label) {
+    private void banner(String label) {
         if(logger.isDebugEnabled()){
             logger.debug("===================================================");
             logger.debug(" Test = " + label);
