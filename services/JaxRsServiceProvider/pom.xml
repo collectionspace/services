@@ -183,7 +183,7 @@
                     <port>8180</port>
                 </configuration>
                 <executions>
-                	
+<!--                	
                     <execution>
                         <id>jboss-undeploy</id>
                         <phase>pre-integration-test</phase>
@@ -208,7 +208,7 @@
                             </fileNames>
                         </configuration>
                     </execution>
-                    
+-->                    
                 </executions>
             </plugin>
 
