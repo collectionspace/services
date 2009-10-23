@@ -107,7 +107,7 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="package"
+    <target name="deploy" depends="install"
     description="deploy common elements in ${jboss.server.cspace}">
         <copy todir="${jboss.server.cspace}/cspace/config/services">
             <fileset dir="${basedir}/src/main/config"/>

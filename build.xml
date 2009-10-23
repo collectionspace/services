@@ -212,7 +212,7 @@
         </sql>
     </target>
 
-    <target name="deploy" depends="package"
+    <target name="deploy" depends="install"
     description="deploy services in ${jboss.server.cspace}">
                 <!-- copy db scripts, etc. -->
         <copy todir="${jboss.server.cspace}/cspace/services">

@@ -107,7 +107,7 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="package"
+    <target name="deploy" depends="install"
     description="deploy vocabulary doctype in ${jboss.server.nuxeo}">
         <copy file="${basedir}/target/${nuxeo.vocabulary.jar}"
         todir="${jboss.deploy.nuxeo.system}"/>

@@ -104,7 +104,7 @@
         </exec>
     </target>
 
-    <target name="deploy" depends="package"
+    <target name="deploy" depends="install"
         description="deploy acquisition service">
         <ant antfile="3rdparty/build.xml" target="deploy" inheritall="false"/>
     </target>

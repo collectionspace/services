@@ -105,7 +105,7 @@
     </target>
 
     <!-- this target is called in order based on the dependencies between the services -->
-    <target name="deploy" depends="package"
+    <target name="deploy" depends="install"
     description="deploy services in ${jboss.server.cspace}">
         <ant antfile="common/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="authentication/build.xml" target="deploy" inheritAll="false"/>
