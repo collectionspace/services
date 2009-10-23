@@ -174,7 +174,7 @@
         <finalName>cspace-services</finalName>
         <defaultGoal>package</defaultGoal>
         <plugins>
-            <plugin>
+            <!--plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jboss-maven-plugin</artifactId>
                 <configuration>
@@ -182,8 +182,7 @@
                     <jbossHome>${jboss.dir}</jbossHome>
                     <port>8180</port>
                 </configuration>
-                <executions>
-<!--                	
+                <executions>               	
                     <execution>
                         <id>jboss-undeploy</id>
                         <phase>pre-integration-test</phase>
@@ -207,9 +206,39 @@
                                 <param>${project.build.directory}/${project.build.finalName}.war</param>
                             </fileNames>
                         </configuration>
-                    </execution>
--->                    
+                    </execution>                
                 </executions>
+            </plugin-->
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <!-- Container configuration -->
+                <configuration>
+                    <container>
+                        <containerId>jboss42x</containerId>
+                        <home>${jboss.dir}</home>
+                        <type>remote</type>
+                    </container>
+                    <configuration>
+                        <type>runtime</type>
+                        <properties>
+                            <cargo.servlet.port>8180</cargo.servlet.port>
+                            <cargo.jboss.configuration>cspace</cargo.jboss.configuration>
+                        </properties>
+                    </configuration>
+                    <deployer>
+                        <type>remote</type>
+                        <deployables>
+                            <deployable>
+                                <groupId>org.collectionspace.services</groupId>
+                                <artifactId>org.collectionspace.services.jaxrs.provider</artifactId>
+                                <type>war</type>
+                                <pingURL>http://127.0.0.1:8180</pingURL>
+                            </deployable>
+                        </deployables>
+                    </deployer>
+                </configuration>
+
             </plugin>
 
             <plugin>
