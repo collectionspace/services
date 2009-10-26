@@ -137,7 +137,8 @@ public class VocabularyServiceTest extends AbstractServiceTest {
     }
 
     @Override
-    @Test(dependsOnMethods = {"create", "createItem"})
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+            dependsOnMethods = {"create", "createItem"})
     public void createList(String testName) throws Exception {
         for (int i = 0; i < 3; i++) {
             create(testName);
