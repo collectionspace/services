@@ -31,6 +31,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.BasicConfigurator;
 import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.vocabulary.VocabulariesCommon;
@@ -49,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: 2009-09-23 11:03:36 -0700 (Wed, 23 Sep 2009) $
  */
 public class VocabularyBaseImport {
-    private final Logger logger =
+    private static final Logger logger =
         LoggerFactory.getLogger(VocabularyBaseImport.class);
 
     // Instance variables specific to this test.
@@ -188,27 +189,33 @@ public class VocabularyBaseImport {
     }
 
 	public static void main(String[] args) {
-			VocabularyBaseImport vbi = new VocabularyBaseImport();
-			final String acquisitionMethodsVocabName = "Acquisition Methods";
-			final String entryMethodsVocabName = "Entry Methods";
-			final String entryReasonsVocabName = "Entry Reasons";
-			final String responsibleDeptsVocabName = "Responsible Departments";
+		
+		BasicConfigurator.configure();
+		logger.info("VocabularyBaseImport starting...");
 
-			List<String> acquisitionMethodsEnumValues = 
-				Arrays.asList("Gift","Purchase","Exchange","Transfer","Treasure");
-			List<String> entryMethodsEnumValues = 
-				Arrays.asList("In person","Post","Found on doorstep");
-			List<String> entryReasonsEnumValues = 
-				Arrays.asList("Enquiry","Commission","Loan");
-			List<String> respDeptNamesEnumValues = 
-				Arrays.asList("Antiquities","Architecture and Design","Decorative Arts",
-										"Ethnography","Herpetology","Media and Performance Art",
-										"Paintings and Sculpture","Paleobotany","Photographs",
-										"Prints and Drawings");
+		VocabularyBaseImport vbi = new VocabularyBaseImport();
+		final String acquisitionMethodsVocabName = "Acquisition Methods";
+		final String entryMethodsVocabName = "Entry Methods";
+		final String entryReasonsVocabName = "Entry Reasons";
+		final String responsibleDeptsVocabName = "Responsible Departments";
 
-			vbi.createEnumeration(acquisitionMethodsVocabName, acquisitionMethodsEnumValues);
-			vbi.createEnumeration(entryMethodsVocabName, entryMethodsEnumValues);
-			vbi.createEnumeration(entryReasonsVocabName, entryReasonsEnumValues);
-			vbi.createEnumeration(responsibleDeptsVocabName, respDeptNamesEnumValues);
-		}
+		List<String> acquisitionMethodsEnumValues = 
+			Arrays.asList("Gift","Purchase","Exchange","Transfer","Treasure");
+		List<String> entryMethodsEnumValues = 
+			Arrays.asList("In person","Post","Found on doorstep");
+		List<String> entryReasonsEnumValues = 
+			Arrays.asList("Enquiry","Commission","Loan");
+		List<String> respDeptNamesEnumValues = 
+			Arrays.asList("Antiquities","Architecture and Design","Decorative Arts",
+									"Ethnography","Herpetology","Media and Performance Art",
+									"Paintings and Sculpture","Paleobotany","Photographs",
+									"Prints and Drawings");
+
+		vbi.createEnumeration(acquisitionMethodsVocabName, acquisitionMethodsEnumValues);
+		vbi.createEnumeration(entryMethodsVocabName, entryMethodsEnumValues);
+		vbi.createEnumeration(entryReasonsVocabName, entryReasonsEnumValues);
+		vbi.createEnumeration(responsibleDeptsVocabName, respDeptNamesEnumValues);
+
+		logger.info("VocabularyBaseImport complete.");
+	}
 }
