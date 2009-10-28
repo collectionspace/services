@@ -34,6 +34,7 @@ public class IDGeneratorInstance {
     private String displayName;
     private String description;
     private String generatorState;
+    private String lastGeneratedID;
 
     public String getDisplayName() {
         return displayName;
@@ -57,6 +58,14 @@ public class IDGeneratorInstance {
 
     public void setGeneratorState(String generatorState) {
         this.generatorState = generatorState;
+    }
+
+    public String getLastGeneratedID() {
+        return lastGeneratedID;
+    }
+
+    public void setLastGeneratedID(String lastGeneratedID) {
+        this.lastGeneratedID = lastGeneratedID;
     }
 
 }

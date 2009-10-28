@@ -586,7 +586,7 @@ public class IDServiceJdbcImpl implements IDService {
 
             ResultSet rs = stmt.executeQuery(
 			  "SELECT csid, displayname, description, " +
-              "id_generator_state FROM id_generators " +
+              "id_generator_state, last_generated_id FROM id_generators " +
 			  "WHERE csid='" + csid + "'");
 			  
 			boolean moreRows = rs.next();
@@ -601,6 +601,7 @@ public class IDServiceJdbcImpl implements IDService {
             instance.setDisplayName(rs.getString(2));
             instance.setDescription(rs.getString(3));
             instance.setGeneratorState(rs.getString(4));
+            instance.setLastGeneratedID(rs.getString(5));
 			
 			rs.close();
 		
@@ -653,7 +654,7 @@ public class IDServiceJdbcImpl implements IDService {
 
 			ResultSet rs = stmt.executeQuery(
 			  "SELECT csid, displayname, description, " +
-              "id_generator_state FROM id_generators " +
+              "id_generator_state, last_generated_id FROM id_generators " +
               "ORDER BY displayname ASC"); // , priority ASC");
 
 			boolean moreRows = rs.next();
@@ -667,6 +668,7 @@ public class IDServiceJdbcImpl implements IDService {
                 instance.setDisplayName(rs.getString(2));
                 instance.setDescription(rs.getString(3));
                 instance.setGeneratorState(rs.getString(4));
+                instance.setLastGeneratedID(rs.getString(5));
                 generators.put(rs.getString(1), instance);
             }
 
