@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>collectionobject-client</name>
+	<name>org.collectionspace.services.collectionobject.client</name>
 	<comment></comment>
 	<projects>
+		<project>org.collectionspace.services.client</project>
+		<project>org.collectionspace.services.collectionobject.jaxb</project>
+		<project>org.collectionspace.services.common</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -17,7 +20,7 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.maven.ide.eclipse.maven2Nature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
 </projectDescription>

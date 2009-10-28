@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>nuxeo-platform-collectionspace</name>
-	<comment>Nuxeo Enterprise Platform: CS extensions</comment>
+	<name>org.collectionspace.services.intake.3rdparty.nuxeo</name>
+	<comment>Intake Nuxeo Document Type</comment>
 	<projects>
 	</projects>
 	<buildSpec>

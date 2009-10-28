@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>javaee-addressbook-client</name>
+	<name>org.collectionspace.services.intake.client</name>
 	<comment></comment>
 	<projects>
+		<project>org.collectionspace.services.client</project>
+		<project>org.collectionspace.services.common</project>
+		<project>org.collectionspace.services.intake.jaxb</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -17,7 +20,7 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.maven.ide.eclipse.maven2Nature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
 </projectDescription>

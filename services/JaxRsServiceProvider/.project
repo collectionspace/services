@@ -3,6 +3,18 @@
 	<name>org.collectionspace.services.jaxrs.provider</name>
 	<comment></comment>
 	<projects>
+		<project>org.collectionspace.services.acquisition.jaxb</project>
+		<project>org.collectionspace.services.acquisition.service</project>
+		<project>org.collectionspace.services.collectionobject.jaxb</project>
+		<project>org.collectionspace.services.collectionobject.service</project>
+		<project>org.collectionspace.services.common</project>
+		<project>org.collectionspace.services.id.jaxb</project>
+		<project>org.collectionspace.services.id.service</project>
+		<project>org.collectionspace.services.intake.jaxb</project>
+		<project>org.collectionspace.services.intake.service</project>
+		<project>org.collectionspace.services.relation.service</project>
+		<project>org.collectionspace.services.vocabulary.jaxb</project>
+		<project>org.collectionspace.services.vocabulary.service</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -17,7 +29,7 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.maven.ide.eclipse.maven2Nature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
 </projectDescription>
