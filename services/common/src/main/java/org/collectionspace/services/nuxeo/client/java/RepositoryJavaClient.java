@@ -17,6 +17,7 @@
  */
 package org.collectionspace.services.nuxeo.client.java;
 
+import java.util.Hashtable;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.repository.BadRequestException;
@@ -189,8 +190,8 @@ public class RepositoryJavaClient implements RepositoryClient {
         String nuxeoWspaceId = ctx.getRepositoryWorkspaceId();
         if(nuxeoWspaceId == null){
             throw new DocumentNotFoundException(
-                    "Unable to find workspace for service " + 
-                    ctx.getServiceName() + 
+                    "Unable to find workspace for service " +
+                    ctx.getServiceName() +
                     " check if the workspace exists in the Nuxeo repository");
         }
         RepositoryInstance repoSession = null;
@@ -321,6 +322,68 @@ public class RepositoryJavaClient implements RepositoryClient {
                 releaseRepositorySession(repoSession);
             }
         }
+    }
+
+    @Override
+    public String createWorkspace(String tenantDomain, String workspaceName) throws Exception {
+        RepositoryInstance repoSession = null;
+        String workspaceId = null;
+        try{
+            repoSession= getRepositorySession();
+            DocumentRef docRef = new PathRef(
+                    "/" + tenantDomain +
+                    "/" + "workspaces");
+            DocumentModel parent = repoSession.getDocument(docRef);
+            DocumentModel doc = repoSession.createDocumentModel(parent.getPathAsString(),
+                    workspaceName, "Workspace");
+            doc.setPropertyValue("dc:title", workspaceName);
+            doc.setPropertyValue("dc:description", "A CollectionSpace workspace for " +
+                    workspaceName);
+            doc = repoSession.createDocument(doc);
+            workspaceId = doc.getId();
+            repoSession.save();
+            if(logger.isDebugEnabled()){
+                logger.debug("created workspace name=" + workspaceName +
+                        " id=" + workspaceId);
+            }
+        }catch(Exception e){
+            if(logger.isDebugEnabled()){
+                logger.debug("createWorkspace caught exception ", e);
+            }
+            throw e;
+        }finally{
+            if(repoSession != null){
+                releaseRepositorySession(repoSession);
+            }
+        }
+        return workspaceId;
+    }
+
+    @Override
+    public String getWorkspaceId(String tenantDomain, String workspaceName) throws Exception {
+        String workspaceId = null;
+        RepositoryInstance repoSession = null;
+        try{
+            repoSession = getRepositorySession();
+            DocumentRef docRef = new PathRef(
+                    "/" + tenantDomain +
+                    "/" + "workspaces" +
+                    "/" + workspaceName);
+            DocumentModel workspace = repoSession.getDocument(docRef);
+            workspaceId = workspace.getId();
+        }catch(DocumentException de){
+            throw de;
+        }catch(Exception e){
+            if(logger.isDebugEnabled()){
+                logger.debug("Caught exception ", e);
+            }
+            throw new DocumentException(e);
+        }finally{
+            if(repoSession != null){
+                releaseRepositorySession(repoSession);
+            }
+        }
+        return workspaceId;
     }
 
     private RepositoryInstance getRepositorySession() throws Exception {

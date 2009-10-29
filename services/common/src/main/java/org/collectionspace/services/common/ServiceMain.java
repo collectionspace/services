@@ -98,16 +98,6 @@ public class ServiceMain {
     }
 
     /**
-     * retrieveWorkspaceIds for given tenant domain. 
-     * @param tenantDomain
-     * @return Hashtable<String, String> key=workspace name, value=workspace id
-     * @throws Exception
-     */
-    public Hashtable<String, String> retrieveWorkspaceIds(String tenantDomain) throws Exception {
-        return nuxeoConnector.retrieveWorkspaceIds(tenantDomain);
-    }
-
-    /**
      * @return the nuxeoConnector
      */
     public NuxeoConnector getNuxeoConnector() {

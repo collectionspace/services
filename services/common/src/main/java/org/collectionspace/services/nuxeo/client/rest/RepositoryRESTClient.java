@@ -307,6 +307,16 @@ public class RepositoryRESTClient implements RepositoryClient {
         }
     }
 
+    @Override
+    public String createWorkspace(String tenantDomain, String workspaceName) throws Exception {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getWorkspaceId(String tenantDomain, String workspaceName) throws Exception {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * buildRequest build HTTP request given parameters
      * @param method

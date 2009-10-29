@@ -25,11 +25,11 @@ package org.collectionspace.services.common.config;
 
 import java.io.File;
 import java.util.Hashtable;
-import java.util.List;
 import org.collectionspace.services.common.ClientType;
-import org.collectionspace.services.common.RepositoryWorkspaceType;
-import org.collectionspace.services.common.ServiceConfig;
+import org.collectionspace.services.common.RepositoryClientConfigType;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.repository.RepositoryClient;
+import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.tenant.TenantBindingType;
 import org.collectionspace.services.common.tenant.TenantBindingConfig;
@@ -110,25 +110,43 @@ public class TenantBindingConfigReader
         }
     }
 
+    /**
+     * retrieveWorkspaceIds retrieves workspace ids for services used by
+     * the given tenant
+     * @param tenantBinding
+     * @throws Exception
+     */
     public void retrieveWorkspaceIds(TenantBindingType tenantBinding) throws Exception {
-        String tenantDomain = tenantBinding.getRepositoryDomain();
         Hashtable<String, String> workspaceIds = new Hashtable<String, String>();
         ServiceMain svcMain = ServiceMain.getInstance();
+        RepositoryClientConfigType rclientConfig = svcMain.getServicesConfigReader().getConfiguration().getRepositoryClient();
         ClientType clientType = svcMain.getClientType();
-        if(clientType.equals(ClientType.JAVA)){
-            workspaceIds = svcMain.retrieveWorkspaceIds(tenantDomain);
+        if(clientType.equals(ClientType.JAVA) &&
+                rclientConfig.getName().equalsIgnoreCase("nuxeo-java")){
+            //FIXME only one repository client is recognized
+            workspaceIds = svcMain.getNuxeoConnector().retrieveWorkspaceIds(
+                    tenantBinding.getRepositoryDomain());
         }
+        //verify if workspace exists for each service in the tenant binding
         for(ServiceBindingType serviceBinding : tenantBinding.getServiceBindings()){
             String serviceName = serviceBinding.getName();
+            RepositoryClient repositoryClient = getRepositoryClient(
+                    serviceBinding.getRepositoryClient());
             String workspaceId = null;
             //workspace name is service name by convention
             String workspace = serviceBinding.getName().toLowerCase();
             if(clientType.equals(ClientType.JAVA)){
                 workspaceId = workspaceIds.get(workspace);
                 if(workspaceId == null){
-                    logger.warn("failed to retrieve workspace id for " + workspace);
-                    //FIXME: should we throw an exception here?
-                    continue;
+                    logger.warn("failed to retrieve workspace id for " + workspace +
+                            " trying to create a new workspace...");
+                    workspaceId = repositoryClient.createWorkspace(
+                            tenantBinding.getRepositoryDomain(),
+                            serviceBinding.getName());
+                    if(workspaceId == null){
+                        logger.warn("failed to create workspace for " + workspace);
+                        continue;
+                    }
                 }
             }else{
                 workspaceId = serviceBinding.getRepositoryWorkspaceId();
@@ -189,5 +207,9 @@ public class TenantBindingConfigReader
     public static String getTenantQualifiedServiceName(
             String tenantId, String serviceName) {
         return tenantId + "." + serviceName.toLowerCase();
+    }
+
+    private RepositoryClient getRepositoryClient(String clientName) {
+        return RepositoryClientFactory.getInstance().getClient(clientName);
     }
 }

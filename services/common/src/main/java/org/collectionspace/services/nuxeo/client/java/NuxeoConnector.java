@@ -209,7 +209,7 @@ public class NuxeoConnector {
     /**
      * retrieveWorkspaceIds retrieves all workspace ids from default repository
      * @param tenantDomain domain representing tenant
-     * @return 
+     * @return
      * @throws java.lang.Exception
      */
     public Hashtable<String, String> retrieveWorkspaceIds(String tenantDomain) throws Exception {
@@ -225,7 +225,7 @@ public class NuxeoConnector {
                 String domainPath = "/" + tenantDomain;
                 if(!domain.getPathAsString().equalsIgnoreCase(domainPath)){
                     continue;
-                }
+}
                 if(logger.isDebugEnabled()){
                     logger.debug("domain=" + domain.toString());
                 }

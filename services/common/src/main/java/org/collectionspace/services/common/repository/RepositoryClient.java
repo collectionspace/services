@@ -25,7 +25,6 @@ package org.collectionspace.services.common.repository;
 
 import org.collectionspace.services.common.context.ServiceContext;
 
-
 /**
  * RepositoryClient is a generic Document Repository client
  *
@@ -86,4 +85,22 @@ public interface RepositoryClient {
      * @throws DocumentException
      */
     void update(ServiceContext ctx, String id, DocumentHandler handler) throws BadRequestException, DocumentNotFoundException, DocumentException;
+
+    /**
+     * createWorkspace creates a workspace in default repository under given domain
+     * @param tenantDomain domain representing tenant
+     * @param workspaceName name of the workspace
+     * @return id of newly created workspace
+     * @throws java.lang.Exception
+     */
+    public String createWorkspace(String tenantDomain, String workspaceName) throws Exception;
+
+        /**
+     * getWorkspaceId gets an id of given workspace in default repository under given domain
+     * @param tenantDomain domain representing tenant
+     * @param workspaceName name of the workspace
+     * @return id of the workspace
+     * @throws java.lang.Exception
+     */
+    public String getWorkspaceId(String tenantDomain, String workspaceName) throws Exception;
 }
