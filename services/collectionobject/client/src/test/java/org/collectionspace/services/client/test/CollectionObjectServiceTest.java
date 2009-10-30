@@ -596,6 +596,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         collectionObject.setObjectNumber(objectNumber);
         collectionObject.setObjectName(objectName);
         collectionObject.setAge(""); //test for null string
+        collectionObject.setBriefDescription("Papier mache bird mask with horns, " +
+                "painted red with black and yellow spots. " +
+                "Puerto Rico. ca. 8&quot; high, 6&quot; wide, projects 10&quot; (with horns).");
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(collectionObject,
             MediaType.APPLICATION_XML_TYPE);
