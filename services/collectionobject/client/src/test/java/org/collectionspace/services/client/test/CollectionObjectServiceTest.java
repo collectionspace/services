@@ -595,6 +595,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
         collectionObject.setObjectNumber(objectNumber);
         collectionObject.setObjectName(objectName);
+        collectionObject.setAge(""); //test for null string
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(collectionObject,
             MediaType.APPLICATION_XML_TYPE);

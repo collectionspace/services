@@ -21,7 +21,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.collectionspace.services.common.repository;
 
 import java.io.InputStream;
@@ -45,11 +44,11 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 /**
-* DocumentUtils is a collection of utilities related to document management
-*
-* $LastChangedRevision: $
-* $LastChangedDate: $
-*/
+ * DocumentUtils is a collection of utilities related to document management
+ *
+ * $LastChangedRevision: $
+ * $LastChangedDate: $
+ */
 public class DocumentUtils {
 
     /**
@@ -93,12 +92,19 @@ public class DocumentUtils {
             Node node = (Node) children.item(i);
             if(node.getNodeType() == Node.ELEMENT_NODE){
                 Node cnode = node.getFirstChild();
-                if(cnode.getNodeType() != Node.TEXT_NODE){
-                    continue;
+                if(cnode == null){
+                    //if element is present but no value, set to ""
+                    //FIXME what about non-string types?
+                    objectProps.put(node.getNodeName(), "");
+                }else{
+                    if(cnode.getNodeType() != Node.TEXT_NODE){
+                        continue;
+                    }
+                    Node textNode = (Text) cnode;
+                    //FIXME what about other native xml types?
+                    objectProps.put(node.getNodeName(),
+                            textNode.getNodeValue());
                 }
-                Node textNode = (Text) cnode;
-                objectProps.put(node.getNodeName(),
-                        textNode.getNodeValue());
             }
         }
         return objectProps;
