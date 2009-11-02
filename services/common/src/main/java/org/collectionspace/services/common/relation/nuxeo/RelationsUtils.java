@@ -29,9 +29,9 @@ import java.util.List;
 import org.collectionspace.services.common.relation.RelationJAXBSchema;
 import org.collectionspace.services.common.repository.DocumentException;
 import org.collectionspace.services.common.repository.DocumentWrapper;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
-import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
@@ -58,7 +58,7 @@ public class RelationsUtils {
         //FIXME: iterating over a long list of documents is not a long term
         //strategy...need to change to more efficient iterating in future
         Iterator<DocumentModel> iter = docList.iterator();
-        while(iter.hasNext()){
+        while (iter.hasNext()) {
             DocumentModel docModel = iter.next();
             RelationListItem relationListItem = getRelationListItem(docModel,
                     serviceContextPath);
@@ -70,8 +70,9 @@ public class RelationsUtils {
     public static RelationListItem getRelationListItem(DocumentModel docModel,
             String serviceContextPath) throws Exception {
         RelationListItem relationListItem = new RelationListItem();
-        relationListItem.setUri(serviceContextPath + docModel.getId());
-        relationListItem.setCsid(docModel.getId());
+        String id = NuxeoUtils.extractId(docModel.getPathAsString());
+        relationListItem.setCsid(id);
+        relationListItem.setUri(serviceContextPath + id);
         return relationListItem;
     }
 
@@ -97,7 +98,7 @@ public class RelationsUtils {
             throws Exception {
         boolean result = false;
         Object valueObject = documentModel.getProperty(RelationConstants.NUXEO_SCHEMA_NAME, RelationJAXBSchema.DOCUMENT_ID_1);
-        if(valueObject != null && csid != null){
+        if (valueObject != null && csid != null) {
             String subjectID = (String) valueObject;
             result = subjectID.equals(csid);
         }
@@ -121,7 +122,7 @@ public class RelationsUtils {
 
         Object valueObject = documentModel.getProperty(RelationConstants.NUXEO_SCHEMA_NAME,
                 RelationJAXBSchema.DOCUMENT_ID_2);
-        if(valueObject != null && csid != null){
+        if (valueObject != null && csid != null) {
             String subjectID = (String) valueObject;
             result = subjectID.equals(csid);
         }
@@ -145,7 +146,7 @@ public class RelationsUtils {
 
         Object valueObject = documentModel.getProperty(RelationConstants.NUXEO_SCHEMA_NAME,
                 RelationJAXBSchema.RELATIONSHIP_TYPE);
-        if(valueObject != null && predicate != null){
+        if (valueObject != null && predicate != null) {
             String relationType = (String) valueObject;
             result = predicate.equalsIgnoreCase(relationType);
         }
@@ -169,12 +170,12 @@ public class RelationsUtils {
 
         Object valueObject = documentModel.getProperty(RelationConstants.NUXEO_SCHEMA_NAME,
                 RelationJAXBSchema.DOCUMENT_ID_1);
-        if(valueObject != null){
+        if (valueObject != null) {
             String subjectID = (String) valueObject;
-            if(subjectID.equals(csid) == true){
+            if (subjectID.equals(csid) == true) {
                 valueObject = documentModel.getProperty(RelationConstants.NUXEO_SCHEMA_NAME,
                         RelationJAXBSchema.DOCUMENT_ID_2);
-                if(valueObject != null){
+                if (valueObject != null) {
                     result = (String) valueObject;
                 }
             }
@@ -201,30 +202,30 @@ public class RelationsUtils {
             String objectCsid) throws DocumentException {
         boolean result = true;
 
-        try{
+        try {
             block:
             {
-                if(subjectCsid != null){
-                    if(isSubjectOfRelation(subjectCsid, documentModel) == false){
+                if (subjectCsid != null) {
+                    if (isSubjectOfRelation(subjectCsid, documentModel) == false) {
                         result = false;
                         break block;
                     }
                 }
-                if(predicate != null){
-                    if(isPredicateOfRelation(predicate, documentModel) == false){
+                if (predicate != null) {
+                    if (isPredicateOfRelation(predicate, documentModel) == false) {
                         result = false;
                         break block;
                     }
                 }
-                if(objectCsid != null){
-                    if(isObjectOfRelation(objectCsid, documentModel) == false){
+                if (objectCsid != null) {
+                    if (isObjectOfRelation(objectCsid, documentModel) == false) {
                         result = false;
                         break block;
                     }
                 }
             }
-        }catch(Exception e){
-            if(logger.isDebugEnabled() == true){
+        } catch (Exception e) {
+            if (logger.isDebugEnabled() == true) {
                 e.printStackTrace();
             }
             throw new DocumentException(e);

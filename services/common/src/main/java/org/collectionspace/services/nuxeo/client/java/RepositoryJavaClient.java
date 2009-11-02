@@ -17,7 +17,8 @@
  */
 package org.collectionspace.services.nuxeo.client.java;
 
-import java.util.Hashtable;
+
+import java.util.UUID;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.repository.BadRequestException;
@@ -25,6 +26,7 @@ import org.collectionspace.services.common.repository.DocumentNotFoundException;
 import org.collectionspace.services.common.repository.DocumentHandler;
 import org.collectionspace.services.common.repository.DocumentException;
 import org.collectionspace.services.common.repository.DocumentHandler.Action;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.common.utils.IdUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -68,28 +70,29 @@ public class RepositoryJavaClient implements RepositoryClient {
             DocumentHandler handler) throws BadRequestException,
             DocumentException {
 
-        if(handler.getDocumentType() == null){
+        if (handler.getDocumentType() == null) {
             throw new IllegalArgumentException(
                     "RemoteRepositoryClient.create: docType is missing");
         }
-        if(handler == null){
+        if (handler == null) {
             throw new IllegalArgumentException(
                     "RemoteRepositoryClient.create: handler is missing");
         }
         String nuxeoWspaceId = ctx.getRepositoryWorkspaceId();
-        if(nuxeoWspaceId == null){
+        if (nuxeoWspaceId == null) {
             throw new DocumentNotFoundException(
                     "Unable to find workspace for service " + ctx.getServiceName() +
                     " check if the workspace exists in the Nuxeo repository");
         }
         RepositoryInstance repoSession = null;
-        try{
+        try {
             handler.prepare(Action.CREATE);
             repoSession = getRepositorySession();
             DocumentRef nuxeoWspace = new IdRef(nuxeoWspaceId);
             DocumentModel wspaceDoc = repoSession.getDocument(nuxeoWspace);
             String wspacePath = wspaceDoc.getPathAsString();
-            String id = IdUtils.generateId("New " + handler.getDocumentType());
+            //give our own ID so PathRef could be constructed later on
+            String id = IdUtils.generateId(UUID.randomUUID().toString());
             // create document model
             DocumentModel doc = repoSession.createDocumentModel(wspacePath, id,
                     handler.getDocumentType());
@@ -100,14 +103,14 @@ public class RepositoryJavaClient implements RepositoryClient {
             doc = repoSession.createDocument(doc);
             repoSession.save();
             handler.complete(Action.CREATE, wrapDoc);
-            return doc.getId();
-        }catch(Exception e){
-            if(logger.isDebugEnabled()){
+            return id;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
             throw new DocumentException(e);
-        }finally{
-            if(repoSession != null){
+        } finally {
+            if (repoSession != null) {
                 releaseRepositorySession(repoSession);
             }
         }
@@ -128,23 +131,20 @@ public class RepositoryJavaClient implements RepositoryClient {
     public void get(ServiceContext ctx, String id, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
 
-        if(handler == null){
+        if (handler == null) {
             throw new IllegalArgumentException(
                     "RemoteRepositoryClient.get: handler is missing");
         }
         RepositoryInstance repoSession = null;
 
-        try{
+        try {
             handler.prepare(Action.GET);
             repoSession = getRepositorySession();
-            //FIXME, there is a potential privacy violation here, one tenant could
-            //retrieve doc id of another tenant and could retrieve the document
-            //PathRef does not seem to come to rescue as expected. Needs more thoughts.
-            DocumentRef docRef = new IdRef(id);
+            DocumentRef docRef = NuxeoUtils.createPathRef(ctx, id);
             DocumentModel doc = null;
-            try{
+            try {
                 doc = repoSession.getDocument(docRef);
-            }catch(ClientException ce){
+            } catch (ClientException ce) {
                 String msg = "could not find document with id=" + id;
                 logger.error(msg, ce);
                 throw new DocumentNotFoundException(msg, ce);
@@ -154,17 +154,17 @@ public class RepositoryJavaClient implements RepositoryClient {
             DocumentModelWrapper wrapDoc = new DocumentModelWrapper(doc);
             handler.handle(Action.GET, wrapDoc);
             handler.complete(Action.GET, wrapDoc);
-        }catch(IllegalArgumentException iae){
+        } catch (IllegalArgumentException iae) {
             throw iae;
-        }catch(DocumentException de){
+        } catch (DocumentException de) {
             throw de;
-        }catch(Exception e){
-            if(logger.isDebugEnabled()){
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
             throw new DocumentException(e);
-        }finally{
-            if(repoSession != null){
+        } finally {
+            if (repoSession != null) {
                 releaseRepositorySession(repoSession);
             }
         }
@@ -183,12 +183,12 @@ public class RepositoryJavaClient implements RepositoryClient {
     @Override
     public void getAll(ServiceContext ctx, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
-        if(handler == null){
+        if (handler == null) {
             throw new IllegalArgumentException(
                     "RemoteRepositoryClient.getAll: handler is missing");
         }
         String nuxeoWspaceId = ctx.getRepositoryWorkspaceId();
-        if(nuxeoWspaceId == null){
+        if (nuxeoWspaceId == null) {
             throw new DocumentNotFoundException(
                     "Unable to find workspace for service " +
                     ctx.getServiceName() +
@@ -196,7 +196,7 @@ public class RepositoryJavaClient implements RepositoryClient {
         }
         RepositoryInstance repoSession = null;
 
-        try{
+        try {
             handler.prepare(Action.GET_ALL);
             repoSession = getRepositorySession();
             DocumentRef wsDocRef = new IdRef(nuxeoWspaceId);
@@ -207,15 +207,15 @@ public class RepositoryJavaClient implements RepositoryClient {
                     docList);
             handler.handle(Action.GET_ALL, wrapDoc);
             handler.complete(Action.GET_ALL, wrapDoc);
-        }catch(DocumentException de){
+        } catch (DocumentException de) {
             throw de;
-        }catch(Exception e){
-            if(logger.isDebugEnabled()){
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
             throw new DocumentException(e);
-        }finally{
-            if(repoSession != null){
+        } finally {
+            if (repoSession != null) {
                 releaseRepositorySession(repoSession);
             }
         }
@@ -236,26 +236,23 @@ public class RepositoryJavaClient implements RepositoryClient {
     public void update(ServiceContext ctx, String id, DocumentHandler handler)
             throws BadRequestException, DocumentNotFoundException,
             DocumentException {
-        if(id == null){
+        if (id == null) {
             throw new BadRequestException(
                     "RemoteRepositoryClient.update: id is missing");
         }
-        if(handler == null){
+        if (handler == null) {
             throw new IllegalArgumentException(
                     "RemoteRepositoryClient.update: handler is missing");
         }
         RepositoryInstance repoSession = null;
-        try{
+        try {
             handler.prepare(Action.UPDATE);
             repoSession = getRepositorySession();
-            //FIXME, there is a potential privacy violation here, one tenant could
-            //retrieve doc id of another tenant and could retrieve the document
-            //PathRef does not seem to come to rescue as expected. Needs more thoughts.
-            DocumentRef docRef = new IdRef(id);
+            DocumentRef docRef = NuxeoUtils.createPathRef(ctx, id);
             DocumentModel doc = null;
-            try{
+            try {
                 doc = repoSession.getDocument(docRef);
-            }catch(ClientException ce){
+            } catch (ClientException ce) {
                 String msg = "Could not find document to update with id=" + id;
                 logger.error(msg, ce);
                 throw new DocumentNotFoundException(msg, ce);
@@ -267,15 +264,15 @@ public class RepositoryJavaClient implements RepositoryClient {
             repoSession.saveDocument(doc);
             repoSession.save();
             handler.complete(Action.UPDATE, wrapDoc);
-        }catch(DocumentException de){
+        } catch (DocumentException de) {
             throw de;
-        }catch(Exception e){
-            if(logger.isDebugEnabled()){
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
             throw new DocumentException(e);
-        }finally{
-            if(repoSession != null){
+        } finally {
+            if (repoSession != null) {
                 releaseRepositorySession(repoSession);
             }
         }
@@ -292,33 +289,30 @@ public class RepositoryJavaClient implements RepositoryClient {
     public void delete(ServiceContext ctx, String id) throws DocumentNotFoundException,
             DocumentException {
 
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("deleting document with id=" + id);
         }
         RepositoryInstance repoSession = null;
-        try{
+        try {
             repoSession = getRepositorySession();
-            //FIXME, there is a potential privacy violation here, one tenant could
-            //retrieve doc id of another tenant and could retrieve the document
-            //PathRef does not seem to come to rescue as expected. needs more thoughts.
-            DocumentRef docRef = new IdRef(id);
-            try{
+            DocumentRef docRef = NuxeoUtils.createPathRef(ctx, id);
+            try {
                 repoSession.removeDocument(docRef);
-            }catch(ClientException ce){
+            } catch (ClientException ce) {
                 String msg = "could not find document to delete with id=" + id;
                 logger.error(msg, ce);
                 throw new DocumentNotFoundException(msg, ce);
             }
             repoSession.save();
-        }catch(DocumentException de){
+        } catch (DocumentException de) {
             throw de;
-        }catch(Exception e){
-            if(logger.isDebugEnabled()){
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
             throw new DocumentException(e);
-        }finally{
-            if(repoSession != null){
+        } finally {
+            if (repoSession != null) {
                 releaseRepositorySession(repoSession);
             }
         }
@@ -391,20 +385,21 @@ public class RepositoryJavaClient implements RepositoryClient {
         // Authentication failures happen while trying to reuse the session
         NuxeoClient client = NuxeoConnector.getInstance().getClient();
         RepositoryInstance repoSession = client.openRepository();
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("getRepository() repository root: " + repoSession.getRootDocument());
         }
         return repoSession;
     }
 
     private void releaseRepositorySession(RepositoryInstance repoSession) {
-        try{
+        try {
             NuxeoClient client = NuxeoConnector.getInstance().getClient();
             // release session
             client.releaseRepository(repoSession);
-        }catch(Exception e){
+        } catch (Exception e) {
             logger.error("Could not close the repository session", e);
             // no need to throw this service specific exception
         }
     }
+
 }

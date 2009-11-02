@@ -34,6 +34,7 @@ import org.collectionspace.services.vocabulary.VocabulariesCommonList;
 import org.collectionspace.services.vocabulary.VocabulariesCommonList.VocabularyListItem;
 
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandler;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
@@ -125,7 +126,7 @@ public class VocabularyDocumentModelHandler
                     VocabularyJAXBSchema.DISPLAY_NAME));
             ilistItem.setVocabType((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     VocabularyJAXBSchema.VOCAB_TYPE));
-            String id = docModel.getId();
+            String id = NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);
             ilistItem.setCsid(id);
             list.add(ilistItem);

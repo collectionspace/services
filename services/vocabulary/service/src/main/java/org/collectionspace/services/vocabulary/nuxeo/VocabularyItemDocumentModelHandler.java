@@ -29,6 +29,7 @@ import java.util.List;
 import org.collectionspace.services.VocabularyItemJAXBSchema;
 import org.collectionspace.services.common.repository.DocumentWrapper;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandler;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommon;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommonList;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommonList.VocabularyitemListItem;
@@ -141,7 +142,7 @@ public class VocabularyItemDocumentModelHandler
 	            VocabularyitemListItem ilistItem = new VocabularyitemListItem();
 	            ilistItem.setDisplayName((String) docModel.getProperty(getServiceContext().getCommonPartLabel("vocabularyItems"),
 	                    VocabularyItemJAXBSchema.DISPLAY_NAME));
-	            String id = docModel.getId();
+                    String id = NuxeoUtils.extractId(docModel.getPathAsString());
 	            ilistItem.setUri("/vocabularies/"+inVocabulary+"/items/" + id);
 	            ilistItem.setCsid(id);
 	            list.add(ilistItem);

@@ -34,6 +34,7 @@ import org.collectionspace.services.intake.IntakesCommonList;
 import org.collectionspace.services.intake.IntakesCommonList.IntakeListItem;
 
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandler;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
@@ -123,7 +124,7 @@ public class IntakeDocumentModelHandler
             IntakeListItem ilistItem = new IntakeListItem();
             ilistItem.setEntryNumber((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     IntakeJAXBSchema.ENTRY_NUMBER));
-            String id = docModel.getId();
+            String id = NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);
             ilistItem.setCsid(id);
             list.add(ilistItem);

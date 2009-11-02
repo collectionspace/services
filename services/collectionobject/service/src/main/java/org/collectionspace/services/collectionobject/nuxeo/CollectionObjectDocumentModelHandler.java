@@ -32,6 +32,7 @@ import org.collectionspace.services.collectionobject.CollectionobjectsCommonList
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList.CollectionObjectListItem;
 import org.collectionspace.services.common.repository.DocumentWrapper;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandler;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
@@ -116,8 +117,9 @@ public class CollectionObjectDocumentModelHandler
             CollectionObjectListItem coListItem = new CollectionObjectListItem();
             coListItem.setObjectNumber((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
             		CollectionObjectListItemJAXBSchema.OBJECT_NUMBER));
-            coListItem.setUri(getServiceContextPath() + docModel.getId());
-            coListItem.setCsid(docModel.getId());
+            String id = NuxeoUtils.extractId(docModel.getPathAsString());
+            coListItem.setUri(getServiceContextPath() + id);
+            coListItem.setCsid(id);
             list.add(coListItem);
         }
 

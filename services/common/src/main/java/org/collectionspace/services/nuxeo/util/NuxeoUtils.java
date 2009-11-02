@@ -23,6 +23,8 @@ import java.io.IOException;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.StringTokenizer;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.repository.DocumentException;
 
 import org.dom4j.Document;
@@ -33,6 +35,7 @@ import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
+import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.core.api.model.DocumentPart;
 import org.nuxeo.ecm.core.io.DocumentPipe;
 import org.nuxeo.ecm.core.io.DocumentReader;
@@ -66,7 +69,7 @@ public class NuxeoUtils {
         DocumentReader reader = null;
         ByteArrayOutputStream baos = null;
         ByteArrayInputStream bais = null;
-        try{
+        try {
             baos = new ByteArrayOutputStream();
             //nuxeo io.impl begin
             reader = new SingleDocumentReader(repoSession, nuxeoDoc);
@@ -79,26 +82,26 @@ public class NuxeoUtils {
             bais = new ByteArrayInputStream(baos.toByteArray());
             SAXReader saxReader = new SAXReader();
             doc = saxReader.read(bais);
-        }catch(Exception e){
-            if(logger.isDebugEnabled()){
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception while processing document ", e);
             }
             throw new DocumentException(e);
-        }finally{
-            if(reader != null){
+        } finally {
+            if (reader != null) {
                 reader.close();
             }
-            if(writer != null){
+            if (writer != null) {
                 writer.close();
             }
-            try{
-                if(bais != null){
+            try {
+                if (bais != null) {
                     bais.close();
                 }
-                if(baos != null){
+                if (baos != null) {
                     baos.close();
                 }
-            }catch(IOException ioe){
+            } catch (IOException ioe) {
                 String msg = "Failed to close io streams";
                 logger.error(msg + " {}", ioe);
                 throw new DocumentException(ioe);
@@ -168,10 +171,10 @@ public class NuxeoUtils {
             throws DocumentException {
         DocumentModel result = null;
 
-        try{
+        try {
             DocumentRef documentRef = new IdRef(csid);
             result = repoSession.getDocument(documentRef);
-        }catch(ClientException e){
+        } catch (ClientException e) {
             e.printStackTrace();
         }
 
@@ -180,18 +183,50 @@ public class NuxeoUtils {
 
     public static void printDocumentModel(DocumentModel docModel) throws Exception {
         String[] schemas = docModel.getDeclaredSchemas();
-        for(int i = 0; schemas != null && i < schemas.length; i++){
+        for (int i = 0; schemas != null && i < schemas.length; i++) {
             logger.debug("Schema-" + i + "=" + schemas[i]);
         }
 
         DocumentPart[] parts = docModel.getParts();
         Map<String, Serializable> propertyValues = null;
-        for(int i = 0; parts != null && i < parts.length; i++){
+        for (int i = 0; parts != null && i < parts.length; i++) {
             logger.debug("Part-" + i + " name =" + parts[i].getName());
             logger.debug("Part-" + i + " path =" + parts[i].getPath());
             logger.debug("Part-" + i + " schema =" + parts[i].getSchema().getName());
             propertyValues = parts[i].exportValues();
         }
 
+    }
+
+    /**
+     * createPathRef creates a PathRef for given service context using given id
+     * @param ctx
+     * @param id
+     * @return PathRef
+     */
+    public static DocumentRef createPathRef(ServiceContext ctx, String id) {
+        return new PathRef("/" + ctx.getRepositoryDomainName() +
+                "/" + "workspaces" +
+                "/" + ctx.getRepositoryWorkspaceName() +
+                "/" + id);
+    }
+
+    /**
+     * extractId extracts id from given path string
+     * @param pathString
+     * @return
+     */
+    public static String extractId(String pathString) {
+        if (pathString == null) {
+            throw new IllegalArgumentException("empty pathString");
+        }
+        String id = null;
+        StringTokenizer stz = new StringTokenizer(pathString, "/");
+        int tokens = stz.countTokens();
+        for (int i = 0; i < tokens - 1; i++) {
+            stz.nextToken();
+        }
+        id = stz.nextToken(); //last token is id
+        return id;
     }
 }

@@ -34,6 +34,7 @@ import org.collectionspace.services.acquisition.AcquisitionsCommonList.Acquisiti
 
 import org.collectionspace.services.common.repository.DocumentHandler.Action;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandler;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
@@ -118,13 +119,13 @@ public class AcquisitionDocumentModelHandler
         //FIXME: iterating over a long list of documents is not a long term
         //strategy...need to change to more efficient iterating in future
         Iterator<DocumentModel> iter = docList.iterator();
-        while(iter.hasNext()){
+        while (iter.hasNext()) {
             DocumentModel docModel = iter.next();
             AcquisitionListItem listItem = new AcquisitionListItem();
             listItem.setAccessionDate((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     AcquisitionJAXBSchema.ACCESSIONDATE));
             //need fully qualified context for URI
-            String id = docModel.getId();
+            String id = NuxeoUtils.extractId(docModel.getPathAsString());
             listItem.setUri(getServiceContextPath() + id);
             listItem.setCsid(id);
             list.add(listItem);
