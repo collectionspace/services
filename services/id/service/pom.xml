@@ -37,15 +37,6 @@
   <version>1.0</version>
   <name>services.id.service</name>
 
-  <repositories>
-    <!-- Repository for recent versions of XStream -->
-    <repository>
-      <id>codehaus-snapshot</id>
-      <name>Codehaus Snapshot Repo</name>
-      <url>http://snapshots.repository.codehaus.org</url>
-    </repository>
-  </repositories>
-
   <dependencies>
   
     <!-- Code common to all CollectionSpace services. -->
