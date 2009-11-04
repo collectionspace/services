@@ -1,12 +1,8 @@
-﻿--
--- Create and initialize CollectionSpace service database environment for MySQL
---
-
 --
 -- delete all users
 --
-DELETE FROM mysql.user WHERE NOT (host="localhost" and user="root");
-FLUSH PRIVILEGES;
+-- DELETE FROM mysql.user WHERE NOT (host="localhost" and user="root");
+-- FLUSH PRIVILEGES;
 
 --
 -- delete anonymous access
