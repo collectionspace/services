@@ -53,9 +53,10 @@
 package org.collectionspace.services.id;
 
 import java.util.Vector;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.collectionspace.services.common.repository.BadRequestException;
 
 /**
  * AlphabeticIDGeneratorPart
@@ -90,7 +91,7 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
     *
     * Additionally defaults to an initial value of "a".
     */
-    public AlphabeticIDGeneratorPart() throws IllegalArgumentException {
+    public AlphabeticIDGeneratorPart() throws BadRequestException {
       this(DEFAULT_START_CHAR, DEFAULT_END_CHAR, DEFAULT_INITIAL_VALUE);
     }
 
@@ -106,7 +107,7 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
     *                 member of the valid alphabetic sequence.
     */
     public AlphabeticIDGeneratorPart(String initial)
-        throws IllegalArgumentException {
+        throws BadRequestException {
       this(DEFAULT_START_CHAR, DEFAULT_END_CHAR, initial);
     }
     
@@ -121,12 +122,12 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
     *                 member of the valid aphabetic sequence.
     */
     public AlphabeticIDGeneratorPart(String sequenceStart, String sequenceEnd,
-        String initial) throws IllegalArgumentException {
+        String initial) throws BadRequestException {
       
         // Validate and store the start character in the character sequence.
       
         if (sequenceStart == null || sequenceStart.equals("")) {
-            throw new IllegalArgumentException(
+            throw new BadRequestException(
               "Start character in the character sequence must not be " +
               "null or empty");
         }
@@ -136,7 +137,7 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
         } else if (false) {
           // Handle representations of Unicode code points here
         } else {
-            throw new IllegalArgumentException(
+            throw new BadRequestException(
               "Start character must be one character in length");
               // "Start character must be one character in length or
               // a Unicode value such as '\u0000'");
@@ -145,7 +146,7 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
         // Validate and store the end character in the character sequence.
         
         if (sequenceEnd == null || sequenceEnd.equals("")) {
-            throw new IllegalArgumentException(
+            throw new BadRequestException(
                 "End character in the character sequence must not be " +
                 "null or empty");
         }
@@ -155,14 +156,14 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
         } else if (false) {
           // Handle representations of Unicode code points here
         } else {
-            throw new IllegalArgumentException(
+            throw new BadRequestException(
               "End character must be one character in length");
               // "End character must be one character in length or
               // a Unicode value such as '\u0000'");
         }
     
         if (this.endChar <= this.startChar) {
-            throw new IllegalArgumentException(
+            throw new BadRequestException(
               "End (last) character in the character sequence must be " +
               "greater than the start character");
         }
@@ -170,7 +171,7 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
         // Validate and store the initial value of this identifier.
 
         if (initial == null || initial.equals("")) {
-            throw new IllegalArgumentException("Initial value must not be " +
+            throw new BadRequestException("Initial value must not be " +
                 "null or empty");
         }
         
@@ -193,7 +194,7 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
                 this.initialValue.add(new Character(ch));
             // Otherwise, we've detected a character not in the sequence.
             } else {
-                throw new IllegalArgumentException(
+                throw new BadRequestException(
                     "character " + "\'" + ch + "\'" + " is not valid");
             }
           
@@ -207,13 +208,13 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
     }
 
     @Override
-    public void setCurrentID(String value) throws IllegalArgumentException {
+    public void setCurrentID(String value) throws BadRequestException {
     
         // @TODO Much of this code is copied from the main constructor,
         // and may be ripe for refactoring.
       
         if (value == null || value.equals("")) {
-            throw new IllegalArgumentException("Initial value must not be " +
+            throw new BadRequestException("Initial value must not be " +
                 "null or empty");
         }
         
@@ -237,7 +238,7 @@ public class AlphabeticIDGeneratorPart implements SequenceIDGeneratorPart {
                 v.add(new Character(ch));
             // Otherwise, we've detected a character not in the sequence.
             } else {
-                throw new IllegalArgumentException(
+                throw new BadRequestException(
                     "character " + "\'" + ch + "\'" + " is not valid");
             }
           

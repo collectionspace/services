@@ -25,6 +25,7 @@ package org.collectionspace.services.id.test;
 
 import java.util.Vector;
 import junit.framework.TestCase;
+import org.collectionspace.services.common.repository.BadRequestException;
 import org.collectionspace.services.id.*;
 
 /**    
@@ -40,7 +41,7 @@ public class BaseIDGeneratorTest extends TestCase {
     
     final static String CURRENT_YEAR = YearIDGeneratorPart.getCurrentYear();
 
-    // Note: tests may fail with IllegalArgumentException
+    // Note: tests may fail with BadRequestException
     // if any initialization of new IDParts fails
     // due to invalid arguments passed to their constructors.
 
@@ -56,7 +57,7 @@ public class BaseIDGeneratorTest extends TestCase {
     
     // Test adding parts and retrieving current IDs
 
-    public void testCurrentIDViaVector() {
+    public void testCurrentIDViaVector() throws BadRequestException {
         Vector parts = new Vector();
         BaseIDGenerator gen;
 
@@ -98,7 +99,7 @@ public class BaseIDGeneratorTest extends TestCase {
         assertEquals("2009.1-a", gen.getCurrentID());
     }
 
-    public void testCurrentIDViaAdd() {
+    public void testCurrentIDViaAdd() throws BadRequestException {
         generator.clear();
         generator.add(new YearIDGeneratorPart("2009"));
         generator.add(new StringIDGeneratorPart("."));
@@ -118,7 +119,7 @@ public class BaseIDGeneratorTest extends TestCase {
     
     // Test generating new IDs from a single part
 
-    public void testNewAlphabeticLowercaseID() {
+    public void testNewAlphabeticLowercaseID() throws BadRequestException {
         generator.clear();
         generator.add(new AlphabeticIDGeneratorPart("a"));
         assertEquals("a", generator.newID());
@@ -145,7 +146,7 @@ public class BaseIDGeneratorTest extends TestCase {
         assertEquals("aza", generator.newID());
     }
 
-    public void testNewAlphabeticUppercaseID() {
+    public void testNewAlphabeticUppercaseID() throws BadRequestException {
         generator.clear();
         generator.add(new AlphabeticIDGeneratorPart("A", "Z", "A"));
         assertEquals("A", generator.newID());
@@ -172,7 +173,7 @@ public class BaseIDGeneratorTest extends TestCase {
         assertEquals("AZA", generator.newID());
     }
 
-    public void testNewNumericID() {
+    public void testNewNumericID() throws BadRequestException {
         generator.clear();
         generator.add(new NumericIDGeneratorPart("1"));
         assertEquals("1", generator.newID());
@@ -180,7 +181,7 @@ public class BaseIDGeneratorTest extends TestCase {
         assertEquals("3", generator.newID());
     }
 
-    public void testNewStringID() {
+    public void testNewStringID() throws BadRequestException {
         generator.clear();
         generator.add(new StringIDGeneratorPart("PREFIX"));
         assertEquals("PREFIX", generator.newID());
@@ -216,7 +217,7 @@ public class BaseIDGeneratorTest extends TestCase {
     
     // Test generating new IDs from multiple, mixed parts
 
-    public void testNewMixedID() {
+    public void testNewMixedID() throws BadRequestException {
         generator.clear();
         generator.add(new YearIDGeneratorPart());
         generator.add(new StringIDGeneratorPart("."));
@@ -253,7 +254,7 @@ public class BaseIDGeneratorTest extends TestCase {
         assertEquals(CURRENT_YEAR + ".1.3", generator.newID()); 
     }
 
-    public void testNewMixedIDWithTrailingConstantStringID() {
+    public void testNewMixedIDWithTrailingConstantStringID() throws BadRequestException {
         generator.clear();
         generator.add(new YearIDGeneratorPart());
         generator.add(new StringIDGeneratorPart("."));
@@ -288,7 +289,7 @@ public class BaseIDGeneratorTest extends TestCase {
         assertFalse(generator.isValidID("10000"));
     }
 
-    public void testValidMixedID() {
+    public void testValidMixedID() throws BadRequestException {
         generator.clear();
         generator.add(new YearIDGeneratorPart("2009"));
         generator.add(new StringIDGeneratorPart("."));
@@ -309,7 +310,7 @@ public class BaseIDGeneratorTest extends TestCase {
         assertFalse(generator.isValidID("2009ZZ-AND-1"));
     }
 
-    public void testGetRegex() {
+    public void testGetRegex() throws BadRequestException {
         generator.clear();
         generator.add(new YearIDGeneratorPart("2009"));
         generator.add(new StringIDGeneratorPart("."));

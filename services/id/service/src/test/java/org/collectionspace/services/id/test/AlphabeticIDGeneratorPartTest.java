@@ -23,6 +23,7 @@
 
 package org.collectionspace.services.id.test;
 
+import org.collectionspace.services.common.repository.BadRequestException;
 import org.collectionspace.services.id.AlphabeticIDGeneratorPart;
 import org.collectionspace.services.id.SequenceIDGeneratorPart;
 
@@ -41,7 +42,7 @@ public class AlphabeticIDGeneratorPartTest extends TestCase {
 
 	SequenceIDGeneratorPart part;
 	
-	public void testNextIDLowercase() {
+	public void testNextIDLowercase() throws BadRequestException {
 
 		part = new AlphabeticIDGeneratorPart("a");
 		assertEquals("a", part.newID());
@@ -55,7 +56,7 @@ public class AlphabeticIDGeneratorPartTest extends TestCase {
 
 }
 
-	public void testnewIDLowercase2Chars() {
+	public void testnewIDLowercase2Chars() throws BadRequestException {
 
 		part = new AlphabeticIDGeneratorPart("aa");
 		assertEquals("aa", part.newID());
@@ -69,7 +70,7 @@ public class AlphabeticIDGeneratorPartTest extends TestCase {
 
 	}
 
-	public void testnewIDLowercase2CharsRolloverFirst() {
+	public void testnewIDLowercase2CharsRolloverFirst() throws BadRequestException {
 
 		part = new AlphabeticIDGeneratorPart("ay");
 		assertEquals("ay", part.newID());
@@ -79,7 +80,7 @@ public class AlphabeticIDGeneratorPartTest extends TestCase {
 
     }
 	
-	public void testnewIDUppercase() {
+	public void testnewIDUppercase() throws BadRequestException {
 		
 		part = new AlphabeticIDGeneratorPart("A", "Z", "A");
 		assertEquals("A", part.newID());
@@ -93,7 +94,7 @@ public class AlphabeticIDGeneratorPartTest extends TestCase {
 
     }
 
-	public void testnewIDUppercase2Chars() {
+	public void testnewIDUppercase2Chars() throws BadRequestException {
 
 		part = new AlphabeticIDGeneratorPart("A", "Z", "AA");
 		assertEquals("AA", part.newID());
@@ -107,7 +108,7 @@ public class AlphabeticIDGeneratorPartTest extends TestCase {
 			
 	}
 
-	public void testnewIDUppercase2CharsRolloverFirst() {
+	public void testnewIDUppercase2CharsRolloverFirst() throws BadRequestException {
 
 		part = new AlphabeticIDGeneratorPart("A", "Z", "AY");
 		assertEquals("AY", part.newID());
@@ -117,21 +118,21 @@ public class AlphabeticIDGeneratorPartTest extends TestCase {
 
   }
 
-	public void testInitialLowercase() {
+	public void testInitialLowercase() throws BadRequestException {
 		
 		part = new AlphabeticIDGeneratorPart("aaa");
 		assertEquals("aaa", part.getInitialID());
 		
 	}
 
-	public void testInitialUppercase() {
+	public void testInitialUppercase() throws BadRequestException {
 		
 		part = new AlphabeticIDGeneratorPart("A", "Z", "AZ");
 		assertEquals("AZ", part.getInitialID());
 		
 	}
 
-	public void testCurrentLowercase() {
+	public void testCurrentLowercase() throws BadRequestException {
 		
 		part = new AlphabeticIDGeneratorPart("aaa");
 		assertEquals("aaa", part.getCurrentID());
@@ -143,7 +144,7 @@ public class AlphabeticIDGeneratorPartTest extends TestCase {
 		
 	}
 
-	public void testCurrentUppercase() {
+	public void testCurrentUppercase() throws BadRequestException {
 		
 		part = new AlphabeticIDGeneratorPart("A", "Z", "A");
 		assertEquals("A", part.getCurrentID());
@@ -155,7 +156,7 @@ public class AlphabeticIDGeneratorPartTest extends TestCase {
 		
 	}	
 
-	public void testOverflowLowercase() {
+	public void testOverflowLowercase() throws BadRequestException {
 	
         part = new AlphabeticIDGeneratorPart("zx");
         assertEquals("zx", part.newID());
@@ -165,7 +166,7 @@ public class AlphabeticIDGeneratorPartTest extends TestCase {
 		
 	}
 
-	public void testOverflowUppercase() {
+	public void testOverflowUppercase() throws BadRequestException {
 	
         part = new AlphabeticIDGeneratorPart("A", "Z", "X");
         assertEquals("X", part.newID());
@@ -178,8 +179,8 @@ public class AlphabeticIDGeneratorPartTest extends TestCase {
 	public void testNonAlphabeticInitialValue() {
 		try {
 			part = new AlphabeticIDGeneratorPart("&*432");
-			fail("Should have thrown IllegalArgumentException here");
-		} catch (IllegalArgumentException expected) {
+			fail("Should have thrown BadRequestException here");
+		} catch (BadRequestException expected) {
 			// This Exception should be thrown, and thus the test should pass.
 		}
 	}
@@ -187,8 +188,8 @@ public class AlphabeticIDGeneratorPartTest extends TestCase {
 	public void testNullInitialValue() {
 		try {
 			part = new AlphabeticIDGeneratorPart(null);
-			fail("Should have thrown IllegalArgumentException here");
-		} catch (IllegalArgumentException expected) {
+			fail("Should have thrown BadRequestException here");
+		} catch (BadRequestException expected) {
 			// This Exception should be thrown, and thus the test should pass.
 		}
 	}
@@ -196,8 +197,8 @@ public class AlphabeticIDGeneratorPartTest extends TestCase {
 	public void testEmptyStringInitialValue() {
 		try {
 			part = new AlphabeticIDGeneratorPart("");
-			fail("Should have thrown IllegalArgumentException here");
-		} catch (IllegalArgumentException expected) {
+			fail("Should have thrown BadRequestException here");
+		} catch (BadRequestException expected) {
 			// This Exception should be thrown, and thus the test should pass.
 		}
 	}
@@ -205,13 +206,13 @@ public class AlphabeticIDGeneratorPartTest extends TestCase {
 	public void testAllSpaceCharsInitialValue() {
 		try {
 			part = new AlphabeticIDGeneratorPart("  ");
-			fail("Should have thrown IllegalArgumentException here");
-		} catch (IllegalArgumentException expected) {
+			fail("Should have thrown BadRequestException here");
+		} catch (BadRequestException expected) {
 			// This Exception should be thrown, and thus the test should pass.
 		}
 	}
 
-	public void testIsValidIDDefaultSeries() {
+	public void testIsValidIDDefaultSeries() throws BadRequestException {
 	
 		part = new AlphabeticIDGeneratorPart();
 
@@ -223,7 +224,7 @@ public class AlphabeticIDGeneratorPartTest extends TestCase {
 		
 	}
 
-	public void testIsValidIDConstrainedLowerCaseSeries() {
+	public void testIsValidIDConstrainedLowerCaseSeries() throws BadRequestException {
 	
 		part = new AlphabeticIDGeneratorPart("a", "f", "a");
 		
@@ -238,7 +239,7 @@ public class AlphabeticIDGeneratorPartTest extends TestCase {
 		
 	}
 
-	public void testIsValidIDConstrainedUppercaseSeries() {
+	public void testIsValidIDConstrainedUppercaseSeries() throws BadRequestException {
 	
 		part = new AlphabeticIDGeneratorPart("A", "F", "A");
 

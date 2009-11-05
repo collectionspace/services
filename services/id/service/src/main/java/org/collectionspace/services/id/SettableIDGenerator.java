@@ -29,8 +29,11 @@
 package org.collectionspace.services.id;
 
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.collectionspace.services.common.repository.BadRequestException;
 
 /**
  * SettableIDGenerator
@@ -91,7 +94,7 @@ public class SettableIDGenerator extends BaseIDGenerator {
      * @return  The current value of this ID.
      */
     public String getCurrentID(String value)
-        throws IllegalArgumentException {
+        throws BadRequestException {
 
       if (value == null) return value;
       
@@ -125,7 +128,7 @@ public class SettableIDGenerator extends BaseIDGenerator {
         // If the supplied ID doesn't partly match the pattern,
         // throw an Exception.
         if (matchedParts == 0) {
-            throw new IllegalArgumentException("Supplied ID does not match " +
+            throw new BadRequestException("Supplied ID does not match " +
                 "this ID pattern.");
         }
 
@@ -136,7 +139,7 @@ public class SettableIDGenerator extends BaseIDGenerator {
         // throw an Exception.  (This error condition should likely
         // never be reached, but it's here as a guard.)
         if (! matcher.matches()) {
-            throw new IllegalArgumentException("Supplied ID does not match " +
+            throw new BadRequestException("Supplied ID does not match " +
                 "this ID pattern.");
         }
         
@@ -146,7 +149,11 @@ public class SettableIDGenerator extends BaseIDGenerator {
         IDGeneratorPart currentPart;
         for (int i = 1; i <= matchedParts; i++) {
             currentPart = this.parts.get(i - 1);
-            currentPart.setCurrentID(matcher.group(i));
+            try {
+                currentPart.setCurrentID(matcher.group(i));
+            } catch (BadRequestException ex) {
+                throw new BadRequestException("Error setting current ID in ID part.");
+            }
         }
 
         // Obtain the initial value of the next IDGeneratorPart, and
@@ -189,10 +196,10 @@ public class SettableIDGenerator extends BaseIDGenerator {
      * @return  An new ID. 
      */
     public String newID(String value)
-        throws IllegalStateException, IllegalArgumentException {
+        throws IllegalStateException, BadRequestException {
 
         if (value == null) { 
-            throw new IllegalArgumentException("Supplied ID cannot be null.");
+            throw new BadRequestException("Supplied ID cannot be null.");
         }
         
         Pattern pattern = Pattern.compile(getRegex());
@@ -201,7 +208,7 @@ public class SettableIDGenerator extends BaseIDGenerator {
         // If the supplied ID doesn't entirely match the pattern,
         // throw an Exception.
         if (! matcher.matches()) {
-            throw new IllegalArgumentException(
+            throw new BadRequestException(
                 "Supplied ID does not match this ID pattern.");
         }
         

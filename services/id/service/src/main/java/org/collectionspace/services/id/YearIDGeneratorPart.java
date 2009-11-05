@@ -43,9 +43,12 @@ package org.collectionspace.services.id;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.collectionspace.services.common.repository.BadRequestException;
 
 /**
  * YearIDGeneratorPart
@@ -64,25 +67,23 @@ public class YearIDGeneratorPart implements IDGeneratorPart {
     // four-digit Gregorian Calendar year dates.
     final static String REGEX_PATTERN = "(\\d{4})";
 
-	public YearIDGeneratorPart() throws IllegalArgumentException {
-		this.currentValue = getCurrentYear();
+	public YearIDGeneratorPart() {
 	}
 	
-	public YearIDGeneratorPart(String yearValue)
-	    throws IllegalArgumentException {
+	public YearIDGeneratorPart(String yearValue) throws BadRequestException {
         setCurrentID(yearValue);
 	}
 
     @Override
-	public void setCurrentID(String yearValue) throws IllegalArgumentException {
+	public void setCurrentID(String yearValue) throws BadRequestException {
 		if (yearValue == null || yearValue.equals("")) {
-			throw new IllegalArgumentException(
+			throw new BadRequestException(
 			    "Supplied year must not be null or empty");
 		}
 		// NOTE: Validation currently is based on a
 		// hard coded year format and calendar system.
 		if (! isValidID(yearValue)) {
-			throw new IllegalArgumentException(
+			throw new BadRequestException(
 			    "Supplied year '" + yearValue + "' is not valid.");
 		}
 		this.currentValue = yearValue;
@@ -90,15 +91,17 @@ public class YearIDGeneratorPart implements IDGeneratorPart {
 
     @Override
 	public String getCurrentID() {
-        if (this.currentValue == null || this.currentValue.equals("")) {
-            setCurrentID(getCurrentYear());
+        String currentYear = "";
+        if (this.currentValue == null || this.currentValue.trim().isEmpty()) {
+            currentYear = getCurrentYear();
+        } else {
+            currentYear = this.currentValue;
         }
-		return this.currentValue;
+		return currentYear;
 	}
 
     @Override
     public String newID() {
-        setCurrentID(getCurrentYear());
 		return getCurrentID();
     }
 

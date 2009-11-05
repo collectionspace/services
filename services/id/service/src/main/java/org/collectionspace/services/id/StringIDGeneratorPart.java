@@ -30,6 +30,7 @@ package org.collectionspace.services.id;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import org.collectionspace.services.common.repository.BadRequestException;
 
 /**
  * StringIDGeneratorPart
@@ -46,10 +47,10 @@ public class StringIDGeneratorPart implements IDGeneratorPart,
     private String currentValue = null;
     
     public StringIDGeneratorPart(String initialValue)
-        throws IllegalArgumentException {
+        throws BadRequestException {
 
         if (initialValue == null || initialValue.equals("")) {
-            throw new IllegalArgumentException(
+            throw new BadRequestException(
                 "Initial ID value must not be null or empty");
         }
         
@@ -68,9 +69,9 @@ public class StringIDGeneratorPart implements IDGeneratorPart,
         return this.currentValue;
     }
 
-    public void setCurrentID(String value) throws IllegalArgumentException {
+    public void setCurrentID(String value) throws BadRequestException {
         if (value == null || value.equals("")) {
-            throw new IllegalArgumentException(
+            throw new BadRequestException(
             "ID value must not be null or empty");
         }
         this.currentValue = value;

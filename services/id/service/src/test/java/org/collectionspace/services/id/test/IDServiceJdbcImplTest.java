@@ -80,7 +80,7 @@ public class IDServiceJdbcImplTest {
 
     @Test(dependsOnMethods = {"hasRequiredDatabaseTable", "createIDGenerator"})
     public void readIDGenerator() throws DocumentNotFoundException,
-        IllegalArgumentException, IllegalStateException {
+        BadRequestException, IllegalStateException {
 
         instance = jdbc.readIDGenerator(DEFAULT_CSID);
         Assert.assertTrue(instance != null);
@@ -204,7 +204,7 @@ public class IDServiceJdbcImplTest {
 
     // @TODO Read test patterns from external configuration.
     
-    public String getSpectrumEntryNumberGenerator() {
+    public String getSpectrumEntryNumberGenerator() throws BadRequestException {
         
         generator = new SettableIDGenerator();
         generator.add(new StringIDGeneratorPart("E"));
@@ -214,7 +214,7 @@ public class IDServiceJdbcImplTest {
         
     }
 
-    public String getChinAccessionNumberGenerator() {
+    public String getChinAccessionNumberGenerator() throws BadRequestException {
 
         generator = new SettableIDGenerator();
         generator.add(new YearIDGeneratorPart());

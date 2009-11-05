@@ -25,6 +25,8 @@ package org.collectionspace.services.id.test;
 
 import org.collectionspace.services.id.*;
 
+import org.collectionspace.services.common.repository.BadRequestException; 
+
 import junit.framework.TestCase;
 import static org.junit.Assert.*;
 
@@ -51,7 +53,7 @@ public class IDGeneratorSerializerTest extends TestCase {
     // @TODO We may want to canonicalize (or otherwise normalize) the
     // expected and actual XML in these tests, to avoid failures resulting
     // from differences in whitespace, etc.
-    public void testSerializeIDGenerator() {
+    public void testSerializeIDGenerator() throws BadRequestException {
       SettableIDGenerator tempGenerator = new SettableIDGenerator();
         assertEquals(DEFAULT_SERIALIZED_ID_GENERATOR,
             IDGeneratorSerializer.serialize(tempGenerator));
@@ -60,8 +62,8 @@ public class IDGeneratorSerializerTest extends TestCase {
     public void testSerializeNullIDGenerator() {
       try {
         String serializedPattern = IDGeneratorSerializer.serialize(null);
-            fail("Should have thrown IllegalArgumentException here");
-        } catch (IllegalArgumentException expected) {
+            fail("Should have thrown BadRequestException here");
+        } catch (BadRequestException expected) {
             // This Exception should be thrown, and thus the test should pass.
         }
     }
@@ -80,8 +82,8 @@ public class IDGeneratorSerializerTest extends TestCase {
       try {
         SettableIDGenerator tempGenerator =
             IDGeneratorSerializer.deserialize(null);
-            fail("Should have thrown IllegalArgumentException here");
-        } catch (IllegalArgumentException expected) {
+            fail("Should have thrown BadRequestException here");
+        } catch (BadRequestException expected) {
             // This Exception should be thrown, and thus the test should pass.
         }
     }
@@ -90,8 +92,8 @@ public class IDGeneratorSerializerTest extends TestCase {
       try {
         IDGenerator tempGenerator =
             IDGeneratorSerializer.deserialize("<invalid_serialized_generator/>");
-            fail("Should have thrown IllegalArgumentException here");
-        } catch (IllegalArgumentException expected) {
+            fail("Should have thrown BadRequestException here");
+        } catch (BadRequestException expected) {
             // This Exception should be thrown, and thus the test should pass.
         }
     }

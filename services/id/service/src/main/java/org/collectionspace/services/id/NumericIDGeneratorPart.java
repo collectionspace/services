@@ -30,6 +30,8 @@ package org.collectionspace.services.id;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.collectionspace.services.common.repository.BadRequestException;
+
 /**  
  * NumericIDGeneratorPart
  *
@@ -52,7 +54,7 @@ public class NumericIDGeneratorPart implements SequenceIDGeneratorPart {
     /**
      * Constructor using defaults for initial value and maximum length.
      */
-    public NumericIDGeneratorPart() throws IllegalArgumentException {
+    public NumericIDGeneratorPart() throws BadRequestException {
         this(Long.toString(DEFAULT_INITIAL_VALUE),
             Long.toString(DEFAULT_MAX_LENGTH));
     }
@@ -63,7 +65,7 @@ public class NumericIDGeneratorPart implements SequenceIDGeneratorPart {
      * @param initialValue  The initial value of the numeric ID.
      */
     public NumericIDGeneratorPart(String initialValue)
-        throws IllegalArgumentException {
+        throws BadRequestException {
         this(initialValue, Long.toString(DEFAULT_MAX_LENGTH));
     }
 
@@ -75,27 +77,27 @@ public class NumericIDGeneratorPart implements SequenceIDGeneratorPart {
      * @param maxLength  The maximum String length for generated IDs.
      */
     public NumericIDGeneratorPart(String initialValue, String maxLength)
-        throws IllegalArgumentException {
+        throws BadRequestException {
 
         if (maxLength == null || maxLength.equals("")) {
-            throw new IllegalArgumentException(
+            throw new BadRequestException(
                 "Initial ID value must not be null or empty");
         }
         try {
             this.maxLength = Long.parseLong(maxLength);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
+            throw new BadRequestException(
                 "Maximum ID length must be parseable as a number");
         }
         if (initialValue == null || initialValue.equals("")) {
-            throw new IllegalArgumentException(
+            throw new BadRequestException(
                 "Initial ID value must not be null or empty");
         }
         
         try {
             long initVal = Long.parseLong(initialValue.trim());
             if ( initVal < 0 ) {
-                throw new IllegalArgumentException(
+                throw new BadRequestException(
                     "Initial ID value should be zero (0) or greater");
             }
             String initValStr = Long.toString(initVal);
@@ -106,10 +108,10 @@ public class NumericIDGeneratorPart implements SequenceIDGeneratorPart {
             }
             this.initialValue = initVal;
         } catch (NullPointerException e) {
-            throw new IllegalArgumentException(
+            throw new BadRequestException(
                 "Initial ID value should not be null");
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
+            throw new BadRequestException(
                 "Initial ID value must be parseable as a number");
         }
 
@@ -121,20 +123,20 @@ public class NumericIDGeneratorPart implements SequenceIDGeneratorPart {
     }
 
     @Override
-    public void setCurrentID(String value) throws IllegalArgumentException {
+    public void setCurrentID(String value) throws BadRequestException {
 
       // @TODO Much of this code is copied from the main constructor,
       // and may be ripe for refactoring.
 
         if (value == null || value.equals("")) {
-            throw new IllegalArgumentException(
+            throw new BadRequestException(
                 "ID value must not be null or empty");
         }
         
         try {
             long currVal = Long.parseLong(value.trim());
             if ( currVal < 0 ) {
-                throw new IllegalArgumentException(
+                throw new BadRequestException(
                     "ID value should be zero (0) or greater");
             }
             String currValStr = Long.toString(currVal);
@@ -145,10 +147,10 @@ public class NumericIDGeneratorPart implements SequenceIDGeneratorPart {
             }
             this.currentValue = currVal;
         } catch (NullPointerException e) {
-            throw new IllegalArgumentException(
+            throw new BadRequestException(
                 "ID value should not be null");
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(
+            throw new BadRequestException(
                 "ID value must be parseable as a number");
         }
     }

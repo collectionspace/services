@@ -29,6 +29,8 @@
  */
 package org.collectionspace.services.id;
 
+import org.collectionspace.services.common.repository.BadRequestException;
+
 public interface IDGeneratorPart {
     
     /**
@@ -45,7 +47,7 @@ public interface IDGeneratorPart {
      *
      * @return  The current value of the ID.
      */
-	public void setCurrentID(String value) throws IllegalArgumentException;
+	public void setCurrentID(String value) throws BadRequestException;
 
     /**
      * Returns a new ID.

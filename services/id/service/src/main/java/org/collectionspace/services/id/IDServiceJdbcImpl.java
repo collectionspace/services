@@ -86,9 +86,7 @@ import java.sql.Statement;
 
 // May at some point instead use
 // org.jboss.resteasy.spi.NotFoundException
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import org.collectionspace.services.common.repository.BadRequestException;
 import org.collectionspace.services.common.repository.DocumentNotFoundException;
@@ -430,8 +428,8 @@ public class IDServiceJdbcImpl implements IDService {
 		String serializedGenerator = "";
 		try {
 			serializedGenerator = IDGeneratorSerializer.serialize(generator);
-		} catch (IllegalArgumentException e) {
-			throw new BadRequestException(e);
+		} catch (BadRequestException e) {
+			throw e;
 		}
 		
 		try {
@@ -726,8 +724,8 @@ public class IDServiceJdbcImpl implements IDService {
 		String serializedGenerator = "";
 		try {
 			serializedGenerator = IDGeneratorSerializer.serialize(generator);
-		} catch (IllegalArgumentException e) {
-			throw new BadRequestException(e);
+		} catch (BadRequestException e) {
+			throw e;
 		}
 	
 		try {

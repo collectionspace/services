@@ -27,6 +27,7 @@
 
 package org.collectionspace.services.id.test;
 
+import org.collectionspace.services.common.repository.BadRequestException;
 import static org.junit.Assert.fail;
 import junit.framework.TestCase;
 import org.collectionspace.services.id.NumericIDGeneratorPart;
@@ -45,7 +46,7 @@ public class NumericIDGeneratorPartTest extends TestCase {
 
     SequenceIDGeneratorPart part;
 
-    public void testInitialID() {
+    public void testInitialID() throws BadRequestException {
         part = new NumericIDGeneratorPart("0");
         assertEquals("0", part.getInitialID());
 
@@ -56,8 +57,8 @@ public class NumericIDGeneratorPartTest extends TestCase {
     public void testNullInitialValue() {
         try {
             part = new NumericIDGeneratorPart(null);
-            fail("Should have thrown IllegalArgumentException here");
-        } catch (IllegalArgumentException expected) {
+            fail("Should have thrown BadRequestException here");
+        } catch (BadRequestException expected) {
             // This Exception should be thrown, and thus the test should pass.
         }
     }
@@ -65,8 +66,8 @@ public class NumericIDGeneratorPartTest extends TestCase {
     public void testNonLongParseableInitialValue() {
         try {
             part = new NumericIDGeneratorPart("not a long parseable value");
-            fail("Should have thrown IllegalArgumentException here");
-        } catch (IllegalArgumentException expected) {
+            fail("Should have thrown BadRequestException here");
+        } catch (BadRequestException expected) {
             // This Exception should be thrown, and thus the test should pass.
         }
     }
@@ -74,8 +75,8 @@ public class NumericIDGeneratorPartTest extends TestCase {
     public void testNonLongParseableMaxLength() {
         try {
             part = new NumericIDGeneratorPart("1", "not an int parseable value");
-            fail("Should have thrown IllegalArgumentException here");
-        } catch (IllegalArgumentException expected) {
+            fail("Should have thrown BadRequestException here");
+        } catch (BadRequestException expected) {
             // This Exception should be thrown, and thus the test should pass.
         }
     }
@@ -83,13 +84,13 @@ public class NumericIDGeneratorPartTest extends TestCase {
     public void testNegativeInitialValue() {
        try {
             part = new NumericIDGeneratorPart("-1");
-            fail("Should have thrown IllegalArgumentException here");
-        } catch (IllegalArgumentException expected) {
+            fail("Should have thrown BadRequestException here");
+        } catch (BadRequestException expected) {
             // This Exception should be thrown, and thus the test should pass.
         }
     }
 
-    public void testGetCurrentID() {
+    public void testGetCurrentID() throws BadRequestException {
         part = new NumericIDGeneratorPart("0");
         assertEquals("0", part.getCurrentID());
         assertEquals("0", part.newID());
@@ -102,7 +103,7 @@ public class NumericIDGeneratorPartTest extends TestCase {
         assertEquals("25", part.getCurrentID());
     }
 
-    public void testNewID() {
+    public void testNewID() throws BadRequestException {
         part = new NumericIDGeneratorPart("0");        
         assertEquals("0", part.newID());
         assertEquals("1", part.newID());
@@ -121,7 +122,7 @@ public class NumericIDGeneratorPartTest extends TestCase {
         assertEquals("3", part.newID());
     }
 
-    public void testNewIDOverflow() {
+    public void testNewIDOverflow() throws BadRequestException {
 
         try {
             part = new NumericIDGeneratorPart("997", "3");        
@@ -148,7 +149,7 @@ public class NumericIDGeneratorPartTest extends TestCase {
             
     }
 
-    public void testIsValidID() {
+    public void testIsValidID() throws BadRequestException {
         part = new NumericIDGeneratorPart("1");
         assertTrue(part.isValidID("1"));
         part = new NumericIDGeneratorPart("1");

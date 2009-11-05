@@ -24,6 +24,7 @@
 package org.collectionspace.services.id.test;
 
 import junit.framework.TestCase;
+import org.collectionspace.services.common.repository.BadRequestException;
 import org.collectionspace.services.id.StoredValueIDGeneratorPart;
 import org.collectionspace.services.id.StringIDGeneratorPart;
 
@@ -42,8 +43,8 @@ public class StringIDGeneratorPartTest extends TestCase {
 	public void testNullInitialValue() {
 		try {
 			part = new StringIDGeneratorPart(null);
-			fail("Should have thrown IllegalArgumentException here");
-		} catch (IllegalArgumentException expected) {
+			fail("Should have thrown BadRequestException here");
+		} catch (BadRequestException expected) {
 			// This Exception should be thrown, and thus the test should pass.
 		}
 	}
@@ -51,30 +52,30 @@ public class StringIDGeneratorPartTest extends TestCase {
 	public void testEmptyInitialValue() {
 		try {
 			part = new StringIDGeneratorPart("");
-			fail("Should have thrown IllegalArgumentException here");
-		} catch (IllegalArgumentException expected) {
+			fail("Should have thrown BadRequestException here");
+		} catch (BadRequestException expected) {
 			// This Exception should be thrown, and thus the test should pass.
 		}
 	}
 
-	public void testGetInitialID() {
+	public void testGetInitialID() throws BadRequestException {
 		part = new StringIDGeneratorPart("-");
 		assertEquals("-", part.getInitialID());
 	}
 
-	public void testGetCurrentID() {
+	public void testGetCurrentID() throws BadRequestException {
 		part = new StringIDGeneratorPart("- -");
 		assertEquals("- -", part.getCurrentID());
 	}
 	
-	public void testNewID() {
+	public void testNewID() throws BadRequestException {
 		part = new StringIDGeneratorPart("E");		
 		assertEquals("E", part.newID());	
 		part = new StringIDGeneratorPart("XYZ");		
 		assertEquals("XYZ", part.newID());		
 	}
 
-	public void testIsValidID() {
+	public void testIsValidID() throws BadRequestException, BadRequestException {
 		part = new StringIDGeneratorPart("-");
 		assertTrue(part.isValidID("-"));
 		part = new StringIDGeneratorPart("TE");

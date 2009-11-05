@@ -23,6 +23,7 @@
 
 package org.collectionspace.services.id.test;
 
+import org.collectionspace.services.common.repository.BadRequestException;
 import static org.junit.Assert.fail;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -50,7 +51,7 @@ public class YearIDGeneratorPartTest extends TestCase {
     }
 
 
-    public void testCurrentID() {
+    public void testCurrentID() throws BadRequestException {
 
         part = new YearIDGeneratorPart();
         assertEquals(getCurrentYear(), part.getCurrentID());
@@ -60,7 +61,7 @@ public class YearIDGeneratorPartTest extends TestCase {
 
     }
 
-    public void testSetCurrentID() {
+    public void testSetCurrentID() throws BadRequestException {
 
         part = new YearIDGeneratorPart("1999");
         part.setCurrentID("1999");
@@ -76,15 +77,15 @@ public class YearIDGeneratorPartTest extends TestCase {
 
         try {
           part.setCurrentID(null);
-            fail("Should have thrown IllegalArgumentException here");
-        } catch (IllegalArgumentException expected) {
+            fail("Should have thrown BadRequestException here");
+        } catch (BadRequestException expected) {
             // This Exception should be thrown, and thus the test should pass.
         }
 
         try {
           part.setCurrentID("");
-            fail("Should have thrown IllegalArgumentException here");
-        } catch (IllegalArgumentException expected) {
+            fail("Should have thrown BadRequestException here");
+        } catch (BadRequestException expected) {
             // This Exception should be thrown, and thus the test should pass.
         }
 
@@ -126,12 +127,12 @@ public class YearIDGeneratorPartTest extends TestCase {
     }
 */
 
-    public void testNullInitialValue() {
+    public void testNullInitialValue() throws BadRequestException {
     
         try {
             part = new YearIDGeneratorPart(null);
-            fail("Should have thrown IllegalArgumentException here");
-        } catch (IllegalArgumentException expected) {
+            fail("Should have thrown BadRequestException here");
+        } catch (BadRequestException expected) {
             // This Exception should be thrown, and thus the test should pass.
         }
         
@@ -141,8 +142,8 @@ public class YearIDGeneratorPartTest extends TestCase {
     
         try {
             part = new YearIDGeneratorPart("");
-            fail("Should have thrown IllegalArgumentException here");
-        } catch (IllegalArgumentException expected) {
+            fail("Should have thrown BadRequestException here");
+        } catch (BadRequestException expected) {
             // This Exception should be thrown, and thus the test should pass.
         }
 

@@ -27,6 +27,9 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
+import org.collectionspace.services.common.repository.BadRequestException;
+
+
 /**
  * IDGeneratorSerializer
  *
@@ -53,13 +56,13 @@ public class IDGeneratorSerializer {
    *
    * @return  A serialized representation of that ID generator.
    *
-   * @throws  IllegalArgumentException if the ID generator cannot be serialized.
+   * @throws  BadRequestException if the ID generator cannot be serialized.
    */
 	public static String serialize(SettableIDGenerator generator)
-	    throws IllegalArgumentException {
+	    throws BadRequestException {
 	
 	  if (generator == null) {
-	    throw new IllegalArgumentException("ID generator cannot be null.");
+	    throw new BadRequestException("ID generator cannot be null.");
 	  }
   
     XStream xstream = new XStream(new DomDriver()); 
@@ -68,7 +71,7 @@ public class IDGeneratorSerializer {
     try {
       serializedGenerator = xstream.toXML(generator);
     } catch (XStreamException e) {
-	    throw new IllegalArgumentException(
+	    throw new BadRequestException(
 	      "Could not convert ID generator to XML for storage in database.");
     }
     
@@ -85,13 +88,13 @@ public class IDGeneratorSerializer {
    *
    * @return  The ID generator deserialized as a Java object.
    *
-   * @throws  IllegalArgumentException if the ID generator cannot be deserialized.
+   * @throws  BadRequestException if the ID generator cannot be deserialized.
    */
 	public static SettableIDGenerator deserialize(String serializedGenerator)
-	  throws IllegalArgumentException {
+	  throws BadRequestException {
 
 	  if (serializedGenerator == null || serializedGenerator.equals("")) {
-	    throw new IllegalArgumentException("ID generator cannot be null or empty.");
+	    throw new BadRequestException("ID generator cannot be null or empty.");
 	  }
 
     XStream xstream = new XStream(new DomDriver());
@@ -100,7 +103,7 @@ public class IDGeneratorSerializer {
     try {
       generator = (SettableIDGenerator) xstream.fromXML(serializedGenerator);
     } catch (XStreamException e) {
-	    throw new IllegalArgumentException(
+	    throw new BadRequestException(
 	      "Could not understand or parse this representation of an ID generator.");
     }
 

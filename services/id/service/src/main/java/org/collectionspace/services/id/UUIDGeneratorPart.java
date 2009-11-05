@@ -24,8 +24,11 @@
 package org.collectionspace.services.id;
 
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.collectionspace.services.common.repository.BadRequestException;
 
 /**
  * UUIDGeneratorPart
@@ -65,13 +68,13 @@ public class UUIDGeneratorPart implements IDGeneratorPart {
     }
 
     @Override
-    public void setCurrentID(String idValue) throws IllegalArgumentException {
+    public void setCurrentID(String idValue) throws BadRequestException {
 		if (idValue == null || idValue.equals("")) {
-			throw new IllegalArgumentException(
+			throw new BadRequestException(
 			    "Supplied UUID must not be null or empty");
 		}
 		if (! isValidID(idValue)) {
-			throw new IllegalArgumentException(
+			throw new BadRequestException(
 			    "Supplied UUID '" + idValue + "' is not valid.");
         }
         this.currentValue = idValue;
@@ -89,7 +92,12 @@ public class UUIDGeneratorPart implements IDGeneratorPart {
     @Override
     public String newID() {
         String newID = UUID.randomUUID().toString();
-        setCurrentID(newID);
+        try {
+            setCurrentID(newID);
+        } catch (BadRequestException ex) {
+            // Do nothing.  There will be no adverse consequences if we
+            // can't set the current ID here.
+        }
         return newID;
     }
 
