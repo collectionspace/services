@@ -24,6 +24,7 @@
 package org.collectionspace.services.id.test;
 
 import junit.framework.TestCase;
+import org.collectionspace.services.common.repository.BadRequestException;
 import org.collectionspace.services.id.*;
 
 /**    
@@ -43,7 +44,7 @@ public class SettableIDGeneratorTest extends TestCase {
     // if any initialization of new IDParts fails
     // due to invalid arguments passed to their constructors.
 
-    public void testCurrentIDWithPartialSuppliedID() {
+    public void testCurrentIDWithPartialSuppliedID() throws BadRequestException {
         generator.clear();
         generator.add(new StringIDGeneratorPart("E"));
         generator.add(new NumericIDGeneratorPart("1"));
@@ -92,7 +93,7 @@ public class SettableIDGeneratorTest extends TestCase {
 
     }
 
-    public void testCurrentIDWithFullSuppliedID() {
+    public void testCurrentIDWithFullSuppliedID() throws BadRequestException {
         generator.clear();
         generator.add(new YearIDGeneratorPart("2009"));
         generator.add(new StringIDGeneratorPart("."));
@@ -110,7 +111,7 @@ public class SettableIDGeneratorTest extends TestCase {
         assertEquals("2009.1-b", generator.newID());
     }
 
-    public void testNewIDWithTrailingConstantStringID() {
+    public void testNewIDWithTrailingConstantStringID() throws BadRequestException {
         generator.clear();
         generator.add(new YearIDGeneratorPart());
         generator.add(new StringIDGeneratorPart("."));
@@ -120,7 +121,7 @@ public class SettableIDGeneratorTest extends TestCase {
         assertEquals(CURRENT_YEAR + ".1-", generator.newID());
     }
 
-    public void testNewIDWithSuppliedID() {
+    public void testNewIDWithSuppliedID() throws BadRequestException {
         generator.clear();
         generator.add(new YearIDGeneratorPart("2009"));
         generator.add(new StringIDGeneratorPart("."));
