@@ -34,6 +34,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.UriBuilder;
 
 // May at some point instead use
 // org.jboss.resteasy.spi.NotFoundException
@@ -61,9 +62,6 @@ import org.slf4j.LoggerFactory;
  */
 // Set the base path component for URLs that access this service.
 @Path("/idgenerators")
-// Identify the default MIME media types consumed and produced by this service.
-@Consumes(MediaType.TEXT_PLAIN)
-@Produces(MediaType.TEXT_PLAIN)
 public class IDResource {
 
     final Logger logger = LoggerFactory.getLogger(IDResource.class);
@@ -114,6 +112,7 @@ public class IDResource {
      */
     @POST
     @Path("/{csid}/ids")
+    @Produces(MediaType.TEXT_PLAIN)
     public Response newID(@PathParam("csid") String csid) {
 
         // @TODO The JavaDoc description reflects an as-yet-to-be-carried out
@@ -138,10 +137,10 @@ public class IDResource {
         String newId = "";
         try {
 
-            // Obtain a new ID from the specified ID generator,
-            // and return it in the entity body of the response.
+            // Obtain a new ID from the specified ID generator instance.
             newId = service.createID(csid);
 
+            // If the new ID is empty, return an error response.
             if (newId == null || newId.trim().isEmpty()) {
                 response =
                     Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -151,19 +150,36 @@ public class IDResource {
                 return response;
             }
 
+            // If we successfully obtained a new ID from the specified
+            // ID generator instance, return it in the response.
+            
+            // Build the URI to be returned in the Location header.
+            //
+            // Gets the base URL path to this resource.
+            UriBuilder path = UriBuilder.fromResource(IDResource.class);
+            // @TODO Look into whether we can create the path using the
+            // URI template in the @Path annotation to this method, rather
+            // than the hard-coded analog to that template currently used.
+            path.path("" + csid + "/ids/" + newId);
+
+            // Build the response, setting the:
+            // - HTTP Status code (to '201 Created')
+            // - Location header (to a resource URI)
+            // - Content-type header (to the relevant media type)
+            // - Entity body (to the new ID)
             response =
-                Response.status(Response.Status.CREATED)
+                Response.created(path.build())
                     .entity(newId)
                     .type(MediaType.TEXT_PLAIN)
                     .build();
 
-            // @TODO Return an XML-based error results format with the
-            // responses below.
+        // @TODO Return an XML-based error results format with the
+        // responses below.
 
-            // @TODO An IllegalStateException often indicates an overflow
-            // of an IDPart.  Consider whether returning a 400 Bad Request
-            // status code is still warranted, or whether returning some other
-            // status would be more appropriate.
+        // @TODO An IllegalStateException often indicates an overflow
+        // of an IDPart.  Consider whether returning a 400 Bad Request
+        // status code is still warranted, or whether returning some other
+        // status would be more appropriate.
 
         } catch (DocumentNotFoundException dnfe) {
             response = Response.status(Response.Status.NOT_FOUND)
@@ -197,28 +213,17 @@ public class IDResource {
     @POST
     @Path("")
     @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.TEXT_PLAIN)
     public Response createIDGenerator() {
 
         // @TODO Implement this stubbed method
+        // by replacing this placeholder code.
 
-        // @TODO Replace this placeholder code.
         Response response =
             Response.status(Response.Status.CREATED)
                 .entity("")
                 .type(MediaType.TEXT_PLAIN)
                 .build();
-
-        /*
-        // @TODO Replace this placeholder code.
-        // Return a URL for the newly-created resource in the
-        // Location header
-        String csid = "TEST-1";
-        String url = BASE_URL_PATH + "/" + csid;
-        List locationList = Collections.singletonList(url);
-        response.getMetadata()
-        .get("Location")
-        .putSingle("Location", locationList);
-         */
 
         return response;
     }
