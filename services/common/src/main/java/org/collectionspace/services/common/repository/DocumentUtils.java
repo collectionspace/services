@@ -25,8 +25,10 @@ package org.collectionspace.services.common.repository;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -51,6 +53,14 @@ import org.w3c.dom.Text;
  */
 public class DocumentUtils {
 
+    private static String NAME_VALUE_SEPARATOR = "|";
+
+    private static class NameValue {
+
+        String name;
+        String value;
+    };
+
     /**
      * parseProperties given payload to create XML document. this
      * method also closes given stream after parsing.
@@ -60,7 +70,7 @@ public class DocumentUtils {
      */
     public static Document parseDocument(InputStream payload)
             throws Exception {
-        try{
+        try {
             // Create a builder factory
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setValidating(false);//TODO take validating value from meta
@@ -68,8 +78,8 @@ public class DocumentUtils {
             // Create the builder and parse the file
             return factory.newDocumentBuilder().parse(payload);
 
-        }finally{
-            if(payload != null){
+        } finally {
+            if (payload != null) {
                 payload.close();
             }
 
@@ -87,27 +97,86 @@ public class DocumentUtils {
         HashMap<String, Object> objectProps = new HashMap<String, Object>();
         // Get a list of all elements in the document
         Node root = document.getFirstChild();
-        NodeList children = root.getChildNodes();
-        for(int i = 0; i < children.getLength(); i++){
-            Node node = (Node) children.item(i);
-            if(node.getNodeType() == Node.ELEMENT_NODE){
-                Node cnode = node.getFirstChild();
-                if(cnode == null){
-                    //if element is present but no value, set to ""
-                    //FIXME what about non-string types?
-                    objectProps.put(node.getNodeName(), "");
-                }else{
-                    if(cnode.getNodeType() != Node.TEXT_NODE){
-                        continue;
-                    }
-                    Node textNode = (Text) cnode;
-                    //FIXME what about other native xml types?
-                    objectProps.put(node.getNodeName(),
-                            textNode.getNodeValue());
+        NodeList rootChildren = root.getChildNodes();
+        for (int i = 0; i < rootChildren.getLength(); i++) {
+            Node node = rootChildren.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                NodeList childNodes = node.getChildNodes();
+                if (childNodes.getLength() > 1) {
+                    //must be multi value element
+                    String[] vals = getMultiValues(node);
+                    objectProps.put(node.getNodeName(), vals);
+                } else if (childNodes.getLength() == 1) {
+                    objectProps.put(node.getNodeName(), getTextNodeValue(node));
                 }
             }
         }
         return objectProps;
+    }
+
+    /**
+     * getMultiValues retrieve multi-value element values
+     * @param node
+     * @return
+     */
+    private static String[] getMultiValues(Node node) {
+        ArrayList<String> vals = new ArrayList<String>();
+        NodeList children = node.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node cnode = children.item(i);
+            vals.add(qualify(cnode.getNodeName(), getTextNodeValue(cnode)));
+        }
+        return vals.toArray(new String[0]);
+    }
+
+    /**
+     * getTextNodeValue retrieves text node value
+     * @param cnode
+     * @return
+     */
+    private static String getTextNodeValue(Node cnode) {
+        String value = "";
+        Node ccnode = cnode.getFirstChild();
+        if (ccnode != null && ccnode.getNodeType() == Node.TEXT_NODE) {
+            value = ccnode.getNodeValue();
+        }
+        return value;
+    }
+
+    /**
+     * isQualified check if the given value is already qualified with given property name
+     * e.g.  otherNumber|urn:org.collectionspace.id:24082390 is qualified with otherNumber
+     * but urn:org.walkerart.id:123 is not qualified
+     * @param name of the property, e.g. otherNumber
+     * @param value of the property e.g. otherNumber
+     * @return
+     */
+    private static boolean isQualified(String name, String value) {
+        StringTokenizer stz = new StringTokenizer(value, NAME_VALUE_SEPARATOR);
+        int tokens = stz.countTokens();
+        if (tokens == 2) {
+            String n = stz.nextToken();
+            return name.equals(n);
+        }
+        return false;
+    }
+
+    /**
+     * qualify qualifies given property value with given property name, e.g.
+     * name=otherNumber and value=urn:org.collectionspace.id:24082390 would be
+     * qualified as otherNumber|urn:org.collectionspace.id:24082390. however,
+     * name=otherNumber and value=otherNumber|urn:org.collectionspace.id:24082390
+     * would be ignored as the given value is already qualified once.
+     * @param name
+     * @param value
+     * @return
+     */
+    private static String qualify(String name, String value) {
+        if (isQualified(name, value)) {
+            return value;
+        }
+        return name + NAME_VALUE_SEPARATOR + value;
+
     }
 
     /**
@@ -124,7 +193,7 @@ public class DocumentUtils {
             throws Exception {
         ObjectPartContentType partContentMeta = partMeta.getContent();
         XmlContentType xc = partContentMeta.getXmlContent();
-        if(xc == null){
+        if (xc == null) {
             return null;
         }
 
@@ -146,18 +215,60 @@ public class DocumentUtils {
         root.setAttribute("xmlns:" + ns, xc.getNamespaceURI());
         document.appendChild(root);
 
-        for(String prop : objectProps.keySet()){
+        for (String prop : objectProps.keySet()) {
             Object value = objectProps.get(prop);
-            if(value != null){
+            if (value != null) {
                 //no need to qualify each element name as namespace is already added
                 Element e = document.createElement(prop);
                 root.appendChild(e);
-                String strValue = objectProps.get(prop).toString();
-                Text tNode = document.createTextNode(strValue);
-                e.appendChild(tNode);
+                if (value instanceof ArrayList) {
+                    //multi-value element
+                    insertMultiValues(document, e, (ArrayList) value);
+                } else {
+                    String strValue = objectProps.get(prop).toString();
+                    insertTextNode(document, e, strValue);
+                }
             }
         }
         return document;
+    }
+
+    private static void insertMultiValues(Document document, Element e, ArrayList vals) {
+        String parentName = e.getNodeName();
+        for (Object o : vals) {
+            String val = (String) o; //force cast
+            NameValue nv = unqualify(val);
+            Element c = document.createElement(nv.name);
+            e.appendChild(c);
+            insertTextNode(document, c, nv.value);
+        }
+    }
+
+    private static void insertTextNode(Document document, Element e, String strValue) {
+        Text tNode = document.createTextNode(strValue);
+        e.appendChild(tNode);
+    }
+
+    /**
+     * unqualify given value. if the given input value is not qualified, throw exception
+     * input of otherNumber|urn:org.collectionspace.id:24082390 would be unqualified
+     * as name=otherNumber and value=urn:org.collectionspace.id:24082390
+     * @param input
+     * @return name and value
+     * @exception IllegalStateException
+     */
+    private static NameValue unqualify(String input) {
+        NameValue nv = new NameValue();
+        StringTokenizer stz = new StringTokenizer(input, NAME_VALUE_SEPARATOR);
+        int tokens = stz.countTokens();
+        if (tokens == 2) {
+            nv.name = stz.nextToken();
+            nv.value = stz.nextToken();
+        } else {
+            throw new IllegalStateException("Found multi valued element " + input +
+                    " without qualification");
+        }
+        return nv;
     }
 
     /**

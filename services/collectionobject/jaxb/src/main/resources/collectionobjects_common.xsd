@@ -33,7 +33,7 @@
                 
                 <!-- Object identification information -->
                 <xs:element name="objectNumber" type="xs:string"/>
-                <xs:element name="otherNumber" type="xs:string"/>
+                <xs:element name="otherNumbers" type="otherNumberList"/>
                 <xs:element name="otherNumberType" type="xs:string"/>
                 <xs:element name="briefDescription" type="xs:string"/>
                 <xs:element name="comments" type="xs:string"/>
@@ -103,7 +103,7 @@
                 
 
 			<!-- Object description Inscription description information -->
-			    <xs:element name="inscriptionDescription" type="xs:string" />
+                <xs:element name="inscriptionDescription" type="xs:string" />
                 <xs:element name="inscriptionDescriptionInscriber" type="xs:string" />
                 <xs:element name="inscriptionDescriptionDate" type="xs:string" />
                 <xs:element name="inscriptionDescriptionInterpretation" type="xs:string" />
@@ -112,38 +112,44 @@
                 <xs:element name="inscriptionDescriptionType" type="xs:string" />
 
 			<!-- Object description Material information -->
-				<xs:element name="material" type="xs:string" />
-				<xs:element name="materialComponent" type="xs:string" />
-				<xs:element name="materialComponentNote" type="xs:string" />
-				<xs:element name="materialName" type="xs:string" />
-				<xs:element name="materialSource" type="xs:string" />
+                <xs:element name="material" type="xs:string" />
+                <xs:element name="materialComponent" type="xs:string" />
+                <xs:element name="materialComponentNote" type="xs:string" />
+                <xs:element name="materialName" type="xs:string" />
+                <xs:element name="materialSource" type="xs:string" />
 
 			<!-- Misc Object description information -->
-				<xs:element name="objectStatus" type="xs:string" />
-				<xs:element name="phase" type="xs:string" />
-				<xs:element name="physicalDescription" type="xs:string" />
-				<xs:element name="sex" type="xs:string" />
-				<xs:element name="style" type="xs:string" />
-				<xs:element name="technicalAttribute" type="xs:string" />
-				<xs:element name="technicalAttributeMeasurement" type="xs:string" />
-				<xs:element name="technicalAttributeMeasurementUnit" type="xs:string" />
-				<xs:element name="objectComponentName" type="xs:string" />
-				<xs:element name="objectComponentInformation" type="xs:string" />
+                <xs:element name="objectStatus" type="xs:string" />
+                <xs:element name="phase" type="xs:string" />
+                <xs:element name="physicalDescription" type="xs:string" />
+                <xs:element name="sex" type="xs:string" />
+                <xs:element name="style" type="xs:string" />
+                <xs:element name="technicalAttribute" type="xs:string" />
+                <xs:element name="technicalAttributeMeasurement" type="xs:string" />
+                <xs:element name="technicalAttributeMeasurementUnit" type="xs:string" />
+                <xs:element name="objectComponentName" type="xs:string" />
+                <xs:element name="objectComponentInformation" type="xs:string" />
 				
 			<!-- Object description Date information -->
-				<xs:element name="dateAssociation" type="xs:string" />
-				<xs:element name="dateEarliestSingle" type="xs:string" />
-				<xs:element name="dateEarliestSingleCertainty" type="xs:string" />
-				<xs:element name="dateEarlierstSingleQualifier" type="xs:string" />
-				<xs:element name="dateLatest" type="xs:string" />
-				<xs:element name="dateLatestCertainty" type="xs:string" />
-				<xs:element name="dateLatestQualifier" type="xs:string" />
-				<xs:element name="datePeriod" type="xs:string" />
-				<xs:element name="dateText" type="xs:string" />
+                <xs:element name="dateAssociation" type="xs:string" />
+                <xs:element name="dateEarliestSingle" type="xs:string" />
+                <xs:element name="dateEarliestSingleCertainty" type="xs:string" />
+                <xs:element name="dateEarlierstSingleQualifier" type="xs:string" />
+                <xs:element name="dateLatest" type="xs:string" />
+                <xs:element name="dateLatestCertainty" type="xs:string" />
+                <xs:element name="dateLatestQualifier" type="xs:string" />
+                <xs:element name="datePeriod" type="xs:string" />
+                <xs:element name="dateText" type="xs:string" />
                 
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <xs:complexType name="otherNumberList">
+        <xs:sequence>
+            <xs:element name="otherNumber" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
     
     <!-- collection objects as in nuxeo repository -->
     <xs:element name="collectionobjects-common-list">
