@@ -334,7 +334,8 @@ public class RelationServiceTest extends AbstractServiceTest {
         relation.setDocumentId2("updated-" + relation.getDocumentId2());
         relation.setDocumentType2("updated-" + relation.getDocumentType2());
         if(logger.isDebugEnabled()){
-            verbose("updated object", relation, RelationsCommon.class);
+            logger.debug("updated object");
+            logger.debug(objectAsXmlString(relation, RelationsCommon.class));
         }
 
         // Submit the request to the service and store the response.
@@ -590,8 +591,8 @@ public class RelationServiceTest extends AbstractServiceTest {
                 multipart.addPart(relation, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getCommonPartName());
         if(logger.isDebugEnabled()){
-          verbose("to be created, relation common ", relation,
-              RelationsCommon.class);
+          logger.debug("to be created, relation common");
+          logger.debug(objectAsXmlString(relation, RelationsCommon.class));
         }
         return multipart;
     }

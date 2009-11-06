@@ -476,7 +476,8 @@ public class VocabularyServiceTest extends AbstractServiceTest {
         vocabulary.setDisplayName("updated-" + vocabulary.getDisplayName());
         vocabulary.setVocabType("updated-" + vocabulary.getVocabType());
         if(logger.isDebugEnabled()){
-            verbose("to be updated Vocabulary", vocabulary, VocabulariesCommon.class);
+            logger.debug("to be updated Vocabulary");
+            logger.debug(objectAsXmlString(vocabulary, VocabulariesCommon.class));
         }
 
         // Submit the updated resource to the service and store the response.
@@ -534,8 +535,9 @@ public class VocabularyServiceTest extends AbstractServiceTest {
         // Update the contents of this resource.
         vocabularyItem.setDisplayName("updated-" + vocabularyItem.getDisplayName());
         if(logger.isDebugEnabled()){
-            verbose("to be updated VocabularyItem", vocabularyItem,
-                VocabularyitemsCommon.class);
+            logger.debug("to be updated VocabularyItem");
+            logger.debug(objectAsXmlString(vocabularyItem,
+                VocabularyitemsCommon.class));
         }
 
         // Submit the updated resource to the service and store the response.
@@ -910,7 +912,8 @@ public class VocabularyServiceTest extends AbstractServiceTest {
         commonPart.getHeaders().add("label", client.getCommonPartName());
 
         if(logger.isDebugEnabled()) {
-            verbose("to be created, vocabulary common ", vocabulary, VocabulariesCommon.class);
+            logger.debug("to be created, vocabulary common");
+            logger.debug(objectAsXmlString(vocabulary, VocabulariesCommon.class));
         }
         return multipart;
     }
@@ -926,8 +929,9 @@ public class VocabularyServiceTest extends AbstractServiceTest {
         commonPart.getHeaders().add("label", client.getItemCommonPartName());
 
         if(logger.isDebugEnabled()){
-            verbose("to be created, vocabularyitem common ", vocabularyItem,
-                VocabularyitemsCommon.class);
+            logger.debug("to be created, vocabularyitem common");
+            logger.debug(objectAsXmlString(vocabularyItem,
+                VocabularyitemsCommon.class));
         }
 
         return multipart;

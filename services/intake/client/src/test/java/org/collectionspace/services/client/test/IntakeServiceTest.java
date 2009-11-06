@@ -337,7 +337,8 @@ public class IntakeServiceTest extends AbstractServiceTest {
         intake.setEntryNumber("updated-" + intake.getEntryNumber());
         intake.setEntryDate("updated-" + intake.getEntryDate());
         if(logger.isDebugEnabled()){
-            verbose("to be updated object", intake, IntakesCommon.class);
+            logger.debug("to be updated object");
+            logger.debug(objectAsXmlString(intake, IntakesCommon.class));
         }
         // Submit the request to the service and store the response.
         MultipartOutput output = new MultipartOutput();
@@ -589,7 +590,8 @@ public class IntakeServiceTest extends AbstractServiceTest {
         commonPart.getHeaders().add("label", client.getCommonPartName());
 
         if(logger.isDebugEnabled()){
-            verbose("to be created, intake common ", intake, IntakesCommon.class);
+            logger.debug("to be created, intake common");
+            logger.debug(objectAsXmlString(intake, IntakesCommon.class));
         }
 
         return multipart;

@@ -309,7 +309,8 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
         // Update the content of this resource.
         acquisition.setAccessionDate("updated-" + acquisition.getAccessionDate());
         if(logger.isDebugEnabled()){
-            verbose("updated object", acquisition, AcquisitionsCommon.class);
+            logger.debug("updated object");
+            logger.debug(objectAsXmlString(acquisition, AcquisitionsCommon.class));
         }
         // Submit the request to the service and store the response.
         MultipartOutput output = new MultipartOutput();
@@ -577,8 +578,8 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
         commonPart.getHeaders().add("label", client.getCommonPartName());
 
         if(logger.isDebugEnabled()){
-            verbose("to be created, acquisition common ",
-                acquisition, AcquisitionsCommon.class);
+            logger.debug("to be created, acquisition common");
+            logger.debug(objectAsXmlString(acquisition, AcquisitionsCommon.class));
         }
         return multipart;
     }

@@ -24,6 +24,7 @@
 package org.collectionspace.services.client.test;
 
 import java.io.ByteArrayInputStream;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import javax.ws.rs.core.MultivaluedMap;
@@ -597,35 +598,28 @@ public abstract class AbstractServiceTest implements ServiceTest {
     // to be moved to a utilities module, suitable for use
     // by both client-side and server-side code.
 
-    protected void verbose(String msg) {
-        if(logger.isDebugEnabled()){
-            logger.debug(msg);
-        }
-    }
-
-    protected void verbose(String msg, Object o, Class clazz) {
+    protected String objectAsXmlString(Object o, Class clazz) {
+        StringWriter sw = new StringWriter();
         try{
-            if(logger.isDebugEnabled()){
-                logger.debug(msg);
-            }
             JAXBContext jc = JAXBContext.newInstance(clazz);
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
                     Boolean.TRUE);
-            m.marshal(o, System.out);
+            m.marshal(o, sw);
         }catch(Exception e){
             e.printStackTrace();
         }
+        return sw.toString();
     }
-
-    protected void verboseMap(MultivaluedMap map) {
+    
+    protected String mapAsString(MultivaluedMap map) {
+        StringBuffer sb = new StringBuffer();
         for(Object entry : map.entrySet()){
             MultivaluedMap.Entry mentry = (MultivaluedMap.Entry) entry;
-            if(logger.isDebugEnabled()){
-                logger.debug("    name=" + mentry.getKey() +
-                    " value=" + mentry.getValue());
-            }
+            sb.append("    name=" + mentry.getKey());
+            sb.append(" value=" + mentry.getValue() + "\n");
         }
+        return sb.toString();
     }
 
     private void banner(String label) {

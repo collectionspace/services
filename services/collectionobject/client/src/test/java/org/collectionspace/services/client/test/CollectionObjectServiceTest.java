@@ -348,9 +348,11 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         collectionObject.setObjectNumber("updated-" + collectionObject.getObjectNumber());
         collectionObject.setObjectName("updated-" + collectionObject.getObjectName());
         if (logger.isDebugEnabled()) {
-            verbose("updated object", collectionObject,
-                    CollectionobjectsCommon.class);
+            logger.debug("updated object");
+            logger.debug(objectAsXmlString(collectionObject,
+                CollectionobjectsCommon.class));
         }
+
         // Submit the request to the service and store the response.
         MultipartOutput output = new MultipartOutput();
         OutputPart commonPart = output.addPart(collectionObject, MediaType.APPLICATION_XML_TYPE);
@@ -609,8 +611,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         commonPart.getHeaders().add("label", commonPartName);
 
         if (logger.isDebugEnabled()) {
-            verbose("to be created, collectionobject common ",
-                    collectionObject, CollectionobjectsCommon.class);
+            logger.debug("to be created, collectionobject common");
+            logger.debug(objectAsXmlString(collectionObject,
+                CollectionobjectsCommon.class));
         }
 
         CollectionObjectNaturalhistory conh = new CollectionObjectNaturalhistory();
@@ -621,8 +624,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         nhPart.getHeaders().add("label", getNHPartName());
 
         if (logger.isDebugEnabled()) {
-            verbose("to be created, collectionobject nhistory",
-                    conh, CollectionObjectNaturalhistory.class);
+            logger.debug("to be created, collectionobject nhistory");
+            logger.debug(objectAsXmlString(conh,
+                CollectionObjectNaturalhistory.class));
         }
         return multipart;
 
