@@ -118,17 +118,20 @@
     </repositories>
     
     <pluginRepositories>
+    	
         <pluginRepository>
             <id>java.net</id>
             <name>java.net Maven Repository</name>
-            <url>https://maven-repository.dev.java.net/nonav/repository</url>
+            <url>http://download.java.net/maven/2</url>
             <layout>legacy</layout>
         </pluginRepository>
+        
         <pluginRepository>
             <id>maven2-repository.dev.java.net</id>
             <name>Java.net Maven 2 Repository</name>
             <url>http://download.java.net/maven/2</url>
         </pluginRepository>
+
         <pluginRepository>
             <id>codehaus snapshot repository</id>
             <url>http://snapshots.repository.codehaus.org/</url>
@@ -136,6 +139,7 @@
               <enabled>true</enabled>
             </releases>
         </pluginRepository>
+        
     </pluginRepositories>
 
     <build>
@@ -150,9 +154,16 @@
                     </configuration>
                 </plugin>
                 <plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<configuration>
+					</configuration>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
                     <configuration>
+                    		<dependencyLocationEnabled>false</dependencyLocationEnabled>
                         <unzipCommand>/usr/bin/unzip -o &gt; err.txt</unzipCommand>
                     </configuration>
                 </plugin>
