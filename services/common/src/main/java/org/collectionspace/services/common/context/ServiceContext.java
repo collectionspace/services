@@ -37,7 +37,7 @@ import org.collectionspace.services.common.service.ServiceBindingType;
 public interface ServiceContext<T1, T2> {
 
     /**
-     * The charactor used to separtate the words in a part label
+     * The character used to separate the words in a part label
      */
     public static final String PART_LABEL_SEPERATOR = "_";
     public static final String PART_COMMON_LABEL = "common";
@@ -65,6 +65,20 @@ public interface ServiceContext<T1, T2> {
      * @return service name
      */
     public String getServiceName();
+
+    /**
+     * getDocumentType returns the name of the (primary) DocumentType for this service
+     * The value defaults to the Service Name, unless overridden with setDocumentType();
+     * @return service name
+     */
+    public String getDocumentType();
+
+    /**
+     * setDocumentType sets the name of the Document Type for this service
+     * The value defaults to the Service Name.
+     * @return service name
+     */
+    public void setDocumentType(String docType);
 
     /**
      * getQualifiedServiceName returns tenant id qualified service name

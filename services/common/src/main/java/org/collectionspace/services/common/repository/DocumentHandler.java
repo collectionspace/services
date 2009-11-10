@@ -200,6 +200,19 @@ public interface DocumentHandler<T, TL> {
     public void setProperties(Map<String, Object> properties);
 
     /**
+     * getDocumentFilter
+     * @return
+     */
+    public DocumentFilter getDocumentFilter();
+
+    /**
+     * setDocumentFilter provides means to the CollectionSpace service resource to
+     * set up DocumentFilter values before invoking any request via the client.
+     * @param docFilter
+     */
+    public void setDocumentFilter(DocumentFilter docFilter);
+
+    /**
      * getCommonPart provides the common part of a CS object.
      * @return common part of CS object
      */

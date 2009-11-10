@@ -67,13 +67,23 @@ public interface RepositoryClient {
     void get(ServiceContext ctx, String id, DocumentHandler handler) throws DocumentNotFoundException, DocumentException;
 
     /**
-     * getAll get all documents for an entity entity service from the Document repository
+     * getAll get all documents for an entity service from the Document repository
      * @param ctx service context under which this method is invoked
      * @param handler should be used by the caller to provide and transform the document
      * @throws DocumentNotFoundException if workspace not found
      * @throws DocumentException
      */
     void getAll(ServiceContext ctx, DocumentHandler handler) throws DocumentNotFoundException, DocumentException;
+
+    /**
+     * getFiltered get all documents for an entity service from the Document repository,
+     * given filter parameters specified by the handler. 
+     * @param ctx service context under which this method is invoked
+     * @param handler should be used by the caller to provide and transform the document
+     * @throws DocumentNotFoundException if workspace not found
+     * @throws DocumentException
+     */
+    void getFiltered(ServiceContext ctx, DocumentHandler handler) throws DocumentNotFoundException, DocumentException;
 
     /**
      * update given document in the Document repository

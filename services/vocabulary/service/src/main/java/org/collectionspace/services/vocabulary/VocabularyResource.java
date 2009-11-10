@@ -23,6 +23,9 @@
  */
 package org.collectionspace.services.vocabulary;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -31,8 +34,10 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -42,6 +47,7 @@ import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.repository.DocumentFilter;
 import org.collectionspace.services.common.repository.DocumentHandler;
 import org.collectionspace.services.common.repository.DocumentNotFoundException;
 import org.collectionspace.services.vocabulary.nuxeo.VocabularyHandlerFactory;
@@ -50,6 +56,8 @@ import org.collectionspace.services.vocabulary.nuxeo.VocabularyItemHandlerFactor
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.ecm.core.client.NuxeoClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,23 +147,23 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
 
     @GET
     @Path("{csid}")
-    public MultipartOutput getVocabulary(
-            @PathParam("csid") String csid) {
-        if(logger.isDebugEnabled()){
-            logger.debug("getVocabulary with csid=" + csid);
-        }
-        if(csid == null || "".equals(csid)){
+    public MultipartOutput getVocabulary(@PathParam("csid") String csid) {
+    	String idValue = null;
+    	if(csid == null){
             logger.error("getVocabulary: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
                     "get failed on Vocabulary csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
+        if(logger.isDebugEnabled()){
+            logger.debug("getVocabulary with path(id)=" + csid);
+        }
         MultipartOutput result = null;
         try{
             RemoteServiceContext ctx = createServiceContext(null);
             DocumentHandler handler = createDocumentHandler(ctx);
-            getRepositoryClient(ctx).get(ctx, csid, handler);
+        	getRepositoryClient(ctx).get(ctx, csid, handler);
             result = ctx.getOutput();
         }catch(DocumentNotFoundException dnfe){
             if(logger.isDebugEnabled()){
@@ -189,7 +197,16 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
         try{
             RemoteServiceContext ctx = createServiceContext(null);
             DocumentHandler handler = createDocumentHandler(ctx);
-            getRepositoryClient(ctx).getAll(ctx, handler);
+            MultivaluedMap<String,String> queryParams = ui.getQueryParameters(); 
+            if(queryParams.size()>0) {
+            	String nameQ = queryParams.getFirst("name");
+            	if(nameQ!= null) {
+                    DocumentFilter myFilter = new DocumentFilter(
+                      		 "vocabularies_common:refName='"+nameQ+"'", 0, 0);
+                    handler.setDocumentFilter(myFilter);
+            	}
+            }
+            getRepositoryClient(ctx).getFiltered(ctx, handler);
             vocabularyObjectList = (VocabulariesCommonList) handler.getCommonPartList();
         }catch(Exception e){
             if(logger.isDebugEnabled()){
@@ -361,14 +378,34 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
     		 @PathParam("csid") String parentcsid,
     		 @Context UriInfo ui) {
          VocabularyitemsCommonList vocabularyItemObjectList = new VocabularyitemsCommonList();
+         RepositoryInstance repoSession = null;
+         NuxeoClient client = null;
          try{
-        	 // Note that we have to create the service context for the Items, not the main service 
+        	 // Note that docType defaults to the ServiceName, so we're fine with that.
              RemoteServiceContext ctx = createServiceContext(null, getItemServiceName());
              DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
-             // HACK This should be a search with the parentcsid. The 
-             // handler.getCommonPartList method will filter these for us, 
-             // which is really silly, but works for now.
-             getRepositoryClient(ctx).getAll(ctx, handler);
+             /*
+             // Note that we replace the getAll() call with a basic search on the parent vocab
+             handler.prepare(Action.GET_ALL);
+        	 client = NuxeoConnector.getInstance().getClient();
+             repoSession = client.openRepository();
+             if (logger.isDebugEnabled()) {
+                 logger.debug("getVocabularyItemList() repository root: " + repoSession.getRootDocument());
+             }
+             DocumentModelList docList = 
+            	 repoSession.query("SELECT * FROM Vocabularyitem WHERE vocabularyitems_common:inVocabulary='"
+            			 			+parentcsid+"'");
+             //set repoSession to handle the document
+             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
+             DocumentModelListWrapper wrapDoc = new DocumentModelListWrapper(
+                     docList);
+             handler.handle(Action.GET_ALL, wrapDoc);
+             handler.complete(Action.GET_ALL, wrapDoc);
+             */
+             DocumentFilter myFilter = new DocumentFilter(
+            		 "vocabularyitems_common:inVocabulary='"+parentcsid+"'", 0, 0);
+             handler.setDocumentFilter(myFilter);
+             getRepositoryClient(ctx).getFiltered(ctx, handler);
              vocabularyItemObjectList = (VocabularyitemsCommonList) handler.getCommonPartList();
          }catch(Exception e){
              if(logger.isDebugEnabled()){
@@ -377,6 +414,16 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
              Response response = Response.status(
                      Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
              throw new WebApplicationException(response);
+         } finally {
+             if(repoSession != null) {
+	             try {
+	                 // release session
+	                 client.releaseRepository(repoSession);
+	             } catch (Exception e) {
+	                 logger.error("Could not close the repository session", e);
+	                 // no need to throw this service specific exception
+	             }
+             }
          }
          return vocabularyItemObjectList;
      }

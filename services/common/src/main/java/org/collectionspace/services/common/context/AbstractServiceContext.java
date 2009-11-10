@@ -50,6 +50,8 @@ public abstract class AbstractServiceContext<T1, T2>
     private ServiceBindingType serviceBinding;
     private TenantBindingType tenantBinding;
     
+    private String overrideDocumentType = null; 
+    
     public AbstractServiceContext(String serviceName) {
         TenantBindingConfigReader tReader =
                 ServiceMain.getInstance().getTenantBindingConfigReader();
@@ -150,6 +152,19 @@ public abstract class AbstractServiceContext<T1, T2>
     @Override
     public String getServiceName() {
         return serviceBinding.getName();
+    } 
+    
+    @Override
+    public String getDocumentType() {
+    	// If they have not overridden the setting, use the type of the service
+    	// object.
+    	return(overrideDocumentType!=null)?overrideDocumentType:
+    		serviceBinding.getObject().get(0).getName();
+    }
+
+    @Override
+    public void setDocumentType(String docType) {
+    	overrideDocumentType = docType;
     }
 
     @Override

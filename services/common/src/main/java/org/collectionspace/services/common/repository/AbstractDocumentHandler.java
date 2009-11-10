@@ -43,6 +43,7 @@ public abstract class AbstractDocumentHandler<T, TL>
 
     private final Logger logger = LoggerFactory.getLogger(AbstractDocumentHandler.class);
     private Map<String, Object> properties = new HashMap<String, Object>();
+    private DocumentFilter docFilter = new DocumentFilter();
     private ServiceContext serviceContext;
 
     public AbstractDocumentHandler() {
@@ -72,6 +73,22 @@ public abstract class AbstractDocumentHandler<T, TL>
     @Override
     public void setProperties(Map<String, Object> properties) {
         this.properties = properties;
+    }
+
+    /**
+     * @return the DocumentFilter
+     */
+    @Override
+    public DocumentFilter getDocumentFilter() {
+        return docFilter;
+    }
+
+    /**
+     * @param properties the DocumentFilter to set
+     */
+    @Override
+    public void setDocumentFilter(DocumentFilter docFilter) {
+        this.docFilter = docFilter;
     }
 
     @Override

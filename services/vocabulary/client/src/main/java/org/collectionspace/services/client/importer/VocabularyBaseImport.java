@@ -60,74 +60,77 @@ public class VocabularyBaseImport {
 
     public void createEnumeration(String vocabName, List<String> enumValues ) {
 
-        // Expected status code: 201 Created
-        int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
-        // Type of service request being tested
-        ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
+    	// Expected status code: 201 Created
+    	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
+    	// Type of service request being tested
+    	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
 
-        if(logger.isDebugEnabled()){
-            logger.debug("Import: Create vocabulary: \"" + vocabName +"\"");
-				}
-        MultipartOutput multipart = createVocabularyInstance(vocabName, "enum");
-        ClientResponse<Response> res = client.create(multipart);
+    	if(logger.isDebugEnabled()){
+    		logger.debug("Import: Create vocabulary: \"" + vocabName +"\"");
+    	}
+    	MultipartOutput multipart = createVocabularyInstance(vocabName, 
+    			createRefName(vocabName), "enum");
+    	ClientResponse<Response> res = client.create(multipart);
 
-        int statusCode = res.getStatus();
+    	int statusCode = res.getStatus();
 
-        if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-					throw new RuntimeException("Could not create enumeration: \""+vocabName
-							+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-				}
-        if(statusCode != EXPECTED_STATUS_CODE) {
-					throw new RuntimeException("Unexpected Status when creating enumeration: \""
-							+vocabName +"\", Status:"+ statusCode);
-				}
+    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
+    		throw new RuntimeException("Could not create enumeration: \""+vocabName
+    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    	}
+    	if(statusCode != EXPECTED_STATUS_CODE) {
+    		throw new RuntimeException("Unexpected Status when creating enumeration: \""
+    				+vocabName +"\", Status:"+ statusCode);
+    	}
 
-        // Store the ID returned from this create operation
-        // for additional tests below.
-        String newVocabId = extractId(res);
-        if(logger.isDebugEnabled()){
-            logger.debug("Import: Created vocabulary: \"" + vocabName +"\" ID:"
-								+newVocabId );
-				}
-				for(String itemName : enumValues){
-					createItemInVocab(newVocabId, vocabName, itemName);
-				}
+    	// Store the ID returned from this create operation
+    	// for additional tests below.
+    	String newVocabId = extractId(res);
+    	if(logger.isDebugEnabled()){
+    		logger.debug("Import: Created vocabulary: \"" + vocabName +"\" ID:"
+    				+newVocabId );
+    	}
+    	for(String itemName : enumValues){
+    		createItemInVocab(newVocabId, vocabName, itemName, createRefName(itemName));
+    	}
     }
     
-    private String createItemInVocab(String vcsid, String vocabName, String itemName) {
-        // Expected status code: 201 Created
-        int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
-        // Type of service request being tested
-        ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
+    private String createItemInVocab(String vcsid, String vocabName, String itemName, String refName) {
+    	// Expected status code: 201 Created
+    	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
+    	// Type of service request being tested
+    	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
 
-        if(logger.isDebugEnabled()){
-            logger.debug("Import: Create Item: \""+itemName+"\" in vocabulary: \"" + vocabName +"\"");
-				}
-        MultipartOutput multipart = createVocabularyItemInstance(vcsid, itemName);
-        ClientResponse<Response> res = client.createItem(vcsid, multipart);
+    	if(logger.isDebugEnabled()){
+    		logger.debug("Import: Create Item: \""+itemName+"\" in vocabulary: \"" + vocabName +"\"");
+    	}
+    	MultipartOutput multipart = createVocabularyItemInstance(vcsid, itemName, refName);
+    	ClientResponse<Response> res = client.createItem(vcsid, multipart);
 
-        int statusCode = res.getStatus();
+    	int statusCode = res.getStatus();
 
-        if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-					throw new RuntimeException("Could not create Item: \""+itemName
-							+"\" in vocabulary: \"" + vocabName
-							+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-				}
-        if(statusCode != EXPECTED_STATUS_CODE) {
-					throw new RuntimeException("Unexpected Status when creating Item: \""+itemName
-							+"\" in vocabulary: \"" + vocabName +"\", Status:"+ statusCode);
-				}
+    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
+    		throw new RuntimeException("Could not create Item: \""+itemName
+    				+"\" in vocabulary: \"" + vocabName
+    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    	}
+    	if(statusCode != EXPECTED_STATUS_CODE) {
+    		throw new RuntimeException("Unexpected Status when creating Item: \""+itemName
+    				+"\" in vocabulary: \"" + vocabName +"\", Status:"+ statusCode);
+    	}
 
-        return extractId(res);
+    	return extractId(res);
     }
 
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
 
-    private MultipartOutput createVocabularyInstance(String displayName, String vocabType) {
+    private MultipartOutput createVocabularyInstance(
+    		String displayName, String refName, String vocabType) {
         VocabulariesCommon vocabulary = new VocabulariesCommon();
         vocabulary.setDisplayName(displayName);
+        vocabulary.setRefName(refName);
         vocabulary.setVocabType(vocabType);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(vocabulary, MediaType.APPLICATION_XML_TYPE);
@@ -141,10 +144,12 @@ public class VocabularyBaseImport {
         return multipart;
     }
 
-    private MultipartOutput createVocabularyItemInstance(String inVocabulary, String displayName) {
+    private MultipartOutput createVocabularyItemInstance(
+    		String inVocabulary, String displayName, String refName) {
     	VocabularyitemsCommon vocabularyItem = new VocabularyitemsCommon();
     	vocabularyItem.setInVocabulary(inVocabulary);
     	vocabularyItem.setDisplayName(displayName);
+    	vocabularyItem.setRefName(refName);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(vocabularyItem, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getItemCommonPartName());
@@ -186,6 +191,10 @@ public class VocabularyBaseImport {
         	logger.debug("id=" + id);
         }
         return id;
+    }
+    
+    protected String createRefName(String displayName) {
+    	return displayName.replaceAll("\\W", "");
     }
 
 	public static void main(String[] args) {

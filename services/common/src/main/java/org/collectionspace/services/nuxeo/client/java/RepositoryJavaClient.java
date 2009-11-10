@@ -19,12 +19,14 @@ package org.collectionspace.services.nuxeo.client.java;
 
 
 import java.util.UUID;
-import org.collectionspace.services.common.repository.RepositoryClient;
+
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.repository.BadRequestException;
-import org.collectionspace.services.common.repository.DocumentNotFoundException;
-import org.collectionspace.services.common.repository.DocumentHandler;
 import org.collectionspace.services.common.repository.DocumentException;
+import org.collectionspace.services.common.repository.DocumentFilter;
+import org.collectionspace.services.common.repository.DocumentHandler;
+import org.collectionspace.services.common.repository.DocumentNotFoundException;
+import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.DocumentHandler.Action;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.common.utils.IdUtils;
@@ -220,6 +222,66 @@ public class RepositoryJavaClient implements RepositoryClient {
             }
         }
     }
+    
+    /**
+     * getFiltered get all documents for an entity service from the Document repository,
+     * given filter parameters specified by the handler. 
+     * @param ctx service context under which this method is invoked
+     * @param handler should be used by the caller to provide and transform the document
+     * @throws DocumentNotFoundException if workspace not found
+     * @throws DocumentException
+     */
+    public void getFiltered(ServiceContext ctx, DocumentHandler handler) 
+    	throws DocumentNotFoundException, DocumentException {
+        if (handler == null) {
+            throw new IllegalArgumentException(
+                    "RemoteRepositoryClient.getFiltered: handler is missing");
+        }
+        DocumentFilter docFilter = handler.getDocumentFilter();
+        if (docFilter == null) {
+            throw new IllegalArgumentException(
+                    "RemoteRepositoryClient.getFiltered: handler has no Filter specified");
+        }
+        String docType = ctx.getDocumentType();
+        if (docType == null) {
+            throw new DocumentNotFoundException(
+                    "Unable to find DocumentType for service " + ctx.getServiceName());
+        }
+        RepositoryInstance repoSession = null;
+        try {
+            handler.prepare(Action.GET_ALL);
+            repoSession = getRepositorySession();
+            StringBuilder query = new StringBuilder("SELECT * FROM ");
+            query.append(docType);
+            String where = docFilter.getWhereClause(); 
+            if((null!=where)&&(where.length()>0))
+            	query.append(" WHERE "+where);
+            if(docFilter.getOffset()>0)
+            	query.append(" OFFSET "+docFilter.getOffset());
+            if(docFilter.getPageSize()>0)
+            	query.append(" LIMIT "+docFilter.getPageSize());
+            DocumentModelList docList = repoSession.query(query.toString());
+            //set repoSession to handle the document
+            ((DocumentModelHandler) handler).setRepositorySession(repoSession);
+            DocumentModelListWrapper wrapDoc = new DocumentModelListWrapper(
+                    docList);
+            handler.handle(Action.GET_ALL, wrapDoc);
+            handler.complete(Action.GET_ALL, wrapDoc);
+        } catch (DocumentException de) {
+            throw de;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw new DocumentException(e);
+        } finally {
+            if (repoSession != null) {
+                releaseRepositorySession(repoSession);
+            }
+        }
+    }
+
+    
 
     /**
      * update given document in the Nuxeo repository

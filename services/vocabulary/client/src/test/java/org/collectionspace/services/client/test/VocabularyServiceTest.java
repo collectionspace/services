@@ -58,7 +58,12 @@ public class VocabularyServiceTest extends AbstractServiceTest {
     final String SERVICE_PATH_COMPONENT = "vocabularies";
     final String ITEM_SERVICE_PATH_COMPONENT = "items";
     private String knownResourceId = null;
+    private String knownResourceRefName = null;
     private String knownItemResourceId = null;
+    
+    protected String createRefName(String displayName) {
+    	return displayName.replaceAll("\\W", "");
+    }    
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
@@ -75,7 +80,11 @@ public class VocabularyServiceTest extends AbstractServiceTest {
 
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
-        MultipartOutput multipart = createVocabularyInstance(identifier);
+        String displayName = "displayName-" + identifier;
+    	String refName = createRefName(displayName);
+    	String typeName = "vocabType-" + identifier;
+    	MultipartOutput multipart = 
+    		createVocabularyInstance(displayName, refName, typeName);
         ClientResponse<Response> res = client.create(multipart);
         int statusCode = res.getStatus();
 
@@ -95,6 +104,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
         // Store the ID returned from this create operation
         // for additional tests below.
         knownResourceId = extractId(res);
+        knownResourceRefName = refName;
         if(logger.isDebugEnabled()){
             logger.debug("create: knownResourceId=" + knownResourceId);
         }
@@ -120,7 +130,8 @@ public class VocabularyServiceTest extends AbstractServiceTest {
 
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
-        MultipartOutput multipart = createVocabularyItemInstance(vcsid, identifier);
+        String refName = createRefName(identifier);
+        MultipartOutput multipart = createVocabularyItemInstance(vcsid, identifier, refName);
         ClientResponse<Response> res = client.createItem(vcsid, multipart);
         int statusCode = res.getStatus();
 
@@ -278,6 +289,38 @@ public class VocabularyServiceTest extends AbstractServiceTest {
             throw new RuntimeException(e);
         }
     }
+
+    /*
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+            dependsOnMethods = {"read"})
+        public void readByName(String testName) throws Exception {
+
+            // Perform setup.
+            setupRead();
+
+            // Submit the request to the service and store the response.
+            ClientResponse<MultipartInput> res = client.read(knownResourceId);
+            int statusCode = res.getStatus();
+
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if(logger.isDebugEnabled()){
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            //FIXME: remove the following try catch once Aron fixes signatures
+            try {
+                MultipartInput input = (MultipartInput) res.getEntity();
+                VocabulariesCommon vocabulary = (VocabulariesCommon) extractPart(input,
+                        client.getCommonPartName(), VocabulariesCommon.class);
+                Assert.assertNotNull(vocabulary);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    */
 
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
         dependsOnMethods = {"createItem", "read"})
@@ -704,7 +747,8 @@ public class VocabularyServiceTest extends AbstractServiceTest {
         // The only relevant ID may be the one used in update(), below.
 
         // The only relevant ID may be the one used in update(), below.
-        MultipartOutput multipart = createVocabularyItemInstance(knownResourceId, NON_EXISTENT_ID);
+        MultipartOutput multipart = createVocabularyItemInstance(
+        		knownResourceId, NON_EXISTENT_ID, createRefName(NON_EXISTENT_ID));
         ClientResponse<MultipartInput> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
@@ -898,14 +942,19 @@ public class VocabularyServiceTest extends AbstractServiceTest {
     }
 
     private MultipartOutput createVocabularyInstance(String identifier) {
+    	String displayName = "displayName-" + identifier;
+    	String refName = createRefName(displayName);
+    	String typeName = "vocabType-" + identifier;
         return createVocabularyInstance(
-                "displayName-" + identifier,
-                "vocabType-" + identifier);
+                displayName, refName,typeName );
     }
 
-    private MultipartOutput createVocabularyInstance(String displayName, String vocabType) {
+    private MultipartOutput createVocabularyInstance(
+    		String displayName, String refName, String vocabType) {
         VocabulariesCommon vocabulary = new VocabulariesCommon();
         vocabulary.setDisplayName(displayName);
+        if(refName!=null)
+            vocabulary.setRefName(refName);
         vocabulary.setVocabType(vocabType);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(vocabulary, MediaType.APPLICATION_XML_TYPE);
@@ -919,10 +968,12 @@ public class VocabularyServiceTest extends AbstractServiceTest {
     }
 
     private MultipartOutput createVocabularyItemInstance(String inVocabulary,
-        String displayName) {
+        String displayName, String refName) {
         VocabularyitemsCommon vocabularyItem = new VocabularyitemsCommon();
         vocabularyItem.setInVocabulary(inVocabulary);
         vocabularyItem.setDisplayName(displayName);
+        if(refName!=null)
+        	vocabularyItem.setRefName(refName);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(vocabularyItem,
             MediaType.APPLICATION_XML_TYPE);

@@ -11,16 +11,30 @@
       </templates>
       <rows>
         <row><widget>displayName</widget></row>
+        <row><widget>refName</widget></row>
         <row><widget>vocabType</widget></row>
       </rows>
 
       <widget name="displayName" type="text">
         <labels>
-          <label mode="any">Name</label>
+          <label mode="any">Display Name</label>
         </labels>
         <translated>true</translated>
         <fields>
           <field schema="vocabularies_common">displayName</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="refName" type="text">
+        <labels>
+          <label mode="any">RefName</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="vocabularies_common">refName</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -51,16 +65,30 @@
       </templates>
       <rows>
         <row><widget>displayName</widget></row>
+        <row><widget>refName</widget></row>
         <row><widget>inVocabulary</widget></row>
       </rows>
 
       <widget name="displayName" type="text">
         <labels>
-          <label mode="any">Name</label>
+          <label mode="any">Display Name</label>
         </labels>
         <translated>true</translated>
         <fields>
           <field schema="vocabularyitems_common">displayName</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="refName" type="text">
+        <labels>
+          <label mode="any">RefName</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="vocabularyitems_common">refName</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>

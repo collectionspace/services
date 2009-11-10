@@ -34,6 +34,7 @@
                 
                 <!--  Vocabulary Information Group -->
                 <xs:element name="displayName" type="xs:string"/>
+                <xs:element name="refName" type="xs:string"/>
                 <xs:element name="vocabType" type="xs:string"/>
 
             </xs:sequence>
