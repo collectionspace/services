@@ -237,6 +237,11 @@
     </target>
 
 
+    <target name="hotdeploy" depends="install"
+    description="deploy services in running ${jboss.server.cspace}">
+        <ant antfile="services/build.xml" target="hotdeploy" inheritAll="false"/>
+    </target>
+
     <target name="eclipse" depends="eclipse-unix,eclipse-windows" description="Generate Eclipse files" />
     <target name="eclipse-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">

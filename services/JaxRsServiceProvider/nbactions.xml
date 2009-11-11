@@ -2,36 +2,24 @@
 <actions>
         <action>
             <actionName>test</actionName>
-            <packagings>
-                <packaging>*</packaging>
-            </packagings>
             <goals>
                 <goal>test</goal>
             </goals>
         </action>
         <action>
             <actionName>build</actionName>
-            <packagings>
-                <packaging>*</packaging>
-            </packagings>
             <goals>
                 <goal>install</goal>
             </goals>
         </action>
         <action>
             <actionName>clean</actionName>
-            <packagings>
-                <packaging>*</packaging>
-            </packagings>
             <goals>
                 <goal>clean</goal>
             </goals>
         </action>
         <action>
             <actionName>rebuild</actionName>
-            <packagings>
-                <packaging>*</packaging>
-            </packagings>
             <goals>
                 <goal>clean</goal>
                 <goal>install</goal>
@@ -42,11 +30,6 @@
         </action>
         <action>
             <actionName>run</actionName>
-            <packagings>
-                <packaging>war</packaging>
-                <packaging>ear</packaging>
-                <packaging>ejb</packaging>
-            </packagings>
             <goals>
                 <goal>package</goal>
             </goals>
@@ -57,11 +40,6 @@
         </action>
         <action>
             <actionName>debug</actionName>
-            <packagings>
-                <packaging>war</packaging>
-                <packaging>ear</packaging>
-                <packaging>ejb</packaging>
-            </packagings>
             <goals>
                 <goal>package</goal>
             </goals>
@@ -70,5 +48,13 @@
                 <netbeans.deploy>true</netbeans.deploy>
                 <netbeans.deploy.debugmode>true</netbeans.deploy.debugmode>
             </properties>
+        </action>
+        <action>
+            <actionName>CUSTOM-redeploy</actionName>
+            <displayName>redeploy</displayName>
+            <goals>
+                <goal>cargo:undeploy</goal>
+                <goal>cargo:deploy</goal>
+            </goals>
         </action>
     </actions>

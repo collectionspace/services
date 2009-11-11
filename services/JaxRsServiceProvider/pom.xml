@@ -174,41 +174,24 @@
         <finalName>cspace-services</finalName>
         <defaultGoal>package</defaultGoal>
         <plugins>
-            <!--plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jboss-maven-plugin</artifactId>
-                <configuration>
-                    <serverName>cspace</serverName>
-                    <jbossHome>${jboss.dir}</jbossHome>
-                    <port>8180</port>
-                </configuration>
-                <executions>               	
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <executions>
                     <execution>
-                        <id>jboss-undeploy</id>
-                        <phase>pre-integration-test</phase>
+                        <phase>initialize</phase>
                         <goals>
-                            <goal>undeploy</goal>
+                            <goal>read-project-properties</goal>
                         </goals>
-                        <configuration>
-                            <fileNames>
-                                <param>${project.build.directory}/${project.build.finalName}.war</param>
-                            </fileNames>
-                        </configuration>
                     </execution>
-                    <execution>
-                        <id>jboss-deploy</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>deploy</goal>
-                        </goals>
-                        <configuration>
-                            <fileNames>
-                                <param>${project.build.directory}/${project.build.finalName}.war</param>
-                            </fileNames>
-                        </configuration>
-                    </execution>                
                 </executions>
-            </plugin-->
+                <configuration>
+                    <files>
+                        <file>../../build.properties</file>
+                    </files>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
@@ -222,7 +205,7 @@
                     <configuration>
                         <type>runtime</type>
                         <properties>
-                            <cargo.servlet.port>8180</cargo.servlet.port>
+                            <cargo.servlet.port>${jboss.domain.cspace.port}</cargo.servlet.port>
                             <cargo.jboss.configuration>cspace</cargo.jboss.configuration>
                         </properties>
                     </configuration>
@@ -233,7 +216,7 @@
                                 <groupId>org.collectionspace.services</groupId>
                                 <artifactId>org.collectionspace.services.jaxrs.provider</artifactId>
                                 <type>war</type>
-                                <pingURL>http://127.0.0.1:8180</pingURL>
+                                <pingURL>http://${host}:${jboss.domain.cspace.port}</pingURL>
                             </deployable>
                         </deployables>
                     </deployer>

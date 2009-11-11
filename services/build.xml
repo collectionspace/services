@@ -132,6 +132,11 @@
         <ant antfile="common/build.xml" target="undeploy" inheritAll="false"/>
     </target>
 
+    <target name="hotdeploy" depends="install"
+    description="deploy services in running ${jboss.server.cspace}">
+        <ant antfile="JaxRsServiceProvider/build.xml" target="hotdeploy" inheritAll="false"/>
+    </target>
+
     <!-- this target is called in order based on the dependencies between the services -->
     <target name="dist" depends="package"
     description="create distribution for services">
