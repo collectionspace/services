@@ -106,17 +106,17 @@
 
     <target name="deploy" depends="install"
     description="deploy id service">
-        
+        <ant antfile="service/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
     description="undeploy id service">
-        
+        <ant antfile="service/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
-    <target name="dist"
-    description="generate distribution for id" depends="package">
-        
+    <target name="dist" depends="package"
+    description="generate distribution for id service}">
+        <ant antfile="service/build.xml" target="dist" inheritall="false"/>
     </target>
 
 
