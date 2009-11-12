@@ -135,10 +135,6 @@ public class VocabularyItemDocumentModelHandler
 	        Iterator<DocumentModel> iter = docList.iterator();
 	        while(iter.hasNext()){
 	            DocumentModel docModel = iter.next();
-	            //String parentVocab = (String)docModel.getProperty(getServiceContext().getCommonPartLabel("vocabularyItems"),
-	            //       VocabularyItemJAXBSchema.IN_VOCABULARY); 
-	            //if( !inVocabulary.equals(parentVocab))
-	            //	continue;
 	            VocabularyitemListItem ilistItem = new VocabularyitemListItem();
 	            ilistItem.setDisplayName((String) docModel.getProperty(getServiceContext().getCommonPartLabel("vocabularyItems"),
 	                    VocabularyItemJAXBSchema.DISPLAY_NAME));
