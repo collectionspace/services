@@ -106,7 +106,7 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
         }
         return docHandler;
     }
-
+    
     private DocumentHandler createItemDocumentHandler(
     		RemoteServiceContext ctx,
     		String inVocabulary) throws Exception {
@@ -196,16 +196,15 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
         VocabulariesCommonList vocabularyObjectList = new VocabulariesCommonList();
         try{
             RemoteServiceContext ctx = createServiceContext(null);
-            DocumentHandler handler = createDocumentHandler(ctx);
             MultivaluedMap<String,String> queryParams = ui.getQueryParameters(); 
-            if(queryParams.size()>0) {
-            	String nameQ = queryParams.getFirst("name");
-            	if(nameQ!= null) {
-                    DocumentFilter myFilter = new DocumentFilter(
-                      		 "vocabularies_common:refName='"+nameQ+"'", 0, 0);
-                    handler.setDocumentFilter(myFilter);
-            	}
-            }
+            DocumentHandler handler = createDocumentHandler(ctx);
+            DocumentFilter myFilter = 
+            	DocumentFilter.CreatePaginatedDocumentFilter(queryParams);
+        	String nameQ = queryParams.getFirst("name");
+        	if(nameQ!= null) {
+                myFilter.setWhereClause("vocabularies_common:refName='"+nameQ+"'");
+        	}
+            handler.setDocumentFilter(myFilter);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             vocabularyObjectList = (VocabulariesCommonList) handler.getCommonPartList();
         }catch(Exception e){
@@ -384,24 +383,6 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
         	 // Note that docType defaults to the ServiceName, so we're fine with that.
              RemoteServiceContext ctx = createServiceContext(null, getItemServiceName());
              DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
-             /*
-             // Note that we replace the getAll() call with a basic search on the parent vocab
-             handler.prepare(Action.GET_ALL);
-        	 client = NuxeoConnector.getInstance().getClient();
-             repoSession = client.openRepository();
-             if (logger.isDebugEnabled()) {
-                 logger.debug("getVocabularyItemList() repository root: " + repoSession.getRootDocument());
-             }
-             DocumentModelList docList = 
-            	 repoSession.query("SELECT * FROM Vocabularyitem WHERE vocabularyitems_common:inVocabulary='"
-            			 			+parentcsid+"'");
-             //set repoSession to handle the document
-             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
-             DocumentModelListWrapper wrapDoc = new DocumentModelListWrapper(
-                     docList);
-             handler.handle(Action.GET_ALL, wrapDoc);
-             handler.complete(Action.GET_ALL, wrapDoc);
-             */
              DocumentFilter myFilter = new DocumentFilter(
             		 "vocabularyitems_common:inVocabulary='"+parentcsid+"'", 0, 0);
              handler.setDocumentFilter(myFilter);

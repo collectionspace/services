@@ -256,11 +256,13 @@ public class RepositoryJavaClient implements RepositoryClient {
             String where = docFilter.getWhereClause(); 
             if((null!=where)&&(where.length()>0))
             	query.append(" WHERE "+where);
-            if(docFilter.getOffset()>0)
-            	query.append(" OFFSET "+docFilter.getOffset());
-            if(docFilter.getPageSize()>0)
-            	query.append(" LIMIT "+docFilter.getPageSize());
-            DocumentModelList docList = repoSession.query(query.toString());
+            DocumentModelList docList = null;
+            if((docFilter.getOffset()>0)||(docFilter.getPageSize()>0)) {
+            	docList = repoSession.query(query.toString(), null, 
+            					docFilter.getPageSize(), docFilter.getOffset(), false);
+            } else {
+            	docList = repoSession.query(query.toString());
+            }
             //set repoSession to handle the document
             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
             DocumentModelListWrapper wrapDoc = new DocumentModelListWrapper(
