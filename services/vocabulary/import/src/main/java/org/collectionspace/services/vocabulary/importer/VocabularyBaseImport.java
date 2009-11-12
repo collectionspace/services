@@ -21,7 +21,7 @@
  * limitations under the License.
  */
 
-package org.collectionspace.services.client.importer;
+package org.collectionspace.services.vocabulary.importer;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -116,7 +116,9 @@
 
     <target name="dist" depends="package"
         description="distribute vocabulary service">
-        <ant antfile="3rdparty/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="3rdparty/build.xml" target="dist" inheritall="false"/>        
+        <ant antfile="client/build.xml" target="dist" inheritall="false"/>
+        
     </target>
 
 </project>

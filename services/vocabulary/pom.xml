@@ -17,6 +17,7 @@
         <module>service</module>
         <module>3rdparty</module>
         <module>client</module>
+        <module>import</module>
     </modules>
 
     <build>
