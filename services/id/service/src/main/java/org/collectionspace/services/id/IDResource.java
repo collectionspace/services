@@ -38,8 +38,8 @@ import javax.ws.rs.core.UriBuilder;
 
 // May at some point instead use
 // org.jboss.resteasy.spi.NotFoundException
-import org.collectionspace.services.common.repository.BadRequestException;
-import org.collectionspace.services.common.repository.DocumentNotFoundException;
+import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;

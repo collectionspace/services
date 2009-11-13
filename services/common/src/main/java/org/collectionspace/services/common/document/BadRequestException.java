@@ -14,28 +14,34 @@
  *  You may obtain a copy of the ECL 2.0 License at
 
  *  https://source.collectionspace.org/collection-space/LICENSE.txt
+
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
-package org.collectionspace.services.common.repository;
+package org.collectionspace.services.common.document;
 
 /**
- * DocumentNotFoundException
+ * BadRequestException
  * 
  */
-public class DocumentNotFoundException extends DocumentException {
+public class BadRequestException extends Exception {
 
     /**
-     * Creates a new instance of <code>DocumentNotFoundException</code> without detail message.
+     * Creates a new instance of <code>BadRequestException</code> without detail message.
      */
-    public DocumentNotFoundException() {
+    public BadRequestException() {
     }
 
 
     /**
-     * Constructs an instance of <code>DocumentNotFoundException</code> with the specified detail message.
+     * Constructs an instance of <code>BadRequestException</code> with the specified detail message.
      * @param msg the detail message.
      */
-    public DocumentNotFoundException(String msg) {
+    public BadRequestException(String msg) {
         super(msg);
     }
 
@@ -54,7 +60,7 @@ public class DocumentNotFoundException extends DocumentException {
      *         unknown.)
      * @since  1.4
      */
-    public DocumentNotFoundException(String message, Throwable cause) {
+    public BadRequestException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -72,7 +78,7 @@ public class DocumentNotFoundException extends DocumentException {
      *         unknown.)
      * @since  1.4
      */
-    public DocumentNotFoundException(Throwable cause) {
+    public BadRequestException(Throwable cause) {
         super(cause);
     }
 }

@@ -47,17 +47,15 @@ import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.repository.DocumentFilter;
-import org.collectionspace.services.common.repository.DocumentHandler;
-import org.collectionspace.services.common.repository.DocumentNotFoundException;
+import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.vocabulary.nuxeo.VocabularyHandlerFactory;
 import org.collectionspace.services.vocabulary.nuxeo.VocabularyItemDocumentModelHandler;
 import org.collectionspace.services.vocabulary.nuxeo.VocabularyItemHandlerFactory;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-import org.nuxeo.ecm.core.client.NuxeoClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -377,7 +375,6 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
     		 @PathParam("csid") String parentcsid,
     		 @Context UriInfo ui) {
          VocabularyitemsCommonList vocabularyItemObjectList = new VocabularyitemsCommonList();
-         NuxeoClient client = null;
          try{
         	 // Note that docType defaults to the ServiceName, so we're fine with that.
              RemoteServiceContext ctx = createServiceContext(null, getItemServiceName());

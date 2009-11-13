@@ -27,7 +27,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
-import org.collectionspace.services.common.repository.BadRequestException;
+import org.collectionspace.services.common.document.BadRequestException;
 
 
 /**

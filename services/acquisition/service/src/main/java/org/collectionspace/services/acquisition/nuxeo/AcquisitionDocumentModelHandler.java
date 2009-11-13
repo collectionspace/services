@@ -27,12 +27,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.collectionspace.services.AcquisitionJAXBSchema;
-import org.collectionspace.services.common.repository.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
 import org.collectionspace.services.acquisition.AcquisitionsCommonList;
 import org.collectionspace.services.acquisition.AcquisitionsCommonList.AcquisitionListItem;
 
-import org.collectionspace.services.common.repository.DocumentHandler.Action;
+import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandler;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;

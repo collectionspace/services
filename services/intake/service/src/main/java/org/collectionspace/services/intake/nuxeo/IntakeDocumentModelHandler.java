@@ -27,8 +27,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.collectionspace.services.IntakeJAXBSchema;
-import org.collectionspace.services.common.repository.DocumentHandler.Action;
-import org.collectionspace.services.common.repository.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.IntakesCommonList;
 import org.collectionspace.services.intake.IntakesCommonList.IntakeListItem;

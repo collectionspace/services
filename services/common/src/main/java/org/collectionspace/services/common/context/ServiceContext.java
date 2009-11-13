@@ -34,7 +34,7 @@ import org.collectionspace.services.common.service.ServiceBindingType;
  * between various components of the service framework while processing
  * a service request.
  */
-public interface ServiceContext<T1, T2> {
+public interface ServiceContext<IT, OT> {
 
     /**
      * The character used to separate the words in a part label
@@ -128,7 +128,7 @@ public interface ServiceContext<T1, T2> {
      * Get input parts as received over the wire from service consumer
      * @return the input
      */
-    public T1 getInput();
+    public IT getInput();
 
     /**
      * setInput is used to set request input before starting to
@@ -136,19 +136,19 @@ public interface ServiceContext<T1, T2> {
      * @param input
      * @exception Exception
      */
-    public void setInput(T1 input) throws Exception;
+    public void setInput(IT input) throws Exception;
 
     /**
      * Get output parts to send over the wire to service consumer
      * @return the output
      */
-    public T2 getOutput();
+    public OT getOutput();
 
     /**
      * setOutput set output
      * @param output
      */
-    public void setOutput(T2 output) throws Exception;
+    public void setOutput(OT output) throws Exception;
 
     /**
      * getPartsMetadata returns metadata for object parts used by the service

@@ -25,7 +25,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.StringTokenizer;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.repository.DocumentException;
+import org.collectionspace.services.common.document.DocumentException;
 
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;

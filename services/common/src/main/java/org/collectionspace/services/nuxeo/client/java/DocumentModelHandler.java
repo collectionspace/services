@@ -23,8 +23,8 @@
  */
 package org.collectionspace.services.nuxeo.client.java;
 
-import org.collectionspace.services.common.repository.DocumentWrapper;
-import org.collectionspace.services.common.repository.AbstractDocumentHandler;
+import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.AbstractDocumentHandler;
 import org.collectionspace.services.nuxeo.client.*;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.slf4j.Logger;
@@ -110,10 +110,10 @@ public abstract class DocumentModelHandler<T, TL>
     @Override
     public abstract void setCommonPartList(TL obj);
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.common.repository.DocumentHandler#getDocumentType()
+    /**
+     * Gets the document type.
+     *
+     * @return the document type
      */
-    @Override
     public abstract String getDocumentType();
-
 }

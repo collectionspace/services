@@ -15,7 +15,7 @@
 
  *  https://source.collectionspace.org/collection-space/LICENSE.txt
  */
-package org.collectionspace.services.common.repository;
+package org.collectionspace.services.common.document;
 
 import java.util.List;
 

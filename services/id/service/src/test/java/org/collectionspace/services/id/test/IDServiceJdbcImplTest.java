@@ -24,8 +24,8 @@
 package org.collectionspace.services.id.test;
 
 import java.util.Map;
-import org.collectionspace.services.common.repository.BadRequestException;
-import org.collectionspace.services.common.repository.DocumentNotFoundException;
+import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 
 import org.collectionspace.services.id.*;
 

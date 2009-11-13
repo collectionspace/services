@@ -23,7 +23,7 @@
 
 package org.collectionspace.services.id.test;
 
-import org.collectionspace.services.common.repository.BadRequestException;
+import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.id.AlphabeticIDGeneratorPart;
 import org.collectionspace.services.id.SequenceIDGeneratorPart;
 

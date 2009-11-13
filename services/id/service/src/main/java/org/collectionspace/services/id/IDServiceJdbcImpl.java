@@ -88,8 +88,8 @@ import java.sql.Statement;
 // org.jboss.resteasy.spi.NotFoundException
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.collectionspace.services.common.repository.BadRequestException;
-import org.collectionspace.services.common.repository.DocumentNotFoundException;
+import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

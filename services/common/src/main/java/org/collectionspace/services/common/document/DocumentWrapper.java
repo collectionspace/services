@@ -22,7 +22,7 @@
  *  limitations under the License.
  */
 
-package org.collectionspace.services.common.repository;
+package org.collectionspace.services.common.document;
 
 /**
  *

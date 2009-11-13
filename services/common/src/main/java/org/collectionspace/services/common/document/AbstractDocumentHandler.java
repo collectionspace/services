@@ -21,7 +21,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.collectionspace.services.common.repository;
+package org.collectionspace.services.common.document;
 
 import java.util.HashMap;
 import java.util.Map;

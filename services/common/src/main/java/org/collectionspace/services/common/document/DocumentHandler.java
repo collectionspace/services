@@ -15,7 +15,7 @@
 
  *  https://source.collectionspace.org/collection-space/LICENSE.txt
  */
-package org.collectionspace.services.common.repository;
+package org.collectionspace.services.common.document;
 
 import java.util.Map;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -179,12 +179,6 @@ public interface DocumentHandler<T, TL> {
      */
     public void fillCommonPartList(TL obj, DocumentWrapper docWrap) throws Exception;
 
-    /**
-     * Gets the document type.
-     * 
-     * @return the document type
-     */
-    public String getDocumentType();
 
     /**
      * getProperties

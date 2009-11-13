@@ -29,7 +29,7 @@ package org.collectionspace.services.common.relation;
 import java.util.List;
 
 
-import org.collectionspace.services.common.repository.DocumentException;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.nuxeo.ecm.core.api.DocumentModel;
 

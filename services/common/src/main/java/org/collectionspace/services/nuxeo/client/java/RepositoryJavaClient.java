@@ -21,13 +21,13 @@ package org.collectionspace.services.nuxeo.client.java;
 import java.util.UUID;
 
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.repository.BadRequestException;
-import org.collectionspace.services.common.repository.DocumentException;
-import org.collectionspace.services.common.repository.DocumentFilter;
-import org.collectionspace.services.common.repository.DocumentHandler;
-import org.collectionspace.services.common.repository.DocumentNotFoundException;
+import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.common.repository.DocumentHandler.Action;
+import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.common.utils.IdUtils;
 import org.nuxeo.ecm.core.api.ClientException;
@@ -72,7 +72,7 @@ public class RepositoryJavaClient implements RepositoryClient {
             DocumentHandler handler) throws BadRequestException,
             DocumentException {
 
-        if (handler.getDocumentType() == null) {
+        if (ctx.getDocumentType() == null) {
             throw new IllegalArgumentException(
                     "RemoteRepositoryClient.create: docType is missing");
         }
@@ -97,7 +97,7 @@ public class RepositoryJavaClient implements RepositoryClient {
             String id = IdUtils.generateId(UUID.randomUUID().toString());
             // create document model
             DocumentModel doc = repoSession.createDocumentModel(wspacePath, id,
-                    handler.getDocumentType());
+                    ctx.getDocumentType());
             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
             DocumentModelWrapper wrapDoc = new DocumentModelWrapper(doc);
             handler.handle(Action.CREATE, wrapDoc);

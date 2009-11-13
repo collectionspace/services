@@ -14,38 +14,45 @@
  *  You may obtain a copy of the ECL 2.0 License at
 
  *  https://source.collectionspace.org/collection-space/LICENSE.txt
-
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
  */
 
-package org.collectionspace.services.common.repository;
+package org.collectionspace.services.common.document;
 
 /**
- * BadRequestException
- * 
+ * DocumentException
+ * document handling exception
  */
-public class BadRequestException extends Exception {
+public class DocumentException extends Exception {
 
     /**
-     * Creates a new instance of <code>BadRequestException</code> without detail message.
+     * collectionspace specific error code
      */
-    public BadRequestException() {
+    private int errorCode;
+
+    /**
+     * Creates a new instance of <code>DocumentException</code> without detail message.
+     */
+    public DocumentException() {
     }
 
-
     /**
-     * Constructs an instance of <code>BadRequestException</code> with the specified detail message.
+     * Constructs an instance of <code>DocumentException</code> with the specified detail message.
      * @param msg the detail message.
      */
-    public BadRequestException(String msg) {
+    public DocumentException(String msg) {
         super(msg);
     }
 
 
+    /**
+     * DocumentException with application specific code and message
+     * @param code
+     * @param msg
+     */
+    public DocumentException(int code, String msg) {
+        super(msg);
+        this.errorCode = code;
+    }
     /**
      * Constructs a new exception with the specified detail message and
      * cause.  <p>Note that the detail message associated with
@@ -60,7 +67,7 @@ public class BadRequestException extends Exception {
      *         unknown.)
      * @since  1.4
      */
-    public BadRequestException(String message, Throwable cause) {
+    public DocumentException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -78,7 +85,22 @@ public class BadRequestException extends Exception {
      *         unknown.)
      * @since  1.4
      */
-    public BadRequestException(Throwable cause) {
+    public DocumentException(Throwable cause) {
         super(cause);
+    }
+
+
+    /**
+     * @return the collectionspace errorCode
+     */
+    public int getErrorCode() {
+        return errorCode;
+    }
+
+    /**
+     * @param errorCode the errorCode to set
+     */
+    public void setErrorCode(int errorCode) {
+        this.errorCode = errorCode;
     }
 }

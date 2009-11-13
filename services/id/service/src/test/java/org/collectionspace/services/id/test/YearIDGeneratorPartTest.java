@@ -23,7 +23,7 @@
 
 package org.collectionspace.services.id.test;
 
-import org.collectionspace.services.common.repository.BadRequestException;
+import org.collectionspace.services.common.document.BadRequestException;
 import static org.junit.Assert.fail;
 import java.util.Calendar;
 import java.util.GregorianCalendar;

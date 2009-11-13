@@ -27,8 +27,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.collectionspace.services.VocabularyJAXBSchema;
-import org.collectionspace.services.common.repository.DocumentHandler.Action;
-import org.collectionspace.services.common.repository.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.vocabulary.VocabulariesCommon;
 import org.collectionspace.services.vocabulary.VocabulariesCommonList;
 import org.collectionspace.services.vocabulary.VocabulariesCommonList.VocabularyListItem;

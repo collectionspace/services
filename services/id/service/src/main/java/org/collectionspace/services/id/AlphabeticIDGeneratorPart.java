@@ -56,7 +56,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.collectionspace.services.common.repository.BadRequestException;
+import org.collectionspace.services.common.document.BadRequestException;
 
 /**
  * AlphabeticIDGeneratorPart

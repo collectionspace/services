@@ -31,12 +31,12 @@ import java.util.Map;
 import org.collectionspace.services.common.relation.IRelationsManager;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
 import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
-import org.collectionspace.services.common.repository.DocumentHandler.Action;
+import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
 
-import org.collectionspace.services.common.repository.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandler;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;

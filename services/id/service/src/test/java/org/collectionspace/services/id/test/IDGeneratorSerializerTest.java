@@ -25,7 +25,7 @@ package org.collectionspace.services.id.test;
 
 import org.collectionspace.services.id.*;
 
-import org.collectionspace.services.common.repository.BadRequestException; 
+import org.collectionspace.services.common.document.BadRequestException;
 
 import junit.framework.TestCase;
 import static org.junit.Assert.*;

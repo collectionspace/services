@@ -27,8 +27,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.collectionspace.services.common.relation.RelationJAXBSchema;
-import org.collectionspace.services.common.repository.DocumentException;
-import org.collectionspace.services.common.repository.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;

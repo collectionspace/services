@@ -23,7 +23,7 @@
  */
 package org.collectionspace.services.common.repository;
 
-import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.storage.StorageClient;
 
 /**
  * RepositoryClient is a generic Document Repository client
@@ -35,66 +35,7 @@ import org.collectionspace.services.common.context.ServiceContext;
  * The repository client then calls handle on the handler
  * 
  */
-public interface RepositoryClient {
-
-    /**
-     * create document in the Document repository
-     * @param ctx service context under which this method is invoked
-     * @param handler should be used by the caller to provide and transform the document
-     * @return id in repository of the newly created document
-     * @throws BadRequestException data input is bad
-     * @throws DocumentException
-     */
-    String create(ServiceContext ctx, DocumentHandler handler) throws BadRequestException, DocumentException;
-
-    /**
-     * delete a document from the Document repository
-     * @param ctx service context under which this method is invoked
-     * @param id of the document
-     * @throws DocumentNotFoundException if document not found
-     * @throws DocumentException
-     */
-    void delete(ServiceContext ctx, String id) throws DocumentNotFoundException, DocumentException;
-
-    /**
-     * get document from the Document repository
-     * @param ctx service context under which this method is invoked
-     * @param id of the document to retrieve
-     * @param handler should be used by the caller to provide and transform the document
-     * @throws DocumentNotFoundException if document not found
-     * @throws DocumentException
-     */
-    void get(ServiceContext ctx, String id, DocumentHandler handler) throws DocumentNotFoundException, DocumentException;
-
-    /**
-     * getAll get all documents for an entity service from the Document repository
-     * @param ctx service context under which this method is invoked
-     * @param handler should be used by the caller to provide and transform the document
-     * @throws DocumentNotFoundException if workspace not found
-     * @throws DocumentException
-     */
-    void getAll(ServiceContext ctx, DocumentHandler handler) throws DocumentNotFoundException, DocumentException;
-
-    /**
-     * getFiltered get all documents for an entity service from the Document repository,
-     * given filter parameters specified by the handler. 
-     * @param ctx service context under which this method is invoked
-     * @param handler should be used by the caller to provide and transform the document
-     * @throws DocumentNotFoundException if workspace not found
-     * @throws DocumentException
-     */
-    void getFiltered(ServiceContext ctx, DocumentHandler handler) throws DocumentNotFoundException, DocumentException;
-
-    /**
-     * update given document in the Document repository
-     * @param ctx service context under which this method is invoked
-     * @param id of the document
-     * @param handler should be used by the caller to provide and transform the document
-     * @throws BadRequestException data input is bad
-     * @throws DocumentNotFoundException if document not found
-     * @throws DocumentException
-     */
-    void update(ServiceContext ctx, String id, DocumentHandler handler) throws BadRequestException, DocumentNotFoundException, DocumentException;
+public interface RepositoryClient extends StorageClient {
 
     /**
      * createWorkspace creates a workspace in default repository under given domain

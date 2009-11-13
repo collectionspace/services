@@ -20,8 +20,8 @@ package org.collectionspace.services.id;
 // May at some point instead use
 // org.jboss.resteasy.spi.NotFoundException
 import java.util.Map;
-import org.collectionspace.services.common.repository.DocumentNotFoundException;
-import org.collectionspace.services.common.repository.BadRequestException;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.BadRequestException;
 
 
 /**

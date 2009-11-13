@@ -30,7 +30,7 @@ package org.collectionspace.services.id;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.collectionspace.services.common.repository.BadRequestException;
+import org.collectionspace.services.common.document.BadRequestException;
 
 /**  
  * NumericIDGeneratorPart

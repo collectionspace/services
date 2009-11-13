@@ -24,8 +24,8 @@
 package org.collectionspace.services.intake.nuxeo;
 
 import org.collectionspace.services.common.ClientType;
-import org.collectionspace.services.common.repository.DocumentHandler;
-import org.collectionspace.services.common.repository.DocumentHandlerFactory;
+import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentHandlerFactory;
 
 /**
  * IntakeHandlerFactory creates handlers for collectionobject based

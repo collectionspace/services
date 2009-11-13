@@ -16,43 +16,30 @@
  *  https://source.collectionspace.org/collection-space/LICENSE.txt
  */
 
-package org.collectionspace.services.common.repository;
+package org.collectionspace.services.common.document;
 
 /**
- * DocumentException
- * document handling exception
+ * DocumentNotFoundException
+ * 
  */
-public class DocumentException extends Exception {
+public class DocumentNotFoundException extends DocumentException {
 
     /**
-     * collectionspace specific error code
+     * Creates a new instance of <code>DocumentNotFoundException</code> without detail message.
      */
-    private int errorCode;
-
-    /**
-     * Creates a new instance of <code>DocumentException</code> without detail message.
-     */
-    public DocumentException() {
+    public DocumentNotFoundException() {
     }
 
+
     /**
-     * Constructs an instance of <code>DocumentException</code> with the specified detail message.
+     * Constructs an instance of <code>DocumentNotFoundException</code> with the specified detail message.
      * @param msg the detail message.
      */
-    public DocumentException(String msg) {
+    public DocumentNotFoundException(String msg) {
         super(msg);
     }
 
 
-    /**
-     * DocumentException with application specific code and message
-     * @param code
-     * @param msg
-     */
-    public DocumentException(int code, String msg) {
-        super(msg);
-        this.errorCode = code;
-    }
     /**
      * Constructs a new exception with the specified detail message and
      * cause.  <p>Note that the detail message associated with
@@ -67,7 +54,7 @@ public class DocumentException extends Exception {
      *         unknown.)
      * @since  1.4
      */
-    public DocumentException(String message, Throwable cause) {
+    public DocumentNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -85,22 +72,7 @@ public class DocumentException extends Exception {
      *         unknown.)
      * @since  1.4
      */
-    public DocumentException(Throwable cause) {
+    public DocumentNotFoundException(Throwable cause) {
         super(cause);
-    }
-
-
-    /**
-     * @return the collectionspace errorCode
-     */
-    public int getErrorCode() {
-        return errorCode;
-    }
-
-    /**
-     * @param errorCode the errorCode to set
-     */
-    public void setErrorCode(int errorCode) {
-        this.errorCode = errorCode;
     }
 }

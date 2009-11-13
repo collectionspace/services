@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.collectionspace.services.VocabularyItemJAXBSchema;
-import org.collectionspace.services.common.repository.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandler;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommon;

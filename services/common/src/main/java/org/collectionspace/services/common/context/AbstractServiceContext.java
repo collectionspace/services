@@ -42,8 +42,8 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public abstract class AbstractServiceContext<T1, T2>
-        implements ServiceContext<T1, T2> {
+public abstract class AbstractServiceContext<IT, OT>
+        implements ServiceContext<IT, OT> {
 
     final Logger logger = LoggerFactory.getLogger(AbstractServiceContext.class);
     Map<String, ObjectPartType> objectPartMap = new HashMap<String, ObjectPartType>();
@@ -178,16 +178,16 @@ public abstract class AbstractServiceContext<T1, T2>
     }
 
     @Override
-    public abstract T1 getInput();
+    public abstract IT getInput();
 
     @Override
-    public abstract void setInput(T1 input) throws Exception;
+    public abstract void setInput(IT input) throws Exception;
 
     @Override
-    public abstract T2 getOutput();
+    public abstract OT getOutput();
 
     @Override
-    public abstract void setOutput(T2 output) throws Exception;
+    public abstract void setOutput(OT output) throws Exception;
 
     @Override
     public String toString() {

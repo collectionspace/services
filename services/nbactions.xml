@@ -2,9 +2,6 @@
 <actions>
         <action>
             <actionName>rebuild</actionName>
-            <packagings>
-                <packaging>*</packaging>
-            </packagings>
             <goals>
                 <goal>clean</goal>
                 <goal>install</goal>
@@ -12,5 +9,12 @@
             <properties>
                 <maven.test.skip>true</maven.test.skip>
             </properties>
+        </action>
+        <action>
+            <actionName>CUSTOM-hotdeploy</actionName>
+            <displayName>hotdeploy</displayName>
+            <goals>
+                <goal>hotdeploy</goal>
+            </goals>
         </action>
     </actions>

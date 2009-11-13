@@ -24,7 +24,7 @@
 
 package org.collectionspace.services.nuxeo.client.java;
 
-import org.collectionspace.services.common.repository.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentWrapper;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
 /**

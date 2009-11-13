@@ -29,7 +29,7 @@
  */
 package org.collectionspace.services.id;
 
-import org.collectionspace.services.common.repository.BadRequestException;
+import org.collectionspace.services.common.document.BadRequestException;
 
 public interface IDGeneratorPart {
     
