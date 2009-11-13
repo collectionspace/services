@@ -377,7 +377,6 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
     		 @PathParam("csid") String parentcsid,
     		 @Context UriInfo ui) {
          VocabularyitemsCommonList vocabularyItemObjectList = new VocabularyitemsCommonList();
-         RepositoryInstance repoSession = null;
          NuxeoClient client = null;
          try{
         	 // Note that docType defaults to the ServiceName, so we're fine with that.
@@ -395,16 +394,6 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
              Response response = Response.status(
                      Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
              throw new WebApplicationException(response);
-         } finally {
-             if(repoSession != null) {
-	             try {
-	                 // release session
-	                 client.releaseRepository(repoSession);
-	             } catch (Exception e) {
-	                 logger.error("Could not close the repository session", e);
-	                 // no need to throw this service specific exception
-	             }
-             }
          }
          return vocabularyItemObjectList;
      }
