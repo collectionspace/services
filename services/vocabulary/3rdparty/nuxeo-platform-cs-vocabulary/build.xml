@@ -118,10 +118,16 @@
         <delete file="${jboss.deploy.nuxeo.system}/${nuxeo.vocabulary.jar}"/>
     </target>
 
-
     <target name="dist"
     description="generate distribution for vocabulary doctype" depends="package">
         <copy todir="${services.trunk}/${dist.deploy.nuxeo.system}">
+            <fileset file="${basedir}/target/${nuxeo.vocabulary.jar}"/>
+        </copy>
+    </target>
+
+    <target name="dist_installer"
+    	description="Creates an installer distribution for Vocabulary doctype" depends="package">
+        <copy todir="${services.trunk}/${dist.installer.services}/vocabulary/nuxeo">
             <fileset file="${basedir}/target/${nuxeo.vocabulary.jar}"/>
         </copy>
     </target>

@@ -7,7 +7,7 @@
     <property name="services.trunk" value="../.."/>
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
-    <property name="src" location="src"/>
+    <property name="src" location="service/src"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -119,5 +119,16 @@
         <ant antfile="service/build.xml" target="dist" inheritall="false"/>
     </target>
 
+    <target name="dist_installer"
+    	description="generate distribution for id" depends="package">        
+        <!-- copy install scripts, etc. -->
+        <copy todir="${services.trunk}/${dist.installer.services}/id">
+            <fileset dir="${basedir}/installer/"/>
+        </copy>
+        <!-- copy db scripts, etc. -->
+        <copy todir="${services.trunk}/${dist.installer.services}/id/db/mysql">
+            <fileset dir="${src}/main/resources/db/mysql"/>
+        </copy>
+    </target>
 
 </project>

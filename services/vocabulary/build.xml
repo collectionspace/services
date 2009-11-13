@@ -118,7 +118,17 @@
         description="distribute vocabulary service">
         <ant antfile="3rdparty/build.xml" target="dist" inheritall="false"/>        
         <ant antfile="client/build.xml" target="dist" inheritall="false"/>
-        
+        <ant antfile="import/build.xml" target="dist" inheritall="false"/>        
+    </target>
+
+    <target name="dist_installer" depends="package"
+        description="distribute vocabulary service">        
+        <!-- copy install scripts, etc. -->
+        <copy todir="${services.trunk}/${dist.installer.services}/vocabulary">
+            <fileset dir="${basedir}/installer/"/>
+        </copy>        
+        <ant antfile="3rdparty/build.xml" target="dist_installer" inheritall="false"/>        
+        <ant antfile="import/build.xml" target="dist_installer" inheritall="false"/>        
     </target>
 
 </project>

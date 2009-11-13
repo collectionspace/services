@@ -1,0 +1,69 @@
+
+<project name="main-install" basedir=".">
+    <description>
+    </description>
+  <!-- set global properties for this build -->
+    <property name="services.trunk" value=".."/>
+    <property file="${services.trunk}/build.properties" />
+    <property name="mvn.opts" value="" />
+    <property name="src" location="src"/>
+
+    <condition property="osfamily-unix">
+        <os family="unix" />
+    </condition>
+    <condition property="osfamily-windows">
+        <os family="windows" />
+    </condition>
+
+    <!-- this target is called in order based on the dependencies between the services -->
+    <target name="setup" description="">
+        <exec executable="echo">
+        		<arg value="Installer: Executing services &apos;setup&apos; target." />
+				</exec>    	
+<!--
+        <ant antfile="common/build.xml" target="setup" inheritAll="false"/>
+        <ant antfile="authentication/build.xml" target="setup" inheritAll="false"/>
+        <ant antfile="relation/build.xml" target="setup" inheritAll="false"/>
+-->        
+        <ant antfile="id/build.xml" target="setup" inheritAll="false"/>
+        <ant antfile="collectionobject/build.xml" target="setup" inheritAll="false"/>
+        <ant antfile="vocabulary/build.xml" target="setup" inheritAll="false"/>
+<!--        
+        <ant antfile="intake/build.xml" target="setup" inheritAll="false"/>
+        <ant antfile="acquisition/build.xml" target="setup" inheritAll="false"/>
+        <ant antfile="JaxRsServiceProvider/build.xml" target="setup" inheritAll="false"/>
+-->        
+    </target>
+
+    <!-- this target is called in revese order of deploy targets -->
+    <target name="takedown" description="">
+        <ant antfile="JaxRsServiceProvider/build.xml" target="takedown" inheritAll="false"/>
+        <ant antfile="vocabulary/build.xml" target="takedown" inheritAll="false"/>
+        <ant antfile="acquisition/build.xml" target="takedown" inheritAll="false"/>
+        <ant antfile="intake/build.xml" target="takedown" inheritAll="false"/>
+        <ant antfile="collectionobject/build.xml" target="takedown" inheritAll="false"/>
+        <ant antfile="id/build.xml" target="takedown" inheritAll="false"/>
+        <ant antfile="relation/build.xml" target="takedown" inheritAll="false"/>
+        <ant antfile="authentication/build.xml" target="takedown" inheritAll="false"/>
+        <ant antfile="common/build.xml" target="takedown" inheritAll="false"/>
+    </target>
+
+    <target name="init" description="">
+        <exec executable="echo">
+        		<arg value="Executing installer's services &apos;init&apos; target." />
+				</exec>    	
+<!--
+        <ant antfile="common/build.xml" target="setup" inheritAll="false"/>
+        <ant antfile="authentication/build.xml" target="setup" inheritAll="false"/>
+        <ant antfile="relation/build.xml" target="setup" inheritAll="false"/>
+-->        
+        <ant antfile="id/build.xml" target="init" inheritAll="false"/>
+        <ant antfile="collectionobject/build.xml" target="init" inheritAll="false"/>
+        <ant antfile="vocabulary/build.xml" target="init" inheritAll="false"/>
+<!--        
+        <ant antfile="intake/build.xml" target="setup" inheritAll="false"/>
+        <ant antfile="acquisition/build.xml" target="setup" inheritAll="false"/>
+        <ant antfile="JaxRsServiceProvider/build.xml" target="setup" inheritAll="false"/>
+-->        
+    </target>    
+</project>

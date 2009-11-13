@@ -124,10 +124,16 @@
     </target>
 
     <target name="dist"
-    description="generate distribution for collectionobject doctype" depends="package">
+    	description="generate distribution for collectionobject doctype" depends="package">
         <copy todir="${services.trunk}/${dist.deploy.nuxeo.system}">
             <fileset file="${basedir}/target/${nuxeo.collectionobject.jar}"/>
         </copy>
     </target>
 
+    <target name="dist_installer"
+    	description="Creates an installer distribution for CollectionObject doctype" depends="package">
+        <copy todir="${services.trunk}/${dist.installer.services}/collectionobject/nuxeo">
+            <fileset file="${basedir}/target/${nuxeo.collectionobject.jar}"/>
+        </copy>
+    </target>
 </project>

@@ -120,6 +120,10 @@
     description="generate distribution for vocabulary" depends="package">
         <ant antfile="nuxeo-platform-cs-vocabulary/build.xml" target="dist" inheritall="false"/>
     </target>
-
+    
+    <target name="dist_installer"
+    description="generate distribution for collectionobject" depends="package">
+        <ant antfile="nuxeo-platform-cs-vocabulary/build.xml" target="dist_installer" inheritall="false"/>
+    </target>
 
 </project>

@@ -150,6 +150,27 @@
         <ant antfile="acquisition/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="JaxRsServiceProvider/build.xml" target="dist" inheritAll="false"/>
     </target>
+    
+    <!-- this target is called in order based on the dependencies between the services -->
+    <target name="dist_installer"
+    	description="create distribution for CollectionSpace installer">
+    
+        <!-- copy install scripts, etc. -->
+        <copy todir="${services.trunk}/${dist.installer.services}">
+            <fileset dir="./installer"/>
+        </copy>
+        <ant antfile="id/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="collectionobject/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="vocabulary/build.xml" target="dist_installer" inheritAll="false"/>    
+<!--
+        <ant antfile="common/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="authentication/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="relation/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="intake/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="acquisition/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="JaxRsServiceProvider/build.xml" target="dist_installer" inheritAll="false"/>
+-->        
+    </target>    
 
     
 </project>

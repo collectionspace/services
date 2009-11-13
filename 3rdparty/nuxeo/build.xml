@@ -26,9 +26,8 @@
 
     </target>
 
-
     <target name="package" depends="package-unix,package-windows"
-  description="Package CollectionSpace Services" />
+    	description="Package CollectionSpace Services" />
     <target name="package-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
             <arg value="package" />
@@ -53,7 +52,7 @@
     </target>
 
     <target name="install" depends="package,install-unix,install-windows"
-  description="Install" />
+    	description="Install" />
     <target name="install-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
             <arg value="install" />
@@ -78,7 +77,7 @@
     </target>
 
     <target name="clean" depends="clean-unix,clean-windows"
-  description="Delete target directories" >
+    	description="Delete target directories" >
         <delete dir="${build}"/>
     </target>
     <target name="clean-unix" if="osfamily-unix">
@@ -113,7 +112,7 @@
     </target>
 
     <target name="deploy" depends="package"
-    description="deploy nuxeo client libs to ${jboss.server.cspace}">
+    	description="deploy nuxeo client libs to ${jboss.server.cspace}">
         <copy todir="${jboss.server.cspace}/nuxeo-client/lib">
             <fileset dir="${basedir}/nuxeo-client/lib">
                 <include name="*.jar"/>
@@ -130,7 +129,7 @@
     </target>
 
     <target name="dist"
-    description="generate distribution for nuxeo client libs" depends="package">
+    	description="generate distribution for nuxeo client libs" depends="package">
         <copy todir="${services.trunk}/${dist.server.cspace}/nuxeo-client">
             <fileset dir="${basedir}/nuxeo-client"/>
         </copy>

@@ -116,8 +116,19 @@
     </target>
 
     <target name="dist" depends="package"
-    description="distribute collectionobject service}">
+    	description="distribute collectionobject service}">
         <ant antfile="3rdparty/build.xml" target="dist" inheritall="false"/>
+    </target>
+        
+		<!-- Creates a distribution of artifacts for the installer. -->        
+    <target name="dist_installer" depends="package"
+    	description="Creates a distribution of artifacts for the installer.">
+
+        <!-- copy install scripts, etc. -->
+        <copy todir="${services.trunk}/${dist.installer.services}/collectionobject">
+            <fileset dir="./installer"/>
+        </copy>    
+        <ant antfile="3rdparty/build.xml" target="dist_installer" inheritall="false"/>
     </target>
 
 </project>

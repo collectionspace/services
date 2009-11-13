@@ -28,10 +28,12 @@
     description="generate cspace service distribution">
         <!-- Create the distribution directory -->
         <mkdir dir="${basedir}/dist"/>
+        
         <!-- copy db scripts, etc. -->
         <copy todir="${basedir}/${dist.server.cspace}/cspace/services">
             <fileset dir="${src}/main/resources/scripts"/>
         </copy>
+        
         <!-- copy datasources -->
         <copy todir="${basedir}/${dist.deploy.cspace}">
             <fileset dir="${src}/main/resources/config"/>
@@ -203,7 +205,7 @@
         <sql driver="com.mysql.jdbc.Driver"
         url="jdbc:mysql://localhost:3306/cspace"
         userid="root"
-        password="admin"
+        password=""
         src="${db.script.dir}/init_db.sql"
         >
             <classpath>
@@ -261,5 +263,14 @@
         </exec>
     </target>
 
+    <target name="dist_installer" depends="package"
+    	description="Installer: Creates an installer distribution for the CollectionSpace services.">
+        <!-- copy install scripts, etc. -->
+        <copy todir="${basedir}/${dist.installer}">
+            <fileset dir="installer"/>
+            <fileset dir="${src}/main/resources/scripts"/>            
+        </copy>
+        <ant antfile="services/build.xml" target="dist_installer" inheritAll="false"/>
+    </target>
 
 </project>

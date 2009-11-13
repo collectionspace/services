@@ -23,12 +23,10 @@
         <tstamp/>
     <!-- Create the build directory structure used by compile -->
         <mkdir dir="${build}"/>
-
     </target>
 
-
     <target name="package" depends="package-unix,package-windows"
-  description="Package CollectionSpace Services" />
+  		description="Package CollectionSpace Services" />  		
     <target name="package-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
             <arg value="package" />
@@ -53,7 +51,7 @@
     </target>
     
     <target name="install" depends="package,install-unix,install-windows"
-  description="Install" />
+    	description="Install" />
     <target name="install-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
             <arg value="install" />
@@ -78,7 +76,7 @@
     </target>
 
     <target name="clean" depends="clean-unix,clean-windows"
-  description="Delete target directories" >
+    	description="Delete target directories" >
         <delete dir="${build}"/>
     </target>
     <target name="clean-unix" if="osfamily-unix">
@@ -113,17 +111,17 @@
     </target>
 
     <target name="deploy" depends="package"
-    description="deploy 3rdparty in ${jboss.server.cspace}">
+    	description="deploy 3rdparty in ${jboss.server.cspace}">
         <ant antfile="nuxeo/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy 3rdparty from ${jboss.server.cspace}">
+    	description="undeploy 3rdparty from ${jboss.server.cspace}">
         <ant antfile="nuxeo/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"
-    description="generate distribution for 3rdparty">
+    	description="generate distribution for 3rdparty">
         <ant antfile="nuxeo/build.xml" target="dist" inheritall="false"/>
     </target>
 

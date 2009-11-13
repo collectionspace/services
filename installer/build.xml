@@ -1,0 +1,50 @@
+
+<project name="trunk-install" default="package" basedir=".">
+    <description>
+        collectionspace services
+    </description>
+  <!-- set global properties for this build -->
+    <property file="build.properties" />
+    <property name="src" location="src"/>
+
+    <property name="db" value="mysql"/>
+    <property name="db.script.dir" location="${basedir}/db/${db}"/>
+
+    <condition property="osfamily-unix">
+        <os family="unix" />
+    </condition>
+    <condition property="osfamily-windows">
+        <os family="windows" />
+    </condition>
+    
+    <target name="setup">
+        <exec executable="echo">
+        		<arg value="Executing installer's &apos;setup&apos; target." />
+				</exec>
+				
+        <exec executable="echo">
+        		<arg value="Creating necessary databases and associated users and privileges." />
+				</exec>
+        <sql driver="com.mysql.jdbc.Driver"
+        url="jdbc:mysql://localhost:3306/cspace"
+        userid="root"
+        password="admin"
+        src="${db.script.dir}/init_db.sql">
+            <classpath>
+                <pathelement path="${jboss.lib.cspace}/mysql-connector-java-5.1.7-bin.jar"/>
+            </classpath>
+        </sql>
+				
+				<!-- Now, invoke the "setup" target on each of the services' install directories -->
+        <ant antfile="services/build.xml" target="setup" inheritAll="false"/>        	
+    </target>
+    	
+    <target name="init">
+        <exec executable="echo">
+        		<arg value="Executing installer's &apos;init&apos; target." />
+				</exec>
+				<!-- Now, invoke the "setup" target on each of the services' install directories -->
+        <ant antfile="services/build.xml" target="init" inheritAll="false"/>        	
+    </target>
+
+</project>

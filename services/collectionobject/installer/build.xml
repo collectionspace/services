@@ -1,0 +1,41 @@
+
+<project name="collectionobject-install" default="package" basedir=".">
+    <description>
+        collectionobject service install
+    </description>
+  <!-- set global properties for this build -->
+    <property name="services.trunk" value="../.."/>
+    <property file="${services.trunk}/build.properties" />
+    <property name="mvn.opts" value="" />
+    <property name="src" location="src"/>
+    <property name="build" location="build"/>
+
+    <condition property="osfamily-unix">
+        <os family="unix" />
+    </condition>
+    <condition property="osfamily-windows">
+        <os family="windows" />
+    </condition>
+
+    <target name="setup" description="">
+        <tstamp/>
+        <exec executable="echo">
+        		<arg value="Installer: Executing CollectionObject Service's &apos;setup&apos; target." />
+				</exec>
+    </target>
+
+    <target name="takedown" description="">
+        <tstamp/>
+        <exec executable="echo">
+        		<arg value="Installer: Executing CollectionObject Service's &apos;takedown&apos; target." />
+				</exec>
+    </target>
+    
+    <target name="init" description="">
+        <exec executable="echo">
+        		<arg value="Installer: Executing CollectionObject Service's &apos;init&apos; target." />
+				</exec>    	
+    </target>
+    
+
+</project>
