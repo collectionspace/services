@@ -247,6 +247,11 @@ public class RepositoryJavaClient implements RepositoryClient {
             throw new DocumentNotFoundException(
                     "Unable to find DocumentType for service " + ctx.getServiceName());
         }
+        String domain = ctx.getRepositoryDomainName();
+        if (domain == null) {
+            throw new DocumentNotFoundException(
+                    "Unable to find Domain for service " + ctx.getServiceName());
+        }
         RepositoryInstance repoSession = null;
         try {
             handler.prepare(Action.GET_ALL);
@@ -254,8 +259,11 @@ public class RepositoryJavaClient implements RepositoryClient {
             StringBuilder query = new StringBuilder("SELECT * FROM ");
             query.append(docType);
             String where = docFilter.getWhereClause(); 
+            // TODO This is a slow method for tenant-filter
+            // We should make this a property that is indexed.
+           	query.append(" WHERE ecm:path STARTSWITH '/"+domain+"'");
             if((null!=where)&&(where.length()>0))
-            	query.append(" WHERE "+where);
+            	query.append(" AND "+where);
             DocumentModelList docList = null;
             if((docFilter.getOffset()>0)||(docFilter.getPageSize()>0)) {
             	docList = repoSession.query(query.toString(), null, 
