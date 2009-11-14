@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Account schema (XSD)
+    
+    Entity  : Account
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+    
+    $LastChangedRevision: 916 $
+    $LastChangedDate: 2009-11-05 16:59:20 -0800 (Thu, 05 Nov 2009) $
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
+  xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
+  xmlns:ns="http://collectionspace.org/servics/account"
+  xmlns="http://collectionspace.org/services/account"
+  targetNamespace="http://collectionspace.org/services/account"
+  version="0.1"
+  jaxb:extensionBindingPrefixes="hj orm"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+
+    <!-- accounts-common -->
+    <!-- convention: <servicename>-common  -->
+    <xs:element name="accounts_common">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="csid" type="xs:string" minOccurs="1" maxOccurs="1" />
+                <xs:element name="anchorName" type="xs:string" minOccurs="1" maxOccurs="1" />
+                <xs:element name="firstName" type="xs:string" minOccurs="1" maxOccurs="1" />
+                <xs:element name="lastName" type="xs:string" minOccurs="1" maxOccurs="1" />
+                <xs:element name="mi" type="xs:string"/>
+                <xs:element name="email" type="xs:string" minOccurs="1" maxOccurs="1" />
+                <xs:element name="phone" type="xs:string"/>
+
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="accounts-common-list">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="account-list-item" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="anchorName" type="xs:string" minOccurs="1"/>
+                            <xs:element name="firstName" type="xs:string" minOccurs="1" />
+                            <xs:element name="lastName" type="xs:string" minOccurs="1" />
+                            <xs:element name="mi" type="xs:string"/>
+                            <xs:element name="email" type="xs:string" minOccurs="1" />
+                            <!-- uri to retrive collection object details -->
+                            <xs:element name="uri" type="xs:anyURI"
+                                minOccurs="1" />
+                            <xs:element name="csid" type="xs:string"
+                                minOccurs="1" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+</xs:schema>
+

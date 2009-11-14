@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>org.collectionspace.services.account</artifactId>
+        <groupId>org.collectionspace.services</groupId>
+        <version>1.0</version>
+    </parent>
+    
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.collectionspace.services</groupId>
+    <artifactId>org.collectionspace.services.account.jaxb</artifactId>
+    <version>1.0</version>
+    <name>services.account.jaxb</name>
+    
+    <dependencies>
+                <!-- keep slf4j dependencies on the top -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jvnet.jaxb2-commons</groupId>
+            <artifactId>property-listener-injector</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jvnet.jaxb2_commons</groupId>
+            <artifactId>runtime</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>5.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.client</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>collectionspace-services-account-jaxb</finalName>
+        <defaultGoal>install</defaultGoal>
+        <plugins>
+            <plugin>
+                <!-- maven-hyperjaxb3-plugin generates jaxb + jpa bindings -->
+                <groupId>org.jvnet.hyperjaxb3</groupId>
+                <artifactId>maven-hyperjaxb3-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <extension>true</extension>
+                    <jdk5>true</jdk5>
+                    <ejb3>false</ejb3>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <!-- use profile as this task is not needed for every build and test -->
+            <id>ddl</id>
+            <build>
+                <plugins>
+                    <!--plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>hibernate3-maven-plugin</artifactId>
+                        <version>2.2</version>
+                        <executions>
+                            <execution>
+                            
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>hbm2ddl</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <components>
+                                <component>
+                                    <name>hbm2ddl</name>
+                                </component>
+                            </components>
+                            <componentProperties>
+                                <outputfilename>${basedir}/src/main/resources/db/mysql/account.sql</outputfilename>
+                                <implementation>jpaconfiguration</implementation>
+                                <drop>true</drop>
+                                <create>true</create>
+                                <export>true</export>
+                                <jdk5>true</jdk5>
+                                <ejb3>false</ejb3>
+                                <persistenceunit>org.collectionspace.services.account</persistenceunit>
+                            </componentProperties>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>mysql</groupId>
+                                <artifactId>mysql-connector-java</artifactId>
+                                <version>5.0.5</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin-->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>process-classes</id>
+                                <phase>process-test-resources</phase>
+                                <configuration>
+                                    <tasks>
+                                        <property name="export" value="false"/>
+                                        <property name="test_classpath" refid="maven.test.classpath"/>
+                                        <property name="compile_classpath" refid="maven.compile.classpath"/>
+                                        <property name="runtime_classpath" refid="maven.runtime.classpath"/>
+                                        <property name="plugin_classpath" refid="maven.plugin.classpath"/>
+                                        <taskdef name="hibernatetool"
+                         classname="org.hibernate.tool.ant.HibernateToolTask"/>
+                                        <hibernatetool destdir="{basedir}/src/main/resources/db/mysql">
+                                            <hbm2ddl drop="true"
+                           create="true"
+                           export="${export}"
+                           outputfilename="${basedir}/src/main/resources/db/mysql/account.sql"
+                           delimiter=";" format="true"/>
+                                            <configuration configurationfile="${basedir}/src/test/resources/hibernate.cfg.xml"/>
+                                        </hibernatetool>
+                                    </tasks>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.hibernate</groupId>
+                                <artifactId>hibernate-tools</artifactId>
+                                <version>3.2.3.GA</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>org.hibernate</groupId>
+                                <artifactId>hibernate</artifactId>
+                                <version>3.4.0.GA</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>org.hibernate</groupId>
+                                <artifactId>hibernate-entitymanager</artifactId>
+                                <version>3.4.0.GA</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>org.slf4j</groupId>
+                                <artifactId>slf4j-api</artifactId>
+                                <version>1.5.2</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>org.slf4j</groupId>
+                                <artifactId>slf4j-log4j12</artifactId>
+                                <version>1.5.2</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>commons-logging</groupId>
+                                <artifactId>commons-logging</artifactId>
+                                <version>1.1</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
+
