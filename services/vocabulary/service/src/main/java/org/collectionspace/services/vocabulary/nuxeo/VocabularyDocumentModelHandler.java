@@ -99,19 +99,19 @@ public class VocabularyDocumentModelHandler
     }
 
     @Override
-    public VocabulariesCommon extractCommonPart(DocumentWrapper wrapDoc)
+    public VocabulariesCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
             throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void fillCommonPart(VocabulariesCommon vocabularyObject, DocumentWrapper wrapDoc) throws Exception {
+    public void fillCommonPart(VocabulariesCommon vocabularyObject, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public VocabulariesCommonList extractCommonPartList(DocumentWrapper wrapDoc) throws Exception {
-        DocumentModelList docList = (DocumentModelList) wrapDoc.getWrappedObject();
+    public VocabulariesCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
+        DocumentModelList docList = wrapDoc.getWrappedObject();
 
         VocabulariesCommonList coList = new VocabulariesCommonList();
         List<VocabulariesCommonList.VocabularyListItem> list = coList.getVocabularyListItem();

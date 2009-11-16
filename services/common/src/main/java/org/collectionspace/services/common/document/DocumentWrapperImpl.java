@@ -22,28 +22,17 @@
  *  limitations under the License.
  */
 
-package org.collectionspace.services.nuxeo.client.java;
+package org.collectionspace.services.common.document;
 
-import org.collectionspace.services.common.document.DocumentWrapper;
-import org.nuxeo.ecm.core.api.DocumentModelList;
+public class DocumentWrapperImpl<T> implements DocumentWrapper<T>{
 
-/**
-* DocumentModelListWrapper wraps Nuxeo DocumentModel
-*
-* $LastChangedRevision: $
-* $LastChangedDate: $
-*/
-public class DocumentModelListWrapper implements DocumentWrapper {
+    private T wrappedObject;
 
-    private DocumentModelList docModelList;
-
-    public DocumentModelListWrapper(DocumentModelList docModelList) {
-        this.docModelList = docModelList;
-    }
-    
-    @Override
-    public Object getWrappedObject() {
-        return docModelList;
+    public DocumentWrapperImpl(T obj) {
+        this.wrappedObject = obj;
     }
 
+    public T getWrappedObject() {
+        return wrappedObject;
+    }
 }

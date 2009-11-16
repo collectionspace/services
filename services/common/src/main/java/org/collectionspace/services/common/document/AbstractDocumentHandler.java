@@ -38,8 +38,8 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public abstract class AbstractDocumentHandler<T, TL>
-        implements DocumentHandler<T, TL> {
+public abstract class AbstractDocumentHandler<T, TL, WT, WTL>
+        implements DocumentHandler<T, TL, WT, WTL> {
 
     private final Logger logger = LoggerFactory.getLogger(AbstractDocumentHandler.class);
     private Map<String, Object> properties = new HashMap<String, Object>();
@@ -97,76 +97,76 @@ public abstract class AbstractDocumentHandler<T, TL>
     }
 
     @Override
-    public void handle(Action action, DocumentWrapper wrapDoc) throws Exception {
+    public void handle(Action action, DocumentWrapper<?> wrapDoc) throws Exception {
         switch(action){
             case CREATE:
-                handleCreate(wrapDoc);
+                handleCreate((DocumentWrapper<WT>)wrapDoc);
                 break;
 
             case UPDATE:
-                handleUpdate(wrapDoc);
+                handleUpdate((DocumentWrapper<WT>)wrapDoc);
                 break;
 
             case GET:
-                handleGet(wrapDoc);
+                handleGet((DocumentWrapper<WT>)wrapDoc);
                 break;
 
             case GET_ALL:
-                handleGetAll(wrapDoc);
+                handleGetAll((DocumentWrapper<WTL>)wrapDoc);
                 break;
 
         }
     }
 
     @Override
-    public abstract void handleCreate(DocumentWrapper wrapDoc) throws Exception;
+    public abstract void handleCreate(DocumentWrapper<WT> wrapDoc) throws Exception;
 
     @Override
-    public abstract void handleUpdate(DocumentWrapper wrapDoc) throws Exception;
+    public abstract void handleUpdate(DocumentWrapper<WT> wrapDoc) throws Exception;
 
     @Override
-    public abstract void handleGet(DocumentWrapper wrapDoc) throws Exception;
+    public abstract void handleGet(DocumentWrapper<WT> wrapDoc) throws Exception;
 
     @Override
-    public abstract void handleGetAll(DocumentWrapper wrapDoc) throws Exception;
+    public abstract void handleGetAll(DocumentWrapper<WTL> wrapDoc) throws Exception;
 
     @Override
-    public void complete(Action action, DocumentWrapper wrapDoc) throws Exception {
+    public void complete(Action action, DocumentWrapper<?> wrapDoc) throws Exception {
         switch(action){
             //TODO: add more actions if needed
             case UPDATE:
-                completeUpdate(wrapDoc);
+                completeUpdate((DocumentWrapper<WT>)wrapDoc);
                 break;
         }
     }
 
     @Override
-    public void completeUpdate(DocumentWrapper wrapDoc) throws Exception {
+    public void completeUpdate(DocumentWrapper<WT> wrapDoc) throws Exception {
         //no specific action needed
     }
 
     @Override
-    public abstract void extractAllParts(DocumentWrapper wrapDoc)
+    public abstract void extractAllParts(DocumentWrapper<WT> wrapDoc)
             throws Exception;
 
     @Override
-    public abstract void fillAllParts(DocumentWrapper wrapDoc)
+    public abstract void fillAllParts(DocumentWrapper<WT> wrapDoc)
             throws Exception;
 
     @Override
-    public abstract T extractCommonPart(DocumentWrapper wrapDoc)
+    public abstract T extractCommonPart(DocumentWrapper<WT> wrapDoc)
             throws Exception;
 
     @Override
-    public abstract void fillCommonPart(T obj, DocumentWrapper wrapDoc)
+    public abstract void fillCommonPart(T obj, DocumentWrapper<WT> wrapDoc)
             throws Exception;
 
     @Override
-    public abstract TL extractCommonPartList(DocumentWrapper wrapDoc)
+    public abstract TL extractCommonPartList(DocumentWrapper<WTL> wrapDoc)
             throws Exception;
 
     @Override
-    final public void fillCommonPartList(TL obj, DocumentWrapper wrapDoc) throws Exception {
+    final public void fillCommonPartList(TL obj, DocumentWrapper<WTL> wrapDoc) throws Exception {
         throw new UnsupportedOperationException("bulk create/update not yet supported");
     }
 

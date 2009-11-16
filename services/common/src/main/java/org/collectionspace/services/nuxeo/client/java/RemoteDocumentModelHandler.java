@@ -68,8 +68,8 @@ public abstract class RemoteDocumentModelHandler<T, TL>
     public abstract String getDocumentType();
 
     @Override
-    public void completeUpdate(DocumentWrapper wrapDoc) throws Exception {
-        DocumentModel docModel = (DocumentModel) wrapDoc.getWrappedObject();
+    public void completeUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+        DocumentModel docModel = wrapDoc.getWrappedObject();
         //return at least those document part(s) that were received
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
         RemoteServiceContext ctx = (RemoteServiceContext) getServiceContext();
@@ -82,9 +82,9 @@ public abstract class RemoteDocumentModelHandler<T, TL>
     }
 
     @Override
-    public void extractAllParts(DocumentWrapper wrapDoc) throws Exception {
+    public void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
 
-        DocumentModel docModel = (DocumentModel) wrapDoc.getWrappedObject();
+        DocumentModel docModel = wrapDoc.getWrappedObject();
         String[] schemas = docModel.getDeclaredSchemas();
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
         for(String schema : schemas){
@@ -97,12 +97,12 @@ public abstract class RemoteDocumentModelHandler<T, TL>
     }
 
     @Override
-    public void fillAllParts(DocumentWrapper wrapDoc) throws Exception {
+    public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
 
         //TODO filling extension parts should be dynamic
         //Nuxeo APIs lack to support stream/byte[] input, get/setting properties is
         //not an ideal way of populating objects.
-        DocumentModel docModel = (DocumentModel) wrapDoc.getWrappedObject();
+        DocumentModel docModel = wrapDoc.getWrappedObject();
         RemoteServiceContext ctx = (RemoteServiceContext) getServiceContext();
         MultipartInput input = ctx.getInput();
         if(input.getParts().isEmpty()){

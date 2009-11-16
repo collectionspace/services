@@ -29,12 +29,12 @@ package org.collectionspace.services.common.document;
  * DocumentWrapper wraps DocumentModel (java) or Representation (REST)
  *
  */
-public interface DocumentWrapper {
+public interface DocumentWrapper<T> {
 
     /**
      * getWrappedObject
      * @return wrapped object
      */
-    public Object getWrappedObject();
+    public T getWrappedObject();
 
 }

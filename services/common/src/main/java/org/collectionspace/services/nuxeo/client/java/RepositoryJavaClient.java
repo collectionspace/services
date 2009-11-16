@@ -17,7 +17,6 @@
  */
 package org.collectionspace.services.nuxeo.client.java;
 
-
 import java.util.UUID;
 
 import org.collectionspace.services.common.context.ServiceContext;
@@ -28,6 +27,8 @@ import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.common.utils.IdUtils;
 import org.nuxeo.ecm.core.api.ClientException;
@@ -99,7 +100,7 @@ public class RepositoryJavaClient implements RepositoryClient {
             DocumentModel doc = repoSession.createDocumentModel(wspacePath, id,
                     ctx.getDocumentType());
             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
-            DocumentModelWrapper wrapDoc = new DocumentModelWrapper(doc);
+            DocumentWrapper<DocumentModel> wrapDoc = new DocumentWrapperImpl<DocumentModel>(doc);
             handler.handle(Action.CREATE, wrapDoc);
             // create document with documentmodel
             doc = repoSession.createDocument(doc);
@@ -153,7 +154,7 @@ public class RepositoryJavaClient implements RepositoryClient {
             }
             //set reposession to handle the document
             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
-            DocumentModelWrapper wrapDoc = new DocumentModelWrapper(doc);
+            DocumentWrapper<DocumentModel> wrapDoc = new DocumentWrapperImpl<DocumentModel>(doc);
             handler.handle(Action.GET, wrapDoc);
             handler.complete(Action.GET, wrapDoc);
         } catch (IllegalArgumentException iae) {
@@ -205,8 +206,7 @@ public class RepositoryJavaClient implements RepositoryClient {
             DocumentModelList docList = repoSession.getChildren(wsDocRef);
             //set reposession to handle the document
             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
-            DocumentModelListWrapper wrapDoc = new DocumentModelListWrapper(
-                    docList);
+            DocumentWrapper<DocumentModelList> wrapDoc = new DocumentWrapperImpl<DocumentModelList>(docList);
             handler.handle(Action.GET_ALL, wrapDoc);
             handler.complete(Action.GET_ALL, wrapDoc);
         } catch (DocumentException de) {
@@ -222,7 +222,7 @@ public class RepositoryJavaClient implements RepositoryClient {
             }
         }
     }
-    
+
     /**
      * getFiltered get all documents for an entity service from the Document repository,
      * given filter parameters specified by the handler. 
@@ -231,8 +231,8 @@ public class RepositoryJavaClient implements RepositoryClient {
      * @throws DocumentNotFoundException if workspace not found
      * @throws DocumentException
      */
-    public void getFiltered(ServiceContext ctx, DocumentHandler handler) 
-    	throws DocumentNotFoundException, DocumentException {
+    public void getFiltered(ServiceContext ctx, DocumentHandler handler)
+            throws DocumentNotFoundException, DocumentException {
         if (handler == null) {
             throw new IllegalArgumentException(
                     "RemoteRepositoryClient.getFiltered: handler is missing");
@@ -258,23 +258,23 @@ public class RepositoryJavaClient implements RepositoryClient {
             repoSession = getRepositorySession();
             StringBuilder query = new StringBuilder("SELECT * FROM ");
             query.append(docType);
-            String where = docFilter.getWhereClause(); 
+            String where = docFilter.getWhereClause();
             // TODO This is a slow method for tenant-filter
             // We should make this a property that is indexed.
-           	query.append(" WHERE ecm:path STARTSWITH '/"+domain+"'");
-            if((null!=where)&&(where.length()>0))
-            	query.append(" AND "+where);
+            query.append(" WHERE ecm:path STARTSWITH '/" + domain + "'");
+            if ((null != where) && (where.length() > 0)) {
+                query.append(" AND " + where);
+            }
             DocumentModelList docList = null;
-            if((docFilter.getOffset()>0)||(docFilter.getPageSize()>0)) {
-            	docList = repoSession.query(query.toString(), null, 
-            					docFilter.getPageSize(), docFilter.getOffset(), false);
+            if ((docFilter.getOffset() > 0) || (docFilter.getPageSize() > 0)) {
+                docList = repoSession.query(query.toString(), null,
+                        docFilter.getPageSize(), docFilter.getOffset(), false);
             } else {
-            	docList = repoSession.query(query.toString());
+                docList = repoSession.query(query.toString());
             }
             //set repoSession to handle the document
             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
-            DocumentModelListWrapper wrapDoc = new DocumentModelListWrapper(
-                    docList);
+            DocumentWrapper<DocumentModelList> wrapDoc = new DocumentWrapperImpl<DocumentModelList>(docList);
             handler.handle(Action.GET_ALL, wrapDoc);
             handler.complete(Action.GET_ALL, wrapDoc);
         } catch (DocumentException de) {
@@ -290,8 +290,6 @@ public class RepositoryJavaClient implements RepositoryClient {
             }
         }
     }
-
-    
 
     /**
      * update given document in the Nuxeo repository
@@ -331,7 +329,7 @@ public class RepositoryJavaClient implements RepositoryClient {
             }
             //set reposession to handle the document
             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
-            DocumentModelWrapper wrapDoc = new DocumentModelWrapper(doc);
+            DocumentWrapper<DocumentModel> wrapDoc = new DocumentWrapperImpl<DocumentModel>(doc);
             handler.handle(Action.UPDATE, wrapDoc);
             repoSession.saveDocument(doc);
             repoSession.save();
@@ -394,8 +392,8 @@ public class RepositoryJavaClient implements RepositoryClient {
     public String createWorkspace(String tenantDomain, String workspaceName) throws Exception {
         RepositoryInstance repoSession = null;
         String workspaceId = null;
-        try{
-            repoSession= getRepositorySession();
+        try {
+            repoSession = getRepositorySession();
             DocumentRef docRef = new PathRef(
                     "/" + tenantDomain +
                     "/" + "workspaces");
@@ -408,17 +406,17 @@ public class RepositoryJavaClient implements RepositoryClient {
             doc = repoSession.createDocument(doc);
             workspaceId = doc.getId();
             repoSession.save();
-            if(logger.isDebugEnabled()){
+            if (logger.isDebugEnabled()) {
                 logger.debug("created workspace name=" + workspaceName +
                         " id=" + workspaceId);
             }
-        }catch(Exception e){
-            if(logger.isDebugEnabled()){
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("createWorkspace caught exception ", e);
             }
             throw e;
-        }finally{
-            if(repoSession != null){
+        } finally {
+            if (repoSession != null) {
                 releaseRepositorySession(repoSession);
             }
         }
@@ -429,7 +427,7 @@ public class RepositoryJavaClient implements RepositoryClient {
     public String getWorkspaceId(String tenantDomain, String workspaceName) throws Exception {
         String workspaceId = null;
         RepositoryInstance repoSession = null;
-        try{
+        try {
             repoSession = getRepositorySession();
             DocumentRef docRef = new PathRef(
                     "/" + tenantDomain +
@@ -437,15 +435,15 @@ public class RepositoryJavaClient implements RepositoryClient {
                     "/" + workspaceName);
             DocumentModel workspace = repoSession.getDocument(docRef);
             workspaceId = workspace.getId();
-        }catch(DocumentException de){
+        } catch (DocumentException de) {
             throw de;
-        }catch(Exception e){
-            if(logger.isDebugEnabled()){
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
             throw new DocumentException(e);
-        }finally{
-            if(repoSession != null){
+        } finally {
+            if (repoSession != null) {
                 releaseRepositorySession(repoSession);
             }
         }
@@ -470,8 +468,7 @@ public class RepositoryJavaClient implements RepositoryClient {
             client.releaseRepository(repoSession);
         } catch (Exception e) {
             logger.error("Could not close the repository session", e);
-            // no need to throw this service specific exception
+        // no need to throw this service specific exception
         }
     }
-
 }

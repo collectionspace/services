@@ -99,19 +99,19 @@ public class IntakeDocumentModelHandler
     }
 
     @Override
-    public IntakesCommon extractCommonPart(DocumentWrapper wrapDoc)
+    public IntakesCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
             throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void fillCommonPart(IntakesCommon intakeObject, DocumentWrapper wrapDoc) throws Exception {
+    public void fillCommonPart(IntakesCommon intakeObject, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public IntakesCommonList extractCommonPartList(DocumentWrapper wrapDoc) throws Exception {
-        DocumentModelList docList = (DocumentModelList) wrapDoc.getWrappedObject();
+    public IntakesCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
+        DocumentModelList docList = wrapDoc.getWrappedObject();
 
         IntakesCommonList coList = new IntakesCommonList();
         List<IntakesCommonList.IntakeListItem> list = coList.getIntakeListItem();

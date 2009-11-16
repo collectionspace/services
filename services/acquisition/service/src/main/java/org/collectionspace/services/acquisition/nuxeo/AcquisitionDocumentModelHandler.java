@@ -99,20 +99,19 @@ public class AcquisitionDocumentModelHandler
     }
 
     @Override
-    public AcquisitionsCommon extractCommonPart(DocumentWrapper wrapDoc)
+    public AcquisitionsCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
             throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void fillCommonPart(AcquisitionsCommon acquisitionObject, DocumentWrapper wrapDoc) throws Exception {
+    public void fillCommonPart(AcquisitionsCommon acquisitionObject, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public AcquisitionsCommonList extractCommonPartList(DocumentWrapper wrapDoc) throws Exception {
-        DocumentModelList docList = (DocumentModelList) wrapDoc.getWrappedObject();
-
+    public AcquisitionsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
+        DocumentModelList docList = wrapDoc.getWrappedObject();
         AcquisitionsCommonList coList = new AcquisitionsCommonList();
         List<AcquisitionsCommonList.AcquisitionListItem> list = coList.getAcquisitionListItem();
 
@@ -135,14 +134,14 @@ public class AcquisitionDocumentModelHandler
     }
 
     @Override
-    public void fillAllParts(DocumentWrapper wrapDoc) throws Exception {
+    public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
 
         super.fillAllParts(wrapDoc);
         fillDublinCoreObject(wrapDoc); //dublincore might not be needed in future
     }
 
-    private void fillDublinCoreObject(DocumentWrapper wrapDoc) throws Exception {
-        DocumentModel docModel = (DocumentModel) wrapDoc.getWrappedObject();
+    private void fillDublinCoreObject(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+        DocumentModel docModel = wrapDoc.getWrappedObject();
         //FIXME property setter should be dynamically set using schema inspection
         //so it does not require hard coding
         // a default title for the Dublin Core schema

@@ -92,19 +92,19 @@ public class CollectionObjectDocumentModelHandler
     }
 
     @Override
-    public CollectionobjectsCommon extractCommonPart(DocumentWrapper wrapDoc)
+    public CollectionobjectsCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
             throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void fillCommonPart(CollectionobjectsCommon co, DocumentWrapper wrapDoc) throws Exception {
+    public void fillCommonPart(CollectionobjectsCommon co, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public CollectionobjectsCommonList extractCommonPartList(DocumentWrapper wrapDoc) throws Exception {
-        DocumentModelList docList = (DocumentModelList) wrapDoc.getWrappedObject();
+    public CollectionobjectsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
+        DocumentModelList docList = wrapDoc.getWrappedObject();
 
         CollectionobjectsCommonList coList = new CollectionobjectsCommonList();
         List<CollectionobjectsCommonList.CollectionObjectListItem> list = coList.getCollectionObjectListItem();
@@ -127,14 +127,14 @@ public class CollectionObjectDocumentModelHandler
     }
 
     @Override
-    public void fillAllParts(DocumentWrapper wrapDoc) throws Exception {
+    public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
 
         super.fillAllParts(wrapDoc);
         fillDublinCoreObject(wrapDoc); //dublincore might not be needed in future
     }
 
-    private void fillDublinCoreObject(DocumentWrapper wrapDoc) throws Exception {
-        DocumentModel docModel = (DocumentModel) wrapDoc.getWrappedObject();
+    private void fillDublinCoreObject(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+        DocumentModel docModel = wrapDoc.getWrappedObject();
         //FIXME property setter should be dynamically set using schema inspection
         //so it does not require hard coding
         // a default title for the Dublin Core schema

@@ -102,19 +102,19 @@ public class RelationDocumentModelHandler
     }
 
     @Override
-    public RelationsCommon extractCommonPart(DocumentWrapper wrapDoc)
+    public RelationsCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
             throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void fillCommonPart(RelationsCommon relation, DocumentWrapper wrapDoc) throws Exception {
+    public void fillCommonPart(RelationsCommon relation, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public RelationsCommonList extractCommonPartList(DocumentWrapper wrapDoc) throws Exception {
-        DocumentModelList docList = (DocumentModelList) wrapDoc.getWrappedObject();
+    public RelationsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
+        DocumentModelList docList = wrapDoc.getWrappedObject();
 
         Map propsFromResource = this.getProperties();
         String subjectCsid = (String) propsFromResource.get(IRelationsManager.SUBJECT);
@@ -142,13 +142,13 @@ public class RelationDocumentModelHandler
   
 
     @Override
-    public void fillAllParts(DocumentWrapper wrapDoc) throws Exception {
+    public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         super.fillAllParts(wrapDoc);
         fillDublinCoreObject(wrapDoc); //dublincore might not be needed in future
     }
 
-    private void fillDublinCoreObject(DocumentWrapper wrapDoc) throws Exception {
-        DocumentModel docModel = (DocumentModel) wrapDoc.getWrappedObject();
+    private void fillDublinCoreObject(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+        DocumentModel docModel = wrapDoc.getWrappedObject();
         //FIXME property setter should be dynamically set using schema inspection
         //so it does not require hard coding
         // a default title for the Dublin Core schema

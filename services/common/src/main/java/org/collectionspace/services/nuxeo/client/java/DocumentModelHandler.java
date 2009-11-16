@@ -26,6 +26,8 @@ package org.collectionspace.services.nuxeo.client.java;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.AbstractDocumentHandler;
 import org.collectionspace.services.nuxeo.client.*;
+import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public abstract class DocumentModelHandler<T, TL>
-        extends AbstractDocumentHandler<T, TL> {
+        extends AbstractDocumentHandler<T, TL, DocumentModel, DocumentModelList> {
 
     private final Logger logger = LoggerFactory.getLogger(DocumentModelHandler.class);
     private RepositoryInstance repositorySession;
@@ -61,42 +63,42 @@ public abstract class DocumentModelHandler<T, TL>
     }
 
     @Override
-    public void handleCreate(DocumentWrapper wrapDoc) throws Exception {
+    public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         fillAllParts(wrapDoc);
     }
 
     @Override
-    public void handleUpdate(DocumentWrapper wrapDoc) throws Exception {
+    public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         fillAllParts(wrapDoc);
     }
 
     @Override
-    public void handleGet(DocumentWrapper wrapDoc) throws Exception {
+    public void handleGet(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         extractAllParts(wrapDoc);
     }
 
     @Override
-    public void handleGetAll(DocumentWrapper wrapDoc) throws Exception {
+    public void handleGetAll(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         setCommonPartList(extractCommonPartList(wrapDoc));
     }
 
     @Override
-    public abstract void completeUpdate(DocumentWrapper wrapDoc) throws Exception;
+    public abstract void completeUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception;
 
     @Override
-    public abstract void extractAllParts(DocumentWrapper wrapDoc) throws Exception;
+    public abstract void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception;
 
     @Override
-    public abstract T extractCommonPart(DocumentWrapper wrapDoc) throws Exception;
+    public abstract T extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc) throws Exception;
 
     @Override
-    public abstract void fillAllParts(DocumentWrapper wrapDoc) throws Exception;
+    public abstract void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception;
 
     @Override
-    public abstract void fillCommonPart(T obj, DocumentWrapper wrapDoc) throws Exception;
+    public abstract void fillCommonPart(T obj, DocumentWrapper<DocumentModel> wrapDoc) throws Exception;
 
     @Override
-    public abstract TL extractCommonPartList(DocumentWrapper wrapDoc) throws Exception;
+    public abstract TL extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception;
 
     @Override
     public abstract T getCommonPart();

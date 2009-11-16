@@ -33,7 +33,7 @@ import org.collectionspace.services.common.context.ServiceContext;
  * The repository client then calls handle on the handler
  *
  */
-public interface DocumentHandler<T, TL> {
+public interface DocumentHandler<T, TL, WT, WTL> {
 
     public enum Action {
 
@@ -73,35 +73,35 @@ public interface DocumentHandler<T, TL> {
      * @param doc wrapped doc
      * @throws Exception
      */
-    public void handle(Action action, DocumentWrapper docWrap) throws Exception;
+    public void handle(Action action, DocumentWrapper<?> docWrap) throws Exception;
 
     /**
      * handleCreate processes documents before creating document in repository
      * @param wrapDoc
      * @throws Exception
      */
-    public void handleCreate(DocumentWrapper wrapDoc) throws Exception;
+    public void handleCreate(DocumentWrapper<WT> wrapDoc) throws Exception;
 
     /**
      * handleUpdate processes documents for the update of document in repository
      * @param wrapDoc
      * @throws Exception
      */
-    public void handleUpdate(DocumentWrapper wrapDoc) throws Exception;
+    public void handleUpdate(DocumentWrapper<WT> wrapDoc) throws Exception;
 
     /**
      * handleGet processes documents from repository before responding to consumer
      * @param wrapDoc
      * @throws Exception
      */
-    public void handleGet(DocumentWrapper wrapDoc) throws Exception;
+    public void handleGet(DocumentWrapper<WT> wrapDoc) throws Exception;
 
     /**
      * handleGetAll processes documents from repository before responding to consumer
      * @param wrapDoc
      * @throws Exception
      */
-    public void handleGetAll(DocumentWrapper wrapDoc) throws Exception;
+    public void handleGetAll(DocumentWrapper<WTL> wrapDoc) throws Exception;
 
     /**
      * complete is called by the client to provide an opportunity to the handler
@@ -110,7 +110,7 @@ public interface DocumentHandler<T, TL> {
      * @param wrapDoc
      * @throws Exception
      */
-    public void complete(Action action, DocumentWrapper wrapDoc) throws Exception;
+    public void complete(Action action, DocumentWrapper<?> wrapDoc) throws Exception;
 
     /**
      * completeUpdate is called by the client to indicate completion of the update call.
@@ -118,7 +118,7 @@ public interface DocumentHandler<T, TL> {
      * @param wrapDoc
      * @throws Exception
      */
-    public void completeUpdate(DocumentWrapper wrapDoc) throws Exception;
+    public void completeUpdate(DocumentWrapper<WT> wrapDoc) throws Exception;
 
     /**
      * extractAllParts extracts all parts of a CS object from given document.
@@ -127,7 +127,7 @@ public interface DocumentHandler<T, TL> {
      * @param docWrap document
      * @throws Exception
      */
-    public void extractAllParts(DocumentWrapper docWrap) throws Exception;
+    public void extractAllParts(DocumentWrapper<WT> docWrap) throws Exception;
 
     /**
      * fillAllParts sets parts of CS object into given document
@@ -137,7 +137,7 @@ public interface DocumentHandler<T, TL> {
      * @param docWrap target document
      * @throws Exception
      */
-    public void fillAllParts(DocumentWrapper docWrap) throws Exception;
+    public void fillAllParts(DocumentWrapper<WT> docWrap) throws Exception;
 
     /**
      * extractCommonPart extracts common part of a CS object from given document.
@@ -147,7 +147,7 @@ public interface DocumentHandler<T, TL> {
      * @return common part of CS object
      * @throws Exception
      */
-    public T extractCommonPart(DocumentWrapper docWrap) throws Exception;
+    public T extractCommonPart(DocumentWrapper<WT> docWrap) throws Exception;
 
     /**
      * fillCommonPart sets common part of CS object into given document
@@ -157,7 +157,7 @@ public interface DocumentHandler<T, TL> {
      * @param docWrap target document
      * @throws Exception
      */
-    public void fillCommonPart(T obj, DocumentWrapper docWrap) throws Exception;
+    public void fillCommonPart(T obj, DocumentWrapper<WT> docWrap) throws Exception;
 
     /**
      * extractCommonPart extracts common part of a CS object from given document.
@@ -167,7 +167,7 @@ public interface DocumentHandler<T, TL> {
      * @return common part of CS object
      * @throws Exception
      */
-    public TL extractCommonPartList(DocumentWrapper docWrap) throws Exception;
+    public TL extractCommonPartList(DocumentWrapper<WTL> docWrap) throws Exception;
 
     /**
      * fillCommonPartList sets list common part of CS object into given document
@@ -177,7 +177,7 @@ public interface DocumentHandler<T, TL> {
      * @param docWrap target document
      * @throws Exception
      */
-    public void fillCommonPartList(TL obj, DocumentWrapper docWrap) throws Exception;
+    public void fillCommonPartList(TL obj, DocumentWrapper<WTL> docWrap) throws Exception;
 
 
     /**
