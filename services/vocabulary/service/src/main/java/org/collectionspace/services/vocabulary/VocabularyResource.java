@@ -198,7 +198,7 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
             DocumentHandler handler = createDocumentHandler(ctx);
             DocumentFilter myFilter = 
             	DocumentFilter.CreatePaginatedDocumentFilter(queryParams);
-        	String nameQ = queryParams.getFirst("name");
+        	String nameQ = queryParams.getFirst("refName");
         	if(nameQ!= null) {
                 myFilter.setWhereClause("vocabularies_common:refName='"+nameQ+"'");
         	}
