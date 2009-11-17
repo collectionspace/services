@@ -33,7 +33,6 @@
     <xs:element name="accounts_common">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="csid" type="xs:string" minOccurs="1" maxOccurs="1" />
                 <xs:element name="anchorName" type="xs:string" minOccurs="1" maxOccurs="1" />
                 <xs:element name="firstName" type="xs:string" minOccurs="1" maxOccurs="1" />
                 <xs:element name="lastName" type="xs:string" minOccurs="1" maxOccurs="1" />
@@ -42,6 +41,13 @@
                 <xs:element name="phone" type="xs:string"/>
 
             </xs:sequence>
+            <xs:attribute name="csid" type="xs:string">
+                <xs:annotation>
+                    <xs:appinfo>
+                        <hj:id />
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:attribute>
         </xs:complexType>
     </xs:element>
 

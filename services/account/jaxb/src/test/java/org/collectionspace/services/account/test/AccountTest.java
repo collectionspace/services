@@ -32,6 +32,7 @@ public class AccountTest {
     private final Logger logger = LoggerFactory.getLogger(AccountTest.class);
     private EntityManagerFactory emf;
     private EntityManager em;
+    private String id;
 
     @BeforeMethod
     public void init() {
@@ -54,14 +55,14 @@ public class AccountTest {
     @SuppressWarnings("unchecked")
     @Test(dataProvider = "testName", dataProviderClass = AccountTest.class)
     public void create(String testName) throws Exception {
-        // Begin transaction
-        em.getTransaction().begin();
         AccountsCommon account = new AccountsCommon();
         account.setAnchorName("sanjay");
         account.setFirstName("Sanjay");
         account.setLastName("Dalal");
         account.setEmail("sanjay.dalal@berkeley.edu");
-        account.setCsid(UUID.randomUUID().toString());
+        id = UUID.randomUUID().toString();
+        account.setCsid(id);
+        em.getTransaction().begin();
         em.persist(account);
         // Commit the transaction
         em.getTransaction().commit();
@@ -95,14 +96,15 @@ public class AccountTest {
     @Test(dataProvider = "testName", dataProviderClass = AccountTest.class,
     dependsOnMethods = {"read"})
     public void update(String testName) throws Exception {
-        // Begin transaction
+        Query q = em.createQuery("update org.collectionspace.services.account.AccountsCommon set email= :email where csid=:csid");
+        q.setParameter("email", "sanjay@berkeley.edu");
+        q.setParameter("csid", id);
         em.getTransaction().begin();
-        AccountsCommon account = findAccount("sanjay");
-        Assert.assertNotNull(account);
-        account.setEmail("sanjay@berkeley.edu");
-        em.persist(account);
+        int no = q.executeUpdate();
         // Commit the transaction
         em.getTransaction().commit();
+        Assert.assertEquals(no, 1);
+        AccountsCommon account = findAccount("sanjay");
         if (logger.isDebugEnabled()) {
             logger.debug("updated account " +
                     " first name=" + account.getFirstName() +
@@ -114,21 +116,22 @@ public class AccountTest {
     @Test(dataProvider = "testName", dataProviderClass = AccountTest.class,
     dependsOnMethods = {"update"})
     public void delete(String testName) throws Exception {
+        Query q = em.createQuery("delete from org.collectionspace.services.account.AccountsCommon where csid=:csid");
+        q.setParameter("csid", id);
         // Begin transaction
         em.getTransaction().begin();
-        AccountsCommon account = findAccount("sanjay");
-        Assert.assertNotNull(account);
+        int no = q.executeUpdate();
+        ;
         if (logger.isDebugEnabled()) {
             logger.debug("deleting account " +
-                    " first name=" + account.getFirstName() +
-                    " email=" + account.getEmail());
+                    " csid=" + id);
         }
-        em.remove(account);
         // Commit the transaction
         em.getTransaction().commit();
+        Assert.assertEquals(no, 1);
         if (logger.isDebugEnabled()) {
             logger.debug("deleted account " +
-                    " first name=" + account.getFirstName());
+                    " csid=" + id);
         }
     }
 
