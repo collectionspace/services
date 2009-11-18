@@ -4,6 +4,7 @@
         collectionspace services
     </description>
   <!-- set global properties for this build -->
+    <property name="services.trunk" value="../.."/>
     <property file="build.properties" />
     <property name="src" location="src"/>
 
@@ -17,9 +18,48 @@
         <os family="windows" />
     </condition>
     
-    <target name="setup">
+    <target name="install"
+    	description="Installer: Copy artifacts for CollectionSpace Nuxeo doctypes">
+        <copy todir="${jboss.deploy.nuxeo.system}">
+            <fileset file="${services.trunk}/${dist.deploy.nuxeo.system}/*.jar"/>
+        </copy>
+        <!-- cspace\server\cspace -->     
+        <copy todir="${jboss.server.cspace}/cspace">
+            <fileset dir="${services.trunk}/${dist.server.cspace}/cspace"/>
+        </copy>
+        <!-- cspace\server\cspace\deploy -->     
+        <copy todir="${jboss.server.cspace}/deploy">
+            <fileset dir="${services.trunk}/${dist.server.cspace}/deploy">
+            	<include name="*"/>
+            </fileset>
+        </copy>
+        <!-- cspace\server\cspace\lib -->      
+        <copy todir="${jboss.server.cspace}/lib">
+            <fileset dir="${services.trunk}/${dist.server.cspace}/lib"/>
+        </copy>   
+        <!-- cspace\server\cspace\nuxeo-client\lib -->     
+        <copy todir="${jboss.server.cspace}/nuxeo-client/lib">
+            <fileset dir="${services.trunk}/${dist.server.cspace}/nuxeo-client/lib">
+            	<include name="*.jar"/>
+						</fileset>
+        </copy>
+        <!-- cspace\server\cspace\nuxeo-client\lib (5.2GA) -->      
+        <copy todir="${jboss.server.cspace}/nuxeo-client/lib">
+            <fileset dir="${services.trunk}/${dist.server.cspace}/nuxeo-client/lib/${nuxeo.release}">
+            	<include name="*.jar"/>
+						</fileset>
+        </copy>        
+    </target>    
+    
+    <target name="config" description="">
         <exec executable="echo">
-        		<arg value="Executing installer's &apos;setup&apos; target." />
+        		<arg value="Installer: Executing CollectionSpace Service's &apos;config&apos; target." />
+				</exec>
+    </target>    
+    
+    <target name="predeploy">
+        <exec executable="echo">
+        		<arg value="Installer: Executing installer's &apos;predeploy&apos; target." />
 				</exec>
 				
         <exec executable="echo">
@@ -35,16 +75,22 @@
             </classpath>
         </sql>
 				
-				<!-- Now, invoke the "setup" target on each of the services' install directories -->
-        <ant antfile="services/build.xml" target="setup" inheritAll="false"/>        	
+				<!-- Now, invoke the "predeploy" target on each of the services' install directories -->
+        <ant antfile="services/build.xml" target="predeploy" inheritAll="false"/>        	
     </target>
-    	
-    <target name="init">
+    
+    <target name="deploy" description="">
         <exec executable="echo">
-        		<arg value="Executing installer's &apos;init&apos; target." />
+        		<arg value="Installer: Executing CollectionSpace Service's &apos;deploy&apos; target." />
 				</exec>
-				<!-- Now, invoke the "setup" target on each of the services' install directories -->
-        <ant antfile="services/build.xml" target="init" inheritAll="false"/>        	
+    </target>     
+    	
+    <target name="postdeploy">
+        <exec executable="echo">
+        		<arg value="Installer: Executing installer's &apos;postdeploy&apos; target." />
+				</exec>
+				<!-- Now, invoke the "predeploy" target on each of the services' install directories -->
+        <ant antfile="services/build.xml" target="postdeploy" inheritAll="false"/>        	
     </target>
 
 </project>

@@ -17,9 +17,21 @@
         <os family="windows" />
     </condition>
 
-    <target name="setup">
+    <target name="install" description="">
         <exec executable="echo">
-        		<arg value="Installer: Executing ID Service's &apos;setup&apos; target for the ID Service." />
+        		<arg value="Installer: Executing ID Service's &apos;install&apos; target." />
+				</exec>
+    </target>
+
+    <target name="config" description="">
+        <exec executable="echo">
+        		<arg value="Installer: Executing ID Service's &apos;config&apos; target." />
+				</exec>
+    </target>
+
+    <target name="predeploy">
+        <exec executable="echo">
+        		<arg value="Installer: Executing ID Service's &apos;predeploy&apos; target for the ID Service." />
 				</exec>
 				
         <exec executable="echo">
@@ -37,7 +49,7 @@
         </sql>
         	
         <exec executable="echo">
-        		<arg value="Loading tables for the ID Service." />
+        		<arg value="Installer: Loading tables for the ID Service." />
 				</exec>        	
 				
 				<!-- Load the tables -->
@@ -52,7 +64,13 @@
         </sql>        	
     </target>
     
-    <target name="init" description="">
+    <target name="deploy" description="">
+        <exec executable="echo">
+        		<arg value="Installer: Executing ID Service's &apos;deploy&apos; target." />
+				</exec>
+    </target>
+    
+    <target name="postdeploy" description="">
         <exec executable="echo">
         		<arg value="Installer: Executing ID Service's &apos;init&apos; target." />
 				</exec>

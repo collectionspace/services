@@ -17,21 +17,34 @@
         <os family="windows" />
     </condition>
 
-    <target name="setup" description="">
-        <tstamp/>
+    <target name="install" description="">
         <exec executable="echo">
-        		<arg value="Installer: Executing CollectionObject Service's &apos;setup&apos; target." />
+        		<arg value="Installer: Executing CollectionObject Service's &apos;install&apos; target." />
+				</exec>
+        <copy todir="${jboss.deploy.nuxeo.system}">
+            <fileset file="nuxeo/*.jar"/>
+        </copy>
+    </target>
+
+    <target name="config" description="">
+        <exec executable="echo">
+        		<arg value="Installer: Executing CollectionObject Service's &apos;config&apos; target." />
 				</exec>
     </target>
 
-    <target name="takedown" description="">
-        <tstamp/>
+    <target name="predeploy" description="">
         <exec executable="echo">
-        		<arg value="Installer: Executing CollectionObject Service's &apos;takedown&apos; target." />
+        		<arg value="Installer: Executing CollectionObject Service's &apos;predeploy&apos; target." />
+				</exec>
+    </target>
+
+    <target name="deploy" description="">
+        <exec executable="echo">
+        		<arg value="Installer: Executing CollectionObject Service's &apos;deploy&apos; target." />
 				</exec>
     </target>
     
-    <target name="init" description="">
+    <target name="postdeploy" description="">
         <exec executable="echo">
         		<arg value="Installer: Executing CollectionObject Service's &apos;init&apos; target." />
 				</exec>    	

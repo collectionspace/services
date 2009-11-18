@@ -3,8 +3,9 @@
     <description>
     </description>
   <!-- set global properties for this build -->
-    <property name="services.trunk" value=".."/>
-    <property file="${services.trunk}/build.properties" />
+    <property name="installer.trunk" value=".."/>
+    <property name="services.trunk" value="../../.."/>
+    <property file="${installer.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
 
@@ -14,20 +15,33 @@
     <condition property="osfamily-windows">
         <os family="windows" />
     </condition>
+    
+    <target name="install"
+    	description="Copy artifacts for CollectionSpace Nuxeo doctypes">
+        <copy todir="${jboss.deploy.nuxeo.system}">
+            <fileset file="${services.trunk}/${dist.deploy.nuxeo.system}/*.jar"/>
+        </copy>        
+    </target>
+    
+    <target name="config" description="">
+        <exec executable="echo">
+        		<arg value="Installer: Executing CollectionSpace Service's &apos;config&apos; target." />
+				</exec>
+    </target>    
 
     <!-- this target is called in order based on the dependencies between the services -->
-    <target name="setup" description="">
+    <target name="predeploy" description="">
         <exec executable="echo">
-        		<arg value="Installer: Executing services &apos;setup&apos; target." />
+        		<arg value="Installer: Executing services &apos;predeploy&apos; target." />
 				</exec>    	
 <!--
         <ant antfile="common/build.xml" target="setup" inheritAll="false"/>
         <ant antfile="authentication/build.xml" target="setup" inheritAll="false"/>
         <ant antfile="relation/build.xml" target="setup" inheritAll="false"/>
 -->        
-        <ant antfile="id/build.xml" target="setup" inheritAll="false"/>
-        <ant antfile="collectionobject/build.xml" target="setup" inheritAll="false"/>
-        <ant antfile="vocabulary/build.xml" target="setup" inheritAll="false"/>
+        <ant antfile="id/build.xml" target="predeploy" inheritAll="false"/>
+        <ant antfile="collectionobject/build.xml" target="predeploy" inheritAll="false"/>
+        <ant antfile="vocabulary/build.xml" target="predeploy" inheritAll="false"/>
 <!--        
         <ant antfile="intake/build.xml" target="setup" inheritAll="false"/>
         <ant antfile="acquisition/build.xml" target="setup" inheritAll="false"/>
@@ -35,31 +49,24 @@
 -->        
     </target>
 
-    <!-- this target is called in revese order of deploy targets -->
-    <target name="takedown" description="">
-        <ant antfile="JaxRsServiceProvider/build.xml" target="takedown" inheritAll="false"/>
-        <ant antfile="vocabulary/build.xml" target="takedown" inheritAll="false"/>
-        <ant antfile="acquisition/build.xml" target="takedown" inheritAll="false"/>
-        <ant antfile="intake/build.xml" target="takedown" inheritAll="false"/>
-        <ant antfile="collectionobject/build.xml" target="takedown" inheritAll="false"/>
-        <ant antfile="id/build.xml" target="takedown" inheritAll="false"/>
-        <ant antfile="relation/build.xml" target="takedown" inheritAll="false"/>
-        <ant antfile="authentication/build.xml" target="takedown" inheritAll="false"/>
-        <ant antfile="common/build.xml" target="takedown" inheritAll="false"/>
+    <target name="deploy" description="">
+        <exec executable="echo">
+        		<arg value="Installer: Executing CollectionSpace Service's &apos;deploy&apos; target." />
+				</exec>
     </target>
 
-    <target name="init" description="">
+    <target name="postdeploy" description="">
         <exec executable="echo">
-        		<arg value="Executing installer's services &apos;init&apos; target." />
+        		<arg value="Executing CollectionSpace Service's &apos;postdeploy&apos; target." />
 				</exec>    	
 <!--
         <ant antfile="common/build.xml" target="setup" inheritAll="false"/>
         <ant antfile="authentication/build.xml" target="setup" inheritAll="false"/>
         <ant antfile="relation/build.xml" target="setup" inheritAll="false"/>
 -->        
-        <ant antfile="id/build.xml" target="init" inheritAll="false"/>
-        <ant antfile="collectionobject/build.xml" target="init" inheritAll="false"/>
-        <ant antfile="vocabulary/build.xml" target="init" inheritAll="false"/>
+        <ant antfile="id/build.xml" target="postdeploy" inheritAll="false"/>
+        <ant antfile="collectionobject/build.xml" target="postdeploy" inheritAll="false"/>
+        <ant antfile="vocabulary/build.xml" target="postdeploy" inheritAll="false"/>
 <!--        
         <ant antfile="intake/build.xml" target="setup" inheritAll="false"/>
         <ant antfile="acquisition/build.xml" target="setup" inheritAll="false"/>
