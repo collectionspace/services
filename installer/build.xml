@@ -20,9 +20,6 @@
     
     <target name="install"
     	description="Installer: Copy artifacts for CollectionSpace Nuxeo doctypes">
-        <copy todir="${jboss.deploy.nuxeo.system}">
-            <fileset file="${services.trunk}/${dist.deploy.nuxeo.system}/*.jar"/>
-        </copy>
         <!-- cspace\server\cspace -->     
         <copy todir="${jboss.server.cspace}/cspace">
             <fileset dir="${services.trunk}/${dist.server.cspace}/cspace"/>
@@ -48,22 +45,19 @@
             <fileset dir="${services.trunk}/${dist.server.cspace}/nuxeo-client/lib/${nuxeo.release}">
             	<include name="*.jar"/>
 						</fileset>
-        </copy>        
+        </copy>
+        <!-- Now execute the "install" target on the services -->
+				<ant antfile="services/build.xml" target="install" inheritAll="false"/>        
     </target>    
     
-    <target name="config" description="">
-        <exec executable="echo">
-        		<arg value="Installer: Executing CollectionSpace Service's &apos;config&apos; target." />
-				</exec>
+    <target name="config" description="" depends="install">
+        <!-- Now execute the "install" target on the services -->
+				<ant antfile="services/build.xml" target="config" inheritAll="false"/>        
     </target>    
     
-    <target name="predeploy">
+    <target name="predeploy" depends="config">
         <exec executable="echo">
-        		<arg value="Installer: Executing installer's &apos;predeploy&apos; target." />
-				</exec>
-				
-        <exec executable="echo">
-        		<arg value="Creating necessary databases and associated users and privileges." />
+        		<arg value="Installer: Creating necessary databases and associated users and privileges." />
 				</exec>
         <sql driver="com.mysql.jdbc.Driver"
         url="jdbc:mysql://localhost:3306/cspace"
@@ -80,17 +74,16 @@
     </target>
     
     <target name="deploy" description="">
-        <exec executable="echo">
-        		<arg value="Installer: Executing CollectionSpace Service's &apos;deploy&apos; target." />
-				</exec>
+				<!-- Now, invoke the "deploy" target on each of the services' install directories -->
+        <ant antfile="services/build.xml" target="deploy" inheritAll="false"/>        	
     </target>     
     	
     <target name="postdeploy">
         <exec executable="echo">
         		<arg value="Installer: Executing installer's &apos;postdeploy&apos; target." />
 				</exec>
-				<!-- Now, invoke the "predeploy" target on each of the services' install directories -->
-        <ant antfile="services/build.xml" target="postdeploy" inheritAll="false"/>        	
+				<!-- Now, invoke the "postdeploy" target on each of the services' install directories -->
+        <ant antfile="services/build.xml" target="postdeploy" inheritAll="false"/>
     </target>
 
 </project>

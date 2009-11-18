@@ -267,6 +267,7 @@
     	description="Installer: Creates an installer distribution for the CollectionSpace services.">
         <!-- copy install scripts, etc. -->
         <copy todir="${basedir}/${dist.installer}">
+            <fileset file="${basedir}/build.properties"/>
             <fileset dir="installer"/>
             <fileset dir="${src}/main/resources/scripts"/>            
         </copy>

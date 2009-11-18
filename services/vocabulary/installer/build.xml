@@ -26,13 +26,13 @@
         </copy>				
     </target>    
 
-    <target name="config" description="">
+    <target name="config" description="" depends="install">
         <exec executable="echo">
         		<arg value="Installer: Executing Vocabulary Service's &apos;config&apos; target." />
 				</exec>
     </target>
     
-    <target name="predeploy" description="">
+    <target name="predeploy" description="" depends="config">
         <exec executable="echo">
         		<arg value="Installer: Executing Vocabulary Service's &apos;predeploy&apos; target." />
 				</exec>
@@ -51,10 +51,9 @@
         <exec executable="echo">
         		<arg value="Importing necessary vocabularies." />
 				</exec>				
-        <java jar="./init/collectionspace-services-vocabulary-importer-jar-with-dependencies.jar"
+        <java jar="./postdeploy/collectionspace-services-vocabulary-importer-jar-with-dependencies.jar"
         	fork="true"
         	failonerror="true">
-        	<arg value="-h"/>
 				</java>	
     </target>
     

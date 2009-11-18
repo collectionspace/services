@@ -23,13 +23,13 @@
 				</exec>
     </target>
 
-    <target name="config" description="">
+    <target name="config" description="" depends="install">
         <exec executable="echo">
         		<arg value="Installer: Executing ID Service's &apos;config&apos; target." />
 				</exec>
     </target>
 
-    <target name="predeploy">
+    <target name="predeploy" depends="config">
         <exec executable="echo">
         		<arg value="Installer: Executing ID Service's &apos;predeploy&apos; target for the ID Service." />
 				</exec>

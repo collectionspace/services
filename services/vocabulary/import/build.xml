@@ -50,7 +50,7 @@
     <target name="dist_installer" depends="package"
     	description="distribute vocabulary service importer tool">        
         <!-- copy install scripts, etc. -->
-        <copy todir="${services.trunk}/${dist.installer.services}/vocabulary/init">
+        <copy todir="${services.trunk}/${dist.installer.services}/vocabulary/postdeploy">
             <fileset dir="${basedir}/target">
             	<include name="*with-dependencies*.jar"/>
             </fileset>

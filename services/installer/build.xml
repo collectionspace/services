@@ -18,19 +18,22 @@
     
     <target name="install"
     	description="Copy artifacts for CollectionSpace Nuxeo doctypes">
-        <copy todir="${jboss.deploy.nuxeo.system}">
-            <fileset file="${services.trunk}/${dist.deploy.nuxeo.system}/*.jar"/>
-        </copy>        
+        <exec executable="echo">
+        		<arg value="Installer: Executing CollectionSpace Service's &apos;install&apos; target." />
+				</exec>
+        <ant antfile="id/build.xml" target="install" inheritAll="false"/>
+        <ant antfile="collectionobject/build.xml" target="install" inheritAll="false"/>
+        <ant antfile="vocabulary/build.xml" target="install" inheritAll="false"/>
     </target>
     
-    <target name="config" description="">
+    <target name="config" description="" depends="install">
         <exec executable="echo">
         		<arg value="Installer: Executing CollectionSpace Service's &apos;config&apos; target." />
 				</exec>
     </target>    
 
     <!-- this target is called in order based on the dependencies between the services -->
-    <target name="predeploy" description="">
+    <target name="predeploy" description="" depends="config">
         <exec executable="echo">
         		<arg value="Installer: Executing services &apos;predeploy&apos; target." />
 				</exec>    	
