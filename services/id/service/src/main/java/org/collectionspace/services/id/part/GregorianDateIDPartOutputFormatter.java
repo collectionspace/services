@@ -1,11 +1,11 @@
 package org.collectionspace.services.id.part;
 
-import java.util.Date;
-import java.util.Locale;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Locale;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,9 +18,17 @@ public class GregorianDateIDPartOutputFormatter implements IDPartOutputFormatter
         LoggerFactory.getLogger(GregorianDateIDPartOutputFormatter.class);
 
     private int maxOutputLength = DEFAULT_MAX_OUTPUT_LENGTH;
-    private Locale locale = null;
-    private String language;
     private String formatPattern;
+    private final String DEFAULT_ISO_8601_FORMAT_PATTERN =
+        "yyyy-MM-dd"; // Note: 'floating date' without time zone.
+    private final String DEFAULT_GREGORIAN_DATE_FORMAT_PATTERN =
+        DEFAULT_ISO_8601_FORMAT_PATTERN;
+    private Locale locale = null;
+    
+    public GregorianDateIDPartOutputFormatter() {
+        setFormatPattern(DEFAULT_GREGORIAN_DATE_FORMAT_PATTERN);
+        setLocale(Locale.getDefault());
+    }
 
     public GregorianDateIDPartOutputFormatter(String formatPattern) {
         setFormatPattern(formatPattern);
@@ -38,6 +46,7 @@ public class GregorianDateIDPartOutputFormatter implements IDPartOutputFormatter
         return this.maxOutputLength;
     }
 
+    @Override
     public void setMaxOutputLength (int length) {
         this.maxOutputLength = length;
     }
@@ -47,6 +56,7 @@ public class GregorianDateIDPartOutputFormatter implements IDPartOutputFormatter
         return this.formatPattern;
     }
 
+    @Override
     public void setFormatPattern(String pattern) {
         if (pattern == null || pattern.trim().isEmpty()) {
             logger.error("Format pattern cannot be null or empty.");
@@ -58,6 +68,14 @@ public class GregorianDateIDPartOutputFormatter implements IDPartOutputFormatter
     @Override
     public String format(String id) {
 
+        String pattern = getFormatPattern();
+        // If the formatting pattern is empty, output using
+        // a default formatting pattern.
+        if (pattern == null || pattern.trim().isEmpty()) {
+            pattern = DEFAULT_GREGORIAN_DATE_FORMAT_PATTERN;
+        }
+
+        // Convert milliseconds in Epoch to Date.
         Long millisecondsInEpoch = 0L;
         try {
             millisecondsInEpoch = (Long.parseLong(id));
@@ -65,14 +83,22 @@ public class GregorianDateIDPartOutputFormatter implements IDPartOutputFormatter
             logger.error("Could not parse date milliseconds as a number.", e);
             return "";
         }
-        
-        String formattedID = "";
-        if (millisecondsInEpoch > 0) {
-          Date d = new Date(millisecondsInEpoch);
-          formattedID = formatDate(d);
 
-          // @TODO Check for exceeding maximum length before
-          // returning formatted date value.
+        if (millisecondsInEpoch <= 0) {
+            return "";
+
+        }
+
+        // Format the date using the specified format pattern.
+        Date d = new Date(millisecondsInEpoch);
+        String formattedID = formatDate(d);
+
+        if (! isValidLength(formattedID)) {
+            logger.error(
+                "Formatted ID '" + formattedID +
+                "' exceeds maximum length of " +
+                getMaxOutputLength() + " characters.");
+            return "";
         }
 
         return formattedID;
@@ -86,6 +112,14 @@ public class GregorianDateIDPartOutputFormatter implements IDPartOutputFormatter
             dateformatter = new SimpleDateFormat(getFormatPattern());
         }
         return dateformatter.format(date);
+    }
+
+    private boolean isValidLength(String id) {
+        if (id.length() <= getMaxOutputLength()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     // @TODO Consider generalizing locale-specific operations
@@ -109,23 +143,25 @@ public class GregorianDateIDPartOutputFormatter implements IDPartOutputFormatter
         if (languageCode.length() != 2) {
             logger.error(
                 "Locale language code '" + languageCode +
-                "' must be a two-letter ISO-639 language code.");
+                "' must be a two-letter ISO 639-1 language code.");
             return;
         }
 
-        // Although language codes are documented as required to be
-        // in lowercase, and they are output in that way in
+        // Although it is documented in Sun's Javadocs that
+        // the language code parameter when initializing a
+        // Locale is required to be in lowercase, and as well,
+        // language codes are output only in lowercase in
         // DateFormat.getAvailableLocales(), they appear to be
         // matched - within Locales - in a case-insensitive manner.
-        /*
-        if (! languageCode.equals(languageCode.toLowerCase())) {
-            logger.error("Locale language code must be in lower case.");
-            return;
-        }
-        */
+        // If that ever changes, uncomment the following block.
+        //
+        // if (! languageCode.equals(languageCode.toLowerCase())) {
+        //    logger.error("Locale language code must be in lower case.");
+        //    return;
+        // }
 
         Locale l = new Locale(languageCode, "");
-        if (isValidLocaleForDateFormatter(l)) {
+        if (isValidLocaleForFormatter(l)) {
             setLocale(l);
         } else {
             logger.error("Locale language code '" + languageCode +
@@ -134,17 +170,9 @@ public class GregorianDateIDPartOutputFormatter implements IDPartOutputFormatter
         }
     }
     
-    private boolean isValidLocaleForDateFormatter(Locale l) {
+    private boolean isValidLocaleForFormatter(Locale l) {
         Locale[] locales = DateFormat.getAvailableLocales();
         return (Arrays.asList(locales).contains(l)) ? true : false;
-    }
-
-    private boolean isValidLength(String id) {
-        if (id.length() > getMaxOutputLength()) {
-            return false;
-        } else {
-            return true;
-        }
     }
 
 }

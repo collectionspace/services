@@ -6,8 +6,13 @@ public interface IDPartOutputFormatter {
 
     public int getMaxOutputLength();
 
+    public void setMaxOutputLength(int length);
+
     public String getFormatPattern();
 
+    public void setFormatPattern(String pattern);
+
+    // @TODO Consider throwing IllegalStateException from this method.
     public String format(String id);
 
 }

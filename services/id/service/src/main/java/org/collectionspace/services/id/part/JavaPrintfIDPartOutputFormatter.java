@@ -1,38 +1,55 @@
 package org.collectionspace.services.id.part;
 
-import java.util.IllegalFormatException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.IllegalFormatException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // Uses Java's interpreter for printf-style format strings.
 // http://java.sun.com/javase/1.6/docs/api/java/util/Formatter.html
 
 public class JavaPrintfIDPartOutputFormatter implements IDPartOutputFormatter {
 
+    final Logger logger =
+        LoggerFactory.getLogger(JavaPrintfIDPartOutputFormatter.class);
+
     StringWriter stringwriter = new StringWriter();
     private int maxOutputLength = DEFAULT_MAX_OUTPUT_LENGTH;
     private String formatPattern;
 
-    public JavaPrintfIDPartOutputFormatter () {
+    public JavaPrintfIDPartOutputFormatter() {
+    }
+
+    public JavaPrintfIDPartOutputFormatter(String formatPattern) {
+        setFormatPattern(formatPattern);
     }
 
     @Override
-    public int getMaxOutputLength () {
+    public int getMaxOutputLength() {
         return this.maxOutputLength;
     }
 
-    public void setMaxOutputLength (int length) {
+    @Override
+    public void setMaxOutputLength(int length) {
         this.maxOutputLength = length;
     }
 
     @Override
-    public String getFormatPattern () {
+    public String getFormatPattern() {
         return this.formatPattern;
     }
 
+    @Override
     public void setFormatPattern(String pattern) {
-        this.formatPattern = pattern;
+        if (pattern == null || pattern.trim().isEmpty()) {
+            logger.error("Format pattern cannot be null or empty.");
+        } else {
+            this.formatPattern = pattern;
+        }
     }
+
 
     @Override
     public String format(String id) {
@@ -43,7 +60,15 @@ public class JavaPrintfIDPartOutputFormatter implements IDPartOutputFormatter {
 
         // If the formatting pattern is empty, just check length.
         if (pattern == null || pattern.trim().isEmpty()) {
-            isValidLength(formattedID);
+
+            if (! isValidLength(formattedID)) {
+                logger.error(
+                    "Formatted ID '" + formattedID +
+                    "' exceeds maximum length of " +
+                    getMaxOutputLength() + " characters." +
+                    "Returning ID without formatting.");
+                return id;
+            }
 
         // Otherwise, format the ID using the pattern, then check length.
         } else {
@@ -66,11 +91,12 @@ public class JavaPrintfIDPartOutputFormatter implements IDPartOutputFormatter {
 
     // Check whether the formatted ID exceeds the specified maximum length.
 
-    private void isValidLength(String id) {
-        if (id.length() > getMaxOutputLength()) {
-            // @TODO Log error, possibly throw exception.
+    private boolean isValidLength(String id) {
+        if (id.length() <= getMaxOutputLength()) {
+            return true;
+        } else {
+            return false;
         }
-
     }
 
 }

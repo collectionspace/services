@@ -24,4 +24,9 @@ public class NumericIDPartRegexValidatorTest {
         Assert.assertFalse(validator.isValid("-1"));
     }
 
+    @Test
+    public void format() {
+
+    }
+
 }

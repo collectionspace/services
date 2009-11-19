@@ -17,12 +17,14 @@ public class NumericSequenceIDPart extends SequenceIDPart {
     final static private long DEFAULT_INCREMENT_BY_VALUE = 1;
     private long incrementBy = DEFAULT_INCREMENT_BY_VALUE;
 
-    // @TODO Replace the NoOp formatter with a printf formatter.
-    private IDPartOutputFormatter formatter = new NoOpIDPartOutputFormatter();
+    private IDPartOutputFormatter formatter = new NumericIDPartOutputFormatter();
     private IDPartValidator validator = new NumericIDPartRegexValidator();
 
-
     public NumericSequenceIDPart() {
+    }
+
+    public NumericSequenceIDPart(String formatPattern) {
+        setOutputFormatter(new NumericIDPartOutputFormatter(formatPattern));
     }
 
     public NumericSequenceIDPart(long initial) {
@@ -34,12 +36,19 @@ public class NumericSequenceIDPart extends SequenceIDPart {
         setIncrementBy(incrementBy);
     }
 
+    public NumericSequenceIDPart(String formatPattern, long initial,
+        long incrementBy) {
+        setOutputFormatter(new NumericIDPartOutputFormatter(formatPattern));
+        setInitialID(initial);
+        setIncrementBy(incrementBy);
+    }
+
     @Override
     public IDPartOutputFormatter getOutputFormatter() {
         return this.formatter;
     }
 
-    public void setOutputFormatter (IDPartOutputFormatter formatter) {
+    public void setOutputFormatter(IDPartOutputFormatter formatter) {
         this.formatter = formatter;
     }
 
@@ -48,7 +57,11 @@ public class NumericSequenceIDPart extends SequenceIDPart {
         return this.validator;
     }
 
-    // newID() is implemented in superclass, SequenceIDPart.
+    @Override
+    public String newID() {
+        String newID = super.newID();
+        return getOutputFormatter().format(newID);
+    }
 
     @Override
     public boolean hasCurrentID() {
@@ -70,11 +83,17 @@ public class NumericSequenceIDPart extends SequenceIDPart {
     }
 
     @Override
-    public void setCurrentID(String str) {
-        try {
-            setCurrentID(Long.parseLong(str));
-        } catch (NumberFormatException e) {
-            logger.error("Could not parse current ID value as a number.", e);
+    public void setCurrentID(String id) {
+        String formatPattern = getOutputFormatter().getFormatPattern();
+        if (formatPattern == null || formatPattern.trim().isEmpty()) {
+            try {
+                setCurrentID(Long.parseLong(id));
+            } catch (NumberFormatException e) {
+                logger.error("Could not parse current ID value as a number.", e);
+            }
+        } else {
+            setCurrentID(((NumericIDPartOutputFormatter)
+                getOutputFormatter()).parseAsLong(id));
         }
     }
 
@@ -94,11 +113,7 @@ public class NumericSequenceIDPart extends SequenceIDPart {
 
     @Override
     public String nextID() {
-        // @TODO Rethink this approach soon, as we may not want
-        // to change the current value for IDs that have been
-        // provisionally issued.
-        this.currentValue = this.currentValue + this.incrementBy;
-        return getCurrentID();
+        return Long.toString(this.currentValue + this.incrementBy);
     }
 
     public String getIncrementBy() {

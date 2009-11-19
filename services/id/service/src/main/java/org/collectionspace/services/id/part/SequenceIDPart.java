@@ -14,9 +14,9 @@ public abstract class SequenceIDPart implements IDPart, DynamicValueIDPart {
     @Override
     public String newID() {
         if (hasCurrentID()) {
-            return getOutputFormatter().format(nextID());
+            return nextID();
         } else {
-            return getOutputFormatter().format(getInitialID());
+            return getInitialID();
         }
     }
 

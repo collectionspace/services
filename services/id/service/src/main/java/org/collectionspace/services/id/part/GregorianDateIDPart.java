@@ -8,17 +8,28 @@ public class GregorianDateIDPart extends DateIDPart {
     private GregorianDateIDPartOutputFormatter formatter;
     private IDPartValidator validator = IDPart.DEFAULT_VALIDATOR;
 
-    public GregorianDateIDPart(String formatPattern) {
-        setFormatter(new GregorianDateIDPartOutputFormatter(formatPattern));
-    }
+    // Because the output from newID() is dependent on a
+    // format pattern having been set in the outputFormatter,
+    // constructors for this class all require that pattern.
 
-    public GregorianDateIDPart(String formatPattern, String languageCode) {
-        setFormatter(
-            new GregorianDateIDPartOutputFormatter(formatPattern, languageCode));
+    public GregorianDateIDPart(String formatPattern) {
+        setOutputFormatter(new GregorianDateIDPartOutputFormatter(formatPattern));
     }
 
     public GregorianDateIDPart(String formatPattern, IDPartValidator validator) {
-        setFormatter(new GregorianDateIDPartOutputFormatter(formatPattern));
+        setOutputFormatter(new GregorianDateIDPartOutputFormatter(formatPattern));
+        setValidator(validator);
+    }
+
+    public GregorianDateIDPart(String formatPattern, String languageCode) {
+        setOutputFormatter(
+            new GregorianDateIDPartOutputFormatter(formatPattern, languageCode));
+    }
+
+    public GregorianDateIDPart(String formatPattern, String languageCode,
+        IDPartValidator validator) {
+        setOutputFormatter(
+            new GregorianDateIDPartOutputFormatter(formatPattern, languageCode));
         setValidator(validator);
     }
 
@@ -27,9 +38,17 @@ public class GregorianDateIDPart extends DateIDPart {
        return this.formatter;
     }
 
+    private void setOutputFormatter(GregorianDateIDPartOutputFormatter formatter) {
+        this.formatter = formatter;
+    }
+
     @Override
     public IDPartValidator getValidator() {
         return this.validator;
+    }
+
+    private void setValidator(IDPartValidator validator) {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     @Override
@@ -54,14 +73,6 @@ public class GregorianDateIDPart extends DateIDPart {
         // In the formatter, this value is converted back into a date
         // and date-specific formatting is applied.
         return getOutputFormatter().format(Long.toString(cal.getTime().getTime()));
-    }
-
-    private void setFormatter(GregorianDateIDPartOutputFormatter formatter) {
-        this.formatter = formatter;
-    }
-
-    private void setValidator(IDPartValidator validator) {
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 
 }

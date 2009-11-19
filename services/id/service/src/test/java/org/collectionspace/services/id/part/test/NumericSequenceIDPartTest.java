@@ -38,7 +38,8 @@ public class NumericSequenceIDPartTest {
 
     @Test
     public void newIDWithSuppliedInitialValue() {
-         part = new NumericSequenceIDPart(100);
+
+        part = new NumericSequenceIDPart(100);
         id = part.newID();
         Assert.assertEquals(id, "100");
         part.setCurrentID(id);
@@ -49,6 +50,18 @@ public class NumericSequenceIDPartTest {
 
         id = part.newID();
         Assert.assertEquals(id, "102");
+
+        // Tests whether default formatting has disabled grouping.
+
+        part = new NumericSequenceIDPart(12345);
+        id = part.newID();
+        Assert.assertEquals(id, "12345"); // No grouping separator; e.g. 12,345
+        part.setCurrentID(id);
+
+        id = part.newID();
+        Assert.assertEquals(id, "12346");
+        part.setCurrentID(id);
+
     }
 
     @Test
@@ -67,7 +80,49 @@ public class NumericSequenceIDPartTest {
     }
 
     @Test
-    public void format() {
+    public void formatWithLeadingZeros() {
+        
+        // Pad at left with leading zeros up to width specified.
+        part = new NumericSequenceIDPart("000");
+        id = part.newID();
+        Assert.assertEquals(id, "001");
+        part.setCurrentID(id);
+
+        id = part.newID();
+        Assert.assertEquals(id, "002");
+        part.setCurrentID(id);
+
+        part = new NumericSequenceIDPart("000", 20, 5);
+        id = part.newID();
+        Assert.assertEquals(id, "020");
+        part.setCurrentID(id);
+
+        id = part.newID();
+        Assert.assertEquals(id, "025");
+        part.setCurrentID(id);
+
+        // Numerals with more digits than pattern do not receive padding.
+        part = new NumericSequenceIDPart("000", 5000, 1);
+        id = part.newID();
+        Assert.assertEquals(id, "5000");
+        part.setCurrentID(id);
+
+        id = part.newID();
+        Assert.assertEquals(id, "5001");
+        part.setCurrentID(id);
+    }
+
+    @Test
+    public void formatWithSeparators() {
+
+        part = new NumericSequenceIDPart("#,###", 1234567, 1);
+        id = part.newID();
+        Assert.assertEquals(id, "1,234,567");
+        part.setCurrentID(id);
+
+        id = part.newID();
+        Assert.assertEquals(id, "1,234,568");
+        part.setCurrentID(id);
     }
 
     @Test
