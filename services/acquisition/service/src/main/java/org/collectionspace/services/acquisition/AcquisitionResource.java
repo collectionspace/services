@@ -39,7 +39,8 @@ import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.acquisition.nuxeo.AcquisitionHandlerFactory;
 import org.collectionspace.services.common.AbstractCollectionSpaceResource;
-import org.collectionspace.services.common.context.RemoteServiceContext;
+import org.collectionspace.services.common.context.MultipartServiceContext;
+import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
@@ -64,13 +65,13 @@ public class AcquisitionResource
     }
 
     @Override
-    public DocumentHandler createDocumentHandler(RemoteServiceContext ctx) throws Exception {
+    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
         DocumentHandler docHandler = AcquisitionHandlerFactory.getInstance().getHandler(
                 ctx.getRepositoryClientType().toString());
         docHandler.setServiceContext(ctx);
-        if(ctx.getInput() != null){
-            Object obj = ctx.getInputPart(ctx.getCommonPartLabel(), AcquisitionsCommon.class);
-            if(obj != null){
+        if (ctx.getInput() != null) {
+            Object obj = ((MultipartServiceContext)ctx).getInputPart(ctx.getCommonPartLabel(), AcquisitionsCommon.class);
+            if (obj != null) {
                 docHandler.setCommonPart((AcquisitionsCommon) obj);
             }
         }
@@ -84,16 +85,16 @@ public class AcquisitionResource
     @POST
     public Response createAcquisition(MultipartInput input) {
 
-        try{
-            RemoteServiceContext ctx = createServiceContext(input);
+        try {
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(input, getServiceName());
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(AcquisitionResource.class);
             path.path("" + csid);
             Response response = Response.created(path.build()).build();
             return response;
-        }catch(Exception e){
-            if(logger.isDebugEnabled()){
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in createAcquisition", e);
             }
             Response response = Response.status(
@@ -106,10 +107,10 @@ public class AcquisitionResource
     @Path("{csid}")
     public MultipartOutput getAcquisition(
             @PathParam("csid") String csid) {
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("getAcquisition with csid=" + csid);
         }
-        if(csid == null || "".equals(csid)){
+        if (csid == null || "".equals(csid)) {
             logger.error("getAcquisition: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
                     "get failed on Acquisition csid=" + csid).type(
@@ -117,21 +118,21 @@ public class AcquisitionResource
             throw new WebApplicationException(response);
         }
         MultipartOutput result = null;
-        try{
-            RemoteServiceContext ctx = createServiceContext(null);
+        try {
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
-            result = ctx.getOutput();
-        }catch(DocumentNotFoundException dnfe){
-            if(logger.isDebugEnabled()){
+            result = (MultipartOutput) ctx.getOutput();
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("getAcquisition", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Get failed on Acquisition csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
-        }catch(Exception e){
-            if(logger.isDebugEnabled()){
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("getAcquisition", e);
             }
             Response response = Response.status(
@@ -139,7 +140,7 @@ public class AcquisitionResource
             throw new WebApplicationException(response);
         }
 
-        if(result == null){
+        if (result == null) {
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Get failed, the requested Acquisition CSID:" + csid + ": was not found.").type(
                     "text/plain").build();
@@ -152,13 +153,13 @@ public class AcquisitionResource
     @Produces("application/xml")
     public AcquisitionsCommonList getAcquisitionList(@Context UriInfo ui) {
         AcquisitionsCommonList acquisitionObjectList = new AcquisitionsCommonList();
-        try{
-            RemoteServiceContext ctx = createServiceContext(null);
+        try {
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getAll(ctx, handler);
             acquisitionObjectList = (AcquisitionsCommonList) handler.getCommonPartList();
-        }catch(Exception e){
-            if(logger.isDebugEnabled()){
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in getAcquisitionList", e);
             }
             Response response = Response.status(
@@ -173,34 +174,34 @@ public class AcquisitionResource
     public MultipartOutput updateAcquisition(
             @PathParam("csid") String csid,
             MultipartInput theUpdate) {
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("updateAcquisition with csid=" + csid);
         }
-        if(csid == null || "".equals(csid)){
+        if (csid == null || "".equals(csid)) {
             logger.error("updateAcquisition: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
                     "update failed on Acquisition csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("updateAcquisition with input: ", theUpdate);
         }
         MultipartOutput result = null;
-        try{
-            RemoteServiceContext ctx = createServiceContext(theUpdate);
+        try {
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(theUpdate, getServiceName());
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
-            result = ctx.getOutput();
-        }catch(DocumentNotFoundException dnfe){
-            if(logger.isDebugEnabled()){
+            result = (MultipartOutput) ctx.getOutput();
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("caugth exception in updateAcquisition", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Update failed on Acquisition csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
-        }catch(Exception e){
+        } catch (Exception e) {
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
             throw new WebApplicationException(response);
@@ -212,34 +213,33 @@ public class AcquisitionResource
     @Path("{csid}")
     public Response deleteAcquisition(@PathParam("csid") String csid) {
 
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("deleteAcquisition with csid=" + csid);
         }
-        if(csid == null || "".equals(csid)){
+        if (csid == null || "".equals(csid)) {
             logger.error("deleteAcquisition: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
                     "delete failed on Acquisition csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        try{
-            ServiceContext ctx = createServiceContext(null);
+        try {
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
-        }catch(DocumentNotFoundException dnfe){
-            if(logger.isDebugEnabled()){
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("caught exception in deleteAcquisition", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Delete failed on Acquisition csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
-        }catch(Exception e){
+        } catch (Exception e) {
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Delete failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
 
     }
-
 }

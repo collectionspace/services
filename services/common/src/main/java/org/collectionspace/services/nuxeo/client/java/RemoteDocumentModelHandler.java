@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import javax.ws.rs.core.MediaType;
-import org.collectionspace.services.common.context.RemoteServiceContext;
+import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentUtils;
@@ -56,11 +56,11 @@ public abstract class RemoteDocumentModelHandler<T, TL>
 
     @Override
     public void setServiceContext(ServiceContext ctx) {
-        if(ctx instanceof RemoteServiceContext){
+        if(ctx instanceof MultipartServiceContext){
             super.setServiceContext(ctx);
         }else{
             throw new IllegalArgumentException("setServiceContext requires instance of " +
-                    RemoteServiceContext.class.getName());
+                    MultipartServiceContext.class.getName());
         }
     }
 
@@ -72,7 +72,7 @@ public abstract class RemoteDocumentModelHandler<T, TL>
         DocumentModel docModel = wrapDoc.getWrappedObject();
         //return at least those document part(s) that were received
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
-        RemoteServiceContext ctx = (RemoteServiceContext) getServiceContext();
+        MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
         List<InputPart> inputParts = ctx.getInput().getParts();
         for(InputPart part : inputParts){
             String partLabel = part.getHeaders().getFirst("label");
@@ -103,7 +103,7 @@ public abstract class RemoteDocumentModelHandler<T, TL>
         //Nuxeo APIs lack to support stream/byte[] input, get/setting properties is
         //not an ideal way of populating objects.
         DocumentModel docModel = wrapDoc.getWrappedObject();
-        RemoteServiceContext ctx = (RemoteServiceContext) getServiceContext();
+        MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
         MultipartInput input = ctx.getInput();
         if(input.getParts().isEmpty()){
             String msg = "No payload found!";
@@ -181,7 +181,7 @@ public abstract class RemoteDocumentModelHandler<T, TL>
             if(logger.isDebugEnabled()){
                 DocumentUtils.writeDocument(doc, System.out);
             }
-            RemoteServiceContext ctx = (RemoteServiceContext) getServiceContext();
+            MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
             ctx.addOutputPart(schema, doc, partMeta.getContent().getContentType());
         } //TODO: handle other media types
     }

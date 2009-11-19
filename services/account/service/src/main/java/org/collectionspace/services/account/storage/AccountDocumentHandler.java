@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.account.storage;
 
+import java.util.UUID;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.common.document.AbstractDocumentHandler;
@@ -34,47 +35,40 @@ import org.collectionspace.services.common.document.DocumentWrapper;
  * @author 
  */
 public class AccountDocumentHandler
-        extends AbstractDocumentHandler<AccountsCommon, AccountsCommonList> {
+        extends AbstractDocumentHandler<AccountsCommon, AccountsCommonList, AccountsCommon, AccountsCommonList> {
 
     @Override
-    public void handleCreate(DocumentWrapper wrapDoc) throws Exception {
+    public void handleCreate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
+        String id = UUID.randomUUID().toString();
+        AccountsCommon account = wrapDoc.getWrappedObject();
+        account.setCsid(id);
     }
 
     @Override
-    public void handleUpdate(DocumentWrapper wrapDoc) throws Exception {
+    public void handleUpdate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
     }
 
     @Override
-    public void handleGet(DocumentWrapper wrapDoc) throws Exception {
+    public void handleGet(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
     }
 
     @Override
-    public void handleGetAll(DocumentWrapper wrapDoc) throws Exception {
+    public void handleGetAll(DocumentWrapper< AccountsCommonList> wrapDoc) throws Exception {
     }
 
     @Override
-    public void extractAllParts(DocumentWrapper wrapDoc)
-            throws Exception {
-    }
-
-    @Override
-    public void fillAllParts(DocumentWrapper wrapDoc)
-            throws Exception {
-    }
-
-    @Override
-    public AccountsCommon extractCommonPart(DocumentWrapper wrapDoc)
+    public AccountsCommon extractCommonPart(DocumentWrapper<AccountsCommon> wrapDoc)
             throws Exception {
         return null;
     }
 
     @Override
-    public void fillCommonPart(AccountsCommon obj, DocumentWrapper wrapDoc)
+    public void fillCommonPart(AccountsCommon obj, DocumentWrapper<AccountsCommon> wrapDoc)
             throws Exception {
     }
 
     @Override
-    public AccountsCommonList extractCommonPartList(DocumentWrapper wrapDoc)
+    public AccountsCommonList extractCommonPartList(DocumentWrapper<AccountsCommonList> wrapDoc)
             throws Exception {
         return null;
     }

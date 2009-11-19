@@ -23,8 +23,8 @@
  */
 package org.collectionspace.services.nuxeo.client.java;
 
+import org.collectionspace.services.common.document.AbstractMultipartDocumentHandler;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.document.AbstractDocumentHandler;
 import org.collectionspace.services.nuxeo.client.*;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public abstract class DocumentModelHandler<T, TL>
-        extends AbstractDocumentHandler<T, TL, DocumentModel, DocumentModelList> {
+        extends AbstractMultipartDocumentHandler<T, TL, DocumentModel, DocumentModelList> {
 
     private final Logger logger = LoggerFactory.getLogger(DocumentModelHandler.class);
     private RepositoryInstance repositorySession;

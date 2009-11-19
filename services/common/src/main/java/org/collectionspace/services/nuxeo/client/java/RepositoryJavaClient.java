@@ -75,11 +75,11 @@ public class RepositoryJavaClient implements RepositoryClient {
 
         if (ctx.getDocumentType() == null) {
             throw new IllegalArgumentException(
-                    "RemoteRepositoryClient.create: docType is missing");
+                    "RepositoryJavaClient.create: docType is missing");
         }
         if (handler == null) {
             throw new IllegalArgumentException(
-                    "RemoteRepositoryClient.create: handler is missing");
+                    "RepositoryJavaClient.create: handler is missing");
         }
         String nuxeoWspaceId = ctx.getRepositoryWorkspaceId();
         if (nuxeoWspaceId == null) {
@@ -136,7 +136,7 @@ public class RepositoryJavaClient implements RepositoryClient {
 
         if (handler == null) {
             throw new IllegalArgumentException(
-                    "RemoteRepositoryClient.get: handler is missing");
+                    "RepositoryJavaClient.get: handler is missing");
         }
         RepositoryInstance repoSession = null;
 
@@ -188,7 +188,7 @@ public class RepositoryJavaClient implements RepositoryClient {
             throws DocumentNotFoundException, DocumentException {
         if (handler == null) {
             throw new IllegalArgumentException(
-                    "RemoteRepositoryClient.getAll: handler is missing");
+                    "RepositoryJavaClient.getAll: handler is missing");
         }
         String nuxeoWspaceId = ctx.getRepositoryWorkspaceId();
         if (nuxeoWspaceId == null) {
@@ -235,12 +235,12 @@ public class RepositoryJavaClient implements RepositoryClient {
             throws DocumentNotFoundException, DocumentException {
         if (handler == null) {
             throw new IllegalArgumentException(
-                    "RemoteRepositoryClient.getFiltered: handler is missing");
+                    "RepositoryJavaClient.getFiltered: handler is missing");
         }
         DocumentFilter docFilter = handler.getDocumentFilter();
         if (docFilter == null) {
             throw new IllegalArgumentException(
-                    "RemoteRepositoryClient.getFiltered: handler has no Filter specified");
+                    "RepositoryJavaClient.getFiltered: handler has no Filter specified");
         }
         String docType = ctx.getDocumentType();
         if (docType == null) {
@@ -306,13 +306,9 @@ public class RepositoryJavaClient implements RepositoryClient {
     public void update(ServiceContext ctx, String id, DocumentHandler handler)
             throws BadRequestException, DocumentNotFoundException,
             DocumentException {
-        if (id == null) {
-            throw new BadRequestException(
-                    "RemoteRepositoryClient.update: id is missing");
-        }
         if (handler == null) {
             throw new IllegalArgumentException(
-                    "RemoteRepositoryClient.update: handler is missing");
+                    "RepositoryJavaClient.update: handler is missing");
         }
         RepositoryInstance repoSession = null;
         try {

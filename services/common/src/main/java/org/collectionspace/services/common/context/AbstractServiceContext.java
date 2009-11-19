@@ -181,13 +181,13 @@ public abstract class AbstractServiceContext<IT, OT>
     public abstract IT getInput();
 
     @Override
-    public abstract void setInput(IT input) throws Exception;
+    public abstract void setInput(IT input);
 
     @Override
     public abstract OT getOutput();
 
     @Override
-    public abstract void setOutput(OT output) throws Exception;
+    public abstract void setOutput(OT output);
 
     @Override
     public String toString() {

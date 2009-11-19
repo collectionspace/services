@@ -21,15 +21,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.collectionspace.services.common;
 
-import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.common.repository.RepositoryClientFactory;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.collectionspace.services.common.storage.StorageClient;
 
 /**
  * CollectionSpaceResource is a resource interface implemented by every
@@ -41,12 +38,7 @@ public interface CollectionSpaceResource {
      * getServiceName returns the name of the service
      */
     public String getServiceName();
-    
-    /**
-     * getRepositoryClientFactory
-     * @return
-     */
-    public RepositoryClientFactory getRepositoryClientFactory();
+
 
     /**
      * getRepositoryClient
@@ -55,23 +47,11 @@ public interface CollectionSpaceResource {
     public RepositoryClient getRepositoryClient(ServiceContext ctx);
 
     /**
-     * createServiceContext is a factory method to create a service context
-     * a service context is created on every service request call
-     * This form uses the serviceName as the default context
-     * @param input
-     * @return
+     * getStorageClient
+     * @param ctx service context
      */
-    public RemoteServiceContext createServiceContext(MultipartInput input) throws Exception;
-
-    /**
-     * createServiceContext is a factory method to create a service context
-     * a service context is created on every service request call
-     * @param input
-     * @param serviceName which service/repository context to use
-     * @return
-     */
-    public RemoteServiceContext createServiceContext(MultipartInput input, String serviceName) throws Exception;
-
+    public StorageClient getStorageClient(ServiceContext ctx);
+    
     /**
      * createDocumentHandler creates a document handler and populates it with given
      * service context. document handler should never be used
@@ -80,5 +60,5 @@ public interface CollectionSpaceResource {
      * @param ctx
      * @return
      */
-    public DocumentHandler createDocumentHandler(RemoteServiceContext ctx) throws Exception ;
+    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception;
 }

@@ -44,7 +44,8 @@ import javax.ws.rs.core.UriInfo;
 
 
 import org.collectionspace.services.common.AbstractCollectionSpaceResource;
-import org.collectionspace.services.common.context.RemoteServiceContext;
+import org.collectionspace.services.common.context.MultipartServiceContext;
+import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.relation.IRelationsManager;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
@@ -70,13 +71,13 @@ public class NewRelationResource extends AbstractCollectionSpaceResource {
     }
 
     @Override
-    public DocumentHandler createDocumentHandler(RemoteServiceContext ctx) throws Exception {
+    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
         DocumentHandler docHandler = RelationHandlerFactory.getInstance().getHandler(
                 ctx.getRepositoryClientType().toString());
         docHandler.setServiceContext(ctx);
-        if(ctx.getInput() != null){
-            Object obj = ctx.getInputPart(ctx.getCommonPartLabel(), RelationsCommon.class);
-            if(obj != null){
+        if (ctx.getInput() != null) {
+            Object obj = ((MultipartServiceContext)ctx).getInputPart(ctx.getCommonPartLabel(), RelationsCommon.class);
+            if (obj != null) {
                 docHandler.setCommonPart((RelationsCommon) obj);
             }
         }
@@ -86,16 +87,16 @@ public class NewRelationResource extends AbstractCollectionSpaceResource {
     @POST
     public Response createRelation(MultipartInput input) {
 
-        try{
-            RemoteServiceContext ctx = createServiceContext(input);
+        try {
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(input, getServiceName());
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(NewRelationResource.class);
             path.path("" + csid);
             Response response = Response.created(path.build()).build();
             return response;
-        }catch(Exception e){
-            if(logger.isDebugEnabled()){
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in createRelation", e);
             }
             Response response = Response.status(
@@ -108,30 +109,30 @@ public class NewRelationResource extends AbstractCollectionSpaceResource {
     @GET
     @Path("{csid}")
     public MultipartOutput getRelation(@PathParam("csid") String csid) {
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("getRelation with csid=" + csid);
         }
-        if(csid == null || "".equals(csid)){
+        if (csid == null || "".equals(csid)) {
             logger.error("getRelation: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity("get failed on Relation csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
         MultipartOutput result = null;
-        try{
-            RemoteServiceContext ctx = createServiceContext(null);
+        try {
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
-            result = ctx.getOutput();
-        }catch(DocumentNotFoundException dnfe){
-            if(logger.isDebugEnabled()){
+            result = (MultipartOutput) ctx.getOutput();
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("getRelation", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity("Get failed on Relation csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
-        }catch(Exception e){
-            if(logger.isDebugEnabled()){
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("getRelation", e);
             }
             Response response = Response.status(
@@ -139,7 +140,7 @@ public class NewRelationResource extends AbstractCollectionSpaceResource {
             throw new WebApplicationException(response);
         }
 
-        if(result == null){
+        if (result == null) {
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Get failed, the requested Relation CSID:" + csid + ": was not found.").type("text/plain").build();
             throw new WebApplicationException(response);
@@ -243,29 +244,29 @@ public class NewRelationResource extends AbstractCollectionSpaceResource {
     @Path("{csid}")
     public MultipartOutput updateRelation(@PathParam("csid") String csid,
             MultipartInput theUpdate) {
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("updateRelation with csid=" + csid);
         }
-        if(csid == null || "".equals(csid)){
+        if (csid == null || "".equals(csid)) {
             logger.error("updateRelation: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity("update failed on Relation csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
         MultipartOutput result = null;
-        try{
-            RemoteServiceContext ctx = createServiceContext(theUpdate);
+        try {
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(theUpdate, getServiceName());
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
-            result = ctx.getOutput();
-        }catch(DocumentNotFoundException dnfe){
-            if(logger.isDebugEnabled()){
+            result = (MultipartOutput) ctx.getOutput();
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("caugth exception in updateRelation", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity("Update failed on Relation csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
-        }catch(Exception e){
+        } catch (Exception e) {
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
                     "Update failed").type("text/plain").build();
@@ -278,27 +279,27 @@ public class NewRelationResource extends AbstractCollectionSpaceResource {
     @Path("{csid}")
     public Response deleteRelation(@PathParam("csid") String csid) {
 
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("deleteRelation with csid=" + csid);
         }
-        if(csid == null || "".equals(csid)){
+        if (csid == null || "".equals(csid)) {
             logger.error("deleteRelation: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity("delete failed on Relation csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        try{
-            ServiceContext ctx = createServiceContext(null);
+        try {
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
-        }catch(DocumentNotFoundException dnfe){
-            if(logger.isDebugEnabled()){
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("caught exception in deleteRelation", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity("Delete failed on Relation csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
-        }catch(Exception e){
+        } catch (Exception e) {
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
                     "Delete failed").type("text/plain").build();
@@ -322,8 +323,8 @@ public class NewRelationResource extends AbstractCollectionSpaceResource {
             String objectCsid)
             throws WebApplicationException {
         RelationsCommonList relationList = new RelationsCommonList();
-        try{
-            RemoteServiceContext ctx = createServiceContext(null);
+        try {
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             DocumentHandler handler = createDocumentHandler(ctx);
             Map propsFromPath = handler.getProperties();
             propsFromPath.put(IRelationsManager.SUBJECT, subjectCsid);
@@ -331,8 +332,8 @@ public class NewRelationResource extends AbstractCollectionSpaceResource {
             propsFromPath.put(IRelationsManager.OBJECT, objectCsid);
             getRepositoryClient(ctx).getAll(ctx, handler);
             relationList = (RelationsCommonList) handler.getCommonPartList();
-        }catch(Exception e){
-            if(logger.isDebugEnabled()){
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in getRelationList", e);
             }
             Response response = Response.status(

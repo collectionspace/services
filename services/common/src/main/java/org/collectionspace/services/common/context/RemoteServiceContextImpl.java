@@ -23,18 +23,9 @@
  */
 package org.collectionspace.services.common.context;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
-import javax.ws.rs.core.MediaType;
-import org.collectionspace.services.common.document.DocumentUtils;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 /**
  * RemoteServiceContextImpl
@@ -42,79 +33,39 @@ import org.w3c.dom.Document;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public class RemoteServiceContextImpl
-        extends AbstractServiceContext<MultipartInput, MultipartOutput>
-        implements RemoteServiceContext {
+public class RemoteServiceContextImpl<IT, OT>
+        extends AbstractServiceContext<IT, OT>
+        implements RemoteServiceContext<IT, OT> {
 
     final Logger logger = LoggerFactory.getLogger(RemoteServiceContextImpl.class);
     //input stores original content as received over the wire
-    private MultipartInput input;
-    private MultipartOutput output;
+    private IT input;
+    private OT output;
 
     public RemoteServiceContextImpl(String serviceName) {
         super(serviceName);
-        output = new MultipartOutput();
     }
 
     @Override
-    public MultipartInput getInput() {
+    public IT getInput() {
         return input;
     }
 
     @Override
-    public void setInput(MultipartInput input) throws IOException {
+    public void setInput(IT input){
         this.input = input;
     }
 
     @Override
-    public MultipartOutput getOutput() {
+    public OT getOutput() {
         return output;
     }
 
     @Override
-    public void setOutput(MultipartOutput output) throws Exception {
+    public void setOutput(OT output){
         this.output = output;
     }
 
-    @Override
-    public Object getInputPart(String label, Class clazz) throws IOException {
-        Object obj = null;
-        if(getInput() != null){
-            MultipartInput fdip = getInput();
-
-            for(InputPart part : fdip.getParts()){
-                String partLabel = part.getHeaders().getFirst("label");
-                if(label.equalsIgnoreCase(partLabel)){
-                    if(logger.isDebugEnabled()){
-                        logger.debug("received part label=" + partLabel +
-                                "\npayload=" + part.getBodyAsString());
-                    }
-                    obj = part.getBody(clazz, null);
-                    break;
-                }
-            }
-        }
-        return obj;
-    }
-
-    @Override
-    public void addOutputPart(String label, Document doc, String contentType) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try{
-            DocumentUtils.writeDocument(doc, baos);
-            baos.close();
-            OutputPart part = output.addPart(new String(baos.toByteArray()),
-                    MediaType.valueOf(contentType));
-            part.getHeaders().add("label", label);
-        }finally{
-            if(baos != null){
-                try{
-                    baos.close();
-                }catch(Exception e){
-                }
-            }
-        }
-    }
 
     @Override
     public ServiceContext getLocalContext(String localContextClassName) throws Exception {

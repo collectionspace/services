@@ -38,19 +38,18 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.AbstractCollectionSpaceResource;
-import org.collectionspace.services.common.context.RemoteServiceContext;
+import org.collectionspace.services.common.context.RemoteServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Path("/accounts")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Consumes("application/xml")
+@Produces("application/xml")
 public class AccountResource
         extends AbstractCollectionSpaceResource {
 
@@ -62,15 +61,21 @@ public class AccountResource
         return serviceName;
     }
 
+    private <T> ServiceContext createServiceContext(T obj) {
+        ServiceContext ctx = new RemoteServiceContextImpl<T, T>(getServiceName());
+        ctx.setInput(obj);
+        return ctx;
+    }
+
     @Override
-    public DocumentHandler createDocumentHandler(RemoteServiceContext ctx) throws Exception {
+    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
         throw new IllegalStateException();
     }
 
     @POST
-    public Response createAccount(MultipartInput input) {
+    public Response createAccount(AccountsCommon input) {
         try {
-            RemoteServiceContext ctx = createServiceContext(input);
+            ServiceContext ctx = createServiceContext(input);
             String csid = "";
             UriBuilder path = UriBuilder.fromResource(AccountResource.class);
             path.path("" + csid);
@@ -88,7 +93,7 @@ public class AccountResource
 
     @GET
     @Path("{csid}")
-    public MultipartOutput getAccount(
+    public AccountsCommon getAccount(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getAccount with csid=" + csid);
@@ -100,11 +105,11 @@ public class AccountResource
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        MultipartOutput result = null;
+        AccountsCommon result = null;
         try {
-            RemoteServiceContext ctx = createServiceContext(null);
+            ServiceContext ctx = createServiceContext((AccountsCommon)null);
 
-            result = ctx.getOutput();
+            result = (AccountsCommon) ctx.getOutput();
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getAccount", dnfe);
@@ -136,7 +141,7 @@ public class AccountResource
     public AccountsCommonList getAccountList(@Context UriInfo ui) {
         AccountsCommonList accountList = new AccountsCommonList();
         try {
-            RemoteServiceContext ctx = createServiceContext(null);
+            ServiceContext ctx = createServiceContext((AccountsCommonList)null);
 
             accountList = null;
         } catch (Exception e) {
@@ -152,9 +157,9 @@ public class AccountResource
 
     @PUT
     @Path("{csid}")
-    public MultipartOutput updateAccount(
+    public AccountsCommon updateAccount(
             @PathParam("csid") String csid,
-            MultipartInput theUpdate) {
+            AccountsCommon theUpdate) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateAccount with csid=" + csid);
         }
@@ -165,11 +170,11 @@ public class AccountResource
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        MultipartOutput result = null;
+        AccountsCommon result = null;
         try {
-            RemoteServiceContext ctx = createServiceContext(theUpdate);
+            ServiceContext ctx = createServiceContext(theUpdate);
 
-            result = ctx.getOutput();
+            result = (AccountsCommon)ctx.getOutput();
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("caugth exception in updateAccount", dnfe);
@@ -201,7 +206,7 @@ public class AccountResource
             throw new WebApplicationException(response);
         }
         try {
-            ServiceContext ctx = createServiceContext(null);
+            ServiceContext ctx = createServiceContext((AccountsCommon)null);
 
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (DocumentNotFoundException dnfe) {

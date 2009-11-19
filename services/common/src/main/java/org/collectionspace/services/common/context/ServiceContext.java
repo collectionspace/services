@@ -134,9 +134,8 @@ public interface ServiceContext<IT, OT> {
      * setInput is used to set request input before starting to
      * process input data
      * @param input
-     * @exception Exception
      */
-    public void setInput(IT input) throws Exception;
+    public void setInput(IT input);
 
     /**
      * Get output parts to send over the wire to service consumer
@@ -148,7 +147,7 @@ public interface ServiceContext<IT, OT> {
      * setOutput set output
      * @param output
      */
-    public void setOutput(OT output) throws Exception;
+    public void setOutput(OT output);
 
     /**
      * getPartsMetadata returns metadata for object parts used by the service

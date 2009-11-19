@@ -146,14 +146,6 @@ public abstract class AbstractDocumentHandler<T, TL, WT, WTL>
     }
 
     @Override
-    public abstract void extractAllParts(DocumentWrapper<WT> wrapDoc)
-            throws Exception;
-
-    @Override
-    public abstract void fillAllParts(DocumentWrapper<WT> wrapDoc)
-            throws Exception;
-
-    @Override
     public abstract T extractCommonPart(DocumentWrapper<WT> wrapDoc)
             throws Exception;
 

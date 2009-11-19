@@ -23,49 +23,60 @@
  */
 package org.collectionspace.services.common.context;
 
+import java.io.IOException;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.w3c.dom.Document;
+
 /**
  * RemoteServiceContext is used to encapsulate the service context of a
  * remotely invokable service
  */
-public interface RemoteServiceContext<IT, OT>
-        extends ServiceContext<IT, OT> {
+public interface MultipartServiceContext
+        extends RemoteServiceContext<MultipartInput, MultipartOutput> {
 
     /**
      * Get input parts as received over the wire from service consumer
      * @return the input
      */
     @Override
-    public IT getInput();
+    public MultipartInput getInput();
 
     /**
      * setInput is used to set request input before starting to
      * process input data
      * @param input
-     * @exception IOException
      */
     @Override
-    public void setInput(IT input);
+    public void setInput(MultipartInput input);
 
     /**
      * Get output parts to send over the wire to service consumer
      * @return the output
      */
     @Override
-    public OT getOutput();
+    public MultipartOutput getOutput();
 
     /**
      * Set output parts to send over the wire to service consumer
      * @return the output
      */
     @Override
-    public void setOutput(OT output);
-
+    public void setOutput(MultipartOutput output);
 
     /**
-     * getLocalContext clones the remote context minus remote messaging data parts
-     * this method is useful to object a local service context to invoke a service locally
-     * @param local context class namee
-     * @return local service context
+     * getInputPart returns part for given label from input
+     * @param label
+     * @param clazz class of the object
+     * @return part
      */
-    public ServiceContext getLocalContext(String localContextClassName) throws Exception;
+    public Object getInputPart(String label, Class clazz) throws IOException;
+
+    /**
+     * addOutputPart adds given XML part with given label and content type to output
+     * @param label
+     * @param document
+     * @param contentType media type
+     */
+    public void addOutputPart(String label, Document doc, String contentType) throws Exception;
 }

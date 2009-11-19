@@ -23,13 +23,12 @@
  */
 package org.collectionspace.services.common;
 
-import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.context.RemoteServiceContextImpl;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.collectionspace.services.common.storage.StorageClient;
+import org.collectionspace.services.common.storage.jpa.JpaStorageClient;
 
 public abstract class AbstractCollectionSpaceResource
         implements CollectionSpaceResource {
@@ -37,6 +36,7 @@ public abstract class AbstractCollectionSpaceResource
     // Fields for default client factory and client
     private RepositoryClientFactory repositoryClientFactory;
     private RepositoryClient repositoryClient;
+    private StorageClient storageClient;
 
     public AbstractCollectionSpaceResource() {
         repositoryClientFactory = RepositoryClientFactory.getInstance();
@@ -45,10 +45,6 @@ public abstract class AbstractCollectionSpaceResource
     @Override
     abstract public String getServiceName();
 
-    @Override
-    public RepositoryClientFactory getRepositoryClientFactory() {
-        return repositoryClientFactory;
-    }
 
     @Override
     synchronized public RepositoryClient getRepositoryClient(ServiceContext ctx) {
@@ -60,17 +56,14 @@ public abstract class AbstractCollectionSpaceResource
     }
 
     @Override
-    public RemoteServiceContext createServiceContext(MultipartInput input) throws Exception {
-        return createServiceContext(input,getServiceName());
+    synchronized public StorageClient getStorageClient(ServiceContext ctx) {
+        if(storageClient != null) {
+            return storageClient;
+        }
+        storageClient = new JpaStorageClient();
+        return storageClient;
     }
 
     @Override
-    public RemoteServiceContext createServiceContext(MultipartInput input, String serviceName) throws Exception {
-        RemoteServiceContext ctx = new RemoteServiceContextImpl(serviceName);
-        ctx.setInput(input);
-        return ctx;
-    }
-
-    @Override
-    abstract public DocumentHandler createDocumentHandler(RemoteServiceContext ctx) throws Exception ;
+    abstract public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception ;
 }

@@ -32,6 +32,11 @@ import org.collectionspace.services.common.context.ServiceContext;
  * repository client calls prepare on the handler
  * The repository client then calls handle on the handler
  *
+ * T - Entity Type (e.g. CollectionObjectsCommon)
+ * TL - Entity List Type (e.g. CollectionObjectsCommonList)
+ * WT - Wrapped Type (e.g. DocumentModel)
+ * WTL - Wrapped List Type (e.g. DocumentModelList)
+ *
  */
 public interface DocumentHandler<T, TL, WT, WTL> {
 
@@ -119,25 +124,6 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @throws Exception
      */
     public void completeUpdate(DocumentWrapper<WT> wrapDoc) throws Exception;
-
-    /**
-     * extractAllParts extracts all parts of a CS object from given document.
-     * this is usually called AFTER the get operation is invoked on the repository
-     * Called in handle GET/GET_ALL actions.
-     * @param docWrap document
-     * @throws Exception
-     */
-    public void extractAllParts(DocumentWrapper<WT> docWrap) throws Exception;
-
-    /**
-     * fillAllParts sets parts of CS object into given document
-     * this is usually called BEFORE create/update operations are invoked on the
-     * repository. Called in handle CREATE/UPDATE actions.
-     * @param obj input object
-     * @param docWrap target document
-     * @throws Exception
-     */
-    public void fillAllParts(DocumentWrapper<WT> docWrap) throws Exception;
 
     /**
      * extractCommonPart extracts common part of a CS object from given document.

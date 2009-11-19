@@ -16,7 +16,7 @@
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-         </dependency>
+        </dependency>
         <dependency>
             <groupId>org.jvnet.jaxb2-commons</groupId>
             <artifactId>property-listener-injector</artifactId>
@@ -85,7 +85,14 @@
             <scope>provided</scope>
         </dependency>
         -->
-        
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+        </dependency>
         <!-- jboss -->
         <dependency>
             <groupId>jboss</groupId>
