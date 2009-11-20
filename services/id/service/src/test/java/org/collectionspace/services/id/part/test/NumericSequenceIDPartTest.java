@@ -39,6 +39,15 @@ public class NumericSequenceIDPartTest {
     @Test
     public void newIDWithSuppliedInitialValue() {
 
+        part = new NumericSequenceIDPart(0);
+        id = part.newID();
+        Assert.assertEquals(id, "0");
+        part.setCurrentID(id);
+
+        id = part.newID();
+        Assert.assertEquals(id, "1");
+        part.setCurrentID(id);
+
         part = new NumericSequenceIDPart(100);
         id = part.newID();
         Assert.assertEquals(id, "100");
@@ -79,6 +88,40 @@ public class NumericSequenceIDPartTest {
         Assert.assertEquals(id, "15");
     }
 
+
+    @Test
+    public void formatWithZeroValue() {
+
+        // With default format pattern.
+        part = new NumericSequenceIDPart(0);
+        id = part.newID();
+        Assert.assertEquals(id, Long.toString(0));
+
+        // With supplied format pattern.
+        part = new NumericSequenceIDPart("#####", 0, 1);
+        id = part.newID();
+        Assert.assertEquals(id, Long.toString(0));
+        part.setCurrentID(id);
+
+    }
+
+    @Test
+    public void formatWithMaxPossibleValue() {
+
+        // With default format pattern.
+        part = new NumericSequenceIDPart(Long.MAX_VALUE);
+        id = part.newID();
+        Assert.assertEquals(id, Long.toString(Long.MAX_VALUE));
+        part.setCurrentID(id);
+
+        // With supplied format pattern.
+        part = new NumericSequenceIDPart("#####", Long.MAX_VALUE, 1);
+        id = part.newID();
+        Assert.assertEquals(id, Long.toString(Long.MAX_VALUE));
+        part.setCurrentID(id);
+
+    }
+
     @Test
     public void formatWithLeadingZeros() {
         
@@ -101,7 +144,15 @@ public class NumericSequenceIDPartTest {
         Assert.assertEquals(id, "025");
         part.setCurrentID(id);
 
-        // Numerals with more digits than pattern do not receive padding.
+        // With zero value.
+        // Pad at left with leading zeros up to width specified.
+        part = new NumericSequenceIDPart("000", 0, 1);
+        id = part.newID();
+        Assert.assertEquals(id, "000");
+        part.setCurrentID(id);
+
+        // Values containing more digits than supplied pattern
+        // do not receive zero padding.
         part = new NumericSequenceIDPart("000", 5000, 1);
         id = part.newID();
         Assert.assertEquals(id, "5000");

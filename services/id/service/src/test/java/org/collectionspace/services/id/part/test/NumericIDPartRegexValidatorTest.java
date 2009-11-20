@@ -17,16 +17,19 @@ public class NumericIDPartRegexValidatorTest {
     }
 
     @Test(dependsOnMethods = {"isValid"})
-    public void isValidWithInvalidValues() {
+    public void isValidWithNullOrEmptyValues() {
         Assert.assertFalse(validator.isValid(null));
         Assert.assertFalse(validator.isValid(""));
-        Assert.assertFalse(validator.isValid("non-numeric value"));
-        Assert.assertFalse(validator.isValid("-1"));
     }
 
-    @Test
-    public void format() {
+    @Test(dependsOnMethods = {"isValid"})
+    public void isValidWithNonNumericValues() {
+        Assert.assertFalse(validator.isValid("non-numeric value"));
+    }
 
+    @Test(dependsOnMethods = {"isValid"})
+    public void isValidWithNegativeValues() {
+        Assert.assertFalse(validator.isValid("-1"));
     }
 
 }

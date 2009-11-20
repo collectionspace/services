@@ -3,6 +3,12 @@ package org.collectionspace.services.id.part;
 
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+// Returns a evenly-distributed, pseudorandom number from within a
+// default or supplied range of integer values.
+
 public class JavaRandomNumberIDPartAlgorithm implements IDPartAlgorithm {
 
     // @TODO Verify whether this simple singleton pattern is
@@ -11,36 +17,83 @@ public class JavaRandomNumberIDPartAlgorithm implements IDPartAlgorithm {
 
     // @TODO Check whether we might need to store a serialization
     // of this class, once instantiated, between invocations, and
-    // load the class from its serialized state.
+    // load the class from its serialized state, to reduce the
+    // possibility of
 
     // @TODO Look into whether we may have some user stories or use cases
     // that require the use of java.security.SecureRandom, rather than
     // java.util.Random.
 
+    final Logger logger =
+        LoggerFactory.getLogger(JavaRandomNumberIDPartAlgorithm.class);
+
     // Starting with Java 5, the default instantiation of Random()
     // sets the seed "to a value very likely to be distinct from any
     // other invocation of this constructor."
-    private Random r = new Random();
+    private static Random r = new Random();
 
-    private JavaRandomNumberIDPartAlgorithm() {
+    public final static int DEFAULT_MAX_VALUE = Integer.MAX_VALUE - 1;
+    public final static int DEFAULT_MIN_VALUE = 0;
+
+    private int maxValue = DEFAULT_MAX_VALUE;
+    private int minValue = DEFAULT_MIN_VALUE;
+
+    public JavaRandomNumberIDPartAlgorithm() {
     }
 
-    // See http://en.wikipedia.org/wiki/Singleton_pattern
-    private static class SingletonHolder {
-        private static final JavaRandomNumberIDPartAlgorithm INSTANCE =
-            new JavaRandomNumberIDPartAlgorithm();
+    // Throws IllegalArgumentException
+    public JavaRandomNumberIDPartAlgorithm(int maxVal) {
+        try {
+            setMaxValue(maxVal);
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
     }
 
-    public static JavaRandomNumberIDPartAlgorithm getInstance() {
-        return SingletonHolder.INSTANCE;
+    // Throws IllegalArgumentException
+    public JavaRandomNumberIDPartAlgorithm(int maxVal, int minVal) {
+        setMaxValue(maxVal);
+        setMinValue(minVal);
     }
 
-    // @TODO Allow setting a maximum value.
+    private void setMaxValue(int maxVal) {
+        if (0 < maxVal && maxVal < DEFAULT_MAX_VALUE) {
+            this.maxValue = maxVal;
+        } else {
+            String msg =
+                "Invalid maximum value for random number. " +
+                "Must be between 1 and " +
+                Integer.toString(DEFAULT_MAX_VALUE - 1) + ".";
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    private void setMinValue(int minVal) {
+        if (DEFAULT_MIN_VALUE <= minVal && minVal < this.maxValue) {
+            this.minValue = minVal;
+        } else {
+            String msg =
+                "Invalid minimum value for random number. " +
+                "Must be between 0 and " +
+                Integer.toString(this.maxValue - 1) + ".";
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
     @Override
     public String generateID(){
-        // Returns a value between 0 (inclusive) and the
-        // maximum value of an int.
-        return Integer.toString(r.nextInt(Integer.MAX_VALUE));
+        // Returns an evenly distributed random value between 0
+        // and the maximum value.
+        // See http://mindprod.com/jgloss/pseudorandom.html
+        //
+        // Note: Random.nextInt() returns a pseudorandom number
+        // between 0 and n-1 inclusive, not a number between 0 and n.
+        return
+            Integer.toString(r.nextInt(
+            this.maxValue - this.minValue + 1) + this.minValue);
+
     }
 
 }

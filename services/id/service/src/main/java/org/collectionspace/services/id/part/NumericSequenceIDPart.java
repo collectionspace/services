@@ -73,8 +73,9 @@ public class NumericSequenceIDPart extends SequenceIDPart {
         return Long.toString(this.currentValue);
     }
 
+    // @TODO Consider throwing IllegalArgumentException here.
     public void setCurrentID(long val) {
-        if (val <= 0) {
+        if (val < 0) {
             logger.error("Current ID value for numeric ID sequences " +
                 "must be positive.");
         } else {
@@ -102,8 +103,9 @@ public class NumericSequenceIDPart extends SequenceIDPart {
         return Long.toString(this.initialValue);
     }
 
+    // @TODO Consider throwing IllegalArgumentException here.
     public void setInitialID(long initial) {
-        if (initial <= 0) {
+        if (initial < 0) {
             logger.error("Current ID value for numeric ID sequences " +
                 "must be positive.");
         } else {

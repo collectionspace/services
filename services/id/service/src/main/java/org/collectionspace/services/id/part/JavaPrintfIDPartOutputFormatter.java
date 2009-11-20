@@ -55,7 +55,6 @@ public class JavaPrintfIDPartOutputFormatter implements IDPartOutputFormatter {
     public String format(String id) {
 
         String formattedID = id;
-
         String pattern = getFormatPattern();
 
         // If the formatting pattern is empty, just check length.
@@ -72,6 +71,7 @@ public class JavaPrintfIDPartOutputFormatter implements IDPartOutputFormatter {
 
         // Otherwise, format the ID using the pattern, then check length.
         } else {
+
             // Clear the StringWriter's buffer from its last usage. 
             StringBuffer buf = stringwriter.getBuffer();
             buf.setLength(0);
@@ -81,9 +81,19 @@ public class JavaPrintfIDPartOutputFormatter implements IDPartOutputFormatter {
                 printwriter.printf(id, pattern);
                 formattedID = stringwriter.toString();
             } catch(IllegalFormatException e) {
-                // @TODO Log and handle this exception.
+                logger.error("Error when attempting to format ID '" +
+                    id + "' using formatting pattern '" + pattern);
+                // @TODO Consider throwing this exception.
             }
-            isValidLength(formattedID);
+
+            if (! isValidLength(formattedID)) {
+                logger.error(
+                    "Formatted ID '" + formattedID +
+                    "' exceeds maximum length of " +
+                    getMaxOutputLength() + " characters." +
+                    "Returning ID without formatting.");
+                return id;
+            }
         }
 
         return formattedID;
