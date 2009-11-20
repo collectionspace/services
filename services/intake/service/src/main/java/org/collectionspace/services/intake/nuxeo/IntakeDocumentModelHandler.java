@@ -133,15 +133,6 @@ public class IntakeDocumentModelHandler
         return coList;
     }
 
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#getDocumentType()
-     */
-    @Override
-    public String getDocumentType() {
-        return IntakeConstants.NUXEO_DOCTYPE;
-    }
-
     /**
      * getQProperty converts the given property to qualified schema property
      * @param prop

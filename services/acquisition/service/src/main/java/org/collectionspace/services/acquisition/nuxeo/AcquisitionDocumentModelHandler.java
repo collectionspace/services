@@ -149,13 +149,6 @@ public class AcquisitionDocumentModelHandler
     }
 
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#getDocumentType()
-     */
-    public String getDocumentType() {
-        return AcquisitionConstants.NUXEO_DOCTYPE;
-    }
-
     /**
      * getQProperty converts the given property to qualified schema property
      * @param prop

@@ -112,10 +112,4 @@ public abstract class DocumentModelHandler<T, TL>
     @Override
     public abstract void setCommonPartList(TL obj);
 
-    /**
-     * Gets the document type.
-     *
-     * @return the document type
-     */
-    public abstract String getDocumentType();
 }

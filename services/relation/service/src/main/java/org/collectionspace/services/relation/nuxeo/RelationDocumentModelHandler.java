@@ -155,10 +155,6 @@ public class RelationDocumentModelHandler
         docModel.setPropertyValue("dublincore:title", RelationConstants.NUXEO_DC_TITLE);
     }
 
-    @Override
-    public String getDocumentType() {
-        return RelationConstants.NUXEO_DOCTYPE;
-    }
 
     @Override
     public String getQProperty(String prop) {

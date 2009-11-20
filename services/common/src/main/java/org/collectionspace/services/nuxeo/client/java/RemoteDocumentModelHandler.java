@@ -65,9 +65,6 @@ public abstract class RemoteDocumentModelHandler<T, TL>
     }
 
     @Override
-    public abstract String getDocumentType();
-
-    @Override
     public void completeUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         DocumentModel docModel = wrapDoc.getWrappedObject();
         //return at least those document part(s) that were received

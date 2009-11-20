@@ -153,13 +153,6 @@ public class VocabularyItemDocumentModelHandler
     }
 
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#getDocumentType()
-     */
-    @Override
-    public String getDocumentType() {
-        return VocabularyItemConstants.NUXEO_DOCTYPE;
-    }
 
     /**
      * getQProperty converts the given property to qualified schema property

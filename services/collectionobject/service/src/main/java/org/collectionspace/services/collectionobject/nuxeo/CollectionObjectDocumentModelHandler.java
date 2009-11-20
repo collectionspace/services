@@ -142,11 +142,6 @@ public class CollectionObjectDocumentModelHandler
     }
 
     @Override
-    public String getDocumentType() {
-        return CollectionObjectConstants.NUXEO_DOCTYPE;
-    }
-
-    @Override
     public String getQProperty(String prop) {
         return CollectionObjectConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
