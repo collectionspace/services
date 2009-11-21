@@ -29,13 +29,15 @@ import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.common.document.AbstractDocumentHandler;
 import org.collectionspace.services.common.document.DocumentWrapper;
 
-
 /**
  *
  * @author 
  */
 public class AccountDocumentHandler
         extends AbstractDocumentHandler<AccountsCommon, AccountsCommonList, AccountsCommon, AccountsCommonList> {
+
+    private AccountsCommon account;
+    private AccountsCommonList accountList;
 
     @Override
     public void handleCreate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
@@ -50,45 +52,50 @@ public class AccountDocumentHandler
 
     @Override
     public void handleGet(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
+        setCommonPart(wrapDoc.getWrappedObject());
     }
 
     @Override
-    public void handleGetAll(DocumentWrapper< AccountsCommonList> wrapDoc) throws Exception {
+    public void handleGetAll(DocumentWrapper<AccountsCommonList> wrapDoc) throws Exception {
+        setCommonPartList(wrapDoc.getWrappedObject());
     }
 
     @Override
     public AccountsCommon extractCommonPart(DocumentWrapper<AccountsCommon> wrapDoc)
             throws Exception {
-        return null;
+        throw new UnsupportedOperationException("operation not relevant for AccountDocumentHandler");
     }
 
     @Override
     public void fillCommonPart(AccountsCommon obj, DocumentWrapper<AccountsCommon> wrapDoc)
             throws Exception {
+        throw new UnsupportedOperationException("operation not relevant for AccountDocumentHandler");
     }
 
     @Override
     public AccountsCommonList extractCommonPartList(DocumentWrapper<AccountsCommonList> wrapDoc)
             throws Exception {
-        return null;
+        return wrapDoc.getWrappedObject();
     }
 
     @Override
     public AccountsCommon getCommonPart() {
-        return null;
+        return account;
     }
 
     @Override
-    public void setCommonPart(AccountsCommon obj) {
+    public void setCommonPart(AccountsCommon account) {
+        this.account = account;
     }
 
     @Override
     public AccountsCommonList getCommonPartList() {
-        return null;
+        return accountList;
     }
 
     @Override
-    public void setCommonPartList(AccountsCommonList obj) {
+    public void setCommonPartList(AccountsCommonList accountList) {
+        this.accountList = accountList;
     }
 
     @Override

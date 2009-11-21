@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    CollectionSpace identity provider schema (XSD)
+    
+    Entity  :
+    Used for: 
+    
+    $LastChangedRevision: 916 $
+    $LastChangedDate: 2009-11-05 16:59:20 -0800 (Thu, 05 Nov 2009) $
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
+  xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
+  xmlns:ns="http://collectionspace.org/servics/authentication"
+  xmlns="http://collectionspace.org/services/authentication"
+  targetNamespace="http://collectionspace.org/services/authentication"
+  version="0.1"
+  jaxb:extensionBindingPrefixes="hj orm"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+
+    <xs:element name="user">
+        <xs:complexType>
+            <xs:annotation>
+                <xs:appinfo>
+                    <hj:entity>
+                        <orm:table name="users"/>
+                    </hj:entity>
+                </xs:appinfo>
+            </xs:annotation>
+            <xs:sequence>
+                <xs:element name="username" type="xs:string" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:id>
+                                <orm:column name="username"  length="128" nullable="false"/>
+                            </hj:id>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="passwd" type="xs:string" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="passwd" length="128" nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="role">
+        <xs:complexType>
+            <xs:annotation>
+                <xs:appinfo>
+                    <hj:entity>
+                        <orm:table name="roles"/>
+                    </hj:entity>
+                </xs:appinfo>
+            </xs:annotation>
+            <xs:sequence>
+                <xs:element name="rolename" type="xs:string" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:id>
+                                <orm:column name="rolename"  length="128" nullable="false"/>
+                            </hj:id>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="rolegroup" type="xs:string" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="rolegroup" length="128" nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="user_role">
+        <xs:complexType>
+            <xs:annotation>
+                <xs:appinfo>
+                    <hj:entity>
+                        <orm:table name="users_roles"/>
+                    </hj:entity>
+                </xs:appinfo>
+            </xs:annotation>
+            <xs:sequence>
+                <xs:element name="username" type="xs:string" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="username" length="128" nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="rolename" type="xs:string" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="rolename" length="128" nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
+

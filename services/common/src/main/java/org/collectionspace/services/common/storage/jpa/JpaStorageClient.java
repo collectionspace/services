@@ -37,9 +37,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * JpaStorageClient is used to perform CRUD operations on documents in Nuxeo
- * repository using Remote Java APIs. It uses @see DocumentHandler as IOHandler
- * with the client.
+ * JpaStorageClient is used to perform CRUD operations on SQL storage using JPA.
+ * It uses @see DocumentHandler as IOHandler with the client.
+ * All the operations in this client are carried out under their own transactions.
+ * A call to any method would start and commit/rollback a transaction.
  *
  * $LastChangedRevision: $ $LastChangedDate: $
  */

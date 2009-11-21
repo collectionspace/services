@@ -37,12 +37,16 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.account.storage.AccountHandlerFactory;
+import org.collectionspace.services.account.storage.AccountStorageClient;
 import org.collectionspace.services.common.AbstractCollectionSpaceResource;
+import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.RemoteServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.collectionspace.services.common.storage.StorageClient;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +59,7 @@ public class AccountResource
 
     final private String serviceName = "accounts";
     final Logger logger = LoggerFactory.getLogger(AccountResource.class);
+    final StorageClient storageClient = new AccountStorageClient();
 
     @Override
     public String getServiceName() {
@@ -64,19 +69,31 @@ public class AccountResource
     private <T> ServiceContext createServiceContext(T obj) {
         ServiceContext ctx = new RemoteServiceContextImpl<T, T>(getServiceName());
         ctx.setInput(obj);
+        ctx.setDocumentType("org.collectionspace.services.account"); //persistence unit
         return ctx;
     }
 
     @Override
+    public StorageClient getStorageClient(ServiceContext ctx) {
+        //FIXME use ctx to identify storage client
+        return storageClient;
+    }
+
+    @Override
     public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-        throw new IllegalStateException();
+        DocumentHandler docHandler = AccountHandlerFactory.getInstance().getHandler(
+                ctx.getRepositoryClientType().toString());
+        docHandler.setServiceContext(ctx);
+        docHandler.setCommonPart(ctx.getInput());
+        return docHandler;
     }
 
     @POST
     public Response createAccount(AccountsCommon input) {
         try {
             ServiceContext ctx = createServiceContext(input);
-            String csid = "";
+            DocumentHandler handler = createDocumentHandler(ctx);
+            String csid = getStorageClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(AccountResource.class);
             path.path("" + csid);
             Response response = Response.created(path.build()).build();
@@ -107,8 +124,9 @@ public class AccountResource
         }
         AccountsCommon result = null;
         try {
-            ServiceContext ctx = createServiceContext((AccountsCommon)null);
-
+            ServiceContext ctx = createServiceContext((AccountsCommon) null);
+            DocumentHandler handler = createDocumentHandler(ctx);
+            getStorageClient(ctx).get(ctx, csid, handler);
             result = (AccountsCommon) ctx.getOutput();
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
@@ -141,8 +159,11 @@ public class AccountResource
     public AccountsCommonList getAccountList(@Context UriInfo ui) {
         AccountsCommonList accountList = new AccountsCommonList();
         try {
-            ServiceContext ctx = createServiceContext((AccountsCommonList)null);
-
+            ServiceContext ctx = createServiceContext((AccountsCommonList) null);
+            DocumentHandler handler = createDocumentHandler(ctx);
+            DocumentFilter myFilter = new DocumentFilter();
+            handler.setDocumentFilter(myFilter);
+            getStorageClient(ctx).getFiltered(ctx, handler);
             accountList = null;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -173,8 +194,9 @@ public class AccountResource
         AccountsCommon result = null;
         try {
             ServiceContext ctx = createServiceContext(theUpdate);
-
-            result = (AccountsCommon)ctx.getOutput();
+            DocumentHandler handler = createDocumentHandler(ctx);
+            getStorageClient(ctx).update(ctx, csid, handler);
+            result = (AccountsCommon) ctx.getOutput();
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("caugth exception in updateAccount", dnfe);
@@ -206,8 +228,8 @@ public class AccountResource
             throw new WebApplicationException(response);
         }
         try {
-            ServiceContext ctx = createServiceContext((AccountsCommon)null);
-
+            ServiceContext ctx = createServiceContext((AccountsCommon) null);
+            getStorageClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {

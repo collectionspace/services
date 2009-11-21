@@ -40,6 +40,10 @@
                 <xs:element name="email" type="xs:string" minOccurs="1" maxOccurs="1" />
                 <xs:element name="phone" type="xs:string"/>
 
+                <!-- optional username for default identity provider -->
+                <xs:element name="userName" type="xs:string" minOccurs="0" maxOccurs="1" />
+                <!-- optional base64 encoded password for default identity provider -->
+                <xs:element name="password" type="xs:base64Binary" minOccurs="0" maxOccurs="1" />
             </xs:sequence>
             <xs:attribute name="csid" type="xs:string">
                 <xs:annotation>

@@ -23,11 +23,7 @@
  */
 package org.collectionspace.services.common.document;
 
-import java.util.HashMap;
-import java.util.Map;
 
-import java.util.StringTokenizer;
-import org.collectionspace.services.common.context.ServiceContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

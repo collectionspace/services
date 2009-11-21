@@ -193,6 +193,33 @@
             </service:object>
         </tenant:serviceBindings>
         <!-- end relation service meta-data -->
+        <!-- begin account service meta-data -->
+        <tenant:serviceBindings name="Accounts" version="0.1">
+            <service:object id="1" name="Acccount" version="0.1"
+            xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:part id="0" control_group="Managed"
+                            versionable="true" auditable="false"
+                            label="accounts_system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                        namespaceURI="http://collectionspace.org/services/common/system"
+                        schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed"
+                            versionable="true" auditable="false"
+                            label="accounts_common" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                        namespaceURI="http://collectionspace.org/services/account"
+                        schemaLocation="http://collectionspace.org/services/account http://services.collectionspace.org/relation/accounts_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end account service meta-data -->
     </tenant:tenantBinding>
     <!-- end movinimages.us tenant meta-data -->
 </tenant:TenantBindingConfig>

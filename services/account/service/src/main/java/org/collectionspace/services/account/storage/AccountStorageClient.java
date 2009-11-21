@@ -23,30 +23,14 @@
  */
 package org.collectionspace.services.account.storage;
 
-import org.collectionspace.services.common.ClientType;
-import org.collectionspace.services.common.document.DocumentHandler;
-import org.collectionspace.services.common.document.DocumentHandlerFactory;
+import org.collectionspace.services.common.storage.jpa.JpaStorageClient;
 
 /**
- * CollectionObjectHandlerFactory creates handlers for collectionobject based
- * on type of Nuxeo client used
- *
- * $LastChangedRevision: $
- * $LastChangedDate: $
+ * AccountStorageClient deals with both Account and Default Identity Provider's
+ * state in persistent storage
+ * @author 
  */
-public class AccountHandlerFactory implements DocumentHandlerFactory {
+public class AccountStorageClient extends JpaStorageClient
+{
 
-    private static final AccountHandlerFactory self = new AccountHandlerFactory();
-
-    private AccountHandlerFactory() {
-    }
-
-    public static AccountHandlerFactory getInstance() {
-        return self;
-    }
-
-    @Override
-    public DocumentHandler getHandler(String clientType) {
-        return new AccountDocumentHandler();
-    }
 }

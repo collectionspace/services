@@ -16,6 +16,7 @@
     </properties>
 
     <modules>
+        <module>jaxb</module>
         <module>service</module>
         <module>client</module>
     </modules>

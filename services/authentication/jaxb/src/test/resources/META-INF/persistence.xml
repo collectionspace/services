@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<persistence version="1.0" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd
+http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_1_0.xsd" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:orm="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <persistence-unit name="org.collectionspace.services.authentication">
+    <class>org.collectionspace.services.authentication.User</class>
+    <class>org.collectionspace.services.authentication.Role</class>
+    <class>org.collectionspace.services.authentication.UserRole</class>
+        <properties>
+            <property name="hibernate.ejb.cfgfile" value="hibernate.cfg.xml"/>
+
+            <!--property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
+            <property name="hibernate.max_fetch_depth" value="3"/>
+            <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
+            <property name="hibernate.connection.username" value="test"/>
+            <property name="hibernate.connection.password" value="test"/>
+            <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/cspace"/-->
+        </properties>
+    </persistence-unit>
+</persistence>

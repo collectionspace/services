@@ -16,6 +16,7 @@
         <!-- add modules below in the order based on dependencies -->
         <module>common</module>
         <module>authentication</module>
+        <!--module>account</module-->
         <module>relation</module>
         <!--module>query</module-->
         <module>acquisition</module>
@@ -27,7 +28,6 @@
         <module>client</module>
         <module>sdk</module>
         <module>IntegrationTests</module>
-    <!--module>account</module-->
     </modules>
 
     <repositories> </repositories>

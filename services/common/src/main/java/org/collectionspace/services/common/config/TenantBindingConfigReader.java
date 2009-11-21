@@ -70,16 +70,16 @@ public class TenantBindingConfigReader
     public void read() throws Exception {
         String configFileName = getAbsoluteFileName(CONFIG_FILE_NAME);
         File configFile = new File(configFileName);
-        if(!configFile.exists()){
+        if (!configFile.exists()) {
             String msg = "Could not find configuration file " + configFileName;
             logger.error(msg);
             throw new RuntimeException(msg);
         }
         tenantBindingConfig = (TenantBindingConfig) parse(configFile, TenantBindingConfig.class);
-        for(TenantBindingType tenantBinding : tenantBindingConfig.getTenantBinding()){
+        for (TenantBindingType tenantBinding : tenantBindingConfig.getTenantBinding()) {
             tenantBindings.put(tenantBinding.getId(), tenantBinding);
             readServiceBindings(tenantBinding);
-            if(logger.isDebugEnabled()){
+            if (logger.isDebugEnabled()) {
                 logger.debug("read() added tenant id=" + tenantBinding.getId() +
                         " name=" + tenantBinding.getName());
             }
@@ -87,11 +87,11 @@ public class TenantBindingConfigReader
     }
 
     private void readServiceBindings(TenantBindingType tenantBinding) throws Exception {
-        for(ServiceBindingType serviceBinding : tenantBinding.getServiceBindings()){
+        for (ServiceBindingType serviceBinding : tenantBinding.getServiceBindings()) {
             String key = getTenantQualifiedServiceName(tenantBinding.getId(),
                     serviceBinding.getName());
             serviceBindings.put(key, serviceBinding);
-            if(logger.isDebugEnabled()){
+            if (logger.isDebugEnabled()) {
                 logger.debug("readServiceBindings() added service " +
                         " name=" + key +
                         " workspace=" + serviceBinding.getName());
@@ -105,7 +105,7 @@ public class TenantBindingConfigReader
      * @throws Exception
      */
     public void retrieveAllWorkspaceIds() throws Exception {
-        for(TenantBindingType tenantBinding : tenantBindings.values()){
+        for (TenantBindingType tenantBinding : tenantBindings.values()) {
             retrieveWorkspaceIds(tenantBinding);
         }
     }
@@ -121,36 +121,44 @@ public class TenantBindingConfigReader
         ServiceMain svcMain = ServiceMain.getInstance();
         RepositoryClientConfigType rclientConfig = svcMain.getServicesConfigReader().getConfiguration().getRepositoryClient();
         ClientType clientType = svcMain.getClientType();
-        if(clientType.equals(ClientType.JAVA) &&
-                rclientConfig.getName().equalsIgnoreCase("nuxeo-java")){
+        if (clientType.equals(ClientType.JAVA) &&
+                rclientConfig.getName().equalsIgnoreCase("nuxeo-java")) {
             //FIXME only one repository client is recognized
             workspaceIds = svcMain.getNuxeoConnector().retrieveWorkspaceIds(
                     tenantBinding.getRepositoryDomain());
         }
         //verify if workspace exists for each service in the tenant binding
-        for(ServiceBindingType serviceBinding : tenantBinding.getServiceBindings()){
+        for (ServiceBindingType serviceBinding : tenantBinding.getServiceBindings()) {
             String serviceName = serviceBinding.getName();
+            if (serviceBinding.getRepositoryClient() == null) {
+                //no repository needed for this service...skip
+                if (logger.isDebugEnabled()) {
+                    logger.debug("no repository configured for service " + serviceName +
+                            " skipping...");
+                }
+                continue;
+            }
             RepositoryClient repositoryClient = getRepositoryClient(
                     serviceBinding.getRepositoryClient());
             String workspaceId = null;
             //workspace name is service name by convention
             String workspace = serviceBinding.getName().toLowerCase();
-            if(clientType.equals(ClientType.JAVA)){
+            if (clientType.equals(ClientType.JAVA)) {
                 workspaceId = workspaceIds.get(workspace);
-                if(workspaceId == null){
+                if (workspaceId == null) {
                     logger.warn("failed to retrieve workspace id for " + workspace +
                             " trying to create a new workspace...");
                     workspaceId = repositoryClient.createWorkspace(
                             tenantBinding.getRepositoryDomain(),
                             serviceBinding.getName());
-                    if(workspaceId == null){
+                    if (workspaceId == null) {
                         logger.warn("failed to create workspace for " + workspace);
                         continue;
                     }
                 }
-            }else{
+            } else {
                 workspaceId = serviceBinding.getRepositoryWorkspaceId();
-                if(workspaceId == null || "".equals(workspaceId)){
+                if (workspaceId == null || "".equals(workspaceId)) {
                     logger.error("could not find workspace id for " + workspace);
                     //FIXME: should we throw an exception here?
                     continue;
@@ -158,7 +166,7 @@ public class TenantBindingConfigReader
             }
             String tenantService = getTenantQualifiedServiceName(tenantBinding.getId(), serviceName);
             serviceWorkspaces.put(tenantService, workspaceId);
-            if(logger.isDebugEnabled()){
+            if (logger.isDebugEnabled()) {
                 logger.debug("retrieved workspace id=" + workspaceId +
                         " service=" + serviceName +
                         " workspace=" + workspace);
