@@ -18,6 +18,7 @@
         <module>3rdparty</module>
         <module>client</module>
         <module>import</module>
+        <module>sample</module>
     </modules>
 
     <build>
