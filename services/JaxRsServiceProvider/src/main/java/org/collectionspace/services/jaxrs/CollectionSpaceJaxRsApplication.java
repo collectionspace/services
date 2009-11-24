@@ -1,6 +1,6 @@
 package org.collectionspace.services.jaxrs;
 
-//import org.collectionspace.services.account.AccountResource;
+import org.collectionspace.services.account.AccountResource;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.id.IDResource;
 import org.collectionspace.services.intake.IntakeResource;
@@ -22,7 +22,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
     private Set<Class<?>> empty = new HashSet<Class<?>>();
 
     public CollectionSpaceJaxRsApplication() {
-//        singletons.add(new AccountResource());
+        singletons.add(new AccountResource());
         singletons.add(new CollectionObjectResource());
         singletons.add(new IDResource());
         singletons.add(new IntakeResource());

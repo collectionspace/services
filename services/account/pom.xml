@@ -15,7 +15,6 @@
     <modules>
         <module>jaxb</module>
         <module>service</module>
-        <module>3rdparty</module>
         <module>client</module>
     </modules>
 

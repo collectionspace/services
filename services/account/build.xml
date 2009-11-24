@@ -1,5 +1,5 @@
 
-<project name="collectionobject" default="package" basedir=".">
+<project name="account" default="package" basedir=".">
     <description>
         collectionobject service
     </description>

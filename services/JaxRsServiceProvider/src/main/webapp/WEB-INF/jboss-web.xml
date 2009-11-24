@@ -3,11 +3,11 @@
   <!-- All secure web resources will use this security domain -->
     <security-domain>java:/jaas/cspace</security-domain>
     <context-root>/cspace-services</context-root>
-    <resource-ref>
+    <!--resource-ref>
         <description>DB Connection</description>
         <res-ref-name>jdbc/cspaceds</res-ref-name>
         <res-type>javax.sql.DataSource</res-type>
         <jndi-name>java:/cspaceds</jndi-name>
         <res-auth>Container</res-auth>
-    </resource-ref>
+    </resource-ref-->
 </jboss-web>

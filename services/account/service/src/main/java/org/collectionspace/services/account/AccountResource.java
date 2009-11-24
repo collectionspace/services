@@ -69,7 +69,8 @@ public class AccountResource
     private <T> ServiceContext createServiceContext(T obj) {
         ServiceContext ctx = new RemoteServiceContextImpl<T, T>(getServiceName());
         ctx.setInput(obj);
-        ctx.setDocumentType("org.collectionspace.services.account"); //persistence unit
+        ctx.setDocumentType(AccountsCommon.class.getPackage().getName()); //persistence unit
+        ctx.setProperty("entity-name", AccountsCommon.class.getName());
         return ctx;
     }
 
@@ -127,7 +128,7 @@ public class AccountResource
             ServiceContext ctx = createServiceContext((AccountsCommon) null);
             DocumentHandler handler = createDocumentHandler(ctx);
             getStorageClient(ctx).get(ctx, csid, handler);
-            result = (AccountsCommon) ctx.getOutput();
+            result = (AccountsCommon)ctx.getOutput();
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getAccount", dnfe);
@@ -164,7 +165,7 @@ public class AccountResource
             DocumentFilter myFilter = new DocumentFilter();
             handler.setDocumentFilter(myFilter);
             getStorageClient(ctx).getFiltered(ctx, handler);
-            accountList = null;
+            accountList = (AccountsCommonList)handler.getCommonPartList();
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in getAccountList", e);
@@ -196,7 +197,7 @@ public class AccountResource
             ServiceContext ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getStorageClient(ctx).update(ctx, csid, handler);
-            result = (AccountsCommon) ctx.getOutput();
+            result = (AccountsCommon)ctx.getOutput();
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("caugth exception in updateAccount", dnfe);

@@ -23,18 +23,21 @@
  */
 package org.collectionspace.services.account.storage;
 
+import java.util.List;
 import java.util.UUID;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
+import org.collectionspace.services.account.AccountsCommonList.AccountListItem;
 import org.collectionspace.services.common.document.AbstractDocumentHandler;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
 /**
  *
  * @author 
  */
 public class AccountDocumentHandler
-        extends AbstractDocumentHandler<AccountsCommon, AccountsCommonList, AccountsCommon, AccountsCommonList> {
+        extends AbstractDocumentHandler<AccountsCommon, AccountsCommonList, AccountsCommon, List> {
 
     private AccountsCommon account;
     private AccountsCommonList accountList;
@@ -48,22 +51,27 @@ public class AccountDocumentHandler
 
     @Override
     public void handleUpdate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
+        getServiceContext().setOutput(getCommonPart());
     }
 
     @Override
     public void handleGet(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
-        setCommonPart(wrapDoc.getWrappedObject());
+        setCommonPart(extractCommonPart(wrapDoc));
+        getServiceContext().setOutput(getCommonPart());
     }
 
     @Override
-    public void handleGetAll(DocumentWrapper<AccountsCommonList> wrapDoc) throws Exception {
-        setCommonPartList(wrapDoc.getWrappedObject());
+    public void handleGetAll(DocumentWrapper<List> wrapDoc) throws Exception {
+        AccountsCommonList accList = extractCommonPartList(wrapDoc);
+        setCommonPartList(accList);
+        getServiceContext().setOutput(getCommonPartList());
     }
 
     @Override
-    public AccountsCommon extractCommonPart(DocumentWrapper<AccountsCommon> wrapDoc)
+    public AccountsCommon extractCommonPart(
+            DocumentWrapper<AccountsCommon> wrapDoc)
             throws Exception {
-        throw new UnsupportedOperationException("operation not relevant for AccountDocumentHandler");
+        return wrapDoc.getWrappedObject();
     }
 
     @Override
@@ -73,9 +81,26 @@ public class AccountDocumentHandler
     }
 
     @Override
-    public AccountsCommonList extractCommonPartList(DocumentWrapper<AccountsCommonList> wrapDoc)
+    public AccountsCommonList extractCommonPartList(
+            DocumentWrapper<List> wrapDoc)
             throws Exception {
-        return wrapDoc.getWrappedObject();
+
+        AccountsCommonList accList = new AccountsCommonList();
+        List<AccountsCommonList.AccountListItem> list = accList.getAccountListItem();
+
+        for (Object obj : wrapDoc.getWrappedObject()) {
+            AccountsCommon account = (AccountsCommon) obj;
+            AccountListItem accListItem = new AccountListItem();
+            accListItem.setAnchorName(account.getAnchorName());
+            accListItem.setEmail(account.getEmail());
+            accListItem.setFirstName(account.getFirstName());
+            accListItem.setLastName(account.getLastName());
+            String id = account.getCsid();
+            accListItem.setUri(getServiceContextPath() + id);
+            accListItem.setCsid(id);
+            list.add(accListItem);
+        }
+        return accList;
     }
 
     @Override
@@ -99,7 +124,8 @@ public class AccountDocumentHandler
     }
 
     @Override
-    public String getQProperty(String prop) {
+    public String getQProperty(
+            String prop) {
         return null;
     }
 }

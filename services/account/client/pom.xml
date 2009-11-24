@@ -14,7 +14,10 @@
     <artifactId>org.collectionspace.services.account.client</artifactId>
     <version>1.0</version>
     <name>services.account.client</name>
-    
+    <properties>
+        <sql.file>account.sql</sql.file>
+        <sql.dir>${basedir}/src/main/resources/db/mysql</sql.dir>
+    </properties>
     <dependencies>
         <!-- keep slf4j dependencies on the top -->
         <dependency>
@@ -79,6 +82,12 @@
             <artifactId>commons-httpclient</artifactId>
             <version>3.1</version>
         </dependency>
+
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
     </dependencies>
     
     <build>
@@ -106,5 +115,67 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <!-- use profile as this task is not needed for every build and test -->
+            <id>ddl</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>hibernate3-maven-plugin</artifactId>
+                        <version>2.2</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>hbm2ddl</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <components>
+                                <component>
+                                    <name>hbm2ddl</name>
+                                </component>
+                            </components>
+                            <componentProperties>
+                                <outputfilename>${sql.file}</outputfilename>
+                                <implementation>jpaconfiguration</implementation>
+                                <drop>true</drop>
+                                <create>true</create>
+                                <export>true</export>
+                                <jdk5>true</jdk5>
+                                <ejb3>false</ejb3>
+                                <persistenceunit>org.collectionspace.services.account</persistenceunit>
+                            </componentProperties>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>mysql</groupId>
+                                <artifactId>mysql-connector-java</artifactId>
+                                <version>5.0.5</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <configuration>
+                                    <tasks>
+                                        <copy file="${basedir}/target/hibernate3/sql/${sql.file}" tofile="${sql.dir}/${sql.file}"/>
+                                    </tasks>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
 

@@ -32,23 +32,100 @@
     <!-- convention: <servicename>-common  -->
     <xs:element name="accounts_common">
         <xs:complexType>
+            <xs:annotation>
+                <xs:appinfo>
+                    <hj:entity>
+                        <orm:table name="accounts_common"/>
+                    </hj:entity>
+                </xs:appinfo>
+            </xs:annotation>
             <xs:sequence>
-                <xs:element name="anchorName" type="xs:string" minOccurs="1" maxOccurs="1" />
-                <xs:element name="firstName" type="xs:string" minOccurs="1" maxOccurs="1" />
-                <xs:element name="lastName" type="xs:string" minOccurs="1" maxOccurs="1" />
-                <xs:element name="mi" type="xs:string"/>
-                <xs:element name="email" type="xs:string" minOccurs="1" maxOccurs="1" />
-                <xs:element name="phone" type="xs:string"/>
-
+                <xs:element name="anchorName" type="xs:string" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="anchor_name" length="128" nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="firstName" type="xs:string" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="first_name" length="256" nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="lastName" type="xs:string" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="last_name" length="256" nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="mi" type="xs:string">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="mi" length="1" nullable="true"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="email" type="xs:string" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="email" length="512" nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="phone" type="xs:string">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="phone" length="15" nullable="true"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="mobile" type="xs:string">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="mobile" length="15" nullable="true"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
                 <!-- optional username for default identity provider -->
-                <xs:element name="userName" type="xs:string" minOccurs="0" maxOccurs="1" />
+                <xs:element name="userName" type="xs:string" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:ignored/>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
                 <!-- optional base64 encoded password for default identity provider -->
-                <xs:element name="password" type="xs:base64Binary" minOccurs="0" maxOccurs="1" />
+                <xs:element name="password" type="xs:base64Binary" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:ignored/>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
             </xs:sequence>
             <xs:attribute name="csid" type="xs:string">
                 <xs:annotation>
                     <xs:appinfo>
-                        <hj:id />
+                        <hj:id>
+                            <orm:column name="csid" nullable="false"/>
+                        </hj:id>
                     </xs:appinfo>
                 </xs:annotation>
             </xs:attribute>
@@ -57,9 +134,19 @@
 
     <xs:element name="accounts-common-list">
         <xs:complexType>
+            <xs:annotation>
+                <xs:appinfo>
+                    <hj:ignored/>
+                </xs:appinfo>
+            </xs:annotation>
             <xs:sequence>
                 <xs:element name="account-list-item" maxOccurs="unbounded">
                     <xs:complexType>
+                        <xs:annotation>
+                            <xs:appinfo>
+                                <hj:ignored/>
+                            </xs:appinfo>
+                        </xs:annotation>
                         <xs:sequence>
                             <xs:element name="anchorName" type="xs:string" minOccurs="1"/>
                             <xs:element name="firstName" type="xs:string" minOccurs="1" />

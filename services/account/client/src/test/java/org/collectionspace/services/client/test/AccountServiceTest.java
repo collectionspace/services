@@ -31,7 +31,6 @@ import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -76,7 +75,7 @@ public class AccountServiceTest extends AbstractServiceTest {
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
-                createAccountInstance("sanjay", "hello");
+                createAccountInstance("barney", "dino", "barney", "hello", "barney@dinoland.com");
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
 
@@ -207,7 +206,7 @@ public class AccountServiceTest extends AbstractServiceTest {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = false;
+        boolean iterateThroughList = true;
         if (iterateThroughList && logger.isDebugEnabled()) {
             List<AccountsCommonList.AccountListItem> items =
                     list.getAccountListItem();
@@ -234,7 +233,7 @@ public class AccountServiceTest extends AbstractServiceTest {
     // Success outcomes
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
-    dependsOnMethods = {"read"})
+    dependsOnMethods = {"read", "readNonExistent"})
     public void update(String testName) throws Exception {
 
         // Perform setup.
@@ -250,10 +249,8 @@ public class AccountServiceTest extends AbstractServiceTest {
         if (logger.isDebugEnabled()) {
             logger.debug("got object to update with ID: " + knownResourceId);
         }
-        MultipartInput input = (MultipartInput) res.getEntity();
         AccountsCommon toUpdateAccount =
-                (AccountsCommon) extractPart(input,
-                client.getCommonPartName(), AccountsCommon.class);
+                (AccountsCommon) res.getEntity();
         Assert.assertNotNull(toUpdateAccount);
 
         // Update the content of this resource.
@@ -277,11 +274,11 @@ public class AccountServiceTest extends AbstractServiceTest {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
 
-        AccountsCommon updatedAccount = (AccountsCommon)res.getEntity();
+        AccountsCommon updatedAccount = (AccountsCommon) res.getEntity();
         Assert.assertNotNull(updatedAccount);
 
         Assert.assertEquals(updatedAccount.getEmail(),
-                toUpdateAccount.getPhone(),
+                toUpdateAccount.getEmail(),
                 "Data in updated object did not match submitted data.");
 
     }
@@ -303,7 +300,7 @@ public class AccountServiceTest extends AbstractServiceTest {
 
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
-    dependsOnMethods = {"update", "testSubmitRequest"})
+    dependsOnMethods = {"update", "readNonExistent", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
 
         // Perform setup.
@@ -314,7 +311,7 @@ public class AccountServiceTest extends AbstractServiceTest {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in updateAccount(), below.
         AccountsCommon account =
-                createAccountInstance("dalal", "junk");
+                createAccountInstance("simba", "mufasa", "simba", "tiger", "simba@lionking.com");
         ClientResponse<AccountsCommon> res =
                 client.update(NON_EXISTENT_ID, account);
         int statusCode = res.getStatus();
@@ -335,7 +332,7 @@ public class AccountServiceTest extends AbstractServiceTest {
     // Success outcomes
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
-    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
+    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update", "updateNonExistent"})
     public void delete(String testName) throws Exception {
 
         // Perform setup.
@@ -409,15 +406,17 @@ public class AccountServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-    private AccountsCommon createAccountInstance(String anchorName,
-            String passwd) {
+    private AccountsCommon createAccountInstance(String firstName, String lastName, String anchorName,
+            String passwd, String email) {
 
         AccountsCommon account = new AccountsCommon();
+        account.setFirstName(firstName);
+        account.setLastName(lastName);
         account.setAnchorName(anchorName);
         account.setUserName(anchorName);
         byte[] b64passwd = Base64.encodeBase64(passwd.getBytes());
         account.setPassword(b64passwd);
-
+        account.setEmail(email);
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, account common");
             logger.debug(objectAsXmlString(account,
@@ -426,5 +425,4 @@ public class AccountServiceTest extends AbstractServiceTest {
         return account;
 
     }
-
 }

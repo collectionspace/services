@@ -23,7 +23,9 @@
  */
 package org.collectionspace.services.common.context;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.service.ServiceBindingType;
@@ -167,6 +169,31 @@ public interface ServiceContext<IT, OT> {
      * @return label
      */
     public String getCommonPartLabel(String schemaName);
+    
+    /**
+     * getProperties retruns user-defined properties associated with this context
+     * @return
+     */
+    public Map<String, Object> getProperties();
+
+
+    /**
+     * setProperties sets user-defined properties to this context
+     * @param props
+     */
+    public void setProperties(Map<String, Object> props);
+
+
+    /**
+     * getProperty returns specified user-defined property
+     */
+    public Object getProperty(String name);
+
+    /**
+     * setProperty sets user-defined property with given name
+     */
+    public void setProperty(String name, Object o);
+
 }
 
 

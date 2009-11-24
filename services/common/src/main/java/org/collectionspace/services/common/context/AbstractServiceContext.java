@@ -46,33 +46,33 @@ public abstract class AbstractServiceContext<IT, OT>
         implements ServiceContext<IT, OT> {
 
     final Logger logger = LoggerFactory.getLogger(AbstractServiceContext.class);
+    Map<String, Object> properties = new HashMap<String, Object>();
     Map<String, ObjectPartType> objectPartMap = new HashMap<String, ObjectPartType>();
     private ServiceBindingType serviceBinding;
     private TenantBindingType tenantBinding;
-    
-    private String overrideDocumentType = null; 
-    
+    private String overrideDocumentType = null;
+
     public AbstractServiceContext(String serviceName) {
         TenantBindingConfigReader tReader =
                 ServiceMain.getInstance().getTenantBindingConfigReader();
         //TODO: get tenant binding from security context (Subject.g
         String tenantId = "1"; //hardcoded for movingimages.us
         tenantBinding = tReader.getTenantBinding(tenantId);
-        if(tenantBinding == null){
+        if (tenantBinding == null) {
             String msg = "No tenant binding found while processing request for " +
                     serviceName;
             logger.error(msg);
             throw new IllegalStateException(msg);
         }
         serviceBinding = tReader.getServiceBinding(tenantId, serviceName);
-        if(serviceBinding == null){
+        if (serviceBinding == null) {
             String msg = "No service binding found while processing request for " +
                     serviceName + " for tenant id=" + getTenantId() +
                     " name=" + getTenantName();
             logger.error(msg);
             throw new IllegalStateException(msg);
         }
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("tenantId=" + tenantId +
                     " service binding=" + serviceBinding.getName());
         }
@@ -97,14 +97,14 @@ public abstract class AbstractServiceContext<IT, OT>
 
     @Override
     public Map<String, ObjectPartType> getPartsMetadata() {
-        if(objectPartMap.size() != 0){
+        if (objectPartMap.size() != 0) {
             return objectPartMap;
         }
         ServiceBindingType serviceBinding = getServiceBinding();
         List<ServiceObjectType> objectTypes = serviceBinding.getObject();
-        for(ServiceObjectType objectType : objectTypes){
+        for (ServiceObjectType objectType : objectTypes) {
             List<ObjectPartType> objectPartTypes = objectType.getPart();
-            for(ObjectPartType objectPartType : objectPartTypes){
+            for (ObjectPartType objectPartType : objectPartTypes) {
                 objectPartMap.put(objectPartType.getLabel(), objectPartType);
             }
         }
@@ -152,19 +152,18 @@ public abstract class AbstractServiceContext<IT, OT>
     @Override
     public String getServiceName() {
         return serviceBinding.getName();
-    } 
-    
+    }
+
     @Override
     public String getDocumentType() {
-    	// If they have not overridden the setting, use the type of the service
-    	// object.
-    	return(overrideDocumentType!=null)?overrideDocumentType:
-    		serviceBinding.getObject().get(0).getName();
+        // If they have not overridden the setting, use the type of the service
+        // object.
+        return (overrideDocumentType != null) ? overrideDocumentType : serviceBinding.getObject().get(0).getName();
     }
 
     @Override
     public void setDocumentType(String docType) {
-    	overrideDocumentType = docType;
+        overrideDocumentType = docType;
     }
 
     @Override
@@ -190,14 +189,37 @@ public abstract class AbstractServiceContext<IT, OT>
     public abstract void setOutput(OT output);
 
     @Override
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
+    @Override
+    public void setProperties(Map<String, Object> props) {
+        properties.putAll(props);
+    }
+
+    public Object getProperty(String name) {
+        return properties.get(name);
+    }
+
+    public void setProperty(String name, Object o) {
+        properties.put(name, o);
+    }
+
+    @Override
     public String toString() {
-        return "AbstractServiceContext [" +
-                "service name=" + serviceBinding.getName() + " " +
-                "service version=" + serviceBinding.getVersion() + " " +
-                "tenant id=" + tenantBinding.getId() + " " +
-                "tenant name=" + tenantBinding.getName() + " " +
-                tenantBinding.getDisplayName() + " " +
-                "tenant repository domain=" + tenantBinding.getRepositoryDomain() + " " +
-                "]";
+        StringBuilder msg = new StringBuilder();
+        msg.append("AbstractServiceContext [");
+        msg.append("service name=" + serviceBinding.getName() + " ");
+        msg.append("service version=" + serviceBinding.getVersion() + " ");
+        msg.append("tenant id=" + tenantBinding.getId() + " ");
+        msg.append("tenant name=" + tenantBinding.getName() + " ");
+        msg.append(tenantBinding.getDisplayName() + " ");
+        msg.append("tenant repository domain=" + tenantBinding.getRepositoryDomain());
+        for(Map.Entry<String, Object> entry : properties.entrySet()) {
+            msg.append("property name=" + entry.getKey() + " value=" + entry.getValue().toString());
+        }
+        msg.append("]");
+        return msg.toString();
     }
 }

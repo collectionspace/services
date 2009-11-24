@@ -22,11 +22,11 @@
             <artifactId>org.collectionspace.services.common</artifactId>
             <version>1.0</version>
         </dependency>
-        <!--dependency>
+        <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.account.service</artifactId>
             <version>1.0</version>
-        </dependency-->
+        </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.collectionobject.service</artifactId>

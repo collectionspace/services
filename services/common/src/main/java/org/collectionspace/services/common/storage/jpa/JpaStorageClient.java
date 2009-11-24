@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -69,18 +70,18 @@ public class JpaStorageClient implements StorageClient {
         EntityManager em = null;
         try {
             handler.prepare(Action.CREATE);
-            Object po = handler.getCommonPart();
-            DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(po);
+            Object entity = handler.getCommonPart();
+            DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entity);
             handler.handle(Action.CREATE, wrapDoc);
             emf = getEntityManagerFactory(docType);
             em = emf.createEntityManager();
             em.getTransaction().begin();
-            em.persist(po);
+            em.persist(entity);
             em.getTransaction().commit();
             handler.complete(Action.CREATE, wrapDoc);
-            return getCsid(po);
+            return getCsid(entity);
         } catch (Exception e) {
-            if (em != null) {
+            if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
             if (logger.isDebugEnabled()) {
@@ -116,8 +117,9 @@ public class JpaStorageClient implements StorageClient {
         EntityManager em = null;
         try {
             handler.prepare(Action.GET);
-            StringBuilder queryStr = new StringBuilder("SELECT * FROM ");
-            queryStr.append(docType);
+            StringBuilder queryStr = new StringBuilder("SELECT a FROM ");
+            queryStr.append(getEntityName(ctx));
+            queryStr.append(" a");
             queryStr.append(" WHERE csid = :csid");
             //TODO: add tenant id
             String where = docFilter.getWhereClause();
@@ -134,10 +136,21 @@ public class JpaStorageClient implements StorageClient {
             if ((docFilter.getOffset() > 0) || (docFilter.getPageSize() > 0)) {
             } else {
             }
-            //require transaction for get?
-            em.getTransaction().begin();
-            Object o = q.getSingleResult();
-            em.getTransaction().commit();
+            Object o = null;
+
+            try {
+                //require transaction for get?
+                em.getTransaction().begin();
+                o = q.getSingleResult();
+                em.getTransaction().commit();
+            } catch (NoResultException nre) {
+                if (em != null && em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                String msg = "could not find entity with id=" + id;
+                logger.error(msg, nre);
+                throw new DocumentNotFoundException(msg, nre);
+            }
             DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(o);
             handler.handle(Action.GET, wrapDoc);
             handler.complete(Action.GET, wrapDoc);
@@ -193,8 +206,9 @@ public class JpaStorageClient implements StorageClient {
         try {
             handler.prepare(Action.GET_ALL);
 
-            StringBuilder queryStr = new StringBuilder("SELECT * FROM ");
-            queryStr.append(docType);
+            StringBuilder queryStr = new StringBuilder("SELECT a FROM ");
+            queryStr.append(getEntityName(ctx));
+            queryStr.append(" a");
             //TODO: add tenant id
             String where = docFilter.getWhereClause();
             if ((null != where) && (where.length() > 0)) {
@@ -246,14 +260,23 @@ public class JpaStorageClient implements StorageClient {
         EntityManager em = null;
         try {
             handler.prepare(Action.UPDATE);
-            Object po = handler.getCommonPart();
-            setCsid(po, id);
-            DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(po);
+            Object entity = handler.getCommonPart();
+            setCsid(entity, id);
+            DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entity);
             handler.handle(Action.UPDATE, wrapDoc);
             emf = getEntityManagerFactory(docType);
             em = emf.createEntityManager();
             em.getTransaction().begin();
-            em.merge(po);
+            Object entityFound = em.find(entity.getClass(), id);
+            if(entityFound == null) {
+                if (em != null && em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                String msg = "could not find entity with id=" + id;
+                logger.error(msg);
+                throw new DocumentNotFoundException(msg);
+            }
+            em.merge(entity);
             em.getTransaction().commit();
             handler.complete(Action.UPDATE, wrapDoc);
         } catch (DocumentException de) {
@@ -264,6 +287,9 @@ public class JpaStorageClient implements StorageClient {
             }
             throw new DocumentException(e);
         } finally {
+            if (emf != null) {
+                releaseEntityManagerFactory(emf);
+            }
         }
     }
 
@@ -275,11 +301,12 @@ public class JpaStorageClient implements StorageClient {
      * @throws DocumentException
      */
     @Override
-    public void delete(ServiceContext ctx, String id) throws DocumentNotFoundException,
+    public void delete(ServiceContext ctx, String id)
+            throws DocumentNotFoundException,
             DocumentException {
 
         if (logger.isDebugEnabled()) {
-            logger.debug("deleting document with id=" + id);
+            logger.debug("deleting entity with id=" + id);
         }
         String docType = ctx.getDocumentType();
         if (docType == null) {
@@ -290,7 +317,7 @@ public class JpaStorageClient implements StorageClient {
         EntityManager em = null;
         try {
             StringBuilder deleteStr = new StringBuilder("DELETE FROM ");
-            deleteStr.append(docType);
+            deleteStr.append(getEntityName(ctx));
             deleteStr.append(" WHERE csid = :csid");
             //TODO: add tenant id
 
@@ -299,23 +326,26 @@ public class JpaStorageClient implements StorageClient {
             Query q = em.createQuery(deleteStr.toString());
             q.setParameter("csid", id);
             //TODO: add tenant id
+            int rcount = 0;
             em.getTransaction().begin();
-            int rcount = q.executeUpdate();
-            em.getTransaction().commit();
+            rcount = q.executeUpdate();
             if (rcount != 1) {
-                throw new DocumentException("failed to delete " + docType +
-                        " csid=" + id);
+                if (em != null && em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                String msg = "could not find entity with id=" + id;
+                logger.error(msg);
+                throw new DocumentNotFoundException(msg);
             }
+            em.getTransaction().commit();
+
         } catch (DocumentException de) {
-            if (em != null) {
-                em.getTransaction().rollback();
-            }
             throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
-            if (em != null) {
+            if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
             throw new DocumentException(e);
@@ -326,7 +356,8 @@ public class JpaStorageClient implements StorageClient {
         }
     }
 
-    private EntityManagerFactory getEntityManagerFactory(String persistenceUnit) {
+    private EntityManagerFactory getEntityManagerFactory(
+            String persistenceUnit) {
         return Persistence.createEntityManagerFactory(persistenceUnit);
 
     }
@@ -335,21 +366,24 @@ public class JpaStorageClient implements StorageClient {
         if (emf != null) {
             emf.close();
         }
+
     }
 
     private String getCsid(Object o) throws Exception {
         Class c = o.getClass();
         Method m = c.getMethod("getCsid");
         if (m == null) {
-            String msg = "Could not find csid in object of class=" + o.getClass().getCanonicalName();
+            String msg = "Could not find csid in entity of class=" + o.getClass().getCanonicalName();
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }
+
         Object r = m.invoke(o);
         if (logger.isDebugEnabled()) {
-            logger.debug("getCsid returned csid=" + r.toString() +
+            logger.debug("getCsid returned csid=" + r +
                     " for " + c.getName());
         }
+
         return (String) r;
     }
 
@@ -365,19 +399,32 @@ public class JpaStorageClient implements StorageClient {
                 //no need to set
                 return;
             }
+
         }
         //set csid
         Class c = o.getClass();
-        Method m = c.getMethod("setCsid");
+        Method m = c.getMethod("setCsid", java.lang.String.class);
         if (m == null) {
-            String msg = "Could not find csid in object of class=" + o.getClass().getCanonicalName();
+            String msg = "Could not find csid in entity of class=" + o.getClass().getCanonicalName();
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }
+
         Object r = m.invoke(o, csid);
         if (logger.isDebugEnabled()) {
-            logger.debug("setCsid returned csid=" + r.toString() +
+            logger.debug("completed setCsid " +
                     " for " + c.getName());
         }
+
+    }
+
+    private String getEntityName(ServiceContext ctx) {
+        Object o = ctx.getProperty("entity-name");
+        if (o == null) {
+            throw new IllegalArgumentException("property entity-name missing in context " +
+                    ctx.toString());
+        }
+
+        return (String) o;
     }
 }

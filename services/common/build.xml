@@ -107,6 +107,20 @@
         </exec>
     </target>
 
+    <target name="jpa"
+    description="one time upgrade jpa binaries in ${jboss.server.cspace}">
+        <move todir="${jboss.server.cspace}/jpa-upgrade/lib">
+            <filelist dir="${jboss.server.cspace}/lib">
+                <file name="hibernate-annotations.jar"/>
+                <file name="hibernate-entitymanager.jar"/>
+                <file name="ejb3-persistence.jar"/>
+            </filelist>
+        </move>
+        <copy todir="${jboss.server.cspace}/lib">
+            <fileset dir="${basedir}/lib/jpa-upgrade"/>
+        </copy>
+    </target>
+
     <target name="deploy" depends="install"
     description="deploy common elements in ${jboss.server.cspace}">
         <copy todir="${jboss.server.cspace}/cspace/config/services">

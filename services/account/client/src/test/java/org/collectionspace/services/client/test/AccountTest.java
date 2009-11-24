@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.collectionspace.services.account.test;
+package org.collectionspace.services.client.test;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -56,10 +56,10 @@ public class AccountTest {
     @Test(dataProvider = "testName", dataProviderClass = AccountTest.class)
     public void create(String testName) throws Exception {
         AccountsCommon account = new AccountsCommon();
-        account.setAnchorName("sanjay");
-        account.setFirstName("Sanjay");
-        account.setLastName("Dalal");
-        account.setEmail("sanjay.dalal@berkeley.edu");
+        account.setAnchorName("john");
+        account.setFirstName("John");
+        account.setLastName("Doe");
+        account.setEmail("john.doe@berkeley.edu");
         id = UUID.randomUUID().toString();
         account.setCsid(id);
         em.getTransaction().begin();
@@ -77,7 +77,7 @@ public class AccountTest {
     @Test(dataProvider = "testName", dataProviderClass = AccountTest.class,
     dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
-        AccountsCommon account = findAccount("sanjay");
+        AccountsCommon account = findAccount("john");
         Assert.assertNotNull(account);
         if (logger.isDebugEnabled()) {
             logger.debug("read account " +
@@ -97,14 +97,14 @@ public class AccountTest {
     dependsOnMethods = {"read"})
     public void update(String testName) throws Exception {
         Query q = em.createQuery("update org.collectionspace.services.account.AccountsCommon set email= :email where csid=:csid");
-        q.setParameter("email", "sanjay@berkeley.edu");
+        q.setParameter("email", "john@berkeley.edu");
         q.setParameter("csid", id);
         em.getTransaction().begin();
         int no = q.executeUpdate();
         // Commit the transaction
         em.getTransaction().commit();
         Assert.assertEquals(no, 1);
-        AccountsCommon account = findAccount("sanjay");
+        AccountsCommon account = findAccount("john");
         if (logger.isDebugEnabled()) {
             logger.debug("updated account " +
                     " first name=" + account.getFirstName() +
