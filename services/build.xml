@@ -104,6 +104,13 @@
         </exec>
     </target>
 
+    <target name="create_db"
+    description="create service-specific tables(s), indices, etc.">
+        <ant antfile="authentication/build.xml" target="create_db" inheritAll="false"/>
+        <ant antfile="account/build.xml" target="create_db" inheritAll="false"/>
+        <ant antfile="id/build.xml" target="create_db" inheritAll="false"/>
+    </target>
+
     <!-- this target is called in order based on the dependencies between the services -->
     <target name="deploy" depends="install"
     description="deploy services in ${jboss.server.cspace}">
@@ -161,7 +168,7 @@
         </copy>
         <ant antfile="id/build.xml" target="dist_installer" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="dist_installer" inheritAll="false"/>
-        <ant antfile="vocabulary/build.xml" target="dist_installer" inheritAll="false"/>    
+        <ant antfile="vocabulary/build.xml" target="dist_installer" inheritAll="false"/>
 <!--
         <ant antfile="common/build.xml" target="dist_installer" inheritAll="false"/>
         <ant antfile="authentication/build.xml" target="dist_installer" inheritAll="false"/>
@@ -170,7 +177,7 @@
         <ant antfile="acquisition/build.xml" target="dist_installer" inheritAll="false"/>
         <ant antfile="JaxRsServiceProvider/build.xml" target="dist_installer" inheritAll="false"/>
 -->        
-    </target>    
+    </target>
 
     
 </project>

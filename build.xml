@@ -8,10 +8,6 @@
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
 
-    <property name="db" value="mysql"/>
-    <property name="db.script.dir" location="${basedir}/src/main/resources/scripts/db/${db}"/>
-
-
     <condition property="osfamily-unix">
         <os family="unix" />
     </condition>
@@ -203,22 +199,23 @@
     <target name="create_db"
     description="create database(s), grant privileges to test users">
         <sql driver="com.mysql.jdbc.Driver"
-        url="jdbc:mysql://localhost:3306/cspace"
-        userid="root"
-        password=""
+        url="jdbc:mysql://${db.host}:${db.port}/cspace"
+        userid="${db.user}"
+        password="${db.user.password}"
         src="${db.script.dir}/init_db.sql"
         >
             <classpath>
-                <pathelement path="${jboss.lib.cspace}/mysql-connector-java-5.1.7-bin.jar"/>
+                <pathelement path="${db.driver.jar}"/>
             </classpath>
         </sql>
+        <ant antfile="services/build.xml" target="create_db" inheritAll="false"/>
     </target>
 
     <target name="deploy" depends="install"
     description="deploy services in ${jboss.server.cspace}">
                 <!-- copy db scripts, etc. -->
         <copy todir="${jboss.server.cspace}/cspace/services">
-            <fileset dir="${src}/main/resources/scripts"/>
+            <fileset dir="${src}/main/resources/"/>
         </copy>
         <!-- copy datasources -->
         <copy todir="${jboss.deploy.cspace}">

@@ -105,6 +105,11 @@
         </exec>
     </target>
 
+    <target name="create_db"
+    description="create tables(s), indices for account service">
+        <ant antfile="client/build.xml" target="create_db" inheritAll="false"/>
+    </target>
+
     <target name="deploy" depends="install"
     description="deploy collectionobject service">
         <ant antfile="3rdparty/build.xml" target="deploy" inheritall="false"/>
@@ -117,7 +122,7 @@
 
     <target name="dist" depends="package"
     description="distribute collectionobject service}">
-        <ant antfile="3rdparty/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="client/build.xml" target="dist" inheritall="false"/>
     </target>
 
 </project>

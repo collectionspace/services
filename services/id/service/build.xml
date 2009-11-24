@@ -1,5 +1,5 @@
 
-<project name="id" default="package" basedir=".">
+<project name="id.service" default="package" basedir=".">
     <description>
         id service
     </description>
@@ -8,7 +8,6 @@
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
-    <property name="id.jar" value="collectionspace-services-id.jar"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -106,8 +105,35 @@
         </exec>
     </target>
 
+    <target name="create_db"
+    description="create tables(s), indices for id service">
+        <sql driver="com.mysql.jdbc.Driver"
+        url="jdbc:mysql://${db.host}:${db.port}/cspace"
+        userid="${db.user}"
+        password="${db.user.password}"
+        src="${db.script.dir}/create_id_generators_table.sql"
+        >
+            <classpath>
+                <pathelement path="${db.driver.jar}"/>
+            </classpath>
+        </sql>
+        <sql driver="com.mysql.jdbc.Driver"
+        url="jdbc:mysql://${db.host}:${db.port}/cspace"
+        userid="${db.user}"
+        password="${db.user.password}"
+        src="${db.script.dir}/load_id_generators.sql"
+        >
+            <classpath>
+                <pathelement path="${db.driver.jar}"/>
+            </classpath>
+        </sql>
+    </target>
+
     <target name="deploy" depends="install"
     description="deploy id service">
+        <copy todir="${jboss.server.cspace}/cspace/services">
+            <fileset dir="${src}/main/resources/"/>
+        </copy>
     </target>
 
     <target name="undeploy"
