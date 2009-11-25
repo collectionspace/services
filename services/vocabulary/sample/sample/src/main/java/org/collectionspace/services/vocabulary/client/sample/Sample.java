@@ -35,7 +35,11 @@ import org.apache.log4j.BasicConfigurator;
 import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.vocabulary.VocabulariesCommon;
+import org.collectionspace.services.vocabulary.VocabulariesCommonList;
+import org.collectionspace.services.vocabulary.VocabulariesCommonList.VocabularyListItem;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommon;
+import org.collectionspace.services.vocabulary.VocabularyitemsCommonList;
+import org.collectionspace.services.vocabulary.VocabularyitemsCommonList.VocabularyitemListItem;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
@@ -58,6 +62,9 @@ public class Sample {
     final String SERVICE_PATH_COMPONENT = "vocabularies";
     final String ITEM_SERVICE_PATH_COMPONENT = "items";
 
+
+    // Create
+
     public void createEnumeration(String vocabName, List<String> enumValues ) {
 
     	// Expected status code: 201 Created
@@ -65,9 +72,7 @@ public class Sample {
     	// Type of service request being tested
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
 
-    	if(logger.isDebugEnabled()){
-    		logger.debug("Import: Create vocabulary: \"" + vocabName +"\"");
-    	}
+    	logger.info("Import: Create vocabulary: \"" + vocabName +"\"");
     	MultipartOutput multipart = createVocabularyInstance(vocabName, 
     			createRefName(vocabName), "enum");
     	ClientResponse<Response> res = client.create(multipart);
@@ -86,13 +91,14 @@ public class Sample {
     	// Store the ID returned from this create operation
     	// for additional tests below.
     	String newVocabId = extractId(res);
-    	if(logger.isDebugEnabled()){
-    		logger.debug("Import: Created vocabulary: \"" + vocabName +"\" ID:"
+        logger.info("Import: Created vocabulary: \"" + vocabName +"\" ID:"
     				+newVocabId );
-    	}
+        
+        // Add items to the vocabulary
     	for(String itemName : enumValues){
     		createItemInVocab(newVocabId, vocabName, itemName, createRefName(itemName));
     	}
+        
     }
     
     private String createItemInVocab(String vcsid, String vocabName, String itemName, String refName) {
@@ -101,9 +107,7 @@ public class Sample {
     	// Type of service request being tested
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
 
-    	if(logger.isDebugEnabled()){
-    		logger.debug("Import: Create Item: \""+itemName+"\" in vocabulary: \"" + vocabName +"\"");
-    	}
+    	logger.info("Import: Create Item: \""+itemName+"\" in vocabulary: \"" + vocabName +"\"");
     	MultipartOutput multipart = createVocabularyItemInstance(vcsid, itemName, refName);
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
 
@@ -122,6 +126,73 @@ public class Sample {
     	return extractId(res);
     }
 
+   // Read
+
+   private VocabulariesCommonList readVocabularies() {
+
+        // Expected status code: 200 OK
+    	int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
+    	// Type of service request being tested
+    	ServiceRequestType REQUEST_TYPE = ServiceRequestType.READ;
+
+        // Submit the request to the service and store the response.
+        ClientResponse<VocabulariesCommonList> res = client.readList();
+        VocabulariesCommonList list = res.getEntity();
+
+        int statusCode = res.getStatus();
+    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
+    		throw new RuntimeException("Could not read list of vocabularies: "
+                + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    	}
+    	if(statusCode != EXPECTED_STATUS_CODE) {
+    		throw new RuntimeException("Unexpected Status when reading " +
+                "list of vocabularies, Status:"+ statusCode);
+    	}
+
+        return list;
+
+    }
+/*
+    private List<String> readVocabularyIds() {
+
+        VocabulariesCommonList items = readVocabularies();
+
+        List<String> ids;
+        for (VocabulariesCommonList.VocabularyListItem item : items) {
+            ids.add(item.getCsid());
+        }
+
+        return list;
+
+    }
+*/
+    private VocabularyitemsCommonList readItemsInVocab(String vocabId) {
+
+        // Expected status code: 200 OK
+    	int EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
+    	// Type of service request being tested
+    	ServiceRequestType REQUEST_TYPE = ServiceRequestType.READ;
+
+        // Submit the request to the service and store the response.
+        ClientResponse<VocabularyitemsCommonList> res =
+                client.readItemList(vocabId);
+        VocabularyitemsCommonList list = res.getEntity();
+
+        int statusCode = res.getStatus();
+
+    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
+    		throw new RuntimeException("Could not read items in vocabulary: "
+                + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    	}
+    	if(statusCode != EXPECTED_STATUS_CODE) {
+    		throw new RuntimeException("Unexpected Status when reading " +
+                "items in vocabulary, Status:"+ statusCode);
+    	}
+
+        return list;
+
+    }
+
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
@@ -137,7 +208,7 @@ public class Sample {
         commonPart.getHeaders().add("label", client.getCommonPartName());
 
         if(logger.isDebugEnabled()){
-        	logger.debug("to be created, vocabulary common ", 
+        	logger.debug("to be created, vocabulary common ",
         				vocabulary, VocabulariesCommon.class);
         }
 
@@ -161,6 +232,53 @@ public class Sample {
         return multipart;
     }
 
+    // Retrieve individual fields of vocabulary records.
+
+    private String displayVocabularyListDetails(VocabulariesCommonList list) {
+        StringBuffer sb = new StringBuffer();
+            List<VocabulariesCommonList.VocabularyListItem> items =
+                    list.getVocabularyListItem();
+            int i = 0;
+        for (VocabulariesCommonList.VocabularyListItem item : items) {
+            sb.append("vocabulary [" + i + "]" + "\n");
+            sb.append(displayVocabularyDetails(item));
+            i++;
+        }
+        return sb.toString();
+    }
+
+    private String displayVocabularyDetails(
+        VocabulariesCommonList.VocabularyListItem item) {
+            StringBuffer sb = new StringBuffer();
+            sb.append("csid=" + item.getCsid() + "\n");
+            sb.append("displayName=" + item.getDisplayName() + "\n");
+            sb.append("URI=" + item.getUri() + "\n");
+        return sb.toString();
+    }
+
+    // Retrieve individual fields of vocabulary item records.
+
+    private String displayVocabularyItemListDetails(VocabularyitemsCommonList list) {
+        StringBuffer sb = new StringBuffer();
+        List<VocabularyitemListItem> items =
+                list.getVocabularyitemListItem();
+        int i = 0;
+        for (VocabularyitemListItem item : items) {
+            sb.append("vocabulary item [" + i + "]" + "\n");
+            sb.append(displayVocabularyItemDetails(item));
+            i++;
+        }
+        return sb.toString();
+    }
+
+    private String displayVocabularyItemDetails(
+        VocabularyitemsCommonList.VocabularyitemListItem item) {
+            StringBuffer sb = new StringBuffer();
+            sb.append("csid=" + item.getCsid() + "\n");
+            sb.append("displayName=" + item.getDisplayName() + "\n");
+            sb.append("URI=" + item.getUri() + "\n");
+        return sb.toString();
+    }
 
     /**
      * Returns an error message indicating that the status code returned by a
@@ -183,7 +301,7 @@ public class Sample {
         MultivaluedMap<String, Object> mvm = res.getMetadata();
         String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
         if(logger.isDebugEnabled()){
-        	logger.debug("extractId:uri=" + uri);
+        	logger.info("extractId:uri=" + uri);
         }
         String[] segments = uri.split("/");
         String id = segments[segments.length - 1];
@@ -201,6 +319,7 @@ public class Sample {
 		
 		BasicConfigurator.configure();
 		logger.info("VocabularyBaseImport starting...");
+
 
 		Sample vbi = new Sample();
 		final String acquisitionMethodsVocabName = "Acquisition Methods";
@@ -226,5 +345,20 @@ public class Sample {
 		vbi.createEnumeration(responsibleDeptsVocabName, respDeptNamesEnumValues);
 
 		logger.info("VocabularyBaseImport complete.");
+
+        logger.info("Reading newly-created vocabularies ...");
+
+        // Read vocabularies.
+        VocabulariesCommonList vocabularies = vbi.readVocabularies();
+        String details = vbi.displayVocabularyListDetails(vocabularies);
+        logger.info(details);
+
+        // Read items in each vocabulary.
+//        readItemsInVocab(newVocabId);
+
+        // Delete vocabulary items.
+
+        // Delete vocabularies.
 	}
+
 }
