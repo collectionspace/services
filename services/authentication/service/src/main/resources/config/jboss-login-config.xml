@@ -20,7 +20,7 @@ copy before the "other" application-policy
         <authentication>
             <login-module code="org.collectionspace.authentication.CSpaceDBLoginModule"
                              flag="required">
-                <module-option name="dsJndiName">java:/CspaceDS</module-option>
+                <module-option name="dsJndiName">CspaceDS</module-option>
                 <module-option name="hashAlgorithm">SHA-256</module-option>
                 <module-option name="ignorePasswordCase">false</module-option>
                 <module-option name="principalsQuery">

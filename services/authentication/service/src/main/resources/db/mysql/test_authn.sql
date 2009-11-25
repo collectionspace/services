@@ -5,8 +5,7 @@
 --
 use cspace;
 
-insert into users (username, passwd) values ('test', 'test');
-insert into users (username, passwd) values ('admin', 'admin');
+INSERT INTO `users` (`username`,`passwd`) VALUES ('test','n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg=');
 
 insert into roles (rolename, rolegroup) values ('collections_manager', 'collections');
 insert into roles (rolename, rolegroup) values ('collections_registrar', 'collections');

@@ -138,7 +138,6 @@
             <fileset dir="${src}/main/resources/"/>
         </copy>
         <echo message="Add authentication-policy to ${jboss.server.cspace}/conf/login-config.xml"/>
-        <echo message="Make sure cspace-ds.xml exists in ${jboss.server.cspace}/deploy"/>
     </target>
 
     <target name="undeploy"
