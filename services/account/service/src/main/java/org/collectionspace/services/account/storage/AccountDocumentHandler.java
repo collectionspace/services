@@ -91,7 +91,7 @@ public class AccountDocumentHandler
         for (Object obj : wrapDoc.getWrappedObject()) {
             AccountsCommon account = (AccountsCommon) obj;
             AccountListItem accListItem = new AccountListItem();
-            accListItem.setAnchorName(account.getAnchorName());
+            accListItem.setScreenName(account.getScreenName());
             accListItem.setEmail(account.getEmail());
             accListItem.setFirstName(account.getFirstName());
             accListItem.setLastName(account.getLastName());

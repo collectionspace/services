@@ -56,7 +56,7 @@ public class AccountTest {
     @Test(dataProvider = "testName", dataProviderClass = AccountTest.class)
     public void create(String testName) throws Exception {
         AccountsCommon account = new AccountsCommon();
-        account.setAnchorName("john");
+        account.setScreenName("john");
         account.setFirstName("John");
         account.setLastName("Doe");
         account.setEmail("john.doe@berkeley.edu");
@@ -85,9 +85,9 @@ public class AccountTest {
         }
     }
 
-    private AccountsCommon findAccount(String anchorName) throws Exception {
-        Query q = em.createQuery("select a from org.collectionspace.services.account.AccountsCommon a where a.anchorName = :anchorname");
-        q.setParameter("anchorname", anchorName);
+    private AccountsCommon findAccount(String screenName) throws Exception {
+        Query q = em.createQuery("select a from org.collectionspace.services.account.AccountsCommon a where a.screenName = :screenname");
+        q.setParameter("screenname", screenName);
         return (AccountsCommon) q.getSingleResult();
 
     }

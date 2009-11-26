@@ -215,8 +215,8 @@ public class AccountServiceTest extends AbstractServiceTest {
             for (AccountsCommonList.AccountListItem item : items) {
                 logger.debug(testName + ": list-item[" + i + "] csid=" +
                         item.getCsid());
-                logger.debug(testName + ": list-item[" + i + "] anchorName=" +
-                        item.getAnchorName());
+                logger.debug(testName + ": list-item[" + i + "] screenName=" +
+                        item.getScreenName());
                 logger.debug(testName + ": list-item[" + i + "] URI=" +
                         item.getUri());
                 i++;
@@ -406,14 +406,14 @@ public class AccountServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-    private AccountsCommon createAccountInstance(String firstName, String lastName, String anchorName,
+    private AccountsCommon createAccountInstance(String firstName, String lastName, String screenName,
             String passwd, String email) {
 
         AccountsCommon account = new AccountsCommon();
         account.setFirstName(firstName);
         account.setLastName(lastName);
-        account.setAnchorName(anchorName);
-        account.setUserName(anchorName);
+        account.setScreenName(screenName);
+        account.setUserName(screenName);
         byte[] b64passwd = Base64.encodeBase64(passwd.getBytes());
         account.setPassword(b64passwd);
         account.setEmail(email);
