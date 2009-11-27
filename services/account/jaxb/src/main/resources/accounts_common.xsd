@@ -103,19 +103,34 @@
                         </xs:appinfo>
                     </xs:annotation>
                 </xs:element>
-                <!-- optional username for default identity provider -->
-                <xs:element name="userName" type="xs:string" minOccurs="0" maxOccurs="1">
+                <!-- userid, could be calnet id, openid URI -->
+                <xs:element name="userId" type="xs:string" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="userid" length="512"  nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <!-- optional base64 encoded password for default identity provider only -->
+                <xs:element name="password" type="xs:base64Binary" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
                         <xs:appinfo>
                             <hj:ignored/>
                         </xs:appinfo>
                     </xs:annotation>
                 </xs:element>
-                <!-- optional base64 encoded password for default identity provider -->
-                <xs:element name="password" type="xs:base64Binary" minOccurs="0" maxOccurs="1">
+                <!-- tenant id is not needed from service consumer, it will be ignored if provided -->
+                <!-- tenant id is for internal use for CollectionSpace -->
+                <!-- it is assumed that account creation is performed under valid -->
+                <!-- tenant context. tenant id is never returned in response -->
+                <xs:element name="tenantid" type="xs:string" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
                         <xs:appinfo>
-                            <hj:ignored/>
+                            <hj:basic>
+                                <orm:column name="tenantid" nullable="false"/>
+                            </hj:basic>
                         </xs:appinfo>
                     </xs:annotation>
                 </xs:element>

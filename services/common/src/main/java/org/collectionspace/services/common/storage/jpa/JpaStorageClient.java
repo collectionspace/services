@@ -17,6 +17,7 @@
  */
 package org.collectionspace.services.common.storage.jpa;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -48,7 +49,7 @@ import org.slf4j.LoggerFactory;
 public class JpaStorageClient implements StorageClient {
 
     private final Logger logger = LoggerFactory.getLogger(JpaStorageClient.class);
-
+    protected final static String CS_PERSISTENCE_UNIT = "org.collectionspace.services";
     public JpaStorageClient() {
     }
 
@@ -73,13 +74,15 @@ public class JpaStorageClient implements StorageClient {
             Object entity = handler.getCommonPart();
             DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entity);
             handler.handle(Action.CREATE, wrapDoc);
-            emf = getEntityManagerFactory(docType);
+            emf = getEntityManagerFactory();
             em = emf.createEntityManager();
             em.getTransaction().begin();
             em.persist(entity);
             em.getTransaction().commit();
             handler.complete(Action.CREATE, wrapDoc);
-            return getCsid(entity);
+            return (String) getValue(entity, "getCsid");
+        } catch (DocumentException de) {
+            throw de;
         } catch (Exception e) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -126,7 +129,7 @@ public class JpaStorageClient implements StorageClient {
             if ((null != where) && (where.length() > 0)) {
                 queryStr.append(" AND " + where);
             }
-            emf = getEntityManagerFactory(docType);
+            emf = getEntityManagerFactory();
             em = emf.createEntityManager();
             Query q = em.createQuery(queryStr.toString());
             q.setParameter("csid", id);
@@ -154,8 +157,6 @@ public class JpaStorageClient implements StorageClient {
             DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(o);
             handler.handle(Action.GET, wrapDoc);
             handler.complete(Action.GET, wrapDoc);
-        } catch (IllegalArgumentException iae) {
-            throw iae;
         } catch (DocumentException de) {
             throw de;
         } catch (Exception e) {
@@ -176,14 +177,7 @@ public class JpaStorageClient implements StorageClient {
         throw new UnsupportedOperationException("use getFiltered instead");
     }
 
-    /**
-     * getFiltered get all documents for an entity service from the Document repository,
-     * given filter parameters specified by the handler.
-     * @param ctx service context under which this method is invoked
-     * @param handler should be used by the caller to provide and transform the document
-     * @throws DocumentNotFoundException if workspace not found
-     * @throws DocumentException
-     */
+    @Override
     public void getFiltered(ServiceContext ctx, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
         if (handler == null) {
@@ -214,7 +208,7 @@ public class JpaStorageClient implements StorageClient {
             if ((null != where) && (where.length() > 0)) {
                 queryStr.append(" AND " + where);
             }
-            emf = getEntityManagerFactory(docType);
+            emf = getEntityManagerFactory();
             em = emf.createEntityManager();
             Query q = em.createQuery(queryStr.toString());
             //TODO: add tenant id
@@ -264,11 +258,11 @@ public class JpaStorageClient implements StorageClient {
             setCsid(entity, id);
             DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entity);
             handler.handle(Action.UPDATE, wrapDoc);
-            emf = getEntityManagerFactory(docType);
+            emf = getEntityManagerFactory();
             em = emf.createEntityManager();
             em.getTransaction().begin();
             Object entityFound = em.find(entity.getClass(), id);
-            if(entityFound == null) {
+            if (entityFound == null) {
                 if (em != null && em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
                 }
@@ -293,13 +287,6 @@ public class JpaStorageClient implements StorageClient {
         }
     }
 
-    /**
-     * delete a document from the Nuxeo repository
-     * @param ctx service context under which this method is invoked
-     * @param id
-     *            of the document
-     * @throws DocumentException
-     */
     @Override
     public void delete(ServiceContext ctx, String id)
             throws DocumentNotFoundException,
@@ -321,7 +308,7 @@ public class JpaStorageClient implements StorageClient {
             deleteStr.append(" WHERE csid = :csid");
             //TODO: add tenant id
 
-            emf = getEntityManagerFactory(docType);
+            emf = getEntityManagerFactory();
             em = emf.createEntityManager();
             Query q = em.createQuery(deleteStr.toString());
             q.setParameter("csid", id);
@@ -356,40 +343,87 @@ public class JpaStorageClient implements StorageClient {
         }
     }
 
-    private EntityManagerFactory getEntityManagerFactory(
+    protected EntityManagerFactory getEntityManagerFactory() {
+        return getEntityManagerFactory(CS_PERSISTENCE_UNIT);
+    }
+    protected EntityManagerFactory getEntityManagerFactory(
             String persistenceUnit) {
         return Persistence.createEntityManagerFactory(persistenceUnit);
 
     }
 
-    private void releaseEntityManagerFactory(EntityManagerFactory emf) {
+    protected void releaseEntityManagerFactory(EntityManagerFactory emf) {
         if (emf != null) {
             emf.close();
         }
 
     }
 
-    private String getCsid(Object o) throws Exception {
-        Class c = o.getClass();
-        Method m = c.getMethod("getCsid");
-        if (m == null) {
-            String msg = "Could not find csid in entity of class=" + o.getClass().getCanonicalName();
+    /**
+     * getValue gets invokes specified accessor method on given object. Assumption
+     * is that this is used for JavaBean pattern getXXX methods only.
+     * @param o object to return value from
+     * @param methodName of method to invoke
+     * @return value returned of invocation
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    protected Object getValue(Object o, String methodName)
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        if (methodName == null) {
+            String msg = methodName + " cannot be null";
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }
+        Class c = o.getClass();
+        Method m = c.getMethod(methodName);
 
         Object r = m.invoke(o);
         if (logger.isDebugEnabled()) {
-            logger.debug("getCsid returned csid=" + r +
+            logger.debug("getValue returned value=" + r +
                     " for " + c.getName());
         }
-
-        return (String) r;
+        return r;
     }
 
-    private void setCsid(Object o, String csid) throws Exception {
-        //verify csid 
-        String id = getCsid(o);
+    /**
+     * setValue mutates the given object by invoking specified method. Assumption
+     * is that this is used for JavaBean pattern setXXX methods only.
+     * @param o object to mutate
+     * @param methodName indicates method to invoke
+     * @param argType type of the only argument (assumed) to method
+     * @param argValue value of the only argument (assumed) to method
+     * @return
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    protected Object setValue(Object o, String methodName, Class argType, Object argValue)
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        if (methodName == null) {
+            String msg = methodName + " cannot be null";
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        if (argType == null) {
+            String msg = "argType cannot be null";
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        Class c = o.getClass();
+        Method m = c.getMethod(methodName, argType);
+        Object r = m.invoke(o, argValue);
+        if (logger.isDebugEnabled()) {
+            logger.debug("completed invocation of " + methodName +
+                    " for " + c.getName());
+        }
+        return r;
+    }
+
+    protected void setCsid(Object o, String csid) throws Exception {
+        //verify csid
+        String id = (String) getValue(o, "getCsid");
         if (id != null) {
             if (!id.equals(csid)) {
                 String msg = "Csids do not match!";
@@ -402,23 +436,10 @@ public class JpaStorageClient implements StorageClient {
 
         }
         //set csid
-        Class c = o.getClass();
-        Method m = c.getMethod("setCsid", java.lang.String.class);
-        if (m == null) {
-            String msg = "Could not find csid in entity of class=" + o.getClass().getCanonicalName();
-            logger.error(msg);
-            throw new IllegalArgumentException(msg);
-        }
-
-        Object r = m.invoke(o, csid);
-        if (logger.isDebugEnabled()) {
-            logger.debug("completed setCsid " +
-                    " for " + c.getName());
-        }
-
+        setValue(o, "setCsid", java.lang.String.class, csid);
     }
 
-    private String getEntityName(ServiceContext ctx) {
+    protected String getEntityName(ServiceContext ctx) {
         Object o = ctx.getProperty("entity-name");
         if (o == null) {
             throw new IllegalArgumentException("property entity-name missing in context " +

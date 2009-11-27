@@ -107,6 +107,31 @@
         </exec>
     </target>
 
+    <target name="gen_ddl" depends="gen_ddl-unix,gen_ddl-windows"
+  description="geneate ddl" />
+    <target name="gen_ddl-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="-Pddl" />
+            <arg value="process-test-resources" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="gen_ddl-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="-Pddl" />
+            <arg value="process-test-resources" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
     <target name="create_db"
     description="create tables(s), indices for account service">
         <sql driver="com.mysql.jdbc.Driver"

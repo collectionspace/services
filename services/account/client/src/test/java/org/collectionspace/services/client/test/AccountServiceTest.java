@@ -75,7 +75,7 @@ public class AccountServiceTest extends AbstractServiceTest {
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
-                createAccountInstance("barney", "dino", "barney", "hello", "barney@dinoland.com");
+                createAccountInstance("barney", "dino", "barney", "hithere08", "barney@dinoland.com");
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
 
@@ -100,18 +100,13 @@ public class AccountServiceTest extends AbstractServiceTest {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.ServiceTest#createList()
-     */
+    //to not cause uniqueness violation for account, createList is removed
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
     dependsOnMethods = {"create"})
     public void createList(String testName) throws Exception {
-        for (int i = 0; i < 3; i++) {
-            create(testName);
-        }
     }
-
+    
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
@@ -413,7 +408,7 @@ public class AccountServiceTest extends AbstractServiceTest {
         account.setFirstName(firstName);
         account.setLastName(lastName);
         account.setScreenName(screenName);
-        account.setUserName(screenName);
+        account.setUserId(screenName);
         byte[] b64passwd = Base64.encodeBase64(passwd.getBytes());
         account.setPassword(b64passwd);
         account.setEmail(email);

@@ -60,8 +60,10 @@ public class AccountTest {
         account.setFirstName("John");
         account.setLastName("Doe");
         account.setEmail("john.doe@berkeley.edu");
+        account.setUserId("johndoe");
         id = UUID.randomUUID().toString();
         account.setCsid(id);
+        account.setTenantid("123"); //set by service runtime
         em.getTransaction().begin();
         em.persist(account);
         // Commit the transaction
