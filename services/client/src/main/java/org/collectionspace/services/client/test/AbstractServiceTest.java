@@ -27,6 +27,7 @@ import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
@@ -557,19 +558,50 @@ public abstract class AbstractServiceTest implements ServiceTest {
     protected Object extractPart(MultipartInput input, String label,
         Class clazz) throws Exception {
         Object obj = null;
-        for(InputPart part : input.getParts()){
-            String partLabel = part.getHeaders().getFirst("label");
+        String partLabel = "";
+        List<InputPart> parts = input.getParts();
+        if (parts.size() == 0) {
+            logger.warn("No parts found in multipart body.");
+        }
+        if(logger.isDebugEnabled()){
+            logger.debug("Parts:");
+            for(InputPart part : parts){
+               partLabel = part.getHeaders().getFirst("label");
+               logger.debug("part = " + partLabel);
+            }
+        }
+        boolean partLabelMatched = false;
+        for(InputPart part : parts){
+            partLabel = part.getHeaders().getFirst("label");
             if(label.equalsIgnoreCase(partLabel)){
-                String partStr = part.getBodyAsString();
+                partLabelMatched = true;
                 if(logger.isDebugEnabled()){
-                    logger.debug("extracted part str=\n" + partStr);
+                    logger.debug("found part" + partLabel);
                 }
-                obj = part.getBody(clazz, null);
-                if(logger.isDebugEnabled()){
-                    logger.debug("extracted part obj=\n", obj, clazz);
+                String partStr = part.getBodyAsString();
+                if (partStr == null || partStr.trim().isEmpty()) {
+                    logger.warn("Part '" + label + "' in multipart body is empty.");
+                } else {
+                    if (logger.isDebugEnabled()){
+                        logger.debug("extracted part as str=\n" + partStr);
+                    }
+                    obj = part.getBody(clazz, null);
+                    if(logger.isDebugEnabled()){
+                        logger.debug("extracted part as obj=\n",
+                            objectAsXmlString(obj, clazz));
+                    }
                 }
                 break;
             }
+        }
+        if (! partLabelMatched) {
+            logger.warn("Could not find part '" + label + "' in multipart body.");
+        // In the event that getBodyAsString() or getBody(), above, do *not*
+        // throw an IOException, but getBody() nonetheless retrieves a null object.
+        // This *may* be unreachable.
+        } else if (obj == null) {
+            logger.warn("Could not extract part '" + label +
+                "' in multipart body as an object.");
         }
         return obj;
     }
