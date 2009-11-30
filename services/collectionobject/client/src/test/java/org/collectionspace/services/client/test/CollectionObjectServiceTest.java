@@ -28,7 +28,7 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
-import org.collectionspace.services.collectionobject.domain.naturalhistory.CollectionObjectNaturalhistory;
+import org.collectionspace.services.collectionobject.domain.naturalhistory.CollectionobjectsNaturalhistory;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.collectionspace.services.collectionobject.OtherNumberList;
 import org.jboss.resteasy.client.ClientResponse;
@@ -239,10 +239,22 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         MultipartInput input = (MultipartInput) res.getEntity();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": Reading Common part ...");
+        }
         CollectionobjectsCommon collectionObject =
                 (CollectionobjectsCommon) extractPart(input,
                 client.getCommonPartName(), CollectionobjectsCommon.class);
         Assert.assertNotNull(collectionObject);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": Reading Natural History part ...");
+        }
+        CollectionobjectsNaturalhistory conh =
+                (CollectionobjectsNaturalhistory) extractPart(input,
+                getNHPartName(), CollectionobjectsNaturalhistory.class);
+        Assert.assertNotNull(conh);
     }
 
     // Failure outcomes
@@ -616,7 +628,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
                 CollectionobjectsCommon.class));
         }
 
-        CollectionObjectNaturalhistory conh = new CollectionObjectNaturalhistory();
+        CollectionobjectsNaturalhistory conh = new CollectionobjectsNaturalhistory();
         conh.setNhString("test-string");
         conh.setNhInt(999);
         conh.setNhLong(9999);
@@ -626,13 +638,13 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, collectionobject nhistory");
             logger.debug(objectAsXmlString(conh,
-                CollectionObjectNaturalhistory.class));
+                CollectionobjectsNaturalhistory.class));
         }
         return multipart;
 
     }
 
     private String getNHPartName() {
-        return "collectionobjects-naturalhistory";
+        return "collectionobjects_naturalhistory";
     }
 }

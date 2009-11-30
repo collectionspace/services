@@ -19,7 +19,7 @@
   version="0.1"
 >
     <!-- collection-object for museum of natural history  -->
-    <xs:element name="collection-object-naturalhistory">
+    <xs:element name="collectionobjects_naturalhistory">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="nh-string" type="xs:string" />
