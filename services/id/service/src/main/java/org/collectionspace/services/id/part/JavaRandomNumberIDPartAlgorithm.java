@@ -32,7 +32,7 @@ public class JavaRandomNumberIDPartAlgorithm implements IDPartAlgorithm {
     // other invocation of this constructor."
     private static Random r = new Random();
 
-    public final static int DEFAULT_MAX_VALUE = Integer.MAX_VALUE - 1;
+    public final static int DEFAULT_MAX_VALUE = Integer.MAX_VALUE - 2;
     public final static int DEFAULT_MIN_VALUE = 0;
 
     private int maxValue = DEFAULT_MAX_VALUE;
@@ -57,14 +57,17 @@ public class JavaRandomNumberIDPartAlgorithm implements IDPartAlgorithm {
     }
 
     private void setMaxValue(int maxVal) {
-        if (0 < maxVal && maxVal < DEFAULT_MAX_VALUE) {
+        if (0 < maxVal && maxVal <= DEFAULT_MAX_VALUE) {
             this.maxValue = maxVal;
         } else {
             String msg =
-                "Invalid maximum value for random number. " +
+                "Invalid maximum value '" +
+                Integer.toString(maxVal) +
+                "' for random number. " +
                 "Must be between 1 and " +
-                Integer.toString(DEFAULT_MAX_VALUE - 1) + ".";
-            logger.error(msg);
+                Integer.toString(DEFAULT_MAX_VALUE) +
+                ", inclusive.";
+            logger.info(msg);
             throw new IllegalArgumentException(msg);
         }
     }
@@ -74,10 +77,14 @@ public class JavaRandomNumberIDPartAlgorithm implements IDPartAlgorithm {
             this.minValue = minVal;
         } else {
             String msg =
-                "Invalid minimum value for random number. " +
+                "Invalid minimum value '" +
+                Integer.toString(minVal) +
+                "' for random number. " +
                 "Must be between 0 and " +
-                Integer.toString(this.maxValue - 1) + ".";
-            logger.error(msg);
+                Integer.toString(this.maxValue - 1) + 
+                ", inclusive (i.e. less than the supplied maximum value " +
+                "of " + Integer.toString(this.maxValue) + ").";
+            logger.info(msg);
             throw new IllegalArgumentException(msg);
         }
     }
@@ -85,11 +92,18 @@ public class JavaRandomNumberIDPartAlgorithm implements IDPartAlgorithm {
     @Override
     public String generateID(){
         // Returns an evenly distributed random value between 0
-        // and the maximum value.
+        // and the maximum value.  An even distribution decreases
+        // randomness but is more likely to meet end user requirements
+        // and expectations.
+        //
         // See http://mindprod.com/jgloss/pseudorandom.html
         //
         // Note: Random.nextInt() returns a pseudorandom number
         // between 0 and n-1 inclusive, not a number between 0 and n.
+
+        // @TODO Consider adding code to ensure the uniqueness of
+        // each generated pseudorandom number, until all possible
+        // values within the inclusive set have been generated.
         return
             Integer.toString(r.nextInt(
             this.maxValue - this.minValue + 1) + this.minValue);

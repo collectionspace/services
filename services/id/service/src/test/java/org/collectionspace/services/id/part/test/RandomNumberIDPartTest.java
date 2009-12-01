@@ -86,16 +86,32 @@ public class RandomNumberIDPartTest {
         }
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void minValueTooLow() {
-        int minValue = -1;
+    @Test
+    public void defaultMaxValue() {
         part = new RandomNumberIDPart(
-            JavaRandomNumberIDPartAlgorithm.DEFAULT_MAX_VALUE, minValue);
+            JavaRandomNumberIDPartAlgorithm.DEFAULT_MAX_VALUE);
+        part.newID();
+    }
+
+     @Test(dependsOnMethods = {"defaultMaxValue"})
+    public void defaultMinValue() {
+        part = new RandomNumberIDPart(
+            JavaRandomNumberIDPartAlgorithm.DEFAULT_MAX_VALUE,
+            JavaRandomNumberIDPartAlgorithm.DEFAULT_MIN_VALUE);
+        part.newID();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void maxValueTooHigh() {
-        part = new RandomNumberIDPart(Integer.MAX_VALUE);
+        int maxValue = Integer.MAX_VALUE; // Value too high
+        part = new RandomNumberIDPart(maxValue);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void minValueTooLow() {
+        int maxValue = 10;
+        int minValue = -1; // Value too low
+        part = new RandomNumberIDPart(maxValue, minValue);
     }
 
     @Test
