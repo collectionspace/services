@@ -48,6 +48,7 @@ import org.collectionspace.services.common.context.MultipartServiceContextFactor
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.security.UnauthorizedException;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
@@ -79,7 +80,7 @@ public class IntakeResource extends AbstractCollectionSpaceResource {
                 ctx.getRepositoryClientType().toString());
         docHandler.setServiceContext(ctx);
         if (ctx.getInput() != null) {
-            Object obj = ((MultipartServiceContext)ctx).getInputPart(ctx.getCommonPartLabel(), IntakesCommon.class);
+            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), IntakesCommon.class);
             if (obj != null) {
                 docHandler.setCommonPart((IntakesCommon) obj);
             }
@@ -98,6 +99,10 @@ public class IntakeResource extends AbstractCollectionSpaceResource {
             path.path("" + csid);
             Response response = Response.created(path.build()).build();
             return response;
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Create failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in createIntake", e);
@@ -128,6 +133,10 @@ public class IntakeResource extends AbstractCollectionSpaceResource {
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getIntake", dnfe);
@@ -162,6 +171,10 @@ public class IntakeResource extends AbstractCollectionSpaceResource {
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getAll(ctx, handler);
             intakeObjectList = (IntakesCommonList) handler.getCommonPartList();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in getIntakeList", e);
@@ -194,6 +207,10 @@ public class IntakeResource extends AbstractCollectionSpaceResource {
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("caugth exception in updateIntake", dnfe);
@@ -228,6 +245,10 @@ public class IntakeResource extends AbstractCollectionSpaceResource {
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Delete failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("caught exception in deleteIntake", dnfe);

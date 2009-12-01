@@ -32,26 +32,28 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import java.util.HashMap;
+import java.util.Map;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.security.auth.Subject;
+import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
 import javax.sql.DataSource;
 import org.jboss.security.SimpleGroup;
 import org.jboss.security.SimplePrincipal;
 import org.jboss.security.auth.spi.DatabaseServerLoginModule;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
 
+/**
+ * CollectionSpace default identity provider supporting multi-tenancy
+ * @author
+ */
 public class CSpaceDBLoginModule extends DatabaseServerLoginModule {
 
+    protected String tenantQuery = "select tenantid from users where username=?";
     //disabled due to classloading problem
 //    private Logger logger = LoggerFactory.getLogger(CSpaceDBLoginModule.class);
-    private boolean log = true; //logger.isDebugEnabled();
-
-    private void log(String str) {
-        System.out.println(str);
-    }
+    private String tenantId;
 
     protected String getUsersPassword() throws LoginException {
 
@@ -60,38 +62,33 @@ public class CSpaceDBLoginModule extends DatabaseServerLoginModule {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-        InitialContext ctx = null;
         try {
-
-            ctx = new InitialContext();
-            DataSource ds = (DataSource) ctx.lookup(dsJndiName);
-            if (ds == null) {
-                throw new IllegalArgumentException("datasource not found: " + dsJndiName);
-            }
-            conn = ds.getConnection();
+            conn = getConnection();
             // Get the password
-            if (log) {
-                log("Executing query: " + principalsQuery + ", with username: " + username);
+            if (log.isDebugEnabled()) {
+                log.debug("Executing query: " + principalsQuery + ", with username: " + username);
             }
             ps = conn.prepareStatement(principalsQuery);
             ps.setString(1, username);
             rs = ps.executeQuery();
             if (rs.next() == false) {
-                if (log) {
-                    log("Query returned no matches from db");
+                if (log.isDebugEnabled()) {
+                    log.debug(principalsQuery + " returned no matches from db");
                 }
                 throw new FailedLoginException("No matching username found");
             }
 
             password = rs.getString(1);
             password = convertRawPassword(password);
-            if (log) {
-                log("Obtained user password");
+            if (log.isDebugEnabled()) {
+                log.debug("Obtained user password");
             }
-        } catch (NamingException ex) {
-            LoginException le = new LoginException("Error looking up DataSource from: " + dsJndiName);
-            le.initCause(ex);
-            throw le;
+            tenantId = rs.getString(2);
+            if (log.isDebugEnabled()) {
+                log.debug("Obtained tenantId");
+            }
+            CSpacePrincipal principal = (CSpacePrincipal)getIdentity();
+            principal.setTenantId(tenantId);
         } catch (SQLException ex) {
             LoginException le = new LoginException("Query failed");
             le.initCause(ex);
@@ -119,12 +116,6 @@ public class CSpaceDBLoginModule extends DatabaseServerLoginModule {
                 } catch (SQLException ex) {
                 }
             }
-            if (ctx != null) {
-                try {
-                    ctx.close();
-                } catch (Exception e) {
-                }
-            }
         }
         return password;
     }
@@ -136,8 +127,8 @@ public class CSpaceDBLoginModule extends DatabaseServerLoginModule {
      */
     protected Group[] getRoleSets() throws LoginException {
         String username = getUsername();
-        if (log) {
-            log("getRoleSets using rolesQuery: " + rolesQuery + ", username: " + username);
+        if (log.isDebugEnabled()) {
+            log.debug("getRoleSets using rolesQuery: " + rolesQuery + ", username: " + username);
         }
 
         Connection conn = null;
@@ -146,24 +137,23 @@ public class CSpaceDBLoginModule extends DatabaseServerLoginModule {
         ResultSet rs = null;
 
         try {
-            InitialContext ctx = new InitialContext();
-            DataSource ds = (DataSource) ctx.lookup(dsJndiName);
-            conn = ds.getConnection();
+            conn = getConnection();
             // Get the user role names
-            if (log) {
-                log("Executing query: " + rolesQuery + ", with username: " + username);
+            if (log.isDebugEnabled()) {
+                log.debug("Executing query: " + rolesQuery + ", with username: " + username);
             }
 
             ps = conn.prepareStatement(rolesQuery);
             try {
                 ps.setString(1, username);
+                ps.setString(2, tenantId);
             } catch (ArrayIndexOutOfBoundsException ignore) {
                 // The query may not have any parameters so just try it
             }
             rs = ps.executeQuery();
             if (rs.next() == false) {
-                if (log) {
-                    log("No roles found");
+                if (log.isDebugEnabled()) {
+                    log.debug("No roles found");
                 }
 //                if(aslm.getUnauthenticatedIdentity() == null){
 //                    throw new FailedLoginException("No matching username found in Roles");
@@ -192,20 +182,16 @@ public class CSpaceDBLoginModule extends DatabaseServerLoginModule {
                 try {
 //                    Principal p = aslm.createIdentity(name);
                     Principal p = createIdentity(name);
-                    if (log) {
-                        log("Assign user to role " + name);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Assign user to role " + name);
                     }
 
                     group.addMember(p);
                 } catch (Exception e) {
-                    log("Failed to create principal: " + name + " " + e.toString());
+                    log.error("Failed to create principal: " + name + " " + e.toString());
                 }
 
             } while (rs.next());
-        } catch (NamingException ex) {
-            LoginException le = new LoginException("Error looking up DataSource from: " + dsJndiName);
-            le.initCause(ex);
-            throw le;
         } catch (SQLException ex) {
             LoginException le = new LoginException("Query failed");
             le.initCause(ex);
@@ -237,29 +223,30 @@ public class CSpaceDBLoginModule extends DatabaseServerLoginModule {
         return roleSets;
     }
 
-    /** Utility method to create a Principal for the given username. This
-     * creates an instance of the principalClassName type if this option was
-     * specified using the class constructor matching: ctor(String). If
-     * principalClassName was not specified, a SimplePrincipal is created.
-     *
-     * @param username the name of the principal
-     * @return the principal instance
-     * @throws java.lang.Exception thrown if the custom principal type cannot be created.
-     */
-    protected Principal createIdentity(String username)
-            throws Exception {
-        Principal p = null;
-        if (principalClassName == null) {
-            p = new SimplePrincipal(username);
-        } else {
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-            Class clazz = loader.loadClass(principalClassName);
-            Class[] ctorSig = {String.class};
-            Constructor ctor = clazz.getConstructor(ctorSig);
-            Object[] ctorArgs = {username};
-            p = (Principal) ctor.newInstance(ctorArgs);
+
+    private Connection getConnection() throws LoginException, SQLException {
+        InitialContext ctx = null;
+        Connection conn = null;
+        try {
+            ctx = new InitialContext();
+            DataSource ds = (DataSource) ctx.lookup(dsJndiName);
+            if (ds == null) {
+                throw new IllegalArgumentException("datasource not found: " + dsJndiName);
+            }
+            conn = ds.getConnection();
+            return conn;
+        } catch (NamingException ex) {
+            LoginException le = new LoginException("Error looking up DataSource from: " + dsJndiName);
+            le.initCause(ex);
+            throw le;
+        } finally {
+            if (ctx != null) {
+                try {
+                    ctx.close();
+                } catch (Exception e) {
+                }
+            }
         }
 
-        return p;
     }
 }

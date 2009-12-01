@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import javax.ws.rs.core.MediaType;
 import org.collectionspace.services.common.document.DocumentUtils;
+import org.collectionspace.services.common.security.UnauthorizedException;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -37,7 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 /**
- * RemoteServiceContextImpl
+ * MultipartServiceContextImpl takes Multipart Input/Output
  *
  * $LastChangedRevision: $
  * $LastChangedDate: $
@@ -48,7 +49,7 @@ public class MultipartServiceContextImpl
 
     final Logger logger = LoggerFactory.getLogger(MultipartServiceContextImpl.class);
 
-    public MultipartServiceContextImpl(String serviceName) {
+    public MultipartServiceContextImpl(String serviceName) throws UnauthorizedException {
         super(serviceName);
         setOutput(new MultipartOutput());
     }

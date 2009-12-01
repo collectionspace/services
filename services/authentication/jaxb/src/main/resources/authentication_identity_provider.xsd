@@ -37,11 +37,24 @@
                 </xs:appinfo>
             </xs:annotation>
             <xs:sequence>
+                <!-- tenant id is not needed from service consumer, it will be ignored if provided -->
+                <!-- tenant id is for internal use for CollectionSpace -->
+                <!-- it is assumed that account creation is performed under valid -->
+                <!-- tenant context. tenant id is never returned in response -->
+                <xs:element name="tenantid" type="xs:string" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="tenantid" nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element name="username" type="xs:string" minOccurs="1" maxOccurs="1">
                     <xs:annotation>
                         <xs:appinfo>
                             <hj:id>
-                                <orm:column name="username"  length="512" nullable="false"/>
+                                <orm:column name="username"  nullable="false"/>
                             </hj:id>
                         </xs:appinfo>
                     </xs:annotation>
@@ -69,11 +82,24 @@
                 </xs:appinfo>
             </xs:annotation>
             <xs:sequence>
+                 <!-- tenant id is not needed from service consumer, it will be ignored if provided -->
+                <!-- tenant id is for internal use for CollectionSpace -->
+                <!-- it is assumed that account creation is performed under valid -->
+                <!-- tenant context. tenant id is never returned in response -->
+                <xs:element name="tenantid" type="xs:string" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="tenantid" nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element name="rolename" type="xs:string" minOccurs="1" maxOccurs="1">
                     <xs:annotation>
                         <xs:appinfo>
                             <hj:id>
-                                <orm:column name="rolename"  length="128" nullable="false"/>
+                                <orm:column name="rolename" nullable="false"/>
                             </hj:id>
                         </xs:appinfo>
                     </xs:annotation>
@@ -82,7 +108,7 @@
                     <xs:annotation>
                         <xs:appinfo>
                             <hj:basic>
-                                <orm:column name="rolegroup" length="128" nullable="false"/>
+                                <orm:column name="rolegroup" nullable="false"/>
                             </hj:basic>
                         </xs:appinfo>
                     </xs:annotation>
@@ -101,11 +127,24 @@
                 </xs:appinfo>
             </xs:annotation>
             <xs:sequence>
+                <!-- tenant id is not needed from service consumer, it will be ignored if provided -->
+                <!-- tenant id is for internal use for CollectionSpace -->
+                <!-- it is assumed that account creation is performed under valid -->
+                <!-- tenant context. tenant id is never returned in response -->
+                <xs:element name="tenantid" type="xs:string" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="tenantid" nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element name="username" type="xs:string" minOccurs="1" maxOccurs="1">
                     <xs:annotation>
                         <xs:appinfo>
                             <hj:basic>
-                                <orm:column name="username" length="128" nullable="false"/>
+                                <orm:column name="username" nullable="false"/>
                             </hj:basic>
                         </xs:appinfo>
                     </xs:annotation>
@@ -114,7 +153,7 @@
                     <xs:annotation>
                         <xs:appinfo>
                             <hj:basic>
-                                <orm:column name="rolename" length="128" nullable="false"/>
+                                <orm:column name="rolename" nullable="false"/>
                             </hj:basic>
                         </xs:appinfo>
                     </xs:annotation>

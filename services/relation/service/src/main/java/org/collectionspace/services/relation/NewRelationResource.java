@@ -50,6 +50,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.relation.IRelationsManager;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.relation.nuxeo.RelationHandlerFactory;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -76,7 +77,7 @@ public class NewRelationResource extends AbstractCollectionSpaceResource {
                 ctx.getRepositoryClientType().toString());
         docHandler.setServiceContext(ctx);
         if (ctx.getInput() != null) {
-            Object obj = ((MultipartServiceContext)ctx).getInputPart(ctx.getCommonPartLabel(), RelationsCommon.class);
+            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), RelationsCommon.class);
             if (obj != null) {
                 docHandler.setCommonPart((RelationsCommon) obj);
             }
@@ -95,6 +96,10 @@ public class NewRelationResource extends AbstractCollectionSpaceResource {
             path.path("" + csid);
             Response response = Response.created(path.build()).build();
             return response;
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Create failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in createRelation", e);
@@ -124,6 +129,10 @@ public class NewRelationResource extends AbstractCollectionSpaceResource {
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getRelation", dnfe);
@@ -259,6 +268,10 @@ public class NewRelationResource extends AbstractCollectionSpaceResource {
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("caugth exception in updateRelation", dnfe);
@@ -292,6 +305,10 @@ public class NewRelationResource extends AbstractCollectionSpaceResource {
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Delete failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("caught exception in deleteRelation", dnfe);
@@ -332,6 +349,10 @@ public class NewRelationResource extends AbstractCollectionSpaceResource {
             propsFromPath.put(IRelationsManager.OBJECT, objectCsid);
             getRepositoryClient(ctx).getAll(ctx, handler);
             relationList = (RelationsCommonList) handler.getCommonPartList();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Get relations failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in getRelationList", e);

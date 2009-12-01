@@ -28,7 +28,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import org.apache.commons.codec.binary.Base64;
 import org.collectionspace.services.account.AccountsCommon;
-import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.authentication.User;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
@@ -82,7 +81,7 @@ public class AccountStorageClient extends JpaStorageClient {
             em.getTransaction().begin();
             //if userid and password are given, add to default id provider
             if (account.getUserId() != null && account.getPassword() != null) {
-                User user = createUser(account);
+                User user = createUser(account, ctx.getTenantId());
                 em.persist(user);
             }
             account.setTenantid(ctx.getTenantId());
@@ -194,8 +193,9 @@ public class AccountStorageClient extends JpaStorageClient {
         }
     }
 
-    private User createUser(AccountsCommon account) {
+    private User createUser(AccountsCommon account, String tenantId) {
         User user = new User();
+        user.setTenantid(tenantId);
         user.setUsername(account.getUserId());
         byte[] bpass = Base64.decodeBase64(account.getPassword());
         SecurityUtils.validatePassword(new String(bpass));

@@ -18,16 +18,14 @@
 
 package org.collectionspace.services.common.document;
 
+import org.collectionspace.services.common.ServiceException;
+
 /**
  * DocumentException
  * document handling exception
  */
-public class DocumentException extends Exception {
+public class DocumentException extends ServiceException {
 
-    /**
-     * collectionspace specific error code
-     */
-    private int errorCode;
 
     /**
      * Creates a new instance of <code>DocumentException</code> without detail message.
@@ -43,15 +41,20 @@ public class DocumentException extends Exception {
         super(msg);
     }
 
-
     /**
-     * DocumentException with application specific code and message
-     * @param code
-     * @param msg
+     * DocumentException with application specific code
+     * @param errorCode
      */
-    public DocumentException(int code, String msg) {
-        super(msg);
-        this.errorCode = code;
+    public DocumentException(int errorCode) {
+        super(errorCode);
+    }
+    /**
+     * DocumentException with application specific code and reason
+     * @param errorCode
+     * @param errorReason
+     */
+    public DocumentException(int errorCode, String errorReason) {
+        super(errorCode, errorReason);
     }
     /**
      * Constructs a new exception with the specified detail message and
@@ -89,18 +92,4 @@ public class DocumentException extends Exception {
         super(cause);
     }
 
-
-    /**
-     * @return the collectionspace errorCode
-     */
-    public int getErrorCode() {
-        return errorCode;
-    }
-
-    /**
-     * @param errorCode the errorCode to set
-     */
-    public void setErrorCode(int errorCode) {
-        this.errorCode = errorCode;
-    }
 }

@@ -40,12 +40,12 @@ import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.account.storage.AccountHandlerFactory;
 import org.collectionspace.services.account.storage.AccountStorageClient;
 import org.collectionspace.services.common.AbstractCollectionSpaceResource;
-import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.RemoteServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
@@ -66,7 +66,7 @@ public class AccountResource
         return serviceName;
     }
 
-    private <T> ServiceContext createServiceContext(T obj) {
+    private <T> ServiceContext createServiceContext(T obj) throws Exception {
         ServiceContext ctx = new RemoteServiceContextImpl<T, T>(getServiceName());
         ctx.setInput(obj);
         ctx.setDocumentType(AccountsCommon.class.getPackage().getName()); //persistence unit
@@ -99,6 +99,10 @@ public class AccountResource
             path.path("" + csid);
             Response response = Response.created(path.build()).build();
             return response;
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Create failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in createAccount", e);
@@ -128,7 +132,11 @@ public class AccountResource
             ServiceContext ctx = createServiceContext((AccountsCommon) null);
             DocumentHandler handler = createDocumentHandler(ctx);
             getStorageClient(ctx).get(ctx, csid, handler);
-            result = (AccountsCommon)ctx.getOutput();
+            result = (AccountsCommon) ctx.getOutput();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getAccount", dnfe);
@@ -165,7 +173,12 @@ public class AccountResource
             DocumentFilter myFilter = new DocumentFilter();
             handler.setDocumentFilter(myFilter);
             getStorageClient(ctx).getFiltered(ctx, handler);
-            accountList = (AccountsCommonList)handler.getCommonPartList();
+            accountList = (AccountsCommonList) handler.getCommonPartList();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in getAccountList", e);
@@ -197,7 +210,12 @@ public class AccountResource
             ServiceContext ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getStorageClient(ctx).update(ctx, csid, handler);
-            result = (AccountsCommon)ctx.getOutput();
+            result = (AccountsCommon) ctx.getOutput();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("caugth exception in updateAccount", dnfe);
@@ -232,6 +250,11 @@ public class AccountResource
             ServiceContext ctx = createServiceContext((AccountsCommon) null);
             getStorageClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Delete failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("caught exception in deleteAccount", dnfe);

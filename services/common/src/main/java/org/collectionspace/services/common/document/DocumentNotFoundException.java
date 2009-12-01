@@ -15,7 +15,6 @@
 
  *  https://source.collectionspace.org/collection-space/LICENSE.txt
  */
-
 package org.collectionspace.services.common.document;
 
 /**
@@ -24,12 +23,14 @@ package org.collectionspace.services.common.document;
  */
 public class DocumentNotFoundException extends DocumentException {
 
+    final public static int HTTP_CODE = 404;
+
     /**
      * Creates a new instance of <code>DocumentNotFoundException</code> without detail message.
      */
     public DocumentNotFoundException() {
+        setErrorCode(HTTP_CODE);
     }
-
 
     /**
      * Constructs an instance of <code>DocumentNotFoundException</code> with the specified detail message.
@@ -37,8 +38,8 @@ public class DocumentNotFoundException extends DocumentException {
      */
     public DocumentNotFoundException(String msg) {
         super(msg);
+        setErrorCode(HTTP_CODE);
     }
-
 
     /**
      * Constructs a new exception with the specified detail message and
@@ -56,6 +57,7 @@ public class DocumentNotFoundException extends DocumentException {
      */
     public DocumentNotFoundException(String message, Throwable cause) {
         super(message, cause);
+        setErrorCode(HTTP_CODE);
     }
 
     /**
@@ -74,5 +76,6 @@ public class DocumentNotFoundException extends DocumentException {
      */
     public DocumentNotFoundException(Throwable cause) {
         super(cause);
+        setErrorCode(HTTP_CODE);
     }
 }

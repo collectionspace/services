@@ -24,6 +24,7 @@
 package org.collectionspace.services.common.context;
 
 import java.lang.reflect.Constructor;
+import org.collectionspace.services.common.security.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +43,7 @@ public class RemoteServiceContextImpl<IT, OT>
     private IT input;
     private OT output;
 
-    public RemoteServiceContextImpl(String serviceName) {
+    public RemoteServiceContextImpl(String serviceName) throws UnauthorizedException {
         super(serviceName);
     }
 

@@ -23,12 +23,21 @@
  */
 package org.collectionspace.services.common.context;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import javax.security.auth.Subject;
+import javax.security.jacc.PolicyContext;
+import javax.security.jacc.PolicyContextException;
+
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.config.TenantBindingConfigReader;
+import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.service.ServiceObjectType;
@@ -52,11 +61,15 @@ public abstract class AbstractServiceContext<IT, OT>
     private TenantBindingType tenantBinding;
     private String overrideDocumentType = null;
 
-    public AbstractServiceContext(String serviceName) {
+    public AbstractServiceContext(String serviceName) throws UnauthorizedException {
         TenantBindingConfigReader tReader =
                 ServiceMain.getInstance().getTenantBindingConfigReader();
-        //TODO: get tenant binding from security context (Subject.g
-        String tenantId = "1"; //hardcoded for movingimages.us
+        //TODO: get tenant binding from security context
+        String tenantId = retrieveTenantId();
+        if (tenantId == null) {
+            //for testing purposes
+            tenantId = "1"; //hardcoded for movingimages.us
+        }
         tenantBinding = tReader.getTenantBinding(tenantId);
         if (tenantBinding == null) {
             String msg = "No tenant binding found while processing request for " +
@@ -205,6 +218,45 @@ public abstract class AbstractServiceContext<IT, OT>
     public void setProperty(String name, Object o) {
         properties.put(name, o);
     }
+    private static final String SUBJECT_CONTEXT_KEY = "javax.security.auth.Subject.container";
+
+    private String retrieveTenantId() throws UnauthorizedException {
+
+        String tenantId = null;
+        Set<Principal> principals = null;
+        try {
+            Subject caller = (Subject) PolicyContext.getContext(SUBJECT_CONTEXT_KEY);
+            if(caller == null) {
+                //logger.warn("security not enabled...");
+                return tenantId;
+            }
+            principals = caller.getPrincipals(Principal.class);
+        } catch (PolicyContextException pce) {
+            String msg = "Could not retrieve principal information";
+            logger.error(msg, pce);
+            throw new UnauthorizedException(msg);
+        }
+        for (Principal p : principals) {
+            try {
+                Method m = p.getClass().getMethod("getTenantId");
+                Object r = m.invoke(p);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("retrieved tenantid=" + r +
+                            " for principal=" + p.getName());
+                }
+                tenantId = (String) r;
+                break;
+            } catch (Exception e) {
+                //continue with next principal
+            } 
+        }
+        if(tenantId == null) {
+            String msg = "Could not find tenant context";
+            logger.error(msg);
+            throw new UnauthorizedException(msg);
+        }
+        return tenantId;
+    }
 
     @Override
     public String toString() {
@@ -216,7 +268,7 @@ public abstract class AbstractServiceContext<IT, OT>
         msg.append("tenant name=" + tenantBinding.getName() + " ");
         msg.append(tenantBinding.getDisplayName() + " ");
         msg.append("tenant repository domain=" + tenantBinding.getRepositoryDomain());
-        for(Map.Entry<String, Object> entry : properties.entrySet()) {
+        for (Map.Entry<String, Object> entry : properties.entrySet()) {
             msg.append("property name=" + entry.getKey() + " value=" + entry.getValue().toString());
         }
         msg.append("]");

@@ -108,29 +108,6 @@
         </exec>
     </target>
 
-    <target name="create_db"
-    description="create tables(s), indices for authentication service">
-        <sql driver="com.mysql.jdbc.Driver"
-        url="jdbc:mysql://${db.host}:${db.port}/cspace"
-        userid="${db.user}"
-        password="${db.user.password}"
-        src="${db.script.dir}/authentication.sql"
-        >
-            <classpath>
-                <pathelement path="${db.driver.jar}"/>
-            </classpath>
-        </sql>
-        <sql driver="com.mysql.jdbc.Driver"
-        url="jdbc:mysql://${db.host}:${db.port}/cspace"
-        userid="${db.user}"
-        password="${db.user.password}"
-        src="${db.script.dir}/test_authn.sql"
-        >
-            <classpath>
-                <pathelement path="${db.driver.jar}"/>
-            </classpath>
-        </sql>
-    </target>
     <target name="deploy" depends="install"
     description="deploy authentication service in ${jboss.server.cspace}">
         <copy file="${basedir}/target/${authentication.jar}" todir="${jboss.server.cspace}/lib"/>

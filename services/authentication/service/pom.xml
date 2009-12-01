@@ -35,12 +35,21 @@
             <scope>test</scope>
         </dependency>
 
+
+
       <!-- javax -->
         <dependency>
             <groupId>javax.security</groupId>
             <artifactId>jaas</artifactId>
             <version>1.0.01</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- jboss -->
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-log4j</artifactId>
+            <version>2.1.0.GA</version>
         </dependency>
         <dependency>
             <groupId>jboss</groupId>

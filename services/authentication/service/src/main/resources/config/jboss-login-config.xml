@@ -16,19 +16,20 @@ copy the following snippet into $JBOSS_HOME/server/cspace/conf/login-config.xml
 copy before the "other" application-policy
 -->
 
-    <application-policy name="cspace">
-        <authentication>
-            <login-module code="org.collectionspace.authentication.CSpaceDBLoginModule"
+<application-policy name="cspace">
+    <authentication>
+        <login-module code="org.collectionspace.authentication.CSpaceDBLoginModule"
                              flag="required">
-                <module-option name="dsJndiName">CspaceDS</module-option>
-                <module-option name="hashAlgorithm">SHA-256</module-option>
-                <module-option name="ignorePasswordCase">false</module-option>
-                <module-option name="principalsQuery">
-                    select passwd from users where username=?
-                </module-option>
-                <module-option name="rolesQuery">
-                    select rolename, 'Roles' from users_roles where username=?
-                </module-option>
-            </login-module>
-        </authentication>
-    </application-policy>
+            <module-option name="dsJndiName">CspaceDS</module-option>
+            <module-option name="hashAlgorithm">SHA-256</module-option>
+            <module-option name="ignorePasswordCase">false</module-option>
+            <module-option name = "principalClass">org.collectionspace.authentication.CSpacePrincipal</module-option>
+            <module-option name="principalsQuery">
+                    select passwd, tenantid from users where username=?
+            </module-option>
+            <module-option name="rolesQuery">
+                    select rolename, 'Roles' from users_roles where username=? and tenantid=?
+            </module-option>
+        </login-module>
+    </authentication>
+</application-policy>

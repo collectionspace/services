@@ -123,6 +123,14 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+        <!-- some security binaries available under .com only perhaps due to licensing issues -->
+        <repository>
+            <id>jboss</id>
+            <url>http://repository.jboss.com/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
         <repository>
             <id>mojo</id>
             <name>mojo repo</name>

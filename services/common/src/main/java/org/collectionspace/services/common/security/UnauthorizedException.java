@@ -21,30 +21,32 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.collectionspace.services.common.document;
+package org.collectionspace.services.common.security;
 
 import org.collectionspace.services.common.ServiceException;
 
 /**
- * BadRequestException
- * 
+ * ServiceForbidenException is thrown when access to service is not allowed for
+ * one or more of the following reasons:
+ * - tenant id not found
+ * @author 
  */
-public class BadRequestException extends ServiceException {
+public class UnauthorizedException extends ServiceException {
 
-    final public static int HTTP_CODE = 400;
+    final public static int HTTP_CODE = 401;
 
     /**
-     * Creates a new instance of <code>BadRequestException</code> without detail message.
+     * Creates a new instance of <code>UnauthorizedException</code> without detail message.
      */
-    public BadRequestException() {
+    public UnauthorizedException() {
         super(HTTP_CODE);
     }
 
     /**
-     * Constructs an instance of <code>BadRequestException</code> with the specified detail message.
+     * Constructs an instance of <code>UnauthorizedException</code> with the specified detail message.
      * @param msg the detail message.
      */
-    public BadRequestException(String msg) {
+    public UnauthorizedException(String msg) {
         super(msg);
         setErrorCode(HTTP_CODE);
     }
@@ -63,7 +65,7 @@ public class BadRequestException extends ServiceException {
      *         unknown.)
      * @since  1.4
      */
-    public BadRequestException(String message, Throwable cause) {
+    public UnauthorizedException(String message, Throwable cause) {
         super(message, cause);
         setErrorCode(HTTP_CODE);
     }
@@ -82,7 +84,7 @@ public class BadRequestException extends ServiceException {
      *         unknown.)
      * @since  1.4
      */
-    public BadRequestException(Throwable cause) {
+    public UnauthorizedException(Throwable cause) {
         super(cause);
         setErrorCode(HTTP_CODE);
     }

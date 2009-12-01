@@ -47,6 +47,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.vocabulary.nuxeo.VocabularyHandlerFactory;
 import org.collectionspace.services.vocabulary.nuxeo.VocabularyItemDocumentModelHandler;
 import org.collectionspace.services.vocabulary.nuxeo.VocabularyItemHandlerFactory;
@@ -109,7 +110,7 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
         docHandler.setServiceContext(ctx);
         ((VocabularyItemDocumentModelHandler) docHandler).setInVocabulary(inVocabulary);
         if (ctx.getInput() != null) {
-            Object obj = ((MultipartServiceContext)ctx).getInputPart(ctx.getCommonPartLabel(getItemServiceName()),
+            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(getItemServiceName()),
                     VocabularyitemsCommon.class);
             if (obj != null) {
                 docHandler.setCommonPart((VocabularyitemsCommon) obj);
@@ -129,6 +130,10 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
             path.path("" + csid);
             Response response = Response.created(path.build()).build();
             return response;
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Create failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in createVocabulary", e);
@@ -159,6 +164,10 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getVocabulary", dnfe);
@@ -192,15 +201,19 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             DocumentHandler handler = createDocumentHandler(ctx);
-            DocumentFilter myFilter = 
-            	DocumentFilter.CreatePaginatedDocumentFilter(queryParams);
-        	String nameQ = queryParams.getFirst("refName");
-        	if(nameQ!= null) {
-                myFilter.setWhereClause("vocabularies_common:refName='"+nameQ+"'");
-        	}
+            DocumentFilter myFilter =
+                    DocumentFilter.CreatePaginatedDocumentFilter(queryParams);
+            String nameQ = queryParams.getFirst("refName");
+            if (nameQ != null) {
+                myFilter.setWhereClause("vocabularies_common:refName='" + nameQ + "'");
+            }
             handler.setDocumentFilter(myFilter);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             vocabularyObjectList = (VocabulariesCommonList) handler.getCommonPartList();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in getVocabularyList", e);
@@ -233,6 +246,10 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("caugth exception in updateVocabulary", dnfe);
@@ -264,9 +281,13 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
             throw new WebApplicationException(response);
         }
         try {
-ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Delete failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("caught exception in deleteVocabulary", dnfe);
@@ -297,6 +318,10 @@ ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(n
             path.path(parentcsid + "/items/" + itemcsid);
             Response response = Response.created(path.build()).build();
             return response;
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Create failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in createVocabularyItem", e);
@@ -336,7 +361,11 @@ ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(n
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
             getRepositoryClient(ctx).get(ctx, itemcsid, handler);
             // TODO should we assert that the item is in the passed vocab?
-            result = (MultipartOutput)ctx.getOutput();
+            result = (MultipartOutput) ctx.getOutput();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getVocabularyItem", dnfe);
@@ -378,6 +407,10 @@ ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(n
             handler.setDocumentFilter(myFilter);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             vocabularyItemObjectList = (VocabularyitemsCommonList) handler.getCommonPartList();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in getVocabularyItemList", e);
@@ -418,7 +451,11 @@ ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(n
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(theUpdate, getItemServiceName());
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
             getRepositoryClient(ctx).update(ctx, itemcsid, handler);
-            result = (MultipartOutput)ctx.getOutput();
+            result = (MultipartOutput) ctx.getOutput();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("caugth exception in updateVocabularyItem", dnfe);
@@ -462,6 +499,10 @@ ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(n
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getItemServiceName());
             getRepositoryClient(ctx).delete(ctx, itemcsid);
             return Response.status(HttpResponseCodes.SC_OK).build();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Delete failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("caught exception in deleteVocabulary", dnfe);

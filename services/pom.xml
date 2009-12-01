@@ -14,8 +14,8 @@
 
     <modules>
         <!-- add modules below in the order based on dependencies -->
-        <module>common</module>
         <module>authentication</module>
+        <module>common</module>
         <module>account</module>
         <module>relation</module>
         <!--module>query</module-->
