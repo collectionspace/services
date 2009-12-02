@@ -48,9 +48,5 @@ CREATE TABLE `id_generators` (
   INDEX `csid_index` (`csid`)
 ) ENGINE=InnoDB;
 
-GRANT SELECT, INSERT, UPDATE, DELETE
-  on `id_generators`
-  to `test`@'localhost' IDENTIFIED BY 'test' WITH GRANT OPTION;
-FLUSH PRIVILEGES;
 
 SHOW WARNINGS;
