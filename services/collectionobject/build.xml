@@ -5,6 +5,8 @@
     </description>
   <!-- set global properties for this build -->
     <property name="services.trunk" value="../.."/>
+    <!-- enviornment should be declared before reading build.properties -->
+    <property environment="env" />
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
@@ -127,7 +129,7 @@
         <!-- copy install scripts, etc. -->
         <copy todir="${services.trunk}/${dist.installer.services}/collectionobject">
             <fileset dir="./installer"/>
-        </copy>    
+        </copy>
         <ant antfile="3rdparty/build.xml" target="dist_installer" inheritall="false"/>
     </target>
 

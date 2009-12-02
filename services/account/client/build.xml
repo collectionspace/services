@@ -5,6 +5,8 @@
     </description>
   <!-- set global properties for this build -->
     <property name="services.trunk" value="../../.."/>
+    <!-- enviornment should be declared before reading build.properties -->
+    <property environment="env" />
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
@@ -107,9 +109,26 @@
         </exec>
     </target>
 
+
+    <target name="setup_hibernate.cfg" description="replace property keywords in hibernate.cfg.xml">
+        <property name="src.hibernate.cfg" value="${basedir}/src/test/resources/hibernate.cfg.xml"/>
+        <property name="dest.hibernate.cfg" value="${basedir}/target/test-classes/hibernate.cfg.xml"/>
+        <delete file="${dest.hibernate.cfg}" verbose="true" />
+        <filter token="DB_URL" value="${db.jdbc.url}" />
+        <filter token="DB_DRIVER_CLASS" value="${db.jdbc.driver.class}" />
+        <filter token="DB_USER" value="${env.DB_USER}" /> <!-- double-sub from ${db.user} fails -->
+        <filter token="DB_PASSWORD" value="${env.DB_PASSWORD}" /> <!-- double-sub from ${db.user.password} fails -->
+        <filter token="DB_DIALECT" value="${db.dialect}" />
+        <copy todir="${basedir}/target/test-classes" filtering="true">
+            <fileset dir="${basedir}/src/test/resources">
+                <include name="hibernate.cfg.xml" />
+            </fileset>
+        </copy>
+    </target>
+
     <target name="gen_ddl" depends="gen_ddl-unix,gen_ddl-windows"
   description="geneate ddl" />
-    <target name="gen_ddl-unix" if="osfamily-unix">
+    <target name="gen_ddl-unix" if="osfamily-unix" depends="setup_hibernate.cfg">
         <exec executable="mvn" failonerror="true">
             <arg value="-Pddl" />
             <arg value="process-test-resources" />
@@ -119,7 +138,7 @@
             <arg value="${mvn.opts}" />
         </exec>
     </target>
-    <target name="gen_ddl-windows" if="osfamily-windows">
+    <target name="gen_ddl-windows" if="osfamily-windows" depends="setup_hibernate.cfg">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
             <arg value="mvn.bat" />

@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <project name="nuxeo cs" default="all" basedir=".">
 
+    <!-- enviornment should be declared before reading build.properties -->
+    <property environment="env" />
   <property file="build.properties" />
   <property name="cs.nuxeo.jar" value="nuxeo-platform-collectionspace-5.2-SNAPSHOT.jar"/>
 

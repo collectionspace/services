@@ -3,7 +3,9 @@
     <description>
         collectionspace services
     </description>
-  <!-- set global properties for this build -->
+    <!-- enviornment should be declared before reading build.properties -->
+    <property environment="env" />
+    <!-- set global properties for this build -->
     <property file="build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
@@ -266,7 +268,7 @@
         <copy todir="${basedir}/${dist.installer}">
             <fileset file="${basedir}/build.properties"/>
             <fileset dir="installer"/>
-            <fileset dir="${src}/main/resources/scripts"/>            
+            <fileset dir="${src}/main/resources/scripts"/>
         </copy>
         <ant antfile="services/build.xml" target="dist_installer" inheritAll="false"/>
     </target>

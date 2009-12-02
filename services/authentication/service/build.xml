@@ -5,6 +5,8 @@
     </description>
   <!-- set global properties for this build -->
     <property name="services.trunk" value="../../.."/>
+    <!-- enviornment should be declared before reading build.properties -->
+    <property environment="env" />
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
@@ -114,13 +116,15 @@
         <copy todir="${jboss.server.cspace}/cspace/services">
             <fileset dir="${src}/main/resources/"/>
         </copy>
-        <echo message="Add authentication-policy to ${jboss.server.cspace}/conf/login-config.xml"/>
+        <echo message="Add authentication-policy cspace from ${jboss.server.cspace}/cspace/services/jboss-login-config.xml to ${jboss.server.cspace}/conf/login-config.xml"/>
+        <echo message="See Authentication Service Configuration Guide on wiki.collectionspace.org for more details" />
     </target>
 
     <target name="undeploy"
     description="undeploy authentication service from ${jboss.server.cspace}">
         <delete file="${jboss.server.cspace}/lib/${authentication.jar}"/>
-        <echo message="Remove authentication-policy from ${jboss.server.cspace}/conf/login-config.xml"/>
+        <echo message="Remove authentication-policy cspace from ${jboss.server.cspace}/conf/login-config.xml"/>
+         <echo message="See Authentication Service Configuration Guide on wiki.collectionspace.org for more details"/>
     </target>
 
     <target name="dist"
