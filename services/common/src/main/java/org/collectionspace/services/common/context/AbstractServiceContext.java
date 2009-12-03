@@ -223,14 +223,22 @@ public abstract class AbstractServiceContext<IT, OT>
     private String retrieveTenantId() throws UnauthorizedException {
 
         String tenantId = null;
+        Subject caller = null;
         Set<Principal> principals = null;
         try {
-            Subject caller = (Subject) PolicyContext.getContext(SUBJECT_CONTEXT_KEY);
-            if(caller == null) {
+            caller = (Subject) PolicyContext.getContext(SUBJECT_CONTEXT_KEY);
+            if (caller == null) {
                 //logger.warn("security not enabled...");
                 return tenantId;
             }
             principals = caller.getPrincipals(Principal.class);
+            if (principals != null && principals.size() == 0) {
+                //TODO: find out why subject is not null
+                if (logger.isDebugEnabled()) {
+                    logger.debug("weird case where subject is not null and there are no principals");
+                }
+                return tenantId;
+            }
         } catch (PolicyContextException pce) {
             String msg = "Could not retrieve principal information";
             logger.error(msg, pce);
@@ -248,9 +256,9 @@ public abstract class AbstractServiceContext<IT, OT>
                 break;
             } catch (Exception e) {
                 //continue with next principal
-            } 
+            }
         }
-        if(tenantId == null) {
+        if (tenantId == null) {
             String msg = "Could not find tenant context";
             logger.error(msg);
             throw new UnauthorizedException(msg);
