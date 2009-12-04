@@ -150,28 +150,14 @@ public class IDResource {
                 return response;
             }
 
-            // If we successfully obtained a new ID from the specified
-            // ID generator instance, return it in the response.
-            
-            // Build the URI to be returned in the Location header.
-            //
-            // Gets the base URL path to this resource.
-            UriBuilder path = UriBuilder.fromResource(IDResource.class);
-            // @TODO Look into whether we can create the path using the
-            // URI template in the @Path annotation to this method, rather
-            // than the hard-coded analog to that template currently used.
-            path.path("" + csid + "/ids/" + newId);
-
             // Build the response, setting the:
             // - HTTP Status code (to '201 Created')
-            // - Location header (to a resource URI)
             // - Content-type header (to the relevant media type)
             // - Entity body (to the new ID)
-            response =
-                Response.created(path.build())
-                    .entity(newId)
-                    .type(MediaType.TEXT_PLAIN)
-                    .build();
+            response = Response.status(Response.Status.CREATED)
+                .entity(newId)
+                .type(MediaType.TEXT_PLAIN)
+                .build();
 
         // @TODO Return an XML-based error results format with the
         // responses below.
@@ -219,8 +205,30 @@ public class IDResource {
         // @TODO Implement this stubbed method
         // by replacing this placeholder code.
 
-        Response response =
-            Response.status(Response.Status.CREATED)
+        ResponseBuilder builder = Response.ok();
+        Response response = builder.build();
+
+        // If we successfully obtained a new ID from the specified
+        // ID generator instance, return it in the response.
+
+        String id = "idGeneratorResourceIdGoesHere";
+        // String id = service.createIDGenerator();
+
+        // Build the URI to be returned in the Location header.
+        //
+        // Gets the base URL path to this resource.
+        UriBuilder path = UriBuilder.fromResource(IDResource.class);
+        // @TODO Look into whether we can create the path using the
+        // URI template in the @Path annotation to this method, rather
+        // than the hard-coded analog to that template currently used.
+        path.path("" + id);
+
+        // Build the response, setting the:
+        // - HTTP Status code (to '201 Created')
+        // - Content-type header (to the relevant media type)
+        // - Entity body (to the new ID)
+        response =
+            Response.created(path.build())
                 .entity("")
                 .type(MediaType.TEXT_PLAIN)
                 .build();
