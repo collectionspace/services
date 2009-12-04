@@ -35,6 +35,7 @@ import javax.xml.bind.Marshaller;
 
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
+import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.collectionspace.services.collectionobject.OtherNumberList;
 import org.collectionspace.services.collectionobject.domain.naturalhistory.CollectionobjectsNaturalhistory;
 
@@ -96,50 +97,51 @@ public class Sample {
     // Read
     // ---------------------------------------------------------------
 
-    public void readCollectionObject(String resourceIdentifier) throws Exception {
+    public MultipartInput readCollectionObject(String resourceId) throws Exception {
+
+        if (resourceId == null || resourceId.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                "Resource ID must not be null or empty.");
+        }
 
         // Submit the read ("get") request to the service and store the response.
         // The resourceIdentifier is a unique identifier for the CollectionObject
         // record we're reading.
-        ClientResponse<MultipartInput> res = client.read(resourceIdentifier);
+        ClientResponse<MultipartInput> res = client.read(resourceId);
 
         // Get the status code from the response and check it against
         // the expected status code.
-
-        // If there was an
         if (res.getStatus() != Response.Status.OK.getStatusCode()) {
-            logger.error("Error creating new CollectionObject. Status code = " +
+            logger.error("Error reading CollectionObject with" +
+               "resource ID " + resourceId + ". Status code = " +
                res.getStatus());
-            return;
+            return null;
         }
 
         // Get the entity body of the response from the service.
         MultipartInput input = (MultipartInput) res.getEntity();
 
-        // Extract each part of the record, and convert it from
-        // its XML representation to its associated Java object.
+        return input;
 
-        // Read the Common part of the record.
-        CollectionobjectsCommon collectionObject =
-                (CollectionobjectsCommon) extractPart(input,
-                client.getCommonPartName(), CollectionobjectsCommon.class);
+   }
 
-       if (logger.isInfoEnabled()) {
-           logger.info("CollectionObject Common part read:");
-           logger.info(objectAsXmlString(collectionObject,
-               CollectionobjectsCommon.class));
-       }
+   private CollectionobjectsCommonList readCollectionObjectList()
+       throws Exception {
 
-       // Read the Natural History part of the record.
-       CollectionobjectsNaturalhistory conh =
-           (CollectionobjectsNaturalhistory) extractPart(input,
-               getNHPartName(), CollectionobjectsNaturalhistory.class);
+        // Submit the read list request to the service and store the response.
+        ClientResponse<CollectionobjectsCommonList> res = client.readList();
 
-        if (logger.isInfoEnabled()) {
-           logger.info("CollectionObject Natural History part read:");
-           logger.info(objectAsXmlString(conh,
-               CollectionobjectsNaturalhistory.class));
-       }
+        // Get the status code from the response and check it against
+        // the expected status code.
+        if (res.getStatus() != Response.Status.OK.getStatusCode()) {
+            logger.error("Error reading list of CollectionObjects. Status code = " +
+               res.getStatus());
+            return null;
+        }
+
+        CollectionobjectsCommonList list = res.getEntity();
+        return list;
+
 
    }
 
@@ -147,17 +149,53 @@ public class Sample {
    // Delete
    // ---------------------------------------------------------------
 
+   private void deleteCollectionObject(String resourceId) {
+
+        if (resourceId == null || resourceId.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                "Resource ID must not be null or empty.");
+        }
+        
+        ClientResponse res = client.delete(resourceId);
+
+        // Get the status code from the response and check it against
+        // the expected status code.
+        if (res.getStatus() != Response.Status.OK.getStatusCode()) {
+            logger.error("Error deleting CollectionObject with" +
+               "resource ID " + resourceId + ". Status code = " +
+               res.getStatus());
+            return;
+        }
+
+   }
+
+   private void deleteAllCollectionObjects() throws Exception {
+
+        int recordsDeleted = 0;
+        for (String resourceId : getAllResourceIds()) {
+
+            ClientResponse res = client.delete(resourceId);
+
+            // Get the status code from the response and check it against
+            // the expected status code.
+            if (res.getStatus() != Response.Status.OK.getStatusCode()) {
+            logger.error("Error deleting CollectionObject with" +
+               "resource ID " + resourceId + ". Status code = " +
+               res.getStatus());
+            } else {
+                recordsDeleted++;
+            }
+        }
+
+        if (logger.isInfoEnabled()) {
+            logger.info("Deleted " + recordsDeleted + " CollectionObject record(s).");
+        }
+
+   }
+
    // ---------------------------------------------------------------
    // Utility methods
    // ---------------------------------------------------------------
-
-   private String getCommonPartName() {
-       return client.getCommonPartName();
-   }
-
-   private String getNHPartName() {
-       return "collectionobjects_naturalhistory";
-   }
 
    private MultipartOutput createCollectionObjectInstance() {
 
@@ -217,7 +255,7 @@ public class Sample {
        return multipart;
    }
 
-    protected Object extractPart(MultipartInput input, String label,
+    private Object extractPart(MultipartInput input, String label,
         Class clazz) throws Exception {
         Object obj = null;
         String partLabel = "";
@@ -258,9 +296,11 @@ public class Sample {
         }
         if (! partLabelMatched) {
             logger.warn("Could not find part '" + label + "' in multipart body.");
-        // In the event that getBodyAsString() or getBody(), above, do *not*
-        // throw an IOException, but getBody() nonetheless retrieves a null object.
-        // This *may* be unreachable.
+        // Handle a potential condition where getBodyAsString() or getBody(),
+        // above, do *not* throw an IOException, but getBody() nonetheless
+        // retrieves a null object.
+        //
+        // This *may* be effectively unreachable, but is here as a precaution.
         } else if (obj == null) {
             logger.warn("Could not extract part '" + label +
                 "' in multipart body as an object.");
@@ -268,7 +308,65 @@ public class Sample {
         return obj;
     }
 
-    protected String extractId(ClientResponse<Response> res) {
+    public void displayCollectionObject(MultipartInput input)
+        throws Exception {
+
+        if (input == null) {
+            throw new IllegalArgumentException(
+                "Could not display null CollectionObject record.");
+        }
+
+        // Extract each part of the record, and convert it from
+        // its XML representation to its associated Java object.
+
+        // Read the Common part of the record.
+        CollectionobjectsCommon collectionObject =
+                (CollectionobjectsCommon) extractPart(input,
+                client.getCommonPartName(), CollectionobjectsCommon.class);
+
+       if (logger.isInfoEnabled()) {
+           logger.info("CollectionObject Common part read:");
+           logger.info(objectAsXmlString(collectionObject,
+               CollectionobjectsCommon.class));
+       }
+
+       // Read the Natural History part of the record.
+       CollectionobjectsNaturalhistory conh =
+           (CollectionobjectsNaturalhistory) extractPart(input,
+               getNHPartName(), CollectionobjectsNaturalhistory.class);
+
+        if (logger.isInfoEnabled()) {
+           logger.info("CollectionObject Natural History part read:");
+           logger.info(objectAsXmlString(conh,
+               CollectionobjectsNaturalhistory.class));
+       }
+
+    }
+
+
+    private String getCommonPartName() {
+       return client.getCommonPartName();
+    }
+
+    private String getNHPartName() {
+       return "collectionobjects_naturalhistory";
+    }
+
+    private List<String> getAllResourceIds() throws Exception {
+        
+        CollectionobjectsCommonList list = readCollectionObjectList();
+        List<String> resourceIds = new ArrayList();
+        List<CollectionobjectsCommonList.CollectionObjectListItem> items =
+                list.getCollectionObjectListItem();
+
+        for (CollectionobjectsCommonList.CollectionObjectListItem item : items) {
+            resourceIds.add(item.getCsid());
+        }
+
+        return resourceIds;
+    }
+
+    private String extractId(ClientResponse<Response> res) {
         MultivaluedMap<String, Object> mvm = res.getMetadata();
         String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
         if(logger.isInfoEnabled()){
@@ -282,7 +380,7 @@ public class Sample {
         return id;
     }
 
-        protected String objectAsXmlString(Object o, Class clazz) {
+    private String objectAsXmlString(Object o, Class clazz) {
         StringWriter sw = new StringWriter();
         try{
             JAXBContext jc = JAXBContext.newInstance(clazz);
@@ -300,15 +398,31 @@ public class Sample {
 
         Sample sample = new Sample();
 
-        // Create a new CollectionObject record.
+        if (logger.isInfoEnabled()){
+        	logger.info("Creating a new CollectionObject record ...");
+        }
         String newRecordId = sample.createCollectionObject();
         
         if (newRecordId == null || newRecordId.trim().isEmpty()) {
             logger.error("Could not create new record.");
-        } else {
-            // Read the newly-created record.
-            sample.readCollectionObject(newRecordId);
+            return;
         }
+
+        if (logger.isInfoEnabled()){
+        	logger.info("Reading the new CollectionObject record ...");
+        }
+        MultipartInput corecord = sample.readCollectionObject(newRecordId);
+        sample.displayCollectionObject(corecord);
+
+        if (logger.isInfoEnabled()){
+        	logger.info("Deleting the new CollectionObject record ...");
+        }
+        sample.deleteCollectionObject(newRecordId);
+
+        if (logger.isInfoEnabled()){
+        	logger.info("Deleting all CollectionObject records ...");
+        }
+        sample.deleteAllCollectionObjects();
 		
     }
 
