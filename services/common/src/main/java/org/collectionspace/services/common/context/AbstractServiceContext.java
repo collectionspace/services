@@ -64,8 +64,9 @@ public abstract class AbstractServiceContext<IT, OT>
     public AbstractServiceContext(String serviceName) throws UnauthorizedException {
         TenantBindingConfigReader tReader =
                 ServiceMain.getInstance().getTenantBindingConfigReader();
+        //FIXME retrieveTenantId is not working consistently in non-auth mode
         //TODO: get tenant binding from security context
-        String tenantId = retrieveTenantId();
+        String tenantId = null; //retrieveTenantId();
         if (tenantId == null) {
             //for testing purposes
             tenantId = "1"; //hardcoded for movingimages.us
