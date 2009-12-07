@@ -5,7 +5,6 @@
 package org.collectionspace.services.client.test;
 
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -13,6 +12,7 @@ import javax.persistence.Persistence;
 
 import javax.persistence.Query;
 import org.collectionspace.services.account.AccountsCommon;
+import org.collectionspace.services.account.Status;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -61,6 +61,7 @@ public class AccountTest {
         account.setLastName("Doe");
         account.setEmail("john.doe@berkeley.edu");
         account.setUserId("johndoe");
+        account.setStatus(Status.ACTIVE);
         id = UUID.randomUUID().toString();
         account.setCsid(id);
         account.setTenantid("123"); //set by service runtime

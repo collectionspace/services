@@ -29,6 +29,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.collectionspace.services.client.AccountClient;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
+import org.collectionspace.services.account.Status;
 import org.jboss.resteasy.client.ClientResponse;
 
 import org.testng.Assert;
@@ -106,7 +107,7 @@ public class AccountServiceTest extends AbstractServiceTest {
     dependsOnMethods = {"create"})
     public void createList(String testName) throws Exception {
     }
-    
+
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
@@ -228,11 +229,12 @@ public class AccountServiceTest extends AbstractServiceTest {
     // Success outcomes
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
-    dependsOnMethods = {"read", "readNonExistent"})
+    dependsOnMethods = {"read", "readList", "readNonExistent"})
     public void update(String testName) throws Exception {
 
         // Perform setup.
         setupUpdate(testName);
+
 
         ClientResponse<AccountsCommon> res =
                 client.read(knownResourceId);
@@ -250,7 +252,6 @@ public class AccountServiceTest extends AbstractServiceTest {
 
         // Update the content of this resource.
         toUpdateAccount.setEmail("updated-" + toUpdateAccount.getEmail());
-        toUpdateAccount.setPhone("updated-" + toUpdateAccount.getPhone());
         if (logger.isDebugEnabled()) {
             logger.debug("updated object");
             logger.debug(objectAsXmlString(toUpdateAccount,
@@ -278,6 +279,57 @@ public class AccountServiceTest extends AbstractServiceTest {
 
     }
 
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    dependsOnMethods = {"update"})
+    public void deactivate(String testName) throws Exception {
+
+        // Perform setup.
+        setupUpdate(testName);
+
+
+        ClientResponse<AccountsCommon> res =
+                client.read(knownResourceId);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": read status = " + res.getStatus());
+        }
+        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("got object to update with ID: " + knownResourceId);
+        }
+        AccountsCommon toUpdateAccount =
+                (AccountsCommon) res.getEntity();
+        Assert.assertNotNull(toUpdateAccount);
+
+        // Update the content of this resource.
+        toUpdateAccount.setStatus(Status.INACTIVE);
+        if (logger.isDebugEnabled()) {
+            logger.debug("updated object");
+            logger.debug(objectAsXmlString(toUpdateAccount,
+                    AccountsCommon.class));
+        }
+
+        // Submit the request to the service and store the response.
+        res = client.update(knownResourceId, toUpdateAccount);
+        int statusCode = res.getStatus();
+        // Check the status code of the response: does it match the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+
+        AccountsCommon updatedAccount = (AccountsCommon) res.getEntity();
+        Assert.assertNotNull(updatedAccount);
+
+        Assert.assertEquals(updatedAccount.getStatus(),
+                toUpdateAccount.getStatus(),
+                "Data in updated object did not match submitted data.");
+
+    }
+
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
@@ -295,7 +347,7 @@ public class AccountServiceTest extends AbstractServiceTest {
 
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
-    dependsOnMethods = {"update", "readNonExistent", "testSubmitRequest"})
+    dependsOnMethods = {"deactivate", "readNonExistent", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
 
         // Perform setup.
@@ -327,7 +379,7 @@ public class AccountServiceTest extends AbstractServiceTest {
     // Success outcomes
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
-    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update", "updateNonExistent"})
+    dependsOnMethods = {"testSubmitRequest", "updateNonExistent"})
     public void delete(String testName) throws Exception {
 
         // Perform setup.
@@ -412,6 +464,7 @@ public class AccountServiceTest extends AbstractServiceTest {
         byte[] b64passwd = Base64.encodeBase64(passwd.getBytes());
         account.setPassword(b64passwd);
         account.setEmail(email);
+        account.setPhone("1234567890");
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, account common");
             logger.debug(objectAsXmlString(account,

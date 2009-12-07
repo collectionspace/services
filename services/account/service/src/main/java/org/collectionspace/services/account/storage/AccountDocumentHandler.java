@@ -28,6 +28,7 @@ import java.util.UUID;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.account.AccountsCommonList.AccountListItem;
+import org.collectionspace.services.account.Status;
 import org.collectionspace.services.common.document.AbstractDocumentHandler;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
@@ -47,17 +48,25 @@ public class AccountDocumentHandler
         String id = UUID.randomUUID().toString();
         AccountsCommon account = wrapDoc.getWrappedObject();
         account.setCsid(id);
+        account.setStatus(Status.ACTIVE);
     }
 
     @Override
     public void handleUpdate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
-        getServiceContext().setOutput(getCommonPart());
+        getServiceContext().setOutput(account);
+    }
+
+    @Override
+    public void completeUpdate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
+        AccountsCommon upAcc = wrapDoc.getWrappedObject();
+        sanitize(upAcc);
     }
 
     @Override
     public void handleGet(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
         setCommonPart(extractCommonPart(wrapDoc));
-        getServiceContext().setOutput(getCommonPart());
+        sanitize(getCommonPart());
+        getServiceContext().setOutput(account);
     }
 
     @Override
@@ -95,6 +104,7 @@ public class AccountDocumentHandler
             accListItem.setEmail(account.getEmail());
             accListItem.setFirstName(account.getFirstName());
             accListItem.setLastName(account.getLastName());
+            accListItem.setStatus(account.getStatus());
             String id = account.getCsid();
             accListItem.setUri(getServiceContextPath() + id);
             accListItem.setCsid(id);
@@ -127,5 +137,13 @@ public class AccountDocumentHandler
     public String getQProperty(
             String prop) {
         return null;
+    }
+
+    /**
+     * sanitize removes data not needed to be sent to the consumer
+     * @param account
+     */
+    private void sanitize(AccountsCommon account) {
+        account.setTenantid("");
     }
 }

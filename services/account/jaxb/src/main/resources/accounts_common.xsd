@@ -89,7 +89,7 @@
                     <xs:annotation>
                         <xs:appinfo>
                             <hj:basic>
-                                <orm:column name="phone" length="15" nullable="true"/>
+                                <orm:column name="phone" nullable="true"/>
                             </hj:basic>
                         </xs:appinfo>
                     </xs:annotation>
@@ -98,7 +98,7 @@
                     <xs:annotation>
                         <xs:appinfo>
                             <hj:basic>
-                                <orm:column name="mobile" length="15" nullable="true"/>
+                                <orm:column name="mobile" nullable="true"/>
                             </hj:basic>
                         </xs:appinfo>
                     </xs:annotation>
@@ -130,6 +130,15 @@
                         <xs:appinfo>
                             <hj:basic>
                                 <orm:column name="tenantid" nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="status" type="status">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="status" length="15" nullable="false"/>
                             </hj:basic>
                         </xs:appinfo>
                     </xs:annotation>
@@ -168,17 +177,22 @@
                             <xs:element name="lastName" type="xs:string" minOccurs="1" />
                             <xs:element name="mi" type="xs:string"/>
                             <xs:element name="email" type="xs:string" minOccurs="1" />
+                            <xs:element name="status" type="status" minOccurs="1" />
                             <!-- uri to retrive collection object details -->
-                            <xs:element name="uri" type="xs:anyURI"
-                                minOccurs="1" />
-                            <xs:element name="csid" type="xs:string"
-                                minOccurs="1" />
+                            <xs:element name="uri" type="xs:anyURI" minOccurs="1" />
+                            <xs:element name="csid" type="xs:string" minOccurs="1" />
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    
+
+    <xs:simpleType name="status">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="active" />
+            <xs:enumeration value="inactive" />
+        </xs:restriction>
+    </xs:simpleType>
 </xs:schema>
 
