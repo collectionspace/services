@@ -24,6 +24,7 @@
         <module>id</module>
         <module>collectionobject</module>
         <module>intake</module>
+        <module>dimension</module>
         <module>JaxRsServiceProvider</module>
         <module>client</module>
         <module>sdk</module>

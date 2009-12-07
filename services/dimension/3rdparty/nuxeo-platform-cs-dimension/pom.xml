@@ -1,0 +1,19 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>org.collectionspace.services</groupId>
+        <artifactId>nuxeo-platform-collectionspace</artifactId>
+        <version>1.0</version>
+    </parent>
+    
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.collectionspace.services</groupId>
+    <version>1.0</version>
+    <artifactId>org.collectionspace.services.dimension.3rdparty.nuxeo</artifactId>
+    <packaging>jar</packaging>
+    <name>services.dimension.3rdparty.nuxeo</name>
+    <description>
+    Dimension Nuxeo Document Type
+    </description>
+</project>
