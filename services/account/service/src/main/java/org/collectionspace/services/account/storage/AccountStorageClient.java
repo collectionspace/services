@@ -25,6 +25,7 @@ package org.collectionspace.services.account.storage;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import org.apache.commons.codec.binary.Base64;
 import org.collectionspace.services.account.AccountsCommon;
@@ -32,6 +33,7 @@ import org.collectionspace.services.authentication.User;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
@@ -105,6 +107,60 @@ public class AccountStorageClient extends JpaStorageClient {
     }
 
     @Override
+    public void update(ServiceContext ctx, String id, DocumentHandler handler)
+            throws BadRequestException, DocumentNotFoundException,
+            DocumentException {
+        String docType = ctx.getDocumentType();
+        if (docType == null) {
+            throw new DocumentNotFoundException(
+                    "Unable to find DocumentType for service " + ctx.getServiceName());
+        }
+        if (handler == null) {
+            throw new IllegalArgumentException(
+                    "AccountStorageClient.update: handler is missing");
+        }
+        EntityManagerFactory emf = null;
+        EntityManager em = null;
+        try {
+            handler.prepare(Action.UPDATE);
+            AccountsCommon account = (AccountsCommon) handler.getCommonPart();
+            DocumentWrapper<AccountsCommon> wrapDoc =
+                    new DocumentWrapperImpl<AccountsCommon>(account);
+            setCsid(account, id); //set id just in case it was not populated by consumer
+            handler.handle(Action.UPDATE, wrapDoc);
+            emf = getEntityManagerFactory();
+            em = emf.createEntityManager();
+            em.getTransaction().begin();
+            AccountsCommon accountFound = getAccount(em, id);
+
+            checkAllowedUpdates(account, accountFound);
+            //if userid and password are given, add to default id provider
+            if (account.getUserId() != null && account.getPassword() != null) {
+
+                User userFound = getUser(em, account);
+                User user = createUser(account, ctx.getTenantId());
+                em.merge(user);
+            }
+            em.merge(account);
+            em.getTransaction().commit();
+            handler.complete(Action.UPDATE, wrapDoc);
+        } catch (BadRequestException bre) {
+            throw bre;
+        } catch (DocumentException de) {
+            throw de;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw new DocumentException(e);
+        } finally {
+            if (emf != null) {
+                releaseEntityManagerFactory(emf);
+            }
+        }
+    }
+
+    @Override
     public void delete(ServiceContext ctx, String id)
             throws DocumentNotFoundException,
             DocumentException {
@@ -124,15 +180,7 @@ public class AccountStorageClient extends JpaStorageClient {
             em = emf.createEntityManager();
             //TODO investigate if deep delete is possible
             //query an delete is inefficient
-            AccountsCommon accountFound = em.find(AccountsCommon.class, id);
-            if (accountFound == null) {
-                if (em != null && em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
-                String msg = "could not find entity with id=" + id;
-                logger.error(msg);
-                throw new DocumentNotFoundException(msg);
-            }
+            AccountsCommon accountFound = getAccount(em, id);
 
             StringBuilder accDelStr = new StringBuilder("DELETE FROM ");
             accDelStr.append(getEntityName(ctx));
@@ -193,6 +241,29 @@ public class AccountStorageClient extends JpaStorageClient {
         }
     }
 
+    private AccountsCommon getAccount(EntityManager em, String id) throws DocumentNotFoundException {
+        AccountsCommon accountFound = em.find(AccountsCommon.class, id);
+        if (accountFound == null) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            String msg = "could not find account with id=" + id;
+            logger.error(msg);
+            throw new DocumentNotFoundException(msg);
+        }
+        return accountFound;
+    }
+
+    private boolean checkAllowedUpdates(AccountsCommon toAccount, AccountsCommon fromAccount) throws BadRequestException {
+        if (!fromAccount.getUserId().equals(toAccount.getUserId())) {
+            String msg = "User id " + toAccount.getUserId() + " not found!";
+            logger.error(msg);
+            logger.debug(msg + " found userid=" + fromAccount.getUserId());
+            throw new BadRequestException(msg);
+        }
+        return true;
+    }
+
     private User createUser(AccountsCommon account, String tenantId) {
         User user = new User();
         user.setTenantid(tenantId);
@@ -203,5 +274,18 @@ public class AccountStorageClient extends JpaStorageClient {
                 account.getUserId(), new String(bpass));
         user.setPasswd(secEncPasswd);
         return user;
+    }
+
+    private User getUser(EntityManager em, AccountsCommon account) throws DocumentNotFoundException {
+        User userFound = em.find(User.class, account.getUserId());
+        if (userFound == null) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            String msg = "could not find user with id=" + account.getUserId();
+            logger.error(msg);
+            throw new DocumentNotFoundException(msg);
+        }
+        return userFound;
     }
 }

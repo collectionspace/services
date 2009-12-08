@@ -276,16 +276,63 @@ public class AccountServiceTest extends AbstractServiceTest {
         Assert.assertEquals(updatedAccount.getEmail(),
                 toUpdateAccount.getEmail(),
                 "Data in updated object did not match submitted data.");
-
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
     dependsOnMethods = {"update"})
-    public void deactivate(String testName) throws Exception {
+    public void updatePassword(String testName) throws Exception {
 
         // Perform setup.
         setupUpdate(testName);
 
+        ClientResponse<AccountsCommon> res =
+                client.read(knownResourceId);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": read status = " + res.getStatus());
+        }
+        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("got object to update with ID: " + knownResourceId);
+        }
+        AccountsCommon toUpdateAccount =
+                (AccountsCommon) res.getEntity();
+        Assert.assertNotNull(toUpdateAccount);
+
+        //change password
+        toUpdateAccount.setPassword(Base64.encodeBase64("imagination".getBytes()));
+        if (logger.isDebugEnabled()) {
+            logger.debug("updated object");
+            logger.debug(objectAsXmlString(toUpdateAccount,
+                    AccountsCommon.class));
+        }
+
+        // Submit the request to the service and store the response.
+        res = client.update(knownResourceId, toUpdateAccount);
+        int statusCode = res.getStatus();
+        // Check the status code of the response: does it match the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+
+        AccountsCommon updatedAccount = (AccountsCommon) res.getEntity();
+        Assert.assertNotNull(updatedAccount);
+
+//        Assert.assertEquals(updatedAccount.getPassword(),
+//                toUpdateAccount.getPassword(),
+//                "Data in updated object did not match submitted data.");
+    }
+
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    dependsOnMethods = {"updatePassword"})
+    public void deactivate(String testName) throws Exception {
+
+        // Perform setup.
+        setupUpdate(testName);
 
         ClientResponse<AccountsCommon> res =
                 client.read(knownResourceId);
@@ -361,6 +408,49 @@ public class AccountServiceTest extends AbstractServiceTest {
                 createAccountInstance("simba", "mufasa", "simba", "tiger", "simba@lionking.com");
         ClientResponse<AccountsCommon> res =
                 client.update(NON_EXISTENT_ID, account);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    }
+
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    dependsOnMethods = {"deactivate", "readNonExistent", "testSubmitRequest"})
+    public void updateWrongUser(String testName) throws Exception {
+
+        setupUpdate();
+        // Submit the request to the service and store the response.
+        //
+        // Note: The ID used in this 'create' call may be arbitrary.
+        // The only relevant ID may be the one used in updateAccount(), below.
+         ClientResponse<AccountsCommon> res =
+                client.read(knownResourceId);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": read status = " + res.getStatus());
+        }
+        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("got object to update with ID: " + knownResourceId);
+        }
+        AccountsCommon toUpdateAccount =
+                (AccountsCommon) res.getEntity();
+        Assert.assertNotNull(toUpdateAccount);
+
+        toUpdateAccount.setUserId("barneyFake");
+        if (logger.isDebugEnabled()) {
+            logger.debug("updated object with wrongUser");
+            logger.debug(objectAsXmlString(toUpdateAccount,
+                    AccountsCommon.class));
+        }
+                EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
+        res = client.update(knownResourceId, toUpdateAccount);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -461,8 +551,7 @@ public class AccountServiceTest extends AbstractServiceTest {
         account.setLastName(lastName);
         account.setScreenName(screenName);
         account.setUserId(screenName);
-        byte[] b64passwd = Base64.encodeBase64(passwd.getBytes());
-        account.setPassword(b64passwd);
+        account.setPassword(Base64.encodeBase64(passwd.getBytes()));
         account.setEmail(email);
         account.setPhone("1234567890");
         if (logger.isDebugEnabled()) {

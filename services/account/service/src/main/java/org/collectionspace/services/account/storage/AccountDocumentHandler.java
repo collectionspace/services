@@ -53,12 +53,12 @@ public class AccountDocumentHandler
 
     @Override
     public void handleUpdate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
-        getServiceContext().setOutput(account);
     }
 
     @Override
     public void completeUpdate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
         AccountsCommon upAcc = wrapDoc.getWrappedObject();
+        getServiceContext().setOutput(account);
         sanitize(upAcc);
     }
 
@@ -145,5 +145,6 @@ public class AccountDocumentHandler
      */
     private void sanitize(AccountsCommon account) {
         account.setTenantid("");
+        account.setPassword(null);
     }
 }
