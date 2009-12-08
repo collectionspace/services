@@ -6,7 +6,7 @@
  * http://www.collectionspace.org
  * http://wiki.collectionspace.org
  *
- * Copyright (c)) 2009 Regents of the University of California
+ * Copyright © 2009 Regents of the University of California
  *
  * Licensed under the Educational Community License (ECL), Version 2.0.
  * You may not use this file except in compliance with this License.
@@ -105,7 +105,7 @@ public class Sample {
         }
 
         // Submit the read ("get") request to the service and store the response.
-        // The resourceIdentifier is a unique identifier for the CollectionObject
+        // The resourceId is a unique identifier for the CollectionObject
         // record we're reading.
         ClientResponse<MultipartInput> res = client.read(resourceId);
 
@@ -398,9 +398,14 @@ public class Sample {
 
         Sample sample = new Sample();
 
-        if (logger.isInfoEnabled()){
-        	logger.info("Creating a new CollectionObject record ...");
+        // Optionally first delete all existing collection object records.
+        boolean ENABLE_DELETE_ALL = false;
+        if (ENABLE_DELETE_ALL) {
+            logger.info("Deleting all CollectionObject records ...");
+            sample.deleteAllCollectionObjects();
         }
+
+        logger.info("Creating a new CollectionObject record ...");
         String newRecordId = sample.createCollectionObject();
         
         if (newRecordId == null || newRecordId.trim().isEmpty()) {
@@ -408,21 +413,12 @@ public class Sample {
             return;
         }
 
-        if (logger.isInfoEnabled()){
-        	logger.info("Reading the new CollectionObject record ...");
-        }
+        logger.info("Reading the new CollectionObject record ...");
         MultipartInput corecord = sample.readCollectionObject(newRecordId);
         sample.displayCollectionObject(corecord);
 
-        if (logger.isInfoEnabled()){
-        	logger.info("Deleting the new CollectionObject record ...");
-        }
+        logger.info("Deleting the new CollectionObject record ...");
         sample.deleteCollectionObject(newRecordId);
-
-        if (logger.isInfoEnabled()){
-        	logger.info("Deleting all CollectionObject records ...");
-        }
-        sample.deleteAllCollectionObjects();
 		
     }
 
