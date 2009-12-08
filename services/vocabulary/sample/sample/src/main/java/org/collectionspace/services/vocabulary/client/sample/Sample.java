@@ -50,8 +50,8 @@ import org.slf4j.LoggerFactory;
  * VocabularyServiceTest, carries out tests against a
  * deployed and running Vocabulary Service.
  *
- * $LastChangedRevision: 753 $
- * $LastChangedDate: 2009-09-23 11:03:36 -0700 (Wed, 23 Sep 2009) $
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
 public class Sample {
     private static final Logger logger =
@@ -435,46 +435,48 @@ public class Sample {
     }
 
 	public static void main(String[] args) {
-		
+
+        // Configure logging.
 		BasicConfigurator.configure();
-		logger.info("VocabularyBaseImport starting...");
+
+        logger.info("VocabularyBaseImport starting...");
 
 		Sample vbi = new Sample();
-
-        logger.info("Deleting all vocabulary items and vocabularies ...");
-
-        // For each vocabulary ...
-
-        VocabulariesCommonList vocabularies = vbi.readVocabularies();
-        List<String> vocabIds = vbi.readVocabularyIds(vocabularies);
-        for (String vocabId : vocabIds) {
-            // Delete vocabulary items for this vocabulary.
-            logger.info("Deleting vocabulary items ...");
-            vbi.deleteAllItemsForVocab(vocabId);
-            // Delete vocabularies.
-            logger.info("Deleting vocabulary ...");
-            vbi.deleteVocabulary(vocabId);
-        }
-
-        // Read vocabularies after deletion.
-        logger.info("Reading vocabularies after deletion ...");
-
+        VocabulariesCommonList vocabularies;
+        List<String> vocabIds;
         String details = "";
 
-        vocabularies = vbi.readVocabularies();
-        details = vbi.displayAllVocabularies(vocabularies);
-        logger.info(details);
+        // Optionally delete all vocabularies and vocabulary items.
 
-        logger.info("Reading items in each vocabulary after deletion ...");
+        boolean ENABLE_DELETE_ALL = false;
+        if (ENABLE_DELETE_ALL) {
 
-        // Read items in each vocabulary.
-        vocabIds = vbi.readVocabularyIds(vocabularies);
-        for (String vocabId : vocabIds) {
-            VocabularyitemsCommonList items = vbi.readItemsInVocab(vocabId);
-            details = vbi.displayAllVocabularyItems(items);
+            logger.info("Deleting all vocabulary items and vocabularies ...");
+
+            // For each vocabulary ...
+            vocabularies = vbi.readVocabularies();
+            vocabIds = vbi.readVocabularyIds(vocabularies);
+            for (String vocabId : vocabIds) {
+                logger.info("Deleting all vocabulary items for vocabulary ...");
+                vbi.deleteAllItemsForVocab(vocabId);
+                logger.info("Deleting vocabulary ...");
+                vbi.deleteVocabulary(vocabId);
+            }
+
+            logger.info("Reading vocabularies after deletion ...");
+            vocabularies = vbi.readVocabularies();
+            details = vbi.displayAllVocabularies(vocabularies);
             logger.info(details);
-        }
 
+            logger.info("Reading items in each vocabulary after deletion ...");
+            vocabIds = vbi.readVocabularyIds(vocabularies);
+            for (String vocabId : vocabIds) {
+                VocabularyitemsCommonList items = vbi.readItemsInVocab(vocabId);
+                details = vbi.displayAllVocabularyItems(items);
+                logger.info(details);
+            }
+
+        }
 
         // Create new vocabularies, each populated with vocabulary items.
 
@@ -494,7 +496,7 @@ public class Sample {
 									"Ethnography","Herpetology","Media and Performance Art",
 									"Paintings and Sculpture","Paleobotany","Photographs",
 									"Prints and Drawings");
-
+        
 		vbi.createEnumeration(acquisitionMethodsVocabName, acquisitionMethodsEnumValues);
 		vbi.createEnumeration(entryMethodsVocabName, entryMethodsEnumValues);
 		vbi.createEnumeration(entryReasonsVocabName, entryReasonsEnumValues);
@@ -502,23 +504,43 @@ public class Sample {
 
 		logger.info("VocabularyBaseImport complete.");
 
-        logger.info("Reading newly-created vocabularies ...");
-
-        // Read vocabularies after import.
+        logger.info("Reading vocabularies and items ...");
+        // Get a list of vocabularies.
         vocabularies = vbi.readVocabularies();
-        details = vbi.displayAllVocabularies(vocabularies);
-        logger.info(details);
-
-        logger.info("Reading items in each vocabulary ...");
-
-        // Read items in each vocabulary after import.
-        vocabIds = vbi.readVocabularyIds(vocabularies);
-        for (String vocabId : vocabIds) {
-            VocabularyitemsCommonList items = vbi.readItemsInVocab(vocabId);
-            details = vbi.displayAllVocabularyItems(items);
-            logger.info(details);
+        // For each vocabulary ...
+        for (VocabulariesCommonList.VocabularyListItem
+            vocabulary : vocabularies.getVocabularyListItem()) {
+            // Get its display name.
+            logger.info(vocabulary.getDisplayName());
+            // Get a list of the vocabulary items in this vocabulary.
+            VocabularyitemsCommonList items =
+                vbi.readItemsInVocab(vocabulary.getCsid());
+            // For each vocabulary item ...
+            for (VocabularyitemsCommonList.VocabularyitemListItem
+                item : items.getVocabularyitemListItem()) {
+                // Get its display name.
+                logger.info(" " + item.getDisplayName());
+            }
         }
-        
+
+        // Sample alternate methods of reading all vocabularies and
+        // vocabulary items separately.
+        boolean RUN_ADDITIONAL_SAMPLES = false;
+        if (RUN_ADDITIONAL_SAMPLES) {
+
+            logger.info("Reading all vocabularies ...");
+            details = vbi.displayAllVocabularies(vocabularies);
+            logger.info(details);
+
+            logger.info("Reading all vocabulary items ...");
+            vocabIds = vbi.readVocabularyIds(vocabularies);
+            for (String vocabId : vocabIds) {
+                VocabularyitemsCommonList items = vbi.readItemsInVocab(vocabId);
+                details = vbi.displayAllVocabularyItems(items);
+                logger.info(details);
+            }
+
+        }
 
 	}
 
