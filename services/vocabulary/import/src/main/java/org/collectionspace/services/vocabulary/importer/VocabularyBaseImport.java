@@ -104,7 +104,7 @@ public class VocabularyBaseImport {
     	if(logger.isDebugEnabled()){
     		logger.debug("Import: Create Item: \""+itemName+"\" in vocabulary: \"" + vocabName +"\"");
     	}
-    	MultipartOutput multipart = createVocabularyItemInstance(vcsid, itemName, refName);
+    	MultipartOutput multipart = createVocabularyItemInstance(itemName, refName);
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
 
     	int statusCode = res.getStatus();
@@ -145,9 +145,8 @@ public class VocabularyBaseImport {
     }
 
     private MultipartOutput createVocabularyItemInstance(
-    		String inVocabulary, String displayName, String refName) {
+    		String displayName, String refName) {
     	VocabularyitemsCommon vocabularyItem = new VocabularyitemsCommon();
-    	vocabularyItem.setInVocabulary(inVocabulary);
     	vocabularyItem.setDisplayName(displayName);
     	vocabularyItem.setRefName(refName);
         MultipartOutput multipart = new MultipartOutput();

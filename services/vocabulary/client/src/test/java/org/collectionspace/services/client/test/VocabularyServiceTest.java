@@ -970,7 +970,6 @@ public class VocabularyServiceTest extends AbstractServiceTest {
     private MultipartOutput createVocabularyItemInstance(String inVocabulary,
         String displayName, String refName) {
         VocabularyitemsCommon vocabularyItem = new VocabularyitemsCommon();
-        vocabularyItem.setInVocabulary(inVocabulary);
         vocabularyItem.setDisplayName(displayName);
         if(refName!=null)
         	vocabularyItem.setRefName(refName);

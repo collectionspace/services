@@ -20,10 +20,8 @@
                 
                 <!--  Vocabularyitem Information Group -->
                 <!--  inVocabulary is the csid of the owning Vocabulary -->
-                <xs:element name="inVocabulary" type="xs:string" />
                 <xs:element name="displayName" type="xs:string"/>
                 <xs:element name="refName" type="xs:string"/>
-
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -39,6 +37,8 @@
                                 minOccurs="1" />
                             <!-- uri to retrieve vocabularyitem details -->
                             <xs:element name="uri" type="xs:anyURI"
+                                minOccurs="1" />
+                            <xs:element name="refName" type="xs:string"
                                 minOccurs="1" />
                             <xs:element name="csid" type="xs:string"
                                 minOccurs="1" />

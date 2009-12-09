@@ -124,6 +124,8 @@ public class VocabularyDocumentModelHandler
             VocabularyListItem ilistItem = new VocabularyListItem();
             ilistItem.setDisplayName((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     VocabularyJAXBSchema.DISPLAY_NAME));
+            ilistItem.setRefName((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+                    VocabularyJAXBSchema.REF_NAME));
             ilistItem.setVocabType((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     VocabularyJAXBSchema.VOCAB_TYPE));
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
@@ -134,7 +136,6 @@ public class VocabularyDocumentModelHandler
 
         return coList;
     }
-
 
     /**
      * getQProperty converts the given property to qualified schema property
