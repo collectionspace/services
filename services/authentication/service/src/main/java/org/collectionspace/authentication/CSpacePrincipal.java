@@ -29,7 +29,7 @@ import java.security.Principal;
  * CSpacePrincipal provides additional tenant-specific context to application
  * @author 
  */
-public class CSpacePrincipal
+final public class CSpacePrincipal
         implements Principal, java.io.Serializable {
 
     private String name;
