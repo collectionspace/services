@@ -22,6 +22,7 @@
  */
 package org.collectionspace.services.client.test;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -36,6 +37,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import org.slf4j.Logger;
@@ -57,6 +59,7 @@ public class IntakeServiceTest extends AbstractServiceTest {
     private IntakeClient client = new IntakeClient();
     final String SERVICE_PATH_COMPONENT = "intakes";
     private String knownResourceId = null;
+    private List<String> additionalResourceIds = new ArrayList();
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
@@ -92,11 +95,17 @@ public class IntakeServiceTest extends AbstractServiceTest {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        // Store the ID returned from this create operation
+        // Store the ID returned from the first resource created
         // for additional tests below.
-        knownResourceId = extractId(res);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": knownResourceId=" + knownResourceId);
+        if (knownResourceId == null){
+            knownResourceId = extractId(res);
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": knownResourceId=" + knownResourceId);
+            }
+        // Store the IDs from any additional resources created by tests,
+        // so they can be deleted after all tests have been run.
+        } else {
+            additionalResourceIds.add(extractId(res));
         }
     }
 
@@ -564,6 +573,24 @@ public class IntakeServiceTest extends AbstractServiceTest {
         }
         Assert.assertEquals(statusCode, EXPECTED_STATUS);
 
+    }
+
+    // ---------------------------------------------------------------
+    // Cleanup of resources created during testing
+    // ---------------------------------------------------------------
+
+    /**
+     * Deletes any additional resources created by tests,
+     * after all tests have been run.
+     */
+    @AfterClass
+    public void cleanUp() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Cleaning up temporary resources created for testing ...");
+        }
+        for (String resourceId : additionalResourceIds) {
+            ClientResponse<Response> res = client.delete(resourceId);
+        }
     }
 
     // ---------------------------------------------------------------
