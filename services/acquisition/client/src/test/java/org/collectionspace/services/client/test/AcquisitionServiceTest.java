@@ -58,7 +58,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
     // Instance variables specific to this test.
     private AcquisitionClient client = new AcquisitionClient();
     private String knownResourceId = null;
-    private List<String> additionalResourceIds = new ArrayList();
+    private List<String> allResourceIdsCreated = new ArrayList();
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
@@ -101,11 +101,11 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
-        // Store the IDs from any additional resources created by tests,
-        // so they can be deleted after all tests have been run.
-        } else {
-            additionalResourceIds.add(extractId(res));
         }
+        
+        // Store the IDs from every resource created by tests,
+        // so they can be deleted after tests have been run.
+        allResourceIdsCreated.add(extractId(res));
     }
 
     @Override
@@ -573,16 +573,25 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
     // Cleanup of resources created during testing
     // ---------------------------------------------------------------
 
+    // ---------------------------------------------------------------
+    // Cleanup of resources created during testing
+    // ---------------------------------------------------------------
+
     /**
-     * Deletes any additional resources created by tests,
-     * after all tests have been run.
+     * Deletes all resources created by tests, after all tests have been run.
+     *
+     * This cleanup method will always be run, even if one or more tests fail.
+     * For this reason, it attempts to remove all resources created
+     * at any point during testing, even if some of those resources
+     * may be expected to be deleted by certain tests.
      */
-    @AfterClass
+    @AfterClass(alwaysRun=true)
     public void cleanUp() {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
-        for (String resourceId : additionalResourceIds) {
+        for (String resourceId : allResourceIdsCreated) {
+            // Note: Any non-success responses are ignored and not reported.
             ClientResponse<Response> res = client.delete(resourceId);
         }
     }

@@ -22,7 +22,10 @@
  */
 package org.collectionspace.services.client.test;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -39,6 +42,7 @@ import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 /**
@@ -60,6 +64,9 @@ public class VocabularyServiceTest extends AbstractServiceTest {
     private String knownResourceId = null;
     private String knownResourceRefName = null;
     private String knownItemResourceId = null;
+    private List<String> allResourceIdsCreated = new ArrayList<String>();
+    private Map<String, String> allResourceItemIdsCreated =
+        new HashMap<String, String>();
     
     protected String createRefName(String displayName) {
     	return displayName.replaceAll("\\W", "");
@@ -101,13 +108,22 @@ public class VocabularyServiceTest extends AbstractServiceTest {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        // Store the ID returned from this create operation
+        // Store the refname from the first resource created
         // for additional tests below.
-        knownResourceId = extractId(res);
         knownResourceRefName = refName;
-        if(logger.isDebugEnabled()){
-            logger.debug("create: knownResourceId=" + knownResourceId);
+
+        // Store the ID returned from the first resource created
+        // for additional tests below.
+        if (knownResourceId == null){
+            knownResourceId = extractId(res);
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": knownResourceId=" + knownResourceId);
+            }
         }
+        // Store the IDs from every resource created by tests,
+        // so they can be deleted after tests have been run.
+        allResourceIdsCreated.add(extractId(res));
+
     }
 
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
@@ -143,6 +159,23 @@ public class VocabularyServiceTest extends AbstractServiceTest {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Store the ID returned from the first item resource created
+        // for additional tests below.
+        if (knownItemResourceId == null){
+            knownItemResourceId = extractId(res);
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
+            }
+        }
+
+        // Store the IDs from any item resources created
+        // by tests, along with the IDs of their parents, so these items
+        // can be deleted after all tests have been run.
+        //
+        // Item resource IDs are unique, so these are used as keys;
+        // the non-unique IDs of their parents are stored as associated values.
+        allResourceItemIdsCreated.put(extractId(res), vcsid);
 
         return extractId(res);
     }
@@ -901,6 +934,42 @@ public class VocabularyServiceTest extends AbstractServiceTest {
                 " status=" + statusCode);
         }
         Assert.assertEquals(statusCode, EXPECTED_STATUS);
+
+    }
+
+    // ---------------------------------------------------------------
+    // Cleanup of resources created during testing
+    // ---------------------------------------------------------------
+    
+    /**
+     * Deletes all resources created by tests, after all tests have been run.
+     *
+     * This cleanup method will always be run, even if one or more tests fail.
+     * For this reason, it attempts to remove all resources created
+     * at any point during testing, even if some of those resources
+     * may be expected to be deleted by certain tests.
+     */
+    @AfterClass(alwaysRun=true)
+    public void cleanUp() {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Cleaning up temporary resources created for testing ...");
+        }
+        // Clean up vocabulary item resources.
+        String vocabularyResourceId;
+        String vocabularyItemResourceId;
+        for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
+            vocabularyItemResourceId = entry.getKey();
+            vocabularyResourceId = entry.getValue();
+            // Note: Any non-success responses are ignored and not reported.
+            ClientResponse<Response> res =
+                client.deleteItem(vocabularyResourceId, vocabularyItemResourceId);
+        }
+        // Clean up vocabulary resources.
+        for (String resourceId : allResourceIdsCreated) {
+            // Note: Any non-success responses are ignored and not reported.
+            ClientResponse<Response> res = client.delete(resourceId);
+        }
 
     }
 
