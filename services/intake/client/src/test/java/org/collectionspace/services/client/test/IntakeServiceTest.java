@@ -273,7 +273,7 @@ public class IntakeServiceTest extends AbstractServiceTest {
     // Success outcomes
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"read"})
+        dependsOnMethods = {"createList", "read"})
     public void readList(String testName) throws Exception {
 
         // Perform setup.

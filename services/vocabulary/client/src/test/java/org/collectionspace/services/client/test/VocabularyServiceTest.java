@@ -433,7 +433,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"read"})
+        dependsOnMethods = {"createList", "read"})
     public void readList(String testName) throws Exception {
 
         // Perform setup.
@@ -473,7 +473,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
         }
     }
 
-    @Test(dependsOnMethods = {"readItem"})
+    @Test(dependsOnMethods = {"createList", "readItem"})
     public void readItemList() {
         readItemList(knownResourceId);
     }
