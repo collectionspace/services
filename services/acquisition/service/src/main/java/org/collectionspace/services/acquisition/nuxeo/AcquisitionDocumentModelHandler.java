@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.collectionspace.services.AcquisitionJAXBSchema;
+import org.collectionspace.services.AcquisitionListItemJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
 import org.collectionspace.services.acquisition.AcquisitionsCommonList;
@@ -121,8 +122,8 @@ public class AcquisitionDocumentModelHandler
         while (iter.hasNext()) {
             DocumentModel docModel = iter.next();
             AcquisitionListItem listItem = new AcquisitionListItem();
-            listItem.setAccessionDate((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-                    AcquisitionJAXBSchema.ACCESSIONDATE));
+            listItem.setAcquisitionReferenceNumber((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+                    AcquisitionListItemJAXBSchema.ACQUISITION_REFERENCE_NUMBER));
             //need fully qualified context for URI
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
             listItem.setUri(getServiceContextPath() + id);

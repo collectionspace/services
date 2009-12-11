@@ -275,7 +275,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
                 logger.debug(testName + ": list-item[" + i + "] csid=" +
                         item.getCsid());
                 logger.debug(testName + ": list-item[" + i + "] objectNumber=" +
-                        item.getAccessionDate());
+                        item.getAcquisitionReferenceNumber());
                 logger.debug(testName + ": list-item[" + i + "] URI=" +
                         item.getUri());
                 i++;
@@ -316,7 +316,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
         Assert.assertNotNull(acquisition);
 
         // Update the content of this resource.
-        acquisition.setAccessionDate("updated-" + acquisition.getAccessionDate());
+        acquisition.setAcquisitionReferenceNumber("updated-" + acquisition.getAcquisitionReferenceNumber());
         if(logger.isDebugEnabled()){
             logger.debug("updated object");
             logger.debug(objectAsXmlString(acquisition, AcquisitionsCommon.class));
@@ -343,8 +343,8 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
                         client.getCommonPartName(), AcquisitionsCommon.class);
         Assert.assertNotNull(updatedAcquisition);
 
-        Assert.assertEquals(updatedAcquisition.getAccessionDate(),
-                acquisition.getAccessionDate(),
+        Assert.assertEquals(updatedAcquisition.getAcquisitionReferenceNumber(),
+                acquisition.getAcquisitionReferenceNumber(),
                 "Data in updated object did not match submitted data.");
 
     }
@@ -607,7 +607,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
     private MultipartOutput createAcquisitionInstance(String identifier) {
         AcquisitionsCommon acquisition = new AcquisitionsCommon();
-        acquisition.setAccessionDate("accessionDate-"  + identifier);
+        acquisition.setAcquisitionReferenceNumber("acquisitionReferenceNumber-"  + identifier);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(acquisition,
             MediaType.APPLICATION_XML_TYPE);

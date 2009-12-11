@@ -63,7 +63,7 @@
                 <xs:element name="acquisition-list-item" maxOccurs="unbounded">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="accessionDate" type="xs:string"
+                            <xs:element name="AcquisitionReferenceNumber" type="xs:string"
                                 minOccurs="1" />
                             <!-- uri to retrive acquisition details -->
                             <xs:element name="uri" type="xs:anyURI"
