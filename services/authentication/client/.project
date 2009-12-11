@@ -3,6 +3,7 @@
 	<name>org.collectionspace.services.authentication.client</name>
 	<comment></comment>
 	<projects>
+		<project>org.collectionspace.services.authentication.jaxb</project>
 		<project>org.collectionspace.services.client</project>
 		<project>org.collectionspace.services.collectionobject.client</project>
 		<project>org.collectionspace.services.collectionobject.jaxb</project>
