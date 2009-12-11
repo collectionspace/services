@@ -31,13 +31,18 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import java.util.Map;
+import java.util.HashMap;
+import java.util.StringTokenizer;
 
+import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectHandlerFactory;
 import org.collectionspace.services.common.AbstractCollectionSpaceResource;
 import org.collectionspace.services.common.context.MultipartServiceContext;
@@ -45,6 +50,7 @@ import org.collectionspace.services.common.context.MultipartServiceContextFactor
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -60,6 +66,11 @@ public class CollectionObjectResource
 
     final private String serviceName = "collectionobjects";
     final Logger logger = LoggerFactory.getLogger(CollectionObjectResource.class);
+    final private static String SEARCH_TYPE_KEYWORDS = "keywords";
+    final private static String ECM_FULLTEXT_LIKE = "ecm:fulltext LIKE ";
+    final private static String SEARCH_QUALIFIER_AND = "AND";
+    final private static String SEARCH_QUALIFIER_OR = "OR";
+    final private static String SEARCH_TERM_SEPARATOR = " ";
 
     @Override
     public String getServiceName() {
@@ -256,4 +267,43 @@ public class CollectionObjectResource
         }
 
     }
+    
+    @GET
+    @Path("/search")    
+    @Produces("application/xml")
+    public CollectionobjectsCommonList keywordsSearchCollectionObjects(@Context UriInfo ui,
+    		@QueryParam (SEARCH_TYPE_KEYWORDS) String keywords) {
+        CollectionobjectsCommonList collectionObjectList = new CollectionobjectsCommonList();
+        try {
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+            DocumentHandler handler = createDocumentHandler(ctx);
+
+            // perform a keyword search
+            if (keywords != null && !keywords.isEmpty()) {
+            	String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
+	            DocumentFilter documentFilter = handler.getDocumentFilter();
+	            documentFilter.setWhereClause(whereClause);
+	            if (logger.isDebugEnabled()) {
+	            	logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+	            }
+	            getRepositoryClient(ctx).getFiltered(ctx, handler);
+            } else {
+            	getRepositoryClient(ctx).getAll(ctx, handler);
+            }            
+            collectionObjectList = (CollectionobjectsCommonList) handler.getCommonPartList();
+            
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception in getCollectionObjectList", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return collectionObjectList;
+    }    
 }
