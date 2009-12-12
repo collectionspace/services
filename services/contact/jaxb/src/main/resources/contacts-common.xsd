@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Contact schema (XSD)
+    
+    Entity  : Contact
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+
+    $LastChangedRevision$
+    $LastChangedDate$
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/contact"
+  xmlns="http://collectionspace.org/services/contact"
+  targetNamespace="http://collectionspace.org/services/contact"
+  version="0.1"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Contact+Schema -->    
+    
+    <!-- contact  -->
+    
+    <!-- Note: the following is currently a representative subset -->
+    <!-- of the full Address Information schema specified at -->
+    <!-- http://wiki.collectionspace.org/display/collectionspace/Contact+Information+Schema -->
+    <!-- as this schema is believed to still be in flux. -->
+    <xs:element name="contacts_common">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="csid" type="xs:string" />
+                <xs:element name="addressText" type="xs:string"/>
+                <xs:element name="postcode" type="xs:string"/>
+                <xs:element name="addressType" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- contact records, as in nuxeo repository -->
+    <xs:element name="contacts-common-list">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="contact-list-item" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="addressText" type="xs:string"
+                                minOccurs="1" />
+                            <!-- uri to retrive contact details -->
+                            <xs:element name="uri" type="xs:anyURI"
+                                minOccurs="1" />
+                            <xs:element name="csid" type="xs:string"
+                                minOccurs="1" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+</xs:schema>
+

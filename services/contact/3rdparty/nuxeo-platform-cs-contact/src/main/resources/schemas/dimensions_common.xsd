@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Contact schema (XSD)
+    
+    Entity  : Contact
+    Part    : Common
+    Used for: Nuxeo EP core document type
+
+    $LastChangedRevision$
+    $LastChangedDate$
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/contact/"
+    xmlns="http://collectionspace.org/contact/"
+    targetNamespace="http://collectionspace.org/contact/"
+    version="0.1">
+    
+    <!-- Note: the following is currently a representative subset -->
+    <!-- of the full Address Information schema specified at -->
+    <!-- http://wiki.collectionspace.org/display/collectionspace/Contact+Information+Schema -->
+    <!-- as this schema is believed to still be in flux. -->
+    
+<!--  Address Information Group -->
+    <xs:element name="addressText" type="xs:string"/>
+    <xs:element name="postcode" type="xs:string"/>
+    <xs:element name="addressType" type="xs:string"/>
+    
+</xs:schema>
