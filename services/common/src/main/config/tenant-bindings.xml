@@ -2,15 +2,13 @@
 <!--
     Document   : tenants-bindings.xml
     Created on : August 31, 2009, 10:52 AM
-    Author     : 
-    Description:
-        tenant bindings
+    Description: tenant bindings
 -->
 <tenant:TenantBindingConfig  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
    xmlns:tenant='http://collectionspace.org/services/common/tenant'
    xsi:schemaLocation='http://collectionspace.org/services/common/tenant http://collectionspace.org/services/common/tenant.xsd'
    >
-    <!-- begin movinimages.us tenant meta-data -->
+    <!-- begin movingimages.us tenant meta-data -->
     <tenant:tenantBinding
         id="1" name="movingimages.us" displayName="Museum of Moving Images" version="0.1" repositoryDomain="default-domain">
         <tenant:serviceBindings name="CollectionObjects" version="0.1">
@@ -107,9 +105,11 @@
             </service:object>
         </tenant:serviceBindings>
         <!-- end vocabulary service meta-data -->
-				<!-- begin vocabularyitem service meta-data.
-						Note there is no Vocabularyitem service, but there is a
-						Repository workspace so we have to configure that. -->
+		<!--
+            begin vocabularyitem service meta-data.
+			Note there is no Vocabularyitem service, but there is a
+			Repository workspace so we have to configure that.
+        -->
         <tenant:serviceBindings name="Vocabularyitems" version="0.1">
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>nuxeo-java</service:repositoryClient>
             <service:object id="1" name="Vocabularyitem" version="0.1"
@@ -137,7 +137,7 @@
             </service:object>
         </tenant:serviceBindings>
         <!-- end vocabulary service meta-data -->
-                <!-- begin acquisition service meta-data -->
+        <!-- begin acquisition service meta-data -->
         <tenant:serviceBindings name="Acquisitions" version="0.1">
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>nuxeo-java</service:repositoryClient>
             <service:object id="1" name="Acquisition" version="0.1"
@@ -247,7 +247,35 @@
                 </service:part>
             </service:object>
         </tenant:serviceBindings>
-        <!-- end dimension service meta-data -->    
+        <!-- end dimension service meta-data -->
+        <!-- begin contact service meta-data -->
+        <tenant:serviceBindings name="Contacts" version="0.1">
+            <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>nuxeo-java</service:repositoryClient>
+            <service:object id="1" name="Contact" version="0.1"
+            xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:part id="0" control_group="Managed"
+                            versionable="true" auditable="false"
+                            label="contacts-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                        namespaceURI="http://collectionspace.org/services/common/system"
+                        schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed"
+                            versionable="true" auditable="false"
+                            label="contacts_common" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                        namespaceURI="http://collectionspace.org/services/contact"
+                        schemaLocation="http://collectionspace.org/services/contact http://services.collectionspace.org/contact/contacts_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end contact service meta-data -->
     </tenant:tenantBinding>
-    <!-- end movinimages.us tenant meta-data -->
+    <!-- end movingimages.us tenant meta-data -->
 </tenant:TenantBindingConfig>

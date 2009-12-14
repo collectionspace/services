@@ -16,7 +16,7 @@
         <!-- add modules below in the order based on dependencies -->
         <module>authentication</module>
         <module>common</module>
-        <module>account</module>
+        <!-- module>account</module -->
         <module>relation</module>
         <!--module>query</module-->
         <module>acquisition</module>
@@ -25,6 +25,7 @@
         <module>collectionobject</module>
         <module>intake</module>
         <module>dimension</module>
+        <module>contact</module>
         <module>JaxRsServiceProvider</module>
         <module>client</module>
         <module>sdk</module>

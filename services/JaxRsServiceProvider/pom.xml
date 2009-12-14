@@ -49,6 +49,11 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.contact.service</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.acquisition.service</artifactId>
             <version>1.0</version>
         </dependency>

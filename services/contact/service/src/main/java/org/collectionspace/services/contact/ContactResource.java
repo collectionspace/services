@@ -38,9 +38,6 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.AbstractCollectionSpaceResource;
-import org.collectionspace.services.contact.ContactsCommonList.*;
-
-import org.collectionspace.services.contact.nuxeo.ContactHandlerFactory;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.MultipartServiceContext;
@@ -48,6 +45,9 @@ import org.collectionspace.services.common.context.MultipartServiceContextFactor
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
+
+import org.collectionspace.services.contact.nuxeo.ContactHandlerFactory;
+
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;

@@ -1,3 +1,26 @@
+/**
+ * This document is a part of the source code and related artifacts
+ * for CollectionSpace, an open source collections management system
+ * for museums and related institutions:
+ *
+ * http://www.collectionspace.org
+ * http://wiki.collectionspace.org
+ *
+ * Copyright © 2009 Regents of the University of California
+ *
+ * Licensed under the Educational Community License (ECL), Version 2.0.
+ * You may not use this file except in compliance with this License.
+ *
+ * You may obtain a copy of the ECL 2.0 License at
+ * https://source.collectionspace.org/collection-space/LICENSE.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.collectionspace.services.jaxrs;
 
 import org.collectionspace.services.account.AccountResource;
@@ -7,6 +30,7 @@ import org.collectionspace.services.intake.IntakeResource;
 import org.collectionspace.services.relation.NewRelationResource;
 import org.collectionspace.services.acquisition.AcquisitionResource;
 import org.collectionspace.services.dimension.DimensionResource;
+import org.collectionspace.services.contact.ContactResource;
 
 import org.collectionspace.services.vocabulary.VocabularyResource;
 
@@ -16,6 +40,14 @@ import javax.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * CollectionSpaceJaxRsApplication, the root application
+ * for enumerating Resource classes in the Services Layer,
+ * which in turn respond to and route REST-based requests.
+ *
+ * $LastChangedRevision$
+ * $LastChangedDate$
+ */
 
 public class CollectionSpaceJaxRsApplication extends Application {
 
@@ -31,6 +63,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new NewRelationResource());
         singletons.add(new VocabularyResource());
         singletons.add(new DimensionResource());
+        singletons.add(new ContactResource());
 
 //        singletons.add(new QueryResource());
 //        singletons.add(new DomainIdentifierResource());
