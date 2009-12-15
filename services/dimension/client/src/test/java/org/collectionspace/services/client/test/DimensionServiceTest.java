@@ -22,6 +22,7 @@
  */
 package org.collectionspace.services.client.test;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -36,6 +37,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import org.slf4j.Logger;
@@ -57,6 +59,7 @@ public class DimensionServiceTest extends AbstractServiceTest {
     private DimensionClient client = new DimensionClient();
     final String SERVICE_PATH_COMPONENT = "dimensions";
     private String knownResourceId = null;
+    private List<String> allResourceIdsCreated = new ArrayList();
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
@@ -92,12 +95,18 @@ public class DimensionServiceTest extends AbstractServiceTest {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        // Store the ID returned from this create operation
+        // Store the ID returned from the first resource created
         // for additional tests below.
-        knownResourceId = extractId(res);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": knownResourceId=" + knownResourceId);
+        if (knownResourceId == null){
+            knownResourceId = extractId(res);
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": knownResourceId=" + knownResourceId);
+            }
         }
+
+        // Store the IDs from every resource created by tests,
+        // so they can be deleted after tests have been run.
+        allResourceIdsCreated.add(extractId(res));
     }
 
     @Override
@@ -564,6 +573,29 @@ public class DimensionServiceTest extends AbstractServiceTest {
         }
         Assert.assertEquals(statusCode, EXPECTED_STATUS);
 
+    }
+
+    // ---------------------------------------------------------------
+    // Cleanup of resources created during testing
+    // ---------------------------------------------------------------
+
+    /**
+     * Deletes all resources created by tests, after all tests have been run.
+     *
+     * This cleanup method will always be run, even if one or more tests fail.
+     * For this reason, it attempts to remove all resources created
+     * at any point during testing, even if some of those resources
+     * may be expected to be deleted by certain tests.
+     */
+    @AfterClass(alwaysRun=true)
+    public void cleanUp() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Cleaning up temporary resources created for testing ...");
+        }
+        for (String resourceId : allResourceIdsCreated) {
+            // Note: Any non-success responses are ignored and not reported.
+            ClientResponse<Response> res = client.delete(resourceId);
+        }
     }
 
     // ---------------------------------------------------------------

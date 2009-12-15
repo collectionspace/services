@@ -573,10 +573,6 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
     // Cleanup of resources created during testing
     // ---------------------------------------------------------------
 
-    // ---------------------------------------------------------------
-    // Cleanup of resources created during testing
-    // ---------------------------------------------------------------
-
     /**
      * Deletes all resources created by tests, after all tests have been run.
      *
