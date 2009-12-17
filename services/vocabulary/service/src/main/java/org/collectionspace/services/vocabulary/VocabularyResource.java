@@ -402,8 +402,11 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
             // Note that docType defaults to the ServiceName, so we're fine with that.
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getItemServiceName());
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
-            DocumentFilter myFilter = new DocumentFilter(
-                    "vocabularyitems_common:inVocabulary='" + parentcsid + "'", 0, 0);
+            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+            DocumentFilter myFilter =
+                DocumentFilter.CreatePaginatedDocumentFilter(queryParams);
+            myFilter.setWhereClause(
+                    "vocabularyitems_common:inVocabulary='" + parentcsid + "'");
             handler.setDocumentFilter(myFilter);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             vocabularyItemObjectList = (VocabularyitemsCommonList) handler.getCommonPartList();
