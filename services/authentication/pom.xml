@@ -17,6 +17,7 @@
 
     <modules>
         <module>jaxb</module>
+        <module>pstore</module>
         <module>service</module>
         <module>client</module>
     </modules>

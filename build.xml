@@ -18,20 +18,20 @@
     </condition>
 
     <target name="init">
-    <!-- Create the time stamp -->
+        <!-- Create the time stamp -->
         <tstamp/>
     </target>
 
     <target name="dist" depends="package"
-    description="generate cspace service distribution">
+            description="generate cspace service distribution">
         <!-- Create the distribution directory -->
         <mkdir dir="${basedir}/dist"/>
-        
+
         <!-- copy db scripts, etc. -->
         <copy todir="${basedir}/${dist.server.cspace}/cspace/services">
             <fileset dir="${src}/main/resources/scripts"/>
         </copy>
-        
+
         <!-- copy datasources -->
         <copy todir="${basedir}/${dist.deploy.cspace}">
             <fileset dir="${src}/main/resources/config"/>
@@ -42,19 +42,19 @@
         <!-- bundle up everything -->
         <tar destfile="${basedir}/dist/${cspace.services.release}-${jboss.release}.tar.gz" compression="gzip">
             <tarfileset dir="${basedir}/dist/cspace"
-              preserveLeadingSlashes="true">
+                        preserveLeadingSlashes="true">
             </tarfileset>
         </tar>
     </target>
 
     <target name="dist-jboss-domains" depends="init"
-    description="create jboss distributions for cspace and nuxeo">
+            description="create jboss distributions for cspace and nuxeo">
         <antcall target="dist-jboss-cspace"/>
         <antcall target="dist-jboss-nuxeo"/>
     </target>
 
     <target name="dist-jboss-cspace" depends="dist"
-    description="generate jboss distribution for cspace">
+            description="generate jboss distribution for cspace">
         <fail message="JBoss is not installed or ${jboss.dir} not found">
             <condition>
                 <not>
@@ -73,17 +73,17 @@
 
         <tar destfile="${basedir}/dist/${jboss.release}-${domain.cspace}-${cspace.release}.tar.gz" compression="gzip">
             <tarfileset dir="${jboss.dir}"
-            prefix="${jboss.release}"
-              preserveLeadingSlashes="true">
+                        prefix="${jboss.release}"
+                        preserveLeadingSlashes="true">
                 <exclude name="server/${jboss.domain.nuxeo}/**"/>
                 <exclude name="server/${jboss.domain.cspace}/log/**"/>
                 <exclude name="server/${jboss.domain.cspace}/tmp/**"/>
             </tarfileset>
         </tar>
     </target>
-    
+
     <target name="dist-jboss-nuxeo" depends="dist"
-        description="generate nuxeo domain distribution" >
+            description="generate nuxeo domain distribution" >
         <fail message="JBoss is not installed or ${jboss.dir} not found">
             <condition>
                 <not>
@@ -102,8 +102,8 @@
 
         <tar destfile="${basedir}/dist/${jboss.release}-${domain.nuxeo}-${nuxeo.release}.tar.gz" compression="gzip">
             <tarfileset dir="${jboss.dir}"
-              prefix="${jboss.release}"
-              preserveLeadingSlashes="true">
+                        prefix="${jboss.release}"
+                        preserveLeadingSlashes="true">
                 <exclude name="server/${jboss.domain.cspace}/**"/>
                 <exclude name="server/${jboss.domain.nuxeo}/log/**"/>
                 <exclude name="server/${jboss.domain.nuxeo}/tmp/**"/>
@@ -112,7 +112,7 @@
     </target>
 
     <target name="package" depends="package-unix,package-windows"
-  description="mvn package" />
+            description="mvn package" />
     <target name="package-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
             <arg value="package" />
@@ -137,7 +137,7 @@
     </target>
 
     <target name="install" depends="package,install-unix,install-windows"
-  description="mvn install" />
+            description="mvn install" />
     <target name="install-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
             <arg value="install" />
@@ -163,7 +163,7 @@
 
 
     <target name="clean" depends="clean-unix,clean-windows"
-  description="Delete target directories" >
+            description="Delete target directories" >
         <delete dir="${basedir}/build"/>
         <delete dir="${basedir}/dist"/>
     </target>
@@ -198,24 +198,30 @@
         </exec>
     </target>
 
+    <target name="gen_ddl"
+            description="generate service-specific tables(s), indices, etc.">
+        <ant antfile="services/build.xml" target="gen_ddl" inheritAll="false"/>
+    </target>
+
     <target name="create_db"
-    description="create database(s), grant privileges to test users">
+            description="create database(s), grant privileges to test users">
         <sql driver="com.mysql.jdbc.Driver"
-        url="jdbc:mysql://${db.host}:${db.port}/cspace"
-        userid="${db.user}"
-        password="${db.user.password}"
-        src="${db.script.dir}/init_db.sql"
-        >
+             url="jdbc:mysql://${db.host}:${db.port}/cspace"
+             userid="${db.user}"
+             password="${db.user.password}"
+             src="${db.script.dir}/init_db.sql"
+             >
             <classpath>
                 <pathelement path="${db.driver.jar}"/>
             </classpath>
         </sql>
         <ant antfile="services/build.xml" target="create_db" inheritAll="false"/>
     </target>
+    
 
     <target name="deploy" depends="install"
-    description="deploy services in ${jboss.server.cspace}">
-                <!-- copy db scripts, etc. -->
+            description="deploy services in ${jboss.server.cspace}">
+        <!-- copy db scripts, etc. -->
         <copy todir="${jboss.server.cspace}/cspace/services">
             <fileset dir="${src}/main/resources/"/>
         </copy>
@@ -229,7 +235,7 @@
     </target>
 
     <target name="undeploy"
-    description="undeploy services from ${jboss.server.cspace}">
+            description="undeploy services from ${jboss.server.cspace}">
         <ant antfile="services/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="3rdparty/build.xml" target="undeploy" inheritAll="false"/>
         <delete failonerror="false"  file="${jboss.deploy.cspace}/cspace-ds.xml"/>
@@ -239,7 +245,7 @@
 
 
     <target name="hotdeploy" depends="install"
-    description="deploy services in running ${jboss.server.cspace}">
+            description="deploy services in running ${jboss.server.cspace}">
         <ant antfile="services/build.xml" target="hotdeploy" inheritAll="false"/>
     </target>
 
@@ -263,7 +269,7 @@
     </target>
 
     <target name="dist_installer" depends="package"
-    	description="Installer: Creates an installer distribution for the CollectionSpace services.">
+            description="Installer: Creates an installer distribution for the CollectionSpace services.">
         <!-- copy install scripts, etc. -->
         <copy todir="${basedir}/${dist.installer}">
             <fileset file="${basedir}/build.properties"/>
