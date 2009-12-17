@@ -151,7 +151,6 @@
     <!-- this target is called in order based on the dependencies between the services -->
     <target name="dist" depends="package"
             description="create distribution for services">
-        <ant antfile="common/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="authentication/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="common/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="relation/build.xml" target="dist" inheritAll="false"/>

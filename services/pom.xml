@@ -15,7 +15,8 @@
     <modules>
         <module>authentication</module>
         <module>common</module>
-        <!-- module>account</module -->
+        <module>client</module>
+        <module>account</module>
         <module>relation</module>
         <!--module>query</module-->
         <module>acquisition</module>
@@ -26,9 +27,9 @@
         <module>dimension</module>
         <module>contact</module>
         <module>JaxRsServiceProvider</module>
-        <module>client</module>
         <module>sdk</module>
         <module>IntegrationTests</module>
+        <module>security</module>
     </modules>
 
     <repositories> </repositories>

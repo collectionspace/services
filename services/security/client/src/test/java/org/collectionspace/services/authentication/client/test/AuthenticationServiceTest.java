@@ -20,7 +20,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.collectionspace.services.authentication.client;
+package org.collectionspace.services.authentication.client.test;
 
 import java.util.ArrayList;
 import java.util.List;
