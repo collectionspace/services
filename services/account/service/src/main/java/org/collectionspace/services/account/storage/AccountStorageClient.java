@@ -23,9 +23,10 @@
  */
 package org.collectionspace.services.account.storage;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import org.apache.commons.codec.binary.Base64;
 import org.collectionspace.services.account.AccountsCommon;
@@ -33,7 +34,6 @@ import org.collectionspace.services.authentication.User;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
-import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
@@ -41,6 +41,7 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClient;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,14 +84,22 @@ public class AccountStorageClient extends JpaStorageClient {
             em.getTransaction().begin();
             //if userid and password are given, add to default id provider
             if (account.getUserId() != null && account.getPassword() != null) {
-                User user = createUser(account, ctx.getTenantId());
+                User user = createUser(account);
                 em.persist(user);
             }
-            account.setTenantid(ctx.getTenantId());
+//            if (account.getTenant() != null) {
+//                UserTenant ut = createTenantAssoc(account);
+//                em.persist(ut);
+//            }
             em.persist(account);
             em.getTransaction().commit();
             handler.complete(Action.CREATE, wrapDoc);
             return (String) getValue(account, "getCsid");
+        } catch (BadRequestException bre) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw bre;
         } catch (Exception e) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -138,15 +147,21 @@ public class AccountStorageClient extends JpaStorageClient {
             if (account.getUserId() != null && account.getPassword() != null) {
 
                 User userFound = getUser(em, account);
-                User user = createUser(account, ctx.getTenantId());
+                User user = createUser(account);
                 em.merge(user);
             }
             em.merge(account);
             em.getTransaction().commit();
             handler.complete(Action.UPDATE, wrapDoc);
         } catch (BadRequestException bre) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             throw bre;
         } catch (DocumentException de) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -192,8 +207,8 @@ public class AccountStorageClient extends JpaStorageClient {
 
             //if userid gives any indication about the id provider, it should
             //be used to avoid the following approach
-            User userLocal = em.find(User.class, accountFound.getUserId());
             Query usrDel = null;
+            User userLocal = getUser(em, accountFound);
             if (userLocal != null) {
                 StringBuilder usrDelStr = new StringBuilder("DELETE FROM ");
                 usrDelStr.append(User.class.getCanonicalName());
@@ -203,12 +218,12 @@ public class AccountStorageClient extends JpaStorageClient {
                 usrDel.setParameter("username", accountFound.getUserId());
             }
             em.getTransaction().begin();
-            int accDelCount = accDel.executeUpdate();
-            if (accDelCount != 1) {
-                if (em != null && em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
-            }
+//            int accDelCount = accDel.executeUpdate();
+//            if (accDelCount != 1) {
+//                if (em != null && em.getTransaction().isActive()) {
+//                    em.getTransaction().rollback();
+//                }
+//            }
             if (userLocal != null) {
                 int usrDelCount = usrDel.executeUpdate();
                 if (usrDelCount != 1) {
@@ -222,9 +237,13 @@ public class AccountStorageClient extends JpaStorageClient {
                     throw new DocumentNotFoundException(msg);
                 }
             }
+            em.remove(accountFound);
             em.getTransaction().commit();
 
         } catch (DocumentException de) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -264,9 +283,8 @@ public class AccountStorageClient extends JpaStorageClient {
         return true;
     }
 
-    private User createUser(AccountsCommon account, String tenantId) {
+    private User createUser(AccountsCommon account) {
         User user = new User();
-        user.setTenantid(tenantId);
         user.setUsername(account.getUserId());
         byte[] bpass = Base64.decodeBase64(account.getPassword());
         SecurityUtils.validatePassword(new String(bpass));
@@ -288,4 +306,20 @@ public class AccountStorageClient extends JpaStorageClient {
         }
         return userFound;
     }
+
+//    private UserTenant createTenantAssoc(AccountsCommon account) {
+//        UserTenant userTenant = new UserTenant();
+//        userTenant.setUserId(account.getUserId());
+//        List<AccountsCommon.Tenant> atl = account.getTenant();
+//        List<UserTenant.Tenant> utl =
+//                new ArrayList<UserTenant.Tenant>();
+//        for (AccountsCommon.Tenant at : atl) {
+//            UserTenant.Tenant ut = new UserTenant.Tenant();
+//            ut.setId(at.getId());
+//            ut.setName(at.getName());
+//            utl.add(ut);
+//        }
+//        userTenant.setTenant(utl);
+//        return userTenant;
+//    }
 }

@@ -13,7 +13,6 @@
     <name>services.main</name>
 
     <modules>
-        <!-- add modules below in the order based on dependencies -->
         <module>authentication</module>
         <module>common</module>
         <!-- module>account</module -->

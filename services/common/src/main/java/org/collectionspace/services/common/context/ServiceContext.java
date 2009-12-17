@@ -45,7 +45,7 @@ public interface ServiceContext<IT, OT> {
     public static final String PART_COMMON_LABEL = "common";
 	
     /**
-     * getTenantId get tenant id
+     * getTenantId get id of tenant for which service is accessed
      * @return tenant id
      */
     public String getTenantId();

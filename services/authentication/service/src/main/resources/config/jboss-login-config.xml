@@ -4,10 +4,10 @@
     Copyright 2009 University of California at Berkeley
     Licensed under the Educational Community License (ECL), Version 2.0.
     You may not use this file except in compliance with this License.
-    
+
     Document   : jboss-login-config.xml
     Created on : June 19, 2009, 9:58 AM
-    Author     : 
+    Author     :
     Description:
         jboss config for JAAS DatabaseServerLoginModule
 -->
@@ -19,16 +19,19 @@ copy before the "other" application-policy
 <application-policy name="cspace">
     <authentication>
         <login-module code="org.collectionspace.authentication.CSpaceDBLoginModule"
-                             flag="required">
+                      flag="required">
             <module-option name="dsJndiName">CspaceDS</module-option>
             <module-option name="hashAlgorithm">SHA-256</module-option>
             <module-option name="ignorePasswordCase">false</module-option>
             <module-option name = "principalClass">org.collectionspace.authentication.CSpacePrincipal</module-option>
             <module-option name="principalsQuery">
-                    select passwd, tenantid from users where username=?
+                select passwd from users where username=?
             </module-option>
             <module-option name="rolesQuery">
-                    select rolename, 'Roles' from users_roles where username=? and tenantid=?
+                select rolename, 'Roles' from users_roles where username=?
+            </module-option>
+            <module-option name="tenantsQuery">
+                select id, name, 'Tenants' from accounts_common a, tenants as t where a.userid=? and a.csid = t.TENANT_ACCOUNTSCOMMON_CSID
             </module-option>
         </login-module>
     </authentication>

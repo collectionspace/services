@@ -2,16 +2,20 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.collectionspace.services.client.test;
+package org.collectionspace.services.account.client.test;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 
 import javax.persistence.Query;
 import org.collectionspace.services.account.AccountsCommon;
+import org.collectionspace.services.account.AccountsCommon.Tenant;
 import org.collectionspace.services.account.Status;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -54,25 +58,67 @@ public class AccountTest {
 
     @SuppressWarnings("unchecked")
     @Test(dataProvider = "testName", dataProviderClass = AccountTest.class)
-    public void create(String testName) throws Exception {
-        AccountsCommon account = new AccountsCommon();
-        account.setScreenName("john");
-        account.setFirstName("John");
-        account.setLastName("Doe");
-        account.setEmail("john.doe@berkeley.edu");
-        account.setUserId("johndoe");
+    public void createTest(String testName) throws Exception {
+        AccountsCommon account = null;
+        try {
+            account = findAccount("test");
+            if (account != null) {
+                return;
+            }
+        } catch (NoResultException nre) {
+            //ignore
+        }
+        if (account == null) {
+            account = new AccountsCommon();
+        }
+        account.setScreenName("test");
+        account.setEmail("test.test@berkeley.edu");
+        account.setUserId("test");
         account.setStatus(Status.ACTIVE);
         id = UUID.randomUUID().toString();
         account.setCsid(id);
-        account.setTenantid("123"); //set by service runtime
+
+        Tenant tenant = new Tenant();
+        tenant.setId("1");
+        tenant.setName("movingimages.us");
+        List<Tenant> lt = new ArrayList<Tenant>();
+        lt.add(tenant);
+        account.setTenant(lt);
         em.getTransaction().begin();
         em.persist(account);
         // Commit the transaction
         em.getTransaction().commit();
         if (logger.isDebugEnabled()) {
-            logger.debug("created account " +
-                    " first name=" + account.getFirstName() +
-                    " email=" + account.getEmail());
+            logger.debug("created/updated account "
+                    + " screen name=" + account.getScreenName()
+                    + " email=" + account.getEmail());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test(dataProvider = "testName", dataProviderClass = AccountTest.class)
+    public void create(String testName) throws Exception {
+        AccountsCommon account = new AccountsCommon();
+        account.setScreenName("john");
+        account.setEmail("john.doe@berkeley.edu");
+        account.setUserId("johndoe");
+        account.setStatus(Status.ACTIVE);
+        id = UUID.randomUUID().toString();
+        account.setCsid(id);
+        Tenant tenant = new Tenant();
+        tenant.setId("123");
+        tenant.setName("movingimages.us.standalone");
+        List<Tenant> lt = new ArrayList<Tenant>();
+        lt.add(tenant);
+        account.setTenant(lt);
+        em.getTransaction().begin();
+        em.persist(account);
+        // Commit the transaction
+        em.getTransaction().commit();
+        if (logger.isDebugEnabled()) {
+            logger.debug("created account "
+                    + " screen name=" + account.getScreenName()
+                    + " email=" + account.getEmail());
         }
     }
 
@@ -83,8 +129,8 @@ public class AccountTest {
         AccountsCommon account = findAccount("john");
         Assert.assertNotNull(account);
         if (logger.isDebugEnabled()) {
-            logger.debug("read account " +
-                    " first name=" + account.getFirstName());
+            logger.debug("read account "
+                    + " screen name=" + account.getScreenName());
         }
     }
 
@@ -109,9 +155,9 @@ public class AccountTest {
         Assert.assertEquals(no, 1);
         AccountsCommon account = findAccount("john");
         if (logger.isDebugEnabled()) {
-            logger.debug("updated account " +
-                    " first name=" + account.getFirstName() +
-                    " email=" + account.getEmail());
+            logger.debug("updated account "
+                    + " screen name=" + account.getScreenName()
+                    + " email=" + account.getEmail());
         }
     }
 
@@ -119,22 +165,19 @@ public class AccountTest {
     @Test(dataProvider = "testName", dataProviderClass = AccountTest.class,
     dependsOnMethods = {"update"})
     public void delete(String testName) throws Exception {
-        Query q = em.createQuery("delete from org.collectionspace.services.account.AccountsCommon where csid=:csid");
-        q.setParameter("csid", id);
         // Begin transaction
         em.getTransaction().begin();
-        int no = q.executeUpdate();
-        ;
+        AccountsCommon account = findAccount("john");
+        em.remove(account);
         if (logger.isDebugEnabled()) {
-            logger.debug("deleting account " +
-                    " csid=" + id);
+            logger.debug("deleting account "
+                    + " csid=" + id);
         }
         // Commit the transaction
         em.getTransaction().commit();
-        Assert.assertEquals(no, 1);
         if (logger.isDebugEnabled()) {
-            logger.debug("deleted account " +
-                    " csid=" + id);
+            logger.debug("deleted account "
+                    + " csid=" + id);
         }
     }
 

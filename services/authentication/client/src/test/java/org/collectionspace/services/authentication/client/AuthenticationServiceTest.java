@@ -22,8 +22,14 @@
  */
 package org.collectionspace.services.authentication.client;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.apache.commons.codec.binary.Base64;
+import org.collectionspace.services.client.AccountClient;
+import org.collectionspace.services.account.AccountsCommon;
 import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -48,6 +54,8 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
 
     /** The known resource id. */
     private String knownResourceId = null;
+    private String barneyAccountId = null;
+    private String babybopAccountId = null;
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(AuthenticationServiceTest.class);
 
@@ -61,12 +69,69 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
         return null;
     }
 
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class)
+    public void createAccounts(String testName) throws Exception {
+        // Perform setup, such as initializing the type of service request
+        // (e.g. CREATE, DELETE), its valid and expected status codes, and
+        // its associated HTTP method name (e.g. POST, DELETE).
+        setupCreate(testName);
+        AccountClient accountClient = new AccountClient();
+        if (!accountClient.isServerSecure()) {
+            logger.warn("set -Dcspace.server.secure=true to run security tests");
+            return;
+        }
+        accountClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
+                "true");
+        accountClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
+                "test");
+        accountClient.setProperty(
+                CollectionSpaceClient.PASSWORD_PROPERTY, "test");
+        // Submit the request to the service and store the response.
+        AccountsCommon account =
+                createAccountInstance("barney", "barney08", "barney@dinoland.com", "1");
+        ClientResponse<Response> res = accountClient.create(account);
+        int statusCode = res.getStatus();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": barney status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        // Store the ID returned from this create operation
+        // for additional tests below.
+        barneyAccountId = extractId(res);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": barneyAccountId=" + barneyAccountId);
+        }
+
+        account = createAccountInstance("babybop", "babybop09", "babybop@dinoland.com", "non-existent");
+        res = accountClient.create(account);
+        statusCode = res.getStatus();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": babybop status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+
+        // Store the ID returned from this create operation
+        // for additional tests below.
+        babybopAccountId = extractId(res);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": babybopAccountId=" + babybopAccountId);
+        }
+
+    }
+
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTest#create()
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class)
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    dependsOnMethods = {"createAccounts"})
     @Override
     public void create(String testName) {
+        setupCreate(testName);
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         String identifier = this.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
@@ -79,9 +144,9 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
         collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
                 "true");
         collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
-                "test");
+                "barney");
         collectionObjectClient.setProperty(
-                CollectionSpaceClient.PASSWORD_PROPERTY, "test");
+                CollectionSpaceClient.PASSWORD_PROPERTY, "barney08");
         try {
             collectionObjectClient.setupHttpClient();
             collectionObjectClient.setProxy();
@@ -101,42 +166,11 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
     }
 
     /**
-     * Creates the collection object instance without user.
-     */
-    @Test(dependsOnMethods = {"create"})
-    public void createWithoutUser() {
-        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        String identifier = this.createIdentifier();
-        MultipartOutput multipart = createCollectionObjectInstance(
-                collectionObjectClient.getCommonPartName(), identifier);
-        if (!collectionObjectClient.isServerSecure()) {
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
-        collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
-                "true");
-        collectionObjectClient.removeProperty(CollectionSpaceClient.USER_PROPERTY);
-        collectionObjectClient.setProperty(
-                CollectionSpaceClient.PASSWORD_PROPERTY, "test");
-        try {
-            collectionObjectClient.setupHttpClient();
-            collectionObjectClient.setProxy();
-        } catch (Exception e) {
-            logger.error("createWithoutUser: caught " + e.getMessage());
-            return;
-        }
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        if (logger.isDebugEnabled()) {
-            logger.debug("createWithoutUser: status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
-    }
-
-    /**
      * Creates the collection object instance without password.
      */
-    @Test(dependsOnMethods = {"createWithoutUser"})
+    @Test(dependsOnMethods = {"createAccounts"})
     public void createWithoutPassword() {
+        banner("createWithoutPassword");
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         String identifier = this.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
@@ -165,10 +199,45 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
     }
 
     /**
+     * Creates the collection object with unknown user
+     */
+    @Test(dependsOnMethods = {"createAccounts"})
+    public void createWithUnknownUser() {
+        banner("createWithUnknownUser");
+        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+        String identifier = this.createIdentifier();
+        MultipartOutput multipart = createCollectionObjectInstance(
+                collectionObjectClient.getCommonPartName(), identifier);
+        if (!collectionObjectClient.isServerSecure()) {
+            logger.warn("set -Dcspace.server.secure=true to run security tests");
+            return;
+        }
+        collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
+                "true");
+        collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
+                "foo");
+        collectionObjectClient.setProperty(CollectionSpaceClient.PASSWORD_PROPERTY,
+                "bar");
+        try {
+            collectionObjectClient.setupHttpClient();
+            collectionObjectClient.setProxy();
+        } catch (Exception e) {
+            logger.error("createWithUnknownUser: caught " + e.getMessage());
+            return;
+        }
+        ClientResponse<Response> res = collectionObjectClient.create(multipart);
+        if (logger.isDebugEnabled()) {
+            logger.debug("createWithUnknownUser: status = " + res.getStatus());
+        }
+        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
+    }
+
+    /**
      * Creates the collection object instance with incorrect password.
      */
-    @Test(dependsOnMethods = {"createWithoutPassword"})
+    @Test(dependsOnMethods = {"createAccounts"})
     public void createWithIncorrectPassword() {
+        banner("createWithIncorrectPassword");
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         String identifier = this.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
@@ -198,41 +267,11 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
     }
 
     /**
-     * Creates the collection object instance without user password.
-     */
-    @Test(dependsOnMethods = {"createWithoutPassword"})
-    public void createWithoutUserPassword() {
-        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        String identifier = this.createIdentifier();
-        MultipartOutput multipart = createCollectionObjectInstance(
-                collectionObjectClient.getCommonPartName(), identifier);
-        if (!collectionObjectClient.isServerSecure()) {
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
-        collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
-                "true");
-        collectionObjectClient.removeProperty(CollectionSpaceClient.USER_PROPERTY);
-        collectionObjectClient.removeProperty(CollectionSpaceClient.PASSWORD_PROPERTY);
-        try {
-            collectionObjectClient.setupHttpClient();
-            collectionObjectClient.setProxy();
-        } catch (Exception e) {
-            logger.error("createWithoutUserPassword: caught " + e.getMessage());
-            return;
-        }
-        ClientResponse<Response> res = collectionObjectClient.create(multipart);
-        if (logger.isDebugEnabled()) {
-            logger.debug("createWithoutUserPassword: status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), Response.Status.FORBIDDEN.getStatusCode(), "expected " + Response.Status.FORBIDDEN.getStatusCode());
-    }
-
-    /**
      * Creates the collection object instance with incorrect user password.
      */
-    @Test(dependsOnMethods = {"createWithoutPassword"})
+    @Test(dependsOnMethods = {"createAccounts"})
     public void createWithIncorrectUserPassword() {
+        banner("createWithIncorrectUserPassword");
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         String identifier = this.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
@@ -256,8 +295,43 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
         }
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
         if (logger.isDebugEnabled()) {
-            logger.debug("createWithIncorrectUserPassword: status = " +
-                    res.getStatus());
+            logger.debug("createWithIncorrectUserPassword: status = "
+                    + res.getStatus());
+        }
+        Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
+    }
+
+    /**
+     * Creates the collection object instance with incorrect user password.
+     */
+    @Test(dependsOnMethods = {"createAccounts"})
+    public void createWithoutTenant() {
+        banner("createWithoutTenant");
+        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+        String identifier = this.createIdentifier();
+        MultipartOutput multipart = createCollectionObjectInstance(
+                collectionObjectClient.getCommonPartName(), identifier);
+        if (!collectionObjectClient.isServerSecure()) {
+            logger.warn("set -Dcspace.server.secure=true to run security tests");
+            return;
+        }
+        collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
+                "true");
+        collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
+                "babybop");
+        collectionObjectClient.setProperty(
+                CollectionSpaceClient.PASSWORD_PROPERTY, "babybop09");
+        try {
+            collectionObjectClient.setupHttpClient();
+            collectionObjectClient.setProxy();
+        } catch (Exception e) {
+            logger.error("createWithoutTenant: caught " + e.getMessage());
+            return;
+        }
+        ClientResponse<Response> res = collectionObjectClient.create(multipart);
+        if (logger.isDebugEnabled()) {
+            logger.debug("createWithoutTenant: status = "
+                    + res.getStatus());
         }
         Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
     }
@@ -267,8 +341,9 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
      */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
-    dependsOnMethods = {"createWithIncorrectUserPassword"})
+    dependsOnMethods = {"create"})
     public void delete(String testName) {
+        setupDelete(testName);
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient = new CollectionObjectClient();
         if (!collectionObjectClient.isServerSecure()) {
@@ -297,6 +372,41 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
         }
         Assert.assertEquals(res.getStatus(),
                 Response.Status.OK.getStatusCode(), "expected " + Response.Status.OK.getStatusCode());
+    }
+
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    dependsOnMethods = {"delete"})
+    public void deleteAccounts(String testName) throws Exception {
+
+        // Perform setup.
+        setupDelete(testName);
+        AccountClient accountClient = new AccountClient();
+        if (!accountClient.isServerSecure()) {
+            logger.warn("set -Dcspace.server.secure=true to run security tests");
+            return;
+        }
+        accountClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
+                "true");
+        accountClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
+                "test");
+        accountClient.setProperty(
+                CollectionSpaceClient.PASSWORD_PROPERTY, "test");
+        // Submit the request to the service and store the response.
+        ClientResponse<Response> res = accountClient.delete(barneyAccountId);
+        int statusCode = res.getStatus();
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": barney status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+
+        res = accountClient.delete(babybopAccountId);
+        statusCode = res.getStatus();
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": babybop status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     }
 
     // ---------------------------------------------------------------
@@ -340,6 +450,38 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
                     collectionObject, CollectionobjectsCommon.class);
         }
         return multipart;
+    }
+
+    private AccountsCommon createAccountInstance(String screenName,
+            String passwd, String email, String tenantId) {
+
+        AccountsCommon account = new AccountsCommon();
+        account.setScreenName(screenName);
+        account.setUserId(screenName);
+        account.setPassword(Base64.encodeBase64(passwd.getBytes()));
+        account.setEmail(email);
+        account.setPhone("1234567890");
+        List<AccountsCommon.Tenant> atl = new ArrayList<AccountsCommon.Tenant>();
+
+        AccountsCommon.Tenant at = new AccountsCommon.Tenant();
+        at.setId(tenantId);//for testing purposes
+        at.setName("movingimages.us");
+        atl.add(at);
+        //disable 2nd tenant till tenant identification is in effect
+        //on the service side for 1-n user-tenants
+//        AccountsCommon.Tenant at2 = new AccountsCommon.Tenant();
+//        at2.setId(UUID.randomUUID().toString());
+//        at2.setName("collectionspace.org");
+//        atl.add(at2);
+        account.setTenant(atl);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("to be created, account common");
+            logger.debug(objectAsXmlString(account,
+                    AccountsCommon.class));
+        }
+        return account;
+
     }
 
     /* (non-Javadoc)

@@ -30,8 +30,10 @@ import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.account.AccountsCommonList.AccountListItem;
 import org.collectionspace.services.account.Status;
 import org.collectionspace.services.common.document.AbstractDocumentHandler;
+import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -40,6 +42,7 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 public class AccountDocumentHandler
         extends AbstractDocumentHandler<AccountsCommon, AccountsCommonList, AccountsCommon, List> {
 
+    private final Logger logger = LoggerFactory.getLogger(AccountDocumentHandler.class);
     private AccountsCommon account;
     private AccountsCommonList accountList;
 
@@ -47,12 +50,29 @@ public class AccountDocumentHandler
     public void handleCreate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
         String id = UUID.randomUUID().toString();
         AccountsCommon account = wrapDoc.getWrappedObject();
+        if (account.getUserId() == null || "".equals(account.getUserId())) {
+            String msg = "userId is missing";
+            logger.error(msg);
+            throw new BadRequestException(msg);
+        }
+        List<AccountsCommon.Tenant> tl = account.getTenant();
+        if (tl == null || tl.size() == 0) {
+            String msg = "missing tenant information!";
+            logger.error(msg);
+            throw new BadRequestException(msg);
+        }
         account.setCsid(id);
         account.setStatus(Status.ACTIVE);
     }
 
     @Override
     public void handleUpdate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
+        if (account.getPassword() != null
+                && (account.getUserId() == null || "".equals(account.getUserId()))) {
+            String msg = "userId is missing";
+            logger.error(msg);
+            throw new BadRequestException(msg);
+        }
     }
 
     @Override
@@ -102,8 +122,6 @@ public class AccountDocumentHandler
             AccountListItem accListItem = new AccountListItem();
             accListItem.setScreenName(account.getScreenName());
             accListItem.setEmail(account.getEmail());
-            accListItem.setFirstName(account.getFirstName());
-            accListItem.setLastName(account.getLastName());
             accListItem.setStatus(account.getStatus());
             String id = account.getCsid();
             accListItem.setUri(getServiceContextPath() + id);
@@ -144,7 +162,6 @@ public class AccountDocumentHandler
      * @param account
      */
     private void sanitize(AccountsCommon account) {
-        account.setTenantid("");
         account.setPassword(null);
     }
 }

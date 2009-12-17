@@ -100,6 +100,10 @@ public class AccountResource
             path.path("" + csid);
             Response response = Response.created(path.build()).build();
             return response;
+        } catch (BadRequestException bre) {
+            Response response = Response.status(
+                    Response.Status.BAD_REQUEST).entity("Create failed reason " + bre.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Create failed reason " + ue.getErrorReason()).type("text/plain").build();

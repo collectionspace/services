@@ -23,9 +23,8 @@
  */
 package org.collectionspace.services.common.context;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.security.Principal;
+import java.security.acl.Group;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +32,7 @@ import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.jacc.PolicyContext;
 import javax.security.jacc.PolicyContextException;
+import org.collectionspace.authentication.CSpaceTenant;
 
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
@@ -66,29 +66,29 @@ public abstract class AbstractServiceContext<IT, OT>
                 ServiceMain.getInstance().getTenantBindingConfigReader();
         //FIXME retrieveTenantId is not working consistently in non-auth mode
         //TODO: get tenant binding from security context
-        String tenantId = null; //retrieveTenantId();
+        String tenantId = retrieveTenantId();
         if (tenantId == null) {
             //for testing purposes
             tenantId = "1"; //hardcoded for movingimages.us
         }
         tenantBinding = tReader.getTenantBinding(tenantId);
         if (tenantBinding == null) {
-            String msg = "No tenant binding found while processing request for " +
-                    serviceName;
+            String msg = "No tenant binding found for tenantId=" + tenantId + 
+                    " while processing request for service= " + serviceName;
             logger.error(msg);
             throw new IllegalStateException(msg);
         }
         serviceBinding = tReader.getServiceBinding(tenantId, serviceName);
         if (serviceBinding == null) {
-            String msg = "No service binding found while processing request for " +
-                    serviceName + " for tenant id=" + getTenantId() +
-                    " name=" + getTenantName();
+            String msg = "No service binding found while processing request for "
+                    + serviceName + " for tenant id=" + getTenantId()
+                    + " name=" + getTenantName();
             logger.error(msg);
             throw new IllegalStateException(msg);
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("tenantId=" + tenantId +
-                    " service binding=" + serviceBinding.getName());
+            logger.debug("tenantId=" + tenantId
+                    + " service binding=" + serviceBinding.getName());
         }
     }
 
@@ -225,18 +225,18 @@ public abstract class AbstractServiceContext<IT, OT>
 
         String tenantId = null;
         Subject caller = null;
-        Set<Principal> principals = null;
+        Set<Group> groups = null;
         try {
             caller = (Subject) PolicyContext.getContext(SUBJECT_CONTEXT_KEY);
             if (caller == null) {
                 //logger.warn("security not enabled...");
                 return tenantId;
             }
-            principals = caller.getPrincipals(Principal.class);
-            if (principals != null && principals.size() == 0) {
+            groups = caller.getPrincipals(Group.class);
+            if (groups != null && groups.size() == 0) {
                 //TODO: find out why subject is not null
                 if (logger.isDebugEnabled()) {
-                    logger.debug("weird case where subject is not null and there are no principals");
+                    logger.debug("no tenant(s) found!");
                 }
                 return tenantId;
             }
@@ -245,20 +245,21 @@ public abstract class AbstractServiceContext<IT, OT>
             logger.error(msg, pce);
             throw new UnauthorizedException(msg);
         }
-        for (Principal p : principals) {
-            try {
-                Method m = p.getClass().getMethod("getTenantId");
-                Object r = m.invoke(p);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("retrieved tenantid=" + r +
-                            " for principal=" + p.getName());
+        for (Group g : groups) {
+            if ("Tenants".equals(g.getName())) {
+                Enumeration members = g.members();
+                while (members.hasMoreElements()) {
+                    CSpaceTenant tenant = (CSpaceTenant) members.nextElement();
+                    tenantId = tenant.getId();
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("found tenant id=" + tenant.getId()
+                                + " name=" + tenant.getName());
+                    }
                 }
-                tenantId = (String) r;
-                break;
-            } catch (Exception e) {
-                //continue with next principal
             }
         }
+        //TODO: if a user is associated with more than one tenants, the tenant
+        //id should be matched with sent over the wire
         if (tenantId == null) {
             String msg = "Could not find tenant context";
             logger.error(msg);

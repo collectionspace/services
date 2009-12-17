@@ -66,7 +66,7 @@ public abstract class AbstractServiceTest implements ServiceTest {
     protected final String NON_EXISTENT_ID = createNonExistentIdentifier();
     // The HTTP status code expected to be returned in the response,
     // from a request made to a service (where relevant).
-    int EXPECTED_STATUS_CODE = 0;
+    protected int EXPECTED_STATUS_CODE = 0;
     // The generic type of service request being tested
     // (e.g. CREATE, UPDATE, DELETE).
     //
@@ -654,7 +654,7 @@ public abstract class AbstractServiceTest implements ServiceTest {
         return sb.toString();
     }
 
-    private void banner(String label) {
+    protected void banner(String label) {
         if(logger.isDebugEnabled()){
             logger.debug("===================================================");
             logger.debug(" Test = " + label);

@@ -19,14 +19,13 @@
     </properties>
 
     <dependencies>
+        <!-- slf4j not available due to classloading issues perhaps -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
+
         <!-- utilities -->
         <dependency>
             <groupId>junit</groupId>
@@ -35,9 +34,7 @@
             <scope>test</scope>
         </dependency>
 
-
-
-      <!-- javax -->
+        <!-- javax -->
         <dependency>
             <groupId>javax.security</groupId>
             <artifactId>jaas</artifactId>

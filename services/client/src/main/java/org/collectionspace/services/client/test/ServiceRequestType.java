@@ -20,7 +20,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
 package org.collectionspace.services.client.test;
 
 import java.util.Arrays;
@@ -40,194 +39,212 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate$
  */
 public enum ServiceRequestType {
-   
+
     // Define each of the service request types and their valid HTTP status codes.
-    
     CREATE {
+
         @Override
-        public int[] validStatusCodes() { 
-              final int[] STATUS_CODES = {
-                    Response.Status.CREATED.getStatusCode(),
-                    Response.Status.BAD_REQUEST.getStatusCode(),
-                    Response.Status.FORBIDDEN.getStatusCode(),
-                    Response.Status.CONFLICT.getStatusCode(),
-                    Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()
-              };
-              Arrays.sort(STATUS_CODES);
-              return STATUS_CODES;
+        public int[] validStatusCodes() {
+            final int[] STATUS_CODES = {
+                Response.Status.CREATED.getStatusCode(),
+                Response.Status.BAD_REQUEST.getStatusCode(),
+                Response.Status.UNAUTHORIZED.getStatusCode(),
+                Response.Status.FORBIDDEN.getStatusCode(),
+                Response.Status.CONFLICT.getStatusCode(),
+                Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()
+            };
+            Arrays.sort(STATUS_CODES);
+            return STATUS_CODES;
         }
+
         @Override
         public boolean isValidStatusCode(int statusCode) {
-              if (Arrays.binarySearch(CREATE.validStatusCodes(), statusCode) >= 0) {
-                    return true;
-              } else {
-                    return false;
-              }
+            if (Arrays.binarySearch(CREATE.validStatusCodes(), statusCode) >= 0) {
+                return true;
+            } else {
+                return false;
+            }
         }
+
         @Override
         public String validStatusCodesAsString() {
-              return Arrays.toString(CREATE.validStatusCodes());
+            return Arrays.toString(CREATE.validStatusCodes());
         }
+
         @Override
         public String httpMethodName() {
             return javax.ws.rs.HttpMethod.POST;
         }
-    },  // Note that commas are required at the end of each enum block, except the last.
-    
-    
+    }, // Note that commas are required at the end of each enum block, except the last.
+
     READ {
+
         @Override
-        public int[] validStatusCodes() { 
-              final int[] STATUS_CODES = {
-                    Response.Status.OK.getStatusCode(),
-                    Response.Status.FORBIDDEN.getStatusCode(),
-                    Response.Status.NOT_FOUND.getStatusCode(),
-                    Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()
-              };
-              Arrays.sort(STATUS_CODES);
-              return STATUS_CODES;
+        public int[] validStatusCodes() {
+            final int[] STATUS_CODES = {
+                Response.Status.OK.getStatusCode(),
+                Response.Status.UNAUTHORIZED.getStatusCode(),
+                Response.Status.FORBIDDEN.getStatusCode(),
+                Response.Status.NOT_FOUND.getStatusCode(),
+                Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()
+            };
+            Arrays.sort(STATUS_CODES);
+            return STATUS_CODES;
         }
+
         @Override
         public boolean isValidStatusCode(int statusCode) {
-              if (Arrays.binarySearch(READ.validStatusCodes(), statusCode) >= 0) {
-                    return true;
-              } else {
-                    return false;
-              }
+            if (Arrays.binarySearch(READ.validStatusCodes(), statusCode) >= 0) {
+                return true;
+            } else {
+                return false;
+            }
         }
+
         @Override
         public String validStatusCodesAsString() {
-              return Arrays.toString(READ.validStatusCodes());
+            return Arrays.toString(READ.validStatusCodes());
         }
+
         @Override
         public String httpMethodName() {
             return javax.ws.rs.HttpMethod.GET;
         }
     },
-    
-    
     READ_LIST {
+
         @Override
-        public int[] validStatusCodes() { 
-              final int[] STATUS_CODES = {
-                    Response.Status.OK.getStatusCode(),
-                    Response.Status.BAD_REQUEST.getStatusCode(),
-                    Response.Status.FORBIDDEN.getStatusCode(),
-                    Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()
-              };
-              Arrays.sort(STATUS_CODES);
-              return STATUS_CODES;
+        public int[] validStatusCodes() {
+            final int[] STATUS_CODES = {
+                Response.Status.OK.getStatusCode(),
+                Response.Status.BAD_REQUEST.getStatusCode(),
+                Response.Status.UNAUTHORIZED.getStatusCode(),
+                Response.Status.FORBIDDEN.getStatusCode(),
+                Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()
+            };
+            Arrays.sort(STATUS_CODES);
+            return STATUS_CODES;
         }
+
         @Override
         public boolean isValidStatusCode(int statusCode) {
-              if (Arrays.binarySearch(READ_LIST.validStatusCodes(), statusCode) >= 0) {
-                    return true;
-              } else {
-                    return false;
-              }
+            if (Arrays.binarySearch(READ_LIST.validStatusCodes(), statusCode) >= 0) {
+                return true;
+            } else {
+                return false;
+            }
         }
+
         @Override
         public String validStatusCodesAsString() {
-              return Arrays.toString(READ_LIST.validStatusCodes());
+            return Arrays.toString(READ_LIST.validStatusCodes());
         }
+
         @Override
         public String httpMethodName() {
             return javax.ws.rs.HttpMethod.GET;
         }
     },
-    
-    
     UPDATE {
+
         @Override
-        public int[] validStatusCodes() { 
-              final int[] STATUS_CODES = {
-                    Response.Status.OK.getStatusCode(),
-                    Response.Status.BAD_REQUEST.getStatusCode(),
-                    Response.Status.FORBIDDEN.getStatusCode(),
-                    Response.Status.NOT_FOUND.getStatusCode(),
-                    Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()
-              };
-              Arrays.sort(STATUS_CODES);
-              return STATUS_CODES;
+        public int[] validStatusCodes() {
+            final int[] STATUS_CODES = {
+                Response.Status.OK.getStatusCode(),
+                Response.Status.BAD_REQUEST.getStatusCode(),
+                Response.Status.UNAUTHORIZED.getStatusCode(),
+                Response.Status.FORBIDDEN.getStatusCode(),
+                Response.Status.NOT_FOUND.getStatusCode(),
+                Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()
+            };
+            Arrays.sort(STATUS_CODES);
+            return STATUS_CODES;
         }
+
         @Override
         public boolean isValidStatusCode(int statusCode) {
-              if (Arrays.binarySearch(UPDATE.validStatusCodes(), statusCode) >= 0) {
-                    return true;
-              } else {
-                    return false;
-              }
+            if (Arrays.binarySearch(UPDATE.validStatusCodes(), statusCode) >= 0) {
+                return true;
+            } else {
+                return false;
+            }
         }
+
         @Override
         public String validStatusCodesAsString() {
-              return Arrays.toString(UPDATE.validStatusCodes());
+            return Arrays.toString(UPDATE.validStatusCodes());
         }
+
         @Override
         public String httpMethodName() {
             return javax.ws.rs.HttpMethod.PUT;
         }
     },
-    
-    
     DELETE {
+
         @Override
-        public int[] validStatusCodes() { 
-              final int[] STATUS_CODES = {
-                    Response.Status.OK.getStatusCode(),
-                    Response.Status.FORBIDDEN.getStatusCode(),
-                    Response.Status.NOT_FOUND.getStatusCode(),
-                    Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()
-              };
-              Arrays.sort(STATUS_CODES);
-              return STATUS_CODES;
+        public int[] validStatusCodes() {
+            final int[] STATUS_CODES = {
+                Response.Status.OK.getStatusCode(),
+                Response.Status.UNAUTHORIZED.getStatusCode(),
+                Response.Status.FORBIDDEN.getStatusCode(),
+                Response.Status.NOT_FOUND.getStatusCode(),
+                Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()
+            };
+            Arrays.sort(STATUS_CODES);
+            return STATUS_CODES;
         }
+
         @Override
         public boolean isValidStatusCode(int statusCode) {
-              if (Arrays.binarySearch(DELETE.validStatusCodes(), statusCode) >= 0) {
-                    return true;
-              } else {
-                    return false;
-              }
+            if (Arrays.binarySearch(DELETE.validStatusCodes(), statusCode) >= 0) {
+                return true;
+            } else {
+                return false;
+            }
         }
+
         @Override
         public String validStatusCodesAsString() {
-              return Arrays.toString(DELETE.validStatusCodes());
+            return Arrays.toString(DELETE.validStatusCodes());
         }
+
         @Override
         public String httpMethodName() {
             return javax.ws.rs.HttpMethod.DELETE;
         }
     },
-    
-    
     // Used by guard code.
     NON_EXISTENT {
+
         @Override
-        public int[] validStatusCodes() { 
-              final int[] STATUS_CODES = { 0 };
-              Arrays.sort(STATUS_CODES);
-              return STATUS_CODES;
+        public int[] validStatusCodes() {
+            final int[] STATUS_CODES = {0};
+            Arrays.sort(STATUS_CODES);
+            return STATUS_CODES;
         }
+
         @Override
         public boolean isValidStatusCode(int statusCode) {
-              return false;
+            return false;
         }
+
         @Override
         public String validStatusCodesAsString() {
-              return Arrays.toString(NON_EXISTENT.validStatusCodes());
+            return Arrays.toString(NON_EXISTENT.validStatusCodes());
         }
+
         @Override
         public String httpMethodName() {
-              return "";
+            return "";
         }
     };
-    
+
     // Template methods to be implemented by each ServiceRequestType.
-    
     public abstract int[] validStatusCodes();
-    
+
     public abstract boolean isValidStatusCode(int statusCode);
-    
+
     public abstract String validStatusCodesAsString();
 
     public abstract String httpMethodName();

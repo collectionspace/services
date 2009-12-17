@@ -11,8 +11,62 @@
     <packaging>jar</packaging>
     <version>1.0</version>
     <name>services.common</name>
-    
+
     <dependencies>
+
+        <!-- utilities -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+        <!-- javax -->
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.security</groupId>
+            <artifactId>jaas</artifactId>
+            <version>1.0.01</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.security</groupId>
+            <artifactId>jacc</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--
+            <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.6.1</version>
+            <scope>provided</scope>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
@@ -25,6 +79,8 @@
             <groupId>org.jvnet.jaxb2_commons</groupId>
             <artifactId>runtime</artifactId>
         </dependency>
+
+        <!-- jboss -->
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
@@ -46,54 +102,6 @@
             <version>1.1.GA</version>
         </dependency>
 
-        <!-- utilities -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-      <!-- javax -->
-
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>javax.security</groupId>
-            <artifactId>jaas</artifactId>
-            <version>1.0.01</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.security</groupId>
-            <artifactId>jacc</artifactId>
-            <version>1.0</version>
-             <scope>provided</scope>
-        </dependency>
-        <!--
-            <dependency>
-            <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>1.6.1</version>
-            <scope>provided</scope>
-        </dependency>
-        -->
-        <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>persistence-api</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
@@ -189,15 +197,30 @@
             <version>1.1.1</version>
         </dependency>
 
-
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.authentication.jaxb</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.authentication.service</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
-    
+
     <build>
         <finalName>collectionspace-services-common</finalName>
         <plugins>
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
+                <!-- version is very important here as we want to explicitly
+                use jaxb2 plugin only and not jaxb2 bundled with hyperjaxb3
+                that does not allow to invoke generate from base plugin -->
+                <version>0.7.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -211,23 +234,23 @@
                         <arg>-XtoString</arg>
                         <arg>-Xinject-listener-code</arg>
 
-                     <!-- <arg>-Xcollection-setter-injector</arg>
+                        <!-- <arg>-Xcollection-setter-injector</arg>
                                 <arg>-Xfluent-api</arg> -->
                     </args>
                     <plugins>
                         <plugin>
                             <groupId>
-                           org.jvnet.jaxb2_commons
+                                org.jvnet.jaxb2_commons
                             </groupId>
                             <artifactId>basic</artifactId>
                             <version>0.4.1</version>
                         </plugin>
                         <plugin>
                             <groupId>
-                           org.jvnet.jaxb2-commons
+                                org.jvnet.jaxb2-commons
                             </groupId>
                             <artifactId>
-                           property-listener-injector
+                                property-listener-injector
                             </artifactId>
                             <version>1.0</version>
                         </plugin>

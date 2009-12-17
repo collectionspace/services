@@ -20,9 +20,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.collectionspace.services.client.test;
+package org.collectionspace.services.account.client.test;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.codec.binary.Base64;
@@ -30,6 +32,8 @@ import org.collectionspace.services.client.AccountClient;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.account.Status;
+import org.collectionspace.services.client.test.AbstractServiceTest;
+import org.collectionspace.services.client.test.ServiceRequestType;
 import org.jboss.resteasy.client.ClientResponse;
 
 import org.testng.Assert;
@@ -76,7 +80,7 @@ public class AccountServiceTest extends AbstractServiceTest {
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
-                createAccountInstance("barney", "dino", "barney", "hithere08", "barney@dinoland.com");
+                createAccountInstance("barney", "hithere08", "barney@dinoland.com", true, true, true);
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
 
@@ -99,6 +103,47 @@ public class AccountServiceTest extends AbstractServiceTest {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": knownResourceId=" + knownResourceId);
         }
+    }
+
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    dependsOnMethods = {"create"})
+    public void createWithoutTenant(String testName) throws Exception {
+
+        setupCreate(testName);
+
+        // Submit the request to the service and store the response.
+        AccountsCommon account =
+                createAccountInstance("babybop", "hithere08", "babybop@dinoland.com", false, true, true);
+        ClientResponse<Response> res = client.create(account);
+        int statusCode = res.getStatus();
+        // Does it exactly match the expected status code?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+
+    }
+
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    dependsOnMethods = {"create"})
+    public void createWithoutUser(String testName) throws Exception {
+
+        setupCreate(testName);
+
+        // Submit the request to the service and store the response.
+        AccountsCommon account =
+                createAccountInstance("babybop", "hithere08", "babybop@dinoland.com", true, false, true);
+        ClientResponse<Response> res = client.create(account);
+        int statusCode = res.getStatus();
+        // Does it exactly match the expected status code?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     //to not cause uniqueness violation for account, createList is removed
@@ -209,12 +254,12 @@ public class AccountServiceTest extends AbstractServiceTest {
             int i = 0;
 
             for (AccountsCommonList.AccountListItem item : items) {
-                logger.debug(testName + ": list-item[" + i + "] csid=" +
-                        item.getCsid());
-                logger.debug(testName + ": list-item[" + i + "] screenName=" +
-                        item.getScreenName());
-                logger.debug(testName + ": list-item[" + i + "] URI=" +
-                        item.getUri());
+                logger.debug(testName + ": list-item[" + i + "] csid="
+                        + item.getCsid());
+                logger.debug(testName + ": list-item[" + i + "] screenName="
+                        + item.getScreenName());
+                logger.debug(testName + ": list-item[" + i + "] URI="
+                        + item.getUri());
                 i++;
 
             }
@@ -293,7 +338,7 @@ public class AccountServiceTest extends AbstractServiceTest {
         Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("got object to update with ID: " + knownResourceId);
+            logger.debug(testName + ": got object to update password with ID: " + knownResourceId);
         }
         AccountsCommon toUpdateAccount =
                 (AccountsCommon) res.getEntity();
@@ -302,7 +347,7 @@ public class AccountServiceTest extends AbstractServiceTest {
         //change password
         toUpdateAccount.setPassword(Base64.encodeBase64("imagination".getBytes()));
         if (logger.isDebugEnabled()) {
-            logger.debug("updated object");
+            logger.debug(testName + ": updated object");
             logger.debug(objectAsXmlString(toUpdateAccount,
                     AccountsCommon.class));
         }
@@ -328,7 +373,50 @@ public class AccountServiceTest extends AbstractServiceTest {
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
-    dependsOnMethods = {"updatePassword"})
+    dependsOnMethods = {"update"})
+    public void updatePasswordWithoutUser(String testName) throws Exception {
+
+        // Perform setup.
+        setupUpdate(testName);
+
+        ClientResponse<AccountsCommon> res =
+                client.read(knownResourceId);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": read status = " + res.getStatus());
+        }
+        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + " : got object to update with ID: " + knownResourceId);
+        }
+        AccountsCommon toUpdateAccount =
+                (AccountsCommon) res.getEntity();
+        Assert.assertNotNull(toUpdateAccount);
+
+        toUpdateAccount.setUserId(null);
+        //change password
+        toUpdateAccount.setPassword(Base64.encodeBase64("imagination".getBytes()));
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + " : updated object");
+            logger.debug(objectAsXmlString(toUpdateAccount,
+                    AccountsCommon.class));
+        }
+
+        // Submit the request to the service and store the response.
+        res = client.update(knownResourceId, toUpdateAccount);
+        int statusCode = res.getStatus();
+        // Check the status code of the response: does it match the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+
+    }
+
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    dependsOnMethods = {"updatePasswordWithoutUser"})
     public void deactivate(String testName) throws Exception {
 
         // Perform setup.
@@ -405,7 +493,7 @@ public class AccountServiceTest extends AbstractServiceTest {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in updateAccount(), below.
         AccountsCommon account =
-                createAccountInstance("simba", "mufasa", "simba", "tiger", "simba@lionking.com");
+                createAccountInstance("simba", "tiger", "simba@lionking.com", true, true, true);
         ClientResponse<AccountsCommon> res =
                 client.update(NON_EXISTENT_ID, account);
         int statusCode = res.getStatus();
@@ -429,7 +517,7 @@ public class AccountServiceTest extends AbstractServiceTest {
         //
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in updateAccount(), below.
-         ClientResponse<AccountsCommon> res =
+        ClientResponse<AccountsCommon> res =
                 client.read(knownResourceId);
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": read status = " + res.getStatus());
@@ -449,7 +537,7 @@ public class AccountServiceTest extends AbstractServiceTest {
             logger.debug(objectAsXmlString(toUpdateAccount,
                     AccountsCommon.class));
         }
-                EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
+
         res = client.update(knownResourceId, toUpdateAccount);
         int statusCode = res.getStatus();
 
@@ -460,7 +548,7 @@ public class AccountServiceTest extends AbstractServiceTest {
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     // ---------------------------------------------------------------
@@ -469,7 +557,7 @@ public class AccountServiceTest extends AbstractServiceTest {
     // Success outcomes
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
-    dependsOnMethods = {"testSubmitRequest", "updateNonExistent"})
+    dependsOnMethods = {"testSubmitRequest", "updateWrongUser"})
     public void delete(String testName) throws Exception {
 
         // Perform setup.
@@ -533,8 +621,8 @@ public class AccountServiceTest extends AbstractServiceTest {
         // Check the status code of the response: does it match
         // the expected response(s)?
         if (logger.isDebugEnabled()) {
-            logger.debug("testSubmitRequest: url=" + url +
-                    " status=" + statusCode);
+            logger.debug("testSubmitRequest: url=" + url
+                    + " status=" + statusCode);
         }
         Assert.assertEquals(statusCode, EXPECTED_STATUS);
 
@@ -543,17 +631,38 @@ public class AccountServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-    private AccountsCommon createAccountInstance(String firstName, String lastName, String screenName,
-            String passwd, String email) {
+    /*
+     * createAccountInstance
+     * @param tenant fillup tenant
+     * @param user to fill up user
+     * @param password to fill up password
+     */
+    private AccountsCommon createAccountInstance(String screenName,
+            String passwd, String email, boolean tenant, boolean user, boolean password) {
 
         AccountsCommon account = new AccountsCommon();
-        account.setFirstName(firstName);
-        account.setLastName(lastName);
         account.setScreenName(screenName);
-        account.setUserId(screenName);
-        account.setPassword(Base64.encodeBase64(passwd.getBytes()));
+        if (user) {
+            account.setUserId(screenName);
+        }
+        if (password) {
+            account.setPassword(Base64.encodeBase64(passwd.getBytes()));
+        }
         account.setEmail(email);
         account.setPhone("1234567890");
+        if (tenant) {
+            List<AccountsCommon.Tenant> atl = new ArrayList<AccountsCommon.Tenant>();
+            AccountsCommon.Tenant at = new AccountsCommon.Tenant();
+            at.setId(UUID.randomUUID().toString());
+            at.setName("movingimages.us");
+            atl.add(at);
+
+            AccountsCommon.Tenant at2 = new AccountsCommon.Tenant();
+            at2.setId(UUID.randomUUID().toString());
+            at2.setName("collectionspace.org");
+            atl.add(at2);
+            account.setTenant(atl);
+        }
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, account common");
             logger.debug(objectAsXmlString(account,

@@ -6,7 +6,7 @@
         <groupId>org.collectionspace.services</groupId>
         <version>1.0</version>
     </parent>
-    
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.account.service</artifactId>
@@ -38,7 +38,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -50,7 +50,7 @@
             <artifactId>testng</artifactId>
             <version>5.6</version>
         </dependency>
-        
+
         <!-- apache -->
         <dependency>
             <groupId>commons-beanutils</groupId>
@@ -62,7 +62,7 @@
             <artifactId>commons-logging</artifactId>
             <version>1.1</version>
         </dependency>
-      <!-- javax -->
+        <!-- javax -->
 
 
         <dependency>
@@ -72,7 +72,7 @@
             <scope>provided</scope>
         </dependency>
 
-        
+
         <!-- jboss -->
 
         <dependency>
@@ -96,10 +96,10 @@
             <artifactId>resteasy-multipart-provider</artifactId>
             <version>1.1.GA</version>
         </dependency>
-        
+
 
     </dependencies>
-    
+
     <build>
         <finalName>collectionspace-services-account</finalName>
         <plugins>

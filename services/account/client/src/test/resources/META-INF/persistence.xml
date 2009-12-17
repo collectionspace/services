@@ -3,6 +3,7 @@
 http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_1_0.xsd" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:orm="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <persistence-unit name="org.collectionspace.services.account">
         <class>org.collectionspace.services.account.AccountsCommon</class>
+        <class>org.collectionspace.services.account.AccountsCommon$Tenant</class>
         <class>org.collectionspace.services.account.AccountsCommonList</class>
         <class>org.collectionspace.services.account.AccountsCommonList$AccountListItem</class>
         <properties>
