@@ -279,7 +279,7 @@ public class DatabaseRealm {
      * the authenticated user.
      * @return collection containing the roles
      */
-    Collection<Group> getTenants(String username, String principalClassName, String groupClassName) throws LoginException {
+    Collection<Group> getTenants(String username, String groupClassName) throws LoginException {
 
         if (log.isDebugEnabled()) {
             log.debug("getTenants using tenantsQuery: " + tenantsQuery + ", username: " + username);

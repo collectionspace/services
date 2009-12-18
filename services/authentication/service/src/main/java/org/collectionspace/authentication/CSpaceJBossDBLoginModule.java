@@ -38,7 +38,7 @@ import org.jboss.security.auth.spi.UsernamePasswordLoginModule;
  * CollectionSpace default identity provider supporting multi-tenancy
  * @author
  */
-public class CSpaceDBLoginModule extends UsernamePasswordLoginModule {
+public class CSpaceJBossDBLoginModule extends UsernamePasswordLoginModule {
 
     private DatabaseRealm realm;
 
@@ -96,7 +96,6 @@ public class CSpaceDBLoginModule extends UsernamePasswordLoginModule {
                 "org.jboss.security.SimpleGroup");
 
         Collection<Group> tenants = realm.getTenants(username,
-                "org.collectionspace.authentication.CSpacePrincipal",
                 "org.jboss.security.SimpleGroup");
 
         List<Group> all = new ArrayList<Group>();
