@@ -26,9 +26,9 @@ package org.collectionspace.services.common.security;
 import org.collectionspace.services.common.ServiceException;
 
 /**
- * ServiceForbidenException is thrown when access to service is not allowed for
- * one or more of the following reasons:
- * - tenant id not found
+ * UnauthorizedException is thrown when authentication to the service fails. Usually
+ * this is thrown when 2nd step of authentication to the service fails. This step
+ * includes associating the user with tenant(s) and role(s).
  * @author 
  */
 public class UnauthorizedException extends ServiceException {

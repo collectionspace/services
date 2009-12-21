@@ -198,6 +198,10 @@
         </exec>
     </target>
 
+    <target name="doc" description="Build Java API docs">
+        <ant antfile="services/build.xml" target="doc" inheritAll="false"/>
+    </target>
+
     <target name="gen_ddl"
             description="generate service-specific tables(s), indices, etc.">
         <ant antfile="services/build.xml" target="gen_ddl" inheritAll="false"/>
@@ -217,7 +221,7 @@
         </sql>
         <ant antfile="services/build.xml" target="create_db" inheritAll="false"/>
     </target>
-    
+
 
     <target name="deploy" depends="install"
             description="deploy services in ${jboss.server.cspace}">

@@ -8,6 +8,7 @@
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
+    <property name="javadoc.jar" value="org.collectionspace.services-javadoc.jar"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -104,6 +105,26 @@
         </exec>
     </target>
 
+    <target name="doc" depends="install,doc-unix,doc-windows" description="Build Java API docs">
+        <jar destfile="${basedir}/target/${javadoc.jar}"
+             basedir="${basedir}/target/site"
+             />
+    </target>
+    <target name="doc-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="javadoc:aggregate" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="doc-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="javadoc:aggregate" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
     <target name="gen_ddl"
             description="generate service-specific tables(s), indices, etc.">
         <ant antfile="authentication/build.xml" target="gen_ddl" inheritAll="false"/>
@@ -138,8 +159,8 @@
             description="undeploy services from ${jboss.server.cspace}">
         <ant antfile="JaxRsServiceProvider/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="vocabulary/build.xml" target="undeploy" inheritAll="false"/>
-        <ant antfile="contact/build.xml" target="undeploy" inheritAll="false"/>        
-        <ant antfile="dimension/build.xml" target="undeploy" inheritAll="false"/>        
+        <ant antfile="contact/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="dimension/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="acquisition/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="undeploy" inheritAll="false"/>
@@ -166,6 +187,8 @@
         <ant antfile="vocabulary/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="acquisition/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="JaxRsServiceProvider/build.xml" target="dist" inheritAll="false"/>
+        <copy file="${basedir}/target/${javadoc.jar}"
+              todir="${services.trunk}/${dist.server.cspace}/cspace/services/docs"/>
     </target>
 
     <!-- this target is called in order based on the dependencies between the services -->
