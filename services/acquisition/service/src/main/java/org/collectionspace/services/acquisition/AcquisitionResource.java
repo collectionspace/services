@@ -31,6 +31,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -38,12 +39,16 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.acquisition.nuxeo.AcquisitionHandlerFactory;
+import org.collectionspace.services.acquisition.AcquisitionsCommonList;
 import org.collectionspace.services.common.AbstractCollectionSpaceResource;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.query.IQueryManager;
+import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -261,6 +266,45 @@ public class AcquisitionResource
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Delete failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-
     }
+    
+    @GET
+    @Path("/search")    
+    @Produces("application/xml")
+    public AcquisitionsCommonList keywordsSearchAcquisitions(@Context UriInfo ui,
+    		@QueryParam (IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
+    	AcquisitionsCommonList acquisitionObjectList = new AcquisitionsCommonList();
+        try {
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+            DocumentHandler handler = createDocumentHandler(ctx);
+
+            // perform a keyword search
+            if (keywords != null && !keywords.isEmpty()) {
+            	String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
+	            DocumentFilter documentFilter = handler.getDocumentFilter();
+	            documentFilter.setWhereClause(whereClause);
+	            if (logger.isDebugEnabled()) {
+	            	logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+	            }
+	            getRepositoryClient(ctx).getFiltered(ctx, handler);
+            } else {
+            	getRepositoryClient(ctx).getAll(ctx, handler);
+            }            
+            acquisitionObjectList = (AcquisitionsCommonList) handler.getCommonPartList();
+            
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception in search for Acquisitions", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return acquisitionObjectList;
+    }    
+    
 }

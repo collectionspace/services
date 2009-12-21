@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import org.collectionspace.services.common.query.QueryManager;
+import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectHandlerFactory;
 import org.collectionspace.services.common.AbstractCollectionSpaceResource;
 import org.collectionspace.services.common.context.MultipartServiceContext;
@@ -66,11 +67,6 @@ public class CollectionObjectResource
 
     final private String serviceName = "collectionobjects";
     final Logger logger = LoggerFactory.getLogger(CollectionObjectResource.class);
-    final private static String SEARCH_TYPE_KEYWORDS = "keywords";
-    final private static String ECM_FULLTEXT_LIKE = "ecm:fulltext LIKE ";
-    final private static String SEARCH_QUALIFIER_AND = "AND";
-    final private static String SEARCH_QUALIFIER_OR = "OR";
-    final private static String SEARCH_TERM_SEPARATOR = " ";
 
     @Override
     public String getServiceName() {
@@ -272,7 +268,7 @@ public class CollectionObjectResource
     @Path("/search")    
     @Produces("application/xml")
     public CollectionobjectsCommonList keywordsSearchCollectionObjects(@Context UriInfo ui,
-    		@QueryParam (SEARCH_TYPE_KEYWORDS) String keywords) {
+    		@QueryParam (IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
         CollectionobjectsCommonList collectionObjectList = new CollectionobjectsCommonList();
         try {
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
