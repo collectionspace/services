@@ -32,8 +32,8 @@
 
     <xs:complexType name="ServiceBindingType">
         <xs:sequence>
-            <!-- object(s) served by the service -->
-            <xs:element name="object" type="ServiceObjectType" minOccurs="1" maxOccurs="unbounded"/>
+            <!-- object representation served by the service -->
+            <xs:element name="object" type="ServiceObjectType" minOccurs="1" maxOccurs="1"/>
 
             <!-- name of the repository client (from service-config.xml) -->
             <xs:element name="repositoryClient" type="xs:string" minOccurs="0" maxOccurs="1"/>
@@ -60,7 +60,6 @@
             <!-- a handler Java class to process the content of this service -->
             <xs:element name="serviceHandler" type="xs:string" minOccurs="0" maxOccurs="1"/>
         </xs:sequence>
-        <xs:attribute name="id" type="xs:ID" use="required"/>
         <!-- the object name could be collectionobject|intake|location, etc. -->
         <xs:attribute name="name" type="xs:string" use="required"/>
         <xs:attribute name="version" type="types:VersionType" use="required"/>

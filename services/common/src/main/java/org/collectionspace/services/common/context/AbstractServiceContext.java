@@ -73,8 +73,8 @@ public abstract class AbstractServiceContext<IT, OT>
         }
         tenantBinding = tReader.getTenantBinding(tenantId);
         if (tenantBinding == null) {
-            String msg = "No tenant binding found for tenantId=" + tenantId + 
-                    " while processing request for service= " + serviceName;
+            String msg = "No tenant binding found for tenantId=" + tenantId
+                    + " while processing request for service= " + serviceName;
             logger.error(msg);
             throw new IllegalStateException(msg);
         }
@@ -115,12 +115,10 @@ public abstract class AbstractServiceContext<IT, OT>
             return objectPartMap;
         }
         ServiceBindingType serviceBinding = getServiceBinding();
-        List<ServiceObjectType> objectTypes = serviceBinding.getObject();
-        for (ServiceObjectType objectType : objectTypes) {
-            List<ObjectPartType> objectPartTypes = objectType.getPart();
-            for (ObjectPartType objectPartType : objectPartTypes) {
-                objectPartMap.put(objectPartType.getLabel(), objectPartType);
-            }
+        ServiceObjectType objectType = serviceBinding.getObject();
+        List<ObjectPartType> objectPartTypes = objectType.getPart();
+        for (ObjectPartType objectPartType : objectPartTypes) {
+            objectPartMap.put(objectPartType.getLabel(), objectPartType);
         }
         return objectPartMap;
     }
@@ -172,7 +170,7 @@ public abstract class AbstractServiceContext<IT, OT>
     public String getDocumentType() {
         // If they have not overridden the setting, use the type of the service
         // object.
-        return (overrideDocumentType != null) ? overrideDocumentType : serviceBinding.getObject().get(0).getName();
+        return (overrideDocumentType != null) ? overrideDocumentType : serviceBinding.getObject().getName();
     }
 
     @Override

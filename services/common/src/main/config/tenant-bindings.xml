@@ -14,7 +14,7 @@
         <tenant:serviceBindings name="CollectionObjects" version="0.1">
             <!-- begin collectionobject service meta-data -->
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>nuxeo-java</service:repositoryClient>
-            <service:object id="1" name="CollectionObject" version="0.1"
+            <service:object name="CollectionObject" version="0.1"
             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
                             versionable="true" auditable="false"
@@ -52,7 +52,7 @@
         <!-- begin intake service meta-data -->
         <tenant:serviceBindings name="Intakes" version="0.1">
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>nuxeo-java</service:repositoryClient>
-            <service:object id="1" name="Intake" version="0.1"
+            <service:object name="Intake" version="0.1"
             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
                             versionable="true" auditable="false"
@@ -80,7 +80,7 @@
         <!-- begin vocabulary service meta-data -->
         <tenant:serviceBindings name="Vocabularies" version="0.1">
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>nuxeo-java</service:repositoryClient>
-            <service:object id="1" name="Vocabulary" version="0.1"
+            <service:object name="Vocabulary" version="0.1"
             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
                             versionable="true" auditable="false"
@@ -112,7 +112,7 @@
         -->
         <tenant:serviceBindings name="Vocabularyitems" version="0.1">
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>nuxeo-java</service:repositoryClient>
-            <service:object id="1" name="Vocabularyitem" version="0.1"
+            <service:object name="Vocabularyitem" version="0.1"
             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
                             versionable="true" auditable="false"
@@ -140,7 +140,7 @@
         <!-- begin acquisition service meta-data -->
         <tenant:serviceBindings name="Acquisitions" version="0.1">
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>nuxeo-java</service:repositoryClient>
-            <service:object id="1" name="Acquisition" version="0.1"
+            <service:object name="Acquisition" version="0.1"
             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
                             versionable="true" auditable="false"
@@ -168,7 +168,7 @@
         <!-- begin relation service meta-data -->
         <tenant:serviceBindings name="Relations" version="0.1">
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>nuxeo-java</service:repositoryClient>
-            <service:object id="1" name="Relation" version="0.1"
+            <service:object name="Relation" version="0.1"
             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
                             versionable="true" auditable="false"
@@ -195,7 +195,7 @@
         <!-- end relation service meta-data -->
         <!-- begin account service meta-data -->
         <tenant:serviceBindings name="Accounts" version="0.1">
-            <service:object id="1" name="Acccount" version="0.1"
+            <service:object name="Acccount" version="0.1"
             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
                             versionable="true" auditable="false"
@@ -223,7 +223,7 @@
         <!-- begin dimension service meta-data -->
         <tenant:serviceBindings name="Dimensions" version="0.1">
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>nuxeo-java</service:repositoryClient>
-            <service:object id="1" name="Dimension" version="0.1"
+            <service:object name="Dimension" version="0.1"
             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
                             versionable="true" auditable="false"
@@ -251,7 +251,7 @@
         <!-- begin contact service meta-data -->
         <tenant:serviceBindings name="Contacts" version="0.1">
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>nuxeo-java</service:repositoryClient>
-            <service:object id="1" name="Contact" version="0.1"
+            <service:object name="Contact" version="0.1"
             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
                             versionable="true" auditable="false"
