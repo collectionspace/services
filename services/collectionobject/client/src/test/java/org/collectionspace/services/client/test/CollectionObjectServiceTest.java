@@ -59,6 +59,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     private CollectionObjectClient client = new CollectionObjectClient();
     private String knownResourceId = null;
     private List<String> allResourceIdsCreated = new ArrayList();
+    private boolean multivalue; //toggle
 
     /*
      * This method is called only by the parent class, AbstractServiceTest
@@ -323,12 +324,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
             int i = 0;
 
             for (CollectionobjectsCommonList.CollectionObjectListItem item : items) {
-                logger.debug(testName + ": list-item[" + i + "] csid=" +
-                        item.getCsid());
-                logger.debug(testName + ": list-item[" + i + "] objectNumber=" +
-                        item.getObjectNumber());
-                logger.debug(testName + ": list-item[" + i + "] URI=" +
-                        item.getUri());
+                logger.debug(testName + ": list-item[" + i + "] csid="
+                        + item.getCsid());
+                logger.debug(testName + ": list-item[" + i + "] objectNumber="
+                        + item.getObjectNumber());
+                logger.debug(testName + ": list-item[" + i + "] URI="
+                        + item.getUri());
                 i++;
 
             }
@@ -371,7 +372,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         if (logger.isDebugEnabled()) {
             logger.debug("updated object");
             logger.debug(objectAsXmlString(collectionObject,
-                CollectionobjectsCommon.class));
+                    CollectionobjectsCommon.class));
         }
 
         // Submit the request to the service and store the response.
@@ -595,8 +596,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         // Check the status code of the response: does it match
         // the expected response(s)?
         if (logger.isDebugEnabled()) {
-            logger.debug("testSubmitRequest: url=" + url +
-                    " status=" + statusCode);
+            logger.debug("testSubmitRequest: url=" + url
+                    + " status=" + statusCode);
         }
         Assert.assertEquals(statusCode, EXPECTED_STATUS);
 
@@ -605,7 +606,6 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Cleanup of resources created during testing
     // ---------------------------------------------------------------
-    
     /**
      * Deletes all resources created by tests, after all tests have been run.
      *
@@ -614,7 +614,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
      */
-    @AfterClass(alwaysRun=true)
+    @AfterClass(alwaysRun = true)
     public void cleanUp() {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
@@ -641,14 +641,17 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         OtherNumberList onList = new OtherNumberList();
         List<String> ons = onList.getOtherNumber();
         ons.add("urn:org.collectionspace.id:24082390");
-        ons.add("urn:org.walkerart.id:123");
+        if (multivalue) {
+            ons.add("urn:org.walkerart.id:123");
+        }
+        multivalue = !multivalue;
         collectionObject.setOtherNumbers(onList);
         collectionObject.setObjectNumber(objectNumber);
         collectionObject.setObjectName(objectName);
         collectionObject.setAge(""); //test for null string
-        collectionObject.setBriefDescription("Papier mache bird mask with horns, " +
-                "painted red with black and yellow spots. " +
-                "Puerto Rico. ca. 8&quot; high, 6&quot; wide, projects 10&quot; (with horns).");
+        collectionObject.setBriefDescription("Papier mache bird mask with horns, "
+                + "painted red with black and yellow spots. "
+                + "Puerto Rico. ca. 8&quot; high, 6&quot; wide, projects 10&quot; (with horns).");
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(collectionObject,
                 MediaType.APPLICATION_XML_TYPE);
@@ -657,7 +660,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, collectionobject common");
             logger.debug(objectAsXmlString(collectionObject,
-                CollectionobjectsCommon.class));
+                    CollectionobjectsCommon.class));
         }
 
         CollectionobjectsNaturalhistory conh = new CollectionobjectsNaturalhistory();
@@ -670,7 +673,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, collectionobject nhistory");
             logger.debug(objectAsXmlString(conh,
-                CollectionobjectsNaturalhistory.class));
+                    CollectionobjectsNaturalhistory.class));
         }
         return multipart;
 

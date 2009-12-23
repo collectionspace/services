@@ -97,17 +97,19 @@ public class DocumentUtils {
         HashMap<String, Object> objectProps = new HashMap<String, Object>();
         // Get a list of all elements in the document
         Node root = document.getFirstChild();
-        NodeList rootChildren = root.getChildNodes();
-        for (int i = 0; i < rootChildren.getLength(); i++) {
-            Node node = rootChildren.item(i);
+        NodeList nodeChildren = root.getChildNodes();
+        for (int i = 0; i < nodeChildren.getLength(); i++) {
+            Node node = nodeChildren.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 NodeList childNodes = node.getChildNodes();
-                if (childNodes.getLength() > 1) {
-                    //must be multi value element
-                    String[] vals = getMultiValues(node);
-                    objectProps.put(node.getNodeName(), vals);
-                } else if (childNodes.getLength() == 1) {
-                    objectProps.put(node.getNodeName(), getTextNodeValue(node));
+                Node cnode = childNodes.item(0);
+                if (cnode != null) {
+                    if (cnode.getNodeType() == Node.TEXT_NODE) {
+                        objectProps.put(node.getNodeName(), getTextNodeValue(node));
+                    } else {
+                        String[] vals = getMultiValues(node);
+                        objectProps.put(node.getNodeName(), vals);
+                    }
                 }
             }
         }
@@ -265,8 +267,8 @@ public class DocumentUtils {
             nv.name = stz.nextToken();
             nv.value = stz.nextToken();
         } else {
-            throw new IllegalStateException("Found multi valued element " + input +
-                    " without qualification");
+            throw new IllegalStateException("Found multi valued element " + input
+                    + " without qualification");
         }
         return nv;
     }
