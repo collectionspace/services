@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    OrgAuthority schema (XSD)
+    
+    Entity  : OrgAuthority
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+    
+    $LastChangedRevision: 1055 $
+    $LastChangedDate: 2009-12-09 12:25:15 -0800 (Wed, 09 Dec 2009) $
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/organization"
+  xmlns="http://collectionspace.org/services/organization"
+  targetNamespace="http://collectionspace.org/services/organization"
+  version="0.1"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Organization+Service+Home -->    
+    
+    <!-- OrgAuthority  -->
+    <xs:element name="orgauthorities_common">
+        <xs:complexType>
+            <xs:sequence>
+                <!--  Common identifier -->
+                <xs:element name="csid" type="xs:string" />
+                
+                <!--  OrgAuthority Information Group -->
+                <xs:element name="displayName" type="xs:string"/>
+                <xs:element name="refName" type="xs:string"/>
+                <xs:element name="vocabType" type="xs:string"/>
+
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <!-- OrgAuthority instances, as in nuxeo repository -->
+    <xs:element name="orgauthorities-common-list">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="orgauthority-list-item" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="displayName" type="xs:string"
+                                minOccurs="1" />
+                            <xs:element name="refName" type="xs:string"
+                                minOccurs="1" />
+                            <xs:element name="vocabType" type="xs:string"
+                                minOccurs="1" />
+                            <!-- uri to retrieve orgauthority details -->
+                            <xs:element name="uri" type="xs:anyURI"
+                                minOccurs="1" />
+                            <xs:element name="csid" type="xs:string"
+                                minOccurs="1" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>
+

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Organization schema (XSD)
+    
+    Entity  : Organization
+    Part    : Common
+    Used for: Nuxeo EP core document type
+    
+    $LastChangedRevision: 860 $
+    $LastChangedDate: 2009-10-14 14:48:05 -0700 (Wed, 14 Oct 2009) $
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/organization"
+  xmlns="http://collectionspace.org/services/organization"
+  targetNamespace="http://collectionspace.org/services/organization"
+  version="0.1"
+>
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Organization+Service+Home -->    
+
+		<!--  Organization Information Group -->
+		<!--  inAuthority is the csid of the owning OrgAuthority -->
+		<xs:element name="inAuthority" type="xs:string" />
+		<xs:element name="refName" type="xs:string"/>
+		<xs:element name="displayName" type="xs:string"/>
+		<xs:element name="longName" type="xs:string"/>
+		<xs:element name="description" type="xs:string"/>
+
+</xs:schema>
+
