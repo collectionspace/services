@@ -19,7 +19,6 @@
                 <xs:element name="csid" type="xs:string" />
                 
                 <!--  Vocabularyitem Information Group -->
-                <!--  inVocabulary is the csid of the owning Vocabulary -->
                 <xs:element name="displayName" type="xs:string"/>
                 <xs:element name="refName" type="xs:string"/>
             </xs:sequence>
