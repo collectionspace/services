@@ -316,7 +316,7 @@ public class Sample {
     private MultipartOutput createOrganizationInstance(
     		String displayName, String refName) {
     	OrganizationsCommon organization = new OrganizationsCommon();
-    	organization.setDisplayName(displayName);
+    	organization.setShortName(displayName);
     	organization.setRefName(refName);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(organization, MediaType.APPLICATION_XML_TYPE);

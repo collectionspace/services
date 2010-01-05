@@ -18,10 +18,16 @@
                 <!--  Common identifier -->
                 <xs:element name="csid" type="xs:string" />
                 
-                <!--  Vocabularyitem Information Group -->
-                <xs:element name="displayName" type="xs:string"/>
+                <!--  Organization Information Group -->
                 <xs:element name="refName" type="xs:string"/>
+                <xs:element name="shortName" type="xs:string"/>
                 <xs:element name="longName" type="xs:string"/>
+								<xs:element name="nameAdditions" type="xs:string"/>
+								<xs:element name="contactName" type="xs:string"/>
+								<xs:element name="foundingDate" type="xs:string"/>
+								<xs:element name="dissolutionDate" type="xs:string"/>
+								<xs:element name="foundingPlace" type="xs:string"/>
+								<xs:element name="function" type="xs:string"/>
                 <xs:element name="description" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>

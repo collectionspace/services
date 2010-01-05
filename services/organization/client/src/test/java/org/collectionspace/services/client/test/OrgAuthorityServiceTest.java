@@ -148,8 +148,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
         String identifier = createIdentifier();
         String refName = createRefName(identifier);
         MultipartOutput multipart = createOrganizationInstance(vcsid, 
-        		identifier, refName, "Longer Name for "+identifier,
-        		"This is a fake organization that was created by a test method.");
+    		identifier, refName, "Longer Name for "+identifier,
+    		null, "joe@org.org", "1910", null, "Anytown, USA", "testing",  
+    		"This is a fake organization that was created by a test method." );
         ClientResponse<Response> res = client.createItem(vcsid, multipart);
         int statusCode = res.getStatus();
 
@@ -611,7 +612,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
         Assert.assertNotNull(organization);
 
         // Update the contents of this resource.
-        organization.setDisplayName("updated-" + organization.getDisplayName());
+        organization.setShortName("updated-" + organization.getShortName());
         if(logger.isDebugEnabled()){
             logger.debug("to be updated Organization");
             logger.debug(objectAsXmlString(organization,
@@ -641,8 +642,8 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
         Assert.assertNotNull(updatedOrganization);
 
         // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedOrganization.getDisplayName(),
-                organization.getDisplayName(),
+        Assert.assertEquals(updatedOrganization.getShortName(),
+                organization.getShortName(),
                 "Data in updated Organization did not match submitted data.");
     }
 
@@ -784,7 +785,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
         // The only relevant ID may be the one used in update(), below.
         MultipartOutput multipart = createOrganizationInstance(
         		knownResourceId, NON_EXISTENT_ID, createRefName(NON_EXISTENT_ID),
-        		null, null);
+        		null, null, null, null, null, null, null, null);
         ClientResponse<MultipartInput> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
@@ -1038,13 +1039,28 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
     }
 
     private MultipartOutput createOrganizationInstance(String inAuthority,
-        String displayName, String refName, String longName, String description) {
+        String shortName, String refName, String longName, 
+        String nameAdditions, String contactName, 
+        String foundingDate, String dissolutionDate, String foundingPlace,
+        String function, String description ) {
         OrganizationsCommon organization = new OrganizationsCommon();
-        organization.setDisplayName(displayName);
+        organization.setShortName(shortName);
         if(refName!=null)
         	organization.setRefName(refName);
         if(longName!=null)
         	organization.setLongName(longName);
+        if(nameAdditions!=null)
+        	organization.setNameAdditions(nameAdditions);
+        if(contactName!=null)
+        	organization.setContactName(contactName);
+        if(foundingDate!=null)
+        	organization.setFoundingDate(foundingDate);
+        if(dissolutionDate!=null)
+        	organization.setDissolutionDate(dissolutionDate);
+        if(foundingPlace!=null)
+        	organization.setFoundingPlace(foundingPlace);
+        if(function!=null)
+        	organization.setFunction(function);
         if(description!=null)
         	organization.setDescription(description);
         MultipartOutput multipart = new MultipartOutput();

@@ -104,7 +104,8 @@ public class OrgAuthorityBaseImport {
     	if(logger.isDebugEnabled()){
     		logger.debug("Import: Create Item: \""+itemName+"\" in orgAuthorityulary: \"" + orgAuthorityName +"\"");
     	}
-    	MultipartOutput multipart = createOrganizationInstance(itemName, refName);
+    	MultipartOutput multipart = createOrganizationInstance(itemName, refName,
+    			null, null, null, null, null, null, null, null, null );
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
 
     	int statusCode = res.getStatus();
@@ -144,13 +145,34 @@ public class OrgAuthorityBaseImport {
         return multipart;
     }
 
-    private MultipartOutput createOrganizationInstance(
-    		String displayName, String refName) {
-    	OrganizationsCommon organization = new OrganizationsCommon();
-    	organization.setDisplayName(displayName);
-    	organization.setRefName(refName);
+    private MultipartOutput createOrganizationInstance(String inAuthority,
+        String shortName, String refName, String longName, 
+        String nameAdditions, String contactName, 
+        String foundingDate, String dissolutionDate, String foundingPlace,
+        String function, String description ) {
+        OrganizationsCommon organization = new OrganizationsCommon();
+        organization.setShortName(shortName);
+        if(refName!=null)
+        	organization.setRefName(refName);
+        if(longName!=null)
+        	organization.setLongName(longName);
+        if(nameAdditions!=null)
+        	organization.setNameAdditions(nameAdditions);
+        if(contactName!=null)
+        	organization.setContactName(contactName);
+        if(foundingDate!=null)
+        	organization.setFoundingDate(foundingDate);
+        if(dissolutionDate!=null)
+        	organization.setDissolutionDate(dissolutionDate);
+        if(foundingPlace!=null)
+        	organization.setFoundingPlace(foundingPlace);
+        if(function!=null)
+        	organization.setFunction(function);
+        if(description!=null)
+        	organization.setDescription(description);
         MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(organization, MediaType.APPLICATION_XML_TYPE);
+        OutputPart commonPart = multipart.addPart(organization,
+            MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getItemCommonPartName());
 
         if(logger.isDebugEnabled()){
