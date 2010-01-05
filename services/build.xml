@@ -148,6 +148,7 @@
         <ant antfile="collectionobject/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="vocabulary/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="organization/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="acquisition/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="dimension/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="contact/build.xml" target="deploy" inheritAll="false"/>
@@ -159,8 +160,9 @@
             description="undeploy services from ${jboss.server.cspace}">
         <ant antfile="JaxRsServiceProvider/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="vocabulary/build.xml" target="undeploy" inheritAll="false"/>
-        <ant antfile="contact/build.xml" target="undeploy" inheritAll="false"/>
-        <ant antfile="dimension/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="organization/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="contact/build.xml" target="undeploy" inheritAll="false"/>        
+        <ant antfile="dimension/build.xml" target="undeploy" inheritAll="false"/>        
         <ant antfile="acquisition/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="undeploy" inheritAll="false"/>
@@ -185,6 +187,7 @@
         <ant antfile="collectionobject/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="vocabulary/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="organization/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="acquisition/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="JaxRsServiceProvider/build.xml" target="dist" inheritAll="false"/>
         <copy file="${basedir}/target/${javadoc.jar}"
@@ -202,6 +205,7 @@
         <ant antfile="id/build.xml" target="dist_installer" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="dist_installer" inheritAll="false"/>
         <ant antfile="vocabulary/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="organization/build.xml" target="dist_installer" inheritAll="false"/>
         <!--
         <ant antfile="common/build.xml" target="dist_installer" inheritAll="false"/>
         <ant antfile="authentication/build.xml" target="dist_installer" inheritAll="false"/>

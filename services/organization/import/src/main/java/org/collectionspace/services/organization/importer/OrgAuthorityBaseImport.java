@@ -91,11 +91,11 @@ public class OrgAuthorityBaseImport {
     				+newOrgAuthorityId );
     	}
     	for(String itemName : enumValues){
-    		createItemInOrgAuthority(newOrgAuthorityId, orgAuthorityName, itemName, createRefName(itemName));
+    		createItemInAuthority(newOrgAuthorityId, orgAuthorityName, itemName, createRefName(itemName));
     	}
     }
     
-    private String createItemInOrgAuthority(String vcsid, String orgAuthorityName, String itemName, String refName) {
+    private String createItemInAuthority(String vcsid, String orgAuthorityName, String itemName, String refName) {
     	// Expected status code: 201 Created
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
     	// Type of service request being tested

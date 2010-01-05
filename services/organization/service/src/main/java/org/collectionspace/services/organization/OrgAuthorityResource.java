@@ -104,11 +104,11 @@ public class OrgAuthorityResource extends AbstractCollectionSpaceResource {
 
     private DocumentHandler createItemDocumentHandler(
             ServiceContext ctx,
-            String inOrgAuthority) throws Exception {
+            String inAuthority) throws Exception {
         DocumentHandler docHandler = OrganizationHandlerFactory.getInstance().getHandler(
                 ctx.getRepositoryClientType().toString());
         docHandler.setServiceContext(ctx);
-        ((OrganizationDocumentModelHandler) docHandler).setInOrgAuthority(inOrgAuthority);
+        ((OrganizationDocumentModelHandler) docHandler).setInAuthority(inAuthority);
         if (ctx.getInput() != null) {
             Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(getItemServiceName()),
                     OrganizationsCommon.class);
@@ -406,7 +406,7 @@ public class OrgAuthorityResource extends AbstractCollectionSpaceResource {
             DocumentFilter myFilter =
                 DocumentFilter.CreatePaginatedDocumentFilter(queryParams);
             myFilter.setWhereClause(
-                    "organizations_common:inOrgAuthority='" + parentcsid + "'");
+                    "organizations_common:inAuthority='" + parentcsid + "'");
             handler.setDocumentFilter(myFilter);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             organizationObjectList = (OrganizationsCommonList) handler.getCommonPartList();

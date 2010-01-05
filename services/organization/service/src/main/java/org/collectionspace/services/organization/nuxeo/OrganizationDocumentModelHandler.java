@@ -60,16 +60,16 @@ public class OrganizationDocumentModelHandler
     private OrganizationsCommonList organizationList;
     
     /**
-     * inOrgAuthority is the parent OrgAuthority for this context
+     * inAuthority is the parent OrgAuthority for this context
      */
-    private String inOrgAuthority;
+    private String inAuthority;
 
-    public String getInOrgAuthority() {
-		return inOrgAuthority;
+    public String getInAuthority() {
+		return inAuthority;
 	}
 
-	public void setInOrgAuthority(String inOrgAuthority) {
-		this.inOrgAuthority = inOrgAuthority;
+	public void setInAuthority(String inAuthority) {
+		this.inAuthority = inAuthority;
 	}
 
 	@Override
@@ -152,7 +152,7 @@ public class OrganizationDocumentModelHandler
 									OrganizationJAXBSchema.DESCRIPTION));
 							 */
 							String id = NuxeoUtils.extractId(docModel.getPathAsString());
-	            ilistItem.setUri("/organizations/"+inOrgAuthority+"/items/" + id);
+	            ilistItem.setUri("/organizations/"+inAuthority+"/items/" + id);
 	            ilistItem.setCsid(id);
 	            list.add(ilistItem);
 	        }

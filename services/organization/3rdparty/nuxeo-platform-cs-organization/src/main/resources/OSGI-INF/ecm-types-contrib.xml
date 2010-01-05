@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <component name="org.collectionspace.organization.ecm.types">
   <extension target="org.nuxeo.ecm.platform.types.TypeService" point="types">
-    <type id="OrgAuthority" coretype="OrgAuthority">
+    <type id="Orgauthority" coretype="Orgauthority">
       <label>org.collectionspace.orgauthority</label>
       <!--icon>/icons/file.gif</icon-->
       <default-view>view_documents</default-view>
@@ -14,13 +14,13 @@
 
     <type id="Folder" coretype="Folder">
       <subtypes>
-        <type>OrgAuthority</type>
+        <type>Orgauthority</type>
       </subtypes>
     </type>
     
     <type id="Workspace" coretype="Workspace">
       <subtypes>
-        <type>OrgAuthority</type>
+        <type>Orgauthority</type>
       </subtypes>
     </type>
 

@@ -131,15 +131,15 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
     public void createItem(String testName) {
         setupCreate(testName);
 
-        knownItemResourceId = createItemInOrgAuthority(knownResourceId);
+        knownItemResourceId = createItemInAuthority(knownResourceId);
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
         }
     }
 
-    private String createItemInOrgAuthority(String vcsid) {
+    private String createItemInAuthority(String vcsid) {
 
-        final String testName = "createItemInOrgAuthority";
+        final String testName = "createItemInAuthority";
         if(logger.isDebugEnabled()){
             logger.debug(testName + ":...");
         }
@@ -147,7 +147,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
         String refName = createRefName(identifier);
-        MultipartOutput multipart = createOrganizationInstance(vcsid, identifier, refName);
+        MultipartOutput multipart = createOrganizationInstance(vcsid, 
+        		identifier, refName, "Longer Name for "+identifier,
+        		"This is a fake organization that was created by a test method.");
         ClientResponse<Response> res = client.createItem(vcsid, multipart);
         int statusCode = res.getStatus();
 
@@ -781,7 +783,8 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
 
         // The only relevant ID may be the one used in update(), below.
         MultipartOutput multipart = createOrganizationInstance(
-        		knownResourceId, NON_EXISTENT_ID, createRefName(NON_EXISTENT_ID));
+        		knownResourceId, NON_EXISTENT_ID, createRefName(NON_EXISTENT_ID),
+        		null, null);
         ClientResponse<MultipartInput> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
@@ -951,7 +954,6 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
      */
     @AfterClass(alwaysRun=true)
     public void cleanUp() {
-
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
@@ -970,7 +972,6 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
             // Note: Any non-success responses are ignored and not reported.
             ClientResponse<Response> res = client.delete(resourceId);
         }
-
     }
 
     // ---------------------------------------------------------------
@@ -1036,12 +1037,16 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
         return multipart;
     }
 
-    private MultipartOutput createOrganizationInstance(String inOrgAuthority,
-        String displayName, String refName) {
+    private MultipartOutput createOrganizationInstance(String inAuthority,
+        String displayName, String refName, String longName, String description) {
         OrganizationsCommon organization = new OrganizationsCommon();
         organization.setDisplayName(displayName);
         if(refName!=null)
         	organization.setRefName(refName);
+        if(longName!=null)
+        	organization.setLongName(longName);
+        if(description!=null)
+        	organization.setDescription(description);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(organization,
             MediaType.APPLICATION_XML_TYPE);
