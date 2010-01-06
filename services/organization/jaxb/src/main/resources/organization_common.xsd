@@ -19,6 +19,7 @@
                 <xs:element name="csid" type="xs:string" />
                 
                 <!--  Organization Information Group -->
+                <xs:element name="inAuthority" type="xs:string" />
                 <xs:element name="refName" type="xs:string"/>
                 <xs:element name="shortName" type="xs:string"/>
                 <xs:element name="longName" type="xs:string"/>
@@ -40,7 +41,7 @@
                 <xs:element name="organization_list_item" maxOccurs="unbounded">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="displayName" type="xs:string"
+                            <xs:element name="shortName" type="xs:string"
                                 minOccurs="1" />
                             <!-- uri to retrieve organization details -->
                             <xs:element name="uri" type="xs:anyURI"

@@ -136,9 +136,9 @@ public class OrganizationDocumentModelHandler
 	        while(iter.hasNext()){
 	            DocumentModel docModel = iter.next();
 	            OrganizationListItem ilistItem = new OrganizationListItem();
-	            ilistItem.setDisplayName(
+	            ilistItem.setShortName(
 									(String) docModel.getProperty(getServiceContext().getCommonPartLabel("organizations"),
-									OrganizationJAXBSchema.DISPLAY_NAME));
+									OrganizationJAXBSchema.SHORT_NAME));
 	            ilistItem.setRefName(
 									(String) docModel.getProperty(getServiceContext().getCommonPartLabel("organizations"),
 									OrganizationJAXBSchema.REF_NAME));

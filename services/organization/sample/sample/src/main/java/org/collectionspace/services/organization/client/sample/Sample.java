@@ -110,7 +110,7 @@ public class Sample {
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
 
     	logger.info("Import: Create Item: \""+itemName+"\" in orgAuthority: \"" + orgAuthName +"\"");
-    	MultipartOutput multipart = createOrganizationInstance(itemName, refName);
+    	MultipartOutput multipart = createOrganizationInstance(vcsid, itemName, refName);
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
 
     	int statusCode = res.getStatus();
@@ -314,8 +314,9 @@ public class Sample {
     }
 
     private MultipartOutput createOrganizationInstance(
-    		String displayName, String refName) {
+    		String inAuthority, String displayName, String refName) {
     	OrganizationsCommon organization = new OrganizationsCommon();
+    	organization.setInAuthority(inAuthority);
     	organization.setShortName(displayName);
     	organization.setRefName(refName);
         MultipartOutput multipart = new MultipartOutput();
@@ -373,7 +374,7 @@ public class Sample {
         OrganizationsCommonList.OrganizationListItem item) {
             StringBuffer sb = new StringBuffer();
             sb.append("csid=" + item.getCsid() + "\n");
-            sb.append("displayName=" + item.getDisplayName() + "\n");
+            sb.append("shortName=" + item.getShortName() + "\n");
             // sb.append("URI=" + item.getUri() + "\n");
         return sb.toString();
     }
@@ -519,8 +520,8 @@ public class Sample {
             // For each organization ...
             for (OrganizationsCommonList.OrganizationListItem
                 item : items.getOrganizationListItem()) {
-                // Get its display name.
-                logger.info(" " + item.getDisplayName());
+                // Get its short name.
+                logger.info(" " + item.getShortName());
             }
         }
 

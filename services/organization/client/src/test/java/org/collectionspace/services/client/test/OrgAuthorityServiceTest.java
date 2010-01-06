@@ -62,8 +62,10 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
     final String SERVICE_PATH_COMPONENT = "orgauthorities";
     final String ITEM_SERVICE_PATH_COMPONENT = "items";
     private String knownResourceId = null;
+    private String lastOrgAuthId = null;
     private String knownResourceRefName = null;
     private String knownItemResourceId = null;
+    private int nItemsToCreateInList = 3;
     private List<String> allResourceIdsCreated = new ArrayList<String>();
     private Map<String, String> allResourceItemIdsCreated =
         new HashMap<String, String>();
@@ -112,10 +114,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
         // for additional tests below.
         knownResourceRefName = refName;
 
+        lastOrgAuthId = extractId(res);
         // Store the ID returned from the first resource created
         // for additional tests below.
         if (knownResourceId == null){
-            knownResourceId = extractId(res);
+            knownResourceId = lastOrgAuthId;
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
@@ -131,7 +134,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
     public void createItem(String testName) {
         setupCreate(testName);
 
-        knownItemResourceId = createItemInAuthority(knownResourceId);
+        knownItemResourceId = createItemInAuthority(lastOrgAuthId);
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
         }
@@ -189,8 +192,12 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
     public void createList(String testName) throws Exception {
         for (int i = 0; i < 3; i++) {
             create(testName);
-            // Add 3 items to each orgauthority
-            for (int j = 0; j < 3; j++) {
+            knownResourceId = lastOrgAuthId;
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": Resetting knownResourceId to" + knownResourceId);
+            }
+            // Add nItemsToCreateInList items to each orgauthority
+            for (int j = 0; j < nItemsToCreateInList; j++) {
                 createItem(testName);
             }
         }
@@ -503,17 +510,24 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
+        List<OrganizationsCommonList.OrganizationListItem> items =
+            list.getOrganizationListItem();
+        int nItemsReturned = items.size();
+        if(logger.isDebugEnabled()){
+            logger.debug("  " + testName + ": Expected "
+           		+ nItemsToCreateInList+" items; got: "+nItemsReturned);
+        }
+        Assert.assertEquals( nItemsReturned, nItemsToCreateInList);
+
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = false;
         if (iterateThroughList && logger.isDebugEnabled()) {
-            List<OrganizationsCommonList.OrganizationListItem> items =
-                    list.getOrganizationListItem();
             int i = 0;
             for (OrganizationsCommonList.OrganizationListItem item : items) {
                 logger.debug("  " + testName + ": list-item[" + i + "] csid=" +
                         item.getCsid());
-                logger.debug("  " + testName + ": list-item[" + i + "] displayName=" +
-                        item.getDisplayName());
+                logger.debug("  " + testName + ": list-item[" + i + "] shortName=" +
+                        item.getShortName());
                 logger.debug("  " + testName + ": list-item[" + i + "] URI=" +
                         item.getUri());
                 i++;
@@ -1044,6 +1058,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
         String foundingDate, String dissolutionDate, String foundingPlace,
         String function, String description ) {
         OrganizationsCommon organization = new OrganizationsCommon();
+        organization.setInAuthority(inAuthority);
         organization.setShortName(shortName);
         if(refName!=null)
         	organization.setRefName(refName);
