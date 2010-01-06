@@ -110,7 +110,7 @@ public class Sample {
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
 
     	logger.info("Import: Create Item: \""+itemName+"\" in vocabulary: \"" + vocabName +"\"");
-    	MultipartOutput multipart = createVocabularyItemInstance(itemName, refName);
+    	MultipartOutput multipart = createVocabularyItemInstance(vcsid, itemName, refName);
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
 
     	int statusCode = res.getStatus();
@@ -314,8 +314,9 @@ public class Sample {
     }
 
     private MultipartOutput createVocabularyItemInstance(
-    		String displayName, String refName) {
+    		String inVocabulary, String displayName, String refName) {
     	VocabularyitemsCommon vocabularyItem = new VocabularyitemsCommon();
+    	vocabularyItem.setInVocabulary(inVocabulary);
     	vocabularyItem.setDisplayName(displayName);
     	vocabularyItem.setRefName(refName);
         MultipartOutput multipart = new MultipartOutput();

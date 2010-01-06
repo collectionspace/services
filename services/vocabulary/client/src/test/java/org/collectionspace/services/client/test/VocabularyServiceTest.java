@@ -62,8 +62,10 @@ public class VocabularyServiceTest extends AbstractServiceTest {
     final String SERVICE_PATH_COMPONENT = "vocabularies";
     final String ITEM_SERVICE_PATH_COMPONENT = "items";
     private String knownResourceId = null;
+    private String lastVocabId = null;
     private String knownResourceRefName = null;
     private String knownItemResourceId = null;
+    private int nItemsToCreateInList = 3;
     private List<String> allResourceIdsCreated = new ArrayList<String>();
     private Map<String, String> allResourceItemIdsCreated =
         new HashMap<String, String>();
@@ -112,10 +114,11 @@ public class VocabularyServiceTest extends AbstractServiceTest {
         // for additional tests below.
         knownResourceRefName = refName;
 
+        lastVocabId = extractId(res);
         // Store the ID returned from the first resource created
         // for additional tests below.
         if (knownResourceId == null){
-            knownResourceId = extractId(res);
+            knownResourceId = lastVocabId;
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
@@ -131,7 +134,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
     public void createItem(String testName) {
         setupCreate(testName);
 
-        knownItemResourceId = createItemInVocab(knownResourceId);
+        knownItemResourceId = createItemInVocab(lastVocabId);
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
         }
@@ -186,8 +189,12 @@ public class VocabularyServiceTest extends AbstractServiceTest {
     public void createList(String testName) throws Exception {
         for (int i = 0; i < 3; i++) {
             create(testName);
-            // Add 3 items to each vocab
-            for (int j = 0; j < 3; j++) {
+            knownResourceId = lastVocabId;
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": Resetting knownResourceId to" + knownResourceId);
+            }
+            // Add nItemsToCreateInList items to each vocab
+            for (int j = 0; j < nItemsToCreateInList; j++) {
                 createItem(testName);
             }
         }
@@ -500,11 +507,19 @@ public class VocabularyServiceTest extends AbstractServiceTest {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
+        List<VocabularyitemsCommonList.VocabularyitemListItem> items =
+            list.getVocabularyitemListItem();
+        int nItemsReturned = items.size();
+        if(logger.isDebugEnabled()){
+            logger.debug("  " + testName + ": Expected "
+           		+ nItemsToCreateInList+" items; got: "+nItemsReturned);
+        }
+        Assert.assertEquals( nItemsReturned, nItemsToCreateInList);
+
         // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = false;
+        boolean iterateThroughList = true;
         if (iterateThroughList && logger.isDebugEnabled()) {
-            List<VocabularyitemsCommonList.VocabularyitemListItem> items =
-                    list.getVocabularyitemListItem();
+            logger.debug("  " + testName + ": checking items");
             int i = 0;
             for (VocabularyitemsCommonList.VocabularyitemListItem item : items) {
                 logger.debug("  " + testName + ": list-item[" + i + "] csid=" +
@@ -1039,6 +1054,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
     private MultipartOutput createVocabularyItemInstance(String inVocabulary,
         String displayName, String refName) {
         VocabularyitemsCommon vocabularyItem = new VocabularyitemsCommon();
+        vocabularyItem.setInVocabulary(inVocabulary);
         vocabularyItem.setDisplayName(displayName);
         if(refName!=null)
         	vocabularyItem.setRefName(refName);
