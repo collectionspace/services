@@ -527,7 +527,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
                 logger.debug("  " + testName + ": list-item[" + i + "] csid=" +
                         item.getCsid());
                 logger.debug("  " + testName + ": list-item[" + i + "] shortName=" +
-                        item.getShortName());
+                        item.getDisplayName());
                 logger.debug("  " + testName + ": list-item[" + i + "] URI=" +
                         item.getUri());
                 i++;

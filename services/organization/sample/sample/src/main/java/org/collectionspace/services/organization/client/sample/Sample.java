@@ -374,7 +374,7 @@ public class Sample {
         OrganizationsCommonList.OrganizationListItem item) {
             StringBuffer sb = new StringBuffer();
             sb.append("csid=" + item.getCsid() + "\n");
-            sb.append("shortName=" + item.getShortName() + "\n");
+            sb.append("displayName=" + item.getDisplayName() + "\n");
             // sb.append("URI=" + item.getUri() + "\n");
         return sb.toString();
     }
@@ -520,8 +520,8 @@ public class Sample {
             // For each organization ...
             for (OrganizationsCommonList.OrganizationListItem
                 item : items.getOrganizationListItem()) {
-                // Get its short name.
-                logger.info(" " + item.getShortName());
+                // Get its display name.
+                logger.info(" " + item.getDisplayName());
             }
         }
 

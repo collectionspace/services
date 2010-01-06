@@ -69,10 +69,10 @@ public class OrgAuthorityBaseImport {
     	if(logger.isDebugEnabled()){
     		logger.debug("Import: Create orgAuthority: \"" + orgAuthorityName +"\"");
     	}
-    	String baseOrgRefName = createOrgAuthRefName(orgAuthorityName);
-    	String fullOrgRefName = baseOrgRefName+"'"+orgAuthorityName+"'";
+    	String baseOrgAuthRefName = createOrgAuthRefName(orgAuthorityName);
+    	String fullOrgAuthRefName = baseOrgAuthRefName+"'"+orgAuthorityName+"'";
     	MultipartOutput multipart = createOrgAuthorityInstance(orgAuthorityName, 
-    			fullOrgRefName);
+    			fullOrgAuthRefName);
     	ClientResponse<Response> res = client.create(multipart);
 
     	int statusCode = res.getStatus();
@@ -94,7 +94,7 @@ public class OrgAuthorityBaseImport {
     				+newOrgAuthorityId );
     	}
     	for(List<String> orgStrings : orgInfo){
-    		createItemInAuthority(newOrgAuthorityId, baseOrgRefName, orgStrings);
+    		createItemInAuthority(newOrgAuthorityId, baseOrgAuthRefName, orgStrings);
     	}
     }
     
@@ -109,7 +109,7 @@ public class OrgAuthorityBaseImport {
 	        foundingDate, dissolutionDate, foundingPlace, function, description
 		 */		
     	String shortName = orgStrings.get(0);
-    	String refName = createOrganizationRefName(orgAuthorityRefName, shortName);
+    	String refName = createOrganizationRefName(orgAuthorityRefName, shortName)+"'"+shortName+"'";
 
     	if(logger.isDebugEnabled()){
     		logger.debug("Import: Create Item: \""+shortName
@@ -231,7 +231,7 @@ public class OrgAuthorityBaseImport {
     }
     
     protected String createOrgAuthRefName(String orgAuthorityName) {
-    	return "urn:cspace:org.collectionspace.demo:personauthority:name("
+    	return "urn:cspace:org.collectionspace.demo:orgauthority:name("
     			+orgAuthorityName+")";
     }
 

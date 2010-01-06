@@ -17,7 +17,7 @@
 
       <widget name="displayName" type="text">
         <labels>
-          <label mode="any">Name</label>
+          <label mode="any">Display Name</label>
         </labels>
         <translated>true</translated>
         <fields>
@@ -64,6 +64,7 @@
         <template mode="any">/layouts/layout_default_template.xhtml</template>
       </templates>
       <rows>
+        <row><widget>displayName</widget></row>
         <row><widget>shortName</widget></row>
         <row><widget>refName</widget></row>
         <row><widget>inAuthority</widget></row>
@@ -77,9 +78,22 @@
         <row><widget>description</widget></row>
       </rows>
 
+      <widget name="displayName" type="text">
+        <labels>
+          <label mode="any">Display Name</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="orgauthorities_common">displayName</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
       <widget name="shortName" type="text">
         <labels>
-          <label mode="any">Name</label>
+          <label mode="any">ShortName</label>
         </labels>
         <translated>true</translated>
         <fields>

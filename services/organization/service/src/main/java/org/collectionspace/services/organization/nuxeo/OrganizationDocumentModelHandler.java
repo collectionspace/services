@@ -77,6 +77,23 @@ public class OrganizationDocumentModelHandler
         //no specific action needed
     }
 
+    /* Override handleGet so we can deal with defaulting the displayName
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleGet(org.collectionspace.services.common.document.DocumentWrapper)
+     */
+    @Override
+    public void handleGet(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	DocumentModel docModel = wrapDoc.getWrappedObject();
+    	String displayName = (String) docModel.getProperty(getServiceContext().getCommonPartLabel("organizations"),
+    			OrganizationJAXBSchema.DISPLAY_NAME);
+    	if(displayName == null) {
+    		displayName = (String) docModel.getProperty(getServiceContext().getCommonPartLabel("organizations"),
+    				OrganizationJAXBSchema.SHORT_NAME);
+    		docModel.setProperty(getServiceContext().getCommonPartLabel("organizations"),
+    				OrganizationJAXBSchema.DISPLAY_NAME, displayName);
+    	}
+    	super.handleGet(wrapDoc);
+    }
+
     /**
      * getCommonPart get associated organization
      * @return
@@ -136,9 +153,13 @@ public class OrganizationDocumentModelHandler
 	        while(iter.hasNext()){
 	            DocumentModel docModel = iter.next();
 	            OrganizationListItem ilistItem = new OrganizationListItem();
-	            ilistItem.setShortName(
-									(String) docModel.getProperty(getServiceContext().getCommonPartLabel("organizations"),
-									OrganizationJAXBSchema.SHORT_NAME));
+	            // We look for a set display name, and fall back to teh short name if there is none
+	            String displayName = (String) docModel.getProperty(getServiceContext().getCommonPartLabel("organizations"),
+												OrganizationJAXBSchema.DISPLAY_NAME);
+	            if(displayName == null)
+		            displayName = (String) docModel.getProperty(getServiceContext().getCommonPartLabel("organizations"),
+							OrganizationJAXBSchema.SHORT_NAME);
+	            ilistItem.setDisplayName( displayName );
 	            ilistItem.setRefName(
 									(String) docModel.getProperty(getServiceContext().getCommonPartLabel("organizations"),
 									OrganizationJAXBSchema.REF_NAME));
