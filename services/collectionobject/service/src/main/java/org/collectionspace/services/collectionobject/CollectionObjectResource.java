@@ -67,6 +67,8 @@ import org.slf4j.LoggerFactory;
 public class CollectionObjectResource
         extends AbstractCollectionSpaceResource {
 
+	//FIXME: Remove this static string
+	final private String lastChangeRevision = "$LastChangedRevision$";
     final private String serviceName = "collectionobjects";
     final Logger logger = LoggerFactory.getLogger(CollectionObjectResource.class);
 
