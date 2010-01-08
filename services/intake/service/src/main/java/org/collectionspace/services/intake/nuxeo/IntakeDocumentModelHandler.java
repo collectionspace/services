@@ -124,6 +124,8 @@ public class IntakeDocumentModelHandler
             IntakeListItem ilistItem = new IntakeListItem();
             ilistItem.setEntryNumber((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     IntakeJAXBSchema.ENTRY_NUMBER));
+            ilistItem.setDepositor((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+                    IntakeJAXBSchema.DEPOSITOR));
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);
             ilistItem.setCsid(id);

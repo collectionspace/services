@@ -645,11 +645,13 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
             ons.add("urn:org.walkerart.id:123");
         }
         multivalue = !multivalue;
+        //FIXME: Title does not need to be set.
+        collectionObject.setTitle("acoward");
         collectionObject.setOtherNumbers(onList);
         collectionObject.setObjectNumber(objectNumber);
         collectionObject.setObjectName(objectName);
         collectionObject.setAge(""); //test for null string
-        collectionObject.setBriefDescription("Papier mache bird mask with horns, "
+        collectionObject.setBriefDescription("Papier mache bird cow mask with horns, "
                 + "painted red with black and yellow spots. "
                 + "Puerto Rico. ca. 8&quot; high, 6&quot; wide, projects 10&quot; (with horns).");
         MultipartOutput multipart = new MultipartOutput();

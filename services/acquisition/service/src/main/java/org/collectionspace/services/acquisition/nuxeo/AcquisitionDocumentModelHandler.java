@@ -124,6 +124,8 @@ public class AcquisitionDocumentModelHandler
             AcquisitionListItem listItem = new AcquisitionListItem();
             listItem.setAcquisitionReferenceNumber((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     AcquisitionListItemJAXBSchema.ACQUISITION_REFERENCE_NUMBER));
+            listItem.setAcquisitionSource((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+                    AcquisitionListItemJAXBSchema.ACQUISITION_SOURCE));
             //need fully qualified context for URI
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
             listItem.setUri(getServiceContextPath() + id);

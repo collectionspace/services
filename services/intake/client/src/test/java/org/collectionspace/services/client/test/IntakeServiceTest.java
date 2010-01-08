@@ -609,13 +609,17 @@ public class IntakeServiceTest extends AbstractServiceTest {
     private MultipartOutput createIntakeInstance(String identifier) {
         return createIntakeInstance(
                 "entryNumber-" + identifier,
-                "entryDate-" + identifier);
+                "entryDate-" + identifier,
+                "depositor-" + identifier);
     }
 
-    private MultipartOutput createIntakeInstance(String entryNumber, String entryDate) {
+    private MultipartOutput createIntakeInstance(String entryNumber,
+    		String entryDate,
+    		String depositor) {
         IntakesCommon intake = new IntakesCommon();
         intake.setEntryNumber(entryNumber);
         intake.setEntryDate(entryDate);
+        intake.setDepositor(depositor);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);

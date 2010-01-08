@@ -117,6 +117,8 @@ public class CollectionObjectDocumentModelHandler
             CollectionObjectListItem coListItem = new CollectionObjectListItem();
             coListItem.setObjectNumber((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
             		CollectionObjectListItemJAXBSchema.OBJECT_NUMBER));
+            coListItem.setTitle((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+            		CollectionObjectListItemJAXBSchema.TITLE));
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
             coListItem.setUri(getServiceContextPath() + id);
             coListItem.setCsid(id);

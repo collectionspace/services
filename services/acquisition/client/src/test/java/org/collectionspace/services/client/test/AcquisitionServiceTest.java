@@ -604,6 +604,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
     private MultipartOutput createAcquisitionInstance(String identifier) {
         AcquisitionsCommon acquisition = new AcquisitionsCommon();
         acquisition.setAcquisitionReferenceNumber("acquisitionReferenceNumber-"  + identifier);
+        acquisition.setAcquisitionSource("acquisitionSource-"  + identifier);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(acquisition,
             MediaType.APPLICATION_XML_TYPE);

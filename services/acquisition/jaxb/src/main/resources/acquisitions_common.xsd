@@ -65,6 +65,8 @@
                         <xs:sequence>
                             <xs:element name="AcquisitionReferenceNumber" type="xs:string"
                                 minOccurs="1" />
+                            <xs:element name="AcquisitionSource" type="xs:string"
+                                minOccurs="1" />
                             <!-- uri to retrive acquisition details -->
                             <xs:element name="uri" type="xs:anyURI"
                                 minOccurs="1" />

@@ -160,6 +160,8 @@
                         <xs:sequence>
                             <xs:element name="objectNumber" type="xs:string"
                                 minOccurs="1" />
+                            <xs:element name="title" type="xs:string"
+                                minOccurs="1" />
                             <!-- uri to retrive collection object details -->
                             <xs:element name="uri" type="xs:anyURI"
                                 minOccurs="1" />

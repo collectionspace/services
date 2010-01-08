@@ -109,6 +109,8 @@
                         <xs:sequence>
                             <xs:element name="entryNumber" type="xs:string"
                                 minOccurs="1" />
+                            <xs:element name="depositor" type="xs:string"
+                                minOccurs="1" />
                             <!-- uri to retrive intake details -->
                             <xs:element name="uri" type="xs:anyURI"
                                 minOccurs="1" />
