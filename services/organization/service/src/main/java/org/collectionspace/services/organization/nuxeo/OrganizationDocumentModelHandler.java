@@ -173,7 +173,7 @@ public class OrganizationDocumentModelHandler
 									OrganizationJAXBSchema.DESCRIPTION));
 							 */
 							String id = NuxeoUtils.extractId(docModel.getPathAsString());
-	            ilistItem.setUri("/organizations/"+inAuthority+"/items/" + id);
+	            ilistItem.setUri("/orgauthorities/"+inAuthority+"/items/" + id);
 	            ilistItem.setCsid(id);
 	            list.add(ilistItem);
 	        }
