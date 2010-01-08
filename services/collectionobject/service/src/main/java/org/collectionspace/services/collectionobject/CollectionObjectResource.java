@@ -21,7 +21,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  *  
- *  $LastChangedRevision: 1161 $
+ *  $LastChangedRevision$
  */
 package org.collectionspace.services.collectionobject;
 
