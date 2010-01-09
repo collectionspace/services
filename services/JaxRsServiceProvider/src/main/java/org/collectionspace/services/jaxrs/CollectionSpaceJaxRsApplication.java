@@ -34,6 +34,7 @@ import org.collectionspace.services.contact.ContactResource;
 
 import org.collectionspace.services.vocabulary.VocabularyResource;
 import org.collectionspace.services.organization.OrgAuthorityResource;
+import org.collectionspace.services.person.PersonAuthorityResource;
 
 //import org.collectionspace.services.query.QueryResource;
 
@@ -64,6 +65,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new NewRelationResource());
         singletons.add(new VocabularyResource());
         singletons.add(new OrgAuthorityResource());
+        singletons.add(new PersonAuthorityResource());
         singletons.add(new DimensionResource());
         singletons.add(new ContactResource());
 

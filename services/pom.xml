@@ -22,6 +22,7 @@
         <module>acquisition</module>
         <module>vocabulary</module>
         <module>organization</module>
+        <module>person</module>
         <module>id</module>
         <module>collectionobject</module>
         <module>intake</module>

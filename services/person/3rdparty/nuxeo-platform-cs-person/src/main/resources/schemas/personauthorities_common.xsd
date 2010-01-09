@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    PersonAuthority schema (XSD)
+    
+    Entity  : PersonAuthority
+    Part    : Common
+    Used for: Nuxeo EP core document type
+    
+    $LastChangedRevision: 928 $
+    $LastChangedDate: 2009-11-10 12:25:58 -0800 (Tue, 10 Nov 2009) $
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/person"
+  xmlns="http://collectionspace.org/services/person"
+  targetNamespace="http://collectionspace.org/services/person"
+  version="0.1"
+>
+
+<!-- Flattened version of jaxb schema for nuxeo -->
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Person+Service+Home -->    
+
+		<!--  PersonAuthority Information Group -->
+		<xs:element name="displayName" type="xs:string"/>
+		<xs:element name="refName" type="xs:string"/>
+		<xs:element name="vocabType" type="xs:string"/>
+
+</xs:schema>
+

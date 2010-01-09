@@ -196,6 +196,65 @@
             </service:object>
         </tenant:serviceBindings>
         <!-- end organization service meta-data -->
+        <!-- begin personauthority service meta-data -->
+        <tenant:serviceBindings name="Personauthorities" version="0.1">
+            <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>nuxeo-java</service:repositoryClient>
+            <service:object id="1" name="Personauthority" version="0.1"
+            xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:part id="0" control_group="Managed"
+                            versionable="true" auditable="false"
+                            label="personauthorities-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                        namespaceURI="http://collectionspace.org/services/common/system"
+                        schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed"
+                            versionable="true" auditable="false"
+                            label="personauthorities_common" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                        namespaceURI="http://collectionspace.org/services/person"
+                        schemaLocation="http://collectionspace.org/services/person http://services.collectionspace.org/person/personauthorities_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end personauthority service meta-data -->
+			<!-- begin person service meta-data.
+			Note there is no Person service, but there is a
+			Repository workspace so we have to configure that.
+        -->
+        <tenant:serviceBindings name="Persons" version="0.1">
+            <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>nuxeo-java</service:repositoryClient>
+            <service:object id="1" name="Person" version="0.1"
+            xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:part id="0" control_group="Managed"
+                            versionable="true" auditable="false"
+                            label="persons-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                        namespaceURI="http://collectionspace.org/services/common/system"
+                        schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed"
+                            versionable="true" auditable="false"
+                            label="persons_common" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                        namespaceURI="http://collectionspace.org/services/person"
+                        schemaLocation="http://collectionspace.org/services/person http://services.collectionspace.org/person/persons_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end person service meta-data -->
         <!-- begin acquisition service meta-data -->
         <tenant:serviceBindings name="Acquisitions" version="0.1">
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>nuxeo-java</service:repositoryClient>
