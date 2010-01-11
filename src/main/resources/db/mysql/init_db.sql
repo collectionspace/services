@@ -20,13 +20,13 @@ CREATE database jbossdb;
 -- recreate cspace database
 --
 DROP database IF EXISTS cspace;
-CREATE database cspace;
+CREATE database cspace DEFAULT CHARACTER SET utf8;
 
 --
 -- recreate nuxeo database
 --
 DROP database IF EXISTS nuxeo;
-CREATE database nuxeo;
+CREATE database nuxeo DEFAULT CHARACTER SET utf8;
 
 
 --
