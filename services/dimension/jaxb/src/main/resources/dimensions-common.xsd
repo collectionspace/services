@@ -32,7 +32,7 @@
                 <xs:element name="csid" type="xs:string" />
                 <xs:element name="dimension" type="xs:string"/>
                 <xs:element name="measuredPart" type="xs:string"/>
-                <xs:element name="measuredUnit" type="xs:string"/>
+                <xs:element name="measurementUnit" type="xs:string"/>
                 <xs:element name="value" type="xs:string"/>
                 <xs:element name="valueDate" type="xs:string"/>
                 <xs:element name="valueQualifier" type="xs:string"/>

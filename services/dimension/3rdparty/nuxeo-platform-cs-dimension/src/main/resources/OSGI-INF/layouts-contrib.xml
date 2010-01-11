@@ -12,7 +12,7 @@
       <rows>
         <row><widget>dimension</widget></row>
         <row><widget>measuredPart</widget></row>
-        <row><widget>measuredUnit</widget></row>
+        <row><widget>measurementUnit</widget></row>
         <row><widget>value</widget></row>
         <row><widget>valueDate</widget></row>
         <row><widget>valueQualifier</widget></row>
@@ -44,13 +44,13 @@
         </properties>
       </widget>
       
-      <widget name="measuredUnit" type="text">
+      <widget name="measurementUnit" type="text">
         <labels>
-          <label mode="any">measuredUnit</label>
+          <label mode="any">measurementUnit</label>
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="dimensions_common">measuredUnit</field>
+          <field schema="dimensions_common">measurementUnit</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
