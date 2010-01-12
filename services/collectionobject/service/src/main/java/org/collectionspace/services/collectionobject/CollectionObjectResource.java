@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
+import org.collectionspace.services.common.Version;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectHandlerFactory;
@@ -67,11 +68,16 @@ import org.slf4j.LoggerFactory;
 public class CollectionObjectResource
         extends AbstractCollectionSpaceResource {
 
-	//FIXME: Remove this static string
-	final private String lastChangeRevision = "$LastChangedRevision$";
     final private String serviceName = "collectionobjects";
     final Logger logger = LoggerFactory.getLogger(CollectionObjectResource.class);
 
+    @Override
+    protected String getVersionString() {
+    	/** The last change revision. */
+    	final String lastChangeRevision = "$LastChangedRevision$";
+    	return lastChangeRevision;
+    }
+    
     @Override
     public String getServiceName() {
         return serviceName;

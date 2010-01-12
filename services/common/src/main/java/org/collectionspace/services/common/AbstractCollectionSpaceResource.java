@@ -23,6 +23,10 @@
  */
 package org.collectionspace.services.common;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.repository.RepositoryClient;
@@ -30,22 +34,39 @@ import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClient;
 
+/**
+ * The Class AbstractCollectionSpaceResource.
+ */
 public abstract class AbstractCollectionSpaceResource
         implements CollectionSpaceResource {
 
     // Fields for default client factory and client
+    /** The repository client factory. */
     private RepositoryClientFactory repositoryClientFactory;
+    
+    /** The repository client. */
     private RepositoryClient repositoryClient;
+    
+    /** The storage client. */
     private StorageClient storageClient;
 
+    /**
+     * Instantiates a new abstract collection space resource.
+     */
     public AbstractCollectionSpaceResource() {
         repositoryClientFactory = RepositoryClientFactory.getInstance();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.CollectionSpaceResource#getServiceName()
+     */
     @Override
     abstract public String getServiceName();
 
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.CollectionSpaceResource#getRepositoryClient(org.collectionspace.services.common.context.ServiceContext)
+     */
     @Override
     synchronized public RepositoryClient getRepositoryClient(ServiceContext ctx) {
         if(repositoryClient != null){
@@ -55,6 +76,9 @@ public abstract class AbstractCollectionSpaceResource
         return repositoryClient;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.CollectionSpaceResource#getStorageClient(org.collectionspace.services.common.context.ServiceContext)
+     */
     @Override
     synchronized public StorageClient getStorageClient(ServiceContext ctx) {
         if(storageClient != null) {
@@ -64,6 +88,33 @@ public abstract class AbstractCollectionSpaceResource
         return storageClient;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.CollectionSpaceResource#createDocumentHandler(org.collectionspace.services.common.context.ServiceContext)
+     */
     @Override
     abstract public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception ;
+    
+    /**
+     * Gets the version string.
+     * 
+     * @return the version string
+     */
+    abstract protected String getVersionString();
+    
+    /**
+     * Gets the version.
+     * 
+     * @return the version
+     */
+    @GET
+    @Path("/version")    
+    @Produces("application/xml")
+    public Version getVersion() {
+    	Version result = new Version();
+    	
+    	result.setVersionString(getVersionString());
+    	
+    	return result;
+    }
+    
 }

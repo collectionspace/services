@@ -66,6 +66,13 @@ public class AcquisitionResource
     final Logger logger = LoggerFactory.getLogger(AcquisitionResource.class);
 
     @Override
+    protected String getVersionString() {
+    	/** The last change revision. */
+    	final String lastChangeRevision = "$LastChangedRevision: 1165 $";
+    	return lastChangeRevision;
+    }
+    
+    @Override
     public String getServiceName() {
         return serviceName;
     }
