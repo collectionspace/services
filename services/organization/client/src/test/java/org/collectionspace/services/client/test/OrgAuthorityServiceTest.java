@@ -29,7 +29,9 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.client.OrgAuthorityClient;
+import org.collectionspace.services.client.OrgAuthorityClientUtils;
 import org.collectionspace.services.organization.OrgauthoritiesCommon;
 import org.collectionspace.services.organization.OrgauthoritiesCommonList;
 import org.collectionspace.services.organization.OrganizationsCommon;
@@ -91,9 +93,10 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
         String identifier = createIdentifier();
         String displayName = "displayName-" + identifier;
     	String refName = createRefName(displayName);
-    	String typeName = "vocabType-" + identifier;
     	MultipartOutput multipart = 
-    		createOrgAuthorityInstance(displayName, refName, typeName);
+    		OrgAuthorityClientUtils.createOrgAuthorityInstance(
+				displayName, refName, 
+				client.getCommonPartName());
         ClientResponse<Response> res = client.create(multipart);
         int statusCode = res.getStatus();
 
@@ -150,10 +153,16 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
         String refName = createRefName(identifier);
-        MultipartOutput multipart = createOrganizationInstance(vcsid, 
-    		identifier, refName, "Longer Name for "+identifier,
-    		null, "joe@org.org", "1910", null, "Anytown, USA", "testing",  
-    		"This is a fake organization that was created by a test method." );
+        Map<String, String> testOrgMap = new HashMap<String,String>();
+        testOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "Test Org");
+        testOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "The real official test organization");
+        testOrgMap.put(OrganizationJAXBSchema.CONTACT_NAME, "joe@test.org");
+        testOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "May 26, 1907");
+        testOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, "Anytown, USA");
+        testOrgMap.put(OrganizationJAXBSchema.FUNCTION, "For testing");
+        MultipartOutput multipart = 
+        	OrgAuthorityClientUtils.createOrganizationInstance(vcsid, 
+    		refName, testOrgMap, client.getItemCommonPartName() );
         ClientResponse<Response> res = client.createItem(vcsid, multipart);
         int statusCode = res.getStatus();
 
@@ -797,9 +806,12 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
         // The only relevant ID may be the one used in update(), below.
 
         // The only relevant ID may be the one used in update(), below.
-        MultipartOutput multipart = createOrganizationInstance(
-        		knownResourceId, NON_EXISTENT_ID, createRefName(NON_EXISTENT_ID),
-        		null, null, null, null, null, null, null, null);
+        Map<String, String> nonexOrgMap = new HashMap<String,String>();
+        nonexOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "Non-existent");
+        MultipartOutput multipart = 
+        	OrgAuthorityClientUtils.createOrganizationInstance(
+        		knownResourceId, createRefName(NON_EXISTENT_ID),
+        		nonexOrgMap, client.getCommonPartName() );
         ClientResponse<MultipartInput> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
@@ -1029,66 +1041,8 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
     private MultipartOutput createOrgAuthorityInstance(String identifier) {
     	String displayName = "displayName-" + identifier;
     	String refName = createRefName(displayName);
-    	String typeName = "vocabType-" + identifier;
-        return createOrgAuthorityInstance(
-                displayName, refName,typeName );
-    }
-
-    private MultipartOutput createOrgAuthorityInstance(
-    		String displayName, String refName, String vocabType) {
-        OrgauthoritiesCommon orgAuthority = new OrgauthoritiesCommon();
-        orgAuthority.setDisplayName(displayName);
-        if(refName!=null)
-            orgAuthority.setRefName(refName);
-        orgAuthority.setVocabType(vocabType);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(orgAuthority, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
-
-        if(logger.isDebugEnabled()) {
-            logger.debug("to be created, orgAuthority common");
-            logger.debug(objectAsXmlString(orgAuthority, OrgauthoritiesCommon.class));
-        }
-        return multipart;
-    }
-
-    private MultipartOutput createOrganizationInstance(String inAuthority,
-        String shortName, String refName, String longName, 
-        String nameAdditions, String contactName, 
-        String foundingDate, String dissolutionDate, String foundingPlace,
-        String function, String description ) {
-        OrganizationsCommon organization = new OrganizationsCommon();
-        organization.setInAuthority(inAuthority);
-        organization.setShortName(shortName);
-        if(refName!=null)
-        	organization.setRefName(refName);
-        if(longName!=null)
-        	organization.setLongName(longName);
-        if(nameAdditions!=null)
-        	organization.setNameAdditions(nameAdditions);
-        if(contactName!=null)
-        	organization.setContactName(contactName);
-        if(foundingDate!=null)
-        	organization.setFoundingDate(foundingDate);
-        if(dissolutionDate!=null)
-        	organization.setDissolutionDate(dissolutionDate);
-        if(foundingPlace!=null)
-        	organization.setFoundingPlace(foundingPlace);
-        if(function!=null)
-        	organization.setFunction(function);
-        if(description!=null)
-        	organization.setDescription(description);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(organization,
-            MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getItemCommonPartName());
-
-        if(logger.isDebugEnabled()){
-            logger.debug("to be created, organization common");
-            logger.debug(objectAsXmlString(organization,
-                OrganizationsCommon.class));
-        }
-
-        return multipart;
+        return OrgAuthorityClientUtils.createOrgAuthorityInstance(
+				displayName, refName, 
+				client.getCommonPartName());
     }
 }

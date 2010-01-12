@@ -25,14 +25,18 @@ package org.collectionspace.services.organization.client.sample;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.BasicConfigurator;
+import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.client.OrgAuthorityClient;
+import org.collectionspace.services.client.OrgAuthorityClientUtils;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.organization.OrgauthoritiesCommon;
 import org.collectionspace.services.organization.OrgauthoritiesCommonList;
@@ -66,8 +70,19 @@ public class Sample {
     // ---------------------------------------------------------------
     // Create
     // ---------------------------------------------------------------
+    protected String createOrgAuthRefName(String orgAuthorityName) {
+    	return "urn:cspace:org.collectionspace.demo:orgauthority:name("
+    			+orgAuthorityName+")";
+    }
 
-    public void createEnumeration(String orgAuthName, List<String> enumValues ) {
+    protected String createOrganizationRefName(
+    						String orgAuthRefName, String orgName) {
+    	return orgAuthRefName+":organization:name("+orgName+")";
+    }
+
+    
+
+    public void createOrgAuthority(String orgAuthName, List<Map<String,String>> orgInfos ) {
 
     	// Expected status code: 201 Created
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
@@ -75,8 +90,12 @@ public class Sample {
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
 
     	logger.info("Import: Create orgAuthority: \"" + orgAuthName +"\"");
-    	MultipartOutput multipart = createOrgAuthorityInstance(orgAuthName, 
-    			createRefName(orgAuthName), "enum");
+    	String baseOrgAuthRefName = createOrgAuthRefName(orgAuthName);
+    	String fullOrgAuthRefName = baseOrgAuthRefName+"'"+orgAuthName+"'";
+    	MultipartOutput multipart = 
+    		OrgAuthorityClientUtils.createOrgAuthorityInstance(
+				orgAuthName, fullOrgAuthRefName, 
+				client.getCommonPartName());
     	ClientResponse<Response> res = client.create(multipart);
 
     	int statusCode = res.getStatus();
@@ -97,32 +116,42 @@ public class Sample {
     				+newOrgAuthId );
         
         // Add items to the orgAuthority
-    	for(String itemName : enumValues){
-    		createItemInOrgAuth(newOrgAuthId, orgAuthName, itemName, createRefName(itemName));
+       	for(Map<String,String> orgInfo : orgInfos){
+    		createItemInOrgAuth(newOrgAuthId, baseOrgAuthRefName, orgInfo);
     	}
         
     }
     
-    private String createItemInOrgAuth(String vcsid, String orgAuthName, String itemName, String refName) {
+    private String createItemInOrgAuth(String vcsid, 
+    		String orgAuthorityRefName, Map<String,String> orgInfo) {
     	// Expected status code: 201 Created
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
     	// Type of service request being tested
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
+    	String shortName = orgInfo.get(OrganizationJAXBSchema.SHORT_NAME);
+    	String refName = createOrganizationRefName(
+    						orgAuthorityRefName, shortName)+"'"+shortName+"'";
 
-    	logger.info("Import: Create Item: \""+itemName+"\" in orgAuthority: \"" + orgAuthName +"\"");
-    	MultipartOutput multipart = createOrganizationInstance(vcsid, itemName, refName);
+
+    	logger.info("Import: Create Item: \""+shortName+
+    			"\" in orgAuthority: \"" + orgAuthorityRefName +"\"");
+        MultipartOutput multipart = 
+        	OrgAuthorityClientUtils.createOrganizationInstance( vcsid, 
+				refName, orgInfo, client.getCommonPartName() );
+
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
 
     	int statusCode = res.getStatus();
 
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-    		throw new RuntimeException("Could not create Item: \""+itemName
-    				+"\" in orgAuthority: \"" + orgAuthName
+    		throw new RuntimeException("Could not create Item: \""+shortName
+    				+"\" in orgAuthority: \"" + orgAuthorityRefName
     				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
-    		throw new RuntimeException("Unexpected Status when creating Item: \""+itemName
-    				+"\" in orgAuthority: \"" + orgAuthName +"\", Status:"+ statusCode);
+    		throw new RuntimeException("Unexpected Status when creating Item: \""+shortName
+    				+"\" in orgAuthority: \"" + orgAuthorityRefName +
+    				"\", Status:"+ statusCode);
     	}
 
     	return extractId(res);
@@ -295,40 +324,6 @@ public class Sample {
     // Utility methods used by tests above
     // ---------------------------------------------------------------
 
-    private MultipartOutput createOrgAuthorityInstance(
-    		String displayName, String refName, String vocabType) {
-        OrgauthoritiesCommon orgAuthority = new OrgauthoritiesCommon();
-        orgAuthority.setDisplayName(displayName);
-        orgAuthority.setRefName(refName);
-        orgAuthority.setVocabType(vocabType);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(orgAuthority, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
-
-        if(logger.isDebugEnabled()){
-        	logger.debug("to be created, orgAuthority common ",
-        				orgAuthority, OrgauthoritiesCommon.class);
-        }
-
-        return multipart;
-    }
-
-    private MultipartOutput createOrganizationInstance(
-    		String inAuthority, String displayName, String refName) {
-    	OrganizationsCommon organization = new OrganizationsCommon();
-    	organization.setInAuthority(inAuthority);
-    	organization.setShortName(displayName);
-    	organization.setRefName(refName);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(organization, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getItemCommonPartName());
-
-        if(logger.isDebugEnabled()){
-        	logger.debug("to be created, organization common ", organization, OrganizationsCommon.class);
-        }
-
-        return multipart;
-    }
 
     // Retrieve individual fields of orgAuthority records.
 
@@ -441,7 +436,7 @@ public class Sample {
 
         logger.info("OrgAuthority Sample starting...");
 
-		Sample vbi = new Sample();
+		Sample sample = new Sample();
         OrgauthoritiesCommonList orgAuthorities;
         List<String> orgAuthIds;
         String details = "";
@@ -454,61 +449,59 @@ public class Sample {
             logger.info("Deleting all organizations and orgAuthorities ...");
 
             // For each orgAuthority ...
-            orgAuthorities = vbi.readOrgAuthorities();
-            orgAuthIds = vbi.readOrgAuthorityIds(orgAuthorities);
+            orgAuthorities = sample.readOrgAuthorities();
+            orgAuthIds = sample.readOrgAuthorityIds(orgAuthorities);
             for (String orgAuthId : orgAuthIds) {
                 logger.info("Deleting all organizations for orgAuthority ...");
-                vbi.deleteAllItemsForOrgAuth(orgAuthId);
+                sample.deleteAllItemsForOrgAuth(orgAuthId);
                 logger.info("Deleting orgAuthority ...");
-                vbi.deleteOrgAuthority(orgAuthId);
+                sample.deleteOrgAuthority(orgAuthId);
             }
 
             logger.info("Reading orgAuthorities after deletion ...");
-            orgAuthorities = vbi.readOrgAuthorities();
-            details = vbi.displayAllOrgAuthorities(orgAuthorities);
+            orgAuthorities = sample.readOrgAuthorities();
+            details = sample.displayAllOrgAuthorities(orgAuthorities);
             logger.info(details);
 
             logger.info("Reading items in each orgAuthority after deletion ...");
-            orgAuthIds = vbi.readOrgAuthorityIds(orgAuthorities);
+            orgAuthIds = sample.readOrgAuthorityIds(orgAuthorities);
             for (String orgAuthId : orgAuthIds) {
-                OrganizationsCommonList items = vbi.readItemsInOrgAuth(orgAuthId);
-                details = vbi.displayAllOrganizations(items);
+                OrganizationsCommonList items = sample.readItemsInOrgAuth(orgAuthId);
+                details = sample.displayAllOrganizations(items);
                 logger.info(details);
             }
 
         }
 
         // Create new authorities, each populated with organizations.
-
-				/*
-		final String acquisitionMethodsVocabName = "Acquisition Methods";
-		final String entryMethodsVocabName = "Entry Methods";
-		final String entryReasonsVocabName = "Entry Reasons";
-		final String responsibleDeptsVocabName = "Responsible Departments";
-
-		List<String> acquisitionMethodsEnumValues = 
-			Arrays.asList("Gift","Purchase","Exchange","Transfer","Treasure");
-		List<String> entryMethodsEnumValues = 
-			Arrays.asList("In person","Post","Found on doorstep");
-		List<String> entryReasonsEnumValues = 
-			Arrays.asList("Enquiry","Commission","Loan");
-		List<String> respDeptNamesEnumValues = 
-			Arrays.asList("Antiquities","Architecture and Design","Decorative Arts",
-									"Ethnography","Herpetology","Media and Performance Art",
-									"Paintings and Sculpture","Paleobotany","Photographs",
-									"Prints and Drawings");
+        Map<String, String> mmiOrgMap = new HashMap<String,String>();
+        mmiOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "MMI");
+        mmiOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "Museum of the Moving Image");
+        mmiOrgMap.put(OrganizationJAXBSchema.CONTACT_NAME, "Megan Forbes");
+        mmiOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "1984");
+        mmiOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, "Astoria, NY");
+        Map<String, String> pahmaOrgMap = new HashMap<String,String>();
+        pahmaOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "PAHMA");
+        pahmaOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "Phoebe A. Hearst Museum of Anthropology");
+        pahmaOrgMap.put(OrganizationJAXBSchema.NAME_ADDITIONS, "University of California, Berkeley");
+        pahmaOrgMap.put(OrganizationJAXBSchema.CONTACT_NAME, "Michael Black");
+        pahmaOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "1901");
+        pahmaOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, "Berkeley, CA");
+        Map<String, String> savoyOrgMap = new HashMap<String,String>();
+        savoyOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "Savoy Theatre");
+        savoyOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "1900");
+        savoyOrgMap.put(OrganizationJAXBSchema.DISSOLUTION_DATE, "1952");
+        savoyOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, "New York, NY");
+        List<Map<String, String>> orgMaps = 
+        	Arrays.asList(mmiOrgMap, pahmaOrgMap, savoyOrgMap );
         
-		vbi.createEnumeration(acquisitionMethodsVocabName, acquisitionMethodsEnumValues);
-		vbi.createEnumeration(entryMethodsVocabName, entryMethodsEnumValues);
-		vbi.createEnumeration(entryReasonsVocabName, entryReasonsEnumValues);
-		vbi.createEnumeration(responsibleDeptsVocabName, respDeptNamesEnumValues);
-		*/
+		sample.createOrgAuthority("Sample Org Authority", orgMaps);
 
 		logger.info("OrgAuthority Sample complete.");
 
         logger.info("Reading orgAuthorities and items ...");
         // Get a list of orgAuthorities.
-        orgAuthorities = vbi.readOrgAuthorities();
+        orgAuthorities = sample.readOrgAuthorities();
         // For each orgAuthority ...
         for (OrgauthoritiesCommonList.OrgauthorityListItem
             orgAuthority : orgAuthorities.getOrgauthorityListItem()) {
@@ -516,7 +509,7 @@ public class Sample {
             logger.info(orgAuthority.getDisplayName());
             // Get a list of the organizations in this orgAuthority.
             OrganizationsCommonList items =
-                vbi.readItemsInOrgAuth(orgAuthority.getCsid());
+                sample.readItemsInOrgAuth(orgAuthority.getCsid());
             // For each organization ...
             for (OrganizationsCommonList.OrganizationListItem
                 item : items.getOrganizationListItem()) {
@@ -531,14 +524,14 @@ public class Sample {
         if (RUN_ADDITIONAL_SAMPLES) {
 
             logger.info("Reading all orgAuthorities ...");
-            details = vbi.displayAllOrgAuthorities(orgAuthorities);
+            details = sample.displayAllOrgAuthorities(orgAuthorities);
             logger.info(details);
 
             logger.info("Reading all organizations ...");
-            orgAuthIds = vbi.readOrgAuthorityIds(orgAuthorities);
+            orgAuthIds = sample.readOrgAuthorityIds(orgAuthorities);
             for (String orgAuthId : orgAuthIds) {
-                OrganizationsCommonList items = vbi.readItemsInOrgAuth(orgAuthId);
-                details = vbi.displayAllOrganizations(items);
+                OrganizationsCommonList items = sample.readItemsInOrgAuth(orgAuthId);
+                details = sample.displayAllOrganizations(items);
                 logger.info(details);
             }
 

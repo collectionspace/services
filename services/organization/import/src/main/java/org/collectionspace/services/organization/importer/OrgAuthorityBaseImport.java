@@ -25,20 +25,20 @@ package org.collectionspace.services.organization.importer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.BasicConfigurator;
+import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.client.OrgAuthorityClient;
+import org.collectionspace.services.client.OrgAuthorityClientUtils;
 import org.collectionspace.services.client.test.ServiceRequestType;
-import org.collectionspace.services.organization.OrgauthoritiesCommon;
-import org.collectionspace.services.organization.OrganizationsCommon;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +59,7 @@ public class OrgAuthorityBaseImport {
     final String ITEM_SERVICE_PATH_COMPONENT = "items";
 
     public void createOrgAuthority(String orgAuthorityName, 
-    		List<List<String>> orgInfo ) {
+    		List<Map<String,String>> orgInfos ) {
 
     	// Expected status code: 201 Created
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
@@ -71,8 +71,10 @@ public class OrgAuthorityBaseImport {
     	}
     	String baseOrgAuthRefName = createOrgAuthRefName(orgAuthorityName);
     	String fullOrgAuthRefName = baseOrgAuthRefName+"'"+orgAuthorityName+"'";
-    	MultipartOutput multipart = createOrgAuthorityInstance(orgAuthorityName, 
-    			fullOrgAuthRefName);
+    	MultipartOutput multipart = 
+    		OrgAuthorityClientUtils.createOrgAuthorityInstance(
+    				orgAuthorityName, fullOrgAuthRefName, 
+    				client.getCommonPartName());
     	ClientResponse<Response> res = client.create(multipart);
 
     	int statusCode = res.getStatus();
@@ -93,30 +95,29 @@ public class OrgAuthorityBaseImport {
     		logger.debug("Import: Created orgAuthorityulary: \"" + orgAuthorityName +"\" ID:"
     				+newOrgAuthorityId );
     	}
-    	for(List<String> orgStrings : orgInfo){
-    		createItemInAuthority(newOrgAuthorityId, baseOrgAuthRefName, orgStrings);
+    	for(Map<String,String> orgInfo : orgInfos){
+    		createItemInAuthority(newOrgAuthorityId, 
+    				baseOrgAuthRefName, orgInfo );
     	}
     }
     
     private String createItemInAuthority(String vcsid, 
-    		String orgAuthorityRefName, List<String> orgStrings) {
+    		String orgAuthorityRefName, Map<String, String> orgInfo) {
     	// Expected status code: 201 Created
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
     	// Type of service request being tested
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
-		/* Strings are:  
-			shortName, longName, nameAdditions, contactName, 
-	        foundingDate, dissolutionDate, foundingPlace, function, description
-		 */		
-    	String shortName = orgStrings.get(0);
-    	String refName = createOrganizationRefName(orgAuthorityRefName, shortName)+"'"+shortName+"'";
+    	String shortName = orgInfo.get(OrganizationJAXBSchema.SHORT_NAME);
+    	String refName = createOrganizationRefName(
+    						orgAuthorityRefName, shortName)+"'"+shortName+"'";
 
     	if(logger.isDebugEnabled()){
     		logger.debug("Import: Create Item: \""+shortName
     				+"\" in orgAuthorityulary: \"" + orgAuthorityRefName +"\"");
     	}
-    	MultipartOutput multipart = createOrganizationInstance( vcsid, refName,
-    			orgStrings );
+    	MultipartOutput multipart = 
+    		OrgAuthorityClientUtils.createOrganizationInstance( vcsid, 
+    				refName, orgInfo, client.getCommonPartName() );
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
 
     	int statusCode = res.getStatus();
@@ -137,67 +138,6 @@ public class OrgAuthorityBaseImport {
     // ---------------------------------------------------------------
     // Utility methods used by methods above
     // ---------------------------------------------------------------
-
-    private MultipartOutput createOrgAuthorityInstance(
-    		String displayName, String refName ) {
-        OrgauthoritiesCommon orgAuthority = new OrgauthoritiesCommon();
-        orgAuthority.setDisplayName(displayName);
-        orgAuthority.setRefName(refName);
-        orgAuthority.setVocabType("OrgAuthority");
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(orgAuthority, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
-
-        if(logger.isDebugEnabled()){
-        	logger.debug("to be created, orgAuthority common ", 
-        				orgAuthority, OrgauthoritiesCommon.class);
-        }
-
-        return multipart;
-    }
-
-    private MultipartOutput createOrganizationInstance(String inAuthority, 
-    		String orgRefName, List<String> orgStrings){
-        OrganizationsCommon organization = new OrganizationsCommon();
-        organization.setInAuthority(inAuthority);
-        organization.setShortName(orgStrings.get(0));
-       	organization.setRefName(orgRefName);
-       	String longName = orgStrings.get(1);
-        if(longName!=null)
-        	organization.setLongName(longName);
-       	String nameAdditions = orgStrings.get(2);
-        if(nameAdditions!=null)
-        	organization.setNameAdditions(nameAdditions);
-       	String contactName = orgStrings.get(3);
-        if(contactName!=null)
-        	organization.setContactName(contactName);
-       	String foundingDate = orgStrings.get(4);
-        if(foundingDate!=null)
-        	organization.setFoundingDate(foundingDate);
-       	String dissolutionDate = orgStrings.get(5);
-        if(dissolutionDate!=null)
-        	organization.setDissolutionDate(dissolutionDate);
-       	String foundingPlace = orgStrings.get(6);
-        if(foundingPlace!=null)
-        	organization.setFoundingPlace(foundingPlace);
-       	String function = orgStrings.get(7);
-        if(function!=null)
-        	organization.setFunction(function);
-       	String description = orgStrings.get(8);
-        if(description!=null)
-        	organization.setDescription(description);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(organization,
-            MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getItemCommonPartName());
-
-        if(logger.isDebugEnabled()){
-        	logger.debug("to be created, organization common ", organization, OrganizationsCommon.class);
-        }
-
-        return multipart;
-    }
-
 
     /**
      * Returns an error message indicating that the status code returned by a
@@ -248,24 +188,28 @@ public class OrgAuthorityBaseImport {
 		OrgAuthorityBaseImport oabi = new OrgAuthorityBaseImport();
 		final String demoOrgAuthorityName = "Demo Org Authority";
 
-		/* Strings are:  
-			shortName, longName, nameAdditions, contactName, 
-	        foundingDate, dissolutionDate, foundingPlace, function, description
-         */		
-        List<String> mmiOrgStrings = 
-			Arrays.asList("MMI","Museum of the Moving Image",null,"Megan Forbes",
-					"1984", null, "Astoria, NY", null, null);
-        List<String> pahmaOrgStrings = 
-			Arrays.asList("PAHMA","Phoebe A. Hearst Museum of Anthropology",
-							"University of California, Berkeley","Michael Black",
-					"1901", null, "Berkeley, CA", null, null);
-        List<String> savoyOrgStrings = 
-			Arrays.asList("Savoy Theatre",null,null,null,
-					"1900", "1952", "New York, NY", null, null);
-        List<List<String>> orgsStrings = 
-        	Arrays.asList(mmiOrgStrings, pahmaOrgStrings, savoyOrgStrings );
+        Map<String, String> mmiOrgMap = new HashMap<String,String>();
+        mmiOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "MMI");
+        mmiOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "Museum of the Moving Image");
+        mmiOrgMap.put(OrganizationJAXBSchema.CONTACT_NAME, "Megan Forbes");
+        mmiOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "1984");
+        mmiOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, "Astoria, NY");
+        Map<String, String> pahmaOrgMap = new HashMap<String,String>();
+        pahmaOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "PAHMA");
+        pahmaOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "Phoebe A. Hearst Museum of Anthropology");
+        pahmaOrgMap.put(OrganizationJAXBSchema.NAME_ADDITIONS, "University of California, Berkeley");
+        pahmaOrgMap.put(OrganizationJAXBSchema.CONTACT_NAME, "Michael Black");
+        pahmaOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "1901");
+        pahmaOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, "Berkeley, CA");
+        Map<String, String> savoyOrgMap = new HashMap<String,String>();
+        savoyOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "Savoy Theatre");
+        savoyOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "1900");
+        savoyOrgMap.put(OrganizationJAXBSchema.DISSOLUTION_DATE, "1952");
+        savoyOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, "New York, NY");
+        List<Map<String, String>> orgMaps = 
+        	Arrays.asList(mmiOrgMap, pahmaOrgMap, savoyOrgMap );
 
-		oabi.createOrgAuthority(demoOrgAuthorityName, orgsStrings);
+		oabi.createOrgAuthority(demoOrgAuthorityName, orgMaps);
 
 		logger.info("OrgAuthorityBaseImport complete.");
 	}
