@@ -28,8 +28,10 @@ package org.collectionspace.services.common.query;
 
 public interface IQueryManager {
 	
-    final static String SEARCH_TYPE_KEYWORDS = "keywords";	
-	final static String ECM_FULLTEXT_LIKE = "ecm:fulltext LIKE ";
+	final static String SEARCH_LIKE = "LIKE";
+    final static String SEARCH_TYPE_KEYWORDS = "keywords";
+    final static String SEARCH_TYPE_PARTIALTERM = "pt";
+	final static String ECM_FULLTEXT_LIKE = "ecm:fulltext " + SEARCH_LIKE;
 	final static String SEARCH_QUALIFIER_AND = "AND";
 	final static String SEARCH_QUALIFIER_OR = "OR";
 	final static String SEARCH_TERM_SEPARATOR = " ";

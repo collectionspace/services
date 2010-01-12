@@ -40,11 +40,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.StringTokenizer;
-
-import org.collectionspace.services.common.Version;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectHandlerFactory;

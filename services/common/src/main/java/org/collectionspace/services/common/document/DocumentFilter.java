@@ -18,8 +18,8 @@
 package org.collectionspace.services.common.document;
 
 import java.util.List;
-
 import javax.ws.rs.core.MultivaluedMap;
+import org.collectionspace.services.common.query.IQueryManager;
 
 /**
  * DocumentFilter bundles simple query filtering parameters. 
@@ -98,6 +98,14 @@ public class DocumentFilter {
 	 */
 	public void setWhereClause(String whereClause) {
 		this.whereClause = whereClause;
+	}
+	
+	public void appendWhereClause(String whereClause) {
+		String currentClause = getWhereClause();
+		if (currentClause != null) {
+			String newClause = currentClause.concat(IQueryManager.SEARCH_TERM_SEPARATOR + whereClause);
+			this.setWhereClause(newClause);
+		}
 	}
 	
 	/**

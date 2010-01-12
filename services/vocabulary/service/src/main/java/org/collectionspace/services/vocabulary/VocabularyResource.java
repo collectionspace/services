@@ -31,6 +31,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
@@ -38,6 +39,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.VocabularyItemJAXBSchema;
 import org.collectionspace.services.common.AbstractCollectionSpaceResource;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
@@ -47,7 +49,9 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.security.UnauthorizedException;
+import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.vocabulary.nuxeo.VocabularyHandlerFactory;
 import org.collectionspace.services.vocabulary.nuxeo.VocabularyItemDocumentModelHandler;
 import org.collectionspace.services.vocabulary.nuxeo.VocabularyItemHandlerFactory;
@@ -403,6 +407,7 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
     @Produces("application/xml")
     public VocabularyitemsCommonList getVocabularyItemList(
             @PathParam("csid") String parentcsid,
+            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
             @Context UriInfo ui) {
         VocabularyitemsCommonList vocabularyItemObjectList = new VocabularyitemsCommonList();
         try {
@@ -412,10 +417,30 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             DocumentFilter myFilter =
                 DocumentFilter.CreatePaginatedDocumentFilter(queryParams);
+            // "vocabularyitems_common:inVocabulary='" + parentcsid + "'");
             myFilter.setWhereClause(
-                    "vocabularyitems_common:inVocabulary='" + parentcsid + "'");
+            		VocabularyItemJAXBSchema.VOCABULARYITEMS_COMMON + ":" +
+            		VocabularyItemJAXBSchema.IN_VOCABULARY + "=" +
+            		"'" + parentcsid + "'");
+            
+            // AND vocabularyitems_common:displayName LIKE '%partialTerm%'
+            if (partialTerm != null && !partialTerm.isEmpty()) {
+            	String ptClause = "AND " +
+            		VocabularyItemJAXBSchema.VOCABULARYITEMS_COMMON + ":" +
+            		VocabularyItemJAXBSchema.DISPLAY_NAME +
+            		" LIKE " +
+            		"'%" + partialTerm + "%'";
+            	myFilter.appendWhereClause(ptClause);
+            }
+            
+            if (logger.isDebugEnabled()) {
+            	logger.debug("getVocabularyItemList filtered WHERE clause: " +
+            			myFilter.getWhereClause());
+            }
+            
             handler.setDocumentFilter(myFilter);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
+            
             vocabularyItemObjectList = (VocabularyitemsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
