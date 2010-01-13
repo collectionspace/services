@@ -3,6 +3,9 @@
 	<name>org.collectionspace.services.person.importer</name>
 	<comment></comment>
 	<projects>
+		<project>org.collectionspace.services.client</project>
+		<project>org.collectionspace.services.common</project>
+		<project>org.collectionspace.services.person.jaxb</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

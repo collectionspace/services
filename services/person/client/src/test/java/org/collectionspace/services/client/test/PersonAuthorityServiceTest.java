@@ -26,15 +26,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.PersonAuthorityClient;
+import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonauthoritiesCommonList;
 import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonsCommonList;
-
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -96,11 +98,11 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
 
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
-        String displayName = "displayName-" + identifier;
+    	String displayName = "displayName-" + identifier;
     	String refName = createPersonAuthRefName(displayName);
-    	String typeName = "vocabType-" + identifier;
     	MultipartOutput multipart = 
-    		createPersonAuthorityInstance(displayName, refName, typeName);
+    		PersonAuthorityClientUtils.createPersonAuthorityInstance(
+    				displayName, refName, client.getCommonPartName());
         ClientResponse<Response> res = client.create(multipart);
         int statusCode = res.getStatus();
 
@@ -121,7 +123,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
         // for additional tests below.
         knownResourceRefName = refName;
 
-        lastPersonAuthId = extractId(res);
+        lastPersonAuthId = PersonAuthorityClientUtils.extractId(res);
         // Store the ID returned from the first resource created
         // for additional tests below.
         if (knownResourceId == null){
@@ -132,7 +134,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
         }
         // Store the IDs from every resource created by tests,
         // so they can be deleted after tests have been run.
-        allResourceIdsCreated.add(extractId(res));
+        allResourceIdsCreated.add(lastPersonAuthId);
 
     }
 
@@ -156,13 +158,26 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
 
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
-        String refName = createPersonRefName(authRefName, "Patrick Schmitz");
-        MultipartOutput multipart = createPersonInstance(vcsid, refName,
-        		"Patrick","Lee","Schmitz","pls", null, null, null,
-				"1960", null, "Detroit, MI", null, "Coders", "American", "male",
-				null, null, null, null );
+        Map<String, String> johnWayneMap = new HashMap<String,String>();
+        johnWayneMap.put(PersonJAXBSchema.FORE_NAME, "John");
+        johnWayneMap.put(PersonJAXBSchema.SUR_NAME, "Wayne");
+        johnWayneMap.put(PersonJAXBSchema.GENDER, "male");
+        johnWayneMap.put(PersonJAXBSchema.BIRTH_DATE, "May 26, 1907");
+        johnWayneMap.put(PersonJAXBSchema.BIRTH_PLACE, "Winterset, Iowa");
+        johnWayneMap.put(PersonJAXBSchema.DEATH_DATE, "June 11, 1979");
+        johnWayneMap.put(PersonJAXBSchema.BIO_NOTE, "born Marion Robert Morrison and better" +
+        		"known by his stage name John Wayne, was an American film actor, director " +
+        		"and producer. He epitomized rugged masculinity and has become an enduring " +
+        		"American icon. He is famous for his distinctive voice, walk and height. " +
+        		"He was also known for his conservative political views and his support in " +
+        		"the 1950s for anti-communist positions.");
+        String refName = createPersonRefName(authRefName, "John Wayne");
+        MultipartOutput multipart = 
+        	PersonAuthorityClientUtils.createPersonInstance(vcsid, refName, johnWayneMap,
+        			client.getItemCommonPartName() );
         ClientResponse<Response> res = client.createItem(vcsid, multipart);
         int statusCode = res.getStatus();
+        String extractedID = PersonAuthorityClientUtils.extractId(res);
 
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -173,10 +188,11 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
+        
         // Store the ID returned from the first item resource created
         // for additional tests below.
         if (knownItemResourceId == null){
-            knownItemResourceId = extractId(res);
+            knownItemResourceId = extractedID;
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
             }
@@ -188,9 +204,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
         //
         // Item resource IDs are unique, so these are used as keys;
         // the non-unique IDs of their parents are stored as associated values.
-        allResourceItemIdsCreated.put(extractId(res), vcsid);
+        allResourceItemIdsCreated.put(extractedID, vcsid);
 
-        return extractId(res);
+        return extractedID;
     }
 
     @Override
@@ -397,6 +413,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
         PersonsCommon person = (PersonsCommon) extractPart(input,
                 client.getItemCommonPartName(), PersonsCommon.class);
         Assert.assertNotNull(person);
+        boolean showFull = true;
+        if(showFull && logger.isDebugEnabled()){
+            logger.debug(testName + ": returned payload:");
+            logger.debug(objectAsXmlString(person, PersonsCommon.class));
+        }
+        Assert.assertEquals(person.getInAuthority(), knownResourceId);
 
     }
 
@@ -526,19 +548,21 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
         }
         Assert.assertEquals( nItemsReturned, nItemsToCreateInList);
 
-        // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = false;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            int i = 0;
-            for (PersonsCommonList.PersonListItem item : items) {
+        int i = 0;
+        for (PersonsCommonList.PersonListItem item : items) {
+        	Assert.assertTrue((null != item.getRefName()), "Item refName is null!");
+        	Assert.assertTrue((null != item.getDisplayName()), "Item displayName is null!");
+        	// Optionally output additional data about list members for debugging.
+	        boolean showDetails = true;
+	        if (showDetails && logger.isDebugEnabled()) {
                 logger.debug("  " + testName + ": list-item[" + i + "] csid=" +
                         item.getCsid());
                 logger.debug("  " + testName + ": list-item[" + i + "] displayName=" +
                         item.getDisplayName());
                 logger.debug("  " + testName + ": list-item[" + i + "] URI=" +
                         item.getUri());
-                i++;
             }
+            i++;
         }
     }
 
@@ -804,11 +828,14 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
         // The only relevant ID may be the one used in update(), below.
 
         // The only relevant ID may be the one used in update(), below.
-        MultipartOutput multipart = createPersonInstance(NON_EXISTENT_ID, 
-        		createPersonRefName(NON_EXISTENT_ID, NON_EXISTENT_ID),  
-        		"Patrick","Lee","Schmitz","pls", null, null, null,
-				"1960", null, "Detroit, MI", null, "Coders", "American", "male",
-				null, null, null, null );
+        Map<String, String> nonexMap = new HashMap<String,String>();
+        nonexMap.put(PersonJAXBSchema.FORE_NAME, "John");
+        nonexMap.put(PersonJAXBSchema.SUR_NAME, "Wayne");
+        nonexMap.put(PersonJAXBSchema.GENDER, "male");
+        MultipartOutput multipart = 
+    	PersonAuthorityClientUtils.createPersonInstance(NON_EXISTENT_ID, 
+    			createPersonRefName(NON_EXISTENT_ID, NON_EXISTENT_ID), nonexMap,
+    			client.getItemCommonPartName() );
         ClientResponse<MultipartInput> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
@@ -1038,85 +1065,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
     private MultipartOutput createPersonAuthorityInstance(String identifier) {
     	String displayName = "displayName-" + identifier;
     	String refName = createPersonAuthRefName(displayName);
-    	String typeName = "vocabType-" + identifier;
-        return createPersonAuthorityInstance(
-                displayName, refName,typeName );
+    	return 
+    		PersonAuthorityClientUtils.createPersonAuthorityInstance(
+    				displayName, refName, client.getCommonPartName());
     }
 
-    private MultipartOutput createPersonAuthorityInstance(
-    		String displayName, String refName, String vocabType) {
-        PersonauthoritiesCommon personAuthority = new PersonauthoritiesCommon();
-        personAuthority.setDisplayName(displayName);
-        if(refName!=null)
-            personAuthority.setRefName(refName);
-        personAuthority.setVocabType(vocabType);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(personAuthority, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
-
-        if(logger.isDebugEnabled()) {
-            logger.debug("to be created, personAuthority common");
-            logger.debug(objectAsXmlString(personAuthority, PersonauthoritiesCommon.class));
-        }
-        return multipart;
-    }
-
-    private MultipartOutput createPersonInstance(String inAuthority, String refName,
-        String foreName, String middleName, String surName, 
-        String initials, String salutation, String title, String nameAdditions,  
-        String birthDate, String deathDate, String birthPlace, String deathPlace, 
-        String group, String nationality, String gender, String occupation, 
-        String schoolOrStyle, String bioNote, String nameNote ) {
-        PersonsCommon person = new PersonsCommon();
-        person.setInAuthority(inAuthority);
-       	person.setRefName(refName);
-        if(foreName!=null)
-        	person.setForeName(foreName);
-        if(middleName!=null)
-        	person.setMiddleName(middleName);
-        if(surName!=null)
-        	person.setSurName(surName);
-        if(initials!=null)
-        	person.setInitials(initials);
-        if(salutation!=null)
-        	person.setSalutation(salutation);
-        if(title!=null)
-        	person.setTitle(title);
-        if(nameAdditions!=null)
-        	person.setNameAdditions(nameAdditions);
-        if(birthDate!=null)
-        	person.setBirthDate(birthDate);
-        if(deathDate!=null)
-        	person.setDeathDate(deathDate);
-        if(birthPlace!=null)
-        	person.setBirthPlace(birthPlace);
-        if(deathPlace!=null)
-        	person.setDeathPlace(deathPlace);
-        if(group!=null)
-        	person.setGroup(group);
-        if(nationality!=null)
-        	person.setNationality(nationality);
-        if(gender!=null)
-        	person.setGender(gender);
-        if(occupation!=null)
-        	person.setOccupation(occupation);
-        if(schoolOrStyle!=null)
-        	person.setSchoolOrStyle(schoolOrStyle);
-        if(bioNote!=null)
-        	person.setBioNote(bioNote);
-        if(nameNote!=null)
-        	person.setNameNote(nameNote);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(person,
-            MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getItemCommonPartName());
-
-        if(logger.isDebugEnabled()){
-            logger.debug("to be created, person common");
-            logger.debug(objectAsXmlString(person,
-                PersonsCommon.class));
-        }
-
-        return multipart;
-    }
 }

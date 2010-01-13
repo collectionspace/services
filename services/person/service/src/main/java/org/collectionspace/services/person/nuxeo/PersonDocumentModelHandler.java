@@ -46,6 +46,10 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
+/**
+ * @author pschmitz
+ *
+ */
 public class PersonDocumentModelHandler
         extends RemoteDocumentModelHandler<PersonsCommon, PersonsCommonList> {
 
@@ -95,50 +99,70 @@ public class PersonDocumentModelHandler
     }
     
     private String prepareDefaultDisplayName(DocumentModel docModel) throws Exception {
+    	String commonPartLabel = getServiceContext().getCommonPartLabel("persons");
+    	return prepareDefaultDisplayName(
+			(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.FORE_NAME ),    			
+			(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.MIDDLE_NAME ),    			
+			(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.SUR_NAME ),    			
+			(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.BIRTH_DATE ),    			
+			(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.DEATH_DATE )  			
+			);
+    }
+
+    
+    /**
+     * Produces a default displayName from the basic name and dates fields.
+     * @see PersonAuthorityClientUtils.prepareDefaultDisplayName() which
+     * duplicates this logic, until we define a service-general utils package
+     * that is neither client nor service specific.
+     * @param foreName	
+     * @param middleName
+     * @param surName
+     * @param birthDate
+     * @param deathDate
+     * @return
+     * @throws Exception
+     */
+    private static String prepareDefaultDisplayName(
+    		String foreName, String middleName, String surName,
+    		String birthDate, String deathDate ) throws Exception {
     	StringBuilder newStr = new StringBuilder();
-		String part = null;
 		final String sep = " ";
 		final String dateSep = "-";
 		List<String> nameStrings = 
-			Arrays.asList(PersonJAXBSchema.FORE_NAME, PersonJAXBSchema.MIDDLE_NAME, 
-					PersonJAXBSchema.SUR_NAME);
+			Arrays.asList(foreName, middleName, surName);
 		boolean firstAdded = false;
     	for(String partStr : nameStrings ){
-			if(null != (part = (String) 
-					docModel.getProperty(getServiceContext().getCommonPartLabel("persons"), partStr ))) {
+			if(null != partStr ) {
 				if(firstAdded) {
 					newStr.append(sep);
 				}
-				newStr.append(part);
+				newStr.append(partStr);
 				firstAdded = true;
 			}
     	}
     	// Now we add the dates. In theory could have dates with no name, but that is their problem.
     	boolean foundBirth = false;
-		if(null != (part = (String) 
-				docModel.getProperty(getServiceContext().getCommonPartLabel("persons"), 
-						PersonJAXBSchema.BIRTH_DATE ))) {
+		if(null != birthDate) {
 			if(firstAdded) {
 				newStr.append(sep);
 			}
-			newStr.append(part);
+			newStr.append(birthDate);
 	    	newStr.append(dateSep);		// Put this in whether there is a death date or not
 			foundBirth = true;
 		}
-		if(null != (part = (String) 
-				docModel.getProperty(getServiceContext().getCommonPartLabel("persons"), 
-						PersonJAXBSchema.DEATH_DATE ))) {
+		if(null != deathDate) {
 			if(!foundBirth) {
 				if(firstAdded) {
 					newStr.append(sep);
 				}
 		    	newStr.append(dateSep);
 			}
-			newStr.append(part);
+			newStr.append(deathDate);
 		}
 		return newStr.toString();
     }
-
+    
     /**
      * getCommonPart get associated person
      * @return
