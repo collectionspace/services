@@ -399,7 +399,13 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
         OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
                 client.getItemCommonPartName(), OrganizationsCommon.class);
         Assert.assertNotNull(organization);
-
+        boolean showFull = true;
+        if(showFull && logger.isDebugEnabled()){
+            logger.debug(testName + ": returned payload:");
+            logger.debug(objectAsXmlString(organization,
+                    OrganizationsCommon.class));
+        }
+        Assert.assertEquals(organization.getInAuthority(), knownResourceId);
     }
 
     // Failure outcomes
@@ -528,19 +534,23 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
         }
         Assert.assertEquals( nItemsReturned, nItemsToCreateInList);
 
-        // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = false;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            int i = 0;
-            for (OrganizationsCommonList.OrganizationListItem item : items) {
+        int i = 0;
+        for (OrganizationsCommonList.OrganizationListItem item : items) {
+        	Assert.assertTrue((null != item.getRefName()), "Item refName is null!");
+        	Assert.assertTrue((null != item.getDisplayName()), "Item refName is null!");
+        	// Optionally output additional data about list members for debugging.
+	        boolean showDetails = true;
+	        if (showDetails && logger.isDebugEnabled()) {
                 logger.debug("  " + testName + ": list-item[" + i + "] csid=" +
                         item.getCsid());
-                logger.debug("  " + testName + ": list-item[" + i + "] shortName=" +
+                logger.debug("  " + testName + ": list-item[" + i + "] refName=" +
+                        item.getRefName());
+                logger.debug("  " + testName + ": list-item[" + i + "] displayName=" +
                         item.getDisplayName());
                 logger.debug("  " + testName + ": list-item[" + i + "] URI=" +
                         item.getUri());
-                i++;
             }
+            i++;
         }
     }
 
@@ -811,7 +821,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
         MultipartOutput multipart = 
         	OrgAuthorityClientUtils.createOrganizationInstance(
         		knownResourceId, createRefName(NON_EXISTENT_ID),
-        		nonexOrgMap, client.getCommonPartName() );
+        		nonexOrgMap, client.getItemCommonPartName() );
         ClientResponse<MultipartInput> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();

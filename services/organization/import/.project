@@ -3,6 +3,9 @@
 	<name>org.collectionspace.services.organization.importer</name>
 	<comment></comment>
 	<projects>
+		<project>org.collectionspace.services.client</project>
+		<project>org.collectionspace.services.common</project>
+		<project>org.collectionspace.services.organization.jaxb</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
