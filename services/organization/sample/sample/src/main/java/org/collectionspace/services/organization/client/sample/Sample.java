@@ -137,7 +137,7 @@ public class Sample {
     			"\" in orgAuthority: \"" + orgAuthorityRefName +"\"");
         MultipartOutput multipart = 
         	OrgAuthorityClientUtils.createOrganizationInstance( vcsid, 
-				refName, orgInfo, client.getCommonPartName() );
+				refName, orgInfo, client.getItemCommonPartName() );
 
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
 
