@@ -537,7 +537,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
         int i = 0;
         for (OrganizationsCommonList.OrganizationListItem item : items) {
         	Assert.assertTrue((null != item.getRefName()), "Item refName is null!");
-        	Assert.assertTrue((null != item.getDisplayName()), "Item refName is null!");
+        	Assert.assertTrue((null != item.getDisplayName()), "Item displayName is null!");
         	// Optionally output additional data about list members for debugging.
 	        boolean showDetails = true;
 	        if (showDetails && logger.isDebugEnabled()) {
