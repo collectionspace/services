@@ -76,7 +76,7 @@ public class IntakeResource extends AbstractCollectionSpaceResource {
     @Override
     protected String getVersionString() {
     	/** The last change revision. */
-    	final String lastChangeRevision = "$LastChangedRevision: 1165 $";
+    	final String lastChangeRevision = "$LastChangedRevision$";
     	return lastChangeRevision;
     }
     

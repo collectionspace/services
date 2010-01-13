@@ -6,7 +6,7 @@
  * {Other Notes Relating to This Class (Optional)}
  *
  * $LastChangedBy: $
- * $LastChangedRevision: $
+ * $LastChangedRevision$
  * $LastChangedDate: $
  *
  * This document is a part of the source code and related artifacts
@@ -69,7 +69,7 @@ public class NewRelationResource extends AbstractCollectionSpaceResource {
     @Override
     protected String getVersionString() {
     	/** The last change revision. */
-    	final String lastChangeRevision = "$LastChangedRevision: 1165 $";
+    	final String lastChangeRevision = "$LastChangedRevision$";
     	return lastChangeRevision;
     }
     
