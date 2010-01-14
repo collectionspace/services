@@ -69,7 +69,7 @@ public class OrgAuthorityBaseImport {
     	if(logger.isDebugEnabled()){
     		logger.debug("Import: Create orgAuthority: \"" + orgAuthorityName +"\"");
     	}
-    	String baseOrgAuthRefName = createOrgAuthRefName(orgAuthorityName);
+    	String baseOrgAuthRefName = OrgAuthorityClientUtils.createOrgAuthRefName(orgAuthorityName);
     	String fullOrgAuthRefName = baseOrgAuthRefName+"'"+orgAuthorityName+"'";
     	MultipartOutput multipart = 
     		OrgAuthorityClientUtils.createOrgAuthorityInstance(
@@ -81,7 +81,7 @@ public class OrgAuthorityBaseImport {
 
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
     		throw new RuntimeException("Could not create enumeration: \""+orgAuthorityName
-    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    				+"\" "+ OrgAuthorityClientUtils.invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
     		throw new RuntimeException("Unexpected Status when creating enumeration: \""
@@ -90,7 +90,7 @@ public class OrgAuthorityBaseImport {
 
     	// Store the ID returned from this create operation
     	// for additional tests below.
-    	String newOrgAuthorityId = extractId(res);
+    	String newOrgAuthorityId = OrgAuthorityClientUtils.extractId(res);
     	if(logger.isDebugEnabled()){
     		logger.debug("Import: Created orgAuthorityulary: \"" + orgAuthorityName +"\" ID:"
     				+newOrgAuthorityId );
@@ -108,7 +108,7 @@ public class OrgAuthorityBaseImport {
     	// Type of service request being tested
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
     	String shortName = orgInfo.get(OrganizationJAXBSchema.SHORT_NAME);
-    	String refName = createOrganizationRefName(
+    	String refName = OrgAuthorityClientUtils.createOrganizationRefName(
     						orgAuthorityRefName, shortName)+"'"+shortName+"'";
 
     	if(logger.isDebugEnabled()){
@@ -125,60 +125,19 @@ public class OrgAuthorityBaseImport {
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
     		throw new RuntimeException("Could not create Item: \""+shortName
     				+"\" in orgAuthority: \"" + orgAuthorityRefName
-    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    				+"\" "+ OrgAuthorityClientUtils.invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
     		throw new RuntimeException("Unexpected Status when creating Item: \""+shortName
     				+"\" in orgAuthority: \"" + orgAuthorityRefName +"\", Status:"+ statusCode);
     	}
 
-    	return extractId(res);
+    	return OrgAuthorityClientUtils.extractId(res);
     }
 
     // ---------------------------------------------------------------
     // Utility methods used by methods above
     // ---------------------------------------------------------------
-
-    /**
-     * Returns an error message indicating that the status code returned by a
-     * specific call to a service does not fall within a set of valid status
-     * codes for that service.
-     *
-     * @param serviceRequestType  A type of service request (e.g. CREATE, DELETE).
-     *
-     * @param statusCode  The invalid status code that was returned in the response,
-     *                    from submitting that type of request to the service.
-     *
-     * @return An error message.
-     */
-    protected String invalidStatusCodeMessage(ServiceRequestType requestType, int statusCode) {
-        return "Status code '" + statusCode + "' in response is NOT within the expected set: " +
-                requestType.validStatusCodesAsString();
-    }
-
-    protected String extractId(ClientResponse<Response> res) {
-        MultivaluedMap<String, Object> mvm = res.getMetadata();
-        String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
-        if(logger.isDebugEnabled()){
-        	logger.debug("extractId:uri=" + uri);
-        }
-        String[] segments = uri.split("/");
-        String id = segments[segments.length - 1];
-        if(logger.isDebugEnabled()){
-        	logger.debug("id=" + id);
-        }
-        return id;
-    }
-    
-    protected String createOrgAuthRefName(String orgAuthorityName) {
-    	return "urn:cspace:org.collectionspace.demo:orgauthority:name("
-    			+orgAuthorityName+")";
-    }
-
-    protected String createOrganizationRefName(
-    						String orgAuthRefName, String orgName) {
-    	return orgAuthRefName+":organization:name("+orgName+")";
-    }
 
 	public static void main(String[] args) {
 		

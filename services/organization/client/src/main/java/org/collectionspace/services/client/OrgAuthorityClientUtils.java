@@ -1,13 +1,18 @@
 package org.collectionspace.services.client;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.OrganizationJAXBSchema;
+import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.organization.OrganizationsCommon;
 import org.collectionspace.services.organization.OrgauthoritiesCommon;
+import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
@@ -69,6 +74,51 @@ public class OrgAuthorityClientUtils {
         }
 
         return multipart;
+    }
+
+    /**
+     * Returns an error message indicating that the status code returned by a
+     * specific call to a service does not fall within a set of valid status
+     * codes for that service.
+     *
+     * @param serviceRequestType  A type of service request (e.g. CREATE, DELETE).
+     *
+     * @param statusCode  The invalid status code that was returned in the response,
+     *                    from submitting that type of request to the service.
+     *
+     * @return An error message.
+     */
+    public static String invalidStatusCodeMessage(ServiceRequestType requestType, int statusCode) {
+        return "Status code '" + statusCode + "' in response is NOT within the expected set: " +
+                requestType.validStatusCodesAsString();
+    }
+
+    public static String extractId(ClientResponse<Response> res) {
+        MultivaluedMap<String, Object> mvm = res.getMetadata();
+        String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
+        if(logger.isDebugEnabled()){
+        	logger.info("extractId:uri=" + uri);
+        }
+        String[] segments = uri.split("/");
+        String id = segments[segments.length - 1];
+        if(logger.isDebugEnabled()){
+        	logger.debug("id=" + id);
+        }
+        return id;
+    }
+    
+    public static String createRefName(String displayName) {
+    	return displayName.replaceAll("\\W", "");
+    }
+
+    public static String createOrgAuthRefName(String orgAuthorityName) {
+    	return "urn:cspace:org.collectionspace.demo:orgauthority:name("
+    			+orgAuthorityName+")";
+    }
+
+    public static String createOrganizationRefName(
+    						String orgAuthRefName, String orgName) {
+    	return orgAuthRefName+":organization:name("+orgName+")";
     }
 
 }

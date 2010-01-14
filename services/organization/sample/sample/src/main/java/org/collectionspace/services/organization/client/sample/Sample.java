@@ -102,7 +102,7 @@ public class Sample {
 
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
     		throw new RuntimeException("Could not create enumeration: \""+orgAuthName
-    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    				+"\" "+ OrgAuthorityClientUtils.invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
     		throw new RuntimeException("Unexpected Status when creating enumeration: \""
@@ -111,7 +111,7 @@ public class Sample {
 
     	// Store the ID returned from this create operation
     	// for additional tests below.
-    	String newOrgAuthId = extractId(res);
+    	String newOrgAuthId = OrgAuthorityClientUtils.extractId(res);
         logger.info("Import: Created orgAuthority: \"" + orgAuthName +"\" ID:"
     				+newOrgAuthId );
         
@@ -146,7 +146,7 @@ public class Sample {
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
     		throw new RuntimeException("Could not create Item: \""+shortName
     				+"\" in orgAuthority: \"" + orgAuthorityRefName
-    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    				+"\" "+ OrgAuthorityClientUtils.invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
     		throw new RuntimeException("Unexpected Status when creating Item: \""+shortName
@@ -154,7 +154,7 @@ public class Sample {
     				"\", Status:"+ statusCode);
     	}
 
-    	return extractId(res);
+    	return OrgAuthorityClientUtils.extractId(res);
     }
 
 
@@ -176,7 +176,7 @@ public class Sample {
         int statusCode = res.getStatus();
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
     		throw new RuntimeException("Could not read list of orgAuthorities: "
-                + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+                + OrgAuthorityClientUtils.invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
     		throw new RuntimeException("Unexpected Status when reading " +
@@ -211,7 +211,7 @@ public class Sample {
             int statusCode = res.getStatus();
             if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
                 throw new RuntimeException("Could not read orgAuthority"
-                    + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+                    + OrgAuthorityClientUtils.invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
             }
             if(statusCode != EXPECTED_STATUS_CODE) {
                 throw new RuntimeException("Unexpected Status when reading " +
@@ -243,7 +243,7 @@ public class Sample {
 
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
     		throw new RuntimeException("Could not read items in orgAuthority: "
-                + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+                + OrgAuthorityClientUtils.invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
     		throw new RuntimeException("Unexpected Status when reading " +
@@ -279,7 +279,7 @@ public class Sample {
 
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
     		throw new RuntimeException("Could not delete orgAuthority: "
-                + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+                + OrgAuthorityClientUtils.invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
     		throw new RuntimeException("Unexpected Status when deleting " +
@@ -305,7 +305,7 @@ public class Sample {
 
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
     		throw new RuntimeException("Could not delete orgAuthority item: "
-                + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+                + OrgAuthorityClientUtils.invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
     		throw new RuntimeException("Unexpected Status when deleting " +
@@ -392,41 +392,6 @@ public class Sample {
             }
         }
         return obj;
-    }
-
-    /**
-     * Returns an error message indicating that the status code returned by a
-     * specific call to a service does not fall within a set of valid status
-     * codes for that service.
-     *
-     * @param serviceRequestType  A type of service request (e.g. CREATE, DELETE).
-     *
-     * @param statusCode  The invalid status code that was returned in the response,
-     *                    from submitting that type of request to the service.
-     *
-     * @return An error message.
-     */
-    protected String invalidStatusCodeMessage(ServiceRequestType requestType, int statusCode) {
-        return "Status code '" + statusCode + "' in response is NOT within the expected set: " +
-                requestType.validStatusCodesAsString();
-    }
-
-    protected String extractId(ClientResponse<Response> res) {
-        MultivaluedMap<String, Object> mvm = res.getMetadata();
-        String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
-        if(logger.isDebugEnabled()){
-        	logger.info("extractId:uri=" + uri);
-        }
-        String[] segments = uri.split("/");
-        String id = segments[segments.length - 1];
-        if(logger.isDebugEnabled()){
-        	logger.debug("id=" + id);
-        }
-        return id;
-    }
-    
-    protected String createRefName(String displayName) {
-    	return displayName.replaceAll("\\W", "");
     }
 
 	public static void main(String[] args) {
