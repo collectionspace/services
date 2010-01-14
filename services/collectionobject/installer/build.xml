@@ -1,5 +1,5 @@
 
-<project name="collectionobject-install" default="package" basedir=".">
+<project name="collectionobject-install" default="install" basedir=".">
     <description>
         collectionobject service install
     </description>
