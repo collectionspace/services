@@ -1,9 +1,7 @@
 <projectDescription>
-  <name>org.collectionspace.services.organization.client.sample</name>
-  <comment></comment>
-  <projects>
-	<project>org.collectionspace.services.client</project>
-  </projects>
+  <name>org.collectionspace.services.contact.jaxb</name>
+  <comment/>
+  <projects/>
   <buildSpec>
     <buildCommand>
       <name>org.eclipse.jdt.core.javabuilder</name>
@@ -13,7 +11,7 @@
     </buildCommand>
   </buildSpec>
   <natures>
-    <nature>org.maven.ide.eclipse.maven2Nature</nature>
     <nature>org.eclipse.jdt.core.javanature</nature>
+    <nature>org.maven.ide.eclipse.maven2Nature</nature>
   </natures>
 </projectDescription>

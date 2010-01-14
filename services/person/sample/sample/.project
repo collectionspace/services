@@ -1,7 +1,10 @@
 <projectDescription>
   <name>org.collectionspace.services.person.client.sample</name>
-  <comment/>
-  <projects/>
+	<comment></comment>
+	<projects>
+		<project>org.collectionspace.services.client</project>
+		<project>org.collectionspace.services.common</project>
+	</projects>
   <buildSpec>
     <buildCommand>
       <name>org.eclipse.jdt.core.javabuilder</name>
