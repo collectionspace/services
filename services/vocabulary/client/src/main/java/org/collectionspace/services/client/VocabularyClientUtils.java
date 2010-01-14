@@ -61,6 +61,40 @@ public class VocabularyClientUtils {
         return multipart;
     }
 
+    public static String createItemInVocabulary(String vcsid, 
+    		String vocabularyRefName, Map<String,String> itemMap,
+    		VocabularyClient client ) {
+    	// Expected status code: 201 Created
+    	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
+    	// Type of service request being tested
+    	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
+    	String displayName = itemMap.get(VocabularyItemJAXBSchema.DISPLAY_NAME);
+    	String refName = createVocabularyItemRefName(vocabularyRefName, displayName, true);
+
+    	if(logger.isDebugEnabled()){
+    		logger.debug("Import: Create Item: \""+displayName
+    				+"\" in personAuthorityulary: \"" + vocabularyRefName +"\"");
+    	}
+    	MultipartOutput multipart = 
+    		createVocabularyItemInstance( vcsid, refName,
+    				itemMap, client.getItemCommonPartName() );
+    	ClientResponse<Response> res = client.createItem(vcsid, multipart);
+
+    	int statusCode = res.getStatus();
+
+    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
+    		throw new RuntimeException("Could not create Item: \""+refName
+    				+"\" in personAuthority: \"" + vocabularyRefName
+    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    	}
+    	if(statusCode != EXPECTED_STATUS_CODE) {
+    		throw new RuntimeException("Unexpected Status when creating Item: \""+refName
+    				+"\" in personAuthority: \"" + vocabularyRefName +"\", Status:"+ statusCode);
+    	}
+
+    	return extractId(res);
+    }
+
     /**
      * Returns an error message indicating that the status code returned by a
      * specific call to a service does not fall within a set of valid status
@@ -92,14 +126,20 @@ public class VocabularyClientUtils {
         return id;
     }
     
-    public static String createVocabularyRefName(String vocabularyName) {
-    	return "urn:cspace:org.collectionspace.demo:vocabulary:name("
+    public static String createVocabularyRefName(String vocabularyName, boolean withDisplaySuffix) {
+    	String refName = "urn:cspace:org.collectionspace.demo:vocabulary:name("
     			+vocabularyName+")";
+    	if(withDisplaySuffix)
+    		refName += "'"+vocabularyName+"'";
+    	return refName;
     }
 
     public static String createVocabularyItemRefName(
-    						String vocabularyRefName, String vocabItemName) {
-    	return vocabularyRefName+":item:name("+vocabItemName+")";
+    						String vocabularyRefName, String vocabItemName, boolean withDisplaySuffix) {
+    	String refName = vocabularyRefName+":item:name("+vocabItemName+")";
+    	if(withDisplaySuffix)
+    		refName += "'"+vocabItemName+"'";
+    	return refName;
     }
 
 }

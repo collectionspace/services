@@ -92,7 +92,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
         String displayName = "displayName-" + identifier;
-    	String refName = VocabularyClientUtils.createVocabularyRefName(displayName);
+    	String refName = VocabularyClientUtils.createVocabularyRefName(displayName, false);
     	MultipartOutput multipart = VocabularyClientUtils.createEnumerationInstance(
     					displayName, refName, client.getCommonPartName());
         ClientResponse<Response> res = client.create(multipart);
@@ -146,7 +146,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
         String refName = VocabularyClientUtils.createVocabularyItemRefName(
-        								vocabRefName, identifier);
+        								vocabRefName, identifier, true);
         HashMap<String, String> itemInfo = new HashMap<String, String>();
         itemInfo.put(VocabularyItemJAXBSchema.DISPLAY_NAME, identifier);
         MultipartOutput multipart = VocabularyClientUtils.createVocabularyItemInstance(
@@ -767,7 +767,7 @@ public class VocabularyServiceTest extends AbstractServiceTest {
 
         // The only relevant ID may be the one used in update(), below.
     	String displayName = "displayName-" + NON_EXISTENT_ID;
-    	String refName = VocabularyClientUtils.createVocabularyRefName(displayName);
+    	String refName = VocabularyClientUtils.createVocabularyRefName(displayName, false);
     	MultipartOutput multipart = VocabularyClientUtils.createEnumerationInstance(
 				displayName, refName, client.getCommonPartName());
         ClientResponse<MultipartInput> res =
