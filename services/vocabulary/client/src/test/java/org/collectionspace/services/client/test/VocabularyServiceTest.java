@@ -130,57 +130,13 @@ public class VocabularyServiceTest extends AbstractServiceTest {
     public void createItem(String testName) {
         setupCreate(testName);
 
-        knownItemResourceId = createItemInVocab(knownResourceId, knownResourceRefName);
+        HashMap<String, String> itemInfo = new HashMap<String, String>();
+        itemInfo.put(VocabularyItemJAXBSchema.DISPLAY_NAME, createIdentifier());
+        knownItemResourceId = VocabularyClientUtils.createItemInVocabulary(knownResourceId, 
+				knownResourceRefName, itemInfo, client);
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
         }
-    }
-
-    private String createItemInVocab(String vcsid, String vocabRefName) {
-
-        final String testName = "createItemInVocab";
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ":...");
-        }
-
-        // Submit the request to the service and store the response.
-        String identifier = createIdentifier();
-        String refName = VocabularyClientUtils.createVocabularyItemRefName(
-        								vocabRefName, identifier, true);
-        HashMap<String, String> itemInfo = new HashMap<String, String>();
-        itemInfo.put(VocabularyItemJAXBSchema.DISPLAY_NAME, identifier);
-        MultipartOutput multipart = VocabularyClientUtils.createVocabularyItemInstance(
-        		vcsid, refName, itemInfo, client.getItemCommonPartName());
-        ClientResponse<Response> res = client.createItem(vcsid, multipart);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Store the ID returned from the first item resource created
-        // for additional tests below.
-        if (knownItemResourceId == null){
-            knownItemResourceId = extractId(res);
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
-            }
-        }
-
-        // Store the IDs from any item resources created
-        // by tests, along with the IDs of their parents, so these items
-        // can be deleted after all tests have been run.
-        //
-        // Item resource IDs are unique, so these are used as keys;
-        // the non-unique IDs of their parents are stored as associated values.
-        allResourceItemIdsCreated.put(extractId(res), vcsid);
-
-        return extractId(res);
     }
 
     @Override
