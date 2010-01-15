@@ -74,9 +74,9 @@ public class PersonAuthorityBaseImport {
     		logger.debug("Import: Create personAuthority: \"" + personAuthorityName +"\"");
     	}
     	String basePersonRefName = 
-    		PersonAuthorityClientUtils.createPersonAuthRefName(
-    				personAuthorityName);
-    	String fullPersonRefName = basePersonRefName+"'"+personAuthorityName+"'";
+    		PersonAuthorityClientUtils.createPersonAuthRefName(personAuthorityName, false);
+    	String fullPersonRefName = 
+    		PersonAuthorityClientUtils.createPersonAuthRefName(personAuthorityName, true);
     	MultipartOutput multipart = 
     		PersonAuthorityClientUtils.createPersonAuthorityInstance(
   				personAuthorityName, fullPersonRefName, client.getCommonPartName());

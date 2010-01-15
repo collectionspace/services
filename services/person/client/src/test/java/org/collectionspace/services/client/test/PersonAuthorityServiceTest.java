@@ -72,17 +72,6 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
     private Map<String, String> allResourceItemIdsCreated =
         new HashMap<String, String>();
     
-    protected String createPersonAuthRefName(String personAuthorityName) {
-    	return "urn:cspace:org.collectionspace.demo:personauthority:name("
-    			+personAuthorityName+")";
-    }
-
-    protected String createPersonRefName(
-    						String personAuthRefName, String personName) {
-    	return personAuthRefName+":person:name("+personName+")";
-    }
-
-
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
@@ -99,10 +88,11 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
     	String displayName = "displayName-" + identifier;
-    	String refName = createPersonAuthRefName(displayName);
+    	String baseRefName = PersonAuthorityClientUtils.createPersonAuthRefName(displayName, false);
+    	String fullRefName = PersonAuthorityClientUtils.createPersonAuthRefName(displayName, true);
     	MultipartOutput multipart = 
     		PersonAuthorityClientUtils.createPersonAuthorityInstance(
-    				displayName, refName, client.getCommonPartName());
+    				displayName, fullRefName, client.getCommonPartName());
         ClientResponse<Response> res = client.create(multipart);
         int statusCode = res.getStatus();
 
@@ -121,7 +111,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
 
         // Store the refname from the first resource created
         // for additional tests below.
-        knownResourceRefName = refName;
+        knownResourceRefName = baseRefName;
 
         lastPersonAuthId = PersonAuthorityClientUtils.extractId(res);
         // Store the ID returned from the first resource created
@@ -171,7 +161,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
         		"American icon. He is famous for his distinctive voice, walk and height. " +
         		"He was also known for his conservative political views and his support in " +
         		"the 1950s for anti-communist positions.");
-        String refName = createPersonRefName(authRefName, "John Wayne");
+        String refName = PersonAuthorityClientUtils.createPersonRefName(authRefName, "John Wayne", true);
         MultipartOutput multipart = 
         	PersonAuthorityClientUtils.createPersonInstance(vcsid, refName, johnWayneMap,
         			client.getItemCommonPartName() );
@@ -801,7 +791,10 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
         // The only relevant ID may be the one used in update(), below.
 
         // The only relevant ID may be the one used in update(), below.
-        MultipartOutput multipart = createPersonAuthorityInstance(NON_EXISTENT_ID);
+    	String displayName = "displayName-NON_EXISTENT_ID";
+    	String fullRefName = PersonAuthorityClientUtils.createPersonAuthRefName(displayName, true);
+    	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
+    				displayName, fullRefName, client.getCommonPartName());
         ClientResponse<MultipartInput> res =
                 client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
@@ -834,7 +827,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
         nonexMap.put(PersonJAXBSchema.GENDER, "male");
         MultipartOutput multipart = 
     	PersonAuthorityClientUtils.createPersonInstance(NON_EXISTENT_ID, 
-    			createPersonRefName(NON_EXISTENT_ID, NON_EXISTENT_ID), nonexMap,
+    			PersonAuthorityClientUtils.createPersonRefName(NON_EXISTENT_ID, NON_EXISTENT_ID, true), nonexMap,
     			client.getItemCommonPartName() );
         ClientResponse<MultipartInput> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
@@ -1060,14 +1053,6 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
      */
     protected String getItemResourceURL(String parentResourceIdentifier, String resourceIdentifier) {
         return getItemServiceRootURL(parentResourceIdentifier) + "/" + resourceIdentifier;
-    }
-
-    private MultipartOutput createPersonAuthorityInstance(String identifier) {
-    	String displayName = "displayName-" + identifier;
-    	String refName = createPersonAuthRefName(displayName);
-    	return 
-    		PersonAuthorityClientUtils.createPersonAuthorityInstance(
-    				displayName, refName, client.getCommonPartName());
     }
 
 }

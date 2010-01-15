@@ -80,8 +80,8 @@ public class Sample {
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
 
     	logger.info("Import: Create personAuthority: \"" + personAuthorityName +"\"");
-    	String basePersonRefName = PersonAuthorityClientUtils.createPersonAuthRefName(personAuthorityName);
-    	String fullPersonRefName = basePersonRefName+"'"+personAuthorityName+"'";
+    	String basePersonRefName = PersonAuthorityClientUtils.createPersonAuthRefName(personAuthorityName, false);
+    	String fullPersonRefName = PersonAuthorityClientUtils.createPersonAuthRefName(personAuthorityName, true);
     	MultipartOutput multipart = 
     		PersonAuthorityClientUtils.createPersonAuthorityInstance(
   				personAuthorityName, fullPersonRefName, client.getCommonPartName() );
@@ -134,7 +134,7 @@ public class Sample {
 		builtName.append("-");
     	if(deathDate!=null)
     		builtName.append(deathDate);
-    	String refName = PersonAuthorityClientUtils.createPersonRefName(personAuthorityRefName, builtName.toString());
+    	String refName = PersonAuthorityClientUtils.createPersonRefName(personAuthorityRefName, builtName.toString(), true);
     	logger.info("Import: Create Item: \""+refName+"\" in personAuthority: \"" + personAuthorityRefName +"\"");
 
     	if(logger.isDebugEnabled()){
@@ -469,49 +469,6 @@ public class Sample {
         }
         return obj;
     }
-
-    /**
-     * Returns an error message indicating that the status code returned by a
-     * specific call to a service does not fall within a set of valid status
-     * codes for that service.
-     *
-     * @param serviceRequestType  A type of service request (e.g. CREATE, DELETE).
-     *
-     * @param statusCode  The invalid status code that was returned in the response,
-     *                    from submitting that type of request to the service.
-     *
-     * @return An error message.
-     */
-    /*
-    protected String invalidStatusCodeMessage(ServiceRequestType requestType, int statusCode) {
-        return "Status code '" + statusCode + "' in response is NOT within the expected set: " +
-                requestType.validStatusCodesAsString();
-    }
-
-    protected String extractId(ClientResponse<Response> res) {
-        MultivaluedMap<String, Object> mvm = res.getMetadata();
-        String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
-        if(logger.isDebugEnabled()){
-        	logger.info("extractId:uri=" + uri);
-        }
-        String[] segments = uri.split("/");
-        String id = segments[segments.length - 1];
-        if(logger.isDebugEnabled()){
-        	logger.debug("id=" + id);
-        }
-        return id;
-    }
-    
-    protected String createPersonAuthRefName(String personAuthorityName) {
-    	return "urn:cspace:org.collectionspace.demo:personauthority:name("
-    			+personAuthorityName+")";
-    }
-
-    protected String createPersonRefName(
-    						String personAuthRefName, String personName) {
-    	return personAuthRefName+":person:name("+personName+")";
-    }
-    */
 
 	public static void main(String[] args) {
 

@@ -109,8 +109,7 @@ public class PersonAuthorityClientUtils {
 		    	personMap.get(PersonJAXBSchema.SUR_NAME),
 		    	personMap.get(PersonJAXBSchema.BIRTH_DATE),
 		    	personMap.get(PersonJAXBSchema.DEATH_DATE));
-    	String refName = createPersonRefName(personAuthorityRefName, 
-    			displayName);
+    	String refName = createPersonRefName(personAuthorityRefName, displayName, true);
 
     	if(logger.isDebugEnabled()){
     		logger.debug("Import: Create Item: \""+displayName
@@ -136,14 +135,20 @@ public class PersonAuthorityClientUtils {
     	return extractId(res);
     }
 
-    public static String createPersonAuthRefName(String personAuthorityName) {
-    	return "urn:cspace:org.collectionspace.demo:personauthority:name("
+    public static String createPersonAuthRefName(String personAuthorityName, boolean withDisplaySuffix) {
+    	String refName = "urn:cspace:org.collectionspace.demo:personauthority:name("
     			+personAuthorityName+")";
+    	if(withDisplaySuffix)
+    		refName += "'"+personAuthorityName+"'";
+    	return refName;
     }
 
     public static String createPersonRefName(
-    						String personAuthRefName, String personName) {
-    	return personAuthRefName+":person:name("+personName+")";
+    						String personAuthRefName, String personName, boolean withDisplaySuffix) {
+    	String refName = personAuthRefName+":person:name("+personName+")";
+    	if(withDisplaySuffix)
+    		refName += "'"+personName+"'";
+    	return refName;
     }
 
     public static String extractId(ClientResponse<Response> res) {
