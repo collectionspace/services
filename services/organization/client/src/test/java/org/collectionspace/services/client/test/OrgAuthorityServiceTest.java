@@ -72,10 +72,6 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
     private Map<String, String> allResourceItemIdsCreated =
         new HashMap<String, String>();
     
-    protected String createRefName(String displayName) {
-    	return displayName.replaceAll("\\W", "");
-    }    
-
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
@@ -92,7 +88,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
         String displayName = "displayName-" + identifier;
-    	String refName = createRefName(displayName);
+    	String refName = OrgAuthorityClientUtils.createOrgAuthRefName(displayName, true);
     	MultipartOutput multipart = 
     		OrgAuthorityClientUtils.createOrgAuthorityInstance(
 				displayName, refName, 
@@ -152,7 +148,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
 
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
-        String refName = createRefName(identifier);
+        String refName = OrgAuthorityClientUtils.createOrganizationRefName(knownResourceRefName, identifier, true);
         Map<String, String> testOrgMap = new HashMap<String,String>();
         testOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "Test Org");
         testOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "The real official test organization");
@@ -818,9 +814,10 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
         // The only relevant ID may be the one used in update(), below.
         Map<String, String> nonexOrgMap = new HashMap<String,String>();
         nonexOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "Non-existent");
+        String refName = OrgAuthorityClientUtils.createOrganizationRefName(knownResourceRefName, NON_EXISTENT_ID, true);
         MultipartOutput multipart = 
         	OrgAuthorityClientUtils.createOrganizationInstance(
-        		knownResourceId, createRefName(NON_EXISTENT_ID),
+        		knownResourceId, refName,
         		nonexOrgMap, client.getItemCommonPartName() );
         ClientResponse<MultipartInput> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
@@ -1050,7 +1047,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTest {
 
     private MultipartOutput createOrgAuthorityInstance(String identifier) {
     	String displayName = "displayName-" + identifier;
-    	String refName = createRefName(displayName);
+    	String refName = OrgAuthorityClientUtils.createOrgAuthRefName(displayName, true);
         return OrgAuthorityClientUtils.createOrgAuthorityInstance(
 				displayName, refName, 
 				client.getCommonPartName());

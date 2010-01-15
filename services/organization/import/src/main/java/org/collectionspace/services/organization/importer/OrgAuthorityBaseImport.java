@@ -69,8 +69,8 @@ public class OrgAuthorityBaseImport {
     	if(logger.isDebugEnabled()){
     		logger.debug("Import: Create orgAuthority: \"" + orgAuthorityName +"\"");
     	}
-    	String baseOrgAuthRefName = OrgAuthorityClientUtils.createOrgAuthRefName(orgAuthorityName);
-    	String fullOrgAuthRefName = baseOrgAuthRefName+"'"+orgAuthorityName+"'";
+    	String baseOrgAuthRefName = OrgAuthorityClientUtils.createOrgAuthRefName(orgAuthorityName, false);
+    	String fullOrgAuthRefName = OrgAuthorityClientUtils.createOrgAuthRefName(orgAuthorityName, true);
     	MultipartOutput multipart = 
     		OrgAuthorityClientUtils.createOrgAuthorityInstance(
     				orgAuthorityName, fullOrgAuthRefName, 
@@ -109,7 +109,7 @@ public class OrgAuthorityBaseImport {
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
     	String shortName = orgInfo.get(OrganizationJAXBSchema.SHORT_NAME);
     	String refName = OrgAuthorityClientUtils.createOrganizationRefName(
-    						orgAuthorityRefName, shortName)+"'"+shortName+"'";
+    						orgAuthorityRefName, shortName, true);
 
     	if(logger.isDebugEnabled()){
     		logger.debug("Import: Create Item: \""+shortName

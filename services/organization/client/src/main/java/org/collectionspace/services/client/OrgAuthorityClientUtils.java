@@ -107,18 +107,20 @@ public class OrgAuthorityClientUtils {
         return id;
     }
     
-    public static String createRefName(String displayName) {
-    	return displayName.replaceAll("\\W", "");
-    }
-
-    public static String createOrgAuthRefName(String orgAuthorityName) {
-    	return "urn:cspace:org.collectionspace.demo:orgauthority:name("
+    public static String createOrgAuthRefName(String orgAuthorityName, boolean withDisplaySuffix) {
+    	String refName = "urn:cspace:org.collectionspace.demo:orgauthority:name("
     			+orgAuthorityName+")";
+    	if(withDisplaySuffix)
+    		refName += "'"+orgAuthorityName+"'";
+    	return refName;
     }
 
     public static String createOrganizationRefName(
-    						String orgAuthRefName, String orgName) {
-    	return orgAuthRefName+":organization:name("+orgName+")";
+    						String orgAuthRefName, String orgName, boolean withDisplaySuffix) {
+    	String refName = orgAuthRefName+":organization:name("+orgName+")";
+    	if(withDisplaySuffix)
+    		refName += "'"+orgName+"'";
+    	return refName;
     }
 
 }
