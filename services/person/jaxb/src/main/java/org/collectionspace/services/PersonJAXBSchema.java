@@ -8,6 +8,7 @@ package org.collectionspace.services;
  *
  */
 public interface PersonJAXBSchema {
+	final static String PERSONS_COMMON = "persons_common";
 	final static String CSID = "csid";
 	final static String IN_AUTHORITY = "inAuthority";
 	final static String REF_NAME = "refName";

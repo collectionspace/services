@@ -82,19 +82,38 @@ public class PersonDocumentModelHandler
     public void prepare(Action action) throws Exception {
         //no specific action needed
     }
-
+	
+    @Override
+    public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	// first fill all the parts of the document
+    	super.handleCreate(wrapDoc);    	
+    	handleGetDisplayName(wrapDoc.getWrappedObject());
+    }
+    
+    private String handleGetDisplayName(DocumentModel docModel) throws Exception {
+    	return handleGetDisplayName(docModel, true);
+    }
+    
+    private String handleGetDisplayName(DocumentModel docModel, boolean updateDocModel) throws Exception {
+    	String displayName = (String) docModel.getProperty(getServiceContext().getCommonPartLabel("persons"),
+    			PersonJAXBSchema.DISPLAY_NAME);
+    	if (displayName == null) {
+    		displayName = prepareDefaultDisplayName(docModel);
+			if (updateDocModel == true) {
+				docModel.setProperty(getServiceContext().getCommonPartLabel(
+						"persons"), PersonJAXBSchema.DISPLAY_NAME, displayName);
+			}
+    	}
+    	
+    	return displayName;
+    }
+	
     /* Override handleGet so we can deal with defaulting the displayName
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleGet(org.collectionspace.services.common.document.DocumentWrapper)
      */
     @Override
     public void handleGet(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-    	DocumentModel docModel = wrapDoc.getWrappedObject();
-    	String displayName = (String) docModel.getProperty(getServiceContext().getCommonPartLabel("persons"),
-    			PersonJAXBSchema.DISPLAY_NAME);
-    	if(displayName == null) {
-    		docModel.setProperty(getServiceContext().getCommonPartLabel("persons"),
-    				PersonJAXBSchema.DISPLAY_NAME, prepareDefaultDisplayName(docModel));
-    	}
+    	handleGetDisplayName(wrapDoc.getWrappedObject());
     	super.handleGet(wrapDoc);
     }
     
@@ -223,13 +242,10 @@ public class PersonDocumentModelHandler
 	            DocumentModel docModel = iter.next();
 	            PersonListItem ilistItem = new PersonListItem();
 	            // We look for a set display name, and fall back to teh short name if there is none
-	            String displayName = (String) docModel.getProperty(getServiceContext().getCommonPartLabel("persons"),
-												PersonJAXBSchema.DISPLAY_NAME);
-	            if(displayName == null)
-		            displayName = prepareDefaultDisplayName(docModel);
-	            ilistItem.setDisplayName( displayName );
-	            ilistItem.setRefName((String) docModel.getProperty(getServiceContext().getCommonPartLabel("persons"),
-									PersonJAXBSchema.REF_NAME));
+	            String displayName = handleGetDisplayName(docModel, false);	            
+				ilistItem.setDisplayName(displayName);
+	            ilistItem.setRefName((String) docModel.getProperty(getServiceContext().getCommonPartLabel(
+	            		"persons"), PersonJAXBSchema.REF_NAME));
 				String id = NuxeoUtils.extractId(docModel.getPathAsString());
 	            ilistItem.setUri("/personauthorities/"+inAuthority+"/items/" + id);
 	            ilistItem.setCsid(id);

@@ -31,6 +31,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
@@ -38,6 +39,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.common.AbstractCollectionSpaceResource;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
@@ -48,6 +50,7 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.security.UnauthorizedException;
+import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.organization.nuxeo.OrgAuthorityHandlerFactory;
 import org.collectionspace.services.organization.nuxeo.OrganizationDocumentModelHandler;
 import org.collectionspace.services.organization.nuxeo.OrganizationHandlerFactory;
@@ -403,6 +406,7 @@ public class OrgAuthorityResource extends AbstractCollectionSpaceResource {
     @Produces("application/xml")
     public OrganizationsCommonList getOrganizationList(
             @PathParam("csid") String parentcsid,
+            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
             @Context UriInfo ui) {
         OrganizationsCommonList organizationObjectList = new OrganizationsCommonList();
         try {
@@ -412,8 +416,17 @@ public class OrgAuthorityResource extends AbstractCollectionSpaceResource {
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             DocumentFilter myFilter =
                 DocumentFilter.CreatePaginatedDocumentFilter(queryParams);
-            myFilter.setWhereClause(
-                    "organizations_common:inAuthority='" + parentcsid + "'");
+            myFilter.setWhereClause(OrganizationJAXBSchema.ORGANIZATIONS_COMMON +
+            		":" + OrganizationJAXBSchema.IN_AUTHORITY + "=" +
+            		"'" + parentcsid + "'");
+            
+            // AND organizations_common:displayName LIKE '%partialTerm%'
+            if (partialTerm != null && !partialTerm.isEmpty()) {
+            	String ptClause = "AND " + OrganizationJAXBSchema.ORGANIZATIONS_COMMON +
+            		":" + OrganizationJAXBSchema.DISPLAY_NAME +
+            		" LIKE " + "'%" + partialTerm + "%'";
+            	myFilter.appendWhereClause(ptClause);
+            }            
             handler.setDocumentFilter(myFilter);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             organizationObjectList = (OrganizationsCommonList) handler.getCommonPartList();

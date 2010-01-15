@@ -8,6 +8,7 @@ package org.collectionspace.services;
  *
  */
 public interface OrganizationJAXBSchema {
+	final static String ORGANIZATIONS_COMMON="organizations_common";	
 	final static String CSID = "csid";
 	final static String IN_AUTHORITY = "inAuthority";
 	final static String DISPLAY_NAME = "displayName";

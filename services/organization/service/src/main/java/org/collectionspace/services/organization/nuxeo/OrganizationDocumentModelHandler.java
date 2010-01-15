@@ -76,21 +76,66 @@ public class OrganizationDocumentModelHandler
     public void prepare(Action action) throws Exception {
         //no specific action needed
     }
+	
+    @Override
+    public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	// first fill all the parts of the document
+    	super.handleCreate(wrapDoc);    	
+    	handleGetDisplayName(wrapDoc.getWrappedObject());
+    }
+	
+    private String prepareDefaultDisplayName(DocumentModel docModel) throws Exception {
+    	String result = null;
+    	
+    	result = (String) docModel.getProperty(getServiceContext().getCommonPartLabel("organizations"),
+				OrganizationJAXBSchema.SHORT_NAME);
+    	
+    	return result;
+    }
+    
+    /**
+     * Handle get display name.
+     * 
+     * @param docModel the doc model
+     * 
+     * @return the string
+     * 
+     * @throws Exception the exception
+     */
+    private String handleGetDisplayName(DocumentModel docModel) throws Exception {
+    	return handleGetDisplayName(docModel, true);
+    }
+    
+    /**
+     * Handle get display name.
+     * 
+     * @param wrapDoc the wrap doc
+     * 
+     * @return the string
+     * 
+     * @throws Exception the exception
+     */
+    private String handleGetDisplayName(DocumentModel docModel, boolean updateDocModel) throws Exception {
+    	String displayName = (String) docModel.getProperty(getServiceContext().getCommonPartLabel("organizations"),
+    			OrganizationJAXBSchema.DISPLAY_NAME);
+    	if (displayName == null) {
+    		displayName = prepareDefaultDisplayName(docModel);
+			if (updateDocModel == true) {
+				docModel.setProperty(getServiceContext().getCommonPartLabel(
+						"organizations"), OrganizationJAXBSchema.DISPLAY_NAME,
+						displayName);
+			}
+    	}
+    	
+    	return displayName;
+    }
 
     /* Override handleGet so we can deal with defaulting the displayName
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleGet(org.collectionspace.services.common.document.DocumentWrapper)
      */
     @Override
     public void handleGet(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-    	DocumentModel docModel = wrapDoc.getWrappedObject();
-    	String displayName = (String) docModel.getProperty(getServiceContext().getCommonPartLabel("organizations"),
-    			OrganizationJAXBSchema.DISPLAY_NAME);
-    	if(displayName == null) {
-    		displayName = (String) docModel.getProperty(getServiceContext().getCommonPartLabel("organizations"),
-    				OrganizationJAXBSchema.SHORT_NAME);
-    		docModel.setProperty(getServiceContext().getCommonPartLabel("organizations"),
-    				OrganizationJAXBSchema.DISPLAY_NAME, displayName);
-    	}
+    	handleGetDisplayName(wrapDoc.getWrappedObject());
     	super.handleGet(wrapDoc);
     }
 
@@ -153,16 +198,11 @@ public class OrganizationDocumentModelHandler
 	        while(iter.hasNext()){
 	            DocumentModel docModel = iter.next();
 	            OrganizationListItem ilistItem = new OrganizationListItem();
-	            // We look for a set display name, and fall back to teh short name if there is none
-	            String displayName = (String) docModel.getProperty(getServiceContext().getCommonPartLabel("organizations"),
-												OrganizationJAXBSchema.DISPLAY_NAME);
-	            if(displayName == null)
-		            displayName = (String) docModel.getProperty(getServiceContext().getCommonPartLabel("organizations"),
-							OrganizationJAXBSchema.SHORT_NAME);
-	            ilistItem.setDisplayName( displayName );
-	            ilistItem.setRefName(
-									(String) docModel.getProperty(getServiceContext().getCommonPartLabel("organizations"),
-									OrganizationJAXBSchema.REF_NAME));
+	            // We look for a set display name, and fall back to the short name if there is none
+	            String displayName = handleGetDisplayName(docModel, false);
+				ilistItem.setDisplayName(displayName);
+				ilistItem.setRefName((String) docModel.getProperty(getServiceContext().getCommonPartLabel(
+						"organizations"), OrganizationJAXBSchema.REF_NAME));
 							/*
 							 * These are not currently included in the listing - only in the details
 	            ilistItem.setLongName(
