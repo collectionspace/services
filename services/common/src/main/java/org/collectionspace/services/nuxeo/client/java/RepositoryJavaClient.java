@@ -263,7 +263,8 @@ public class RepositoryJavaClient implements RepositoryClient {
             // We should make this a property that is indexed.
             query.append(" WHERE ecm:path STARTSWITH '/" + domain + "'");
             if ((null != where) && (where.length() > 0)) {
-                query.append(" AND " + where);
+//              query.append(" AND " + where);
+                query.append(" AND " + where + "AND ecm:isProxy = 0");                
             }
             DocumentModelList docList = null;
             if ((docFilter.getOffset() > 0) || (docFilter.getPageSize() > 0)) {
