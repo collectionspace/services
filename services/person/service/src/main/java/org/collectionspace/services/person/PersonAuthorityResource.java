@@ -420,7 +420,7 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResource {
             // Add the where clause "persons_common:inAuthority='" + parentcsid + "'"
             myFilter.setWhereClause(PersonJAXBSchema.PERSONS_COMMON + ":" +
             		PersonJAXBSchema.IN_AUTHORITY +
-            		"='" + parentcsid + "'");
+            		"='" + parentcsid + "'" + "AND ecm:isProxy = 0");
             
             // AND persons_common:displayName LIKE '%partialTerm%'
             if (partialTerm != null && !partialTerm.isEmpty()) {
