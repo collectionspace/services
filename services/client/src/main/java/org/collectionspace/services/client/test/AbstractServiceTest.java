@@ -33,13 +33,17 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-
 import javax.xml.bind.Unmarshaller;
+
+import org.apache.commons.httpclient.methods.DeleteMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
+
 import org.collectionspace.services.client.TestServiceClient;
 
-import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
-
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 
@@ -85,7 +89,10 @@ public abstract class AbstractServiceTest implements ServiceTest {
     protected final String WRONG_XML_SCHEMA_DATA =
             XML_DECLARATION +
             "<wrong_schema>wrong schema contents</wrong_schema>";
-
+    // A MIME media type character set designation for the entity bodies
+    // of PUT and POST requests.  Set this to null to avoid adding a character
+    // set attribute to the MIME type in the "Content-Type:" HTTP header.
+    final String NULL_CHARSET = null;
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
@@ -432,9 +439,11 @@ public abstract class AbstractServiceTest implements ServiceTest {
      *
      * @return An error message.
      */
-    protected String invalidStatusCodeMessage(ServiceRequestType requestType, int statusCode) {
-        return "Status code '" + statusCode + "' in response is NOT within the expected set: " +
-                requestType.validStatusCodesAsString();
+    protected String invalidStatusCodeMessage(
+        ServiceRequestType requestType, int statusCode) {
+        return "Status code '" + statusCode +
+            "' in response is NOT within the expected set: " +
+            requestType.validStatusCodesAsString();
     }
 
     /**
@@ -475,13 +484,13 @@ public abstract class AbstractServiceTest implements ServiceTest {
     protected int submitRequest(String method, String url) {
         int statusCode = 0;
         try{
-            ClientRequest request = new ClientRequest(url);
+            TestServiceClient client = new TestServiceClient();
             if(method.equals(javax.ws.rs.HttpMethod.DELETE)){
-                ClientResponse res = request.delete();
-                statusCode = res.getStatus();
+                DeleteMethod deleteMethod = new DeleteMethod(url);
+                statusCode = client.getHttpClient().executeMethod(deleteMethod);
             }else if(method.equals(javax.ws.rs.HttpMethod.GET)){
-                ClientResponse res = request.get();
-                statusCode = res.getStatus();
+                GetMethod getMethod = new GetMethod(url);
+                statusCode = client.getHttpClient().executeMethod(getMethod);
             }else{
                 // Do nothing - leave status code at default value.
             }
@@ -512,14 +521,19 @@ public abstract class AbstractServiceTest implements ServiceTest {
             String mediaType, String entityStr) {
         int statusCode = 0;
         try{
-            ClientRequest request = new ClientRequest(url);
-            request.body(mediaType, entityStr);
+            TestServiceClient client = new TestServiceClient();
             if(method.equals(javax.ws.rs.HttpMethod.POST)){
-                ClientResponse res = request.post(java.lang.String.class);
-                statusCode = res.getStatus();
+                StringRequestEntity entityBody =
+                    new StringRequestEntity(mediaType, entityStr, NULL_CHARSET);
+                PostMethod postMethod = new PostMethod(url);
+                postMethod.setRequestEntity(entityBody);
+                statusCode = client.getHttpClient().executeMethod(postMethod);
             }else if(method.equals(javax.ws.rs.HttpMethod.PUT)){
-                ClientResponse res = request.put(java.lang.String.class);
-                statusCode = res.getStatus();
+                StringRequestEntity entityBody =
+                    new StringRequestEntity(mediaType, entityStr, NULL_CHARSET);
+                PutMethod putMethod = new PutMethod(url);
+                putMethod.setRequestEntity(entityBody);
+                statusCode = client.getHttpClient().executeMethod(putMethod);
             }else{
                 // Do nothing - leave status code at default value.
             }

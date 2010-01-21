@@ -169,8 +169,8 @@ public abstract class BaseServiceClient implements CollectionSpaceClient {
      */
     @Override
     public void setupHttpClient() {
+        this.httpClient = new HttpClient();
         if(useAuth()){
-            this.httpClient = new HttpClient();
             String user = properties.getProperty(USER_PROPERTY);
             String password = properties.getProperty(PASSWORD_PROPERTY);
             if(logger.isDebugEnabled()){
