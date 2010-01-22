@@ -9,7 +9,7 @@
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.client</artifactId>
     <packaging>jar</packaging>
-    <version>1.0</version>
+    <version>${cspace.services.client.version}</version>
     <name>services.client</name>
 
     <dependencies>

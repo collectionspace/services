@@ -12,7 +12,8 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.acquisition.client</artifactId>
-    <version>1.0</version>
+    <version>${cspace.services.client.version}</version>
+    <packaging>jar</packaging>
     <name>services.acquisition.client</name>
     
     <dependencies>

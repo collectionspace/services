@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.dimension.client</artifactId>
-    <version>1.0</version>
+    <version>${cspace.services.client.version}</version>
     <name>services.dimension.client</name>
     
     <dependencies>
