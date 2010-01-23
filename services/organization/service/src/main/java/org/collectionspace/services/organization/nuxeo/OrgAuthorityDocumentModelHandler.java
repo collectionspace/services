@@ -61,10 +61,6 @@ public class OrgAuthorityDocumentModelHandler
      */
     private OrgauthoritiesCommonList orgAuthorityList;
 
-    @Override
-    public void prepare(Action action) throws Exception {
-        //no specific action needed
-    }
 
     /**
      * getCommonPart get associated orgAuthority

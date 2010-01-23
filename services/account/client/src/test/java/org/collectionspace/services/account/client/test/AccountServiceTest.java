@@ -56,6 +56,8 @@ public class AccountServiceTest extends AbstractServiceTest {
     // Instance variables specific to this test.
     private AccountClient client = new AccountClient();
     private String knownResourceId = null;
+    private String resource1Id = null;
+    private String resource2Id = null;
 
     /*
      * This method is called only by the parent class, AbstractServiceTest
@@ -151,6 +153,26 @@ public class AccountServiceTest extends AbstractServiceTest {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
     dependsOnMethods = {"create"})
     public void createList(String testName) throws Exception {
+
+        setupCreate(testName);
+        // Submit the request to the service and store the response.
+        AccountsCommon account1 =
+                createAccountInstance("curious", "hithere08", "curious@george.com", true, true, true);
+        ClientResponse<Response> res = client.create(account1);
+        int statusCode = res.getStatus();
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        resource1Id = extractId(res);
+
+        AccountsCommon account2 =
+                createAccountInstance("tom", "hithere09", "tom@jerry.com", true, true, true);
+        res = client.create(account2);
+        statusCode = res.getStatus();
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        resource2Id = extractId(res);
     }
 
     // Failure outcomes
@@ -249,20 +271,35 @@ public class AccountServiceTest extends AbstractServiceTest {
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
         if (iterateThroughList && logger.isDebugEnabled()) {
-            List<AccountsCommonList.AccountListItem> items =
-                    list.getAccountListItem();
-            int i = 0;
+            printList(testName, list);
+        }
+    }
 
-            for (AccountsCommonList.AccountListItem item : items) {
-                logger.debug(testName + ": list-item[" + i + "] csid="
-                        + item.getCsid());
-                logger.debug(testName + ": list-item[" + i + "] screenName="
-                        + item.getScreenName());
-                logger.debug(testName + ": list-item[" + i + "] URI="
-                        + item.getUri());
-                i++;
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    dependsOnMethods = {"createList", "read"})
+    public void readSearchList(String testName) throws Exception {
 
-            }
+        // Perform setup.
+        setupReadList(testName);
+
+        // Submit the request to the service and store the response.
+        ClientResponse<AccountsCommonList> res = client.readSearchList("tom");
+        AccountsCommonList list = res.getEntity();
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Optionally output additional data about list members for debugging.
+        boolean iterateThroughList = true;
+        if (iterateThroughList && logger.isDebugEnabled()) {
+            printList(testName, list);
         }
     }
 
@@ -577,6 +614,26 @@ public class AccountServiceTest extends AbstractServiceTest {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    dependsOnMethods = {"testSubmitRequest", "updateWrongUser"})
+    public void deleteList(String testName) throws Exception {
+
+        // Perform setup.
+        setupDelete(testName);
+
+        ClientResponse<Response> res = client.delete(resource1Id);
+        int statusCode = res.getStatus();
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        res = client.delete(resource2Id);
+        statusCode = res.getStatus();
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    }
+
     // Failure outcomes
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
@@ -670,5 +727,22 @@ public class AccountServiceTest extends AbstractServiceTest {
         }
         return account;
 
+    }
+
+    private void printList(String testName, AccountsCommonList list) {
+        List<AccountsCommonList.AccountListItem> items =
+                list.getAccountListItem();
+        int i = 0;
+
+        for (AccountsCommonList.AccountListItem item : items) {
+            logger.debug(testName + ": list-item[" + i + "] csid="
+                    + item.getCsid());
+            logger.debug(testName + ": list-item[" + i + "] screenName="
+                    + item.getScreenName());
+            logger.debug(testName + ": list-item[" + i + "] URI="
+                    + item.getUri());
+            i++;
+
+        }
     }
 }

@@ -61,10 +61,6 @@ public class IntakeDocumentModelHandler
      */
     private IntakesCommonList intakeList;
 
-    @Override
-    public void prepare(Action action) throws Exception {
-        //no specific action needed
-    }
 
     /**
      * getCommonPart get associated intake

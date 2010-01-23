@@ -72,10 +72,6 @@ public class OrganizationDocumentModelHandler
 		this.inAuthority = inAuthority;
 	}
 
-	@Override
-    public void prepare(Action action) throws Exception {
-        //no specific action needed
-    }
 	
     @Override
     public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {

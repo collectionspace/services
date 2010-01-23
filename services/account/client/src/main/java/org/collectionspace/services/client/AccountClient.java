@@ -24,7 +24,6 @@
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
  */
-
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
@@ -48,13 +47,13 @@ public class AccountClient extends BaseServiceClient {
      *
      */
     private AccountProxy accountProxy;
-    
-	/* (non-Javadoc)
-	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
-	 */
-	public String getServicePathComponent() {
-		return "accounts";
-	}
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
+     */
+    public String getServicePathComponent() {
+        return "accounts";
+    }
 
     /**
      *
@@ -71,10 +70,10 @@ public class AccountClient extends BaseServiceClient {
      * allow to reset proxy as per security needs
      */
     public void setProxy() {
-        if(useAuth()){
+        if (useAuth()) {
             accountProxy = ProxyFactory.create(AccountProxy.class,
                     getBaseURL(), getHttpClient());
-        }else{
+        } else {
             accountProxy = ProxyFactory.create(AccountProxy.class,
                     getBaseURL());
         }
@@ -86,6 +85,11 @@ public class AccountClient extends BaseServiceClient {
      */
     public ClientResponse<AccountsCommonList> readList() {
         return accountProxy.readList();
+
+    }
+
+    public ClientResponse<AccountsCommonList> readSearchList(String screenName) {
+        return accountProxy.readSearchList(screenName);
 
     }
 

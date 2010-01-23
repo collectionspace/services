@@ -73,7 +73,34 @@ public interface DocumentHandler<T, TL, WT, WTL> {
     public void prepare(Action action) throws Exception;
 
     /**
-     * handle is called by the client to hand over the document processing task
+     * prepareCreate processes documents before creating document in repository
+
+     * @throws Exception
+     */
+    public void prepareCreate() throws Exception;
+
+    /**
+     * prepareUpdate processes documents for the update of document in repository
+     * @throws Exception
+     */
+    public void prepareUpdate() throws Exception;
+
+    /**
+     * prepareGet processes query from repository before retrieving document from
+     * repository
+     * @throws Exception
+     */
+    public void prepareGet() throws Exception;
+
+    /**
+     * prepareGetAll processes query from repository before retrieving document(s) from
+     * repository
+     * @throws Exception
+     */
+    public void prepareGetAll() throws Exception;
+
+    /**
+     * prepare is called by the client to hand over the document processing task
      * @param action 
      * @param doc wrapped doc
      * @throws Exception
@@ -118,12 +145,32 @@ public interface DocumentHandler<T, TL, WT, WTL> {
     public void complete(Action action, DocumentWrapper<?> wrapDoc) throws Exception;
 
     /**
+     * completeCreate is called by the client to indicate completion of the create call.
+     * @param wrapDoc
+     * @throws Exception
+     */
+    public void completeCreate(DocumentWrapper<WT> wrapDoc) throws Exception;
+
+    /**
      * completeUpdate is called by the client to indicate completion of the update call.
-     * this gives opportunity to prepare updated object that should be sent back to the consumer
      * @param wrapDoc
      * @throws Exception
      */
     public void completeUpdate(DocumentWrapper<WT> wrapDoc) throws Exception;
+
+    /**
+     * completeGetis called by the client to indicate completion of the get call.
+     * @param wrapDoc
+     * @throws Exception
+     */
+    public void completeGet(DocumentWrapper<WT> wrapDoc) throws Exception;
+
+    /**
+     * completeGetAll is called by the client to indicate completion of the getall.
+     * @param wrapDoc
+     * @throws Exception
+     */
+    public void completeGetAll(DocumentWrapper<WTL> wrapDoc) throws Exception;
 
     /**
      * extractCommonPart extracts common part of a CS object from given document.
@@ -165,7 +212,6 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      */
     public void fillCommonPartList(TL obj, DocumentWrapper<WTL> docWrap) throws Exception;
 
-
     /**
      * getProperties
      * @return
@@ -178,6 +224,14 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @param properties
      */
     public void setProperties(Map<String, Object> properties);
+
+    /**
+     * createDocumentFilter is a factory method to create a document
+     * filter that is relevant to be used with this document handler
+     * and corresponding storage client
+     * @return
+     */
+    public DocumentFilter createDocumentFilter();
 
     /**
      * getDocumentFilter

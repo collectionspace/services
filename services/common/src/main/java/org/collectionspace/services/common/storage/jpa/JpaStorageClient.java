@@ -50,6 +50,7 @@ public class JpaStorageClient implements StorageClient {
 
     private final Logger logger = LoggerFactory.getLogger(JpaStorageClient.class);
     protected final static String CS_PERSISTENCE_UNIT = "org.collectionspace.services";
+
     public JpaStorageClient() {
     }
 
@@ -200,22 +201,26 @@ public class JpaStorageClient implements StorageClient {
         try {
             handler.prepare(Action.GET_ALL);
 
-            StringBuilder queryStr = new StringBuilder("SELECT a FROM ");
-            queryStr.append(getEntityName(ctx));
-            queryStr.append(" a");
+            StringBuilder strBld = new StringBuilder("SELECT a FROM ");
+            strBld.append(getEntityName(ctx));
+            strBld.append(" a");
+            //TODO: add tenant id
+            emf = getEntityManagerFactory();
+            em = emf.createEntityManager();
+            String queryStr = strBld.toString(); //for debugging
+            Query q = em.createQuery(queryStr);
             //TODO: add tenant id
             String where = docFilter.getWhereClause();
             if ((null != where) && (where.length() > 0)) {
-                queryStr.append(" AND " + where);
+                strBld.append(where);
             }
-            emf = getEntityManagerFactory();
-            em = emf.createEntityManager();
-            Query q = em.createQuery(queryStr.toString());
-            //TODO: add tenant id
-            //TODO: get page
-            if ((docFilter.getOffset() > 0) || (docFilter.getPageSize() > 0)) {
-            } else {
+            if (docFilter.getOffset() > 0) {
+                q.setFirstResult(docFilter.getOffset());
             }
+            if (docFilter.getPageSize() > 0) {
+                q.setMaxResults(docFilter.getPageSize());
+            }
+
             //FIXME is transaction required for get?
             em.getTransaction().begin();
             List list = q.getResultList();
@@ -346,6 +351,7 @@ public class JpaStorageClient implements StorageClient {
     protected EntityManagerFactory getEntityManagerFactory() {
         return getEntityManagerFactory(CS_PERSISTENCE_UNIT);
     }
+
     protected EntityManagerFactory getEntityManagerFactory(
             String persistenceUnit) {
         return Persistence.createEntityManagerFactory(persistenceUnit);
@@ -381,8 +387,8 @@ public class JpaStorageClient implements StorageClient {
 
         Object r = m.invoke(o);
         if (logger.isDebugEnabled()) {
-            logger.debug("getValue returned value=" + r +
-                    " for " + c.getName());
+            logger.debug("getValue returned value=" + r
+                    + " for " + c.getName());
         }
         return r;
     }
@@ -415,8 +421,8 @@ public class JpaStorageClient implements StorageClient {
         Method m = c.getMethod(methodName, argType);
         Object r = m.invoke(o, argValue);
         if (logger.isDebugEnabled()) {
-            logger.debug("completed invocation of " + methodName +
-                    " for " + c.getName());
+            logger.debug("completed invocation of " + methodName
+                    + " for " + c.getName());
         }
         return r;
     }
@@ -442,8 +448,8 @@ public class JpaStorageClient implements StorageClient {
     protected String getEntityName(ServiceContext ctx) {
         Object o = ctx.getProperty("entity-name");
         if (o == null) {
-            throw new IllegalArgumentException("property entity-name missing in context " +
-                    ctx.toString());
+            throw new IllegalArgumentException("property entity-name missing in context "
+                    + ctx.toString());
         }
 
         return (String) o;

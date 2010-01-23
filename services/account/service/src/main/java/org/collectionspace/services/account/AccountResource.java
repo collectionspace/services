@@ -31,8 +31,10 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -48,6 +50,7 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.storage.StorageClient;
+import org.collectionspace.services.common.storage.jpa.JpaDocumentFilter;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,11 +67,11 @@ public class AccountResource
 
     @Override
     protected String getVersionString() {
-    	/** The last change revision. */
-    	final String lastChangeRevision = "$LastChangedRevision: 1165 $";
-    	return lastChangeRevision;
+        /** The last change revision. */
+        final String lastChangeRevision = "$LastChangedRevision: 1165 $";
+        return lastChangeRevision;
     }
-    
+
     @Override
     public String getServiceName() {
         return serviceName;
@@ -177,12 +180,16 @@ public class AccountResource
 
     @GET
     @Produces("application/xml")
-    public AccountsCommonList getAccountList(@Context UriInfo ui) {
+    public AccountsCommonList getAccountList(
+            @Context UriInfo ui) {
         AccountsCommonList accountList = new AccountsCommonList();
         try {
             ServiceContext ctx = createServiceContext((AccountsCommonList) null);
             DocumentHandler handler = createDocumentHandler(ctx);
-            DocumentFilter myFilter = new DocumentFilter();
+            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+            DocumentFilter myFilter = handler.createDocumentFilter();
+            myFilter.setPagination(queryParams);
+            myFilter.setQueryParams(queryParams);           
             handler.setDocumentFilter(myFilter);
             getStorageClient(ctx).getFiltered(ctx, handler);
             accountList = (AccountsCommonList) handler.getCommonPartList();

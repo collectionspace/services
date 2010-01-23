@@ -72,10 +72,6 @@ public class VocabularyItemDocumentModelHandler
 		this.inVocabulary = inVocabulary;
 	}
 
-	@Override
-    public void prepare(Action action) throws Exception {
-        //no specific action needed
-    }
 
     /**
      * getCommonPart get associated vocabularyItem

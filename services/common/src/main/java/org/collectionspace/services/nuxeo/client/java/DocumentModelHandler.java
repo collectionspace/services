@@ -24,6 +24,7 @@
 package org.collectionspace.services.nuxeo.client.java;
 
 import org.collectionspace.services.common.document.AbstractMultipartDocumentHandler;
+import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.nuxeo.client.*;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -111,5 +112,10 @@ public abstract class DocumentModelHandler<T, TL>
 
     @Override
     public abstract void setCommonPartList(TL obj);
+
+    @Override
+    public DocumentFilter createDocumentFilter() {
+        return new NuxeoDocumentFilter();
+    }
 
 }

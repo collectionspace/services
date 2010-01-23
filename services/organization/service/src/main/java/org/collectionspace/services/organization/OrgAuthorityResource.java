@@ -211,8 +211,8 @@ public class OrgAuthorityResource extends AbstractCollectionSpaceResource {
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             DocumentHandler handler = createDocumentHandler(ctx);
-            DocumentFilter myFilter =
-                    DocumentFilter.CreatePaginatedDocumentFilter(queryParams);
+            DocumentFilter myFilter = new DocumentFilter();
+            myFilter.setPagination(queryParams);
             String nameQ = queryParams.getFirst("refName");
             if (nameQ != null) {
                 myFilter.setWhereClause("orgauthorities_common:refName='" + nameQ + "'");
@@ -414,8 +414,8 @@ public class OrgAuthorityResource extends AbstractCollectionSpaceResource {
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getItemServiceName());
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            DocumentFilter myFilter =
-                DocumentFilter.CreatePaginatedDocumentFilter(queryParams);
+            DocumentFilter myFilter = new DocumentFilter();
+            myFilter.setPagination(queryParams);
             myFilter.setWhereClause(OrganizationJAXBSchema.ORGANIZATIONS_COMMON +
             		":" + OrganizationJAXBSchema.IN_AUTHORITY + "=" +
             		"'" + parentcsid + "'");

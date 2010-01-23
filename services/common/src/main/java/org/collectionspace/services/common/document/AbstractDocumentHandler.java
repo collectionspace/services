@@ -75,6 +75,9 @@ public abstract class AbstractDocumentHandler<T, TL, WT, WTL>
         this.properties = properties;
     }
 
+    @Override
+    public abstract DocumentFilter createDocumentFilter();
+
     /**
      * @return the DocumentFilter
      */
@@ -92,27 +95,60 @@ public abstract class AbstractDocumentHandler<T, TL, WT, WTL>
     }
 
     @Override
-    public void prepare(Action action) throws Exception {
-        //no specific action needed
-    }
-
-    @Override
-    public void handle(Action action, DocumentWrapper<?> wrapDoc) throws Exception {
-        switch(action){
+    final public void prepare(Action action) throws Exception {
+        switch (action) {
             case CREATE:
-                handleCreate((DocumentWrapper<WT>)wrapDoc);
+                prepareCreate();
                 break;
 
             case UPDATE:
-                handleUpdate((DocumentWrapper<WT>)wrapDoc);
+                prepareUpdate();
                 break;
 
             case GET:
-                handleGet((DocumentWrapper<WT>)wrapDoc);
+                prepareGet();
                 break;
 
             case GET_ALL:
-                handleGetAll((DocumentWrapper<WTL>)wrapDoc);
+                prepareGetAll();
+                break;
+
+        }
+    }
+
+    @Override
+    public void prepareCreate() throws Exception {
+    }
+
+    @Override
+    public void prepareUpdate() throws Exception {
+    }
+
+    @Override
+    public void prepareGet() throws Exception {
+    }
+
+    @Override
+    public void prepareGetAll() throws Exception {
+    }
+
+    @Override
+    final public void handle(Action action, DocumentWrapper<?> wrapDoc) throws Exception {
+        switch (action) {
+            case CREATE:
+                handleCreate((DocumentWrapper<WT>) wrapDoc);
+                break;
+
+            case UPDATE:
+                handleUpdate((DocumentWrapper<WT>) wrapDoc);
+                break;
+
+            case GET:
+                handleGet((DocumentWrapper<WT>) wrapDoc);
+                break;
+
+            case GET_ALL:
+                handleGetAll((DocumentWrapper<WTL>) wrapDoc);
                 break;
 
         }
@@ -131,18 +167,46 @@ public abstract class AbstractDocumentHandler<T, TL, WT, WTL>
     public abstract void handleGetAll(DocumentWrapper<WTL> wrapDoc) throws Exception;
 
     @Override
-    public void complete(Action action, DocumentWrapper<?> wrapDoc) throws Exception {
-        switch(action){
-            //TODO: add more actions if needed
+    final public void complete(Action action, DocumentWrapper<?> wrapDoc) throws Exception {
+        switch (action) {
+            case CREATE:
+                completeCreate((DocumentWrapper<WT>) wrapDoc);
+                break;
+
             case UPDATE:
-                completeUpdate((DocumentWrapper<WT>)wrapDoc);
+                completeUpdate((DocumentWrapper<WT>) wrapDoc);
+                break;
+
+            case GET:
+                completeGet((DocumentWrapper<WT>) wrapDoc);
+                break;
+
+            case GET_ALL:
+                completeGetAll((DocumentWrapper<WTL>) wrapDoc);
                 break;
         }
+    }
+
+    /**
+     * completeCreate is called by the client to indicate completion of the create call.
+     * @param wrapDoc
+     * @throws Exception
+     */
+    @Override
+    public void completeCreate(DocumentWrapper<WT> wrapDoc) throws Exception {
     }
 
     @Override
     public void completeUpdate(DocumentWrapper<WT> wrapDoc) throws Exception {
         //no specific action needed
+    }
+
+    @Override
+    public void completeGet(DocumentWrapper<WT> wrapDoc) throws Exception {
+    }
+
+    @Override
+    public void completeGetAll(DocumentWrapper<WTL> wrapDoc) throws Exception {
     }
 
     @Override
@@ -180,9 +244,9 @@ public abstract class AbstractDocumentHandler<T, TL, WT, WTL>
     @Override
     public String getUnQProperty(String qProp) {
         StringTokenizer tkz = new StringTokenizer(qProp, ":");
-        if(tkz.countTokens() != 2){
-            String msg = "Property must be in the form xxx:yyy, " +
-                    "e.g. collectionobjects_common:objectNumber";
+        if (tkz.countTokens() != 2) {
+            String msg = "Property must be in the form xxx:yyy, "
+                    + "e.g. collectionobjects_common:objectNumber";
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }

@@ -64,10 +64,6 @@ public class RelationDocumentModelHandler
      */
     private RelationsCommonList relationList;
 
-    @Override
-    public void prepare(Action action) throws Exception {
-        //no specific action needed
-    }
 
     /**
      * getCommonObject get associated Relation
