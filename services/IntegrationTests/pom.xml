@@ -26,7 +26,7 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.client</artifactId>
-            <version>1.0</version>
+            <version>${cspace.services.client.version}</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.relation.client</artifactId>
-            <version>1.0</version>
+            <version>${cspace.services.client.version}</version>
         </dependency>
     </dependencies>
     

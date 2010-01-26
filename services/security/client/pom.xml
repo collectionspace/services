@@ -29,18 +29,13 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.client</artifactId>
-            <version>1.0</version>
+            <version>${cspace.services.client.version}</version>
         </dependency>
         <!-- authentication tests use CollectionObject service and Account service -->
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authentication.client</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.account</artifactId>
-            <version>1.0</version>
+            <version>${cspace.services.client.version}</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
@@ -50,7 +45,7 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.collectionobject.client</artifactId>
-            <version>1.0</version>
+            <version>${cspace.services.client.version}</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
