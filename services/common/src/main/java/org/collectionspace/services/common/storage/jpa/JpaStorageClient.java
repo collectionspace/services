@@ -121,18 +121,19 @@ public class JpaStorageClient implements StorageClient {
         EntityManager em = null;
         try {
             handler.prepare(Action.GET);
-            StringBuilder queryStr = new StringBuilder("SELECT a FROM ");
-            queryStr.append(getEntityName(ctx));
-            queryStr.append(" a");
-            queryStr.append(" WHERE csid = :csid");
+            StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
+            queryStrBldr.append(getEntityName(ctx));
+            queryStrBldr.append(" a");
+            queryStrBldr.append(" WHERE csid = :csid");
             //TODO: add tenant id
             String where = docFilter.getWhereClause();
             if ((null != where) && (where.length() > 0)) {
-                queryStr.append(" AND " + where);
+                queryStrBldr.append(" AND " + where);
             }
             emf = getEntityManagerFactory();
             em = emf.createEntityManager();
-            Query q = em.createQuery(queryStr.toString());
+            String queryStr = queryStrBldr.toString(); //for debugging
+            Query q = em.createQuery(queryStr);
             q.setParameter("csid", id);
             //TODO: add tenant id
 
@@ -201,18 +202,18 @@ public class JpaStorageClient implements StorageClient {
         try {
             handler.prepare(Action.GET_ALL);
 
-            StringBuilder strBld = new StringBuilder("SELECT a FROM ");
-            strBld.append(getEntityName(ctx));
-            strBld.append(" a");
+            StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
+            queryStrBldr.append(getEntityName(ctx));
+            queryStrBldr.append(" a");
+            List<DocumentFilter.ParamBinding> params = docFilter.buildWhereForSearch(queryStrBldr);
             //TODO: add tenant id
             emf = getEntityManagerFactory();
             em = emf.createEntityManager();
-            String queryStr = strBld.toString(); //for debugging
+            String queryStr = queryStrBldr.toString(); //for debugging
             Query q = em.createQuery(queryStr);
-            //TODO: add tenant id
-            String where = docFilter.getWhereClause();
-            if ((null != where) && (where.length() > 0)) {
-                strBld.append(where);
+            //bind parameters
+            for(DocumentFilter.ParamBinding p : params) {
+                q.setParameter(p.getName(), p.getValue());
             }
             if (docFilter.getOffset() > 0) {
                 q.setFirstResult(docFilter.getOffset());

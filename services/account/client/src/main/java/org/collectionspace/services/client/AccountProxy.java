@@ -58,7 +58,7 @@ public interface AccountProxy {
 
         @GET
     @Produces({"application/xml"})
-    ClientResponse<AccountsCommonList> readSearchList(@QueryParam("sn") String screenName);
+    ClientResponse<AccountsCommonList> readSearchList(@QueryParam("sn") String screenName, @QueryParam("uid") String uid, @QueryParam("email") String email);
 
     //(C)reate
     @POST

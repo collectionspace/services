@@ -33,7 +33,6 @@ import org.collectionspace.services.common.document.AbstractDocumentHandler;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.storage.jpa.JpaDocumentFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -161,26 +160,15 @@ public class AccountDocumentHandler
 
     @Override
     public DocumentFilter createDocumentFilter() {
-        return new JpaDocumentFilter();
+        return new AccountJpaFilter();
     }
-    private void setWhereForGetAll(StringBuilder strBld) {
-        DocumentFilter filter = getDocumentFilter();
-        String screenName = null;
-        if (screenName != null && !screenName.isEmpty()) {
-            String ptClause =
-                    "WHERE UPPER(a.screenName)"
-                    + " LIKE "
-                    + ":sn";
-            filter.addQueryParam("sn", "%" + screenName.toUpperCase() + "%");
-            filter.setWhereClause(ptClause);
-        }
 
-    }
     /**
      * sanitize removes data not needed to be sent to the consumer
      * @param account
      */
     private void sanitize(AccountsCommon account) {
         account.setPassword(null);
+
     }
 }

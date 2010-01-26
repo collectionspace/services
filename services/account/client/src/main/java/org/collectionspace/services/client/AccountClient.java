@@ -88,8 +88,8 @@ public class AccountClient extends BaseServiceClient {
 
     }
 
-    public ClientResponse<AccountsCommonList> readSearchList(String screenName) {
-        return accountProxy.readSearchList(screenName);
+    public ClientResponse<AccountsCommonList> readSearchList(String screenName, String uid, String email) {
+        return accountProxy.readSearchList(screenName, uid, email);
 
     }
 

@@ -17,11 +17,13 @@
  */
 package org.collectionspace.services.common.document;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 import org.collectionspace.services.common.query.IQueryManager;
+
+//TODO: would be great to not rely on resteasy directly
+import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
 
 /**
  * DocumentFilter bundles simple query filtering parameters. 
@@ -38,8 +40,51 @@ public class DocumentFilter {
     protected String whereClause;	// Filtering clause. Omit the "WHERE".
     protected int startPage;		// Pagination offset for list results
     protected int pageSize;			// Pagination limit for list results
-    private MultivaluedMap<String, String> queryParams;
+    private MultivaluedMap<String, String> queryParams = new MultivaluedMapImpl<String, String>();
 
+
+    /**
+     * ParamBinding encapsulates parameter binding for query
+     */
+    public static class ParamBinding {
+
+        private String name;
+        private Object value;
+
+        public ParamBinding(String name, Object value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        /**
+         * @return the name
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * @param name the name to set
+         */
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        /**
+         * @return the value
+         */
+        public Object getValue() {
+            return value;
+        }
+
+        /**
+         * @param value the value to set
+         */
+        public void setValue(Object value) {
+            this.value = value;
+        }
+    }
+    
     public DocumentFilter() {
         this("", 0, defaultPageSize);			// Use empty string for easy concatenation
     }
@@ -112,6 +157,24 @@ public class DocumentFilter {
             String newClause = currentClause.concat(IQueryManager.SEARCH_TERM_SEPARATOR + whereClause);
             this.setWhereClause(newClause);
         }
+    }
+
+    /**
+     * buildWhereClause builds where clause for search query
+     * @param queryStrBldr query string to append with where clause
+     * @return parameter binding
+     */
+    public List<ParamBinding> buildWhereForSearch(StringBuilder queryStrBldr) {
+        return new ArrayList<ParamBinding>();
+    }
+
+    /**
+     * buildWhereClause builds where clause for get, update or delete
+     * @param queryStrBldr query string to append with where clause
+     * @return parameter binding
+     */
+    public List<ParamBinding> buildWhere(StringBuilder queryStrBldr) {
+        return new ArrayList<ParamBinding>();
     }
 
     /**
