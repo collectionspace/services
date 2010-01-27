@@ -38,10 +38,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.intake.IntakesCommonList;
 import org.collectionspace.services.common.AbstractCollectionSpaceResource;
 
-import org.collectionspace.services.intake.nuxeo.IntakeHandlerFactory;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.MultipartServiceContext;
@@ -50,6 +48,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentHandlerFactory;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.security.UnauthorizedException;
@@ -87,8 +86,8 @@ public class IntakeResource extends AbstractCollectionSpaceResource {
 
     @Override
     public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-        DocumentHandler docHandler = IntakeHandlerFactory.getInstance().getHandler(
-                ctx.getRepositoryClientType().toString());
+        DocumentHandler docHandler = DocumentHandlerFactory.getInstance().getHandler(
+                ctx.getDocumentHandlerClass());
         docHandler.setServiceContext(ctx);
         if (ctx.getInput() != null) {
             Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), IntakesCommon.class);

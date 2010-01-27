@@ -127,6 +127,12 @@ public interface ServiceContext<IT, OT> {
     public String getRepositoryWorkspaceId();
 
     /**
+     * getDocumentHandlerClass returns the class name for document handler
+     * @return class name of document handler
+     */
+    public String getDocumentHandlerClass();
+
+    /**
      * Get input parts as received over the wire from service consumer
      * @return the input
      */

@@ -48,13 +48,11 @@ import org.collectionspace.services.common.context.MultipartServiceContextFactor
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentHandlerFactory;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
-import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.query.IQueryManager;
-import org.collectionspace.services.vocabulary.nuxeo.VocabularyHandlerFactory;
 import org.collectionspace.services.vocabulary.nuxeo.VocabularyItemDocumentModelHandler;
-import org.collectionspace.services.vocabulary.nuxeo.VocabularyItemHandlerFactory;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
@@ -78,11 +76,11 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
 
     @Override
     protected String getVersionString() {
-    	/** The last change revision. */
-    	final String lastChangeRevision = "$LastChangedRevision$";
-    	return lastChangeRevision;
+        /** The last change revision. */
+        final String lastChangeRevision = "$LastChangedRevision$";
+        return lastChangeRevision;
     }
-    
+
     @Override
     public String getServiceName() {
         return vocabularyServiceName;
@@ -101,8 +99,8 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
      */
     @Override
     public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-        DocumentHandler docHandler = VocabularyHandlerFactory.getInstance().getHandler(
-                ctx.getRepositoryClientType().toString());
+        DocumentHandler docHandler = DocumentHandlerFactory.getInstance().getHandler(
+                ctx.getDocumentHandlerClass());
         docHandler.setServiceContext(ctx);
         if (ctx.getInput() != null) {
             Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), VocabulariesCommon.class);
@@ -116,8 +114,8 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
     private DocumentHandler createItemDocumentHandler(
             ServiceContext ctx,
             String inVocabulary) throws Exception {
-        DocumentHandler docHandler = VocabularyItemHandlerFactory.getInstance().getHandler(
-                ctx.getRepositoryClientType().toString());
+        DocumentHandler docHandler = DocumentHandlerFactory.getInstance().getHandler(
+                ctx.getDocumentHandlerClass());
         docHandler.setServiceContext(ctx);
         ((VocabularyItemDocumentModelHandler) docHandler).setInVocabulary(inVocabulary);
         if (ctx.getInput() != null) {
@@ -407,7 +405,7 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
     @Produces("application/xml")
     public VocabularyitemsCommonList getVocabularyItemList(
             @PathParam("csid") String parentcsid,
-            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
+            @QueryParam(IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
             @Context UriInfo ui) {
         VocabularyitemsCommonList vocabularyItemObjectList = new VocabularyitemsCommonList();
         try {
@@ -419,28 +417,28 @@ public class VocabularyResource extends AbstractCollectionSpaceResource {
             myFilter.setPagination(queryParams);
             // "vocabularyitems_common:inVocabulary='" + parentcsid + "'");
             myFilter.setWhereClause(
-            		VocabularyItemJAXBSchema.VOCABULARYITEMS_COMMON + ":" +
-            		VocabularyItemJAXBSchema.IN_VOCABULARY + "=" +
-            		"'" + parentcsid + "'");
-            
+                    VocabularyItemJAXBSchema.VOCABULARYITEMS_COMMON + ":"
+                    + VocabularyItemJAXBSchema.IN_VOCABULARY + "="
+                    + "'" + parentcsid + "'");
+
             // AND vocabularyitems_common:displayName LIKE '%partialTerm%'
             if (partialTerm != null && !partialTerm.isEmpty()) {
-            	String ptClause = "AND " +
-            		VocabularyItemJAXBSchema.VOCABULARYITEMS_COMMON + ":" +
-            		VocabularyItemJAXBSchema.DISPLAY_NAME +
-            		" LIKE " +
-            		"'%" + partialTerm + "%'";
-            	myFilter.appendWhereClause(ptClause);
+                String ptClause = "AND "
+                        + VocabularyItemJAXBSchema.VOCABULARYITEMS_COMMON + ":"
+                        + VocabularyItemJAXBSchema.DISPLAY_NAME
+                        + " LIKE "
+                        + "'%" + partialTerm + "%'";
+                myFilter.appendWhereClause(ptClause);
             }
-            
+
             if (logger.isDebugEnabled()) {
-            	logger.debug("getVocabularyItemList filtered WHERE clause: " +
-            			myFilter.getWhereClause());
+                logger.debug("getVocabularyItemList filtered WHERE clause: "
+                        + myFilter.getWhereClause());
             }
-            
+
             handler.setDocumentFilter(myFilter);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
-            
+
             vocabularyItemObjectList = (VocabularyitemsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(

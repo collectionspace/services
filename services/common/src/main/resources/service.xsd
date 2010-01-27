@@ -20,13 +20,13 @@
                  Derived from Fedora Digtial Object Model and MIME Multipart
 -->
 <xs:schema
-  xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns="http://collectionspace.org/services/common/service"
-  xmlns:types="http://collectionspace.org/services/common/types"
-  targetNamespace="http://collectionspace.org/services/common/service"
-  version="0.1"
-  elementFormDefault="qualified"
->
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://collectionspace.org/services/common/service"
+    xmlns:types="http://collectionspace.org/services/common/types"
+    targetNamespace="http://collectionspace.org/services/common/service"
+    version="0.1"
+    elementFormDefault="qualified"
+    >
 
     <xs:import namespace="http://collectionspace.org/services/common/types" schemaLocation="types.xsd" />
 
@@ -34,7 +34,14 @@
         <xs:sequence>
             <!-- object representation served by the service -->
             <xs:element name="object" type="ServiceObjectType" minOccurs="1" maxOccurs="1"/>
-
+            <!-- document handler to be used to process the content (need to be in classpath) -->
+            <xs:element name="documentHandler" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <!-- validator handler(s) to be used to validate the content (need to be in classpath) -->
+            <!-- validator handler is called for create (POST) and update (PUT) requests only -->
+            <xs:element name="validatorHandler" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <!-- event handler is called during prepare and complete document handler events -->
+            <!-- event handler is called for create, get, update, delete, index and search requests -->
+            <xs:element name="eventHandler" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             <!-- name of the repository client (from service-config.xml) -->
             <xs:element name="repositoryClient" type="xs:string" minOccurs="0" maxOccurs="1"/>
             <!-- repositoryWorkspaceId could be workspace id -->
@@ -137,7 +144,7 @@
         </xs:attribute>
         <xs:attribute name="value" type="xs:string" use="required"/>
     </xs:complexType>
-    
+
     <xs:complexType name="XmlContentType">
         <xs:sequence>
             <xs:any namespace="##any" processContents="skip" minOccurs="0" maxOccurs="1"/>

@@ -130,7 +130,10 @@ public abstract class AbstractServiceContext<IT, OT>
 
     @Override
     public String getRepositoryClientName() {
-        return serviceBinding.getRepositoryClient();
+        if(serviceBinding.getRepositoryClient() == null) {
+            return null;
+        }
+        return serviceBinding.getRepositoryClient().trim();
     }
 
     @Override
@@ -159,6 +162,19 @@ public abstract class AbstractServiceContext<IT, OT>
     @Override
     public ServiceBindingType getServiceBinding() {
         return serviceBinding;
+    }
+
+    @Override
+    public String getDocumentHandlerClass() {
+        if (serviceBinding.getDocumentHandler() == null
+                || serviceBinding.getDocumentHandler().isEmpty()) {
+            String msg = "Missing documentHandler in service binding for "
+                    + getServiceName() + " for tenant id=" + getTenantId()
+                    + " name=" + getTenantName();
+            logger.error(msg);
+            throw new IllegalStateException(msg);
+        }
+        return serviceBinding.getDocumentHandler().trim();
     }
 
     @Override

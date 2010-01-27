@@ -42,7 +42,6 @@ import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.query.IQueryManager;
-import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectHandlerFactory;
 import org.collectionspace.services.common.AbstractCollectionSpaceResource;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
@@ -50,6 +49,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.document.DocumentHandlerFactory;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -80,8 +80,8 @@ public class CollectionObjectResource
 
     @Override
     public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-        DocumentHandler docHandler = CollectionObjectHandlerFactory.getInstance().getHandler(
-                ctx.getRepositoryClientType().toString());
+        DocumentHandler docHandler = DocumentHandlerFactory.getInstance().getHandler(
+                ctx.getDocumentHandlerClass());
         docHandler.setServiceContext(ctx);
         if (ctx.getInput() != null) {
             Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), CollectionobjectsCommon.class);

@@ -40,7 +40,6 @@ import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.common.AbstractCollectionSpaceResource;
 import org.collectionspace.services.dimension.DimensionsCommonList.*;
 
-import org.collectionspace.services.dimension.nuxeo.DimensionHandlerFactory;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.MultipartServiceContext;
@@ -48,6 +47,7 @@ import org.collectionspace.services.common.context.MultipartServiceContextFactor
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentHandlerFactory;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
@@ -82,8 +82,8 @@ public class DimensionResource extends AbstractCollectionSpaceResource {
 
     @Override
     public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-        DocumentHandler docHandler = DimensionHandlerFactory.getInstance().getHandler(
-                ctx.getRepositoryClientType().toString());
+        DocumentHandler docHandler = DocumentHandlerFactory.getInstance().getHandler(
+                ctx.getDocumentHandlerClass());
         docHandler.setServiceContext(ctx);
         if (ctx.getInput() != null) {
             Object obj = ((MultipartServiceContext)ctx).getInputPart(ctx.getCommonPartLabel(), DimensionsCommon.class);

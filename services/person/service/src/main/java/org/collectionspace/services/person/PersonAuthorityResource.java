@@ -48,12 +48,11 @@ import org.collectionspace.services.common.context.MultipartServiceContextFactor
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentHandlerFactory;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.query.IQueryManager;
-import org.collectionspace.services.person.nuxeo.PersonAuthorityHandlerFactory;
 import org.collectionspace.services.person.nuxeo.PersonDocumentModelHandler;
-import org.collectionspace.services.person.nuxeo.PersonHandlerFactory;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
@@ -100,8 +99,8 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResource {
      */
     @Override
     public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-        DocumentHandler docHandler = PersonAuthorityHandlerFactory.getInstance().getHandler(
-                ctx.getRepositoryClientType().toString());
+        DocumentHandler docHandler = DocumentHandlerFactory.getInstance().getHandler(
+                ctx.getDocumentHandlerClass());
         docHandler.setServiceContext(ctx);
         if (ctx.getInput() != null) {
             Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), PersonauthoritiesCommon.class);
@@ -115,8 +114,8 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResource {
     private DocumentHandler createItemDocumentHandler(
             ServiceContext ctx,
             String inAuthority) throws Exception {
-        DocumentHandler docHandler = PersonHandlerFactory.getInstance().getHandler(
-                ctx.getRepositoryClientType().toString());
+        DocumentHandler docHandler = DocumentHandlerFactory.getInstance().getHandler(
+                ctx.getDocumentHandlerClass());
         docHandler.setServiceContext(ctx);
         ((PersonDocumentModelHandler) docHandler).setInAuthority(inAuthority);
         if (ctx.getInput() != null) {

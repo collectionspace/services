@@ -28,11 +28,31 @@ package org.collectionspace.services.common.document;
  * DocumentHandlerFactory creates document handler
  *
  */
-public interface DocumentHandlerFactory {
+public class DocumentHandlerFactory {
+
+    private static final DocumentHandlerFactory self = new DocumentHandlerFactory();
+
+    private DocumentHandlerFactory() {
+    }
+
+    public static DocumentHandlerFactory getInstance() {
+        return self;
+    }
 
     /**
      * getHandler returns a document handler. The factory may create a new
      * stateful handler or return an existing stateless handler.
+     * @param clazz name of the class to instantiate. The class should implement
+     * DocumentHandler
      */
-    public DocumentHandler getHandler(String clientType);
+    public DocumentHandler getHandler(String clazz)
+            throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        Class c = tccl.loadClass(clazz);
+        if (DocumentHandler.class.isAssignableFrom(c)) {
+            return (DocumentHandler) c.newInstance();
+        } else {
+            throw new IllegalArgumentException("Not of type " + DocumentHandler.class.getCanonicalName());
+        }
+    }
 }
