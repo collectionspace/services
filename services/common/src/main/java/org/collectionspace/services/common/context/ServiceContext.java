@@ -23,10 +23,11 @@
  */
 package org.collectionspace.services.common.context;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import org.collectionspace.services.common.ClientType;
+import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.ValidatorHandler;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.service.ServiceBindingType;
 
@@ -126,11 +127,6 @@ public interface ServiceContext<IT, OT> {
      */
     public String getRepositoryWorkspaceId();
 
-    /**
-     * getDocumentHandlerClass returns the class name for document handler
-     * @return class name of document handler
-     */
-    public String getDocumentHandlerClass();
 
     /**
      * Get input parts as received over the wire from service consumer
@@ -199,6 +195,21 @@ public interface ServiceContext<IT, OT> {
      * setProperty sets user-defined property with given name
      */
     public void setProperty(String name, Object o);
+
+
+    /**
+     * getDocumentHanlder returns document handler configured in the the binding
+     * it creates the handler if necessary.
+     * @return document handler
+     */
+    public DocumentHandler getDocumentHandler() throws Exception;
+
+    /**
+     * getValidatorHandlers returns registered (from binding) validtor handlers
+     * for the service. it creates the handlers if necessary.
+     * @return validation handlers
+     */
+    public List<ValidatorHandler> getValidatorHandlers() throws Exception;
 
 }
 

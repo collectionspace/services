@@ -24,6 +24,7 @@
 package org.collectionspace.services.common.document;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import java.util.StringTokenizer;
@@ -98,10 +99,12 @@ public abstract class AbstractDocumentHandler<T, TL, WT, WTL>
     final public void prepare(Action action) throws Exception {
         switch (action) {
             case CREATE:
+                validate(action);
                 prepareCreate();
                 break;
 
             case UPDATE:
+                validate(action);
                 prepareUpdate();
                 break;
 
@@ -257,5 +260,12 @@ public abstract class AbstractDocumentHandler<T, TL, WT, WTL>
     @Override
     public String getServiceContextPath() {
         return "/" + getServiceContext().getServiceName().toLowerCase() + "/";
+    }
+
+    private void validate(Action action) throws Exception {
+        List<ValidatorHandler> valHandlers = serviceContext.getValidatorHandlers();
+        for (ValidatorHandler handler : valHandlers) {
+            handler.validate(action, serviceContext);
+        }
     }
 }

@@ -46,7 +46,6 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
 
-import org.collectionspace.services.common.document.DocumentHandlerFactory;
 
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -82,9 +81,7 @@ public class ContactResource extends AbstractCollectionSpaceResource {
 
     @Override
     public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-        DocumentHandler docHandler = DocumentHandlerFactory.getInstance().getHandler(
-                ctx.getDocumentHandlerClass());
-        docHandler.setServiceContext(ctx);
+        DocumentHandler docHandler = ctx.getDocumentHandler();
         if (ctx.getInput() != null) {
             Object obj = ((MultipartServiceContext)ctx).getInputPart(ctx.getCommonPartLabel(), ContactsCommon.class);
             if (obj != null) {

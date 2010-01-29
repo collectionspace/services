@@ -51,29 +51,12 @@ public class AccountDocumentHandler
     public void handleCreate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
         String id = UUID.randomUUID().toString();
         AccountsCommon account = wrapDoc.getWrappedObject();
-        if (account.getUserId() == null || "".equals(account.getUserId())) {
-            String msg = "userId is missing";
-            logger.error(msg);
-            throw new BadRequestException(msg);
-        }
-        List<AccountsCommon.Tenant> tl = account.getTenant();
-        if (tl == null || tl.size() == 0) {
-            String msg = "missing tenant information!";
-            logger.error(msg);
-            throw new BadRequestException(msg);
-        }
         account.setCsid(id);
         account.setStatus(Status.ACTIVE);
     }
 
     @Override
     public void handleUpdate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
-        if (account.getPassword() != null
-                && (account.getUserId() == null || "".equals(account.getUserId()))) {
-            String msg = "userId is missing";
-            logger.error(msg);
-            throw new BadRequestException(msg);
-        }
     }
 
     @Override

@@ -84,8 +84,8 @@ public class RepositoryJavaClient implements RepositoryClient {
         String nuxeoWspaceId = ctx.getRepositoryWorkspaceId();
         if (nuxeoWspaceId == null) {
             throw new DocumentNotFoundException(
-                    "Unable to find workspace for service " + ctx.getServiceName() +
-                    " check if the workspace exists in the Nuxeo repository");
+                    "Unable to find workspace for service " + ctx.getServiceName()
+                    + " check if the workspace exists in the Nuxeo repository");
         }
         RepositoryInstance repoSession = null;
         try {
@@ -107,6 +107,8 @@ public class RepositoryJavaClient implements RepositoryClient {
             repoSession.save();
             handler.complete(Action.CREATE, wrapDoc);
             return id;
+        } catch (BadRequestException bre) {
+            throw bre;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
@@ -193,9 +195,9 @@ public class RepositoryJavaClient implements RepositoryClient {
         String nuxeoWspaceId = ctx.getRepositoryWorkspaceId();
         if (nuxeoWspaceId == null) {
             throw new DocumentNotFoundException(
-                    "Unable to find workspace for service " +
-                    ctx.getServiceName() +
-                    " check if the workspace exists in the Nuxeo repository");
+                    "Unable to find workspace for service "
+                    + ctx.getServiceName()
+                    + " check if the workspace exists in the Nuxeo repository");
         }
         RepositoryInstance repoSession = null;
 
@@ -264,7 +266,7 @@ public class RepositoryJavaClient implements RepositoryClient {
             query.append(" WHERE ecm:path STARTSWITH '/" + domain + "'");
             if ((null != where) && (where.length() > 0)) {
 //              query.append(" AND " + where);
-                query.append(" AND " + where + "AND ecm:isProxy = 0");                
+                query.append(" AND " + where + "AND ecm:isProxy = 0");
             }
             DocumentModelList docList = null;
             if ((docFilter.getOffset() > 0) || (docFilter.getPageSize() > 0)) {
@@ -331,6 +333,8 @@ public class RepositoryJavaClient implements RepositoryClient {
             repoSession.saveDocument(doc);
             repoSession.save();
             handler.complete(Action.UPDATE, wrapDoc);
+        } catch (BadRequestException bre) {
+            throw bre;
         } catch (DocumentException de) {
             throw de;
         } catch (Exception e) {
@@ -392,20 +396,20 @@ public class RepositoryJavaClient implements RepositoryClient {
         try {
             repoSession = getRepositorySession();
             DocumentRef docRef = new PathRef(
-                    "/" + tenantDomain +
-                    "/" + "workspaces");
+                    "/" + tenantDomain
+                    + "/" + "workspaces");
             DocumentModel parent = repoSession.getDocument(docRef);
             DocumentModel doc = repoSession.createDocumentModel(parent.getPathAsString(),
                     workspaceName, "Workspace");
             doc.setPropertyValue("dc:title", workspaceName);
-            doc.setPropertyValue("dc:description", "A CollectionSpace workspace for " +
-                    workspaceName);
+            doc.setPropertyValue("dc:description", "A CollectionSpace workspace for "
+                    + workspaceName);
             doc = repoSession.createDocument(doc);
             workspaceId = doc.getId();
             repoSession.save();
             if (logger.isDebugEnabled()) {
-                logger.debug("created workspace name=" + workspaceName +
-                        " id=" + workspaceId);
+                logger.debug("created workspace name=" + workspaceName
+                        + " id=" + workspaceId);
             }
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -427,9 +431,9 @@ public class RepositoryJavaClient implements RepositoryClient {
         try {
             repoSession = getRepositorySession();
             DocumentRef docRef = new PathRef(
-                    "/" + tenantDomain +
-                    "/" + "workspaces" +
-                    "/" + workspaceName);
+                    "/" + tenantDomain
+                    + "/" + "workspaces"
+                    + "/" + workspaceName);
             DocumentModel workspace = repoSession.getDocument(docRef);
             workspaceId = workspace.getId();
         } catch (DocumentException de) {
@@ -465,7 +469,7 @@ public class RepositoryJavaClient implements RepositoryClient {
             client.releaseRepository(repoSession);
         } catch (Exception e) {
             logger.error("Could not close the repository session", e);
-        // no need to throw this service specific exception
+            // no need to throw this service specific exception
         }
     }
 }

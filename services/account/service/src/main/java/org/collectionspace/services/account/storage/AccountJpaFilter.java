@@ -104,7 +104,7 @@ public class AccountJpaFilter extends JpaDocumentFilter {
             hasWhere = true;
         }
 
-                String email = null;
+        String email = null;
         List<String> emailvals = getQueryParam(AccountStorageConstants.Q_EMAIL);
         if (emailvals != null) {
             email = emailvals.get(0);

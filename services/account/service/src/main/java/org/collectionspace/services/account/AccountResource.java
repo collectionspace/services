@@ -46,7 +46,6 @@ import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
-import org.collectionspace.services.common.document.DocumentHandlerFactory;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.jboss.resteasy.util.HttpResponseCodes;
@@ -91,9 +90,7 @@ public class AccountResource
 
     @Override
     public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-        DocumentHandler docHandler = DocumentHandlerFactory.getInstance().getHandler(
-                ctx.getDocumentHandlerClass());
-        docHandler.setServiceContext(ctx);
+        DocumentHandler docHandler = ctx.getDocumentHandler();
         docHandler.setCommonPart(ctx.getInput());
         return docHandler;
     }

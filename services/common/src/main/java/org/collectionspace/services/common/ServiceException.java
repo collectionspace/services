@@ -36,7 +36,6 @@ package org.collectionspace.services.common;
 public class ServiceException extends Exception {
 
     private int errorCode;
-    private String errorReason;
 
     /**
      * Creates a new instance of <code>ServiceException</code> without detail message, error code
@@ -68,8 +67,8 @@ public class ServiceException extends Exception {
      * @param errorReason reason for error
      */
     public ServiceException(int errorCode, String errorReason) {
+        super(errorReason);
         this.errorCode = errorCode;
-        this.errorReason = errorReason;
     }
 
     /**
@@ -124,13 +123,6 @@ public class ServiceException extends Exception {
      * @return the errorReason
      */
     public String getErrorReason() {
-        return errorReason;
-    }
-
-    /**
-     * @param errorReason the ErrorReason to set
-     */
-    public void setErrorReason(String errorReason) {
-        this.errorReason = errorReason;
+        return getMessage();
     }
 }

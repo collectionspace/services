@@ -176,7 +176,7 @@ public class AccountServiceTest extends AbstractServiceTest {
         resource2Id = extractId(res);
 
         AccountsCommon account3 =
-                createAccountInstance("dj", "hithere10", "dj@dinoland.com", true, true, true);
+                createAccountInstance("mj", "hithere10", "mj@dinoland.com", true, true, true);
         res = client.create(account3);
         statusCode = res.getStatus();
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),

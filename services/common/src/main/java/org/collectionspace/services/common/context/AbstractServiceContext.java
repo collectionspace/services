@@ -24,6 +24,7 @@
 package org.collectionspace.services.common.context;
 
 import java.security.acl.Group;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +38,8 @@ import org.collectionspace.authentication.CSpaceTenant;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.config.TenantBindingConfigReader;
+import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.ValidatorHandler;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.service.ServiceBindingType;
@@ -60,6 +63,8 @@ public abstract class AbstractServiceContext<IT, OT>
     private ServiceBindingType serviceBinding;
     private TenantBindingType tenantBinding;
     private String overrideDocumentType = null;
+    private List<ValidatorHandler> valHandlers = null;
+    private DocumentHandler docHandler = null;
 
     public AbstractServiceContext(String serviceName) throws UnauthorizedException {
         TenantBindingConfigReader tReader =
@@ -130,7 +135,7 @@ public abstract class AbstractServiceContext<IT, OT>
 
     @Override
     public String getRepositoryClientName() {
-        if(serviceBinding.getRepositoryClient() == null) {
+        if (serviceBinding.getRepositoryClient() == null) {
             return null;
         }
         return serviceBinding.getRepositoryClient().trim();
@@ -162,19 +167,6 @@ public abstract class AbstractServiceContext<IT, OT>
     @Override
     public ServiceBindingType getServiceBinding() {
         return serviceBinding;
-    }
-
-    @Override
-    public String getDocumentHandlerClass() {
-        if (serviceBinding.getDocumentHandler() == null
-                || serviceBinding.getDocumentHandler().isEmpty()) {
-            String msg = "Missing documentHandler in service binding for "
-                    + getServiceName() + " for tenant id=" + getTenantId()
-                    + " name=" + getTenantName();
-            logger.error(msg);
-            throw new IllegalStateException(msg);
-        }
-        return serviceBinding.getDocumentHandler().trim();
     }
 
     @Override
@@ -280,6 +272,54 @@ public abstract class AbstractServiceContext<IT, OT>
             throw new UnauthorizedException(msg);
         }
         return tenantId;
+    }
+
+    @Override
+    public DocumentHandler getDocumentHandler() throws Exception {
+        if (docHandler != null) {
+            return docHandler;
+        }
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        Class c = tccl.loadClass(getDocumentHandlerClass());
+        if (DocumentHandler.class.isAssignableFrom(c)) {
+            docHandler = (DocumentHandler) c.newInstance();
+        } else {
+            throw new IllegalArgumentException("Not of type " +
+                    DocumentHandler.class.getCanonicalName());
+        }
+        docHandler.setServiceContext(this);
+        return docHandler;
+    }
+
+    private String getDocumentHandlerClass() {
+        if (serviceBinding.getDocumentHandler() == null
+                || serviceBinding.getDocumentHandler().isEmpty()) {
+            String msg = "Missing documentHandler in service binding for "
+                    + getServiceName() + " for tenant id=" + getTenantId()
+                    + " name=" + getTenantName();
+            logger.error(msg);
+            throw new IllegalStateException(msg);
+        }
+        return serviceBinding.getDocumentHandler().trim();
+    }
+
+    @Override
+    public List<ValidatorHandler> getValidatorHandlers() throws Exception {
+        if (valHandlers != null) {
+            return valHandlers;
+        }
+        List<String> handlerClazzes = getServiceBinding().getValidatorHandler();
+        List<ValidatorHandler> handlers = new ArrayList<ValidatorHandler>(handlerClazzes.size());
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        for (String clazz : handlerClazzes) {
+            clazz = clazz.trim();
+            Class c = tccl.loadClass(clazz);
+            if (ValidatorHandler.class.isAssignableFrom(c)) {
+                handlers.add((ValidatorHandler) c.newInstance());
+            }
+        }
+        valHandlers = handlers;
+        return valHandlers;
     }
 
     @Override

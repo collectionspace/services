@@ -23,8 +23,10 @@
  */
 package org.collectionspace.services.common.context;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import javax.ws.rs.core.MediaType;
 import org.collectionspace.services.common.document.DocumentUtils;
@@ -55,41 +57,68 @@ public class MultipartServiceContextImpl
     }
 
 
+    private InputPart getInputPart(String label) throws IOException {
+        if (getInput() != null) {
+            MultipartInput fdip = getInput();
+
+            for (InputPart part : fdip.getParts()) {
+                String partLabel = part.getHeaders().getFirst("label");
+                if (label.equalsIgnoreCase(partLabel)) {
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("getInputPart found part with label=" + partLabel
+                                + "\npayload=" + part.getBodyAsString());
+                    }
+                    return part;
+                }
+            }
+        }
+        return null;
+    }
+
     @Override
     public Object getInputPart(String label, Class clazz) throws IOException {
         Object obj = null;
-        if(getInput() != null){
-            MultipartInput fdip = getInput();
-
-            for(InputPart part : fdip.getParts()){
-                String partLabel = part.getHeaders().getFirst("label");
-                if(label.equalsIgnoreCase(partLabel)){
-                    if(logger.isDebugEnabled()){
-                        logger.debug("received part label=" + partLabel +
-                                "\npayload=" + part.getBodyAsString());
-                    }
-                    obj = part.getBody(clazz, null);
-                    break;
-                }
-            }
+        InputPart part = getInputPart(label);
+        if (part != null) {
+            obj = part.getBody(clazz, null);
         }
         return obj;
     }
 
     @Override
+    public String getInputPartAsString(String label) throws IOException {
+        InputPart part = getInputPart(label);
+        if (part != null) {
+            return part.getBodyAsString();
+        }
+        return null;
+    }
+
+    @Override
+    public InputStream getInputPartAsStream(String label) throws IOException {
+        InputPart part = getInputPart(label);
+        if (part != null) {
+            return new ByteArrayInputStream(part.getBodyAsString().getBytes());
+        }
+        return null;
+    }
+
+ 
+
+    @Override
     public void addOutputPart(String label, Document doc, String contentType) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try{
+        try {
             DocumentUtils.writeDocument(doc, baos);
             baos.close();
             OutputPart part = getOutput().addPart(new String(baos.toByteArray()),
                     MediaType.valueOf(contentType));
             part.getHeaders().add("label", label);
-        }finally{
-            if(baos != null){
-                try{
+        } finally {
+            if (baos != null) {
+                try {
                     baos.close();
-                }catch(Exception e){
+                } catch (Exception e) {
                 }
             }
         }
@@ -99,13 +128,13 @@ public class MultipartServiceContextImpl
     public ServiceContext getLocalContext(String localContextClassName) throws Exception {
         ClassLoader cloader = Thread.currentThread().getContextClassLoader();
         Class ctxClass = cloader.loadClass(localContextClassName);
-        if(!ServiceContext.class.isAssignableFrom(ctxClass)) {
-            throw new IllegalArgumentException("getLocalContext requires " +
-                    " implementation of " + ServiceContext.class.getName());
+        if (!ServiceContext.class.isAssignableFrom(ctxClass)) {
+            throw new IllegalArgumentException("getLocalContext requires "
+                    + " implementation of " + ServiceContext.class.getName());
         }
-        
+
         Constructor ctor = ctxClass.getConstructor(java.lang.String.class);
-        ServiceContext ctx = (ServiceContext)ctor.newInstance(getServiceName());
+        ServiceContext ctx = (ServiceContext) ctor.newInstance(getServiceName());
         return ctx;
     }
 }

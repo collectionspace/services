@@ -46,10 +46,10 @@ import org.collectionspace.services.common.AbstractCollectionSpaceResource;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentFilter;
-import org.collectionspace.services.common.document.DocumentHandlerFactory;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -68,11 +68,11 @@ public class CollectionObjectResource
 
     @Override
     protected String getVersionString() {
-    	/** The last change revision. */
-    	final String lastChangeRevision = "$LastChangedRevision$";
-    	return lastChangeRevision;
+        /** The last change revision. */
+        final String lastChangeRevision = "$LastChangedRevision$";
+        return lastChangeRevision;
     }
-    
+
     @Override
     public String getServiceName() {
         return serviceName;
@@ -80,11 +80,10 @@ public class CollectionObjectResource
 
     @Override
     public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-        DocumentHandler docHandler = DocumentHandlerFactory.getInstance().getHandler(
-                ctx.getDocumentHandlerClass());
-        docHandler.setServiceContext(ctx);
+        DocumentHandler docHandler = ctx.getDocumentHandler();
         if (ctx.getInput() != null) {
-            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), CollectionobjectsCommon.class);
+            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(),
+                    CollectionobjectsCommon.class);
             if (obj != null) {
                 docHandler.setCommonPart((CollectionobjectsCommon) obj);
             }
@@ -102,6 +101,10 @@ public class CollectionObjectResource
             path.path("" + csid);
             Response response = Response.created(path.build()).build();
             return response;
+        } catch (BadRequestException bre) {
+            Response response = Response.status(
+                    Response.Status.BAD_REQUEST).entity("Create failed reason " + bre.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Create failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -211,6 +214,10 @@ public class CollectionObjectResource
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
+        } catch (BadRequestException bre) {
+            Response response = Response.status(
+                    Response.Status.BAD_REQUEST).entity("Update failed reason " + bre.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -268,12 +275,12 @@ public class CollectionObjectResource
         }
 
     }
-    
+
     @GET
-    @Path("/search")    
+    @Path("/search")
     @Produces("application/xml")
     public CollectionobjectsCommonList keywordsSearchCollectionObjects(@Context UriInfo ui,
-    		@QueryParam (IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
+            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
         CollectionobjectsCommonList collectionObjectList = new CollectionobjectsCommonList();
         try {
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
@@ -281,18 +288,18 @@ public class CollectionObjectResource
 
             // perform a keyword search
             if (keywords != null && !keywords.isEmpty()) {
-            	String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
-	            DocumentFilter documentFilter = handler.getDocumentFilter();
-	            documentFilter.setWhereClause(whereClause);
-	            if (logger.isDebugEnabled()) {
-	            	logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
-	            }
-	            getRepositoryClient(ctx).getFiltered(ctx, handler);
+                String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
+                DocumentFilter documentFilter = handler.getDocumentFilter();
+                documentFilter.setWhereClause(whereClause);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+                }
+                getRepositoryClient(ctx).getFiltered(ctx, handler);
             } else {
-            	getRepositoryClient(ctx).getAll(ctx, handler);
-            }            
+                getRepositoryClient(ctx).getAll(ctx, handler);
+            }
             collectionObjectList = (CollectionobjectsCommonList) handler.getCommonPartList();
-            
+
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -306,5 +313,5 @@ public class CollectionObjectResource
             throw new WebApplicationException(response);
         }
         return collectionObjectList;
-    }    
+    }
 }

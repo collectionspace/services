@@ -53,7 +53,13 @@ public class RemoteServiceContextImpl<IT, OT>
     }
 
     @Override
-    public void setInput(IT input){
+    public void setInput(IT input) {
+        //for security reasons, do not allow to set input again (from handlers)
+        if (this.input != null) {
+            String msg = "Non-null input cannot be set!";
+            logger.error(msg);
+            throw new IllegalStateException(msg);
+        }
         this.input = input;
     }
 
@@ -63,22 +69,21 @@ public class RemoteServiceContextImpl<IT, OT>
     }
 
     @Override
-    public void setOutput(OT output){
+    public void setOutput(OT output) {
         this.output = output;
     }
-
 
     @Override
     public ServiceContext getLocalContext(String localContextClassName) throws Exception {
         ClassLoader cloader = Thread.currentThread().getContextClassLoader();
         Class ctxClass = cloader.loadClass(localContextClassName);
-        if(!ServiceContext.class.isAssignableFrom(ctxClass)) {
-            throw new IllegalArgumentException("getLocalContext requires " +
-                    " implementation of " + ServiceContext.class.getName());
+        if (!ServiceContext.class.isAssignableFrom(ctxClass)) {
+            throw new IllegalArgumentException("getLocalContext requires "
+                    + " implementation of " + ServiceContext.class.getName());
         }
-        
+
         Constructor ctor = ctxClass.getConstructor(java.lang.String.class);
-        ServiceContext ctx = (ServiceContext)ctor.newInstance(getServiceName());
+        ServiceContext ctx = (ServiceContext) ctor.newInstance(getServiceName());
         return ctx;
     }
 }

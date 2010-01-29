@@ -104,7 +104,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
         // Store the ID returned from the first resource created
         // for additional tests below.
-        if (knownResourceId == null){
+        if (knownResourceId == null) {
             knownResourceId = extractId(res);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
@@ -132,14 +132,34 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
     @Override
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class)
     public void createWithEmptyEntityBody(String testName) throws Exception {
     }
 
     @Override
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class)
     public void createWithMalformedXml(String testName) throws Exception {
+        setupCreate(testName);
+
+        CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
+        collectionObject.setTitle("atitle");
+        //don't set objectNumber to check validation
+        collectionObject.setObjectName("some name");
+        MultipartOutput multipart =
+                createCollectionObjectInstance(client.getCommonPartName(), collectionObject, null);
+        ClientResponse<Response> res = client.create(multipart);
+        int statusCode = res.getStatus();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     @Override
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class)
     public void createWithWrongXmlSchema(String testName) throws Exception {
     }
 
@@ -350,12 +370,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         // Perform setup.
         setupUpdate(testName);
 
-        ClientResponse<MultipartInput> res =
-                client.read(knownResourceId);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+        ClientResponse<MultipartInput> res = updateRetrieve(testName, knownResourceId);
 
         if (logger.isDebugEnabled()) {
             logger.debug("got object to update with ID: " + knownResourceId);
@@ -375,12 +390,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
                     CollectionobjectsCommon.class));
         }
 
-        // Submit the request to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(collectionObject, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
+        res = updateSend(testName, knownResourceId, collectionObject);
 
-        res = client.update(knownResourceId, output);
         int statusCode = res.getStatus();
         // Check the status code of the response: does it match the expected response(s)?
         if (logger.isDebugEnabled()) {
@@ -403,18 +414,82 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
     }
 
+    private ClientResponse<MultipartInput> updateRetrieve(String testName, String id) {
+        ClientResponse<MultipartInput> res =
+                client.read(id);
+        if (logger.isDebugEnabled()) {
+            logger.debug("read in updateRetrieve for " + testName + " status = " + res.getStatus());
+        }
+        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("got object to updateRetrieve for " + testName + " with ID: " + id);
+        }
+        return res;
+    }
+
+    private ClientResponse<MultipartInput> updateSend(String testName, String id,
+            CollectionobjectsCommon collectionObject) {
+        MultipartOutput output = new MultipartOutput();
+        OutputPart commonPart = output.addPart(collectionObject, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", client.getCommonPartName());
+
+        ClientResponse<MultipartInput> res = client.update(knownResourceId, output);
+        // Check the status code of the response: does it match the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug("updateSend for " + testName + ": status = " + res.getStatus());
+        }
+        return res;
+    }
+
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
     @Override
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    dependsOnMethods = {"read"})
     public void updateWithEmptyEntityBody(String testName) throws Exception {
     }
 
     @Override
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    dependsOnMethods = {"read"})
     public void updateWithMalformedXml(String testName) throws Exception {
+        // Perform setup.
+        setupUpdate(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + " got object to update with ID: " + knownResourceId);
+        }
+
+        ClientResponse<MultipartInput> res = updateRetrieve(testName, knownResourceId);
+
+        MultipartInput input = (MultipartInput) res.getEntity();
+        CollectionobjectsCommon collectionObject =
+                (CollectionobjectsCommon) extractPart(input,
+                client.getCommonPartName(), CollectionobjectsCommon.class);
+        Assert.assertNotNull(collectionObject);
+
+        //update with invalid content
+        collectionObject.setObjectNumber("");
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + " updated object");
+            logger.debug(objectAsXmlString(collectionObject,
+                    CollectionobjectsCommon.class));
+        }
+
+        // Submit the request to the service and store the response.
+        res = updateSend(testName, knownResourceId, collectionObject);
+        int statusCode = res.getStatus();
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+
     }
 
     @Override
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    dependsOnMethods = {"read"})
     public void updateWithWrongXmlSchema(String testName) throws Exception {
     }
 
@@ -654,6 +729,20 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
         collectionObject.setBriefDescription("Papier mache bird cow mask with horns, "
                 + "painted red with black and yellow spots. "
                 + "Puerto Rico. ca. 8&quot; high, 6&quot; wide, projects 10&quot; (with horns).");
+
+        CollectionobjectsNaturalhistory conh = new CollectionobjectsNaturalhistory();
+        conh.setNhString("test-string");
+        conh.setNhInt(999);
+        conh.setNhLong(9999);
+
+
+        MultipartOutput multipart = createCollectionObjectInstance(commonPartName, collectionObject, conh);
+        return multipart;
+    }
+
+    private MultipartOutput createCollectionObjectInstance(String commonPartName,
+            CollectionobjectsCommon collectionObject, CollectionobjectsNaturalhistory conh) {
+
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(collectionObject,
                 MediaType.APPLICATION_XML_TYPE);
@@ -665,17 +754,15 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
                     CollectionobjectsCommon.class));
         }
 
-        CollectionobjectsNaturalhistory conh = new CollectionobjectsNaturalhistory();
-        conh.setNhString("test-string");
-        conh.setNhInt(999);
-        conh.setNhLong(9999);
-        OutputPart nhPart = multipart.addPart(conh, MediaType.APPLICATION_XML_TYPE);
-        nhPart.getHeaders().add("label", getNHPartName());
+        if (conh != null) {
+            OutputPart nhPart = multipart.addPart(conh, MediaType.APPLICATION_XML_TYPE);
+            nhPart.getHeaders().add("label", getNHPartName());
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("to be created, collectionobject nhistory");
-            logger.debug(objectAsXmlString(conh,
-                    CollectionobjectsNaturalhistory.class));
+            if (logger.isDebugEnabled()) {
+                logger.debug("to be created, collectionobject nhistory");
+                logger.debug(objectAsXmlString(conh,
+                        CollectionobjectsNaturalhistory.class));
+            }
         }
         return multipart;
 

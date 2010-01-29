@@ -24,6 +24,7 @@
 package org.collectionspace.services.common.context;
 
 import java.io.IOException;
+import java.io.InputStream;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.w3c.dom.Document;
@@ -65,13 +66,28 @@ public interface MultipartServiceContext
     public void setOutput(MultipartOutput output);
 
     /**
-     * getInputPart returns part for given label from input
+     * getInputPart returns the input part object for given label and clazz
      * @param label
      * @param clazz class of the object
      * @return part
      */
     public Object getInputPart(String label, Class clazz) throws IOException;
 
+    /**
+     * getInputPartAsString returns the input part with given label in the string form
+     * @param label
+     * @return
+     * @throws IOException
+     */
+    public String getInputPartAsString(String label) throws IOException;
+
+    /**
+     * getInputPartAsStream returns input part as stream for given label
+     * @param label
+     * @return
+     * @throws IOException
+     */
+    public InputStream getInputPartAsStream(String label) throws IOException;
     /**
      * addOutputPart adds given XML part with given label and content type to output
      * @param label
