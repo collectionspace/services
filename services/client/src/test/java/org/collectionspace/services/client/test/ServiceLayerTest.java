@@ -33,9 +33,11 @@ import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.methods.OptionsMethod;
 import org.apache.commons.httpclient.methods.TraceMethod;
 import org.collectionspace.services.client.TestServiceClient;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 /**
@@ -48,8 +50,25 @@ import org.testng.annotations.Test;
 public class ServiceLayerTest {
 
     final Logger logger = LoggerFactory.getLogger(ServiceTest.class);
-    private HttpClient httpClient = new HttpClient();
     private TestServiceClient serviceClient = new TestServiceClient();
+    private HttpClient httpClient = serviceClient.getHttpClient();
+
+    @BeforeSuite void printServiceClientProperties() {
+        if(logger.isDebugEnabled()){
+            logger.debug("Client properties read from the properties path;\n"
+                +"possibly from the command line or a properties file:");
+            logger.debug("url = " +
+                serviceClient.getProperty(serviceClient.URL_PROPERTY));
+            logger.debug("secure (SSL) = " +
+                serviceClient.getProperty(serviceClient.SSL_PROPERTY));
+            logger.debug("useAuth = " +
+                serviceClient.getProperty(serviceClient.AUTH_PROPERTY));
+            logger.debug("user = " +
+                serviceClient.getProperty(serviceClient.USER_PROPERTY));
+            logger.debug("password = " +
+                serviceClient.getProperty(serviceClient.PASSWORD_PROPERTY));
+        }
+    }
 
     @Test
     public void servicesExist() {
@@ -57,6 +76,7 @@ public class ServiceLayerTest {
         String url = serviceClient.getBaseURL() + "idgenerators";
         OptionsMethod method = new OptionsMethod(url);
         try{
+            serviceClient = new TestServiceClient();
             int statusCode = httpClient.executeMethod(method);
             if(logger.isDebugEnabled()){
                 logger.debug("servicesExist url=" + url + " status=" + statusCode);
@@ -77,7 +97,7 @@ public class ServiceLayerTest {
 
     @Test
     public void methodNotAllowed() {
-        //delete is not allowed on the root URL of the id service
+        // Delete is not allowed on the root URL of the id service
         String url = serviceClient.getBaseURL() + "idgenerators";
         DeleteMethod method = new DeleteMethod(url);
         try{
@@ -100,14 +120,13 @@ public class ServiceLayerTest {
     }
 
     @Test
-    public void noService() {
-
-        String url = serviceClient.getBaseURL() + "fake-service";
+    public void nonexistentService() {
+        String url = serviceClient.getBaseURL() + "nonexistent-service";
         GetMethod method = new GetMethod(url);
         try{
             int statusCode = httpClient.executeMethod(method);
             if(logger.isDebugEnabled()){
-                logger.debug("noService url=" + url + " status=" + statusCode);
+                logger.debug("nonexistentService url=" + url + " status=" + statusCode);
             }
             Assert.assertEquals(statusCode, HttpStatus.SC_NOT_FOUND,
                     "expected " + HttpStatus.SC_NOT_FOUND);
@@ -131,8 +150,11 @@ public class ServiceLayerTest {
         }
         String url = serviceClient.getBaseURL() + "collectionobjects";
         GetMethod method = new GetMethod(url);
+        // This vanilla HTTP client does not contain credentials or any other
+        // properties of the serviceClient.
+        HttpClient noCredentialsHttpClient = new HttpClient();
         try{
-            int statusCode = httpClient.executeMethod(method);
+            int statusCode = noCredentialsHttpClient.executeMethod(method);
             if(logger.isDebugEnabled()){
                 logger.debug("serviceSecure url=" + url + " status=" + statusCode);
             }
