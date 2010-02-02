@@ -133,7 +133,7 @@ public class TenantBindingConfigReader
             if (serviceBinding.getRepositoryClient() == null) {
                 //no repository needed for this service...skip
                 if (logger.isDebugEnabled()) {
-                    logger.debug("no repository configured for service " + serviceName +
+                    logger.debug("No repository configured for service " + serviceName +
                             " skipping...");
                 }
                 continue;
@@ -146,20 +146,20 @@ public class TenantBindingConfigReader
             if (clientType.equals(ClientType.JAVA)) {
                 workspaceId = workspaceIds.get(workspace);
                 if (workspaceId == null) {
-                    logger.warn("failed to retrieve workspace id for " + workspace +
-                            " trying to create a new workspace...");
+                    logger.warn("Failed to retrieve workspace ID for " + workspace);
+                    logger.warn("Trying to create a new workspace ...");
                     workspaceId = repositoryClient.createWorkspace(
                             tenantBinding.getRepositoryDomain(),
                             serviceBinding.getName());
                     if (workspaceId == null) {
-                        logger.warn("failed to create workspace for " + workspace);
+                        logger.warn("Failed to create workspace for " + workspace);
                         continue;
                     }
                 }
             } else {
                 workspaceId = serviceBinding.getRepositoryWorkspaceId();
                 if (workspaceId == null || "".equals(workspaceId)) {
-                    logger.error("could not find workspace id for " + workspace);
+                    logger.error("Could not find workspace ID for " + workspace);
                     //FIXME: should we throw an exception here?
                     continue;
                 }
