@@ -18,39 +18,40 @@
     targetNamespace="http://collectionspace.org/collectionobject/"
     version="0.1">
 
-                <!-- Object identification information -->
+    <!-- Object identification information -->
     <xs:element name="objectNumber" type="xs:string"/>
-    <xs:element name="otherNumbers">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="otherNumber" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+    <xs:element name="otherNumber" type="xs:string"/>
     <xs:element name="otherNumberType" type="xs:string"/>
     <xs:element name="briefDescription" type="xs:string"/>
     <xs:element name="comments" type="xs:string"/>
-    <xs:element name="distFeatures" type="xs:string"/>
+    <xs:element name="distinguishingFeatures" type="xs:string"/>
     <xs:element name="numberOfObjects" type="xs:string"/>
     <xs:element name="objectName" type="xs:string"/>
     <xs:element name="objectNameCurrency" type="xs:string"/>
+    <xs:element name="objectNameLevel" type="xs:string"/>
     <xs:element name="objectNameNote" type="xs:string"/>
     <xs:element name="objectNameSystem" type="xs:string"/>
     <xs:element name="objectNameType" type="xs:string"/>
     <xs:element name="objectNameLanguage" type="xs:string"/>
-    <xs:element name="responsibleDept" type="xs:string"/>
+    <xs:element name="responsibleDepartments">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="responsibleDepartment" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="title" type="xs:string"/>
     <xs:element name="objectTitleLanguage" type="xs:string"/>
     <xs:element name="titleTranslation" type="xs:string"/>
     <xs:element name="titleType" type="xs:string"/>
                 
-			<!-- Object description information -->
+    <!-- Object description information -->
     <xs:element name="age" type="xs:string" />
     <xs:element name="ageQualifier" type="xs:string" />
     <xs:element name="ageUnit" type="xs:string" />
     <xs:element name="color" type="xs:string" />
 
-			<!-- Object description Content information -->                
+    <!-- Object description: Content information -->
     <xs:element name="contentActivity" type="xs:string" />
     <xs:element name="contentConcept" type="xs:string" />
     <xs:element name="contentDate" type="xs:string" />
@@ -68,9 +69,10 @@
     <xs:element name="contentPerson" type="xs:string" />
     <xs:element name="contentPlace" type="xs:string" />
     <xs:element name="contentPosition" type="xs:string" />
+    <xs:element name="contentScript" type="xs:string" />
     <xs:element name="copyNumber" type="xs:string" />
 
-			<!-- Object description Dimension information -->
+    <!-- Object description: Dimension information -->
     <xs:element name="dimension" type="xs:string" />
     <xs:element name="dimensionMeasuredPart" type="xs:string" />
     <xs:element name="dimensionMeasurementUnit" type="xs:string" />
@@ -81,7 +83,7 @@
     <xs:element name="editionNumber" type="xs:string" />
     <xs:element name="form" type="xs:string" />
 
-			<!-- Object description Inscription content information -->
+    <!-- Object description: Inscription content information -->
     <xs:element name="inscriptionContent" type="xs:string" />
     <xs:element name="inscriber" type="xs:string" />
     <xs:element name="inscriptionDate" type="xs:string" />
@@ -94,8 +96,7 @@
     <xs:element name="inscriptionTransliteration" type="xs:string" />
     <xs:element name="inscriptionType" type="xs:string" />
                 
-
-			<!-- Object description Inscription description information -->
+    <!-- Object description: Inscription description information -->
     <xs:element name="inscriptionDescription" type="xs:string" />
     <xs:element name="inscriptionDescriptionInscriber" type="xs:string" />
     <xs:element name="inscriptionDescriptionDate" type="xs:string" />
@@ -104,14 +105,14 @@
     <xs:element name="inscriptionDescriptionPosition" type="xs:string" />
     <xs:element name="inscriptionDescriptionType" type="xs:string" />
 
-			<!-- Object description Material information -->
+    <!-- Object description: Material information -->
     <xs:element name="material" type="xs:string" />
     <xs:element name="materialComponent" type="xs:string" />
     <xs:element name="materialComponentNote" type="xs:string" />
     <xs:element name="materialName" type="xs:string" />
     <xs:element name="materialSource" type="xs:string" />
 
-			<!-- Misc Object description information -->
+    <!-- Misc Object description information -->
     <xs:element name="objectStatus" type="xs:string" />
     <xs:element name="phase" type="xs:string" />
     <xs:element name="physicalDescription" type="xs:string" />
@@ -123,11 +124,11 @@
     <xs:element name="objectComponentName" type="xs:string" />
     <xs:element name="objectComponentInformation" type="xs:string" />
 				
-			<!-- Object description Date information -->
+    <!-- Object description: Date information -->
     <xs:element name="dateAssociation" type="xs:string" />
     <xs:element name="dateEarliestSingle" type="xs:string" />
     <xs:element name="dateEarliestSingleCertainty" type="xs:string" />
-    <xs:element name="dateEarlierstSingleQualifier" type="xs:string" />
+    <xs:element name="dateEarliestSingleQualifier" type="xs:string" />
     <xs:element name="dateLatest" type="xs:string" />
     <xs:element name="dateLatestCertainty" type="xs:string" />
     <xs:element name="dateLatestQualifier" type="xs:string" />

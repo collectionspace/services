@@ -36,7 +36,7 @@ import javax.xml.bind.Marshaller;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
-import org.collectionspace.services.collectionobject.OtherNumberList;
+import org.collectionspace.services.collectionobject.ResponsibleDepartmentList;
 import org.collectionspace.services.collectionobject.domain.naturalhistory.CollectionobjectsNaturalhistory;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -204,15 +204,12 @@ public class Sample {
        CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
        collectionObject.setObjectNumber("some object number here");
        collectionObject.setObjectName("some object name here");
-       // The 'other number' field in the common part of a CollectionObject record
-       // is multi-valued.
-       OtherNumberList onList = new OtherNumberList();
-       List<String> ons = onList.getOtherNumber();
-       // Note: the structured (URN) format of the values below is for
-       // illustrative purposes only.
-       ons.add("urn:org.collectionspace.id:24082390");
-       ons.add("urn:org.walkerart.id:123");
-       collectionObject.setOtherNumbers(onList);
+       ResponsibleDepartmentList deptList = new ResponsibleDepartmentList();
+       List<String> depts = deptList.getResponsibleDepartment();
+       // @TODO Use properly formatted refNames for representative departments
+       // in this example test record. The following are mere placeholders.
+       depts.add("urn:org.collectionspace.services.department:Registrar");
+       depts.add("urn:org.walkerart.department:Fine Art");
        collectionObject.setAge(""); // Test using an empty String.
        collectionObject.setBriefDescription("Papier mache bird mask with horns, " +
                "painted red with black and yellow spots. " +

@@ -31,7 +31,7 @@ import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.domain.naturalhistory.CollectionobjectsNaturalhistory;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
-import org.collectionspace.services.collectionobject.OtherNumberList;
+import org.collectionspace.services.collectionobject.ResponsibleDepartmentList;
 import org.jboss.resteasy.client.ClientResponse;
 
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -713,17 +713,20 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     private MultipartOutput createCollectionObjectInstance(String commonPartName,
             String objectNumber, String objectName) {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
-        OtherNumberList onList = new OtherNumberList();
-        List<String> ons = onList.getOtherNumber();
-        ons.add("urn:org.collectionspace.id:24082390");
+        ResponsibleDepartmentList deptList = new ResponsibleDepartmentList();
+        List<String> depts = deptList.getResponsibleDepartment();
+        // @TODO Use properly formatted refNames for representative departments
+        // in this example test record. The following are mere placeholders.
+        depts.add("urn:org.collectionspace.services.department:Registrar");
         if (multivalue) {
-            ons.add("urn:org.walkerart.id:123");
+            depts.add("urn:org.walkerart.department:Fine Art");
         }
         multivalue = !multivalue;
         //FIXME: Title does not need to be set.
         collectionObject.setTitle("acoward");
-        collectionObject.setOtherNumbers(onList);
+        collectionObject.setResponsibleDepartments(deptList);
         collectionObject.setObjectNumber(objectNumber);
+        collectionObject.setOtherNumber("urn:org.walkerart.id:123");
         collectionObject.setObjectName(objectName);
         collectionObject.setAge(""); //test for null string
         collectionObject.setBriefDescription("Papier mache bird cow mask with horns, "

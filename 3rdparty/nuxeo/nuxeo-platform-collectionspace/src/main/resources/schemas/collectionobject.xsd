@@ -18,9 +18,9 @@
     <xs:element name="otherNumber" type="xs:string"/>
     <xs:element name="briefDescription" type="xs:string"/>
     <xs:element name="comments" type="xs:string"/>
-    <xs:element name="distFeatures" type="xs:string"/>
+    <xs:element name="distinguishingFeatures" type="xs:string"/>
     <xs:element name="objectName" type="xs:string"/>
-    <xs:element name="responsibleDept" type="xs:string"/>
+    <xs:element name="responsibleDepartment" type="xs:string"/>
     <xs:element name="title" type="xs:string"/>
     
 </xs:schema>

@@ -15,17 +15,18 @@
         <row><widget>otherNumberType</widget></row>
         <row><widget>briefDescription</widget></row>
         <row><widget>comments</widget></row>
-        <row><widget>distFeatures</widget></row>
+        <row><widget>distinguishingFeatures</widget></row>
         <row><widget>numberOfObjects</widget></row>
         
         <row><widget>objectName</widget></row>
         <row><widget>objectNameCurrency</widget></row>
+        <row><widget>objectNameLevel</widget></row>
         <row><widget>objectNameNote</widget></row>
         <row><widget>objectNameSystem</widget></row>
         <row><widget>objectNameType</widget></row>
         <row><widget>objectNameLanguage</widget></row>
         
-        <row><widget>responsibleDept</widget></row>
+        <row><widget>responsibleDepartment</widget></row>
         <row><widget>title</widget></row>
         <row><widget>objectTitleLanguage</widget></row>
         <row><widget>titleTranslation</widget></row>
@@ -97,13 +98,13 @@
         </properties>
       </widget>
 
-      <widget name="distFeatures" type="text">
+      <widget name="distinguishingFeatures" type="text">
         <labels>
-          <label mode="any">distFeatures</label>
+          <label mode="any">distinguishingFeatures</label>
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="collectionobjects_common">distFeatures</field>
+          <field schema="collectionobjects_common">distinguishingFeatures</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -123,13 +124,13 @@
         </properties>
       </widget>
 
-      <widget name="responsibleDept" type="text">
+      <widget name="responsibleDepartment" type="text">
         <labels>
-          <label mode="any">responsibleDept</label>
+          <label mode="any">responsibleDepartment</label>
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="collectionobjects_common">responsibleDept</field>
+          <field schema="collectionobjects_common">responsibleDepartment</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
