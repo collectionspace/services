@@ -80,8 +80,8 @@ public class TenantBindingConfigReader
             tenantBindings.put(tenantBinding.getId(), tenantBinding);
             readServiceBindings(tenantBinding);
             if (logger.isDebugEnabled()) {
-                logger.debug("read() added tenant id=" + tenantBinding.getId() +
-                        " name=" + tenantBinding.getName());
+                logger.debug("read() added tenant id=" + tenantBinding.getId()
+                        + " name=" + tenantBinding.getName());
             }
         }
     }
@@ -92,9 +92,9 @@ public class TenantBindingConfigReader
                     serviceBinding.getName());
             serviceBindings.put(key, serviceBinding);
             if (logger.isDebugEnabled()) {
-                logger.debug("readServiceBindings() added service " +
-                        " name=" + key +
-                        " workspace=" + serviceBinding.getName());
+                logger.debug("readServiceBindings() added service "
+                        + " name=" + key
+                        + " workspace=" + serviceBinding.getName());
             }
         }
     }
@@ -121,8 +121,8 @@ public class TenantBindingConfigReader
         ServiceMain svcMain = ServiceMain.getInstance();
         RepositoryClientConfigType rclientConfig = svcMain.getServicesConfigReader().getConfiguration().getRepositoryClient();
         ClientType clientType = svcMain.getClientType();
-        if (clientType.equals(ClientType.JAVA) &&
-                rclientConfig.getName().equalsIgnoreCase("nuxeo-java")) {
+        if (clientType.equals(ClientType.JAVA)
+                && rclientConfig.getName().equalsIgnoreCase("nuxeo-java")) {
             //FIXME only one repository client is recognized
             workspaceIds = svcMain.getNuxeoConnector().retrieveWorkspaceIds(
                     tenantBinding.getRepositoryDomain());
@@ -130,16 +130,30 @@ public class TenantBindingConfigReader
         //verify if workspace exists for each service in the tenant binding
         for (ServiceBindingType serviceBinding : tenantBinding.getServiceBindings()) {
             String serviceName = serviceBinding.getName();
-            if (serviceBinding.getRepositoryClient() == null) {
+            String repositoryClientName = serviceBinding.getRepositoryClient();
+            if (repositoryClientName == null) {
                 //no repository needed for this service...skip
                 if (logger.isDebugEnabled()) {
-                    logger.debug("No repository configured for service " + serviceName +
-                            " skipping...");
+                    logger.debug("No repository configured for service " + serviceName
+                            + " skipping...");
                 }
                 continue;
             }
+
+            if (repositoryClientName.isEmpty()) {
+                String msg = "Invalid repositoryClient " + serviceName;
+                logger.error(msg);
+                continue;
+            }
+            repositoryClientName = repositoryClientName.trim();
             RepositoryClient repositoryClient = getRepositoryClient(
-                    serviceBinding.getRepositoryClient());
+                    repositoryClientName);
+            if (repositoryClient == null) {
+                String msg = "Could not find repositoryClient " + repositoryClientName
+                        + " for service=" + serviceName;
+                logger.error(msg);
+                continue;
+            }
             String workspaceId = null;
             //workspace name is service name by convention
             String workspace = serviceBinding.getName().toLowerCase();
@@ -167,9 +181,9 @@ public class TenantBindingConfigReader
             String tenantService = getTenantQualifiedServiceName(tenantBinding.getId(), serviceName);
             serviceWorkspaces.put(tenantService, workspaceId);
             if (logger.isDebugEnabled()) {
-                logger.debug("retrieved workspace id=" + workspaceId +
-                        " service=" + serviceName +
-                        " workspace=" + workspace);
+                logger.debug("retrieved workspace id=" + workspaceId
+                        + " service=" + serviceName
+                        + " workspace=" + workspace);
             }
         }
     }
