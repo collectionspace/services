@@ -303,7 +303,7 @@ public class ContactServiceTest extends AbstractServiceTest {
                 logger.debug(testName + ": list-item[" + i + "] csid=" +
                         item.getCsid());
                 logger.debug(testName + ": list-item[" + i + "] objectNumber=" +
-                        item.getAddressText());
+                        item.getAddressText1());
                 logger.debug(testName + ": list-item[" + i + "] URI=" +
                         item.getUri());
                 i++;
@@ -342,8 +342,8 @@ public class ContactServiceTest extends AbstractServiceTest {
         Assert.assertNotNull(contact);
 
         // Update the content of this resource.
-        contact.setAddressText("updated-" + contact.getAddressText());
-        contact.setPostcode("updated-" + contact.getPostcode());
+        contact.setAddressText1("updated-" + contact.getAddressText1());
+        contact.setPostcode1("updated-" + contact.getPostcode1());
         if(logger.isDebugEnabled()){
             logger.debug("to be updated object");
             logger.debug(objectAsXmlString(contact, ContactsCommon.class));
@@ -370,8 +370,8 @@ public class ContactServiceTest extends AbstractServiceTest {
                         client.getCommonPartName(), ContactsCommon.class);
         Assert.assertNotNull(updatedContact);
 
-        Assert.assertEquals(updatedContact.getPostcode(),
-                contact.getPostcode(),
+        Assert.assertEquals(updatedContact.getPostcode1(),
+                contact.getPostcode1(),
                 "Data in updated object did not match submitted data.");
 
     }
@@ -607,17 +607,17 @@ public class ContactServiceTest extends AbstractServiceTest {
 
     private MultipartOutput createContactInstance(String identifier) {
         return createContactInstance(
-        		"addressText-" + identifier,
+        		"addressText1-" + identifier,
                 "postcode-" + identifier,
-                "addressType-" + identifier);
+                "addressType1-" + identifier);
     }
 
-    private MultipartOutput createContactInstance(String addressText,
-        String postcode, String addressType) {
+    private MultipartOutput createContactInstance(String addressText1,
+        String postcode, String addressType1) {
         ContactsCommon contact = new ContactsCommon();
-        contact.setAddressText(addressText);
-        contact.setPostcode(postcode);
-        contact.setAddressType(addressType);
+        contact.setAddressText1(addressText1);
+        contact.setPostcode1(postcode);
+        contact.setAddressType1(addressType1);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(contact, MediaType.APPLICATION_XML_TYPE);

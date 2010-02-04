@@ -120,9 +120,9 @@ public class ContactDocumentModelHandler
             ContactListItem clistItem = new ContactListItem();
             // TODO Revisit which information unit(s) should be returned
             // in each entry, in a list of contact information.
-            // Should this be addressText or some other unit(s)?
-            clistItem.setAddressText((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-                    ContactJAXBSchema.ADDRESS_TEXT));
+            // Should this be AddressText1 or some other unit(s)?
+            clistItem.setAddressText1((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+                    ContactJAXBSchema.ADDRESS_TEXT1));
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
             clistItem.setUri(getServiceContextPath() + id);
             clistItem.setCsid(id);
