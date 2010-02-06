@@ -31,6 +31,7 @@ import org.collectionspace.services.client.AcquisitionClient;
 
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
 import org.collectionspace.services.acquisition.AcquisitionsCommonList;
+import org.collectionspace.services.acquisition.AcquisitionSourceList;
 import org.jboss.resteasy.client.ClientResponse;
 
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -604,7 +605,12 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
     private MultipartOutput createAcquisitionInstance(String identifier) {
         AcquisitionsCommon acquisition = new AcquisitionsCommon();
         acquisition.setAcquisitionReferenceNumber("acquisitionReferenceNumber-"  + identifier);
-        acquisition.setAcquisitionSource("acquisitionSource-"  + identifier);
+        AcquisitionSourceList acqSourcesList = new AcquisitionSourceList();
+        List<String> sources = acqSourcesList.getAcquisitionSource();
+        // @TODO Use properly formatted refNames for representative acquisition
+        // sources in this example test record. The following are mere placeholders.
+        sources.add("Donor Acquisition Source " + identifier);
+        sources.add("Museum Acquisition Source" + identifier);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(acquisition,
             MediaType.APPLICATION_XML_TYPE);

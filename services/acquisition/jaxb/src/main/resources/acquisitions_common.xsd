@@ -34,27 +34,33 @@
                 <!--  Object Entry Information Group -->
                 <xs:element name="accessionDate" type="xs:string"/>
                 <xs:element name="acquisitionAuthorizer" type="xs:string"/>
-                <xs:element name="AcquisitionAuthorizerDate" type="xs:string"/>
-                <xs:element name="AcquisitionDate" type="xs:string"/>
-                <xs:element name="AcquisitionFunding" type="xs:string"/>
-                <xs:element name="AcquisitionFundingSource" type="xs:string"/>
-                <xs:element name="AcquisitionFundingSourceProvisos" type="xs:string"/>
-                <xs:element name="AcquisitionMethod" type="xs:string"/>
-                <xs:element name="AcquisitionNote" type="xs:string"/>
-                <xs:element name="AcquisitionProvisos" type="xs:string"/>
-                <xs:element name="AcquisitionReason" type="xs:string"/>
-                <xs:element name="AcquisitionReferenceNumber" type="xs:string"/>
-                <xs:element name="AcquisitionSource" type="xs:string"/>
-                <xs:element name="GroupPurchasePrice" type="xs:string"/>
-                <xs:element name="ObjectOfferPrice" type="xs:string"/>
-                <xs:element name="ObjectPurchaseOfferPrice" type="xs:string"/>
-                <xs:element name="ObjectPurchasePrice" type="xs:string"/>
-                <xs:element name="OriginalObjectPurchasePrice" type="xs:string"/>
-                <xs:element name="OriginalObjectPurchasePriceDenomination" type="xs:string"/>
-                <xs:element name="TransferOfTitleNumber" type="xs:string"/>                
+                <xs:element name="acquisitionAuthorizerDate" type="xs:string"/>
+                <xs:element name="acquisitionDate" type="xs:string"/>
+                <xs:element name="acquisitionFunding" type="xs:string"/>
+                <xs:element name="acquisitionFundingSource" type="xs:string"/>
+                <xs:element name="acquisitionFundingSourceProvisos" type="xs:string"/>
+                <xs:element name="acquisitionMethod" type="xs:string"/>
+                <xs:element name="acquisitionNote" type="xs:string"/>
+                <xs:element name="acquisitionProvisos" type="xs:string"/>
+                <xs:element name="acquisitionReason" type="xs:string"/>
+                <xs:element name="acquisitionReferenceNumber" type="xs:string"/>
+                <xs:element name="acquisitionSources" type="acquisitionSourceList"/>
+                <xs:element name="groupPurchasePrice" type="xs:string"/>
+                <xs:element name="objectOfferPrice" type="xs:string"/>
+                <xs:element name="objectPurchaseOfferPrice" type="xs:string"/>
+                <xs:element name="objectPurchasePrice" type="xs:string"/>
+                <xs:element name="originalObjectPurchasePrice" type="xs:string"/>
+                <xs:element name="originalObjectPurchasePriceDenomination" type="xs:string"/>
+                <xs:element name="transferOfTitleNumber" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+   <xs:complexType name="acquisitionSourceList">
+        <xs:sequence>
+            <xs:element name="acquisitionSource" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
     
     <!-- acquisition records, as in nuxeo repository -->
     <xs:element name="acquisitions-common-list">
@@ -63,9 +69,9 @@
                 <xs:element name="acquisition-list-item" maxOccurs="unbounded">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="AcquisitionReferenceNumber" type="xs:string"
+                            <xs:element name="acquisitionReferenceNumber" type="xs:string"
                                 minOccurs="1" />
-                            <xs:element name="AcquisitionSource" type="xs:string"
+                            <xs:element name="acquisitionSource" type="xs:string"
                                 minOccurs="1" />
                             <!-- uri to retrive acquisition details -->
                             <xs:element name="uri" type="xs:anyURI"
