@@ -65,6 +65,7 @@
       </templates>
       <rows>
         <row><widget>displayName</widget></row>
+<!--        <row><widget>displayNameComputed</widget></row> -->
         <row><widget>shortName</widget></row>
         <row><widget>refName</widget></row>
         <row><widget>inAuthority</widget></row>
@@ -84,12 +85,25 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="orgauthorities_common">displayName</field>
+          <field schema="organizations_common">displayName</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
+      
+<!--      <widget name="displayNameComputed" type="text">
+        <labels>
+          <label mode="any">Display Name Computed?</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="organizations_common">displayNameComputed</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget> -->
       
       <widget name="shortName" type="text">
         <labels>

@@ -1,35 +1,34 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema 
-  xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:ns="http://collectionspace.org/services/organization"
-  xmlns="http://collectionspace.org/services/organization"
-  targetNamespace="http://collectionspace.org/services/organization"
-  version="0.1"
->
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/services/organization"
+    xmlns="http://collectionspace.org/services/organization"
+    targetNamespace="http://collectionspace.org/services/organization"
+    version="0.1"
+    >
 
-
-<!-- avoid XmlRootElement nightnmare, see http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html-->
-<!-- See http://wiki.collectionspace.org/display/collectionspace/Organization+Service+Home -->    
+    <!-- avoid XmlRootElement nightnmare, see http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html-->
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Organization+Service+Home -->    
     
     <!-- Organization -->
     <xs:element name="organizations_common">
         <xs:complexType>
             <xs:sequence>
                 <!--  Common identifier -->
-                <xs:element name="csid" type="xs:string" />
-                
+                <xs:element name="csid" type="xs:string" />			        
                 <!--  Organization Information Group -->
                 <xs:element name="inAuthority" type="xs:string" />
                 <xs:element name="refName" type="xs:string"/>
                 <xs:element name="displayName" type="xs:string"/>
+<!--			        <xs:element name="displayNameComputed" type="xs:boolean"/> -->
                 <xs:element name="shortName" type="xs:string"/>
                 <xs:element name="longName" type="xs:string"/>
-				<xs:element name="nameAdditions" type="xs:string"/>
-				<xs:element name="contactName" type="xs:string"/>
-				<xs:element name="foundingDate" type="xs:string"/>
-				<xs:element name="dissolutionDate" type="xs:string"/>
-				<xs:element name="foundingPlace" type="xs:string"/>
-				<xs:element name="function" type="xs:string"/>
+                <xs:element name="nameAdditions" type="xs:string"/>
+                <xs:element name="contactName" type="xs:string"/>
+                <xs:element name="foundingDate" type="xs:string"/>
+                <xs:element name="dissolutionDate" type="xs:string"/>
+                <xs:element name="foundingPlace" type="xs:string"/>
+                <xs:element name="function" type="xs:string"/>
                 <xs:element name="description" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
