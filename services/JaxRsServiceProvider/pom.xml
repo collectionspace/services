@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    
+
     <parent>
         <artifactId>org.collectionspace.services.main</artifactId>
         <groupId>org.collectionspace.services</groupId>
         <version>1.0</version>
     </parent>
 
-    
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.jaxrs.provider</artifactId>
     <packaging>war</packaging>
     <version>1.0</version>
     <name>services.jaxrs.provider</name>
-
-
+    <properties>
+        <spring.version>3.0.0.RELEASE</spring.version>
+        <spring.security.version>3.0.2.CI-SNAPSHOT</spring.security.version>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
@@ -130,6 +132,57 @@
             <version>1.5.2</version>
         </dependency>
 
+        <!-- dependencies on spring security & framework are runtime deps only -->
+        <!-- the following list is kept to make sure domain has these packages -->
+        <!-- in the cspace/lib directory -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <version>${spring.security.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+            <version>${spring.security.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
+            <version>${spring.security.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-acl</artifactId>
+            <version>${spring.security.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+            <version>${spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- javax -->
 
         <!-- jboss -->
@@ -220,10 +273,11 @@
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
+                <version>0.3-SNAPSHOT</version>
                 <!-- Container configuration -->
                 <configuration>
                     <container>
-                        <containerId>jboss42x</containerId>
+                        <containerId>jboss4x</containerId>
                         <home>${jboss.dir}</home>
                         <type>remote</type>
                     </container>

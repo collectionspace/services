@@ -21,7 +21,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.collectionspace.authentication;
+package org.collectionspace.authentication.jaas;
 
 import java.security.acl.Group;
 import java.util.ArrayList;
@@ -32,6 +32,7 @@ import java.util.Map;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginException;
+import org.collectionspace.authentication.realm.CSpaceDbRealm;
 import org.jboss.security.auth.spi.UsernamePasswordLoginModule;
 
 /**
@@ -40,7 +41,7 @@ import org.jboss.security.auth.spi.UsernamePasswordLoginModule;
  */
 public class CSpaceJBossDBLoginModule extends UsernamePasswordLoginModule {
 
-    private DatabaseRealm realm;
+    private CSpaceDbRealm realm;
 
     /**
      * Initialize CSpaceDBLoginModule
@@ -58,7 +59,7 @@ public class CSpaceJBossDBLoginModule extends UsernamePasswordLoginModule {
     public void initialize(Subject subject, CallbackHandler callbackHandler,
             Map sharedState, Map options) {
         super.initialize(subject, callbackHandler, sharedState, options);
-        realm = new DatabaseRealm(options);
+        realm = new CSpaceDbRealm(options);
     }
     //disabled due to classloading problem
 //    private Logger logger = LoggerFactory.getLogger(CSpaceDBLoginModule.class);

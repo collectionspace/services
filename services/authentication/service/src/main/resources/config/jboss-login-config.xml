@@ -18,7 +18,7 @@ copy before the "other" application-policy
 
 <application-policy name="cspace">
     <authentication>
-        <login-module code="org.collectionspace.authentication.CSpaceJBossDBLoginModule"
+        <login-module code="org.collectionspace.authentication.jaas.CSpaceJBossDBLoginModule"
                       flag="required">
             <module-option name="dsJndiName">CspaceDS</module-option>
             <module-option name="hashAlgorithm">SHA-256</module-option>

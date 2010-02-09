@@ -47,7 +47,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.collectionspace.authentication;
+package org.collectionspace.authentication.realm;
 
 import java.lang.reflect.Constructor;
 import java.security.Principal;
@@ -67,14 +67,15 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.collectionspace.authentication.CSpaceTenant;
 
 /**
- * DatabaseRealm provides access to user, password, role, tenant database
+ * CSpaceDbRealm provides access to user, password, role, tenant database
  * @author 
  */
-public class DatabaseRealm {
+public class CSpaceDbRealm implements CSpaceRealm {
 
-    private static Log log = LogFactory.getLog(DatabaseRealm.class);
+    private static Log log = LogFactory.getLog(CSpaceDbRealm.class);
     private String datasourceName;
     private String principalsQuery;
     private String rolesQuery;
@@ -82,10 +83,10 @@ public class DatabaseRealm {
     private boolean suspendResume;
 
     /**
-     * create DatabaseRelam 
+     * CSpace Database Realm
      * @param datasourceName datasource name
      */
-    public DatabaseRealm(Map options) {
+    public CSpaceDbRealm(Map options) {
         datasourceName = (String) options.get("dsJndiName");
         if (datasourceName == null) {
             datasourceName = "java:/DefaultDS";
@@ -115,7 +116,8 @@ public class DatabaseRealm {
 
     }
 
-    String getUsersPassword(String username) throws LoginException {
+    @Override
+    public String getUsersPassword(String username) throws LoginException {
 
         String password = null;
         Connection conn = null;
@@ -174,7 +176,8 @@ public class DatabaseRealm {
      * the authenticated user.
      * @return collection containing the roles
      */
-    Collection<Group> getRoles(String username, String principalClassName, String groupClassName) throws LoginException {
+    @Override
+    public Collection<Group> getRoles(String username, String principalClassName, String groupClassName) throws LoginException {
 
         if (log.isDebugEnabled()) {
             log.debug("getRoleSets using rolesQuery: " + rolesQuery + ", username: " + username);
@@ -279,7 +282,8 @@ public class DatabaseRealm {
      * the authenticated user.
      * @return collection containing the roles
      */
-    Collection<Group> getTenants(String username, String groupClassName) throws LoginException {
+    @Override
+    public Collection<Group> getTenants(String username, String groupClassName) throws LoginException {
 
         if (log.isDebugEnabled()) {
             log.debug("getTenants using tenantsQuery: " + tenantsQuery + ", username: " + username);
