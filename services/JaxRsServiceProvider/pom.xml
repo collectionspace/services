@@ -16,7 +16,7 @@
     <name>services.jaxrs.provider</name>
     <properties>
         <spring.version>3.0.0.RELEASE</spring.version>
-        <spring.security.version>3.0.2.CI-SNAPSHOT</spring.security.version>
+        <spring.security.version>3.0.1.RELEASE</spring.security.version>
     </properties>
     <dependencies>
         <dependency>

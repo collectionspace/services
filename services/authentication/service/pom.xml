@@ -16,7 +16,7 @@
         <jboss.version>4.2.3.GA</jboss.version>
         <jboss.ejb.version>3.0</jboss.ejb.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.security.version>3.0.2.CI-SNAPSHOT</spring.security.version>
+        <spring.security.version>3.0.1.RELEASE</spring.security.version>
     </properties>
 
     <dependencies>

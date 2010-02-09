@@ -143,7 +143,7 @@
                     <findbugsXmlOutputDirectory>target/site</findbugsXmlOutputDirectory>
                 </configuration>
             </plugin>
-            
+
         </plugins>
     </reporting>
     <dependencyManagement>
