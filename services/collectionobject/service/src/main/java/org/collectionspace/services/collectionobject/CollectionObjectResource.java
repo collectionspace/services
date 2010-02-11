@@ -25,6 +25,11 @@
  */
 package org.collectionspace.services.collectionobject;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.lang.reflect.Type;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -51,11 +56,22 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.security.UnauthorizedException;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.collectionspace.services.intake.IntakesCommonList;
+import org.collectionspace.services.intake.IntakeResource;
+
+import org.collectionspace.services.relation.NewRelationResource;
+import org.collectionspace.services.relation.RelationshipType;
+import org.collectionspace.services.relation.RelationsCommonList;
+import org.collectionspace.services.relation.RelationsCommon;
+
 
 @Path("/collectionobjects")
 @Consumes("multipart/mixed")
@@ -63,7 +79,7 @@ import org.slf4j.LoggerFactory;
 public class CollectionObjectResource
         extends AbstractCollectionSpaceResource {
 
-    final private String serviceName = "collectionobjects";
+    static final public String serviceName = "collectionobjects";
     final Logger logger = LoggerFactory.getLogger(CollectionObjectResource.class);
 
     @Override
@@ -277,6 +293,50 @@ public class CollectionObjectResource
     }
 
     @GET
+    @Path("{csid}/intakes")
+    @Produces("application/xml")
+    public IntakesCommonList getIntakesCommonList(@Context UriInfo ui,
+    		@PathParam("csid") String csid) {
+        IntakesCommonList result = null;  	
+        
+        try {
+        	//
+        	// Find all the intake-related relation records.
+        	//
+        	String subjectCsid = csid;
+        	String predicate = RelationshipType.COLLECTIONOBJECT_INTAKE.value();
+        	String objectCsid = null;
+        	NewRelationResource relationResource = new NewRelationResource();        	
+        	RelationsCommonList relationsCommonList = relationResource.getRelationList(subjectCsid, predicate, objectCsid);
+        	
+        	//
+        	// Create an array of Intake csid's
+        	//
+        	List<RelationsCommonList.RelationListItem> relationsListItems = relationsCommonList.getRelationListItem();
+        	List<String> intakeCsidList = new ArrayList<String>();
+            for (RelationsCommonList.RelationListItem relationsListItem : relationsListItems) {
+            	intakeCsidList.add(relationsListItem.getObjectCsid());
+        	}
+            
+            //
+            // Get a response list for the Intake records from the Intake resource
+            //
+        	IntakeResource intakeResource = new IntakeResource();
+        	result = intakeResource.getIntakeList(intakeCsidList);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception in getIntakeList", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        
+        return result;
+    }    
+
+    //FIXME: Replace this "search" resource with a keyword "kw" query parameter
+    @GET
     @Path("/search")
     @Produces("application/xml")
     public CollectionobjectsCommonList keywordsSearchCollectionObjects(@Context UriInfo ui,
@@ -314,4 +374,5 @@ public class CollectionObjectResource
         }
         return collectionObjectList;
     }
+        
 }

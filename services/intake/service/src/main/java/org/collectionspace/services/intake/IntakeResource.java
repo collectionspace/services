@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.intake;
 
+import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -193,6 +194,35 @@ public class IntakeResource extends AbstractCollectionSpaceResource {
         return intakeObjectList;
     }
 
+    /**
+     * Gets the intake list.
+     * 
+     * @param csidList the csid list
+     * 
+     * @return the intake list
+     */
+    public IntakesCommonList getIntakeList(List<String> csidList) {
+        IntakesCommonList intakeObjectList = new IntakesCommonList();
+        try {
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+            DocumentHandler handler = createDocumentHandler(ctx);
+            getRepositoryClient(ctx).get(ctx, csidList, handler);
+            intakeObjectList = (IntakesCommonList) handler.getCommonPartList();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception in getIntakeList", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return intakeObjectList;
+    }
+    
     @PUT
     @Path("{csid}")
     public MultipartOutput updateIntake(

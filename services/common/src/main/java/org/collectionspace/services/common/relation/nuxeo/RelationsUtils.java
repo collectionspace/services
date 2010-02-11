@@ -26,9 +26,12 @@ package org.collectionspace.services.common.relation.nuxeo;
 import java.util.Iterator;
 import java.util.List;
 
+import org.collectionspace.services.common.relation.RelationListItemJAXBSchema;
 import org.collectionspace.services.common.relation.RelationJAXBSchema;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.context.ServiceContext;
+
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
@@ -47,7 +50,7 @@ public class RelationsUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(RelationsUtils.class);
 
-    public static RelationsCommonList extractCommonPartList(DocumentWrapper wrapDoc,
+    public static RelationsCommonList extractCommonPartList(ServiceContext ctx, DocumentWrapper wrapDoc,
             String serviceContextPath)
             throws Exception {
         DocumentModelList docList = (DocumentModelList) wrapDoc.getWrappedObject();
@@ -60,18 +63,23 @@ public class RelationsUtils {
         Iterator<DocumentModel> iter = docList.iterator();
         while (iter.hasNext()) {
             DocumentModel docModel = iter.next();
-            RelationListItem relationListItem = getRelationListItem(docModel,
+            RelationListItem relationListItem = getRelationListItem(ctx, docModel,
                     serviceContextPath);
             list.add(relationListItem);
         }
         return relList;
     }
 
-    public static RelationListItem getRelationListItem(DocumentModel docModel,
+    public static RelationListItem getRelationListItem(ServiceContext ctx, DocumentModel docModel,
             String serviceContextPath) throws Exception {
         RelationListItem relationListItem = new RelationListItem();
         String id = NuxeoUtils.extractId(docModel.getPathAsString());
         relationListItem.setCsid(id);
+        relationListItem.setSubjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(),
+        		RelationJAXBSchema.DOCUMENT_ID_1));
+        relationListItem.setObjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(),
+        		RelationJAXBSchema.DOCUMENT_ID_2));
+        
         relationListItem.setUri(serviceContextPath + id);
         return relationListItem;
     }

@@ -18,6 +18,7 @@
 package org.collectionspace.services.nuxeo.client.java;
 
 import java.util.UUID;
+import java.util.List;
 
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
@@ -34,6 +35,7 @@ import org.nuxeo.common.utils.IdUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.PathRef;
@@ -121,7 +123,7 @@ public class RepositoryJavaClient implements RepositoryClient {
         }
 
     }
-
+    
     /**
      * get document from the Nuxeo repository
      * @param ctx service context under which this method is invoked
@@ -175,6 +177,46 @@ public class RepositoryJavaClient implements RepositoryClient {
         }
     }
 
+    @Override
+    public void get(ServiceContext ctx, List<String> csidList, DocumentHandler handler)
+		throws DocumentNotFoundException, DocumentException {
+        if (handler == null) {
+            throw new IllegalArgumentException(
+                    "RepositoryJavaClient.getAll: handler is missing");
+        }
+
+        RepositoryInstance repoSession = null;
+
+        try {
+            handler.prepare(Action.GET_ALL);
+            repoSession = getRepositorySession();
+            DocumentModelList docModelList = new DocumentModelListImpl();
+            //FIXME: Should be using NuxeoUtils.createPathRef for security reasons
+            for (String csid : csidList) {
+                DocumentRef docRef = NuxeoUtils.createPathRef(ctx, csid);
+                DocumentModel docModel = repoSession.getDocument(docRef);
+                docModelList.add(docModel);
+            }
+
+            //set reposession to handle the document
+            ((DocumentModelHandler) handler).setRepositorySession(repoSession);
+            DocumentWrapper<DocumentModelList> wrapDoc = new DocumentWrapperImpl<DocumentModelList>(docModelList);
+            handler.handle(Action.GET_ALL, wrapDoc);
+            handler.complete(Action.GET_ALL, wrapDoc);
+        } catch (DocumentException de) {
+            throw de;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw new DocumentException(e);
+        } finally {
+            if (repoSession != null) {
+                releaseRepositorySession(repoSession);
+            }
+        }
+    }
+    
     /**
      * getAll get all documents for an entity entity service from the Nuxeo
      * repository

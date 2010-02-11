@@ -17,6 +17,8 @@
  */
 package org.collectionspace.services.common.storage;
 
+import java.util.List;
+
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
@@ -58,6 +60,19 @@ public interface StorageClient {
      */
     void get(ServiceContext ctx, String id, DocumentHandler handler) throws DocumentNotFoundException, DocumentException;
 
+    /**
+     * Gets the.
+     * 
+     * @param ctx the ctx
+     * @param csidList the csid list
+     * @param handler the handler
+     * 
+     * @throws DocumentNotFoundException the document not found exception
+     * @throws DocumentException the document exception
+     */
+    void get(ServiceContext ctx, List<String> csidList, DocumentHandler handler)
+		throws DocumentNotFoundException, DocumentException;
+    
     /**
      * getAll get all entitys for an entity service from the persistence store
      * @param ctx service context under which this method is invoked

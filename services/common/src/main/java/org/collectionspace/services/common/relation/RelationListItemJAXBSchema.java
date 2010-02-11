@@ -37,6 +37,9 @@ public interface RelationListItemJAXBSchema {
 	/** The Constant CSID. */
 	final static String CSID = "csid";
 	
+	final static String SUBJECT_CSID = "subjectCsid";
+	final static String OBJECT_CSID = "objectCsid";
+	
 	/** The Constant URI. */
 	final static String URI = "url";
 }

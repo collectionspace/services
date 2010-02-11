@@ -127,7 +127,7 @@ public class RelationDocumentModelHandler
             DocumentModel docModel = iter.next();
             if(RelationsUtils.isQueryMatch(docModel, subjectCsid,
                     predicate, objectCsid) == true){
-                RelationListItem relListItem = RelationsUtils.getRelationListItem(
+                RelationListItem relListItem = RelationsUtils.getRelationListItem(getServiceContext(),
                         docModel, getServiceContextPath());
                 itemList.add(relListItem);
             }

@@ -55,6 +55,8 @@
                             <!-- uri to retrive collection object details -->
                             <xs:element name="uri" type="xs:anyURI" minOccurs="1"/>
                             <xs:element name="csid" type="xs:string" minOccurs="1"/>
+                            <xs:element name="subjectCsid" type="xs:string" minOccurs="1"/>
+                            <xs:element name="objectCsid" type="xs:string" minOccurs="1"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>

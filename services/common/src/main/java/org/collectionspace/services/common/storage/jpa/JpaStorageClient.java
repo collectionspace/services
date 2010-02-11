@@ -48,12 +48,21 @@ import org.slf4j.LoggerFactory;
  */
 public class JpaStorageClient implements StorageClient {
 
+    /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(JpaStorageClient.class);
+    
+    /** The Constant CS_PERSISTENCE_UNIT. */
     protected final static String CS_PERSISTENCE_UNIT = "org.collectionspace.services";
 
+    /**
+     * Instantiates a new jpa storage client.
+     */
     public JpaStorageClient() {
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.storage.StorageClient#create(org.collectionspace.services.common.context.ServiceContext, org.collectionspace.services.common.document.DocumentHandler)
+     */
     @Override
     public String create(ServiceContext ctx,
             DocumentHandler handler) throws BadRequestException,
@@ -100,6 +109,17 @@ public class JpaStorageClient implements StorageClient {
 
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.storage.StorageClient#get(org.collectionspace.services.common.context.ServiceContext, java.util.List, org.collectionspace.services.common.document.DocumentHandler)
+     */
+    public void get(ServiceContext ctx, List<String> csidList, DocumentHandler handler)
+		throws DocumentNotFoundException, DocumentException {
+        throw new UnsupportedOperationException();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.storage.StorageClient#get(org.collectionspace.services.common.context.ServiceContext, java.lang.String, org.collectionspace.services.common.document.DocumentHandler)
+     */
     @Override
     public void get(ServiceContext ctx, String id, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
@@ -173,12 +193,18 @@ public class JpaStorageClient implements StorageClient {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.storage.StorageClient#getAll(org.collectionspace.services.common.context.ServiceContext, org.collectionspace.services.common.document.DocumentHandler)
+     */
     @Override
     public void getAll(ServiceContext ctx, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
         throw new UnsupportedOperationException("use getFiltered instead");
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.storage.StorageClient#getFiltered(org.collectionspace.services.common.context.ServiceContext, org.collectionspace.services.common.document.DocumentHandler)
+     */
     @Override
     public void getFiltered(ServiceContext ctx, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
@@ -243,6 +269,9 @@ public class JpaStorageClient implements StorageClient {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.storage.StorageClient#update(org.collectionspace.services.common.context.ServiceContext, java.lang.String, org.collectionspace.services.common.document.DocumentHandler)
+     */
     @Override
     public void update(ServiceContext ctx, String id, DocumentHandler handler)
             throws BadRequestException, DocumentNotFoundException,
@@ -293,6 +322,9 @@ public class JpaStorageClient implements StorageClient {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.storage.StorageClient#delete(org.collectionspace.services.common.context.ServiceContext, java.lang.String)
+     */
     @Override
     public void delete(ServiceContext ctx, String id)
             throws DocumentNotFoundException,
@@ -349,16 +381,33 @@ public class JpaStorageClient implements StorageClient {
         }
     }
 
+    /**
+     * Gets the entity manager factory.
+     * 
+     * @return the entity manager factory
+     */
     protected EntityManagerFactory getEntityManagerFactory() {
         return getEntityManagerFactory(CS_PERSISTENCE_UNIT);
     }
 
+    /**
+     * Gets the entity manager factory.
+     * 
+     * @param persistenceUnit the persistence unit
+     * 
+     * @return the entity manager factory
+     */
     protected EntityManagerFactory getEntityManagerFactory(
             String persistenceUnit) {
         return Persistence.createEntityManagerFactory(persistenceUnit);
 
     }
 
+    /**
+     * Release entity manager factory.
+     * 
+     * @param emf the emf
+     */
     protected void releaseEntityManagerFactory(EntityManagerFactory emf) {
         if (emf != null) {
             emf.close();
@@ -428,6 +477,14 @@ public class JpaStorageClient implements StorageClient {
         return r;
     }
 
+    /**
+     * Sets the csid.
+     * 
+     * @param o the o
+     * @param csid the csid
+     * 
+     * @throws Exception the exception
+     */
     protected void setCsid(Object o, String csid) throws Exception {
         //verify csid
         String id = (String) getValue(o, "getCsid");
@@ -446,6 +503,13 @@ public class JpaStorageClient implements StorageClient {
         setValue(o, "setCsid", java.lang.String.class, csid);
     }
 
+    /**
+     * Gets the entity name.
+     * 
+     * @param ctx the ctx
+     * 
+     * @return the entity name
+     */
     protected String getEntityName(ServiceContext ctx) {
         Object o = ctx.getProperty("entity-name");
         if (o == null) {
