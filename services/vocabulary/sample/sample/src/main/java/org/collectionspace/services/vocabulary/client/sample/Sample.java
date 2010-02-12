@@ -25,6 +25,7 @@ package org.collectionspace.services.vocabulary.client.sample;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -32,7 +33,9 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.BasicConfigurator;
+import org.collectionspace.services.VocabularyItemJAXBSchema;
 import org.collectionspace.services.client.VocabularyClient;
+import org.collectionspace.services.client.VocabularyClientUtils;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.vocabulary.VocabulariesCommon;
 import org.collectionspace.services.vocabulary.VocabulariesCommonList;
@@ -74,16 +77,20 @@ public class Sample {
     	// Type of service request being tested
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
 
-    	logger.info("Import: Create vocabulary: \"" + vocabName +"\"");
-    	MultipartOutput multipart = createVocabularyInstance(vocabName, 
-    			createRefName(vocabName), "enum");
+    	if(logger.isDebugEnabled()){
+    		logger.debug("Import: Create vocabulary: \"" + vocabName +"\"");
+    	}
+    	String baseVocabRefName = VocabularyClientUtils.createVocabularyRefName(vocabName, false);
+    	String fullVocabRefName = VocabularyClientUtils.createVocabularyRefName(vocabName, true);
+    	MultipartOutput multipart = VocabularyClientUtils.createEnumerationInstance(
+    			vocabName, fullVocabRefName, client.getCommonPartName());
     	ClientResponse<Response> res = client.create(multipart);
 
     	int statusCode = res.getStatus();
 
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
     		throw new RuntimeException("Could not create enumeration: \""+vocabName
-    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    				+"\" "+ VocabularyClientUtils.invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
     		throw new RuntimeException("Unexpected Status when creating enumeration: \""
@@ -92,43 +99,19 @@ public class Sample {
 
     	// Store the ID returned from this create operation
     	// for additional tests below.
-    	String newVocabId = extractId(res);
-        logger.info("Import: Created vocabulary: \"" + vocabName +"\" ID:"
+    	String newVocabId = VocabularyClientUtils.extractId(res);
+    	if(logger.isDebugEnabled()){
+    		logger.debug("Import: Created vocabulary: \"" + vocabName +"\" ID:"
     				+newVocabId );
-        
-        // Add items to the vocabulary
-    	for(String itemName : enumValues){
-    		createItemInVocab(newVocabId, vocabName, itemName, createRefName(itemName));
     	}
-        
+    	for(String itemName : enumValues){
+            HashMap<String, String> itemInfo = new HashMap<String, String>();
+            itemInfo.put(VocabularyItemJAXBSchema.DISPLAY_NAME, itemName);
+    		VocabularyClientUtils.createItemInVocabulary(newVocabId, 
+    				baseVocabRefName, itemInfo, client);
+    	}
     }
     
-    private String createItemInVocab(String vcsid, String vocabName, String itemName, String refName) {
-    	// Expected status code: 201 Created
-    	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
-    	// Type of service request being tested
-    	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
-
-    	logger.info("Import: Create Item: \""+itemName+"\" in vocabulary: \"" + vocabName +"\"");
-    	MultipartOutput multipart = createVocabularyItemInstance(vcsid, itemName, refName);
-    	ClientResponse<Response> res = client.createItem(vcsid, multipart);
-
-    	int statusCode = res.getStatus();
-
-    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-    		throw new RuntimeException("Could not create Item: \""+itemName
-    				+"\" in vocabulary: \"" + vocabName
-    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    	}
-    	if(statusCode != EXPECTED_STATUS_CODE) {
-    		throw new RuntimeException("Unexpected Status when creating Item: \""+itemName
-    				+"\" in vocabulary: \"" + vocabName +"\", Status:"+ statusCode);
-    	}
-
-    	return extractId(res);
-    }
-
-
    // ---------------------------------------------------------------
    // Read
    // ---------------------------------------------------------------
@@ -147,7 +130,7 @@ public class Sample {
         int statusCode = res.getStatus();
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
     		throw new RuntimeException("Could not read list of vocabularies: "
-                + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+                + VocabularyClientUtils.invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
     		throw new RuntimeException("Unexpected Status when reading " +
@@ -182,7 +165,7 @@ public class Sample {
             int statusCode = res.getStatus();
             if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
                 throw new RuntimeException("Could not read vocabulary"
-                    + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+                    + VocabularyClientUtils.invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
             }
             if(statusCode != EXPECTED_STATUS_CODE) {
                 throw new RuntimeException("Unexpected Status when reading " +
@@ -214,7 +197,7 @@ public class Sample {
 
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
     		throw new RuntimeException("Could not read items in vocabulary: "
-                + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+                + VocabularyClientUtils.invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
     		throw new RuntimeException("Unexpected Status when reading " +
@@ -250,7 +233,7 @@ public class Sample {
 
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
     		throw new RuntimeException("Could not delete vocabulary: "
-                + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+                + VocabularyClientUtils.invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
     		throw new RuntimeException("Unexpected Status when deleting " +
@@ -276,7 +259,7 @@ public class Sample {
 
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
     		throw new RuntimeException("Could not delete vocabulary item: "
-                + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+                + VocabularyClientUtils.invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
     		throw new RuntimeException("Unexpected Status when deleting " +
@@ -294,41 +277,6 @@ public class Sample {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-
-    private MultipartOutput createVocabularyInstance(
-    		String displayName, String refName, String vocabType) {
-        VocabulariesCommon vocabulary = new VocabulariesCommon();
-        vocabulary.setDisplayName(displayName);
-        vocabulary.setRefName(refName);
-        vocabulary.setVocabType(vocabType);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(vocabulary, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
-
-        if(logger.isDebugEnabled()){
-        	logger.debug("to be created, vocabulary common ",
-        				vocabulary, VocabulariesCommon.class);
-        }
-
-        return multipart;
-    }
-
-    private MultipartOutput createVocabularyItemInstance(
-    		String inVocabulary, String displayName, String refName) {
-    	VocabularyitemsCommon vocabularyItem = new VocabularyitemsCommon();
-    	vocabularyItem.setInVocabulary(inVocabulary);
-    	vocabularyItem.setDisplayName(displayName);
-    	vocabularyItem.setRefName(refName);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(vocabularyItem, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getItemCommonPartName());
-
-        if(logger.isDebugEnabled()){
-        	logger.debug("to be created, vocabularyitem common ", vocabularyItem, VocabularyitemsCommon.class);
-        }
-
-        return multipart;
-    }
 
     // Retrieve individual fields of vocabulary records.
 
@@ -379,6 +327,7 @@ public class Sample {
         return sb.toString();
     }
 
+    // TODO this should be moved to a common utils class
     private Object extractPart(MultipartInput input, String label,
         Class clazz) throws Exception {
         Object obj = null;
@@ -397,41 +346,6 @@ public class Sample {
             }
         }
         return obj;
-    }
-
-    /**
-     * Returns an error message indicating that the status code returned by a
-     * specific call to a service does not fall within a set of valid status
-     * codes for that service.
-     *
-     * @param serviceRequestType  A type of service request (e.g. CREATE, DELETE).
-     *
-     * @param statusCode  The invalid status code that was returned in the response,
-     *                    from submitting that type of request to the service.
-     *
-     * @return An error message.
-     */
-    protected String invalidStatusCodeMessage(ServiceRequestType requestType, int statusCode) {
-        return "Status code '" + statusCode + "' in response is NOT within the expected set: " +
-                requestType.validStatusCodesAsString();
-    }
-
-    protected String extractId(ClientResponse<Response> res) {
-        MultivaluedMap<String, Object> mvm = res.getMetadata();
-        String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
-        if(logger.isDebugEnabled()){
-        	logger.info("extractId:uri=" + uri);
-        }
-        String[] segments = uri.split("/");
-        String id = segments[segments.length - 1];
-        if(logger.isDebugEnabled()){
-        	logger.debug("id=" + id);
-        }
-        return id;
-    }
-    
-    protected String createRefName(String displayName) {
-    	return displayName.replaceAll("\\W", "");
     }
 
 	public static void main(String[] args) {
