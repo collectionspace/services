@@ -37,7 +37,7 @@ import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
 
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandler;
+import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class RelationDocumentModelHandler
-        extends RemoteDocumentModelHandler<RelationsCommon, RelationsCommonList> {
+        extends RemoteDocumentModelHandlerImpl<RelationsCommon, RelationsCommonList> {
 
     private final Logger logger = LoggerFactory.getLogger(RelationDocumentModelHandler.class);
     /**

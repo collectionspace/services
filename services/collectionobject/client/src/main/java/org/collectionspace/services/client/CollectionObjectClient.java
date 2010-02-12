@@ -43,7 +43,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
  * @version $Revision:$
  */
-public class CollectionObjectClient extends BaseServiceClient {
+public class CollectionObjectClient extends AbstractServiceClientImpl {
 
     /**
      *

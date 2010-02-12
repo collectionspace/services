@@ -28,7 +28,7 @@ package org.collectionspace.services.client;
 
  * @version $Revision:$
  */
-public class TestServiceClient extends BaseServiceClient {
+public class TestServiceClient extends AbstractServiceClientImpl {
     /**
      *
      * Default constructor for CollectionObjectClient class.

@@ -41,7 +41,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
  * @version $Revision:$
  */
-public class AccountClient extends BaseServiceClient {
+public class AccountClient extends AbstractServiceClientImpl {
 
     /**
      *
@@ -49,7 +49,7 @@ public class AccountClient extends BaseServiceClient {
     private AccountProxy accountProxy;
 
     /* (non-Javadoc)
-     * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
+     * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */
     public String getServicePathComponent() {
         return "accounts";

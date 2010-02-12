@@ -42,7 +42,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.common.AbstractCollectionSpaceResource;
+import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -62,7 +62,7 @@ import org.slf4j.LoggerFactory;
 @Path("/relations")
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
-public class NewRelationResource extends AbstractCollectionSpaceResource {
+public class NewRelationResource extends AbstractCollectionSpaceResourceImpl {
 
 	/** The Constant serviceName. */
 	public final static String serviceName = "relations";

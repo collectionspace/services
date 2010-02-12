@@ -41,14 +41,14 @@ import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.client.NuxeoClient;
 
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
-import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClient;
+import org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.query.IQueryManager;
 
 public class QueryManagerNuxeoImpl implements IQueryManager {
 	
 	private final Logger logger = LoggerFactory
-			.getLogger(RepositoryJavaClient.class);
+			.getLogger(RepositoryJavaClientImpl.class);
 	
 	//TODO: This is currently just an example fixed query.  This should eventually be
 	// removed or replaced with a more generic method.

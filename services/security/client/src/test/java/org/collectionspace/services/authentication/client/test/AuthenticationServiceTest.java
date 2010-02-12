@@ -37,7 +37,7 @@ import org.testng.annotations.Test;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.test.AbstractServiceTest;
+import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: 434 $ $LastChangedDate: 2009-07-28 14:34:15 -0700 (Tue,
  * 28 Jul 2009) $
  */
-public class AuthenticationServiceTest extends AbstractServiceTest {
+public class AuthenticationServiceTest extends AbstractServiceTestImpl {
 
     /** The known resource id. */
     private String knownResourceId = null;
@@ -69,7 +69,7 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
         return null;
     }
 
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class)
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createAccounts(String testName) throws Exception {
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
@@ -127,7 +127,7 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTest#create()
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"createAccounts"})
     @Override
     public void create(String testName) {
@@ -340,7 +340,7 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
      * @see org.collectionspace.services.client.test.AbstractServiceTest#delete()
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
     public void delete(String testName) {
         setupDelete(testName);
@@ -374,7 +374,7 @@ public class AuthenticationServiceTest extends AbstractServiceTest {
                 Response.Status.OK.getStatusCode(), "expected " + Response.Status.OK.getStatusCode());
     }
 
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"delete"})
     public void deleteAccounts(String testName) throws Exception {
 

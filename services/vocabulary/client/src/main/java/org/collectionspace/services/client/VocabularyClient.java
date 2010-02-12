@@ -18,7 +18,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
  * @version $Revision:$
  */
-public class VocabularyClient extends BaseServiceClient {
+public class VocabularyClient extends AbstractServiceClientImpl {
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()

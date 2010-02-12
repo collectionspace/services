@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision$
  * $LastChangedDate$
  */
-public class CollectionObjectServiceTest extends AbstractServiceTest {
+public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
     private final Logger logger =
             LoggerFactory.getLogger(CollectionObjectServiceTest.class);
@@ -74,7 +74,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class)
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
 
         // Perform setup, such as initializing the type of service request
@@ -120,7 +120,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
      * @see org.collectionspace.services.client.test.ServiceTest#createList()
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
     public void createList(String testName) throws Exception {
         for (int i = 0; i < 3; i++) {
@@ -132,12 +132,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class)
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createWithEmptyEntityBody(String testName) throws Exception {
     }
 
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class)
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createWithMalformedXml(String testName) throws Exception {
         setupCreate(testName);
 
@@ -159,7 +159,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     }
 
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class)
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createWithWrongXmlSchema(String testName) throws Exception {
     }
 
@@ -248,7 +248,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
 
@@ -289,7 +289,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
     // Failure outcomes
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read"})
     public void readNonExistent(String testName) throws Exception {
 
@@ -315,7 +315,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"createList", "read"})
     public void readList(String testName) throws Exception {
 
@@ -363,7 +363,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read"})
     public void update(String testName) throws Exception {
 
@@ -446,13 +446,13 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read"})
     public void updateWithEmptyEntityBody(String testName) throws Exception {
     }
 
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read"})
     public void updateWithMalformedXml(String testName) throws Exception {
         // Perform setup.
@@ -488,7 +488,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     }
 
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read"})
     public void updateWithWrongXmlSchema(String testName) throws Exception {
     }
@@ -573,7 +573,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     }
      */
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
 
@@ -606,7 +606,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
     public void delete(String testName) throws Exception {
 
@@ -629,7 +629,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTest {
 
     // Failure outcomes
     @Override
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTest.class,
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"delete"})
     public void deleteNonExistent(String testName) throws Exception {
 

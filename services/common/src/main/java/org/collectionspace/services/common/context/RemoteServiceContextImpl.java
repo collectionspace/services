@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class RemoteServiceContextImpl<IT, OT>
-        extends AbstractServiceContext<IT, OT>
+        extends AbstractServiceContextImpl<IT, OT>
         implements RemoteServiceContext<IT, OT> {
 
     final Logger logger = LoggerFactory.getLogger(RemoteServiceContextImpl.class);

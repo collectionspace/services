@@ -43,7 +43,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
  * @version $Revision:$
  */
-public class DimensionClient extends BaseServiceClient {
+public class DimensionClient extends AbstractServiceClientImpl {
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()

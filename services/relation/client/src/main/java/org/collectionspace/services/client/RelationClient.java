@@ -17,7 +17,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
  * @version $Revision:$
  */
-public class RelationClient extends BaseServiceClient implements RelationProxy {
+public class RelationClient extends AbstractServiceClientImpl implements RelationProxy {
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()

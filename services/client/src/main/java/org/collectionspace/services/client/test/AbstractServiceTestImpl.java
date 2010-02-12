@@ -58,10 +58,10 @@ import org.slf4j.LoggerFactory;
  *
  * For Javadoc descriptions of this class's methods, see the ServiceTest interface.
  */
-public abstract class AbstractServiceTest implements ServiceTest {
+public abstract class AbstractServiceTestImpl implements ServiceTest {
 
     private final Logger logger =
-         LoggerFactory.getLogger(AbstractServiceTest.class);
+         LoggerFactory.getLogger(AbstractServiceTestImpl.class);
     // A base-level client, used (only) to obtain the base service URL.
     protected static final TestServiceClient serviceClient =
         new TestServiceClient();

@@ -42,11 +42,11 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public class TenantBindingConfigReader
-        extends AbstractConfigReader<TenantBindingConfig> {
+public class TenantBindingConfigReaderImpl
+        extends AbstractConfigReaderImpl<TenantBindingConfig> {
 
     final private static String CONFIG_FILE_NAME = "tenant-bindings.xml";
-    final Logger logger = LoggerFactory.getLogger(TenantBindingConfigReader.class);
+    final Logger logger = LoggerFactory.getLogger(TenantBindingConfigReaderImpl.class);
     private TenantBindingConfig tenantBindingConfig;
     //tenant name, tenant binding
     private Hashtable<String, TenantBindingType> tenantBindings =
@@ -57,7 +57,7 @@ public class TenantBindingConfigReader
     //tenant-qualified service, workspace
     private Hashtable<String, String> serviceWorkspaces = new Hashtable<String, String>();
 
-    public TenantBindingConfigReader(String serverRootDir) {
+    public TenantBindingConfigReaderImpl(String serverRootDir) {
         super(serverRootDir);
     }
 

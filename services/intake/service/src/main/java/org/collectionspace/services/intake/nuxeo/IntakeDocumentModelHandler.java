@@ -33,7 +33,7 @@ import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.IntakesCommonList;
 import org.collectionspace.services.intake.IntakesCommonList.IntakeListItem;
 
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandler;
+import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class IntakeDocumentModelHandler
-        extends RemoteDocumentModelHandler<IntakesCommon, IntakesCommonList> {
+        extends RemoteDocumentModelHandlerImpl<IntakesCommon, IntakesCommonList> {
 
     private final Logger logger = LoggerFactory.getLogger(IntakeDocumentModelHandler.class);
     /**

@@ -26,7 +26,7 @@ package org.collectionspace.services.common.repository;
 import java.util.Hashtable;
 import org.collectionspace.services.common.RepositoryClientConfigType;
 import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.config.ServicesConfigReader;
+import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +46,7 @@ public class RepositoryClientFactory {
 
     private RepositoryClientFactory() {
         try{
-            ServicesConfigReader scReader = ServiceMain.getInstance().getServicesConfigReader();
+            ServicesConfigReaderImpl scReader = ServiceMain.getInstance().getServicesConfigReader();
             RepositoryClientConfigType repositoryClientConfig = scReader.getConfiguration().getRepositoryClient();
             String clientClassName = repositoryClientConfig.getClientClass();
             String clientName = repositoryClientConfig.getName();

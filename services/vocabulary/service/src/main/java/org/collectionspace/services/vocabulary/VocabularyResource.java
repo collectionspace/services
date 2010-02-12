@@ -40,7 +40,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.VocabularyItemJAXBSchema;
-import org.collectionspace.services.common.AbstractCollectionSpaceResource;
+import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.MultipartServiceContext;
@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
 @Path("/vocabularies")
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
-public class VocabularyResource extends AbstractCollectionSpaceResource {
+public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
 
     private final static String vocabularyServiceName = "vocabularies";
     private final static String vocabularyItemServiceName = "vocabularyitems";

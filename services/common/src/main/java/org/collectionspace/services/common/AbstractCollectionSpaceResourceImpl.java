@@ -32,12 +32,12 @@ import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.storage.StorageClient;
-import org.collectionspace.services.common.storage.jpa.JpaStorageClient;
+import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
 
 /**
  * The Class AbstractCollectionSpaceResource.
  */
-public abstract class AbstractCollectionSpaceResource
+public abstract class AbstractCollectionSpaceResourceImpl
         implements CollectionSpaceResource {
 
     // Fields for default client factory and client
@@ -53,7 +53,7 @@ public abstract class AbstractCollectionSpaceResource
     /**
      * Instantiates a new abstract collection space resource.
      */
-    public AbstractCollectionSpaceResource() {
+    public AbstractCollectionSpaceResourceImpl() {
         repositoryClientFactory = RepositoryClientFactory.getInstance();
     }
 
@@ -84,7 +84,7 @@ public abstract class AbstractCollectionSpaceResource
         if(storageClient != null) {
             return storageClient;
         }
-        storageClient = new JpaStorageClient();
+        storageClient = new JpaStorageClientImpl();
         return storageClient;
     }
 

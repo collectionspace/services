@@ -51,11 +51,11 @@ import org.slf4j.LoggerFactory;
  * 
  * $LastChangedRevision: $ $LastChangedDate: $
  */
-public class RepositoryJavaClient implements RepositoryClient {
+public class RepositoryJavaClientImpl implements RepositoryClient {
 
-    private final Logger logger = LoggerFactory.getLogger(RepositoryJavaClient.class);
+    private final Logger logger = LoggerFactory.getLogger(RepositoryJavaClientImpl.class);
 
-    public RepositoryJavaClient() {
+    public RepositoryJavaClientImpl() {
     }
 
     /**

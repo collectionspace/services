@@ -39,7 +39,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.common.AbstractCollectionSpaceResource;
+import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
 @Path("/intakes")
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
-public class IntakeResource extends AbstractCollectionSpaceResource {
+public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
 
     private final static String serviceName = "intakes";
     final Logger logger = LoggerFactory.getLogger(IntakeResource.class);

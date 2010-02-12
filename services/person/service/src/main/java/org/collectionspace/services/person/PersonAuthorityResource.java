@@ -40,7 +40,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.PersonJAXBSchema;
-import org.collectionspace.services.common.AbstractCollectionSpaceResource;
+import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.MultipartServiceContext;
@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
 @Path("/personauthorities")
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
-public class PersonAuthorityResource extends AbstractCollectionSpaceResource {
+public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl {
 
     private final static String personAuthorityServiceName = "personauthorities";
     private final static String personServiceName = "persons";

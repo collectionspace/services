@@ -43,10 +43,10 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
  * @version $Revision:$
  */
-public class IntakeClient extends BaseServiceClient {
+public class IntakeClient extends AbstractServiceClientImpl {
 
 	/* (non-Javadoc)
-	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
+	 * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
 	 */
 	public String getServicePathComponent() {
 		return "intakes";

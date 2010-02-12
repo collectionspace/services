@@ -37,7 +37,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.common.AbstractCollectionSpaceResource;
+import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.MultipartServiceContext;
@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
 @Path("/contacts")
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
-public class ContactResource extends AbstractCollectionSpaceResource {
+public class ContactResource extends AbstractCollectionSpaceResourceImpl {
 
     private final static String serviceName = "contacts";
     final Logger logger = LoggerFactory.getLogger(ContactResource.class);

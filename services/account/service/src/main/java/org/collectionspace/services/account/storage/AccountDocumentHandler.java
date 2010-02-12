@@ -29,7 +29,7 @@ import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.account.AccountsCommonList.AccountListItem;
 import org.collectionspace.services.account.Status;
-import org.collectionspace.services.common.document.AbstractDocumentHandler;
+import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * @author 
  */
 public class AccountDocumentHandler
-        extends AbstractDocumentHandler<AccountsCommon, AccountsCommonList, AccountsCommon, List> {
+        extends AbstractDocumentHandlerImpl<AccountsCommon, AccountsCommonList, AccountsCommon, List> {
 
     private final Logger logger = LoggerFactory.getLogger(AccountDocumentHandler.class);
     private AccountsCommon account;

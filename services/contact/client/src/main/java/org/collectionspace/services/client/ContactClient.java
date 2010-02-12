@@ -35,7 +35,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * $LastChangedDate: $
  */
  
-public class ContactClient extends BaseServiceClient {
+public class ContactClient extends AbstractServiceClientImpl {
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()

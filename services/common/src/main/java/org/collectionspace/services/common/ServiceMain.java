@@ -4,8 +4,8 @@
 package org.collectionspace.services.common;
 
 import java.util.Hashtable;
-import org.collectionspace.services.common.config.ServicesConfigReader;
-import org.collectionspace.services.common.config.TenantBindingConfigReader;
+import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +24,8 @@ public class ServiceMain {
     final Logger logger = LoggerFactory.getLogger(ServiceMain.class);
     private NuxeoConnector nuxeoConnector;
     private String serverRootDir = null;
-    private ServicesConfigReader servicesConfigReader;
-    private TenantBindingConfigReader tenantBindingConfigReader;
+    private ServicesConfigReaderImpl servicesConfigReader;
+    private TenantBindingConfigReaderImpl tenantBindingConfigReader;
 
     private ServiceMain() {
     }
@@ -85,10 +85,10 @@ public class ServiceMain {
 
     private void readConfig() throws Exception {
         //read service config
-        servicesConfigReader = new ServicesConfigReader(getServerRootDir());
+        servicesConfigReader = new ServicesConfigReaderImpl(getServerRootDir());
         getServicesConfigReader().read();
 
-        tenantBindingConfigReader = new TenantBindingConfigReader(getServerRootDir());
+        tenantBindingConfigReader = new TenantBindingConfigReaderImpl(getServerRootDir());
         getTenantBindingConfigReader().read();
     }
 
@@ -135,14 +135,14 @@ public class ServiceMain {
     /**
      * @return the servicesConfigReader
      */
-    public ServicesConfigReader getServicesConfigReader() {
+    public ServicesConfigReaderImpl getServicesConfigReader() {
         return servicesConfigReader;
     }
 
     /**
      * @return the tenantBindingConfigReader
      */
-    public TenantBindingConfigReader getTenantBindingConfigReader() {
+    public TenantBindingConfigReaderImpl getTenantBindingConfigReader() {
         return tenantBindingConfigReader;
     }
 }

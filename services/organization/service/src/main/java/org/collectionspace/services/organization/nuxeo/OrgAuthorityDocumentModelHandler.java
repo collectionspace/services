@@ -33,7 +33,7 @@ import org.collectionspace.services.organization.OrgauthoritiesCommon;
 import org.collectionspace.services.organization.OrgauthoritiesCommonList;
 import org.collectionspace.services.organization.OrgauthoritiesCommonList.OrgauthorityListItem;
 
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandler;
+import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class OrgAuthorityDocumentModelHandler
-        extends RemoteDocumentModelHandler<OrgauthoritiesCommon, OrgauthoritiesCommonList> {
+        extends RemoteDocumentModelHandlerImpl<OrgauthoritiesCommon, OrgauthoritiesCommonList> {
 
     private final Logger logger = LoggerFactory.getLogger(OrgAuthorityDocumentModelHandler.class);
     /**

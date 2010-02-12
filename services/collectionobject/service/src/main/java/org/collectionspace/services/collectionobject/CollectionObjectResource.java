@@ -47,7 +47,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.query.IQueryManager;
-import org.collectionspace.services.common.AbstractCollectionSpaceResource;
+import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -77,7 +77,7 @@ import org.collectionspace.services.relation.RelationsCommon;
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
 public class CollectionObjectResource
-        extends AbstractCollectionSpaceResource {
+        extends AbstractCollectionSpaceResourceImpl {
 
     static final public String serviceName = "collectionobjects";
     final Logger logger = LoggerFactory.getLogger(CollectionObjectResource.class);

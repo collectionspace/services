@@ -39,15 +39,15 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public abstract class AbstractDocumentHandler<T, TL, WT, WTL>
+public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
         implements DocumentHandler<T, TL, WT, WTL> {
 
-    private final Logger logger = LoggerFactory.getLogger(AbstractDocumentHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(AbstractDocumentHandlerImpl.class);
     private Map<String, Object> properties = new HashMap<String, Object>();
     private DocumentFilter docFilter = new DocumentFilter();
     private ServiceContext serviceContext;
 
-    public AbstractDocumentHandler() {
+    public AbstractDocumentHandlerImpl() {
     }
 
     @Override

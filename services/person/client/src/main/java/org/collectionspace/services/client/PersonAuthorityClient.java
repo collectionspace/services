@@ -18,7 +18,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
  * @version $Revision:$
  */
-public class PersonAuthorityClient extends BaseServiceClient {
+public class PersonAuthorityClient extends AbstractServiceClientImpl {
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()

@@ -34,13 +34,13 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public abstract class AbstractMultipartDocumentHandler<T, TL, WT, WTL>
-        extends AbstractDocumentHandler<T, TL, WT, WTL>
+public abstract class AbstractMultipartDocumentHandlerImpl<T, TL, WT, WTL>
+        extends AbstractDocumentHandlerImpl<T, TL, WT, WTL>
         implements MultipartDocumentHandler<T, TL, WT, WTL> {
 
-    private final Logger logger = LoggerFactory.getLogger(AbstractMultipartDocumentHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(AbstractMultipartDocumentHandlerImpl.class);
 
-    public AbstractMultipartDocumentHandler() {
+    public AbstractMultipartDocumentHandlerImpl() {
     }
 
     @Override

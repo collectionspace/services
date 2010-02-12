@@ -36,9 +36,9 @@ import org.slf4j.LoggerFactory;
 /**
  * BaseServiceClient is an abstract base client of all service clients
  */
-public abstract class BaseServiceClient implements CollectionSpaceClient {
+public abstract class AbstractServiceClientImpl implements CollectionSpaceClient {
 
-    protected final Logger logger = LoggerFactory.getLogger(BaseServiceClient.class);
+    protected final Logger logger = LoggerFactory.getLogger(AbstractServiceClientImpl.class);
     private Properties properties = new Properties();
     private URL url;
     private HttpClient httpClient;
@@ -55,7 +55,7 @@ public abstract class BaseServiceClient implements CollectionSpaceClient {
 
 	abstract public String getServicePathComponent();
     
-    protected BaseServiceClient() {
+    protected AbstractServiceClientImpl() {
         readProperties();
         setupHttpClient();
     }

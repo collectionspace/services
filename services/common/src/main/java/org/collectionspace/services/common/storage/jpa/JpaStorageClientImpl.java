@@ -46,10 +46,10 @@ import org.slf4j.LoggerFactory;
  *
  * $LastChangedRevision: $ $LastChangedDate: $
  */
-public class JpaStorageClient implements StorageClient {
+public class JpaStorageClientImpl implements StorageClient {
 
     /** The logger. */
-    private final Logger logger = LoggerFactory.getLogger(JpaStorageClient.class);
+    private final Logger logger = LoggerFactory.getLogger(JpaStorageClientImpl.class);
     
     /** The Constant CS_PERSISTENCE_UNIT. */
     protected final static String CS_PERSISTENCE_UNIT = "org.collectionspace.services";
@@ -57,7 +57,7 @@ public class JpaStorageClient implements StorageClient {
     /**
      * Instantiates a new jpa storage client.
      */
-    public JpaStorageClient() {
+    public JpaStorageClientImpl() {
     }
 
     /* (non-Javadoc)

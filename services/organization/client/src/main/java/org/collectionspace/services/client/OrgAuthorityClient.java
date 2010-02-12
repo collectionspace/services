@@ -18,10 +18,10 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
  * @version $Revision:$
  */
-public class OrgAuthorityClient extends BaseServiceClient {
+public class OrgAuthorityClient extends AbstractServiceClientImpl {
 
 	/* (non-Javadoc)
-	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
+	 * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
 	 */
     @Override
 	public String getServicePathComponent() {

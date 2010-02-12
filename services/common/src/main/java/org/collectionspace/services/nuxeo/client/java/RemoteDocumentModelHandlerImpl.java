@@ -49,10 +49,10 @@ import org.w3c.dom.Document;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public abstract class RemoteDocumentModelHandler<T, TL>
+public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         extends DocumentModelHandler<T, TL> {
 
-    private final Logger logger = LoggerFactory.getLogger(RemoteDocumentModelHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(RemoteDocumentModelHandlerImpl.class);
 
     @Override
     public void setServiceContext(ServiceContext ctx) {

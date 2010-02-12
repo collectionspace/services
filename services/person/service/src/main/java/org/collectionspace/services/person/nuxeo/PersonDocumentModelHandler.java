@@ -30,7 +30,7 @@ import java.util.List;
 
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandler;
+import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonsCommonList;
@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class PersonDocumentModelHandler
-        extends RemoteDocumentModelHandler<PersonsCommon, PersonsCommonList> {
+        extends RemoteDocumentModelHandlerImpl<PersonsCommon, PersonsCommonList> {
 
     private final Logger logger = LoggerFactory.getLogger(PersonDocumentModelHandler.class);
     /**

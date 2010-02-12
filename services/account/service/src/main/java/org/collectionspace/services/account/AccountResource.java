@@ -39,7 +39,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.account.storage.AccountStorageClient;
-import org.collectionspace.services.common.AbstractCollectionSpaceResource;
+import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.context.RemoteServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
 @Consumes("application/xml")
 @Produces("application/xml")
 public class AccountResource
-        extends AbstractCollectionSpaceResource {
+        extends AbstractCollectionSpaceResourceImpl {
 
     final private String serviceName = "accounts";
     final Logger logger = LoggerFactory.getLogger(AccountResource.class);

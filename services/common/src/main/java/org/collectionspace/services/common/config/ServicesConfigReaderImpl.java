@@ -34,16 +34,16 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public class ServicesConfigReader
-        extends AbstractConfigReader<ServiceConfig> {
+public class ServicesConfigReaderImpl
+        extends AbstractConfigReaderImpl<ServiceConfig> {
 
     final private static String CONFIG_FILE_NAME = "service-config.xml";
-    final Logger logger = LoggerFactory.getLogger(ServicesConfigReader.class);
+    final Logger logger = LoggerFactory.getLogger(ServicesConfigReaderImpl.class);
     private ServiceConfig serviceConfig;
     private ClientType clientType;
     private String clientClassName;
 
-    public ServicesConfigReader(String serverRootDir) {
+    public ServicesConfigReaderImpl(String serverRootDir) {
         super(serverRootDir);
     }
 

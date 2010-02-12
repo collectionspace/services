@@ -37,7 +37,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.common.AbstractCollectionSpaceResource;
+import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.dimension.DimensionsCommonList.*;
 
 import org.collectionspace.services.common.ClientType;
@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
 @Path("/dimensions")
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
-public class DimensionResource extends AbstractCollectionSpaceResource {
+public class DimensionResource extends AbstractCollectionSpaceResourceImpl {
 
     private final static String serviceName = "dimensions";
     final Logger logger = LoggerFactory.getLogger(DimensionResource.class);

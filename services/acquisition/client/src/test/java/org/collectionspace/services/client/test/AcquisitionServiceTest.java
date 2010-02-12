@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: 621 $
  * $LastChangedDate: 2009-09-02 16:49:01 -0700 (Wed, 02 Sep 2009) $
  */
-public class AcquisitionServiceTest extends AbstractServiceTest {
+public class AcquisitionServiceTest extends AbstractServiceTestImpl {
 
     private final Logger logger =
         LoggerFactory.getLogger(AcquisitionServiceTest.class);
@@ -66,7 +66,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class)
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
 
         // Perform setup, such as initializing the type of service request
@@ -110,7 +110,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
     }
 
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
        dependsOnMethods = {"create"})
     public void createList(String testName) throws Exception {
         for(int i = 0; i < 3; i++){
@@ -190,7 +190,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
 
@@ -219,7 +219,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
     // Failure outcomes
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"read"})
     public void readNonExistent(String testName) throws Exception {
 
@@ -245,7 +245,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"createList", "read"})
     public void readList(String testName) throws Exception {
 
@@ -294,7 +294,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
     // Success outcomes
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"read"})
     public void update(String testName) throws Exception {
 
@@ -468,7 +468,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
      */
     
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
 
@@ -498,7 +498,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "read", "update"})
     public void delete(String testName) throws Exception {
 
@@ -521,7 +521,7 @@ public class AcquisitionServiceTest extends AbstractServiceTest {
 
     // Failure outcomes
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"delete"})
     public void deleteNonExistent(String testName) throws Exception {
 

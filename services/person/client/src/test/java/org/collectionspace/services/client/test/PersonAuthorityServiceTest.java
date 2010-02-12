@@ -54,7 +54,7 @@ import org.testng.annotations.Test;
  * $LastChangedRevision: 753 $
  * $LastChangedDate: 2009-09-23 11:03:36 -0700 (Wed, 23 Sep 2009) $
  */
-public class PersonAuthorityServiceTest extends AbstractServiceTest {
+public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
     private final Logger logger =
         LoggerFactory.getLogger(PersonAuthorityServiceTest.class);
@@ -77,7 +77,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class)
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
 
         // Perform setup, such as initializing the type of service request
@@ -128,7 +128,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
 
     }
 
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"create"})
     public void createItem(String testName) {
         setupCreate(testName);
@@ -200,7 +200,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
     }
 
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
             dependsOnMethods = {"create", "createItem"})
     public void createList(String testName) throws Exception {
         for (int i = 0; i < 3; i++) {
@@ -316,7 +316,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
 
@@ -378,7 +378,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
         }
     */
 
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"createItem", "read"})
     public void readItem(String testName) throws Exception {
 
@@ -414,7 +414,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
 
     // Failure outcomes
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"read"})
     public void readNonExistent(String testName) {
 
@@ -435,7 +435,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"readItem", "readNonExistent"})
     public void readItemNonExistent(String testName) {
 
@@ -461,7 +461,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
     // Success outcomes
 
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"createList", "read"})
     public void readList(String testName) throws Exception {
 
@@ -563,7 +563,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"read"})
     public void update(String testName) throws Exception {
 
@@ -622,7 +622,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
                 "Data in updated object did not match submitted data.");
     }
 
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"readItem", "update"})
     public void updateItem(String testName) throws Exception {
 
@@ -779,7 +779,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
 
 
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
 
@@ -809,7 +809,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"updateItem", "testItemSubmitRequest"})
     public void updateNonExistentItem(String testName) throws Exception {
 
@@ -848,7 +848,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
     public void delete(String testName) throws Exception {
 
@@ -869,7 +869,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
-   @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+   @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"createItem", "readItemList", "testItemSubmitRequest",
             "updateItem"})
     public void deleteItem(String testName) throws Exception {
@@ -893,7 +893,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
 
     // Failure outcomes
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"delete"})
     public void deleteNonExistent(String testName) throws Exception {
 
@@ -914,7 +914,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTest {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"deleteItem"})
     public void deleteNonExistentItem(String testName) {
 

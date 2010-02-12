@@ -33,7 +33,7 @@ import org.collectionspace.services.vocabulary.VocabulariesCommon;
 import org.collectionspace.services.vocabulary.VocabulariesCommonList;
 import org.collectionspace.services.vocabulary.VocabulariesCommonList.VocabularyListItem;
 
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandler;
+import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class VocabularyDocumentModelHandler
-        extends RemoteDocumentModelHandler<VocabulariesCommon, VocabulariesCommonList> {
+        extends RemoteDocumentModelHandlerImpl<VocabulariesCommon, VocabulariesCommonList> {
 
     private final Logger logger = LoggerFactory.getLogger(VocabularyDocumentModelHandler.class);
     /**

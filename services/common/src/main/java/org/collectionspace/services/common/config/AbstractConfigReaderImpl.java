@@ -35,13 +35,13 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public abstract class AbstractConfigReader<T>
+public abstract class AbstractConfigReaderImpl<T>
         implements ConfigReader<T> {
 
-    private final Logger logger = LoggerFactory.getLogger(AbstractConfigReader.class);
+    private final Logger logger = LoggerFactory.getLogger(AbstractConfigReaderImpl.class);
     private String serverRootDir;
 
-    AbstractConfigReader(String serverRootDir) {
+    AbstractConfigReaderImpl(String serverRootDir) {
         this.serverRootDir = serverRootDir;
     }
 

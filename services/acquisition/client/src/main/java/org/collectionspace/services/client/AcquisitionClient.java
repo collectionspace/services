@@ -16,7 +16,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
  * @version $Revision:$
  */
-public class AcquisitionClient extends BaseServiceClient {
+public class AcquisitionClient extends AbstractServiceClientImpl {
 
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()

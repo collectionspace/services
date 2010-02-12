@@ -38,7 +38,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.common.AbstractCollectionSpaceResource;
+import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
 public class AcquisitionResource
-        extends AbstractCollectionSpaceResource {
+        extends AbstractCollectionSpaceResourceImpl {
 
     final private String serviceName = "acquisitions";
     final Logger logger = LoggerFactory.getLogger(AcquisitionResource.class);

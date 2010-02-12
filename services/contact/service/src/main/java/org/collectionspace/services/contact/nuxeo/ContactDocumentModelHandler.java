@@ -33,7 +33,7 @@ import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.contact.ContactsCommonList.ContactListItem;
 
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandler;
+import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class ContactDocumentModelHandler
-        extends RemoteDocumentModelHandler<ContactsCommon, ContactsCommonList> {
+        extends RemoteDocumentModelHandlerImpl<ContactsCommon, ContactsCommonList> {
 
     private final Logger logger = LoggerFactory.getLogger(ContactDocumentModelHandler.class);
     /**

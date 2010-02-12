@@ -38,7 +38,7 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.security.SecurityUtils;
-import org.collectionspace.services.common.storage.jpa.JpaStorageClient;
+import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * state in persistent storage
  * @author 
  */
-public class AccountStorageClient extends JpaStorageClient {
+public class AccountStorageClient extends JpaStorageClientImpl {
 
     private final Logger logger = LoggerFactory.getLogger(AccountStorageClient.class);
 

@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandler;
+import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.organization.OrganizationsCommon;
 import org.collectionspace.services.organization.OrganizationsCommonList;
@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class OrganizationDocumentModelHandler
-        extends RemoteDocumentModelHandler<OrganizationsCommon, OrganizationsCommonList> {
+        extends RemoteDocumentModelHandlerImpl<OrganizationsCommon, OrganizationsCommonList> {
 
     private final Logger logger = LoggerFactory.getLogger(OrganizationDocumentModelHandler.class);
     /**

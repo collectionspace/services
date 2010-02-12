@@ -33,7 +33,7 @@ import org.collectionspace.services.dimension.DimensionsCommon;
 import org.collectionspace.services.dimension.DimensionsCommonList;
 import org.collectionspace.services.dimension.DimensionsCommonList.DimensionListItem;
 
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandler;
+import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class DimensionDocumentModelHandler
-        extends RemoteDocumentModelHandler<DimensionsCommon, DimensionsCommonList> {
+        extends RemoteDocumentModelHandlerImpl<DimensionsCommon, DimensionsCommonList> {
 
     private final Logger logger = LoggerFactory.getLogger(DimensionDocumentModelHandler.class);
     /**

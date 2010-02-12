@@ -37,7 +37,7 @@ import org.collectionspace.authentication.CSpaceTenant;
 
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.config.TenantBindingConfigReader;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.ValidatorHandler;
 import org.collectionspace.services.common.security.UnauthorizedException;
@@ -54,10 +54,10 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public abstract class AbstractServiceContext<IT, OT>
+public abstract class AbstractServiceContextImpl<IT, OT>
         implements ServiceContext<IT, OT> {
 
-    final Logger logger = LoggerFactory.getLogger(AbstractServiceContext.class);
+    final Logger logger = LoggerFactory.getLogger(AbstractServiceContextImpl.class);
     Map<String, Object> properties = new HashMap<String, Object>();
     Map<String, ObjectPartType> objectPartMap = new HashMap<String, ObjectPartType>();
     private ServiceBindingType serviceBinding;
@@ -66,8 +66,8 @@ public abstract class AbstractServiceContext<IT, OT>
     private List<ValidatorHandler> valHandlers = null;
     private DocumentHandler docHandler = null;
 
-    public AbstractServiceContext(String serviceName) throws UnauthorizedException {
-        TenantBindingConfigReader tReader =
+    public AbstractServiceContextImpl(String serviceName) throws UnauthorizedException {
+        TenantBindingConfigReaderImpl tReader =
                 ServiceMain.getInstance().getTenantBindingConfigReader();
         //FIXME retrieveTenantId is not working consistently in non-auth mode
         //TODO: get tenant binding from security context
@@ -130,7 +130,7 @@ public abstract class AbstractServiceContext<IT, OT>
 
     @Override
     public String getQualifiedServiceName() {
-        return TenantBindingConfigReader.getTenantQualifiedServiceName(getTenantId(), getServiceName());
+        return TenantBindingConfigReaderImpl.getTenantQualifiedServiceName(getTenantId(), getServiceName());
     }
 
     @Override
@@ -154,7 +154,7 @@ public abstract class AbstractServiceContext<IT, OT>
 
     @Override
     public String getRepositoryWorkspaceId() {
-        TenantBindingConfigReader tbConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+        TenantBindingConfigReaderImpl tbConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
         return tbConfigReader.getWorkspaceId(getTenantId(), getServiceName());
     }
 

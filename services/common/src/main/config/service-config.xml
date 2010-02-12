@@ -22,7 +22,7 @@
         <user>Administrator</user>
         <password>Administrator</password>
         <client-type>java</client-type>
-        <client-class>org.collectionspace.services.nuxeo.client.java.RepositoryJavaClient</client-class>
+        <client-class>org.collectionspace.services.nuxeo.client.java.RepositoryJavaClientImpl</client-class>
     </repository-client>
 
 
