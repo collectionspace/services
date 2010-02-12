@@ -40,12 +40,61 @@ public class OrgAuthorityClientUtils {
         return multipart;
     }
 
+    public static String createItemInAuthority(String vcsid, 
+    		String orgAuthorityRefName, Map<String, String> orgInfo,
+    		OrgAuthorityClient client) {
+    	// Expected status code: 201 Created
+    	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
+    	// Type of service request being tested
+    	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
+    	String displayName = orgInfo.get(OrganizationJAXBSchema.DISPLAY_NAME);
+    	String displayNameComputedStr = orgInfo.get(OrganizationJAXBSchema.DISPLAY_NAME_COMPUTED);
+    	boolean displayNameComputed = (displayNameComputedStr==null) || displayNameComputedStr.equalsIgnoreCase("true");
+    	if( displayName == null ) {
+    		if(!displayNameComputed) {
+	    		throw new RuntimeException(
+	    		"CreateItem: Must supply a displayName if displayNameComputed is set to false.");
+    		}
+    		displayName = prepareDefaultDisplayName(
+        			orgInfo.get(OrganizationJAXBSchema.SHORT_NAME ),    			
+        			orgInfo.get(OrganizationJAXBSchema.FOUNDING_PLACE ));
+    	}
+    	String refName = createOrganizationRefName( orgAuthorityRefName, displayName, true);
+
+    	if(logger.isDebugEnabled()){
+    		logger.debug("Import: Create Item: \""+displayName
+    				+"\" in orgAuthorityulary: \"" + orgAuthorityRefName +"\"");
+    	}
+    	MultipartOutput multipart =
+    		createOrganizationInstance( vcsid, refName, orgInfo, client.getItemCommonPartName() );
+    	ClientResponse<Response> res = client.createItem(vcsid, multipart);
+
+    	int statusCode = res.getStatus();
+
+    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
+    		throw new RuntimeException("Could not create Item: \""+displayName
+    				+"\" in orgAuthority: \"" + orgAuthorityRefName
+    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    	}
+    	if(statusCode != EXPECTED_STATUS_CODE) {
+    		throw new RuntimeException("Unexpected Status when creating Item: \""+displayName
+    				+"\" in orgAuthority: \"" + orgAuthorityRefName +"\", Status:"+ statusCode);
+    	}
+
+    	return extractId(res);
+    }
+
     public static MultipartOutput createOrganizationInstance(String inAuthority, 
     		String orgRefName, Map<String, String> orgInfo, String headerLabel){
         OrganizationsCommon organization = new OrganizationsCommon();
         organization.setInAuthority(inAuthority);
        	organization.setRefName(orgRefName);
        	String value = null;
+    	value = orgInfo.get(OrganizationJAXBSchema.DISPLAY_NAME_COMPUTED);
+    	boolean displayNameComputed = (value==null) || value.equalsIgnoreCase("true"); 
+   		organization.setDisplayNameComputed(displayNameComputed);
+        if((value = (String)orgInfo.get(OrganizationJAXBSchema.DISPLAY_NAME))!=null)
+        	organization.setDisplayName(value);
         if((value = (String)orgInfo.get(OrganizationJAXBSchema.SHORT_NAME))!=null)
         	organization.setShortName(value);
         if((value = (String)orgInfo.get(OrganizationJAXBSchema.LONG_NAME))!=null)
@@ -123,4 +172,33 @@ public class OrgAuthorityClientUtils {
     	return refName;
     }
 
+    /**
+     * Produces a default displayName from the basic name and foundingPlace fields.
+     * @see OrgAuthorityDocumentModelHandler.prepareDefaultDisplayName() which
+     * duplicates this logic, until we define a service-general utils package
+     * that is neither client nor service specific.
+     * @param shortName
+     * @param foundingPlace
+     * @return
+     * @throws Exception
+     */
+    public static String prepareDefaultDisplayName(
+    		String shortName, String foundingPlace ) {
+    	StringBuilder newStr = new StringBuilder();
+		final String sep = " ";
+		boolean firstAdded = false;
+		if(null != shortName ) {
+			newStr.append(shortName);
+			firstAdded = true;
+		}
+    	// Now we add the place
+		if(null != foundingPlace ) {
+			if(firstAdded) {
+				newStr.append(sep);
+			}
+			newStr.append(foundingPlace);
+		}
+		return newStr.toString();
+    }
+    
 }

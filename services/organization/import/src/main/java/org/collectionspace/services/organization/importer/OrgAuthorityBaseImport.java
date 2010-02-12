@@ -96,45 +96,11 @@ public class OrgAuthorityBaseImport {
     				+newOrgAuthorityId );
     	}
     	for(Map<String,String> orgInfo : orgInfos){
-    		createItemInAuthority(newOrgAuthorityId, 
-    				baseOrgAuthRefName, orgInfo );
+            OrgAuthorityClientUtils.createItemInAuthority(
+            		newOrgAuthorityId, baseOrgAuthRefName, orgInfo, client);
     	}
     }
     
-    private String createItemInAuthority(String vcsid, 
-    		String orgAuthorityRefName, Map<String, String> orgInfo) {
-    	// Expected status code: 201 Created
-    	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
-    	// Type of service request being tested
-    	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
-    	String shortName = orgInfo.get(OrganizationJAXBSchema.SHORT_NAME);
-    	String refName = OrgAuthorityClientUtils.createOrganizationRefName(
-    						orgAuthorityRefName, shortName, true);
-
-    	if(logger.isDebugEnabled()){
-    		logger.debug("Import: Create Item: \""+shortName
-    				+"\" in orgAuthorityulary: \"" + orgAuthorityRefName +"\"");
-    	}
-    	MultipartOutput multipart = 
-    		OrgAuthorityClientUtils.createOrganizationInstance( vcsid, 
-    				refName, orgInfo, client.getItemCommonPartName() );
-    	ClientResponse<Response> res = client.createItem(vcsid, multipart);
-
-    	int statusCode = res.getStatus();
-
-    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-    		throw new RuntimeException("Could not create Item: \""+shortName
-    				+"\" in orgAuthority: \"" + orgAuthorityRefName
-    				+"\" "+ OrgAuthorityClientUtils.invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    	}
-    	if(statusCode != EXPECTED_STATUS_CODE) {
-    		throw new RuntimeException("Unexpected Status when creating Item: \""+shortName
-    				+"\" in orgAuthority: \"" + orgAuthorityRefName +"\", Status:"+ statusCode);
-    	}
-
-    	return OrgAuthorityClientUtils.extractId(res);
-    }
-
     // ---------------------------------------------------------------
     // Utility methods used by methods above
     // ---------------------------------------------------------------

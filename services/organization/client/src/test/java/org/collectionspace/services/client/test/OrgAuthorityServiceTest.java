@@ -63,6 +63,8 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     private OrgAuthorityClient client = new OrgAuthorityClient();
     final String SERVICE_PATH_COMPONENT = "orgauthorities";
     final String ITEM_SERVICE_PATH_COMPONENT = "items";
+    private final String TEST_ORG_SHORTNAME = "Test Org";
+    private final String TEST_ORG_FOUNDING_PLACE = "Anytown, USA";
     private String knownResourceId = null;
     private String lastOrgAuthId = null;
     private String knownResourceRefName = null;
@@ -133,13 +135,13 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     public void createItem(String testName) {
         setupCreate(testName);
 
-        knownItemResourceId = createItemInAuthority(lastOrgAuthId);
+        knownItemResourceId = createItemInAuthority(lastOrgAuthId, knownResourceRefName);
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
         }
     }
 
-    private String createItemInAuthority(String vcsid) {
+    private String createItemInAuthority(String vcsid, String orgAuthorityRefName) {
 
         final String testName = "createItemInAuthority";
         if(logger.isDebugEnabled()){
@@ -150,31 +152,18 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         String identifier = createIdentifier();
         String refName = OrgAuthorityClientUtils.createOrganizationRefName(knownResourceRefName, identifier, true);
         Map<String, String> testOrgMap = new HashMap<String,String>();
-        testOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "Test Org");
+        testOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, TEST_ORG_SHORTNAME);
         testOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "The real official test organization");
         testOrgMap.put(OrganizationJAXBSchema.CONTACT_NAME, "joe@test.org");
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "May 26, 1907");
-        testOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, "Anytown, USA");
+        testOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, TEST_ORG_FOUNDING_PLACE);
         testOrgMap.put(OrganizationJAXBSchema.FUNCTION, "For testing");
-        MultipartOutput multipart = 
-        	OrgAuthorityClientUtils.createOrganizationInstance(vcsid, 
-    		refName, testOrgMap, client.getItemCommonPartName() );
-        ClientResponse<Response> res = client.createItem(vcsid, multipart);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+        String newID = OrgAuthorityClientUtils.createItemInAuthority(
+        		vcsid, orgAuthorityRefName, testOrgMap, client);
         // Store the ID returned from the first item resource created
         // for additional tests below.
         if (knownItemResourceId == null){
-            knownItemResourceId = extractId(res);
+            knownItemResourceId = newID;
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
             }
@@ -186,9 +175,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         //
         // Item resource IDs are unique, so these are used as keys;
         // the non-unique IDs of their parents are stored as associated values.
-        allResourceItemIdsCreated.put(extractId(res), vcsid);
+        allResourceItemIdsCreated.put(newID, vcsid);
 
-        return extractId(res);
+        return newID;
     }
 
     @Override
@@ -402,6 +391,112 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
                     OrganizationsCommon.class));
         }
         Assert.assertEquals(organization.getInAuthority(), knownResourceId);
+    }
+
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+            dependsOnMethods = {"readItem", "updateItem"})
+    public void verifyItemDisplayName(String testName) throws Exception {
+
+        // Perform setup.
+        setupRead(testName);
+
+        // Submit the request to the service and store the response.
+        ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Check whether organization has expected displayName.
+        MultipartInput input = (MultipartInput) res.getEntity();
+        OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
+                client.getItemCommonPartName(), OrganizationsCommon.class);
+        Assert.assertNotNull(organization);
+        String displayName = organization.getDisplayName();
+        // Make sure displayName matches computed form
+        String expectedDisplayName = 
+        	OrgAuthorityClientUtils.prepareDefaultDisplayName(
+        			TEST_ORG_SHORTNAME, TEST_ORG_FOUNDING_PLACE);
+        Assert.assertNotNull(displayName, expectedDisplayName);
+        
+        // Update the shortName and verify the computed name is updated.
+        organization.setDisplayNameComputed(true);
+        organization.setShortName("updated-" + TEST_ORG_SHORTNAME);
+        expectedDisplayName = 
+        	OrgAuthorityClientUtils.prepareDefaultDisplayName(
+        			"updated-" + TEST_ORG_SHORTNAME, TEST_ORG_FOUNDING_PLACE);
+
+        // Submit the updated resource to the service and store the response.
+        MultipartOutput output = new MultipartOutput();
+        OutputPart commonPart = output.addPart(organization, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+        res = client.updateItem(knownResourceId, knownItemResourceId, output);
+        statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug("updateItem: status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Retrieve the updated resource and verify that its contents exist.
+        input = (MultipartInput) res.getEntity();
+        OrganizationsCommon updatedOrganization =
+                (OrganizationsCommon) extractPart(input,
+                        client.getItemCommonPartName(), OrganizationsCommon.class);
+        Assert.assertNotNull(updatedOrganization);
+
+        // Verify that the updated resource received the correct data.
+        Assert.assertEquals(updatedOrganization.getShortName(),
+                organization.getShortName(),
+                "Updated ShortName in Organization did not match submitted data.");
+        // Verify that the updated resource computes the right displayName.
+        Assert.assertEquals(updatedOrganization.getDisplayName(),
+        		expectedDisplayName,
+                "Updated ShortName in Organization not reflected in computed DisplayName.");
+
+        // Now Update the displayName, not computed and verify the computed name is overriden.
+        organization.setDisplayNameComputed(false);
+        expectedDisplayName = "TestName";
+        organization.setDisplayName(expectedDisplayName);
+
+        // Submit the updated resource to the service and store the response.
+        output = new MultipartOutput();
+        commonPart = output.addPart(organization, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+        res = client.updateItem(knownResourceId, knownItemResourceId, output);
+        statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug("updateItem: status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Retrieve the updated resource and verify that its contents exist.
+        input = (MultipartInput) res.getEntity();
+        updatedOrganization =
+                (OrganizationsCommon) extractPart(input,
+                        client.getItemCommonPartName(), OrganizationsCommon.class);
+        Assert.assertNotNull(updatedOrganization);
+
+        // Verify that the updated resource received the correct data.
+        Assert.assertEquals(updatedOrganization.isDisplayNameComputed(), false,
+                "Updated displayNameComputed in Organization did not match submitted data.");
+        // Verify that the updated resource computes the right displayName.
+        Assert.assertEquals(updatedOrganization.getDisplayName(),
+        		expectedDisplayName,
+                "Updated DisplayName (not computed) in Organization not stored.");
     }
 
     // Failure outcomes
@@ -861,7 +956,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"createItem", "readItemList", "testItemSubmitRequest",
-            "updateItem"})
+            "updateItem", "verifyItemDisplayName"})
     public void deleteItem(String testName) throws Exception {
 
         // Perform setup.

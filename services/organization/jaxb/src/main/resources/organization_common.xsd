@@ -20,7 +20,7 @@
                 <xs:element name="inAuthority" type="xs:string" />
                 <xs:element name="refName" type="xs:string"/>
                 <xs:element name="displayName" type="xs:string"/>
-<!--			        <xs:element name="displayNameComputed" type="xs:boolean"/> -->
+				        <xs:element name="displayNameComputed" type="xs:boolean"/>
                 <xs:element name="shortName" type="xs:string"/>
                 <xs:element name="longName" type="xs:string"/>
                 <xs:element name="nameAdditions" type="xs:string"/>

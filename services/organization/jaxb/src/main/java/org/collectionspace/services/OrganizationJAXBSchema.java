@@ -12,6 +12,7 @@ public interface OrganizationJAXBSchema {
 	final static String CSID = "csid";
 	final static String IN_AUTHORITY = "inAuthority";
 	final static String DISPLAY_NAME = "displayName";
+	final static String DISPLAY_NAME_COMPUTED = "displayNameComputed";
 	final static String SHORT_NAME = "shortName";
 	final static String REF_NAME = "refName";
 	final static String LONG_NAME = "longName";

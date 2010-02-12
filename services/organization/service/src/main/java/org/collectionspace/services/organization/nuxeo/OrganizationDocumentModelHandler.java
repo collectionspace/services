@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.collectionspace.services.OrganizationJAXBSchema;
+import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
@@ -77,64 +78,68 @@ public class OrganizationDocumentModelHandler
     public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
     	// first fill all the parts of the document
     	super.handleCreate(wrapDoc);    	
-    	handleGetDisplayName(wrapDoc.getWrappedObject());
-    }
-	
-    private String prepareDefaultDisplayName(DocumentModel docModel) throws Exception {
-    	String result = null;
-    	
-    	result = (String) docModel.getProperty(getServiceContext().getCommonPartLabel("organizations"),
-				OrganizationJAXBSchema.SHORT_NAME);
-    	
-    	return result;
+    	handleDisplayName(wrapDoc.getWrappedObject());
     }
     
-    /**
-     * Handle get display name.
-     * 
-     * @param docModel the doc model
-     * 
-     * @return the string
-     * 
-     * @throws Exception the exception
-     */
-    private String handleGetDisplayName(DocumentModel docModel) throws Exception {
-    	return handleGetDisplayName(docModel, true);
-    }
-    
-    /**
-     * Handle get display name.
-     * 
-     * @param wrapDoc the wrap doc
-     * 
-     * @return the string
-     * 
-     * @throws Exception the exception
-     */
-    private String handleGetDisplayName(DocumentModel docModel, boolean updateDocModel) throws Exception {
-    	String displayName = (String) docModel.getProperty(getServiceContext().getCommonPartLabel("organizations"),
-    			OrganizationJAXBSchema.DISPLAY_NAME);
-    	if (displayName == null) {
-    		displayName = prepareDefaultDisplayName(docModel);
-			if (updateDocModel == true) {
-				docModel.setProperty(getServiceContext().getCommonPartLabel(
-						"organizations"), OrganizationJAXBSchema.DISPLAY_NAME,
-						displayName);
-			}
-    	}
-    	
-    	return displayName;
-    }
-
-    /* Override handleGet so we can deal with defaulting the displayName
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleGet(org.collectionspace.services.common.document.DocumentWrapper)
-     */
     @Override
-    public void handleGet(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-    	handleGetDisplayName(wrapDoc.getWrappedObject());
-    	super.handleGet(wrapDoc);
+    public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	super.handleUpdate(wrapDoc);
+    	handleDisplayName(wrapDoc.getWrappedObject());
     }
 
+    /**
+     * Check the logic around the computed displayName
+     * 
+     * @param docModel
+     * 
+     * @throws Exception the exception
+     */
+    private void handleDisplayName(DocumentModel docModel) throws Exception {
+    	String commonPartLabel = getServiceContext().getCommonPartLabel("organizations");
+    	Boolean displayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
+    			OrganizationJAXBSchema.DISPLAY_NAME_COMPUTED);
+    	if (displayNameComputed) {
+    		String displayName = prepareDefaultDisplayName(
+        			(String) docModel.getProperty(commonPartLabel,OrganizationJAXBSchema.SHORT_NAME),
+        			(String) docModel.getProperty(commonPartLabel,OrganizationJAXBSchema.FOUNDING_PLACE));
+			docModel.setProperty(commonPartLabel, OrganizationJAXBSchema.DISPLAY_NAME,
+						displayName);
+    	} else if(null ==  
+    				docModel.getProperty(commonPartLabel,OrganizationJAXBSchema.DISPLAY_NAME)) { 
+            throw new IllegalArgumentException("Must provide "+OrganizationJAXBSchema.DISPLAY_NAME
+            		+" if " + OrganizationJAXBSchema.DISPLAY_NAME_COMPUTED+" is declared false."); 
+    	}
+    }
+
+    /**
+     * Produces a default displayName from the basic name and foundingPlace fields.
+     * @see OrgAuthorityClientUtils.prepareDefaultDisplayName() which
+     * duplicates this logic, until we define a service-general utils package
+     * that is neither client nor service specific.
+     * @param shortName
+     * @param foundingPlace
+     * @return
+     * @throws Exception
+     */
+    private static String prepareDefaultDisplayName(
+    		String shortName, String foundingPlace ) throws Exception {
+    	StringBuilder newStr = new StringBuilder();
+		final String sep = " ";
+		boolean firstAdded = false;
+		if(null != shortName ) {
+			newStr.append(shortName);
+			firstAdded = true;
+		}
+    	// Now we add the place
+		if(null != foundingPlace ) {
+			if(firstAdded) {
+				newStr.append(sep);
+			}
+			newStr.append(foundingPlace);
+		}
+		return newStr.toString();
+    }
+    
     /**
      * getCommonPart get associated organization
      * @return
@@ -191,24 +196,15 @@ public class OrganizationDocumentModelHandler
 	        //FIXME: iterating over a long list of documents is not a long term
 	        //strategy...need to change to more efficient iterating in future
 	        Iterator<DocumentModel> iter = docList.iterator();
+	        String commonPartLabel = getServiceContext().getCommonPartLabel("organizations");
 	        while(iter.hasNext()){
 	            DocumentModel docModel = iter.next();
 	            OrganizationListItem ilistItem = new OrganizationListItem();
-	            // We look for a set display name, and fall back to the short name if there is none
-	            String displayName = handleGetDisplayName(docModel, false);
-				ilistItem.setDisplayName(displayName);
-				ilistItem.setRefName((String) docModel.getProperty(getServiceContext().getCommonPartLabel(
-						"organizations"), OrganizationJAXBSchema.REF_NAME));
-							/*
-							 * These are not currently included in the listing - only in the details
-	            ilistItem.setLongName(
-									(String) docModel.getProperty(getServiceContext().getCommonPartLabel("organizations"),
-									OrganizationJAXBSchema.LONG_NAME));
-	            ilistItem.setDescription(
-									(String) docModel.getProperty(getServiceContext().getCommonPartLabel("organizations"),
-									OrganizationJAXBSchema.DESCRIPTION));
-							 */
-							String id = NuxeoUtils.extractId(docModel.getPathAsString());
+	            ilistItem.setDisplayName((String)
+	            		docModel.getProperty(commonPartLabel,OrganizationJAXBSchema.DISPLAY_NAME ));
+				ilistItem.setRefName((String) 
+						docModel.getProperty(commonPartLabel, OrganizationJAXBSchema.REF_NAME));
+				String id = NuxeoUtils.extractId(docModel.getPathAsString());
 	            ilistItem.setUri("/orgauthorities/"+inAuthority+"/items/" + id);
 	            ilistItem.setCsid(id);
 	            list.add(ilistItem);
