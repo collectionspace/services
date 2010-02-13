@@ -20,18 +20,17 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  */
 public class VocabularyClient extends AbstractServiceClientImpl {
 
-	/* (non-Javadoc)
-	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
-	 */
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
+     */
     @Override
-	public String getServicePathComponent() {
-		return "vocabularies";
-	}
-	
-	public String getItemCommonPartName() {
-		return getCommonPartName("vocabularyitems");
-	}
+    public String getServicePathComponent() {
+        return "vocabularies";
+    }
 
+    public String getItemCommonPartName() {
+        return getCommonPartName("vocabularyitems");
+    }
     /**
      *
      */
@@ -49,7 +48,18 @@ public class VocabularyClient extends AbstractServiceClientImpl {
     public VocabularyClient() {
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         RegisterBuiltin.register(factory);
-        vocabularyProxy = ProxyFactory.create(VocabularyProxy.class, getBaseURL());
+        setProxy();
+    }
+
+    /**
+     * allow to reset proxy as per security needs
+     */
+    public void setProxy() {
+        if (useAuth()) {
+            vocabularyProxy = ProxyFactory.create(VocabularyProxy.class, getBaseURL(), getHttpClient());
+        } else {
+            vocabularyProxy = ProxyFactory.create(VocabularyProxy.class, getBaseURL());
+        }
     }
 
     /**
@@ -74,7 +84,6 @@ public class VocabularyClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.VocabularyProxy#read(java.lang.String)
      */
-
     public ClientResponse<MultipartInput> read(String csid) {
         return vocabularyProxy.read(csid);
     }
@@ -121,7 +130,6 @@ public class VocabularyClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.VocabularyProxy#read(java.lang.String)
      */
-
     public ClientResponse<MultipartInput> readItem(String vcsid, String csid) {
         return vocabularyProxy.readItem(vcsid, csid);
     }
