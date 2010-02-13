@@ -79,6 +79,34 @@ public class ContactResource extends AbstractCollectionSpaceResourceImpl {
         return serviceName;
     }
 
+    private void validateIdsNotEmpty(String authorityCsid, String itemCsid, String csid)
+        throws WebApplicationException{
+        if (authorityCsid == null || authorityCsid.trim().isEmpty()) {
+            logger.error("missing authorityCsid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "ID of Authority in request " +
+                    "must not be null or empty").type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        if (itemCsid == null || itemCsid.trim().isEmpty()) {
+            logger.error("missing itemCsid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "ID of Item in request " +
+                    "must not be null or empty").type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        if (csid == null || csid.trim().isEmpty()) {
+            logger.error("missing csid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "ID of Contact in request " +
+                    "must not be null or empty").type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+    }
+
     @Override
     public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
         DocumentHandler docHandler = ctx.getDocumentHandler();
@@ -91,6 +119,9 @@ public class ContactResource extends AbstractCollectionSpaceResourceImpl {
         return docHandler;
     }
 
+    // FIXME This method might be removed or disabled once its
+    // counterpart, sub-resource-based createContact method, below,
+    // is fully working.
     @POST
     public Response createContact(MultipartInput input) {
         try {
@@ -112,6 +143,26 @@ public class ContactResource extends AbstractCollectionSpaceResourceImpl {
         }
     }
 
+    @POST
+    public String createContact(String authorityCsid, String itemCsid, MultipartInput input) {
+        try {
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(input, getServiceName());
+            DocumentHandler handler = createDocumentHandler(ctx);
+            String csid = getRepositoryClient(ctx).create(ctx, handler);
+            return csid;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception in createContact", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Create failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+    }
+
+    // FIXME This method might be removed or disabled once its
+    // counterpart, sub-resource-based getContact method, below,
+    // is fully working.
     @GET
     @Path("{csid}")
     public MultipartOutput getContact(
@@ -151,6 +202,43 @@ public class ContactResource extends AbstractCollectionSpaceResourceImpl {
         if (result == null) {
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Get failed, the requested Contact CSID:" + csid + ": was not found.").type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return result;
+    }
+
+    public MultipartOutput getContact(@PathParam("authorityCsid") String authorityCsid,
+        @PathParam("itemCsid") String itemCsid, @PathParam("csid") String csid)
+        throws DocumentNotFoundException, WebApplicationException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("getContact with authorityCsid=" + authorityCsid +
+            " itemcsid=" + itemCsid + " csid=" + csid);
+        }
+        try {
+          validateIdsNotEmpty(authorityCsid, itemCsid, csid);
+        } catch (WebApplicationException e) {
+            throw e;
+        }
+        MultipartOutput result = null;
+        try {
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+            DocumentHandler handler = createDocumentHandler(ctx);
+            getRepositoryClient(ctx).get(ctx, csid, handler);
+            result = (MultipartOutput) ctx.getOutput();
+        } catch (DocumentNotFoundException dnfe) {
+            throw dnfe;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getContact", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        if (result == null) {
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Get failed, the requested Contact CSID:" + csid + " was not found.").type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }

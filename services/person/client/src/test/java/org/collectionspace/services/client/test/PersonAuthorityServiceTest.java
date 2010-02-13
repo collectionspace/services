@@ -28,8 +28,13 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.client.ContactClient;
+import org.collectionspace.services.client.ContactClientUtils;
+import org.collectionspace.services.contact.ContactsCommon;
+import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
@@ -61,12 +66,14 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
     // Instance variables specific to this test.
     private PersonAuthorityClient client = new PersonAuthorityClient();
+    private ContactClient contactClient = new ContactClient();
     final String SERVICE_PATH_COMPONENT = "personauthorities";
     final String ITEM_SERVICE_PATH_COMPONENT = "items";
     private String knownResourceId = null;
     private String lastPersonAuthId = null;
     private String knownResourceRefName = null;
     private String knownItemResourceId = null;
+    private String knownContactResourceId = null;
     private int nItemsToCreateInList = 3;
     private List<String> allResourceIdsCreated = new ArrayList<String>();
     private Map<String, String> allResourceItemIdsCreated =
@@ -195,6 +202,62 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Item resource IDs are unique, so these are used as keys;
         // the non-unique IDs of their parents are stored as associated values.
         allResourceItemIdsCreated.put(extractedID, vcsid);
+
+        return extractedID;
+    }
+
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        dependsOnMethods = {"create", "createItem"})
+    public void createContact(String testName) {
+        setupCreate(testName);
+        knownContactResourceId = createContactInItem(knownResourceId, knownItemResourceId);
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": knownContactResourceId=" + knownContactResourceId);
+        }
+    }
+
+   private String createContactInItem(String authorityId, String itemId) {
+
+        final String testName = "createContactInItem";
+        setupCreate(testName);
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ":...");
+        }
+
+        // Submit the request to the service and store the response.
+        String identifier = createIdentifier();
+        MultipartOutput multipart =
+            ContactClientUtils.createContactInstance(authorityId, itemId, identifier);
+        ClientResponse<Response> res =
+             client.createContact(authorityId, itemId, multipart);
+        int statusCode = res.getStatus();
+        String extractedID = PersonAuthorityClientUtils.extractId(res);
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Store the ID returned from the first contact resource created
+        // for additional tests below.
+        if (knownContactResourceId == null){
+            knownContactResourceId = extractedID;
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": knownContactResourceId=" + knownContactResourceId);
+            }
+        }
+
+        // Store the IDs from any item resources created
+        // by tests, along with the IDs of their parents, so these items
+        // can be deleted after all tests have been run.
+        //
+        // Item resource IDs are unique, so these are used as keys;
+        // the non-unique IDs of their parents are stored as associated values.
+        allResourceItemIdsCreated.put(extractedID, knownContactResourceId);
 
         return extractedID;
     }
@@ -412,6 +475,44 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
     }
 
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        dependsOnMethods = {"create", "createItem",
+        "createContact", "read", "readItem"})
+    public void readContact(String testName) throws Exception {
+
+        // Perform setup.
+        setupRead(testName);
+
+        // Submit the request to the service and store the response.
+        ClientResponse<MultipartInput> res =
+            client.readContact(knownResourceId, knownItemResourceId,
+            knownContactResourceId);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Check whether we've received a contact.
+        MultipartInput input = (MultipartInput) res.getEntity();
+        ContactsCommon contact = (ContactsCommon) extractPart(input,
+                contactClient.getCommonPartName(), ContactsCommon.class);
+        Assert.assertNotNull(contact);
+        boolean showFull = true;
+        if(showFull && logger.isDebugEnabled()){
+            logger.debug(testName + ": returned payload:");
+            logger.debug(objectAsXmlString(contact, ContactsCommon.class));
+        }
+        Assert.assertEquals(contact.getInAuthority(), knownResourceId);
+        Assert.assertEquals(contact.getInItem(), knownItemResourceId);
+
+    }
+
     // Failure outcomes
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
@@ -455,6 +556,29 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
+
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        dependsOnMethods = {"readContact", "readNonExistent", "readItemNonExistent"})
+    public void readContactNonExistent(String testName) {
+
+        // Perform setup.
+        setupReadNonExistent(testName);
+
+        // Submit the request to the service and store the response.
+        ClientResponse<MultipartInput> res =
+            client.readContact(knownResourceId, knownItemResourceId, NON_EXISTENT_ID);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    }
+
     // ---------------------------------------------------------------
     // CRUD tests : READ_LIST tests
     // ---------------------------------------------------------------
@@ -996,6 +1120,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
      */
+
     @AfterClass(alwaysRun=true)
     public void cleanUp() {
         if (logger.isDebugEnabled()) {
@@ -1007,6 +1132,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
             personResourceId = entry.getKey();
             personAuthorityResourceId = entry.getValue();
+            // FIXME Add cleanup of any contact resources created
+            // for this item here, before cleaning up the item.
             // Note: Any non-success responses are ignored and not reported.
             ClientResponse<Response> res =
                 client.deleteItem(personAuthorityResourceId, personResourceId);
@@ -1018,6 +1145,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
     }
 
+    
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------

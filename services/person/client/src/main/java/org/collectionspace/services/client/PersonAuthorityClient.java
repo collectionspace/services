@@ -154,4 +154,15 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
     public ClientResponse<Response> deleteItem(String vcsid, String csid) {
         return personAuthorityProxy.deleteItem(vcsid, csid);
     }
+
+    public ClientResponse<Response> createContact(String authorityCsid,
+        String itemCsid, MultipartOutput multipart) {
+        return personAuthorityProxy.createContact(authorityCsid, itemCsid, multipart);
+    }
+
+    public ClientResponse<MultipartInput> readContact(String authorityCsid,
+        String itemCsid, String csid) {
+        return personAuthorityProxy.readContact(authorityCsid, itemCsid, csid);
+    }
+
 }

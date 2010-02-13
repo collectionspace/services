@@ -61,6 +61,25 @@ public class ContactDocumentModelHandler
      */
     private ContactsCommonList contactList;
 
+    private String inAuthority;
+
+    public String getInAuthority() {
+        return inAuthority;
+    }
+
+    public void setInAuthority(String inAuthority) {
+        this.inAuthority = inAuthority;
+    }
+
+    private String inItem;
+
+    public String getInItem() {
+        return inItem;
+    }
+
+    public void setInItem(String inItem) {
+        this.inItem = inItem;
+    }
 
     /**
      * getCommonPart get associated contact

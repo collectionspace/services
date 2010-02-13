@@ -7,6 +7,9 @@ package org.collectionspace.services.contact;
  *
  */
 public interface ContactJAXBSchema {
+    	final static String CSID = "csid";
+	final static String IN_AUTHORITY = "inAuthority";
+        final static String IN_ITEM ="inItem";
     	final static String ADDRESS_TYPE1 = "addressType1";
 	final static String ADDRESS_TYPE2 = "addressType2";
 	final static String ADDRESS_TYPE3 = "addressType3";

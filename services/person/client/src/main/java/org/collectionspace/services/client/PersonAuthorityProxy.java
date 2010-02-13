@@ -10,6 +10,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.person.PersonauthoritiesCommonList;
 import org.collectionspace.services.person.PersonsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
@@ -59,18 +60,60 @@ public interface PersonAuthorityProxy {
     @Path("/{vcsid}/items/")
     ClientResponse<Response> createItem(@PathParam("vcsid") String vcsid, MultipartOutput multipart);
 
-    //(R)ead
+    //(R)ead Item
     @GET
     @Path("/{vcsid}/items/{csid}")
     ClientResponse<MultipartInput> readItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
 
-    //(U)pdate
+    //(U)pdate Item
     @PUT
     @Path("/{vcsid}/items/{csid}")
     ClientResponse<MultipartInput> updateItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid, MultipartOutput multipart);
 
-    //(D)elete
+    //(D)elete Item
     @DELETE
     @Path("/{vcsid}/items/{csid}")
     ClientResponse<Response> deleteItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
+
+     // List Contacts
+    @GET
+    @Produces({"application/xml"})
+    @Path("/{authorityCsid}/items/{itemCsid}/contacts/")
+    ClientResponse<ContactsCommonList> readContactList(
+            @PathParam("authorityCsid") String authorityCsid,
+            @PathParam("itemCsid") String itemCsid);
+
+    //(C)reate Contact
+    @POST
+    @Path("/{authorityCsid}/items/{itemCsid}/contacts/")
+    ClientResponse<Response> createContact(
+            @PathParam("authorityCsid") String authorityCsid,
+            @PathParam("itemCsid") String itemCsid,
+            MultipartOutput multipart);
+
+     //(R)ead Contact
+    @GET
+    @Path("/{authorityCsid}/items/{itemCsid}/contacts/{csid}")
+    ClientResponse<MultipartInput> readContact(
+            @PathParam("authorityCsid") String authorityCsid,
+            @PathParam("itemCsid") String itemCsid,
+            @PathParam("csid") String csid);
+
+    //(U)pdate Contact
+    @PUT
+    @Path("/{authorityCsid}/items/{itemCsid}/contacts/{csid}")
+    ClientResponse<MultipartInput> updateContact(
+            @PathParam("authorityCsid") String authorityCsid,
+            @PathParam("itemCsid") String itemCsid,
+            @PathParam("csid") String csid,
+            MultipartOutput multipart);
+
+    //(D)elete Contact
+    @DELETE
+    @Path("/{authorityCsid}/items/{itemCsid}/contacts/{csid}")
+    ClientResponse<Response> deleteContact(
+            @PathParam("authorityCsid") String authorityCsid,
+            @PathParam("itemCsid") String itemCsid,
+            @PathParam("csid") String csid);
+
 }

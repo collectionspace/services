@@ -28,6 +28,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.ContactClient;
+import org.collectionspace.services.client.ContactClientUtils;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactsCommonList;
 
@@ -77,7 +78,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
 
-        MultipartOutput multipart = createContactInstance(identifier);
+        MultipartOutput multipart = ContactClientUtils.createContactInstance(identifier);
         ClientResponse<Response> res = client.create(multipart);
 
         int statusCode = res.getStatus();
@@ -482,7 +483,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         // The only relevant ID may be the one used in update(), below.
 
         // The only relevant ID may be the one used in update(), below.
-        MultipartOutput multipart = createContactInstance(NON_EXISTENT_ID);
+        MultipartOutput multipart = ContactClientUtils.createContactInstance(NON_EXISTENT_ID);
         ClientResponse<MultipartInput> res =
                 client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
@@ -605,29 +606,4 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         return SERVICE_PATH_COMPONENT;
     }
 
-    private MultipartOutput createContactInstance(String identifier) {
-        return createContactInstance(
-        		"addressText1-" + identifier,
-                "postcode-" + identifier,
-                "addressType1-" + identifier);
-    }
-
-    private MultipartOutput createContactInstance(String addressText1,
-        String postcode, String addressType1) {
-        ContactsCommon contact = new ContactsCommon();
-        contact.setAddressText1(addressText1);
-        contact.setPostcode1(postcode);
-        contact.setAddressType1(addressType1);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart =
-            multipart.addPart(contact, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
-
-        if(logger.isDebugEnabled()){
-            logger.debug("to be created, contact common");
-            logger.debug(objectAsXmlString(contact, ContactsCommon.class));
-        }
-
-        return multipart;
-    }
 }

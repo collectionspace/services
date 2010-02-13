@@ -24,7 +24,12 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.person.jaxb</artifactId>
             <version>1.0</version>
-        </dependency>				
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.contact.service</artifactId>
+            <version>1.0</version>
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>

@@ -44,6 +44,8 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="csid" type="xs:string" />
+                <xs:element name="inAuthority" type="xs:string" />
+                <xs:element name="inItem" type="xs:string" />
                 <xs:element name="addressType1" type="xs:string"/>
                 <xs:element name="addressType2" type="xs:string"/>
                 <xs:element name="addressType3" type="xs:string"/>
