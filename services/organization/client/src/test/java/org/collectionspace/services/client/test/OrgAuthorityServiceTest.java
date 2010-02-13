@@ -398,7 +398,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     public void verifyItemDisplayName(String testName) throws Exception {
 
         // Perform setup.
-        setupRead(testName);
+        setupUpdate(testName);
 
         // Submit the request to the service and store the response.
         ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
@@ -497,6 +497,51 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(updatedOrganization.getDisplayName(),
         		expectedDisplayName,
                 "Updated DisplayName (not computed) in Organization not stored.");
+    }
+
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+            dependsOnMethods = {"verifyItemDisplayName"})
+    public void verifyIllegalItemDisplayName(String testName) throws Exception {
+
+        // Perform setup.
+    	setupUpdateWithWrongXmlSchema(testName);
+
+        // Submit the request to the service and store the response.
+        ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
+
+        // Check whether organization has expected displayName.
+        MultipartInput input = (MultipartInput) res.getEntity();
+        OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
+                client.getItemCommonPartName(), OrganizationsCommon.class);
+        Assert.assertNotNull(organization);
+        // Try to Update with computed false and no displayName
+    	organization.setDisplayNameComputed(false);
+        organization.setDisplayName(null);
+
+        // Submit the updated resource to the service and store the response.
+        MultipartOutput output = new MultipartOutput();
+        OutputPart commonPart = output.addPart(organization, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+        res = client.updateItem(knownResourceId, knownItemResourceId, output);
+        statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug("updateItem: status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     // Failure outcomes
@@ -956,7 +1001,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"createItem", "readItemList", "testItemSubmitRequest",
-            "updateItem", "verifyItemDisplayName"})
+            "updateItem", "verifyIllegalItemDisplayName"})
     public void deleteItem(String testName) throws Exception {
 
         // Perform setup.

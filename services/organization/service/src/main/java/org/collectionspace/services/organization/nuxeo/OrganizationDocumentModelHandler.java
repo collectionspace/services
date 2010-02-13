@@ -104,10 +104,6 @@ public class OrganizationDocumentModelHandler
         			(String) docModel.getProperty(commonPartLabel,OrganizationJAXBSchema.FOUNDING_PLACE));
 			docModel.setProperty(commonPartLabel, OrganizationJAXBSchema.DISPLAY_NAME,
 						displayName);
-    	} else if(null ==  
-    				docModel.getProperty(commonPartLabel,OrganizationJAXBSchema.DISPLAY_NAME)) { 
-            throw new IllegalArgumentException("Must provide "+OrganizationJAXBSchema.DISPLAY_NAME
-            		+" if " + OrganizationJAXBSchema.DISPLAY_NAME_COMPUTED+" is declared false."); 
     	}
     }
 

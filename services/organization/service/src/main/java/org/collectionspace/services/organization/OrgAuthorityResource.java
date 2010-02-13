@@ -46,6 +46,7 @@ import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
@@ -322,6 +323,10 @@ public class OrgAuthorityResource extends AbstractCollectionSpaceResourceImpl {
             path.path(parentcsid + "/items/" + itemcsid);
             Response response = Response.created(path.build()).build();
             return response;
+        } catch (BadRequestException bre) {
+            Response response = Response.status(
+                    Response.Status.BAD_REQUEST).entity("Create failed reason " + bre.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Create failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -469,6 +474,10 @@ public class OrgAuthorityResource extends AbstractCollectionSpaceResourceImpl {
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
             getRepositoryClient(ctx).update(ctx, itemcsid, handler);
             result = (MultipartOutput) ctx.getOutput();
+        } catch (BadRequestException bre) {
+            Response response = Response.status(
+                    Response.Status.BAD_REQUEST).entity("Create failed reason " + bre.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();

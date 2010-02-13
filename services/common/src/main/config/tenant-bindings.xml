@@ -204,6 +204,9 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.organization.nuxeo.OrganizationDocumentModelHandler
             </service:documentHandler>
+            <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.organization.nuxeo.OrganizationValidatorHandler
+            </service:validatorHandler>
             <service:object id="1" name="Organization" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
