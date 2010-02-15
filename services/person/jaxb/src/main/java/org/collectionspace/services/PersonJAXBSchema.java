@@ -13,7 +13,7 @@ public interface PersonJAXBSchema {
 	final static String IN_AUTHORITY = "inAuthority";
 	final static String REF_NAME = "refName";
 	final static String DISPLAY_NAME = "displayName";
-	final static String DN_COMPUTED = "dnComputed";
+	final static String DISPLAY_NAME_COMPUTED = "displayNameComputed";
 	final static String FORE_NAME = "foreName";
 	final static String MIDDLE_NAME = "middleName";
 	final static String SUR_NAME = "surName";

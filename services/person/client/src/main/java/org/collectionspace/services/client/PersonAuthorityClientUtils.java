@@ -47,6 +47,9 @@ public class PersonAuthorityClientUtils {
         person.setInAuthority(inAuthority);
        	person.setRefName(personRefName);
        	String value = null;
+    	value = personInfo.get(PersonJAXBSchema.DISPLAY_NAME_COMPUTED);
+    	boolean displayNameComputed = (value==null) || value.equalsIgnoreCase("true"); 
+    	person.setDisplayNameComputed(displayNameComputed);
         if((value = (String)personInfo.get(PersonJAXBSchema.FORE_NAME))!=null)
         	person.setForeName(value);
         if((value = (String)personInfo.get(PersonJAXBSchema.MIDDLE_NAME))!=null)
@@ -102,13 +105,24 @@ public class PersonAuthorityClientUtils {
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
     	// Type of service request being tested
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
-    	String displayName = 
-    		prepareDefaultDisplayName(
-		    	personMap.get(PersonJAXBSchema.FORE_NAME),
-		    	personMap.get(PersonJAXBSchema.MIDDLE_NAME),
-		    	personMap.get(PersonJAXBSchema.SUR_NAME),
-		    	personMap.get(PersonJAXBSchema.BIRTH_DATE),
-		    	personMap.get(PersonJAXBSchema.DEATH_DATE));
+    	
+    	String displayName = personMap.get(PersonJAXBSchema.DISPLAY_NAME);
+    	String displayNameComputedStr = personMap.get(PersonJAXBSchema.DISPLAY_NAME_COMPUTED);
+    	boolean displayNameComputed = (displayNameComputedStr==null) || displayNameComputedStr.equalsIgnoreCase("true");
+    	if( displayName == null ) {
+    		if(!displayNameComputed) {
+	    		throw new RuntimeException(
+	    		"CreateItem: Must supply a displayName if displayNameComputed is set to false.");
+    		}
+        	displayName = 
+        		prepareDefaultDisplayName(
+    		    	personMap.get(PersonJAXBSchema.FORE_NAME),
+    		    	personMap.get(PersonJAXBSchema.MIDDLE_NAME),
+    		    	personMap.get(PersonJAXBSchema.SUR_NAME),
+    		    	personMap.get(PersonJAXBSchema.BIRTH_DATE),
+    		    	personMap.get(PersonJAXBSchema.DEATH_DATE));
+    	}
+    	
     	String refName = createPersonRefName(personAuthorityRefName, displayName, true);
 
     	if(logger.isDebugEnabled()){

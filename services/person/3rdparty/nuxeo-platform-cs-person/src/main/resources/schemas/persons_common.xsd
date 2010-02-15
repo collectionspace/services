@@ -25,6 +25,7 @@
 		<xs:element name="inAuthority" type="xs:string" />
 		<xs:element name="refName" type="xs:string"/>
 		<xs:element name="displayName" type="xs:string"/>
+		<xs:element name="displayNameComputed" type="xs:boolean"/>
 		<xs:element name="foreName" type="xs:string"/>
 		<xs:element name="middleName" type="xs:string"/>
 		<xs:element name="surName" type="xs:string"/>

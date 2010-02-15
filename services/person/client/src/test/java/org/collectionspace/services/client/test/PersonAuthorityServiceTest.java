@@ -69,6 +69,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     private ContactClient contactClient = new ContactClient();
     final String SERVICE_PATH_COMPONENT = "personauthorities";
     final String ITEM_SERVICE_PATH_COMPONENT = "items";
+    final String TEST_FORE_NAME = "John";
+    final String TEST_MIDDLE_NAME = null;
+    final String TEST_SUR_NAME = "Wayne";
+    final String TEST_BIRTH_DATE = "May 26, 1907";
+    final String TEST_DEATH_DATE = "June 11, 1979";
+ 
     private String knownResourceId = null;
     private String lastPersonAuthId = null;
     private String knownResourceRefName = null;
@@ -156,12 +162,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
         Map<String, String> johnWayneMap = new HashMap<String,String>();
-        johnWayneMap.put(PersonJAXBSchema.FORE_NAME, "John");
-        johnWayneMap.put(PersonJAXBSchema.SUR_NAME, "Wayne");
+        johnWayneMap.put(PersonJAXBSchema.FORE_NAME, TEST_FORE_NAME);
+        johnWayneMap.put(PersonJAXBSchema.SUR_NAME, TEST_SUR_NAME);
         johnWayneMap.put(PersonJAXBSchema.GENDER, "male");
-        johnWayneMap.put(PersonJAXBSchema.BIRTH_DATE, "May 26, 1907");
+        johnWayneMap.put(PersonJAXBSchema.BIRTH_DATE, TEST_BIRTH_DATE);
         johnWayneMap.put(PersonJAXBSchema.BIRTH_PLACE, "Winterset, Iowa");
-        johnWayneMap.put(PersonJAXBSchema.DEATH_DATE, "June 11, 1979");
+        johnWayneMap.put(PersonJAXBSchema.DEATH_DATE, TEST_DEATH_DATE);
         johnWayneMap.put(PersonJAXBSchema.BIO_NOTE, "born Marion Robert Morrison and better" +
         		"known by his stage name John Wayne, was an American film actor, director " +
         		"and producer. He epitomized rugged masculinity and has become an enduring " +
@@ -475,6 +481,159 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
     }
 
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+            dependsOnMethods = {"readItem", "updateItem"})
+    public void verifyItemDisplayName(String testName) throws Exception {
+
+        // Perform setup.
+        setupUpdate(testName);
+
+        // Submit the request to the service and store the response.
+        ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Check whether person has expected displayName.
+        MultipartInput input = (MultipartInput) res.getEntity();
+        PersonsCommon person = (PersonsCommon) extractPart(input,
+                client.getItemCommonPartName(), PersonsCommon.class);
+        Assert.assertNotNull(person);
+        String displayName = person.getDisplayName();
+        // Make sure displayName matches computed form
+        String expectedDisplayName = 
+        	PersonAuthorityClientUtils.prepareDefaultDisplayName(
+			       			TEST_FORE_NAME, null, TEST_SUR_NAME, 
+			       			TEST_BIRTH_DATE, TEST_DEATH_DATE);
+        Assert.assertNotNull(displayName, expectedDisplayName);
+        
+        // Update the shortName and verify the computed name is updated.
+        person.setDisplayNameComputed(true);
+        person.setForeName("updated-" + TEST_FORE_NAME);
+        expectedDisplayName = 
+        	PersonAuthorityClientUtils.prepareDefaultDisplayName(
+        			"updated-" + TEST_FORE_NAME, null, TEST_SUR_NAME, 
+	       			TEST_BIRTH_DATE, TEST_DEATH_DATE);
+
+        // Submit the updated resource to the service and store the response.
+        MultipartOutput output = new MultipartOutput();
+        OutputPart commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+        res = client.updateItem(knownResourceId, knownItemResourceId, output);
+        statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug("updateItem: status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Retrieve the updated resource and verify that its contents exist.
+        input = (MultipartInput) res.getEntity();
+        PersonsCommon updatedPerson =
+                (PersonsCommon) extractPart(input,
+                        client.getItemCommonPartName(), PersonsCommon.class);
+        Assert.assertNotNull(updatedPerson);
+
+        // Verify that the updated resource received the correct data.
+        Assert.assertEquals(updatedPerson.getForeName(),
+                person.getForeName(),
+                "Updated ForeName in Person did not match submitted data.");
+        // Verify that the updated resource computes the right displayName.
+        Assert.assertEquals(updatedPerson.getDisplayName(),
+        		expectedDisplayName,
+                "Updated ForeName in Person not reflected in computed DisplayName.");
+
+        // Now Update the displayName, not computed and verify the computed name is overriden.
+        person.setDisplayNameComputed(false);
+        expectedDisplayName = "TestName";
+        person.setDisplayName(expectedDisplayName);
+
+        // Submit the updated resource to the service and store the response.
+        output = new MultipartOutput();
+        commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+        res = client.updateItem(knownResourceId, knownItemResourceId, output);
+        statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug("updateItem: status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Retrieve the updated resource and verify that its contents exist.
+        input = (MultipartInput) res.getEntity();
+        updatedPerson =
+                (PersonsCommon) extractPart(input,
+                        client.getItemCommonPartName(), PersonsCommon.class);
+        Assert.assertNotNull(updatedPerson);
+
+        // Verify that the updated resource received the correct data.
+        Assert.assertEquals(updatedPerson.isDisplayNameComputed(), false,
+                "Updated displayNameComputed in Person did not match submitted data.");
+        // Verify that the updated resource computes the right displayName.
+        Assert.assertEquals(updatedPerson.getDisplayName(),
+        		expectedDisplayName,
+                "Updated DisplayName (not computed) in Person not stored.");
+    }
+
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+            dependsOnMethods = {"verifyItemDisplayName"})
+    public void verifyIllegalItemDisplayName(String testName) throws Exception {
+
+        // Perform setup.
+    	setupUpdateWithWrongXmlSchema(testName);
+
+        // Submit the request to the service and store the response.
+        ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
+
+        // Check whether Person has expected displayName.
+        MultipartInput input = (MultipartInput) res.getEntity();
+        PersonsCommon person = (PersonsCommon) extractPart(input,
+                client.getItemCommonPartName(), PersonsCommon.class);
+        Assert.assertNotNull(person);
+        // Try to Update with computed false and no displayName
+        person.setDisplayNameComputed(false);
+        person.setDisplayName(null);
+
+        // Submit the updated resource to the service and store the response.
+        MultipartOutput output = new MultipartOutput();
+        OutputPart commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+        res = client.updateItem(knownResourceId, knownItemResourceId, output);
+        statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug("updateItem: status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    }
+    
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "createItem",
         "createContact", "read", "readItem"})
@@ -995,7 +1154,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"createItem", "readItemList", "testItemSubmitRequest",
-            "updateItem"})
+            "updateItem", "verifyIllegalItemDisplayName"})
     public void deleteItem(String testName) throws Exception {
 
         // Perform setup.
