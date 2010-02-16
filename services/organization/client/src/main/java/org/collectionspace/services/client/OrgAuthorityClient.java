@@ -4,7 +4,6 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.organization.OrgauthoritiesCommonList;
 import org.collectionspace.services.organization.OrganizationsCommonList;
-import org.collectionspace.services.client.OrgAuthorityProxy;
 
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ProxyFactory;
@@ -20,18 +19,17 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  */
 public class OrgAuthorityClient extends AbstractServiceClientImpl {
 
-	/* (non-Javadoc)
-	 * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
-	 */
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
+     */
     @Override
-	public String getServicePathComponent() {
-		return "orgauthorities";
-	}
-	
-	public String getItemCommonPartName() {
-		return getCommonPartName("organizations");
-	}
+    public String getServicePathComponent() {
+        return "orgauthorities";
+    }
 
+    public String getItemCommonPartName() {
+        return getCommonPartName("organizations");
+    }
     /**
      *
      */
@@ -49,7 +47,20 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
     public OrgAuthorityClient() {
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         RegisterBuiltin.register(factory);
-        orgAuthorityProxy = ProxyFactory.create(OrgAuthorityProxy.class, getBaseURL());
+        setProxy();
+    }
+
+    /**
+     * allow to reset proxy as per security needs
+     */
+    public void setProxy() {
+        if (useAuth()) {
+            orgAuthorityProxy = ProxyFactory.create(OrgAuthorityProxy.class,
+                    getBaseURL(), getHttpClient());
+        } else {
+            orgAuthorityProxy = ProxyFactory.create(OrgAuthorityProxy.class,
+                    getBaseURL());
+        }
     }
 
     /**
@@ -74,7 +85,6 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.OrgAuthorityProxy#read(java.lang.String)
      */
-
     public ClientResponse<MultipartInput> read(String csid) {
         return orgAuthorityProxy.read(csid);
     }
@@ -121,7 +131,6 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.OrgAuthorityProxy#read(java.lang.String)
      */
-
     public ClientResponse<MultipartInput> readItem(String vcsid, String csid) {
         return orgAuthorityProxy.readItem(vcsid, csid);
     }

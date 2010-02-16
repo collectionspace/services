@@ -18,7 +18,6 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.contact.ContactsCommonList;
 
 import org.jboss.resteasy.client.ProxyFactory;
@@ -62,7 +61,20 @@ public class ContactClient extends AbstractServiceClientImpl {
     public ContactClient() {
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         RegisterBuiltin.register(factory);
-        contactProxy = ProxyFactory.create(ContactProxy.class, getBaseURL());
+        setProxy();
+    }
+
+    /**
+     * allow to reset proxy as per security needs
+     */
+    public void setProxy() {
+        if (useAuth()) {
+            contactProxy = ProxyFactory.create(ContactProxy.class,
+                    getBaseURL(), getHttpClient());
+        } else {
+            contactProxy = ProxyFactory.create(ContactProxy.class,
+                    getBaseURL());
+        }
     }
 
     /**

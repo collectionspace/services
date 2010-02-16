@@ -20,18 +20,17 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  */
 public class PersonAuthorityClient extends AbstractServiceClientImpl {
 
-	/* (non-Javadoc)
-	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
-	 */
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
+     */
     @Override
-	public String getServicePathComponent() {
-		return "personauthorities";
-	}
-	
-	public String getItemCommonPartName() {
-		return getCommonPartName("persons");
-	}
+    public String getServicePathComponent() {
+        return "personauthorities";
+    }
 
+    public String getItemCommonPartName() {
+        return getCommonPartName("persons");
+    }
     /**
      *
      */
@@ -49,7 +48,20 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
     public PersonAuthorityClient() {
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         RegisterBuiltin.register(factory);
-        personAuthorityProxy = ProxyFactory.create(PersonAuthorityProxy.class, getBaseURL());
+        setProxy();
+    }
+
+    /**
+     * allow to reset proxy as per security needs
+     */
+    public void setProxy() {
+        if (useAuth()) {
+            personAuthorityProxy = ProxyFactory.create(PersonAuthorityProxy.class,
+                    getBaseURL(), getHttpClient());
+        } else {
+            personAuthorityProxy = ProxyFactory.create(PersonAuthorityProxy.class,
+                    getBaseURL());
+        }
     }
 
     /**
@@ -74,7 +86,6 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.PersonAuthorityProxy#read(java.lang.String)
      */
-
     public ClientResponse<MultipartInput> read(String csid) {
         return personAuthorityProxy.read(csid);
     }
@@ -121,7 +132,6 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.PersonAuthorityProxy#read(java.lang.String)
      */
-
     public ClientResponse<MultipartInput> readItem(String vcsid, String csid) {
         return personAuthorityProxy.readItem(vcsid, csid);
     }
@@ -156,13 +166,12 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
     }
 
     public ClientResponse<Response> createContact(String authorityCsid,
-        String itemCsid, MultipartOutput multipart) {
+            String itemCsid, MultipartOutput multipart) {
         return personAuthorityProxy.createContact(authorityCsid, itemCsid, multipart);
     }
 
     public ClientResponse<MultipartInput> readContact(String authorityCsid,
-        String itemCsid, String csid) {
+            String itemCsid, String csid) {
         return personAuthorityProxy.readContact(authorityCsid, itemCsid, csid);
     }
-
 }

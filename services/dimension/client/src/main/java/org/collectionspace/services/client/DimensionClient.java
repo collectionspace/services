@@ -70,7 +70,20 @@ public class DimensionClient extends AbstractServiceClientImpl {
     public DimensionClient() {
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         RegisterBuiltin.register(factory);
-        dimensionProxy = ProxyFactory.create(DimensionProxy.class, getBaseURL());
+        setProxy();
+    }
+
+    /**
+     * allow to reset proxy as per security needs
+     */
+    public void setProxy() {
+        if (useAuth()) {
+            dimensionProxy = ProxyFactory.create(DimensionProxy.class,
+                    getBaseURL(), getHttpClient());
+        } else {
+            dimensionProxy = ProxyFactory.create(DimensionProxy.class,
+                    getBaseURL());
+        }
     }
 
     /**

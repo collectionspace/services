@@ -173,8 +173,8 @@ public abstract class AbstractServiceClientImpl implements CollectionSpaceClient
         if(useAuth()){
             String user = properties.getProperty(USER_PROPERTY);
             String password = properties.getProperty(PASSWORD_PROPERTY);
-            if(logger.isDebugEnabled()){
-                logger.debug("setupHttpClient() using url=" + url +
+            if(logger.isInfoEnabled()){
+                logger.info("setupHttpClient() using url=" + url +
                         " user=" + user + " password=" + password);
             }
 
@@ -183,8 +183,12 @@ public abstract class AbstractServiceClientImpl implements CollectionSpaceClient
                     new UsernamePasswordCredentials(user, password));
             //JAXRS client library requires HTTP preemptive authentication
             httpClient.getParams().setAuthenticationPreemptive(true);
-            if(logger.isDebugEnabled()){
-                logger.debug("setupHttpClient: set preemptive authentication");
+            if(logger.isInfoEnabled()){
+                logger.info("setupHttpClient: set preemptive authentication");
+            }
+        } else {
+            if(logger.isInfoEnabled()){
+                logger.info("setupHttpClient() : no auth mode!");
             }
         }
     }

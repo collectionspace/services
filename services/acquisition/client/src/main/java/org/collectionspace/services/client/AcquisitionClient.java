@@ -18,14 +18,13 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  */
 public class AcquisitionClient extends AbstractServiceClientImpl {
 
-	/* (non-Javadoc)
-	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
-	 */
-	public String getServicePathComponent() {
-		return "acquisitions";
-	}
-
-	// FIXME: Is the "instance" member still needed/used?
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
+     */
+    public String getServicePathComponent() {
+        return "acquisitions";
+    }
+    // FIXME: Is the "instance" member still needed/used?
     /**
      *
      */
@@ -43,7 +42,20 @@ public class AcquisitionClient extends AbstractServiceClientImpl {
     public AcquisitionClient() {
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         RegisterBuiltin.register(factory);
-        acquisitionProxy = ProxyFactory.create(AcquisitionProxy.class, getBaseURL());
+        setProxy();
+    }
+
+    /**
+     * allow to reset proxy as per security needs
+     */
+    public void setProxy() {
+        if (useAuth()) {
+            acquisitionProxy = ProxyFactory.create(AcquisitionProxy.class,
+                    getBaseURL(), getHttpClient());
+        } else {
+            acquisitionProxy = ProxyFactory.create(AcquisitionProxy.class,
+                    getBaseURL());
+        }
     }
 
     /**

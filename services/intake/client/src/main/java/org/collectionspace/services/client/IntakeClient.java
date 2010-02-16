@@ -28,7 +28,6 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.intake.IntakesCommonList;
 
 import org.jboss.resteasy.client.ProxyFactory;
@@ -45,18 +44,16 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  */
 public class IntakeClient extends AbstractServiceClientImpl {
 
-	/* (non-Javadoc)
-	 * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
-	 */
-	public String getServicePathComponent() {
-		return "intakes";
-	}
-
-	/**
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
+     */
+    public String getServicePathComponent() {
+        return "intakes";
+    }
+    /**
      *
      */
     private static final IntakeClient instance = new IntakeClient();
-    
     /**
      *
      */
@@ -70,7 +67,20 @@ public class IntakeClient extends AbstractServiceClientImpl {
     public IntakeClient() {
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         RegisterBuiltin.register(factory);
-        intakeProxy = ProxyFactory.create(IntakeProxy.class, getBaseURL());
+        setProxy();
+    }
+
+    /**
+     * allow to reset proxy as per security needs
+     */
+    public void setProxy() {
+        if (useAuth()) {
+            intakeProxy = ProxyFactory.create(IntakeProxy.class,
+                    getBaseURL(), getHttpClient());
+        } else {
+            intakeProxy = ProxyFactory.create(IntakeProxy.class,
+                    getBaseURL());
+        }
     }
 
     /**
@@ -95,7 +105,6 @@ public class IntakeClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.hello.client.IntakeProxy#getIntake(java.lang.String)
      */
-
     public ClientResponse<MultipartInput> read(String csid) {
         return intakeProxy.read(csid);
     }
