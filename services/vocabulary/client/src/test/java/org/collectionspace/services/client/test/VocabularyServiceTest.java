@@ -345,6 +345,70 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     }
 
     // Failure outcomes
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+            dependsOnMethods = {"updateItem"})
+    public void verifyIllegalItemDisplayName(String testName) throws Exception {
+
+        // Perform setup.
+    	setupUpdateWithWrongXmlSchema(testName);
+
+        // Submit the request to the service and store the response.
+        ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
+
+        // Check whether Person has expected displayName.
+        MultipartInput input = (MultipartInput) res.getEntity();
+        VocabularyitemsCommon vitem = (VocabularyitemsCommon) extractPart(input,
+                client.getItemCommonPartName(), VocabularyitemsCommon.class);
+        Assert.assertNotNull(vitem);
+        // Try to Update with null displayName
+        vitem.setDisplayName(null);
+
+        // Submit the updated resource to the service and store the response.
+        MultipartOutput output = new MultipartOutput();
+        OutputPart commonPart = output.addPart(vitem, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+        res = client.updateItem(knownResourceId, knownItemResourceId, output);
+        statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug("updateItem: status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE, 
+        		"Expecting invalid message because of null displayName.");
+
+        // Now try to Update with 1-char displayName (too short)
+        vitem.setDisplayName("a");
+
+        // Submit the updated resource to the service and store the response.
+        output = new MultipartOutput();
+        commonPart = output.addPart(vitem, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+        res = client.updateItem(knownResourceId, knownItemResourceId, output);
+        statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug("updateItem: status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE, 
+        	"Expecting invalid message because of 1-char displayName.");
+    }
+
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"read"})
@@ -754,8 +818,10 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         // The only relevant ID may be the one used in update(), below.
         HashMap<String, String> itemInfo = new HashMap<String, String>();
         itemInfo.put(VocabularyItemJAXBSchema.DISPLAY_NAME, "nonex");
-        MultipartOutput multipart = VocabularyClientUtils.createVocabularyItemInstance(
-        		knownResourceId, NON_EXISTENT_ID, itemInfo, NON_EXISTENT_ID);
+        MultipartOutput multipart = 
+        	VocabularyClientUtils.createVocabularyItemInstance(knownResourceId, 
+        		VocabularyClientUtils.createVocabularyItemRefName(NON_EXISTENT_ID, NON_EXISTENT_ID, true),
+        		itemInfo, client.getItemCommonPartName());
         ClientResponse<MultipartInput> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
@@ -798,7 +864,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"createItem", "readItemList", "testItemSubmitRequest",
-            "updateItem"})
+            "updateItem", "verifyIllegalItemDisplayName"})
     public void deleteItem(String testName) throws Exception {
 
         // Perform setup.
