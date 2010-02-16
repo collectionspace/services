@@ -15,6 +15,7 @@
     <version>1.0</version>
     <name>services.jaxrs.provider</name>
     <properties>
+        <cs.release>0.5</cs.release>
         <spring.version>3.0.0.RELEASE</spring.version>
         <spring.security.version>3.0.1.RELEASE</spring.security.version>
     </properties>
@@ -307,6 +308,19 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>2.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <packageName>${pom.groupid}</packageName>
+                            <!--addDefaultImplementationEntries/-->
+                        </manifest>
+                        <manifestEntries>
+                            <Vendor>CollectionSpace Services</Vendor>
+                            <Package>${pom.groupId}</Package>
+                            <Release>${cs.release}</Release>
+                        </manifestEntries>                      
+                    </archive>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
