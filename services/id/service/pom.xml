@@ -43,13 +43,6 @@
       <version>1.0</version>
     </dependency>
     
-    <!-- JAXB-generated code, in the jaxb module of this project. -->
-    <dependency>
-      <groupId>org.collectionspace.services</groupId>
-      <artifactId>org.collectionspace.services.id.jaxb</artifactId>
-      <version>1.0</version>
-    </dependency>
-
     <!-- JUnit, a testing framework. -->
     <!-- NOTE: Versions later than 4.1 - such as 4.5 - are available. -->
     <dependency>
@@ -111,36 +104,6 @@
       <version>1.0.2.GA</version>
     </dependency>
     
-    <!-- Nuxeo, a platform offering many enterprise content management (ECM) services. -->
-    <dependency>
-      <groupId>org.nuxeo.ecm.core</groupId>
-      <artifactId>nuxeo-core-api</artifactId>
-      <version>${nuxeo.version.1.5}</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>jboss-remoting</artifactId>
-          <groupId>jboss</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <!-- Restlet, a framework for providing and consuming RESTful services. -->
-    <dependency>
-      <groupId>org.restlet</groupId>
-      <artifactId>org.restlet</artifactId>
-      <version>1.1.5</version>
-    </dependency>
-    <dependency>
-      <groupId>com.noelios.restlet</groupId>
-      <artifactId>com.noelios.restlet.ext.httpclient</artifactId>
-      <version>1.1.5</version>
-    </dependency>
-    <dependency>
-      <groupId>com.noelios.restlet</groupId>
-      <artifactId>com.noelios.restlet</artifactId>
-      <version>1.1.5</version>
-    </dependency>
-
     <!-- Cobertura, a tool for identifying the extent of code coverage in test classes -->
     <dependency>
       <groupId>org.codehaus.mojo</groupId>
@@ -152,7 +115,8 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.6</version>
+      <!--version>5.1.6</version-->
+      <scope>test</scope>
     </dependency>
     
     <!-- XStream, an XML serializer -->
@@ -168,16 +132,6 @@
   <build>
     <finalName>collectionspace-services-id</finalName>
     <plugins>
-      <plugin>
-        <!-- The Mojo project manages a collection of plugins for Maven 2. -->
-        <groupId>org.codehaus.mojo</groupId>
-        <!-- Manages the ability to start/stop JBoss and deploy/undeploy applications via JMX. -->
-        <artifactId>jboss-maven-plugin</artifactId>
-        <!-- The jboss.dir property comes from the accompanying build.properties file. -->
-        <configuration>
-          <jbossHome>${jboss.dir}</jbossHome>
-        </configuration>
-      </plugin>
       <!-- Compiles Java sources, including test sources. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

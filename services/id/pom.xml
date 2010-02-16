@@ -37,57 +37,15 @@
 
   
   <modules>
-    <module>jaxb</module>
+    <!--module>jaxb</module-->
     <module>service</module>
-    <module>3rdparty</module>
+    <!--module>3rdparty</module-->
     <!-- Uncomment the following when/if we'll be creating a client library for this service. -->
     <!-- <module>client</module> -->
   </modules>
 
   <build>
-    <pluginManagement>
-      <plugins>
-      
-        <!-- Compiles Java sources, including test sources. -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <configuration>
-            <source>1.5</source>
-            <target>1.5</target>
-          </configuration>
-        </plugin>
-        
-        <!-- Generates a site for the project, typically a website with project documentation. -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-site-plugin</artifactId>
-          <configuration>
-            <unzipCommand>/usr/bin/unzip -o &gt; err.txt</unzipCommand>
-          </configuration>
-        </plugin>
-        
-        <plugin>
-        
-          <!--
-            Collects "all artifact dependencies, classes and resources of the web
-            application," packaging them into a web application archive (WAR file).
-          -->
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-war-plugin</artifactId>
-          <version>2.0.1</version>
-          <configuration>
-            <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
-            <archive>
-              <manifest>
-                <addClasspath>true</addClasspath>
-              </manifest>
-            </archive>
-          </configuration>
-        </plugin>
-        
-      </plugins>
-    </pluginManagement>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
