@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.collectionspace.services.PersonAuthorityJAXBSchema;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonauthoritiesCommonList;
@@ -112,6 +113,18 @@ public class PersonAuthorityDocumentModelHandler
         PersonauthoritiesCommonList coList = new PersonauthoritiesCommonList();
         List<PersonauthoritiesCommonList.PersonauthorityListItem> list = coList.getPersonauthorityListItem();
 
+        DocumentFilter filter = getDocumentFilter();
+        long pageNum, pageSize;
+        if(filter==null) {
+        	pageNum = 0;
+        	pageSize = 0;
+        } else {
+        	pageSize = filter.getPageSize();
+        	pageNum = filter.getOffset()/pageSize;
+        }
+        coList.setPageNum(pageNum);
+        coList.setPageSize(pageSize);
+    	coList.setTotalItems(docList.totalSize());
         //FIXME: iterating over a long list of documents is not a long term
         //strategy...need to change to more efficient iterating in future
         Iterator<DocumentModel> iter = docList.iterator();

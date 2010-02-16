@@ -45,7 +45,10 @@
     <xs:element name="orgauthorities-common-list">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="orgauthority-list-item" maxOccurs="unbounded">
+								<xs:element name="pageNum" type="xs:unsignedInt" />
+								<xs:element name="pageSize" type="xs:unsignedInt" />
+								<xs:element name="totalItems" type="xs:unsignedInt" />
+                 <xs:element name="orgauthority-list-item" maxOccurs="unbounded">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="displayName" type="xs:string"

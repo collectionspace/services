@@ -49,7 +49,10 @@
     <xs:element name="persons-common-list">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="person_list_item" maxOccurs="unbounded">
+								<xs:element name="pageNum" type="xs:unsignedInt" />
+								<xs:element name="pageSize" type="xs:unsignedInt" />
+								<xs:element name="totalItems" type="xs:unsignedInt" />
+                 <xs:element name="person_list_item" maxOccurs="unbounded">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="displayName" type="xs:string"

@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.collectionspace.services.VocabularyItemJAXBSchema;
+import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
@@ -126,6 +127,18 @@ public class VocabularyItemDocumentModelHandler
 	        List<VocabularyitemsCommonList.VocabularyitemListItem> list = 
 	        	coList.getVocabularyitemListItem();
 	
+	        DocumentFilter filter = getDocumentFilter();
+	        long pageNum, pageSize;
+	        if(filter==null) {
+	        	pageNum = 0;
+	        	pageSize = 0;
+	        } else {
+	        	pageSize = filter.getPageSize();
+	        	pageNum = filter.getOffset()/pageSize;
+	        }
+	        coList.setPageNum(pageNum);
+	        coList.setPageSize(pageSize);
+	    	coList.setTotalItems(docList.totalSize());
 	        //FIXME: iterating over a long list of documents is not a long term
 	        //strategy...need to change to more efficient iterating in future
 	        Iterator<DocumentModel> iter = docList.iterator();

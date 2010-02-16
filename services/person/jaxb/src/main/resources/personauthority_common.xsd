@@ -45,7 +45,10 @@
     <xs:element name="personauthorities-common-list">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="personauthority-list-item" maxOccurs="unbounded">
+								<xs:element name="pageNum" type="xs:unsignedInt" />
+								<xs:element name="pageSize" type="xs:unsignedInt" />
+								<xs:element name="totalItems" type="xs:unsignedInt" />
+                 <xs:element name="personauthority-list-item" maxOccurs="unbounded">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="displayName" type="xs:string"

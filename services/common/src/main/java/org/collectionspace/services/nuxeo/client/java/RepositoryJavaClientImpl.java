@@ -311,9 +311,11 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
                 query.append(" AND " + where + "AND ecm:isProxy = 0");
             }
             DocumentModelList docList = null;
+            // If we have limit and/or offset, then pass true to get totalSize
+            // in returned DocumentModelList.
             if ((docFilter.getOffset() > 0) || (docFilter.getPageSize() > 0)) {
                 docList = repoSession.query(query.toString(), null,
-                        docFilter.getPageSize(), docFilter.getOffset(), false);
+                        docFilter.getPageSize(), docFilter.getOffset(), true);
             } else {
                 docList = repoSession.query(query.toString());
             }

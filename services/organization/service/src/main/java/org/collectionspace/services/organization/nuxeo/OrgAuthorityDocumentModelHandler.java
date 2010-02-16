@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.collectionspace.services.OrgAuthorityJAXBSchema;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.organization.OrgauthoritiesCommon;
 import org.collectionspace.services.organization.OrgauthoritiesCommonList;
@@ -112,6 +113,18 @@ public class OrgAuthorityDocumentModelHandler
         OrgauthoritiesCommonList coList = new OrgauthoritiesCommonList();
         List<OrgauthoritiesCommonList.OrgauthorityListItem> list = coList.getOrgauthorityListItem();
 
+        DocumentFilter filter = getDocumentFilter();
+        long pageNum, pageSize;
+        if(filter==null) {
+        	pageNum = 0;
+        	pageSize = 0;
+        } else {
+        	pageSize = filter.getPageSize();
+        	pageNum = filter.getOffset()/pageSize;
+        }
+        coList.setPageNum(pageNum);
+        coList.setPageSize(pageSize);
+    	coList.setTotalItems(docList.totalSize());
         //FIXME: iterating over a long list of documents is not a long term
         //strategy...need to change to more efficient iterating in future
         Iterator<DocumentModel> iter = docList.iterator();
