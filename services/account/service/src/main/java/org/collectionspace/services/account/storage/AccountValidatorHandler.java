@@ -50,6 +50,8 @@
 package org.collectionspace.services.account.storage;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
@@ -74,29 +76,51 @@ public class AccountValidatorHandler implements ValidatorHandler {
         }
         try {
             AccountsCommon account = (AccountsCommon) ctx.getInput();
-            String msg = "validate() ";
+            StringBuilder msgBldr = new StringBuilder("validate() ");
             boolean invalid = false;
 
             List<AccountsCommon.Tenant> tl = account.getTenant();
             if (tl == null || tl.size() == 0) {
-                msg += " missing tenant information!";
+                msgBldr.append("\ntenant : missing information!");
                 invalid = true;
             }
             if (action.equals(Action.CREATE)) {
                 //create specific validation here
-                if (account.getUserId() == null || "".equals(account.getUserId())) {
+                if (account.getScreenName() == null || account.getScreenName().isEmpty()) {
                     invalid = true;
-                    msg += " userId is missing";
+                    msgBldr.append("\nscreenName : missing");
+                }
+                if (account.getUserId() == null || account.getUserId().isEmpty()) {
+                    invalid = true;
+                    msgBldr.append("\nuserId : missing");
+                }
+                if (account.getEmail() == null || account.getEmail().isEmpty()) {
+                    invalid = true;
+                    msgBldr.append("\nemail : missing");
+                } else {
+                    if (invalidEmail(account.getEmail(), msgBldr)) {
+                        invalid = true;
+                    }
                 }
             } else if (action.equals(Action.UPDATE)) {
                 //update specific validation here
-                if (account.getPassword() != null
-                        && (account.getUserId() == null || "".equals(account.getUserId()))) {
+                if (account.getScreenName() != null && account.getScreenName().isEmpty()) {
                     invalid = true;
-                    msg += " userId is needed with password";
+                    msgBldr.append("\nscreenName : cannot be changed!");
+                }
+                if (account.getPassword() != null
+                        && (account.getUserId() == null || account.getUserId().isEmpty())) {
+                    invalid = true;
+                    msgBldr.append("\npassword : userId is needed");
+                }
+                if (account.getEmail() != null) {
+                    if (invalidEmail(account.getEmail(), msgBldr)) {
+                        invalid = true;
+                    }
                 }
             }
             if (invalid) {
+                String msg = msgBldr.toString();
                 logger.error(msg);
                 throw new InvalidDocumentException(msg);
             }
@@ -105,5 +129,16 @@ public class AccountValidatorHandler implements ValidatorHandler {
         } catch (Exception e) {
             throw new InvalidDocumentException(e);
         }
+    }
+
+    private boolean invalidEmail(String email, StringBuilder msgBldr) {
+        boolean invalid = false;
+        Pattern p = Pattern.compile("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[_A-Za-z0-9-]+)");
+        Matcher m = p.matcher(email);
+        if (!m.find()) {
+            invalid = true;
+            msgBldr.append("\nemail : invalid " + email);
+        }
+        return invalid;
     }
 }

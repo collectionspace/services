@@ -76,11 +76,11 @@ public class CollectionObjectValidatorHandler implements ValidatorHandler {
             MultipartServiceContext mctx = (MultipartServiceContext) ctx;
             CollectionobjectsCommon co = (CollectionobjectsCommon) mctx.getInputPart(mctx.getCommonPartLabel(),
                     CollectionobjectsCommon.class);
-            String msg = "";
+            StringBuilder msgBldr = new StringBuilder("validate()");
             boolean invalid = false;
             if (co.getObjectNumber() == null || co.getObjectNumber().isEmpty()) {
                 invalid = true;
-                msg += "objectNumber is missing!";
+                msgBldr.append("\nobjectNumber : missing");
             }
             if(action.equals(Action.CREATE)) {
                 //create specific validation here
@@ -89,6 +89,7 @@ public class CollectionObjectValidatorHandler implements ValidatorHandler {
             }
 
             if (invalid) {
+                String msg = msgBldr.toString();
                 logger.error(msg);
                 throw new InvalidDocumentException(msg);
             }
