@@ -83,7 +83,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
-                createAccountInstance("barney", "hithere08", "barney@dinoland.com", true, true, true);
+                createAccountInstance("barney", "barney", "hithere08", "barney@dinoland.com",
+                true, true, true, true);
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
 
@@ -110,13 +111,56 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
+    public void createForUniqueUser(String testName) throws Exception {
+
+        setupCreate(testName);
+
+        // Submit the request to the service and store the response.
+        AccountsCommon account =
+                createAccountInstance("barney1", "barney", "hithere08", "barney@dinoland.com",
+                true, true, true, true);
+        ClientResponse<Response> res = client.create(account);
+        int statusCode = res.getStatus();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+    }
+
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"create"})
+    public void createForUniqueScreenName(String testName) throws Exception {
+
+        setupCreate(testName);
+
+        // Submit the request to the service and store the response.
+        AccountsCommon account =
+                createAccountInstance("barney", "otherUser", "hithere08", "barney@dinoland.com",
+                true, true, true, true);
+        ClientResponse<Response> res = client.create(account);
+        int statusCode = res.getStatus();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+    }
+
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"create"})
     public void createWithoutTenant(String testName) throws Exception {
 
         setupCreate(testName);
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
-                createAccountInstance("babybop", "hithere08", "babybop@dinoland.com", false, true, true);
+                createAccountInstance("babybop", "babybop", "hithere08", "babybop@dinoland.com",
+                true, false, true, true);
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
         // Does it exactly match the expected status code?
@@ -137,7 +181,71 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
-                createAccountInstance("babybop", "hithere08", "babybop@dinoland.com", true, false, true);
+                createAccountInstance("babybop", "babybop", "hithere08", "babybop@dinoland.com",
+                true, true, false, true);
+        ClientResponse<Response> res = client.create(account);
+        int statusCode = res.getStatus();
+        // Does it exactly match the expected status code?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+    }
+
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"create"})
+    public void createWithInvalidEmail(String testName) throws Exception {
+
+        setupCreate(testName);
+
+        // Submit the request to the service and store the response.
+        AccountsCommon account =
+                createAccountInstance("babybop", "babybop", "hithere08", "babybop.dinoland.com",
+                true, true, true, true);
+        ClientResponse<Response> res = client.create(account);
+        int statusCode = res.getStatus();
+        // Does it exactly match the expected status code?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+    }
+
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"create"})
+    public void createWithoutScreenName(String testName) throws Exception {
+
+        setupCreate(testName);
+
+        // Submit the request to the service and store the response.
+        AccountsCommon account =
+                createAccountInstance("babybop", "babybop", "hithere08", "babybop@dinoland.com",
+                false, true, true, true);
+        ClientResponse<Response> res = client.create(account);
+        int statusCode = res.getStatus();
+        // Does it exactly match the expected status code?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+    }
+
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"create"})
+    public void createWithMostInvalid(String testName) throws Exception {
+
+        setupCreate(testName);
+
+        // Submit the request to the service and store the response.
+        AccountsCommon account =
+                createAccountInstance("babybop", "babybop", "hithere08", "babybop/dinoland.com",
+                false, false, false, false);
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
         // Does it exactly match the expected status code?
@@ -158,7 +266,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         setupCreate(testName);
         // Submit the request to the service and store the response.
         AccountsCommon account1 =
-                createAccountInstance("curious", "hithere08", "curious@george.com", true, true, true);
+                createAccountInstance("curious", "curious", "hithere08", "curious@george.com",
+                true, true, true, true);
         ClientResponse<Response> res = client.create(account1);
         int statusCode = res.getStatus();
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -167,7 +276,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         resource1Id = extractId(res);
 
         AccountsCommon account2 =
-                createAccountInstance("tom", "hithere09", "tom@jerry.com", true, true, true);
+                createAccountInstance("tom", "tom", "hithere09", "tom@jerry.com",
+                true, true, true, true);
         res = client.create(account2);
         statusCode = res.getStatus();
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -176,7 +286,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         resource2Id = extractId(res);
 
         AccountsCommon account3 =
-                createAccountInstance("mj", "hithere10", "mj@dinoland.com", true, true, true);
+                createAccountInstance("mj", "mj", "hithere10", "mj@dinoland.com",
+                true, true, true, true);
         res = client.create(account3);
         statusCode = res.getStatus();
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -624,7 +735,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in updateAccount(), below.
         AccountsCommon account =
-                createAccountInstance("simba", "tiger", "simba@lionking.com", true, true, true);
+                createAccountInstance("simba", "simba", "tiger", "simba@lionking.com",
+                true, true, true, true);
         ClientResponse<AccountsCommon> res =
                 client.update(NON_EXISTENT_ID, account);
         int statusCode = res.getStatus();
@@ -788,26 +900,35 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-    /*
-     * createAccountInstance
-     * @param tenant fillup tenant
-     * @param user to fill up user
-     * @param password to fill up password
+    /**
+     * create account instance
+     * @param screenName
+     * @param userName
+     * @param passwd
+     * @param email
+     * @param useScreenName
+     * @param useTenant
+     * @param useUser
+     * @param usePassword
+     * @return
      */
     private AccountsCommon createAccountInstance(String screenName,
-            String passwd, String email, boolean tenant, boolean user, boolean password) {
+            String userName, String passwd, String email,
+            boolean useScreenName, boolean useTenant, boolean useUser, boolean usePassword) {
 
         AccountsCommon account = new AccountsCommon();
-        account.setScreenName(screenName);
-        if (user) {
-            account.setUserId(screenName);
+        if (useScreenName) {
+            account.setScreenName(screenName);
         }
-        if (password) {
+        if (useUser) {
+            account.setUserId(userName);
+        }
+        if (usePassword) {
             account.setPassword(Base64.encodeBase64(passwd.getBytes()));
         }
         account.setEmail(email);
         account.setPhone("1234567890");
-        if (tenant) {
+        if (useTenant) {
             List<AccountsCommon.Tenant> atl = new ArrayList<AccountsCommon.Tenant>();
             AccountsCommon.Tenant at = new AccountsCommon.Tenant();
             at.setId(UUID.randomUUID().toString());

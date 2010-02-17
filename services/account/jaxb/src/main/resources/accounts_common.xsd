@@ -35,7 +35,11 @@
             <xs:annotation>
                 <xs:appinfo>
                     <hj:entity>
-                        <orm:table name="accounts_common"/>
+                        <orm:table name="accounts_common">
+                            <orm:unique-constraint>
+                                <orm:column-name>screen_name</orm:column-name>
+                            </orm:unique-constraint>
+                        </orm:table>
                     </hj:entity>
                 </xs:appinfo>
             </xs:annotation>
