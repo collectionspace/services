@@ -132,11 +132,20 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         HashMap<String, String> itemInfo = new HashMap<String, String>();
         itemInfo.put(VocabularyItemJAXBSchema.DISPLAY_NAME, createIdentifier());
-        knownItemResourceId = VocabularyClientUtils.createItemInVocabulary(knownResourceId, 
+        String newID = VocabularyClientUtils.createItemInVocabulary(knownResourceId,
 				knownResourceRefName, itemInfo, client);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
+        // Store the ID returned from the first item resource created
+        // for additional tests below.
+        if (knownItemResourceId == null){
+            knownItemResourceId = newID;
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
+            }
         }
+        // Store the IDs from any item resources created
+        // by tests, along with the IDs of their parents, so these items
+        // can be deleted after all tests have been run.
+        allResourceItemIdsCreated.put(newID, knownResourceId);
     }
 
     @Override
