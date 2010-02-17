@@ -85,7 +85,7 @@
                     <xs:annotation>
                         <xs:appinfo>
                             <hj:basic>
-                                <orm:column name="userid" length="512"  nullable="false"/>
+                                <orm:column name="userid" length="128"  nullable="false"/>
                             </hj:basic>
                         </xs:appinfo>
                     </xs:annotation>
