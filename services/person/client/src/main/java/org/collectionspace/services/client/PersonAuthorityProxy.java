@@ -78,42 +78,42 @@ public interface PersonAuthorityProxy {
      // List Contacts
     @GET
     @Produces({"application/xml"})
-    @Path("/{authorityCsid}/items/{itemCsid}/contacts/")
+    @Path("{parentcsid}/items/{itemcsid}/contacts/")
     ClientResponse<ContactsCommonList> readContactList(
-            @PathParam("authorityCsid") String authorityCsid,
-            @PathParam("itemCsid") String itemCsid);
+            @PathParam("parentcsid") String parentcsid,
+            @PathParam("itemcsid") String itemcsid);
 
     //(C)reate Contact
     @POST
-    @Path("/{authorityCsid}/items/{itemCsid}/contacts/")
+    @Path("{parentcsid}/items/{itemcsid}/contacts/")
     ClientResponse<Response> createContact(
-            @PathParam("authorityCsid") String authorityCsid,
-            @PathParam("itemCsid") String itemCsid,
+            @PathParam("parentcsid") String parentcsid,
+            @PathParam("itemcsid") String itemcsid,
             MultipartOutput multipart);
 
      //(R)ead Contact
     @GET
-    @Path("/{authorityCsid}/items/{itemCsid}/contacts/{csid}")
+    @Path("{parentcsid}/items/{itemcsid}/contacts/{csid}")
     ClientResponse<MultipartInput> readContact(
-            @PathParam("authorityCsid") String authorityCsid,
-            @PathParam("itemCsid") String itemCsid,
+            @PathParam("parentcsid") String parentcsid,
+            @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid);
 
     //(U)pdate Contact
     @PUT
-    @Path("/{authorityCsid}/items/{itemCsid}/contacts/{csid}")
+    @Path("{parentcsid}/items/{itemcsid}/contacts/{csid}")
     ClientResponse<MultipartInput> updateContact(
-            @PathParam("authorityCsid") String authorityCsid,
-            @PathParam("itemCsid") String itemCsid,
+            @PathParam("parentcsid") String parentcsid,
+            @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid,
             MultipartOutput multipart);
 
     //(D)elete Contact
     @DELETE
-    @Path("/{authorityCsid}/items/{itemCsid}/contacts/{csid}")
+    @Path("{parentcsid}/items/{itemcsid}/contacts/{csid}")
     ClientResponse<Response> deleteContact(
-            @PathParam("authorityCsid") String authorityCsid,
-            @PathParam("itemCsid") String itemCsid,
+            @PathParam("parentcsid") String parentcsid,
+            @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid);
 
 }

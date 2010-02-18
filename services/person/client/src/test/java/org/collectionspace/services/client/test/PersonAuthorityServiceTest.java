@@ -69,6 +69,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     private ContactClient contactClient = new ContactClient();
     final String SERVICE_PATH_COMPONENT = "personauthorities";
     final String ITEM_SERVICE_PATH_COMPONENT = "items";
+    final String CONTACT_SERVICE_PATH_COMPONENT = "contacts";
     final String TEST_FORE_NAME = "John";
     final String TEST_MIDDLE_NAME = null;
     final String TEST_SUR_NAME = "Wayne";
@@ -76,21 +77,23 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     final String TEST_DEATH_DATE = "June 11, 1979";
  
     private String knownResourceId = null;
-    private String lastPersonAuthId = null;
     private String knownResourceRefName = null;
     private String knownItemResourceId = null;
     private String knownContactResourceId = null;
     private int nItemsToCreateInList = 3;
     private List<String> allResourceIdsCreated = new ArrayList<String>();
-    private Map<String, String> allResourceItemIdsCreated =
+    private Map<String, String> allItemResourceIdsCreated =
         new HashMap<String, String>();
-    
+    private Map<String, String> allContactResourceIdsCreated =
+        new HashMap<String, String>();
+
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        groups = {"create"})
     public void create(String testName) throws Exception {
 
         // Perform setup, such as initializing the type of service request
@@ -126,30 +129,26 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // for additional tests below.
         knownResourceRefName = baseRefName;
 
-        lastPersonAuthId = PersonAuthorityClientUtils.extractId(res);
+        String newID = PersonAuthorityClientUtils.extractId(res);
         // Store the ID returned from the first resource created
         // for additional tests below.
         if (knownResourceId == null){
-            knownResourceId = lastPersonAuthId;
+            knownResourceId = newID;
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
         }
         // Store the IDs from every resource created by tests,
         // so they can be deleted after tests have been run.
-        allResourceIdsCreated.add(lastPersonAuthId);
+        allResourceIdsCreated.add(newID);
 
     }
 
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create"})
+        groups = {"create"}, dependsOnMethods = {"create"})
     public void createItem(String testName) {
         setupCreate(testName);
-
-        knownItemResourceId = createItemInAuthority(lastPersonAuthId, knownResourceRefName);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
-        }
+        String newID = createItemInAuthority(knownResourceId, knownResourceRefName);
     }
 
     private String createItemInAuthority(String vcsid, String authRefName) {
@@ -180,7 +179,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         			client.getItemCommonPartName() );
         ClientResponse<Response> res = client.createItem(vcsid, multipart);
         int statusCode = res.getStatus();
-        String extractedID = PersonAuthorityClientUtils.extractId(res);
+        String newID = PersonAuthorityClientUtils.extractId(res);
 
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -191,11 +190,10 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        
         // Store the ID returned from the first item resource created
         // for additional tests below.
         if (knownItemResourceId == null){
-            knownItemResourceId = extractedID;
+            knownItemResourceId = newID;
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
             }
@@ -204,25 +202,19 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Store the IDs from any item resources created
         // by tests, along with the IDs of their parents, so these items
         // can be deleted after all tests have been run.
-        //
-        // Item resource IDs are unique, so these are used as keys;
-        // the non-unique IDs of their parents are stored as associated values.
-        allResourceItemIdsCreated.put(extractedID, vcsid);
+        allItemResourceIdsCreated.put(newID, vcsid);
 
-        return extractedID;
+        return newID;
     }
 
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "createItem"})
+        groups = {"create"}, dependsOnMethods = {"createItem"})
     public void createContact(String testName) {
         setupCreate(testName);
-        knownContactResourceId = createContactInItem(knownResourceId, knownItemResourceId);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": knownContactResourceId=" + knownContactResourceId);
-        }
+        String newID = createContactInItem(knownResourceId, knownItemResourceId);
     }
 
-   private String createContactInItem(String authorityId, String itemId) {
+   private String createContactInItem(String parentcsid, String itemcsid) {
 
         final String testName = "createContactInItem";
         setupCreate(testName);
@@ -233,11 +225,11 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
         MultipartOutput multipart =
-            ContactClientUtils.createContactInstance(authorityId, itemId, identifier);
+            ContactClientUtils.createContactInstance(parentcsid, itemcsid, identifier);
         ClientResponse<Response> res =
-             client.createContact(authorityId, itemId, multipart);
+             client.createContact(parentcsid, itemcsid, multipart);
         int statusCode = res.getStatus();
-        String extractedID = PersonAuthorityClientUtils.extractId(res);
+        String newID = PersonAuthorityClientUtils.extractId(res);
 
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -251,38 +243,18 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Store the ID returned from the first contact resource created
         // for additional tests below.
         if (knownContactResourceId == null){
-            knownContactResourceId = extractedID;
+            knownContactResourceId = newID;
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownContactResourceId=" + knownContactResourceId);
             }
         }
 
-        // Store the IDs from any item resources created
-        // by tests, along with the IDs of their parents, so these items
-        // can be deleted after all tests have been run.
-        //
-        // Item resource IDs are unique, so these are used as keys;
-        // the non-unique IDs of their parents are stored as associated values.
-        allResourceItemIdsCreated.put(extractedID, knownContactResourceId);
+        // Store the IDs from any contact resources created
+        // by tests, along with the IDs of their parent items,
+        // so these items can be deleted after all tests have been run.
+        allContactResourceIdsCreated.put(newID, itemcsid);
 
-        return extractedID;
-    }
-
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-            dependsOnMethods = {"create", "createItem"})
-    public void createList(String testName) throws Exception {
-        for (int i = 0; i < 3; i++) {
-            create(testName);
-            knownResourceId = lastPersonAuthId;
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": Resetting knownResourceId to" + knownResourceId);
-            }
-            // Add nItemsToCreateInList items to each personauthority
-            for (int j = 0; j < nItemsToCreateInList; j++) {
-                createItem(testName);
-            }
-        }
+        return newID;
     }
 
     // Failure outcomes
@@ -381,17 +353,48 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      */
 
     // ---------------------------------------------------------------
+    // CRUD tests : CREATE LIST tests
+    // ---------------------------------------------------------------
+    // Success outcomes
+    @Override
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        groups = {"createList"}, dependsOnGroups = {"create"})
+    public void createList(String testName) throws Exception {
+        for (int i = 0; i < nItemsToCreateInList; i++) {
+            create(testName);
+        }
+    }
+
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        groups = {"createList"}, dependsOnGroups = {"create"})
+    public void createItemList(String testName) throws Exception {
+        // Add items to the initially-created, known parent record.
+        for (int j = 0; j < nItemsToCreateInList; j++) {
+            createItem(testName);
+        }
+    }
+
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        groups = {"createList"}, dependsOnGroups = {"create"})
+    public void createContactList(String testName) throws Exception {
+        // Add contacts to the initially-created, known item record.
+        for (int j = 0; j < nItemsToCreateInList; j++) {
+            createContact(testName);
+        }
+    }
+
+    // ---------------------------------------------------------------
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
     // Success outcomes
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create"})
+        groups = {"read"}, dependsOnGroups = {"create"})
     public void read(String testName) throws Exception {
 
         // Perform setup.
         setupRead();
-
+        
         // Submit the request to the service and store the response.
         ClientResponse<MultipartInput> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
@@ -417,8 +420,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
     /*
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-            dependsOnMethods = {"read"})
-        public void readByName(String testName) throws Exception {
+        groups = {"read"}, dependsOnMethods = {"read"})
+    public void readByName(String testName) throws Exception {
 
             // Perform setup.
             setupRead();
@@ -448,7 +451,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     */
 
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"createItem", "read"})
+        groups = {"read"}, dependsOnMethods = {"read"})
     public void readItem(String testName) throws Exception {
 
         // Perform setup.
@@ -482,7 +485,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     }
 
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-            dependsOnMethods = {"readItem", "updateItem"})
+        dependsOnMethods = {"readItem", "updateItem"})
     public void verifyItemDisplayName(String testName) throws Exception {
 
         // Perform setup.
@@ -635,8 +638,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     }
     
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "createItem",
-        "createContact", "read", "readItem"})
+        groups = {"read"}, dependsOnMethods = {"readItem"})
     public void readContact(String testName) throws Exception {
 
         // Perform setup.
@@ -675,7 +677,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     // Failure outcomes
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"read"})
+        groups = {"read"}, dependsOnMethods = {"read"})
     public void readNonExistent(String testName) {
 
         // Perform setup.
@@ -696,7 +698,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     }
 
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"readItem", "readNonExistent"})
+        groups = {"read"}, dependsOnMethods = {"readItem"})
     public void readItemNonExistent(String testName) {
 
         // Perform setup.
@@ -717,7 +719,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     }
 
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"readContact", "readNonExistent", "readItemNonExistent"})
+        groups = {"read"}, dependsOnMethods = {"readContact"})
     public void readContactNonExistent(String testName) {
 
         // Perform setup.
@@ -745,7 +747,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"createList", "read"})
+        groups = {"readList"}, dependsOnGroups = {"create", "read"})
     public void readList(String testName) throws Exception {
 
         // Perform setup.
@@ -785,7 +787,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
     }
 
-    @Test(dependsOnMethods = {"createList", "readItem"})
+    @Test(groups = {"readList"}, dependsOnMethods = {"readList"})
     public void readItemList() {
         readItemList(knownResourceId);
     }
@@ -806,7 +808,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Check the status code of the response: does it match
         // the expected response(s)?
         if(logger.isDebugEnabled()){
-            logger.debug("  " + testName + ": status = " + statusCode);
+            logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -815,11 +817,18 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         List<PersonsCommonList.PersonListItem> items =
             list.getPersonListItem();
         int nItemsReturned = items.size();
+        // There will be one item created, associated with a
+        // known parent resource, by the createItem test.
+        //
+        // In addition, there will be 'nItemsToCreateInList'
+        // additional items created by the createItemList test,
+        // all associated with the same parent resource.
+        int nExpectedItems = nItemsToCreateInList + 1;
         if(logger.isDebugEnabled()){
-            logger.debug("  " + testName + ": Expected "
-           		+ nItemsToCreateInList+" items; got: "+nItemsReturned);
+            logger.debug(testName + ": Expected "
+           		+ nExpectedItems +" items; got: "+nItemsReturned);
         }
-        Assert.assertEquals( nItemsReturned, nItemsToCreateInList);
+        Assert.assertEquals(nItemsReturned, nExpectedItems);
 
         int i = 0;
         for (PersonsCommonList.PersonListItem item : items) {
@@ -839,6 +848,15 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
     }
 
+    @Test(groups = {"readList"}, dependsOnMethods = {"readItemList"})
+    public void readContactList() {
+        readContactList(knownResourceId, knownItemResourceId);
+    }
+
+    private void readContactList(String authorityId, String itemId) {
+        // Currently a no-op method.
+    }
+
     // Failure outcomes
     // None at present.
     // ---------------------------------------------------------------
@@ -847,7 +865,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     // Success outcomes
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"read"})
+        groups = {"update"}, dependsOnGroups = {"read"})
     public void update(String testName) throws Exception {
 
         // Perform setup.
@@ -886,7 +904,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match the expected response(s)?
         if(logger.isDebugEnabled()){
-            logger.debug("update: status = " + statusCode);
+            logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -906,7 +924,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     }
 
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"readItem", "update"})
+        groups = {"update"}, dependsOnMethods = {"update"})
     public void updateItem(String testName) throws Exception {
 
         // Perform setup.
@@ -946,7 +964,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match the expected response(s)?
         if(logger.isDebugEnabled()){
-            logger.debug("updateItem: status = " + statusCode);
+            logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -963,6 +981,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(updatedPerson.getForeName(),
                 person.getForeName(),
                 "Data in updated Person did not match submitted data.");
+    }
+
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        groups = {"update"}, dependsOnMethods = {"updateItem"})
+    public void updateContact(String testName) throws Exception {
+        // Currently a no-op test.
     }
 
     // Failure outcomes
@@ -983,7 +1007,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     /*
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "update", "testSubmitRequest"})
+        groups = {"update"}, dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateWithEmptyEntityBody(String testName) throws Exception {
 
     // Perform setup.
@@ -1009,7 +1033,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "update", "testSubmitRequest"})
+        groups = {"update"}, dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateWithMalformedXml(String testName) throws Exception {
 
     // Perform setup.
@@ -1035,7 +1059,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "update", "testSubmitRequest"})
+        groups = {"update"}, dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateWithWrongXmlSchema(String testName) throws Exception {
 
     // Perform setup.
@@ -1063,7 +1087,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"update", "testSubmitRequest"})
+        groups = {"update"}, dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
 
         // Perform setup.
@@ -1093,7 +1117,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     }
 
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"updateItem", "testItemSubmitRequest"})
+        groups = {"update"}, dependsOnMethods = {"updateItem", "testItemSubmitRequest"})
     public void updateNonExistentItem(String testName) throws Exception {
 
         // Perform setup.
@@ -1126,13 +1150,76 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        groups = {"update"}, dependsOnMethods = {"updateContact", "testContactSubmitRequest"})
+    public void updateNonExistentContact(String testName) throws Exception {
+        // Currently a no-op test
+    }
+
     // ---------------------------------------------------------------
     // CRUD tests : DELETE tests
     // ---------------------------------------------------------------
     // Success outcomes
+
+    // Note: delete sub-resources in ascending hierarchical order,
+    // before deleting their parents.
+
+
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class, 
+        groups = {"delete"}, dependsOnGroups = {"update"})
+    public void deleteContact(String testName) throws Exception {
+
+ /*
+        // Perform setup.
+        setupDelete(testName);
+
+         if(logger.isDebugEnabled()){
+            logger.debug("parentcsid =" + knownResourceId +
+                " itemcsid = " + knownItemResourceId +
+                " csid = " + knownContactResourceId);
+        }
+
+        // Submit the request to the service and store the response.
+        ClientResponse<Response> res =
+            client.deleteContact(knownResourceId, knownItemResourceId, knownContactResourceId);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+  *
+  */
+    }
+
+   @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        groups = {"delete"}, dependsOnMethods = {"deleteContact"})
+    public void deleteItem(String testName) throws Exception {
+
+        // Perform setup.
+        setupDelete(testName);
+
+        // Submit the request to the service and store the response.
+        ClientResponse<Response> res = client.deleteItem(knownResourceId, knownItemResourceId);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    }
+
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
+        groups = {"delete"}, dependsOnMethods = {"deleteItem"})
     public void delete(String testName) throws Exception {
 
         // Perform setup.
@@ -1152,32 +1239,10 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
-   @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"createItem", "readItemList", "testItemSubmitRequest",
-            "updateItem", "verifyIllegalItemDisplayName"})
-    public void deleteItem(String testName) throws Exception {
-
-        // Perform setup.
-        setupDelete(testName);
-
-        // Submit the request to the service and store the response.
-        ClientResponse<Response> res = client.deleteItem(knownResourceId, knownItemResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug("delete: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-
     // Failure outcomes
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"delete"})
+        groups = {"delete"}, dependsOnMethods = {"delete"})
     public void deleteNonExistent(String testName) throws Exception {
 
         // Perform setup.
@@ -1198,7 +1263,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     }
 
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"deleteItem"})
+        groups = {"delete"}, dependsOnMethods = {"deleteItem"})
     public void deleteNonExistentItem(String testName) {
 
         // Perform setup.
@@ -1206,6 +1271,28 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         ClientResponse<Response> res = client.deleteItem(knownResourceId, NON_EXISTENT_ID);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    }
+
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        groups = {"delete"}, dependsOnMethods = {"deleteContact"})
+    public void deleteNonExistentContact(String testName) {
+
+        // Perform setup.
+        setupDeleteNonExistent(testName);
+
+        // Submit the request to the service and store the response.
+        ClientResponse<Response> res =
+            client.deleteContact(knownResourceId, knownItemResourceId, NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -1267,6 +1354,29 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
     }
 
+    @Test(dependsOnMethods = {"createContact", "readContact", "testItemSubmitRequest"})
+    public void testContactSubmitRequest() {
+
+        // Expected status code: 200 OK
+        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
+
+        // Submit the request to the service and store the response.
+        String method = ServiceRequestType.READ.httpMethodName();
+        String url = getContactResourceURL(knownResourceId,
+            knownItemResourceId, knownContactResourceId);
+        int statusCode = submitRequest(method, url);
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug("testItemSubmitRequest: url=" + url +
+                " status=" + statusCode);
+        }
+        Assert.assertEquals(statusCode, EXPECTED_STATUS);
+
+    }
+
+
     // ---------------------------------------------------------------
     // Cleanup of resources created during testing
     // ---------------------------------------------------------------
@@ -1285,26 +1395,36 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
-        // Clean up person resources.
-        String personAuthorityResourceId;
-        String personResourceId;
-        for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
-            personResourceId = entry.getKey();
-            personAuthorityResourceId = entry.getValue();
-            // FIXME Add cleanup of any contact resources created
-            // for this item here, before cleaning up the item.
-            // Note: Any non-success responses are ignored and not reported.
+        String parentResourceId;
+        String itemResourceId;
+        String contactResourceId;
+        // Clean up contact resources.
+        parentResourceId = knownResourceId;
+        for (Map.Entry<String, String> entry : allContactResourceIdsCreated.entrySet()) {
+            contactResourceId = entry.getKey();
+            itemResourceId = entry.getValue();
+            // Note: Any non-success responses from the delete operation
+            // below are ignored and not reported.
             ClientResponse<Response> res =
-                client.deleteItem(personAuthorityResourceId, personResourceId);
+                client.deleteContact(parentResourceId, itemResourceId, contactResourceId);
         }
-        // Clean up personAuthority resources.
+        // Clean up item resources.
+        for (Map.Entry<String, String> entry : allItemResourceIdsCreated.entrySet()) {
+            itemResourceId = entry.getKey();
+            parentResourceId = entry.getValue();
+            // Note: Any non-success responses from the delete operation
+            // below are ignored and not reported.
+            ClientResponse<Response> res =
+                client.deleteItem(parentResourceId, itemResourceId);
+        }
+        // Clean up parent resources.
         for (String resourceId : allResourceIdsCreated) {
-            // Note: Any non-success responses are ignored and not reported.
+            // Note: Any non-success responses from the delete operation
+            // below are ignored and not reported.
             ClientResponse<Response> res = client.delete(resourceId);
         }
     }
 
-    
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
@@ -1317,29 +1437,80 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         return ITEM_SERVICE_PATH_COMPONENT;
     }
 
+    public String getContactServicePathComponent() {
+        return CONTACT_SERVICE_PATH_COMPONENT;
+    }
+
     /**
-     * Returns the root URL for a service.
+     * Returns the root URL for the item service.
      *
      * This URL consists of a base URL for all services, followed by
-     * a path component for the owning personAuthority, followed by the 
+     * a path component for the owning parent, followed by the
      * path component for the items.
      *
-     * @return The root URL for a service.
+     * @param  parentResourceIdentifier  An identifier (such as a UUID) for the
+     * parent authority resource of the relevant item resource.
+     *
+     * @return The root URL for the item service.
      */
     protected String getItemServiceRootURL(String parentResourceIdentifier) {
         return getResourceURL(parentResourceIdentifier) + "/" + getItemServicePathComponent();
     }
 
     /**
-     * Returns the URL of a specific resource managed by a service, and
+     * Returns the URL of a specific item resource managed by a service, and
      * designated by an identifier (such as a universally unique ID, or UUID).
      *
-     * @param  resourceIdentifier  An identifier (such as a UUID) for a resource.
+     * @param  parentResourceIdentifier  An identifier (such as a UUID) for the
+     * parent authority resource of the relevant item resource.
+     *
+     * @param  itemResourceIdentifier  An identifier (such as a UUID) for an
+     * item resource.
+     *
+     * @return The URL of a specific item resource managed by a service.
+     */
+    protected String getItemResourceURL(String parentResourceIdentifier, String itemResourceIdentifier) {
+        return getItemServiceRootURL(parentResourceIdentifier) + "/" + itemResourceIdentifier;
+    }
+
+
+    /**
+     * Returns the root URL for the contact service.
+     *
+     * This URL consists of a base URL for all services, followed by
+     * a path component for the owning authority, followed by the
+     * path component for the owning item, followed by the path component
+     * for the contact service.
+     *
+     * @param  parentResourceIdentifier  An identifier (such as a UUID) for the
+     * parent authority resource of the relevant item resource.
+     *
+     * @param  itemResourceIdentifier  An identifier (such as a UUID) for an
+     * item resource.
+     *
+     * @return The root URL for the contact service.
+     */
+    protected String getContactServiceRootURL(String parentResourceIdentifier,
+        String itemResourceIdentifier) {
+        return getItemResourceURL(parentResourceIdentifier, itemResourceIdentifier) + "/" +
+                getContactServicePathComponent();
+    }
+
+    /**
+     * Returns the URL of a specific contact resource managed by a service, and
+     * designated by an identifier (such as a universally unique ID, or UUID).
+     *
+     * @param  parentResourceIdentifier  An identifier (such as a UUID) for the
+     * parent resource of the relevant item resource.
+     *
+     * @param  resourceIdentifier  An identifier (such as a UUID) for an
+     * item resource.
      *
      * @return The URL of a specific resource managed by a service.
      */
-    protected String getItemResourceURL(String parentResourceIdentifier, String resourceIdentifier) {
-        return getItemServiceRootURL(parentResourceIdentifier) + "/" + resourceIdentifier;
+    protected String getContactResourceURL(String parentResourceIdentifier,
+        String itemResourceIdentifier, String contactResourceIdentifier) {
+        return getContactServiceRootURL(parentResourceIdentifier,
+            itemResourceIdentifier) + "/" + contactResourceIdentifier;
     }
-
 }

@@ -138,9 +138,9 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
             ServiceContext ctx, String inAuthority,
             String inItem) throws Exception {
         DocumentHandler docHandler = ctx.getDocumentHandler();
-        // Set the inAuthority and inItem values, specifying the
-        // grandparent authority (e.g. PersonAuthority, OrgAuthority) and
-        // the parent item (e.g. Person, Organization) of the Contact
+        // Set the inAuthority and inItem values, which specify the
+        // parent authority (e.g. PersonAuthority, OrgAuthority) and the item
+        // (e.g. Person, Organization) with which the Contact is associated.
         ((ContactDocumentModelHandler) docHandler).setInAuthority(inAuthority);
         ((ContactDocumentModelHandler) docHandler).setInItem(inItem);
         if (ctx.getInput() != null) {
@@ -585,26 +585,33 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
      * Contact parts - this is a sub-resource of Person (or "item")
      *************************************************************************/
     @POST
-    @Path("{authorityCsid}/items/{itemCsid}/contacts")
+    @Path("{parentcsid}/items/{itemcsid}/contacts")
     public Response createContact(
-            @PathParam("authorityCsid") String authorityCsid,
-            @PathParam("itemCsid") String itemCsid,
+            @PathParam("parentcsid") String parentcsid,
+            @PathParam("itemcsid") String itemcsid,
             MultipartInput input) {
         try {
 
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(input, getContactServiceName());
+            DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
+            String csid = getRepositoryClient(ctx).create(ctx, handler);
+/*
             ContactResource contactResource = new ContactResource();
             String csid =
-                contactResource.createContact(authorityCsid, itemCsid, input);
+                contactResource.createContact(parentcsid, itemcsid, input);
+ */
             UriBuilder path = UriBuilder.fromResource(PersonAuthorityResource.class);
-            path.path("" + authorityCsid + "/items/" + itemCsid + "/contacts/" + csid);
+            path.path("" + parentcsid + "/items/" + itemcsid + "/contacts/" + csid);
             Response response = Response.created(path.build()).build();
             return response;
-/*
-        } catch (UnauthorizedException ue) {
-            Response response = Response.status(Response.Status.UNAUTHORIZED).entity(
-               "Create failed reason " + ue.getErrorReason()).type("text/plain").build();
+        } catch (BadRequestException bre) {
+            Response response = Response.status(
+                    Response.Status.BAD_REQUEST).entity("Create failed reason " + bre.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
-*/
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Create failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in createContact", e);
@@ -620,10 +627,10 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         
     @GET
     @Produces({"application/xml"})
-    @Path("/{authorityCsid}/items/{itemCsid}/contacts/")
+    @Path("{parentcsid}/items/{itemcsid}/contacts/")
     public Response getContactList(
-            @PathParam("authorityCsid") String authorityCsid,
-            @PathParam("itemCsid") String itemCsid) {
+            @PathParam("parentcsid") String parentcsid,
+            @PathParam("itemcsid") String itemcsid) {
 
         // FIXME Placeholder while call is being implemented.
         String msg = "Reading lists of contacts is not yet implemented.";
@@ -635,22 +642,23 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
     }
 
     @GET
-    @Path("/{authorityCsid}/items/{itemCsid}/contacts/{csid}")
+    @Path("{parentcsid}/items/{itemcsid}/contacts/{csid}")
     public MultipartOutput getContact(
-            @PathParam("authorityCsid") String authorityCsid,
-            @PathParam("itemCsid") String itemCsid,
+            @PathParam("parentcsid") String parentcsid,
+            @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid) {
         MultipartOutput result = null;
         try {
+
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getContactServiceName());
+            DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
+            getRepositoryClient(ctx).get(ctx, csid, handler);
+            result = (MultipartOutput) ctx.getOutput();
+/*
             ContactResource resource = new ContactResource();
-            result = resource.getContact(authorityCsid, itemCsid, csid);
- /*
-        } catch (UnauthorizedException ue) {
-            Response response = Response.status(Response.Status.UNAUTHORIZED)
-                .entity("Get failed reason " + ue.getErrorReason())
-                .type("text/plain").build();
-            throw new WebApplicationException(response);
-  */
+            result = resource.getContact(parentcsid, itemcsid, csid);
+ *
+ */
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getContact", dnfe);
@@ -664,7 +672,7 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
                 logger.debug("getContact", e);
             }
             Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity("Get failed")
+                .entity("Get of contact failed")
                 .type("text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -679,10 +687,10 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
     }
 
     @PUT
-    @Path("/{authorityCsid}/items/{itemCsid}/contacts/{csid}")
+    @Path("{parentcsid}/items/{itemcsid}/contacts/{csid}")
     MultipartOutput updateContact(
-            @PathParam("authorityCsid") String authorityCsid,
-            @PathParam("itemCsid") String itemCsid,
+            @PathParam("parentcsid") String parentcsid,
+            @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid,
             MultipartInput input) {
 
@@ -692,19 +700,68 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
     }
 
     @DELETE
-    @Path("/{authorityCsid}/items/{itemCsid}/contacts/{csid}")
+    @Path("{parentcsid}/items/{itemcsid}/contacts/{csid}")
     Response deleteContact(
-            @PathParam("authorityCsid") String authorityCsid,
-            @PathParam("itemCsid") String itemCsid,
+            @PathParam("parentcsid") String parentcsid,
+            @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid) {
 
-        // FIXME Placeholder while call is being implemented.
-        String msg = "Deleting contacts is not yet implemented.";
-        logger.info(msg);
-        Response response = Response.status(
-            Response.Status.INTERNAL_SERVER_ERROR).entity(msg).type("text/plain").build();
-        return response;
+        if (logger.isDebugEnabled()) {
+            logger.debug("deleteContact with parentCsid=" + parentcsid +
+            " itemcsid=" + itemcsid + " csid=" + csid);
+        }
+        if (parentcsid == null || parentcsid.trim().isEmpty()) {
+            logger.error("deleteContact: missing parentcsid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "delete contact failed on parentcsid=" + parentcsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        if (itemcsid == null || itemcsid.trim().isEmpty()) {
+            logger.error("deleteContact: missing itemcsid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "delete contact failed on itemcsid=" + itemcsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        if (csid == null || csid.trim().isEmpty()) {
+            logger.error("deleteContact: missing csid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "delete contact failed on csid=" + csid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        try {
 
+            ServiceContext ctx =
+                MultipartServiceContextFactory.get().createServiceContext(null, getContactServiceName());
+            getRepositoryClient(ctx).delete(ctx, csid);
+            return Response.status(HttpResponseCodes.SC_OK).build();
+
+/*
+            ContactResource resource = new ContactResource();
+            Response response = resource.deleteContact(parentcsid, itemcsid, csid);
+            return response;
+*/
+            
+         } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Delete failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+         } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception in deleteContact", dnfe);
+            }
+            Response response = Response.status(Response.Status.NOT_FOUND)
+                .entity("Delete failed, the requested Contact CSID:" + csid + ": was not found.")
+                .type("text/plain").build();
+            throw new WebApplicationException(response);
+
+       } catch (Exception e) {
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Delete failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
     }
 
 }
