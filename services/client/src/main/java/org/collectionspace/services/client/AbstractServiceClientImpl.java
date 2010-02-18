@@ -123,8 +123,12 @@ public abstract class AbstractServiceClientImpl implements CollectionSpaceClient
             if(spec != null && !"".equals(spec)){
                 properties.setProperty(URL_PROPERTY, spec);
             }
+
             spec = properties.getProperty(URL_PROPERTY);
             url = new URL(spec);
+            if(logger.isInfoEnabled()){
+                logger.info("readProperties() using url=" + url);
+            }
 
             String auth = System.getProperty(AUTH_PROPERTY);
             if(auth != null && !"".equals(auth)){

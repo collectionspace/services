@@ -116,6 +116,37 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         allResourceIdsCreated.add(extractId(res));
     }
 
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    public void createFromXml(String testName) throws Exception {
+
+        // Perform setup, such as initializing the type of service request
+        // (e.g. CREATE, DELETE), its valid and expected status codes, and
+        // its associated HTTP method name (e.g. POST, DELETE).
+        setupCreate(testName);
+
+        // Submit the request to the service and store the response.
+        String identifier = createIdentifier();
+        MultipartOutput multipart =
+                createCollectionObjectInstanceFromXml(client.getCommonPartName(),
+                "test-data/testCambridge.xml");
+        ClientResponse<Response> res = client.create(multipart);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        //
+        // Specifically:
+        // Does it fall within the set of valid status codes?
+        // Does it exactly match the expected status code?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        allResourceIdsCreated.add(extractId(res));
+    }
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.ServiceTest#createList()
      */
@@ -723,7 +754,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         }
         multivalue = !multivalue;
         //FIXME: Title does not need to be set.
-        collectionObject.setTitle("acoward");
+        collectionObject.setTitle("atitle");
         collectionObject.setResponsibleDepartments(deptList);
         collectionObject.setObjectNumber(objectNumber);
         collectionObject.setOtherNumber("urn:org.walkerart.id:123");
@@ -767,6 +798,26 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
                         CollectionobjectsNaturalhistory.class));
             }
         }
+        return multipart;
+
+    }
+
+    private MultipartOutput createCollectionObjectInstanceFromXml(String commonPartName,
+            String commonPartFileName) throws Exception {
+
+        CollectionobjectsCommon collectionObject = (CollectionobjectsCommon) getObjectFromFile(CollectionobjectsCommon.class,
+                commonPartFileName);
+        MultipartOutput multipart = new MultipartOutput();
+        OutputPart commonPart = multipart.addPart(collectionObject,
+                MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", commonPartName);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("to be created, collectionobject common");
+            logger.debug(objectAsXmlString(collectionObject,
+                    CollectionobjectsCommon.class));
+        }
+
         return multipart;
 
     }
