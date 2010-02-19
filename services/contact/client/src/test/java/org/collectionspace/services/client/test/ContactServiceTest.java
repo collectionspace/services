@@ -78,7 +78,8 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
 
-        MultipartOutput multipart = ContactClientUtils.createContactInstance(identifier);
+        MultipartOutput multipart =
+            ContactClientUtils.createContactInstance(identifier, client.getCommonPartName());
         ClientResponse<Response> res = client.create(multipart);
 
         int statusCode = res.getStatus();
@@ -483,7 +484,8 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         // The only relevant ID may be the one used in update(), below.
 
         // The only relevant ID may be the one used in update(), below.
-        MultipartOutput multipart = ContactClientUtils.createContactInstance(NON_EXISTENT_ID);
+        MultipartOutput multipart =
+                ContactClientUtils.createContactInstance(NON_EXISTENT_ID, client.getCommonPartName());
         ClientResponse<MultipartInput> res =
                 client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
