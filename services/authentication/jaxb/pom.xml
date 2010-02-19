@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <artifactId>org.collectionspace.services.authentication</artifactId>
         <groupId>org.collectionspace.services</groupId>
         <version>1.0</version>
     </parent>
-    
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.authentication.jaxb</artifactId>
@@ -19,7 +19,7 @@
         <sql.dir>src/main/resources/db/mysql</sql.dir>
     </properties>
     <dependencies>
-                <!-- keep slf4j dependencies on the top -->
+        <!-- keep slf4j dependencies on the top -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -55,6 +55,10 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jvnet.hyperjaxb3</groupId>
+            <artifactId>hyperjaxb3-ejb-runtime</artifactId>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
@@ -94,6 +98,6 @@
 
         </plugins>
     </build>
-    
+
 </project>
 

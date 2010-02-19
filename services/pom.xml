@@ -220,7 +220,12 @@
                 <artifactId>hibernate</artifactId>
                 <version>3.4.0.GA</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.jvnet.hyperjaxb3</groupId>
+                <!-- for time type adapters -->
+                <artifactId>hyperjaxb3-ejb-runtime</artifactId>
+                <version>0.5.4</version>
+            </dependency>
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>

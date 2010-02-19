@@ -79,12 +79,14 @@ public class AccountValidatorHandler implements ValidatorHandler {
             StringBuilder msgBldr = new StringBuilder("validate() ");
             boolean invalid = false;
 
-            List<AccountsCommon.Tenant> tl = account.getTenant();
-            if (tl == null || tl.size() == 0) {
-                msgBldr.append("\ntenant : missing information!");
-                invalid = true;
-            }
             if (action.equals(Action.CREATE)) {
+                //FIXME tenant would be retrieved from security context once
+                //authentication is made mandatory, no need for validation
+                List<AccountsCommon.Tenant> tl = account.getTenant();
+                if (tl == null || tl.size() == 0) {
+                    msgBldr.append("\ntenant : missing information!");
+                    invalid = true;
+                }
                 //create specific validation here
                 if (account.getScreenName() == null || account.getScreenName().isEmpty()) {
                     invalid = true;

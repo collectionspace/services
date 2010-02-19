@@ -53,6 +53,15 @@
                         </xs:appinfo>
                     </xs:annotation>
                 </xs:element>
+                <xs:element name="personRefName" type="xs:string" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="person_ref_name" length="250" />
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element name="email" type="xs:string" minOccurs="1" maxOccurs="1">
                     <xs:annotation>
                         <xs:appinfo>
@@ -139,6 +148,24 @@
                         </xs:appinfo>
                     </xs:annotation>
                 </xs:element>
+                <xs:element name="createdAt" type="xs:dateTime">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="created_at" nullable="false"/>
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="updatedAt" type="xs:dateTime">
+                    <xs:annotation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="updated_at" />
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
             </xs:sequence>
             <xs:attribute name="csid" type="xs:string">
                 <xs:annotation>
@@ -169,9 +196,7 @@
                         </xs:annotation>
                         <xs:sequence>
                             <xs:element name="screenName" type="xs:string" minOccurs="1"/>
-                            <xs:element name="firstName" type="xs:string" minOccurs="1" />
-                            <xs:element name="lastName" type="xs:string" minOccurs="1" />
-                            <xs:element name="mi" type="xs:string"/>
+                            <xs:element name="personRefName" type="xs:string" minOccurs="1" />
                             <xs:element name="email" type="xs:string" minOccurs="1" />
                             <xs:element name="status" type="status" minOccurs="1" />
                             <!-- uri to retrive collection object details -->

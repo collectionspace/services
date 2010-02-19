@@ -926,6 +926,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         if (usePassword) {
             account.setPassword(Base64.encodeBase64(passwd.getBytes()));
         }
+        account.setPersonRefName(screenName);
         account.setEmail(email);
         account.setPhone("1234567890");
         if (useTenant) {

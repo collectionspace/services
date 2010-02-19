@@ -23,14 +23,15 @@
  */
 package org.collectionspace.services.account.storage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.collectionspace.services.account.AccountsCommon;
+import org.collectionspace.services.account.AccountsCommon.Tenant;
 import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.account.AccountsCommonList.AccountListItem;
 import org.collectionspace.services.account.Status;
 import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
-import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.slf4j.Logger;
@@ -52,6 +53,7 @@ public class AccountDocumentHandler
         String id = UUID.randomUUID().toString();
         AccountsCommon account = wrapDoc.getWrappedObject();
         account.setCsid(id);
+        
         account.setStatus(Status.ACTIVE);
     }
 
@@ -152,6 +154,8 @@ public class AccountDocumentHandler
      */
     private void sanitize(AccountsCommon account) {
         account.setPassword(null);
-
+        //FIXME once auth mode is mandatory, assume tenant could be retrieved
+        //from security context, remove tenant info being passed to the consumer
+        //account.setTenant(new ArrayList<Tenant>(0));
     }
 }

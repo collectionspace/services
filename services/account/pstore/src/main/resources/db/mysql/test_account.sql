@@ -4,6 +4,6 @@
 -- You may not use this file except in compliance with this License.
 --
 use cspace;
-INSERT INTO `cspace`.`accounts_common` VALUES  ('eeca40d7-dc77-4cc5-b489-16a53c75525a','test.test@berkeley.edu',NULL,NULL,'test','ACTIVE','test');
+INSERT INTO `cspace`.`accounts_common` (`csid`, `email`, `phone`, `mobile`, `userid`, `status`, `screen_name`, `created_at`) VALUES  ('eeca40d7-dc77-4cc5-b489-16a53c75525a','test.test@berkeley.edu',NULL,NULL,'test','ACTIVE','test', '2010-02-17 16:31:48');
 
 INSERT INTO `cspace`.`tenants` VALUES  (1,'1','movingimages.us','eeca40d7-dc77-4cc5-b489-16a53c75525a');

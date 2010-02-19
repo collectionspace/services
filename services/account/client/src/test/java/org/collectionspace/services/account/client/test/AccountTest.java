@@ -6,6 +6,7 @@ package org.collectionspace.services.account.client.test;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import javax.persistence.EntityManager;
@@ -72,6 +73,7 @@ public class AccountTest {
             account = new AccountsCommon();
         }
         account.setScreenName("test");
+        account.setPersonRefName("test hello");
         account.setEmail("test.test@berkeley.edu");
         account.setUserId("test");
         account.setStatus(Status.ACTIVE);
@@ -105,6 +107,7 @@ public class AccountTest {
         account.setStatus(Status.ACTIVE);
         id = UUID.randomUUID().toString();
         account.setCsid(id);
+        account.setCreatedAtItem(new Date());
         Tenant tenant = new Tenant();
         tenant.setId("123");
         tenant.setName("movingimages.us.standalone");

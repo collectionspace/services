@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.account.storage;
 
+import java.util.Date;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
@@ -89,6 +90,7 @@ public class AccountStorageClient extends JpaStorageClientImpl {
 //                UserTenant ut = createTenantAssoc(account);
 //                em.persist(ut);
 //            }
+            account.setCreatedAtItem(new Date());
             em.persist(account);
             em.getTransaction().commit();
             handler.complete(Action.CREATE, wrapDoc);
@@ -139,16 +141,17 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             em = emf.createEntityManager();
             em.getTransaction().begin();
             AccountsCommon accountFound = getAccount(em, id);
-
+            Date now = new Date();
             checkAllowedUpdates(account, accountFound);
             //if userid and password are given, add to default id provider
-            if (account.getUserId() != null && account.getPassword() != null) {
-
-                User userFound = getUser(em, account);
-                User user = createUser(account);
-                em.merge(user);
+            if (account.getUserId() != null && hasPassword(account.getPassword())) {
+                updateUser(em, account);
             }
-            em.merge(account);
+            account = em.merge(account);
+            account.setUpdatedAtItem(now);
+            if (logger.isDebugEnabled()) {
+                logger.debug("merged account=" + account.toString());
+            }
             em.getTransaction().commit();
             handler.complete(Action.UPDATE, wrapDoc);
         } catch (BadRequestException bre) {
@@ -284,11 +287,10 @@ public class AccountStorageClient extends JpaStorageClientImpl {
     private User createUser(AccountsCommon account) {
         User user = new User();
         user.setUsername(account.getUserId());
-        byte[] bpass = Base64.decodeBase64(account.getPassword());
-        SecurityUtils.validatePassword(new String(bpass));
-        String secEncPasswd = SecurityUtils.createPasswordHash(
-                account.getUserId(), new String(bpass));
-        user.setPasswd(secEncPasswd);
+        if (hasPassword(account.getPassword())) {
+            user.setPasswd(getEncPassword(account));
+        }
+        user.setCreatedAtItem(new Date());
         return user;
     }
 
@@ -305,6 +307,29 @@ public class AccountStorageClient extends JpaStorageClientImpl {
         return userFound;
     }
 
+    private void updateUser(EntityManager em, AccountsCommon account) throws Exception {
+        User userFound = getUser(em, account);
+        if (userFound != null) {
+            userFound.setPasswd(getEncPassword(account));
+            userFound.setUpdatedAtItem(new Date());
+            if (logger.isDebugEnabled()) {
+                logger.debug("updated user=" + userFound.toString());
+            }
+            em.persist(userFound);
+        }
+    }
+
+    private String getEncPassword(AccountsCommon account) {
+        byte[] bpass = Base64.decodeBase64(account.getPassword());
+        SecurityUtils.validatePassword(new String(bpass));
+        String secEncPasswd = SecurityUtils.createPasswordHash(
+                account.getUserId(), new String(bpass));
+        return secEncPasswd;
+    }
+
+    private boolean hasPassword(byte[] bpass) {
+        return bpass != null && bpass.length > 0;
+    }
 //    private UserTenant createTenantAssoc(AccountsCommon account) {
 //        UserTenant userTenant = new UserTenant();
 //        userTenant.setUserId(account.getUserId());
