@@ -56,6 +56,8 @@ import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.contact.ContactsCommon;
+import org.collectionspace.services.contact.ContactsCommonList;
+import org.collectionspace.services.contact.ContactJAXBSchema;
 import org.collectionspace.services.contact.nuxeo.ContactDocumentModelHandler;
 import org.collectionspace.services.person.nuxeo.PersonDocumentModelHandler;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -591,15 +593,11 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
             @PathParam("itemcsid") String itemcsid,
             MultipartInput input) {
         try {
-
+            // Note that we have to create the service context and document
+            // handler for the Contact service, not the main service.
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(input, getContactServiceName());
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
-/*
-            ContactResource contactResource = new ContactResource();
-            String csid =
-                contactResource.createContact(parentcsid, itemcsid, input);
- */
             UriBuilder path = UriBuilder.fromResource(PersonAuthorityResource.class);
             path.path("" + parentcsid + "/items/" + itemcsid + "/contacts/" + csid);
             Response response = Response.created(path.build()).build();
@@ -628,17 +626,41 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
     @GET
     @Produces({"application/xml"})
     @Path("{parentcsid}/items/{itemcsid}/contacts/")
-    public Response getContactList(
+    public ContactsCommonList getContactList(
             @PathParam("parentcsid") String parentcsid,
-            @PathParam("itemcsid") String itemcsid) {
-
-        // FIXME Placeholder while call is being implemented.
-        String msg = "Reading lists of contacts is not yet implemented.";
-        logger.info(msg);
-        Response response = Response.status(
-            Response.Status.INTERNAL_SERVER_ERROR).entity(msg).type("text/plain").build();
-        return response;
-        
+            @PathParam("itemcsid") String itemcsid,
+            @Context UriInfo ui) {
+        ContactsCommonList contactObjectList = new ContactsCommonList();
+        try {
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getContactServiceName());
+            DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
+            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+            DocumentFilter myFilter = new DocumentFilter();
+            myFilter.setPagination(queryParams);
+            myFilter.setWhereClause(ContactJAXBSchema.CONTACTS_COMMON + ":" +
+            		ContactJAXBSchema.IN_AUTHORITY +
+            		"='" + parentcsid + "'" +
+                        " AND " +
+                        ContactJAXBSchema.CONTACTS_COMMON + ":" +
+             		ContactJAXBSchema.IN_ITEM +
+            		"='" + itemcsid + "'" +
+                        " AND ecm:isProxy = 0");
+            handler.setDocumentFilter(myFilter);
+            getRepositoryClient(ctx).getFiltered(ctx, handler);
+            contactObjectList = (ContactsCommonList) handler.getCommonPartList();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception in getContactsList", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return contactObjectList;
     }
 
     @GET
@@ -648,17 +670,21 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid) {
         MultipartOutput result = null;
+       if (logger.isDebugEnabled()) {
+            logger.debug("getContact with parentCsid=" + parentcsid +
+            " itemcsid=" + itemcsid + " csid=" + csid);
+        }
         try {
-
+            // Note that we have to create the service context and document
+            // handler for the Contact service, not the main service.
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getContactServiceName());
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
-/*
-            ContactResource resource = new ContactResource();
-            result = resource.getContact(parentcsid, itemcsid, csid);
- *
- */
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getContact", dnfe);
@@ -672,7 +698,7 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
                 logger.debug("getContact", e);
             }
             Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity("Get of contact failed")
+                .entity("Get contact failed")
                 .type("text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -692,10 +718,62 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid,
-            MultipartInput input) {
-
-        // FIXME Placeholder while call is being implemented.
+            MultipartInput theUpdate) {
+       if (logger.isDebugEnabled()) {
+            logger.debug("updateContact with parentcsid=" + parentcsid +
+            " itemcsid=" + itemcsid + " csid=" + csid);
+        }
+       if (parentcsid == null || parentcsid.trim().isEmpty()) {
+            logger.error("updateContact: missing csid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "update failed on Contact parentcsid=" + parentcsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        if (itemcsid == null || itemcsid.trim().isEmpty()) {
+            logger.error("updateContact: missing itemcsid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "update failed on Contact=" + itemcsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        if (csid == null || csid.trim().isEmpty()) {
+            logger.error("updateContact: missing csid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "update failed on Contact=" + csid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
         MultipartOutput result = null;
+        try {
+            // Note that we have to create the service context and document
+            // handler for the Contact service, not the main service.
+            ServiceContext ctx = MultipartServiceContextFactory.get()
+                .createServiceContext(theUpdate, getContactServiceName());
+            DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
+            getRepositoryClient(ctx).update(ctx, csid, handler);
+            result = (MultipartOutput) ctx.getOutput();
+        } catch (BadRequestException bre) {
+            Response response = Response.status(
+                    Response.Status.BAD_REQUEST).entity("Create failed reason " + bre.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("caught exception in updateContact", dnfe);
+            }
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Update failed on Contact csid=" + itemcsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
         return result;
     }
 
@@ -705,7 +783,6 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid) {
-
         if (logger.isDebugEnabled()) {
             logger.debug("deleteContact with parentCsid=" + parentcsid +
             " itemcsid=" + itemcsid + " csid=" + csid);
@@ -732,18 +809,12 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
             throw new WebApplicationException(response);
         }
         try {
-
+            // Note that we have to create the service context for the
+            // Contact service, not the main service.
             ServiceContext ctx =
                 MultipartServiceContextFactory.get().createServiceContext(null, getContactServiceName());
             getRepositoryClient(ctx).delete(ctx, csid);
-            return Response.status(HttpResponseCodes.SC_OK).build();
-
-/*
-            ContactResource resource = new ContactResource();
-            Response response = resource.deleteContact(parentcsid, itemcsid, csid);
-            return response;
-*/
-            
+            return Response.status(HttpResponseCodes.SC_OK).build();   
          } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Delete failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -756,7 +827,6 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
                 .entity("Delete failed, the requested Contact CSID:" + csid + ": was not found.")
                 .type("text/plain").build();
             throw new WebApplicationException(response);
-
        } catch (Exception e) {
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Delete failed").type("text/plain").build();

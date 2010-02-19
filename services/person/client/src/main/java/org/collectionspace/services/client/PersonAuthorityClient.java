@@ -2,6 +2,7 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.person.PersonauthoritiesCommonList;
 import org.collectionspace.services.person.PersonsCommonList;
 import org.collectionspace.services.client.PersonAuthorityProxy;
@@ -31,6 +32,7 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
     public String getItemCommonPartName() {
         return getCommonPartName("persons");
     }
+
     /**
      *
      */
@@ -173,6 +175,16 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
     public ClientResponse<MultipartInput> readContact(String parentcsid,
             String itemcsid, String csid) {
         return personAuthorityProxy.readContact(parentcsid, itemcsid, csid);
+    }
+
+    public ClientResponse<ContactsCommonList> readContactList(String parentcsid,
+            String itemcsid) {
+        return personAuthorityProxy.readContactList(parentcsid, itemcsid);
+    }
+
+    public ClientResponse<MultipartInput> updateContact(String parentcsid,
+            String itemcsid, String csid, MultipartOutput multipart) {
+        return personAuthorityProxy.updateContact(parentcsid, itemcsid, csid, multipart);
     }
 
     public ClientResponse<Response> deleteContact(String parentcsid,

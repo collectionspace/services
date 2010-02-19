@@ -225,7 +225,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
         MultipartOutput multipart =
-            ContactClientUtils.createContactInstance(parentcsid, itemcsid, identifier);
+            ContactClientUtils.createContactInstance(parentcsid,
+            itemcsid, identifier, contactClient.getCommonPartName());
         ClientResponse<Response> res =
              client.createContact(parentcsid, itemcsid, multipart);
         int statusCode = res.getStatus();
@@ -853,8 +854,44 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         readContactList(knownResourceId, knownItemResourceId);
     }
 
-    private void readContactList(String authorityId, String itemId) {
-        // Currently a no-op method.
+    private void readContactList(String parentcsid, String itemcsid) {
+        final String testName = "readContactList";
+
+        // Perform setup.
+        setupReadList(testName);
+
+        // Submit the request to the service and store the response.
+        ClientResponse<ContactsCommonList> res =
+                client.readContactList(parentcsid, itemcsid);
+        ContactsCommonList list = res.getEntity();
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        List<ContactsCommonList.ContactListItem> items =
+            list.getContactListItem();
+        int nItemsReturned = items.size();
+        // There will be one item created, associated with a
+        // known parent resource, by the createItem test.
+        //
+        // In addition, there will be 'nItemsToCreateInList'
+        // additional items created by the createItemList test,
+        // all associated with the same parent resource.
+        int nExpectedItems = nItemsToCreateInList + 1;
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": Expected "
+           		+ nExpectedItems +" items; got: "+nItemsReturned);
+        }
+        Assert.assertEquals(nItemsReturned, nExpectedItems);
+
+        //FIXME: Add debugging output here.
     }
 
     // Failure outcomes
@@ -986,7 +1023,64 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"update"}, dependsOnMethods = {"updateItem"})
     public void updateContact(String testName) throws Exception {
-        // Currently a no-op test.
+
+    /*
+        // Perform setup.
+        setupUpdate(testName);
+
+        ClientResponse<MultipartInput> res =
+                client.readContact(knownResourceId, knownItemResourceId, knownContactResourceId);
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": read status = " + res.getStatus());
+        }
+        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+
+        if(logger.isDebugEnabled()){
+            logger.debug("got Contact to update with ID: " +
+                knownContactResourceId +
+                " in item: " + knownItemResourceId +
+                " in parent: " + knownResourceId );
+        }
+        MultipartInput input = (MultipartInput) res.getEntity();
+        ContactsCommon contact = (ContactsCommon) extractPart(input,
+                contactClient.getCommonPartName(), ContactsCommon.class);
+        Assert.assertNotNull(contact);
+
+        // Update the contents of this resource.
+        contact.setAddressText1("updated-" + contact.getAddressText1());
+        if(logger.isDebugEnabled()){
+            logger.debug("to be updated Contact");
+            logger.debug(objectAsXmlString(contact,
+                ContactsCommon.class));
+        }
+
+        // Submit the updated resource to the service and store the response.
+        MultipartOutput output = new MultipartOutput();
+        OutputPart commonPart = output.addPart(contact, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", contactClient.getCommonPartName());
+        res = client.updateContact(knownResourceId, knownItemResourceId, knownContactResourceId, output);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Retrieve the updated resource and verify that its contents exist.
+        input = (MultipartInput) res.getEntity();
+        ContactsCommon updatedContact =
+                (ContactsCommon) extractPart(input,
+                        contactClient.getCommonPartName(), ContactsCommon.class);
+        Assert.assertNotNull(updatedContact);
+
+        // Verify that the updated resource received the correct data.
+        Assert.assertEquals(updatedContact.getAddressText1(),
+                contact.getAddressText1(),
+                "Data in updated Contact did not match submitted data.");
+ */
     }
 
     // Failure outcomes

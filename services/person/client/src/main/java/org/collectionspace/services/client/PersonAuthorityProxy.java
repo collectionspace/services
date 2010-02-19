@@ -78,14 +78,14 @@ public interface PersonAuthorityProxy {
      // List Contacts
     @GET
     @Produces({"application/xml"})
-    @Path("{parentcsid}/items/{itemcsid}/contacts/")
+    @Path("/{parentcsid}/items/{itemcsid}/contacts/")
     ClientResponse<ContactsCommonList> readContactList(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid);
 
     //(C)reate Contact
     @POST
-    @Path("{parentcsid}/items/{itemcsid}/contacts/")
+    @Path("/{parentcsid}/items/{itemcsid}/contacts/")
     ClientResponse<Response> createContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
@@ -93,7 +93,7 @@ public interface PersonAuthorityProxy {
 
      //(R)ead Contact
     @GET
-    @Path("{parentcsid}/items/{itemcsid}/contacts/{csid}")
+    @Path("/{parentcsid}/items/{itemcsid}/contacts/{csid}")
     ClientResponse<MultipartInput> readContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
@@ -101,7 +101,7 @@ public interface PersonAuthorityProxy {
 
     //(U)pdate Contact
     @PUT
-    @Path("{parentcsid}/items/{itemcsid}/contacts/{csid}")
+    @Path("/{parentcsid}/items/{itemcsid}/contacts/{csid}")
     ClientResponse<MultipartInput> updateContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
@@ -110,7 +110,7 @@ public interface PersonAuthorityProxy {
 
     //(D)elete Contact
     @DELETE
-    @Path("{parentcsid}/items/{itemcsid}/contacts/{csid}")
+    @Path("/{parentcsid}/items/{itemcsid}/contacts/{csid}")
     ClientResponse<Response> deleteContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
