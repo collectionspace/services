@@ -30,6 +30,7 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.id.*;
 
 import org.testng.Assert;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 /**        
@@ -55,6 +56,19 @@ public class IDServiceJdbcImplTest {
     final static String DEFAULT_CSID = "TEST-1";
     
     final static String CURRENT_YEAR = YearIDGeneratorPart.getCurrentYear();
+
+    // FIXME: Hard-coded driver name here should instead come from
+    // external configuration.
+    final String JDBC_DRIVER_CLASSNAME = "com.mysql.jdbc.Driver";
+
+    @BeforeSuite
+    public void init() {
+        try {
+            Class.forName(JDBC_DRIVER_CLASSNAME).newInstance();
+        } catch (Exception e) {
+            Assert.fail("Error locating required JDBC driver " + JDBC_DRIVER_CLASSNAME);
+        }
+    }
 
 
     @Test
