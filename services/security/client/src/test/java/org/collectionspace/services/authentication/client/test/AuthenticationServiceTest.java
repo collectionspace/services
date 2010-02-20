@@ -24,10 +24,10 @@ package org.collectionspace.services.authentication.client.test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.codec.binary.Base64;
+import org.collectionspace.services.account.AccountTenant;
 import org.collectionspace.services.client.AccountClient;
 import org.collectionspace.services.account.AccountsCommon;
 import org.jboss.resteasy.client.ClientResponse;
@@ -55,7 +55,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     /** The known resource id. */
     private String knownResourceId = null;
     private String barneyAccountId = null;
-    private String babybopAccountId = null;
+
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(AuthenticationServiceTest.class);
 
@@ -97,6 +97,8 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
         // Store the ID returned from this create operation
         // for additional tests below.
         barneyAccountId = extractId(res);
@@ -113,13 +115,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-
-        // Store the ID returned from this create operation
-        // for additional tests below.
-        babybopAccountId = extractId(res);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": babybopAccountId=" + babybopAccountId);
-        }
+        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
 
     }
 
@@ -399,14 +395,6 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-
-        res = accountClient.delete(babybopAccountId);
-        statusCode = res.getStatus();
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": babybop status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     }
 
     // ---------------------------------------------------------------
@@ -461,11 +449,10 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         account.setPassword(Base64.encodeBase64(passwd.getBytes()));
         account.setEmail(email);
         account.setPhone("1234567890");
-        List<AccountsCommon.Tenant> atl = new ArrayList<AccountsCommon.Tenant>();
+        List<AccountTenant> atl = new ArrayList<AccountTenant>();
 
-        AccountsCommon.Tenant at = new AccountsCommon.Tenant();
-        at.setId(tenantId);//for testing purposes
-        at.setName("movingimages.us");
+        AccountTenant at = new AccountTenant();
+        at.setTenantId(tenantId);//for testing purposes
         atl.add(at);
         //disable 2nd tenant till tenant identification is in effect
         //on the service side for 1-n user-tenants
@@ -473,7 +460,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
 //        at2.setId(UUID.randomUUID().toString());
 //        at2.setName("collectionspace.org");
 //        atl.add(at2);
-        account.setTenant(atl);
+        account.setTenants(atl);
 
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, account common");

@@ -52,7 +52,7 @@ public class JpaStorageClientImpl implements StorageClient {
     private final Logger logger = LoggerFactory.getLogger(JpaStorageClientImpl.class);
     
     /** The Constant CS_PERSISTENCE_UNIT. */
-    protected final static String CS_PERSISTENCE_UNIT = "org.collectionspace.services";
+    public final static String CS_PERSISTENCE_UNIT = "org.collectionspace.services";
 
     /**
      * Instantiates a new jpa storage client.
@@ -386,7 +386,7 @@ public class JpaStorageClientImpl implements StorageClient {
      * 
      * @return the entity manager factory
      */
-    protected EntityManagerFactory getEntityManagerFactory() {
+    public EntityManagerFactory getEntityManagerFactory() {
         return getEntityManagerFactory(CS_PERSISTENCE_UNIT);
     }
 
@@ -397,7 +397,7 @@ public class JpaStorageClientImpl implements StorageClient {
      * 
      * @return the entity manager factory
      */
-    protected EntityManagerFactory getEntityManagerFactory(
+    public EntityManagerFactory getEntityManagerFactory(
             String persistenceUnit) {
         return Persistence.createEntityManagerFactory(persistenceUnit);
 
@@ -408,7 +408,7 @@ public class JpaStorageClientImpl implements StorageClient {
      * 
      * @param emf the emf
      */
-    protected void releaseEntityManagerFactory(EntityManagerFactory emf) {
+    public void releaseEntityManagerFactory(EntityManagerFactory emf) {
         if (emf != null) {
             emf.close();
         }

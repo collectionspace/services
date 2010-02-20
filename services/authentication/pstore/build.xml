@@ -3,7 +3,7 @@
     <description>
         collectionspace authentication service
     </description>
-  <!-- set global properties for this build -->
+    <!-- set global properties for this build -->
     <property name="services.trunk" value="../../.."/>
     <!-- enviornment should be declared before reading build.properties -->
     <property environment="env" />
@@ -19,13 +19,13 @@
     </condition>
 
     <target name="init">
-    <!-- Create the time stamp -->
+        <!-- Create the time stamp -->
         <tstamp/>
     </target>
 
 
     <target name="package" depends="package-unix,package-windows"
-  description="Package CollectionSpace Services" />
+            description="Package CollectionSpace Services" />
     <target name="package-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
             <arg value="package" />
@@ -50,7 +50,7 @@
     </target>
 
     <target name="install" depends="package,install-unix,install-windows"
-  description="Install" />
+            description="Install" />
     <target name="install-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
             <arg value="install" />
@@ -73,9 +73,9 @@
             <arg value="${mvn.opts}" />
         </exec>
     </target>
-    
+
     <target name="clean" depends="clean-unix,clean-windows"
-  description="Delete target directories" >
+            description="Delete target directories" >
         <delete dir="${build}"/>
     </target>
     <target name="clean-unix" if="osfamily-unix">
@@ -108,7 +108,7 @@
             <arg value="${mvn.opts}" />
         </exec>
     </target>
-    
+
     <target name="setup_hibernate.cfg" description="replace property keywords in hibernate.cfg.xml">
         <property name="src.hibernate.cfg" value="${basedir}/src/test/resources/hibernate.cfg.xml"/>
         <property name="dest.hibernate.cfg" value="${basedir}/target/test-classes/hibernate.cfg.xml"/>
@@ -127,7 +127,7 @@
 
 
     <target name="gen_ddl" depends="gen_ddl-unix,gen_ddl-windows"
-  description="geneate ddl" />
+            description="geneate ddl" />
     <target name="gen_ddl-unix" if="osfamily-unix" depends="setup_hibernate.cfg">
         <exec executable="mvn" failonerror="true">
             <arg value="-Pddl" />
@@ -152,42 +152,52 @@
     </target>
 
     <target name="create_db"
-    description="create tables(s), indices for authentication service">
+            description="create tables(s), indices for authentication service">
         <sql driver="com.mysql.jdbc.Driver"
-        url="jdbc:mysql://${db.host}:${db.port}/cspace"
-        userid="${db.user}"
-        password="${db.user.password}"
-        src="${db.script.dir}/authentication.sql"
-        >
+             url="jdbc:mysql://${db.host}:${db.port}/cspace"
+             userid="${db.user}"
+             password="${db.user.password}"
+             src="${db.script.dir}/authentication.sql"
+             >
             <classpath>
                 <pathelement path="${db.driver.jar}"/>
             </classpath>
         </sql>
         <sql driver="com.mysql.jdbc.Driver"
-        url="jdbc:mysql://${db.host}:${db.port}/cspace"
-        userid="${db.user}"
-        password="${db.user.password}"
-        src="${db.script.dir}/test_authn.sql"
-        >
+             url="jdbc:mysql://${db.host}:${db.port}/cspace"
+             userid="${db.user}"
+             password="${db.user.password}"
+             src="${db.script.dir}/authentication_index.sql"
+             >
+            <classpath>
+                <pathelement path="${db.driver.jar}"/>
+            </classpath>
+        </sql>
+        <sql driver="com.mysql.jdbc.Driver"
+             url="jdbc:mysql://${db.host}:${db.port}/cspace"
+             userid="${db.user}"
+             password="${db.user.password}"
+             src="${db.script.dir}/test_authn.sql"
+             >
             <classpath>
                 <pathelement path="${db.driver.jar}"/>
             </classpath>
         </sql>
     </target>
-    
+
     <target name="deploy" depends="install"
-    description="deploy authentication service in ${jboss.server.cspace}">
+            description="deploy authentication service in ${jboss.server.cspace}">
         <copy todir="${jboss.server.cspace}/cspace/services">
             <fileset dir="${src}/main/resources/"/>
         </copy>
     </target>
 
     <target name="undeploy"
-    description="undeploy authentication service from ${jboss.server.cspace}">
+            description="undeploy authentication service from ${jboss.server.cspace}">
     </target>
 
     <target name="dist"
-    description="generate distribution for authentication service" depends="package">
+            description="generate distribution for authentication service" depends="package">
         <!-- copy db scripts, etc. -->
         <copy todir="${services.trunk}/${dist.server.cspace}/cspace/services">
             <fileset dir="${src}/main/resources/"/>

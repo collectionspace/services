@@ -168,6 +168,16 @@
              url="jdbc:mysql://${db.host}:${db.port}/cspace"
              userid="${db.user}"
              password="${db.user.password}"
+             src="${db.script.dir}/account_index.sql"
+             >
+            <classpath>
+                <pathelement path="${db.driver.jar}"/>
+            </classpath>
+        </sql>
+        <sql driver="com.mysql.jdbc.Driver"
+             url="jdbc:mysql://${db.host}:${db.port}/cspace"
+             userid="${db.user}"
+             password="${db.user.password}"
              src="${db.script.dir}/test_account.sql"
              >
             <classpath>

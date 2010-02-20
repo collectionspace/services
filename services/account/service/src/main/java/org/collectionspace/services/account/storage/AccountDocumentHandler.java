@@ -26,11 +26,12 @@ package org.collectionspace.services.account.storage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.collectionspace.services.account.AccountTenant;
 import org.collectionspace.services.account.AccountsCommon;
-import org.collectionspace.services.account.AccountsCommon.Tenant;
 import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.account.AccountsCommonList.AccountListItem;
 import org.collectionspace.services.account.Status;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
@@ -53,7 +54,7 @@ public class AccountDocumentHandler
         String id = UUID.randomUUID().toString();
         AccountsCommon account = wrapDoc.getWrappedObject();
         account.setCsid(id);
-        
+        setTenant(account);
         account.setStatus(Status.ACTIVE);
     }
 
@@ -148,14 +149,26 @@ public class AccountDocumentHandler
         return new AccountJpaFilter();
     }
 
+    private void setTenant(AccountsCommon account) {
+        //set tenant only if not available from input
+        ServiceContext ctx = getServiceContext();
+        if (account.getTenants() == null || account.getTenants().size() == 0) {
+            if (ctx.getTenantId() != null) {
+                AccountTenant at = new AccountTenant();
+                at.setTenantId(ctx.getTenantId());
+                List<AccountTenant> atList = new ArrayList<AccountTenant>();
+                atList.add(at);
+                account.setTenants(atList);
+            }
+        }
+    }
+
     /**
      * sanitize removes data not needed to be sent to the consumer
      * @param account
      */
     private void sanitize(AccountsCommon account) {
         account.setPassword(null);
-        //FIXME once auth mode is mandatory, assume tenant could be retrieved
-        //from security context, remove tenant info being passed to the consumer
-        //account.setTenant(new ArrayList<Tenant>(0));
+        account.setTenants(new ArrayList<AccountTenant>(0));
     }
 }

@@ -5,9 +5,10 @@
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <non-jta-data-source>CspaceDS</non-jta-data-source>
         <class>org.collectionspace.services.account.AccountsCommon</class>
-        <class>org.collectionspace.services.account.AccountsCommon$Tenant</class>
-        <class>org.collectionspace.services.account.AccountsCommonList</class>
         <class>org.collectionspace.services.account.AccountsCommonList$AccountListItem</class>
+        <class>org.collectionspace.services.account.Tenant</class>
+        <class>org.collectionspace.services.account.AccountTenant</class>
+        <class>org.collectionspace.services.account.Status</class>
         <class>org.collectionspace.services.authentication.User</class>
         <class>org.collectionspace.services.authentication.Role</class>
         <class>org.collectionspace.services.authentication.UserRole</class>

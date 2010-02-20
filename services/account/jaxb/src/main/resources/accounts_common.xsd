@@ -3,7 +3,7 @@
 <!--
     Account schema (XSD)
 
-    Entity  : Account
+    Entity  : Account, Tenant
     Part    : Common
     Used for: JAXB binding between XML and Java objects
 
@@ -57,7 +57,7 @@
                     <xs:annotation>
                         <xs:appinfo>
                             <hj:basic>
-                                <orm:column name="person_ref_name" length="250" />
+                                <orm:column name="person_ref_name" />
                             </hj:basic>
                         </xs:appinfo>
                     </xs:annotation>
@@ -66,7 +66,7 @@
                     <xs:annotation>
                         <xs:appinfo>
                             <hj:basic>
-                                <orm:column name="email" length="512" nullable="false"/>
+                                <orm:column name="email" nullable="false"/>
                             </hj:basic>
                         </xs:appinfo>
                     </xs:annotation>
@@ -107,37 +107,7 @@
                         </xs:appinfo>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="tenant" minOccurs="1" maxOccurs="unbounded">
-                    <xs:complexType>
-                        <xs:annotation>
-                            <xs:appinfo>
-                                <hj:entity>
-                                    <orm:table name="tenants"/>
-                                </hj:entity>
-                            </xs:appinfo>
-                        </xs:annotation>
-                        <xs:sequence>
-                            <xs:element name="id" type="xs:string" minOccurs="1">
-                                <xs:annotation>
-                                    <xs:appinfo>
-                                        <hj:basic>
-                                            <orm:column name="id" nullable="false"/>
-                                        </hj:basic>
-                                    </xs:appinfo>
-                                </xs:annotation>
-                            </xs:element>
-                            <xs:element name="name" type="xs:string" minOccurs="1">
-                                <xs:annotation>
-                                    <xs:appinfo>
-                                        <hj:basic>
-                                            <orm:column name="name" nullable="false"/>
-                                        </hj:basic>
-                                    </xs:appinfo>
-                                </xs:annotation>
-                            </xs:element>
-                        </xs:sequence>
-
-                    </xs:complexType>
+                <xs:element name="tenants" type="account_tenant" minOccurs="1" maxOccurs="unbounded">
                 </xs:element>
                 <xs:element name="status" type="status">
                     <xs:annotation>
@@ -171,7 +141,7 @@
                 <xs:annotation>
                     <xs:appinfo>
                         <hj:id>
-                            <orm:column name="csid" nullable="false"/>
+                            <orm:column name="csid" length="128" nullable="false"/>
                         </hj:id>
                     </xs:appinfo>
                 </xs:annotation>
@@ -215,5 +185,75 @@
             <xs:enumeration value="inactive" />
         </xs:restriction>
     </xs:simpleType>
+
+    <xs:complexType name="account_tenant">
+        <xs:annotation>
+            <xs:appinfo>
+                <hj:entity>
+                    <orm:table name="accounts_tenants">
+                    </orm:table>
+                </hj:entity>
+            </xs:appinfo>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="tenant_id" type="xs:string" minOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>
+                        <hj:basic>
+                            <orm:column name="tenant_id" length="128" nullable="false"/>
+                        </hj:basic>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="tenant">
+        <xs:annotation>
+            <xs:appinfo>
+                <hj:entity>
+                    <orm:table name="tenants"/>
+                </hj:entity>
+            </xs:appinfo>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="id" type="xs:string" minOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>
+                        <hj:id>
+                            <orm:column name="id" length="128" nullable="false"/>
+                        </hj:id>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="name" type="xs:string" minOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>
+                        <hj:basic>
+                            <orm:column name="name" nullable="false"/>
+                        </hj:basic>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="createdAt" type="xs:dateTime">
+                <xs:annotation>
+                    <xs:appinfo>
+                        <hj:basic>
+                            <orm:column name="created_at" nullable="false"/>
+                        </hj:basic>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="updatedAt" type="xs:dateTime">
+                <xs:annotation>
+                    <xs:appinfo>
+                        <hj:basic>
+                            <orm:column name="updated_at" />
+                        </hj:basic>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
 </xs:schema>
 

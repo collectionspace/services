@@ -32,6 +32,7 @@ import org.collectionspace.services.client.AccountClient;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.account.Status;
+import org.collectionspace.services.account.AccountTenant;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.jboss.resteasy.client.ClientResponse;
@@ -41,6 +42,7 @@ import org.testng.annotations.Test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.annotations.AfterClass;
 
 /**
  * AccountServiceTest, carries out tests against a
@@ -56,9 +58,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     // Instance variables specific to this test.
     private AccountClient client = new AccountClient();
     private String knownResourceId = null;
-    private String resource1Id = null;
-    private String resource2Id = null;
-    private String resource3Id = null;
+    private List<String> allResourceIdsCreated = new ArrayList();
+    boolean addTenant = true;
     /*
      * This method is called only by the parent class, AbstractServiceTestImpl
      */
@@ -84,7 +85,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         AccountsCommon account =
                 createAccountInstance("barney", "barney", "hithere08", "barney@dinoland.com",
-                true, true, true, true);
+                true, false, true, true);
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
 
@@ -118,7 +119,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         AccountsCommon account =
                 createAccountInstance("barney1", "barney", "hithere08", "barney@dinoland.com",
-                true, true, true, true);
+                true, false, true, true);
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
 
@@ -139,7 +140,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         AccountsCommon account =
                 createAccountInstance("barney", "otherUser", "hithere08", "barney@dinoland.com",
-                true, true, true, true);
+                true, false, true, true);
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
 
@@ -153,14 +154,14 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
-    public void createWithoutTenant(String testName) throws Exception {
+    public void createWithInvalidTenant(String testName) throws Exception {
 
         setupCreate(testName);
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "hithere08", "babybop@dinoland.com",
-                true, false, true, true);
+                true, true, true, true);
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
         // Does it exactly match the expected status code?
@@ -182,7 +183,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "hithere08", "babybop@dinoland.com",
-                true, true, false, true);
+                true, false, false, true);
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
         // Does it exactly match the expected status code?
@@ -203,7 +204,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "hithere08", "babybop.dinoland.com",
-                true, true, true, true);
+                true, false, true, true);
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
         // Does it exactly match the expected status code?
@@ -224,7 +225,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "hithere08", "babybop@dinoland.com",
-                false, true, true, true);
+                false, false, true, true);
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
         // Does it exactly match the expected status code?
@@ -245,7 +246,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "hithere08", "babybop/dinoland.com",
-                false, false, false, false);
+                false, true, false, false);
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
         // Does it exactly match the expected status code?
@@ -267,33 +268,35 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         AccountsCommon account1 =
                 createAccountInstance("curious", "curious", "hithere08", "curious@george.com",
-                true, true, true, true);
+                true, false, true, true);
         ClientResponse<Response> res = client.create(account1);
         int statusCode = res.getStatus();
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        resource1Id = extractId(res);
+        allResourceIdsCreated.add(extractId(res));
 
         AccountsCommon account2 =
                 createAccountInstance("tom", "tom", "hithere09", "tom@jerry.com",
-                true, true, true, true);
+                true, false, true, true);
         res = client.create(account2);
         statusCode = res.getStatus();
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        resource2Id = extractId(res);
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        allResourceIdsCreated.add(extractId(res));
 
         AccountsCommon account3 =
                 createAccountInstance("mj", "mj", "hithere10", "mj@dinoland.com",
-                true, true, true, true);
+                true, false, true, true);
         res = client.create(account3);
         statusCode = res.getStatus();
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        resource3Id = extractId(res);
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        allResourceIdsCreated.add(extractId(res));
     }
 
     // Failure outcomes
@@ -736,7 +739,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // The only relevant ID may be the one used in updateAccount(), below.
         AccountsCommon account =
                 createAccountInstance("simba", "simba", "tiger", "simba@lionking.com",
-                true, true, true, true);
+                true, false, true, true);
         ClientResponse<AccountsCommon> res =
                 client.update(NON_EXISTENT_ID, account);
         int statusCode = res.getStatus();
@@ -820,32 +823,6 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"testSubmitRequest", "updateWrongUser"})
-    public void deleteList(String testName) throws Exception {
-
-        // Perform setup.
-        setupDelete(testName);
-
-        ClientResponse<Response> res = client.delete(resource1Id);
-        int statusCode = res.getStatus();
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        res = client.delete(resource2Id);
-        statusCode = res.getStatus();
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        res = client.delete(resource3Id);
-        statusCode = res.getStatus();
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
-
     // Failure outcomes
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
@@ -907,14 +884,14 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @param passwd
      * @param email
      * @param useScreenName
-     * @param useTenant
+     * @param invalidTenant
      * @param useUser
      * @param usePassword
      * @return
      */
     private AccountsCommon createAccountInstance(String screenName,
             String userName, String passwd, String email,
-            boolean useScreenName, boolean useTenant, boolean useUser, boolean usePassword) {
+            boolean useScreenName, boolean invalidTenant, boolean useUser, boolean usePassword) {
 
         AccountsCommon account = new AccountsCommon();
         if (useScreenName) {
@@ -929,19 +906,24 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         account.setPersonRefName(screenName);
         account.setEmail(email);
         account.setPhone("1234567890");
-        if (useTenant) {
-            List<AccountsCommon.Tenant> atl = new ArrayList<AccountsCommon.Tenant>();
-            AccountsCommon.Tenant at = new AccountsCommon.Tenant();
-            at.setId(UUID.randomUUID().toString());
-            at.setName("movingimages.us");
-            atl.add(at);
-
-            AccountsCommon.Tenant at2 = new AccountsCommon.Tenant();
-            at2.setId(UUID.randomUUID().toString());
-            at2.setName("collectionspace.org");
-            atl.add(at2);
-            account.setTenant(atl);
+        List<AccountTenant> atList = new ArrayList<AccountTenant>();
+        AccountTenant at = new AccountTenant();
+        if (!invalidTenant) {
+            //tenant is not required to be added during create, service layer
+            //picks up tenant from security context if needed
+            if (addTenant) {
+                at.setTenantId("1");
+                atList.add(at);
+                account.setTenants(atList);
+                addTenant = !addTenant;
+            }
+        } else {
+            //use invalid tenant id...called from validation test
+            at.setTenantId(UUID.randomUUID().toString());
+            atList.add(at);
+            account.setTenants(atList);
         }
+
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, account common");
             logger.debug(objectAsXmlString(account,
@@ -949,6 +931,22 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         }
         return account;
 
+    }
+
+    @AfterClass(alwaysRun = true)
+    public void cleanUp() {
+        setupDelete("delete");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Cleaning up temporary resources created for testing ...");
+        }
+        for (String resourceId : allResourceIdsCreated) {
+            // Note: Any non-success responses are ignored and not reported.
+            ClientResponse<Response> res = client.delete(resourceId);
+            int statusCode = res.getStatus();
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        }
     }
 
     private void printList(String testName, AccountsCommonList list) {

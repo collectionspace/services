@@ -31,7 +31,7 @@ copy before the "other" application-policy
                 select rolename, 'Roles' from users_roles where username=?
             </module-option>
             <module-option name="tenantsQuery">
-                select id, name, 'Tenants' from accounts_common a, tenants as t where a.userid=? and a.csid = t.TENANT_ACCOUNTSCOMMON_CSID
+                select t.id, t.name, 'Tenants' from accounts_common as a, accounts_tenants as at, tenants as t where a.userid=? and a.csid = at.TENANTS_ACCOUNTSCOMMON_CSID and at.tenant_id = t.id
             </module-option>
         </login-module>
     </authentication>

@@ -1,6 +1,8 @@
-alter table tenants drop foreign key FKAAE82D09C4F08FD6;
+alter table accounts_tenants drop foreign key FKFDA649B05A9CEEB5;
 drop table if exists accounts_common;
+drop table if exists accounts_tenants;
 drop table if exists tenants;
-create table accounts_common (csid varchar(255) not null, created_at datetime not null, email longtext not null, mobile varchar(255), person_ref_name varchar(250), phone varchar(255), screen_name varchar(128) not null, status varchar(15) not null, updated_at datetime, userid varchar(128) not null, primary key (csid), unique (screen_name));
-create table tenants (HJID bigint not null auto_increment, id varchar(255) not null, name varchar(255) not null, TENANT_ACCOUNTSCOMMON_CSID varchar(255), primary key (HJID));
-alter table tenants add index FKAAE82D09C4F08FD6 (TENANT_ACCOUNTSCOMMON_CSID), add constraint FKAAE82D09C4F08FD6 foreign key (TENANT_ACCOUNTSCOMMON_CSID) references accounts_common (csid);
+create table accounts_common (csid varchar(128) not null, created_at datetime not null, email varchar(255) not null, mobile varchar(255), person_ref_name varchar(255), phone varchar(255), screen_name varchar(128) not null, status varchar(15) not null, updated_at datetime, userid varchar(128) not null, primary key (csid), unique (screen_name));
+create table accounts_tenants (HJID bigint not null auto_increment, tenant_id varchar(128) not null, TENANTS_ACCOUNTSCOMMON_CSID varchar(128), primary key (HJID));
+create table tenants (id varchar(128) not null, created_at datetime not null, name varchar(255) not null, updated_at datetime, primary key (id));
+alter table accounts_tenants add index FKFDA649B05A9CEEB5 (TENANTS_ACCOUNTSCOMMON_CSID), add constraint FKFDA649B05A9CEEB5 foreign key (TENANTS_ACCOUNTSCOMMON_CSID) references accounts_common (csid);

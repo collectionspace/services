@@ -15,8 +15,9 @@ import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 
 import javax.persistence.Query;
+import org.collectionspace.services.account.AccountTenant;
 import org.collectionspace.services.account.AccountsCommon;
-import org.collectionspace.services.account.AccountsCommon.Tenant;
+import org.collectionspace.services.account.Tenant;
 import org.collectionspace.services.account.Status;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -80,12 +81,11 @@ public class AccountTest {
         id = UUID.randomUUID().toString();
         account.setCsid(id);
 
-        Tenant tenant = new Tenant();
-        tenant.setId("1");
-        tenant.setName("movingimages.us");
-        List<Tenant> lt = new ArrayList<Tenant>();
-        lt.add(tenant);
-        account.setTenant(lt);
+        AccountTenant tenant = new AccountTenant();
+        tenant.setTenantId("1");
+        List<AccountTenant> tList = new ArrayList<AccountTenant>();
+        tList.add(tenant);
+        account.setTenants(tList);
         em.getTransaction().begin();
         em.persist(account);
         // Commit the transaction
@@ -108,12 +108,11 @@ public class AccountTest {
         id = UUID.randomUUID().toString();
         account.setCsid(id);
         account.setCreatedAtItem(new Date());
-        Tenant tenant = new Tenant();
-        tenant.setId("123");
-        tenant.setName("movingimages.us.standalone");
-        List<Tenant> lt = new ArrayList<Tenant>();
-        lt.add(tenant);
-        account.setTenant(lt);
+        AccountTenant tenant = new AccountTenant();
+        tenant.setTenantId("123");
+        List<AccountTenant> tList = new ArrayList<AccountTenant>();
+        tList.add(tenant);
+        account.setTenants(tList);
         em.getTransaction().begin();
         em.persist(account);
         // Commit the transaction
