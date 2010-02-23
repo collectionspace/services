@@ -143,6 +143,7 @@
             description="deploy services in ${jboss.server.cspace}">
         <ant antfile="authentication/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="common/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="account/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="relation/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="id/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="deploy" inheritAll="false"/>
@@ -163,13 +164,14 @@
         <ant antfile="vocabulary/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="organization/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="person/build.xml" target="undeploy" inheritAll="false"/>
-        <ant antfile="contact/build.xml" target="undeploy" inheritAll="false"/>        
-        <ant antfile="dimension/build.xml" target="undeploy" inheritAll="false"/>        
+        <ant antfile="contact/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="dimension/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="acquisition/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="id/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="relation/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="account/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="common/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="authentication/build.xml" target="undeploy" inheritAll="false"/>
     </target>
