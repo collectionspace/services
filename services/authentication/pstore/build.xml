@@ -177,7 +177,7 @@
              url="jdbc:mysql://${db.host}:${db.port}/cspace"
              userid="${db.user}"
              password="${db.user.password}"
-             src="${db.script.dir}/test_authn.sql"
+             src="${db.script.dir}/test_authentication.sql"
              >
             <classpath>
                 <pathelement path="${db.driver.jar}"/>
@@ -194,6 +194,10 @@
 
     <target name="undeploy"
             description="undeploy authentication service from ${jboss.server.cspace}">
+        <delete>
+            <fileset dir="${jboss.server.cspace}/cspace/services/db/${db}"
+                     includes="**authentication**.sql"/>
+        </delete>
     </target>
 
     <target name="dist"

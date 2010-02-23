@@ -194,6 +194,10 @@
 
     <target name="undeploy"
             description="undeploy account service from ${jboss.server.cspace}">
+        <delete>
+            <fileset dir="${jboss.server.cspace}/cspace/services/db/${db}"
+                     includes="**account**.sql"/>
+        </delete>
     </target>
 
     <target name="dist"
