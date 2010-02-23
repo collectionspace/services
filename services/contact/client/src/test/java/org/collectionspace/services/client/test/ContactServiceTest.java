@@ -305,7 +305,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
                 logger.debug(testName + ": list-item[" + i + "] csid=" +
                         item.getCsid());
                 logger.debug(testName + ": list-item[" + i + "] objectNumber=" +
-                        item.getAddressText1());
+                        item.getAddressPlace());
                 logger.debug(testName + ": list-item[" + i + "] URI=" +
                         item.getUri());
                 i++;
@@ -344,8 +344,9 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(contact);
 
         // Update the content of this resource.
-        contact.setAddressText1("updated-" + contact.getAddressText1());
-        contact.setPostcode1("updated-" + contact.getPostcode1());
+        contact.setAddressType("updated-" + contact.getAddressType());
+        contact.setAddressPlace("updated-" + contact.getAddressPlace());
+        contact.setEmail("updated-" + contact.getEmail());
         if(logger.isDebugEnabled()){
             logger.debug("to be updated object");
             logger.debug(objectAsXmlString(contact, ContactsCommon.class));
@@ -372,8 +373,8 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
                         client.getCommonPartName(), ContactsCommon.class);
         Assert.assertNotNull(updatedContact);
 
-        Assert.assertEquals(updatedContact.getPostcode1(),
-                contact.getPostcode1(),
+        Assert.assertEquals(updatedContact.getEmail(),
+                contact.getEmail(),
                 "Data in updated object did not match submitted data.");
 
     }

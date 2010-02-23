@@ -16,14 +16,14 @@ public class ContactClientUtils {
         LoggerFactory.getLogger(ContactClientUtils.class);
 
     public static MultipartOutput createContactInstance(String identifier, String headerLabel) {
-        String inAuthority = "";
-        String inItem = "";
+        final String inAuthority = "";
+        final String inItem = "";
         return createContactInstance(
             inAuthority,
             inItem,
-            "addressText1-" + identifier,
-            "postcode-" + identifier,
-            "addressType1-" + identifier,
+            "addressType-" + identifier,
+            "addressPlace-" + identifier,
+            "emakl-" + identifier,
             headerLabel);
     }
 
@@ -32,21 +32,21 @@ public class ContactClientUtils {
         return createContactInstance(
             inAuthority,
             inItem,
-            "addressText1-" + identifier,
-            "postcode-" + identifier,
-            "addressType1-" + identifier,
+            "addressType-" + identifier,
+            "addressPlace-" + identifier,
+            "emakl-" + identifier,
             headerLabel);
     }
 
     public static MultipartOutput createContactInstance(
-        String inAuthority, String inItem, String addressText,
-        String postcode, String addressType, String headerLabel) {
+        String inAuthority, String inItem, String addressType,
+        String addressPlace, String email, String headerLabel) {
         ContactsCommon contact = new ContactsCommon();
         contact.setInAuthority(inAuthority);
         contact.setInItem(inItem);
-        contact.setAddressText1(addressText);
-        contact.setPostcode1(postcode);
-        contact.setAddressType1(addressType);
+        contact.setAddressType(addressType);
+        contact.setAddressPlace(addressPlace);
+        contact.setEmail(email);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(contact, MediaType.APPLICATION_XML_TYPE);

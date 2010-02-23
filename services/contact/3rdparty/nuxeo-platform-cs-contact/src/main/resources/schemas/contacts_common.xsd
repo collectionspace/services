@@ -17,41 +17,15 @@
     xmlns="http://collectionspace.org/contact/"
     targetNamespace="http://collectionspace.org/contact/"
     version="0.1">
-    
-    <!-- Note: the following is currently a representative subset -->
-    <!-- of the full Address Information schema specified at -->
-    <!-- http://wiki.collectionspace.org/display/collectionspace/Contact+Information+Schema -->
-    <!-- as this schema is still in flux. -->
 
-   <!-- The use of numbered field names, below, is an expedient for -->
-    <!-- release 0.5 ("Jupiter").  This will be handled instead in future -->
-    <!-- releases via the standard scalar repeatability methods; e.g. -->
-    <!-- minOccurs="{minValue}" maxOccurs="unbounded" attributes. -->
-
-    <!-- Initially, in release 0.5, this entire group will be repeatable, -->
-    <!-- as a result of Contact records being made a repeatable -->
-    <!-- sub-resource of Person and Organization. -->
     <xs:element name="csid" type="xs:string" />
     <xs:element name="inAuthority" type="xs:string" />
     <xs:element name="inItem" type="xs:string" />
-    <xs:element name="addressType1" type="xs:string"/>
-    <xs:element name="addressType2" type="xs:string"/>
-    <xs:element name="addressType3" type="xs:string"/>
-    <xs:element name="addressText1" type="xs:string"/>
-    <xs:element name="addressText2" type="xs:string"/>
-    <xs:element name="addressText3" type="xs:string"/>
-    <xs:element name="postcode1" type="xs:string"/>
-    <xs:element name="postcode2" type="xs:string"/>
-    <xs:element name="postcode3" type="xs:string"/>
-    <xs:element name="email1" type="xs:string"/>
-    <xs:element name="email2" type="xs:string"/>
-    <xs:element name="email3" type="xs:string"/>
-    <xs:element name="telephoneNumber1" type="xs:string"/>
-    <xs:element name="telephoneNumber2" type="xs:string"/>
-    <xs:element name="telephoneNumber3" type="xs:string"/>
-    <xs:element name="faxNumber1" type="xs:string"/>
-    <xs:element name="faxNumber2" type="xs:string"/>
-    <xs:element name="faxNumber3" type="xs:string"/>
+    <xs:element name="addressType" type="xs:string"/>
+    <xs:element name="addressPlace" type="xs:string"/>
+    <xs:element name="email" type="xs:string"/>
+    <xs:element name="telephoneNumber" type="xs:string"/>
+    <xs:element name="faxNumber" type="xs:string"/>
     <xs:element name="notes" type="xs:string"/>
     
 </xs:schema>
