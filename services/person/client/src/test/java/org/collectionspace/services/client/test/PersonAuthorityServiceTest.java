@@ -28,14 +28,13 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.ContactClientUtils;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactsCommonList;
-import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
@@ -875,9 +874,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        List<ContactsCommonList.ContactListItem> items =
+        List<ContactsCommonList.ContactListItem> listitems =
             list.getContactListItem();
-        int nItemsReturned = items.size();
+        int nItemsReturned = listitems.size();
         // There will be one item created, associated with a
         // known parent resource, by the createItem test.
         //
@@ -891,11 +890,25 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
         Assert.assertEquals(nItemsReturned, nExpectedItems);
 
-        //FIXME: Add debugging output here.
+        int i = 0;
+        for (ContactsCommonList.ContactListItem listitem : listitems) {
+        	// Optionally output additional data about list members for debugging.
+	        boolean showDetails = false;
+	        if (showDetails && logger.isDebugEnabled()) {
+                logger.debug("  " + testName + ": list-item[" + i + "] csid=" +
+                        listitem.getCsid());
+                logger.debug("  " + testName + ": list-item[" + i + "] addressPlace=" +
+                        listitem.getAddressPlace());
+                logger.debug("  " + testName + ": list-item[" + i + "] URI=" +
+                        listitem.getUri());
+            }
+            i++;
+        }
     }
 
     // Failure outcomes
     // None at present.
+
     // ---------------------------------------------------------------
     // CRUD tests : UPDATE tests
     // ---------------------------------------------------------------
@@ -1024,7 +1037,6 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"update"}, dependsOnMethods = {"updateItem"})
     public void updateContact(String testName) throws Exception {
 
-    /*
         // Perform setup.
         setupUpdate(testName);
 
@@ -1047,7 +1059,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(contact);
 
         // Update the contents of this resource.
-        contact.setAddressText1("updated-" + contact.getAddressText1());
+        contact.setAddressPlace("updated-" + contact.getAddressPlace());
         if(logger.isDebugEnabled()){
             logger.debug("to be updated Contact");
             logger.debug(objectAsXmlString(contact,
@@ -1077,10 +1089,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(updatedContact);
 
         // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedContact.getAddressText1(),
-                contact.getAddressText1(),
+        Assert.assertEquals(updatedContact.getAddressPlace(),
+                contact.getAddressPlace(),
                 "Data in updated Contact did not match submitted data.");
- */
     }
 
     // Failure outcomes
@@ -1258,12 +1269,10 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     // Note: delete sub-resources in ascending hierarchical order,
     // before deleting their parents.
 
-
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class, 
-        groups = {"delete"}, dependsOnGroups = {"update"})
+        groups = {"delete"}, dependsOnGroups = {"create", "read", "update"})
     public void deleteContact(String testName) throws Exception {
 
- /*
         // Perform setup.
         setupDelete(testName);
 
@@ -1286,8 +1295,6 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-  *
-  */
     }
 
    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
@@ -1296,6 +1303,11 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Perform setup.
         setupDelete(testName);
+
+        if(logger.isDebugEnabled()){
+            logger.debug("parentcsid =" + knownResourceId +
+                " itemcsid = " + knownItemResourceId);
+        }
 
         // Submit the request to the service and store the response.
         ClientResponse<Response> res = client.deleteItem(knownResourceId, knownItemResourceId);
@@ -1318,6 +1330,10 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Perform setup.
         setupDelete(testName);
+
+        if(logger.isDebugEnabled()){
+            logger.debug("parentcsid =" + knownResourceId);
+        }
 
         // Submit the request to the service and store the response.
         ClientResponse<Response> res = client.delete(knownResourceId);

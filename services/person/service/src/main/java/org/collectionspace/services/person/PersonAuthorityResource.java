@@ -714,7 +714,7 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
 
     @PUT
     @Path("{parentcsid}/items/{itemcsid}/contacts/{csid}")
-    MultipartOutput updateContact(
+    public MultipartOutput updateContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid,
@@ -779,7 +779,7 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
 
     @DELETE
     @Path("{parentcsid}/items/{itemcsid}/contacts/{csid}")
-    Response deleteContact(
+    public Response deleteContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid) {
