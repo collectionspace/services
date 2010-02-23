@@ -145,10 +145,6 @@ public class ServiceLayerTest {
 
     @Test
     public void serviceSecure() {
-        if (!serviceClient.isServerSecure()) {
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
         String url = serviceClient.getBaseURL() + "collectionobjects";
         GetMethod method = new GetMethod(url);
         // This vanilla HTTP client does not contain credentials or any other
@@ -162,8 +158,8 @@ public class ServiceLayerTest {
             //due to anonymous support, the service returns 200 instead of 401
 //            Assert.assertEquals(statusCode, HttpStatus.SC_UNAUTHORIZED,
 //                    "expected " + HttpStatus.SC_UNAUTHORIZED);
-            Assert.assertEquals(statusCode, HttpStatus.SC_OK,
-                    "expected " + HttpStatus.SC_OK);
+            Assert.assertEquals(statusCode, HttpStatus.SC_UNAUTHORIZED,
+                    "expected " + HttpStatus.SC_UNAUTHORIZED);
         } catch (HttpException e) {
             logger.error("Fatal protocol violation: ", e);
         } catch (IOException e) {

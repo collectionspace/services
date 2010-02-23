@@ -11,10 +11,11 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
-    <s:http use-expressions="true">
+    <s:http use-expressions="true" realm="org.collectionspace.services">
         <s:intercept-url pattern="/**" access="permitAll" />
         <s:http-basic />
         <s:logout />
+        <s:anonymous enabled="false"/>
     </s:http>
 
     <s:authentication-manager>

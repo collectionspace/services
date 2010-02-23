@@ -874,6 +874,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
 
     }
 
+
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------

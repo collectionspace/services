@@ -76,10 +76,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         // its associated HTTP method name (e.g. POST, DELETE).
         setupCreate(testName);
         AccountClient accountClient = new AccountClient();
-        if (!accountClient.isServerSecure()) {
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
+
         accountClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
                 "true");
         accountClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
@@ -133,10 +130,6 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
 
-        if (!collectionObjectClient.isServerSecure()) {
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
         collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
                 "true");
         collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
@@ -171,10 +164,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         String identifier = this.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-        if (!collectionObjectClient.isServerSecure()) {
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
+
         collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
                 "true");
         collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
@@ -204,10 +194,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         String identifier = this.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-        if (!collectionObjectClient.isServerSecure()) {
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
+
         collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
                 "true");
         collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
@@ -238,10 +225,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         String identifier = this.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-        if (!collectionObjectClient.isServerSecure()) {
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
+
         collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
                 "true");
         collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
@@ -272,10 +256,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         String identifier = this.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-        if (!collectionObjectClient.isServerSecure()) {
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
+
         collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
                 "true");
         collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
@@ -307,10 +288,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         String identifier = this.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-        if (!collectionObjectClient.isServerSecure()) {
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
+
         collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
                 "true");
         collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
@@ -342,10 +320,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         setupDelete(testName);
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient = new CollectionObjectClient();
-        if (!collectionObjectClient.isServerSecure()) {
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
+
         collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
                 "true");
         collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
@@ -377,10 +352,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupDelete(testName);
         AccountClient accountClient = new AccountClient();
-        if (!accountClient.isServerSecure()) {
-            logger.warn("set -Dcspace.server.secure=true to run security tests");
-            return;
-        }
+
         accountClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
                 "true");
         accountClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
