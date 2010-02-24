@@ -67,6 +67,7 @@
         <row><widget>displayName</widget></row>
         <row><widget>refName</widget></row>
         <row><widget>inVocabulary</widget></row>
+        <row><widget>status</widget></row>
       </rows>
 
       <widget name="displayName" type="text">
@@ -107,6 +108,20 @@
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
+
+      <widget name="status" type="text">
+        <labels>
+          <label mode="any">Status</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="vocabularyitems_common">status</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
     </layout>
   </extension>
 </component>

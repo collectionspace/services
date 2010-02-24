@@ -7,8 +7,8 @@
     Part    : Common
     Used for: Nuxeo EP core document type
     
-    $LastChangedRevision: 860 $
-    $LastChangedDate: 2009-10-14 14:48:05 -0700 (Wed, 14 Oct 2009) $
+    $LastChangedRevision$
+    $LastChangedDate$
 -->
 
 <xs:schema 
@@ -25,6 +25,7 @@
 		<xs:element name="inVocabulary" type="xs:string" />
 		<xs:element name="refName" type="xs:string"/>
 		<xs:element name="displayName" type="xs:string"/>
+                <xs:element name="status" type="xs:string"/>
 
 </xs:schema>
 
