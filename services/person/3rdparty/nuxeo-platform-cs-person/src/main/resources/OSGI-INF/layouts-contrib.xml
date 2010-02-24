@@ -73,6 +73,7 @@
         <row><widget>initials</widget></row>
         <row><widget>salutation</widget></row>
         <row><widget>title</widget></row>
+        <row><widget>honorifics</widget></row>
         <row><widget>nameAdditions</widget></row>
         <row><widget>birthDate</widget></row>
         <row><widget>deathDate</widget></row>
@@ -85,11 +86,12 @@
         <row><widget>schoolOrStyle</widget></row>
         <row><widget>bioNote</widget></row>
         <row><widget>nameNote</widget></row>
+        <row><widget>status</widget></row>
       </rows>
 
       <widget name="displayName" type="text">
         <labels>
-          <label mode="any">DisplayName</label>
+          <label mode="any">displayName</label>
         </labels>
         <translated>true</translated>
         <fields>
@@ -102,7 +104,7 @@
       
       <widget name="refName" type="text">
         <labels>
-          <label mode="any">RefName</label>
+          <label mode="any">refName</label>
         </labels>
         <translated>true</translated>
         <fields>
@@ -115,7 +117,7 @@
       
       <widget name="inAuthority" type="text">
         <labels>
-          <label mode="any">PersonAuthority</label>
+          <label mode="any">inAuthority (PersonAuthority)</label>
         </labels>
         <translated>true</translated>
         <fields>
@@ -128,7 +130,7 @@
 
       <widget name="foreName" type="text">
         <labels>
-          <label mode="any">Forename</label>
+          <label mode="any">foreName</label>
         </labels>
         <translated>true</translated>
         <fields>
@@ -141,7 +143,7 @@
       
       <widget name="middleName" type="text">
         <labels>
-          <label mode="any">Middle Name</label>
+          <label mode="any">middleName</label>
         </labels>
         <translated>true</translated>
         <fields>
@@ -154,7 +156,7 @@
       
       <widget name="surName" type="text">
         <labels>
-          <label mode="any">Surname</label>
+          <label mode="any">surName</label>
         </labels>
         <translated>true</translated>
         <fields>
@@ -167,7 +169,7 @@
       
       <widget name="initials" type="text">
         <labels>
-          <label mode="any">Initials</label>
+          <label mode="any">initials</label>
         </labels>
         <translated>true</translated>
         <fields>
@@ -180,7 +182,7 @@
       
       <widget name="salutation" type="text">
         <labels>
-          <label mode="any">Salutation</label>
+          <label mode="any">salutation</label>
         </labels>
         <translated>true</translated>
         <fields>
@@ -193,11 +195,24 @@
       
       <widget name="title" type="text">
         <labels>
-          <label mode="any">Title</label>
+          <label mode="any">title</label>
         </labels>
         <translated>true</translated>
         <fields>
           <field schema="persons_common">title</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="honorifics" type="text">
+        <labels>
+          <label mode="any">honorifics</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">honorifics</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -354,6 +369,19 @@
         <translated>true</translated>
         <fields>
           <field schema="persons_common">nameNote</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="status" type="text">
+        <labels>
+          <label mode="any">status</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field schema="persons_common">status</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>

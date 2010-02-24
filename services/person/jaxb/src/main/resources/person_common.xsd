@@ -21,27 +21,29 @@
                 <!--  Person Information Group -->
                 <xs:element name="inAuthority" type="xs:string" />
                 <xs:element name="refName" type="xs:string" />
-								<xs:element name="displayName" type="xs:string"/>
-								<xs:element name="displayNameComputed" type="xs:boolean"/>
-								<xs:element name="foreName" type="xs:string"/>
-								<xs:element name="middleName" type="xs:string"/>
-								<xs:element name="surName" type="xs:string"/>
-								<xs:element name="initials" type="xs:string"/>
-								<xs:element name="salutation" type="xs:string"/>
-								<xs:element name="title" type="xs:string"/>
-								<xs:element name="nameAdditions" type="xs:string"/>
-								<xs:element name="birthDate" type="xs:string"/>
-								<xs:element name="deathDate" type="xs:string"/>
-								<xs:element name="birthPlace" type="xs:string"/>
-								<xs:element name="deathPlace" type="xs:string"/>
-								<xs:element name="group" type="xs:string"/>
-								<xs:element name="nationality" type="xs:string"/>
-								<xs:element name="gender" type="xs:string"/>
-								<xs:element name="occupation" type="xs:string"/>
-								<xs:element name="schoolOrStyle" type="xs:string"/>
-								<xs:element name="bioNote" type="xs:string"/>
-								<xs:element name="nameNote" type="xs:string"/>
-						</xs:sequence>
+                <xs:element name="displayName" type="xs:string"/>
+                <xs:element name="displayNameComputed" type="xs:boolean"/>
+                <xs:element name="foreName" type="xs:string"/>
+                <xs:element name="middleName" type="xs:string"/>
+                <xs:element name="surName" type="xs:string"/>
+                <xs:element name="initials" type="xs:string"/>
+                <xs:element name="salutation" type="xs:string"/>
+                <xs:element name="title" type="xs:string"/>
+                <xs:element name="honorifics" type="xs:string"/>
+                <xs:element name="nameAdditions" type="xs:string"/>
+                <xs:element name="birthDate" type="xs:string"/>
+                <xs:element name="deathDate" type="xs:string"/>
+                <xs:element name="birthPlace" type="xs:string"/>
+                <xs:element name="deathPlace" type="xs:string"/>
+                <xs:element name="group" type="xs:string"/>
+                <xs:element name="nationality" type="xs:string"/>
+                <xs:element name="gender" type="xs:string"/>
+                <xs:element name="occupation" type="xs:string"/>
+                <xs:element name="schoolOrStyle" type="xs:string"/>
+                <xs:element name="bioNote" type="xs:string"/>
+                <xs:element name="nameNote" type="xs:string"/>
+                <xs:element name="status" type="xs:string"/>
+            </xs:sequence>
         </xs:complexType>
     </xs:element>
     
@@ -49,9 +51,9 @@
     <xs:element name="persons-common-list">
         <xs:complexType>
             <xs:sequence>
-								<xs:element name="pageNum" type="xs:unsignedInt" />
-								<xs:element name="pageSize" type="xs:unsignedInt" />
-								<xs:element name="totalItems" type="xs:unsignedInt" />
+                <xs:element name="pageNum" type="xs:unsignedInt" />
+                <xs:element name="pageSize" type="xs:unsignedInt" />
+                <xs:element name="totalItems" type="xs:unsignedInt" />
                  <xs:element name="person_list_item" maxOccurs="unbounded">
                     <xs:complexType>
                         <xs:sequence>

@@ -20,30 +20,32 @@
 >
 <!-- See http://wiki.collectionspace.org/display/collectionspace/Person+Service+Home -->    
 
-		<!--  Person Information Group -->
-		<!--  inAuthority is the csid of the owning PersonAuthority -->
-		<xs:element name="inAuthority" type="xs:string" />
-		<xs:element name="refName" type="xs:string"/>
-		<xs:element name="displayName" type="xs:string"/>
-		<xs:element name="displayNameComputed" type="xs:boolean"/>
-		<xs:element name="foreName" type="xs:string"/>
-		<xs:element name="middleName" type="xs:string"/>
-		<xs:element name="surName" type="xs:string"/>
-		<xs:element name="initials" type="xs:string"/>
-		<xs:element name="salutation" type="xs:string"/>
-		<xs:element name="title" type="xs:string"/>
-		<xs:element name="nameAdditions" type="xs:string"/>
-		<xs:element name="birthDate" type="xs:string"/>
-		<xs:element name="deathDate" type="xs:string"/>
-		<xs:element name="birthPlace" type="xs:string"/>
-		<xs:element name="deathPlace" type="xs:string"/>
-		<xs:element name="group" type="xs:string"/>
-		<xs:element name="nationality" type="xs:string"/>
-		<xs:element name="gender" type="xs:string"/>
-		<xs:element name="occupation" type="xs:string"/>
-		<xs:element name="schoolOrStyle" type="xs:string"/>
-		<xs:element name="bioNote" type="xs:string"/>
-		<xs:element name="nameNote" type="xs:string"/>
+    <!--  Person Information Group -->
+    <!--  inAuthority is the csid of the owning PersonAuthority -->
+    <xs:element name="inAuthority" type="xs:string" />
+    <xs:element name="refName" type="xs:string"/>
+    <xs:element name="displayName" type="xs:string"/>
+    <xs:element name="displayNameComputed" type="xs:boolean"/>
+    <xs:element name="foreName" type="xs:string"/>
+    <xs:element name="middleName" type="xs:string"/>
+    <xs:element name="surName" type="xs:string"/>
+    <xs:element name="initials" type="xs:string"/>
+    <xs:element name="salutation" type="xs:string"/>
+    <xs:element name="title" type="xs:string"/>
+    <xs:element name="honorifics" type="xs:string"/>
+    <xs:element name="nameAdditions" type="xs:string"/>
+    <xs:element name="birthDate" type="xs:string"/>
+    <xs:element name="deathDate" type="xs:string"/>
+    <xs:element name="birthPlace" type="xs:string"/>
+    <xs:element name="deathPlace" type="xs:string"/>
+    <xs:element name="group" type="xs:string"/>
+    <xs:element name="nationality" type="xs:string"/>
+    <xs:element name="gender" type="xs:string"/>
+    <xs:element name="occupation" type="xs:string"/>
+    <xs:element name="schoolOrStyle" type="xs:string"/>
+    <xs:element name="bioNote" type="xs:string"/>
+    <xs:element name="nameNote" type="xs:string"/>
+    <xs:element name="status" type="xs:string"/>
 
 </xs:schema>
 
