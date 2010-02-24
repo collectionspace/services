@@ -3,6 +3,8 @@
 	<name>org.collectionspace.services.account</name>
 	<comment></comment>
 	<projects>
+		<project>org.collectionspace.services.account.jaxb</project>
+		<project>org.collectionspace.services.common</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

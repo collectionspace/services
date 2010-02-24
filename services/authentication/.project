@@ -3,6 +3,8 @@
 	<name>org.collectionspace.services.authentication</name>
 	<comment></comment>
 	<projects>
+		<project>org.collectionspace.services.authentication.jaxb</project>
+		<project>org.collectionspace.services.common</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
