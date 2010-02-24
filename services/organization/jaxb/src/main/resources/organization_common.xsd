@@ -8,8 +8,10 @@
     >
 
     <!-- avoid XmlRootElement nightnmare, see http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html-->
-    <!-- See http://wiki.collectionspace.org/display/collectionspace/Organization+Service+Home -->    
-    
+
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Name+Authority+Schema -->
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Organization+Service+Home -->
+
     <!-- Organization -->
     <xs:element name="organizations_common">
         <xs:complexType>
@@ -20,7 +22,7 @@
                 <xs:element name="inAuthority" type="xs:string" />
                 <xs:element name="refName" type="xs:string"/>
                 <xs:element name="displayName" type="xs:string"/>
-				        <xs:element name="displayNameComputed" type="xs:boolean"/>
+                <xs:element name="displayNameComputed" type="xs:boolean"/>
                 <xs:element name="shortName" type="xs:string"/>
                 <xs:element name="longName" type="xs:string"/>
                 <xs:element name="nameAdditions" type="xs:string"/>
@@ -28,8 +30,11 @@
                 <xs:element name="foundingDate" type="xs:string"/>
                 <xs:element name="dissolutionDate" type="xs:string"/>
                 <xs:element name="foundingPlace" type="xs:string"/>
+                <xs:element name="group" type="xs:string"/>
                 <xs:element name="function" type="xs:string"/>
-                <xs:element name="description" type="xs:string"/>
+                <xs:element name="subBody" type="xs:string"/>
+                <xs:element name="history" type="xs:string"/>
+                <xs:element name="status" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -38,10 +43,10 @@
     <xs:element name="organizations-common-list">
         <xs:complexType>
             <xs:sequence>
-								<xs:element name="pageNum" type="xs:unsignedInt" />
-								<xs:element name="pageSize" type="xs:unsignedInt" />
-								<xs:element name="totalItems" type="xs:unsignedInt" />
-                 <xs:element name="organization_list_item" maxOccurs="unbounded">
+                <xs:element name="pageNum" type="xs:unsignedInt" />
+                <xs:element name="pageSize" type="xs:unsignedInt" />
+                <xs:element name="totalItems" type="xs:unsignedInt" />
+                <xs:element name="organization_list_item" maxOccurs="unbounded">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="displayName" type="xs:string"

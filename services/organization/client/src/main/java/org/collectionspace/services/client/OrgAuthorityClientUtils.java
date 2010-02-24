@@ -1,7 +1,6 @@
 package org.collectionspace.services.client;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
@@ -109,10 +108,16 @@ public class OrgAuthorityClientUtils {
         	organization.setDissolutionDate(value);
         if((value = (String)orgInfo.get(OrganizationJAXBSchema.FOUNDING_PLACE))!=null)
         	organization.setFoundingPlace(value);
+        if((value = (String)orgInfo.get(OrganizationJAXBSchema.GROUP))!=null)
+        	organization.setGroup(value);
         if((value = (String)orgInfo.get(OrganizationJAXBSchema.FUNCTION))!=null)
         	organization.setFunction(value);
-        if((value = (String)orgInfo.get(OrganizationJAXBSchema.DESCRIPTION))!=null)
-        	organization.setDescription(value);
+        if((value = (String)orgInfo.get(OrganizationJAXBSchema.SUB_BODY))!=null)
+        	organization.setSubBody(value);
+        if((value = (String)orgInfo.get(OrganizationJAXBSchema.HISTORY))!=null)
+        	organization.setHistory(value);
+        if((value = (String)orgInfo.get(OrganizationJAXBSchema.STATUS))!=null)
+        	organization.setStatus(value);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(organization,
             MediaType.APPLICATION_XML_TYPE);

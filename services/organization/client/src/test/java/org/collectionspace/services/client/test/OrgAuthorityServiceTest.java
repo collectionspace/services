@@ -172,9 +172,6 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         // Store the IDs from any item resources created
         // by tests, along with the IDs of their parents, so these items
         // can be deleted after all tests have been run.
-        //
-        // Item resource IDs are unique, so these are used as keys;
-        // the non-unique IDs of their parents are stored as associated values.
         allResourceItemIdsCreated.put(newID, vcsid);
 
         return newID;

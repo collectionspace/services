@@ -18,23 +18,27 @@
   targetNamespace="http://collectionspace.org/services/organization"
   version="0.1"
 >
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Name+Authority+Schema -->
 <!-- See http://wiki.collectionspace.org/display/collectionspace/Organization+Service+Home -->    
 
-		<!--  Organization Information Group -->
-		<!--  inAuthority is the csid of the owning OrgAuthority -->
-		<xs:element name="inAuthority" type="xs:string" />
-		<xs:element name="refName" type="xs:string"/>
-		<xs:element name="displayName" type="xs:string"/>
-		<xs:element name="displayNameComputed" type="xs:boolean"/>
-		<xs:element name="shortName" type="xs:string"/>
-		<xs:element name="longName" type="xs:string"/>
-		<xs:element name="nameAdditions" type="xs:string"/>
-		<xs:element name="contactName" type="xs:string"/>
-		<xs:element name="foundingDate" type="xs:string"/>
-		<xs:element name="dissolutionDate" type="xs:string"/>
-		<xs:element name="foundingPlace" type="xs:string"/>
-		<xs:element name="function" type="xs:string"/>
-		<xs:element name="description" type="xs:string"/>
+    <!--  Organization Information Group -->
+    <!--  inAuthority is the csid of the owning OrgAuthority -->
+    <xs:element name="inAuthority" type="xs:string" />
+    <xs:element name="refName" type="xs:string"/>
+    <xs:element name="displayName" type="xs:string"/>
+    <xs:element name="displayNameComputed" type="xs:boolean"/>
+    <xs:element name="shortName" type="xs:string"/>
+    <xs:element name="longName" type="xs:string"/>
+    <xs:element name="nameAdditions" type="xs:string"/>
+    <xs:element name="contactName" type="xs:string"/>
+    <xs:element name="foundingDate" type="xs:string"/>
+    <xs:element name="dissolutionDate" type="xs:string"/>
+    <xs:element name="foundingPlace" type="xs:string"/>
+    <xs:element name="group" type="xs:string"/>
+    <xs:element name="function" type="xs:string"/>
+    <xs:element name="subBody" type="xs:string"/>
+    <xs:element name="history" type="xs:string"/>
+    <xs:element name="status" type="xs:string"/>
 
 </xs:schema>
 
