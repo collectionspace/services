@@ -82,117 +82,121 @@ import org.collectionspace.services.relation.RelationshipType;
  */
 public class PerformanceTest extends CollectionSpacePerformanceTest {
 
-	final Logger logger = LoggerFactory
-			.getLogger(PerformanceTest.class);
-	//
-	// Get clients for the CollectionSpace services
-	//
-	private RelationClient relationClient = new RelationClient();
-	private IntakeClient intakeClient = new IntakeClient();
-	private static int MAX_RECORDS = 100;
-	
-	private String createCollectionObject(CollectionObjectClient collectionObjectClient) {
-		String result = null;
-		//
-		// First create a CollectionObject
-		//
-		CollectionobjectsCommon co = new CollectionobjectsCommon();
-		fillCollectionObject(co, createIdentifier());
-		
-		// Next, create a part object
-		MultipartOutput multipart = new MultipartOutput();
-		OutputPart commonPart = multipart.addPart(co, MediaType.APPLICATION_XML_TYPE);
-		commonPart.getHeaders().add("label", collectionObjectClient.getCommonPartName());
-		// Make the create call and check the response
-		ClientResponse<Response> response = collectionObjectClient.create(multipart);
-		Assert.assertEquals(response.getStatus(), Response.Status.CREATED
-				.getStatusCode());
-		result = extractId(response);
-		
-		return result;
-	}
-	
-	@Test
-	public void createCollectionObjects() {
-		CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-		String[] coList = new String[MAX_RECORDS];
-		
-		Date startTime = new Date();
-		for (int i = 0; i < MAX_RECORDS; i++) {
-			coList[i] = createCollectionObject(collectionObjectClient);
-		}
-		Date stopTime = new Date();
-		if (logger.isDebugEnabled()) {
-			logger.debug("Created " + MAX_RECORDS + " CollectionObjects" +
-					" in " + (stopTime.getTime() - startTime.getTime())/1000.0 + " seconds.");
-		}
-		
-		startTime = new Date();
-		for (int i = 0; i < MAX_RECORDS; i++) {
-			deleteCollectionObject(collectionObjectClient, coList[i]);
-		}
-		stopTime = new Date();
-		if (logger.isDebugEnabled()) {
-			logger.debug("Deleted " + MAX_RECORDS + " CollectionObjects" +
-					" in " + (stopTime.getTime() - startTime.getTime())/1000.0 + " seconds.");
-		}
-	}
-	
-	private void deleteCollectionObject(CollectionObjectClient collectionObjectClient,
-			String resourceId) {
-		ClientResponse<Response> res = collectionObjectClient.delete(resourceId);			
-	}
+    final Logger logger = LoggerFactory.getLogger(PerformanceTest.class);
+    //
+    // Get clients for the CollectionSpace services
+    //
+    private RelationClient relationClient = new RelationClient();
+    private IntakeClient intakeClient = new IntakeClient();
+    private static int MAX_RECORDS = 100;
 
-	@Test
-	public void relateCollectionObjectToIntake() {
-		
-		//
-		// First create a CollectionObject
-		//
-		CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-		CollectionobjectsCommon co = new CollectionobjectsCommon();
-		fillCollectionObject(co, createIdentifier());
-		
-		// Next, create a part object
-		MultipartOutput multipart = new MultipartOutput();
-		OutputPart commonPart = multipart.addPart(co, MediaType.APPLICATION_XML_TYPE);
-		commonPart.getHeaders().add("label", collectionObjectClient.getCommonPartName());
-		// Make the create call and check the response
-		ClientResponse<Response> response = collectionObjectClient.create(multipart);
-		Assert.assertEquals(response.getStatus(), Response.Status.CREATED
-				.getStatusCode());
-		String collectionObjectCsid = extractId(response);
-	    
-	    
-	    // Next, create an Intake object
-	    IntakesCommon intake = new IntakesCommon();
-	    fillIntake(intake, createIdentifier());
-	    // Create the a part object
-	    multipart = new MultipartOutput();
-	    commonPart = multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
-	    commonPart.getHeaders().add("label", intakeClient.getCommonPartName());
-	    // Make the call to create and check the response
-	    response = intakeClient.create(multipart);
-	    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
-	    String intakeCsid = extractId(response);
-	    
-	    // Lastly, relate the two entities, by creating a new relation object
-	    RelationsCommon relation = new RelationsCommon();
-	    fillRelation(relation, collectionObjectCsid, CollectionobjectsCommon.class.getSimpleName(),
-	    		intakeCsid, IntakesCommon.class.getSimpleName(),
-	    		RelationshipType.COLLECTIONOBJECT_INTAKE);
-	    // Create the part and fill it with the relation object
-	    multipart = new MultipartOutput();
-	    commonPart = multipart.addPart(relation, MediaType.APPLICATION_XML_TYPE);
-	    commonPart.getHeaders().add("label", relationClient.getCommonPartName());
-	    // Make the call to crate
-	    response = relationClient.create(multipart); 
-	    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
-	    String relationCsid = extractId(response);	    
-	}
+    private String createCollectionObject(CollectionObjectClient collectionObjectClient) {
+        String result = null;
+        //
+        // First create a CollectionObject
+        //
+        CollectionobjectsCommon co = new CollectionobjectsCommon();
+        fillCollectionObject(co, createIdentifier());
 
-	/*
-	 * Private Methods
-	 */
+        // Next, create a part object
+        MultipartOutput multipart = new MultipartOutput();
+        OutputPart commonPart = multipart.addPart(co, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", collectionObjectClient.getCommonPartName());
+        // Make the create call and check the response
+        ClientResponse<Response> response = collectionObjectClient.create(multipart);
+        Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
+        result = extractId(response);
 
+        return result;
+    }
+
+    @Test
+    public void createCollectionObjects() {
+        if (!isEnabled()) {
+            return;
+        }
+        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+        String[] coList = new String[MAX_RECORDS];
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Starting perf test...");
+        }
+        Date startTime = new Date();
+        for (int i = 0; i < MAX_RECORDS; i++) {
+            coList[i] = createCollectionObject(collectionObjectClient);
+        }
+        Date stopTime = new Date();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Created " + MAX_RECORDS + " CollectionObjects"
+                    + " in " + (stopTime.getTime() - startTime.getTime()) / 1000.0 + " seconds.");
+        }
+
+        startTime = new Date();
+        for (int i = 0; i < MAX_RECORDS; i++) {
+            deleteCollectionObject(collectionObjectClient, coList[i]);
+        }
+        stopTime = new Date();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Deleted " + MAX_RECORDS + " CollectionObjects"
+                    + " in " + (stopTime.getTime() - startTime.getTime()) / 1000.0 + " seconds.");
+        }
+    }
+
+    private void deleteCollectionObject(CollectionObjectClient collectionObjectClient,
+            String resourceId) {
+        ClientResponse<Response> res = collectionObjectClient.delete(resourceId);
+    }
+
+    @Test
+    public void relateCollectionObjectToIntake() {
+        if (!isEnabled()) {
+            return;
+        }
+        //
+        // First create a CollectionObject
+        //
+        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+        CollectionobjectsCommon co = new CollectionobjectsCommon();
+        fillCollectionObject(co, createIdentifier());
+
+        // Next, create a part object
+        MultipartOutput multipart = new MultipartOutput();
+        OutputPart commonPart = multipart.addPart(co, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", collectionObjectClient.getCommonPartName());
+        // Make the create call and check the response
+        ClientResponse<Response> response = collectionObjectClient.create(multipart);
+        Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
+        String collectionObjectCsid = extractId(response);
+
+
+        // Next, create an Intake object
+        IntakesCommon intake = new IntakesCommon();
+        fillIntake(intake, createIdentifier());
+        // Create the a part object
+        multipart = new MultipartOutput();
+        commonPart = multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", intakeClient.getCommonPartName());
+        // Make the call to create and check the response
+        response = intakeClient.create(multipart);
+        Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
+        String intakeCsid = extractId(response);
+
+        // Lastly, relate the two entities, by creating a new relation object
+        RelationsCommon relation = new RelationsCommon();
+        fillRelation(relation, collectionObjectCsid, CollectionobjectsCommon.class.getSimpleName(),
+                intakeCsid, IntakesCommon.class.getSimpleName(),
+                RelationshipType.COLLECTIONOBJECT_INTAKE);
+        // Create the part and fill it with the relation object
+        multipart = new MultipartOutput();
+        commonPart = multipart.addPart(relation, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", relationClient.getCommonPartName());
+        // Make the call to crate
+        response = relationClient.create(multipart);
+        Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
+        String relationCsid = extractId(response);
+    }
+
+    /*
+     * Private Methods
+     */
 }

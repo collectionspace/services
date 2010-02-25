@@ -222,4 +222,8 @@ public abstract class CollectionSpacePerformanceTest {
 		}
 	}
 
+        boolean isEnabled() {
+            return Boolean.getBoolean("cspace.perf");
+        }
+
 }
