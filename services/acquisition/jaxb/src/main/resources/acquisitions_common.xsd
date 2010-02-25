@@ -58,7 +58,7 @@
                 <xs:element name="originalObjectPurchasePriceValue" type="xs:string"/>
                 <xs:element name="transferOfTitleNumber" type="xs:string"/>
                 <!-- Object Collection Information Group -->
-                <xs:element name="fieldCollectionData" type="xs:string"/>
+                <xs:element name="fieldCollectionDate" type="xs:string"/>
                 <xs:element name="fieldCollectionEventName" type="xs:string"/>
                 <xs:element name="fieldCollectionNumber" type="xs:string"/>
                 <xs:element name="fieldCollector" type="xs:string"/>

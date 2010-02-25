@@ -34,7 +34,7 @@
         <row><widget>OriginalObjectPurchasePriceDenomination</widget></row>
         <row><widget>OriginalObjectPurchasePriceValue</widget></row>
         <row><widget>TransferOfTitleNumber</widget></row>
-        <row><widget>fieldCollectionData</widget></row>
+        <row><widget>fieldCollectionDate</widget></row>
         <row><widget>fieldCollectionEventName</widget></row>
         <row><widget>fieldCollectionNumber</widget></row>
         <row><widget>fieldCollector</widget></row>
@@ -378,13 +378,13 @@
         </properties>
       </widget>
 
-      <widget name="fieldCollectionData" type="text">
+      <widget name="fieldCollectionDate" type="text">
         <labels>
-          <label mode="any">fieldCollectionData</label>
+          <label mode="any">fieldCollectionDate</label>
         </labels>
         <translated>true</translated>
         <fields>
-          <field>acq:fieldCollectionData</field>
+          <field>acq:fieldCollectionDate</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
