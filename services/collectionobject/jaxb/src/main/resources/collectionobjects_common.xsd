@@ -13,7 +13,7 @@
 
 <xs:schema 
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:ns="http://collectionspace.org/servics/collectionobject"
+  xmlns:ns="http://collectionspace.org/services/collectionobject"
   xmlns="http://collectionspace.org/services/collectionobject"
   targetNamespace="http://collectionspace.org/services/collectionobject"
   version="0.1"

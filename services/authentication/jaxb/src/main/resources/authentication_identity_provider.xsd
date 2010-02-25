@@ -15,7 +15,7 @@
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
     xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
     xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
-    xmlns:ns="http://collectionspace.org/servics/authentication"
+    xmlns:ns="http://collectionspace.org/services/authentication"
     xmlns="http://collectionspace.org/services/authentication"
     targetNamespace="http://collectionspace.org/services/authentication"
     version="0.1"
