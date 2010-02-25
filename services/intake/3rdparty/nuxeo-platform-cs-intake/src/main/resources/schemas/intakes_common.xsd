@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 <!--
     Intake schema (XSD)
@@ -43,31 +43,20 @@
     <xs:element name="datePeriod" type="xs:string"/>
     <xs:element name="dateText" type="xs:string"/>
     
-<!--  Object Collection Information Group -->
+    <!--  Object Collection Information Group -->
     <xs:element name="fieldCollectionDate" type="xs:string"/>
     <xs:element name="fieldCollectionEventName" type="xs:string"/>
-    <xs:element name="fieldCollectionEventRefNumber" type="xs:string"/>
-    <xs:element name="fieldCollectionMethod" type="xs:string"/>
-    <xs:element name="fieldCollectionNote" type="xs:string"/>
     <xs:element name="fieldCollectionNumber" type="xs:string"/>
-    <xs:element name="fieldCollectionPlace" type="xs:string"/>
-    <xs:element name="fieldCollectionSource" type="xs:string"/>
     <xs:element name="fieldCollector" type="xs:string"/>
-    <xs:element name="geologicalComplexName" type="xs:string"/>
-    <xs:element name="habitat" type="xs:string"/>
-    <xs:element name="habitatNote" type="xs:string"/>
-    <xs:element name="stratigraphicUnitName" type="xs:string"/>
-    <xs:element name="stratigraphicUnitType" type="xs:string"/>
-    <xs:element name="stratigraphicUnitNote" type="xs:string"/>
-    
-<!-- Valuation Information Group -->
-    <xs:element name="ValuationReferenceNumber" type="xs:string"/>
-    <xs:element name="Valuer" type="xs:string"/>
-    
-<!-- Insurance Information Group -->
+
+    <!-- Valuation Information Group -->
+    <xs:element name="valuationReferenceNumber" type="xs:string"/>
+    <xs:element name="valuer" type="xs:string"/>
+
+    <!-- Insurance Information Group -->
     <xs:element name="insuranceNote" type="xs:string"/>
     <xs:element name="insurancePolicyNumber" type="xs:string"/>
-    <xs:element name="InsuranceReferenceNumber" type="xs:string"/>
+    <xs:element name="insuranceReferenceNumber" type="xs:string"/>
     <xs:element name="insuranceRenewalDate" type="xs:string"/>
     <xs:element name="insurer" type="xs:string"/>
     
