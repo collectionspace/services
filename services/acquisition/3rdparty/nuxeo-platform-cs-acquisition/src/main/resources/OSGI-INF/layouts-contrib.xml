@@ -14,7 +14,7 @@
         <row><widget>acquisitionAuthorizer</widget></row>
         <row><widget>AcquisitionAuthorizerDate</widget></row>
         <row><widget>AcquisitionDate</widget></row>
-        <row><widget>AcquisitionFunding</widget></row>
+        <row><widget>AcquisitionFundingDenomination</widget></row>
         <row><widget>AcquisitionFundingSource</widget></row>
         <row><widget>AcquisitionFundingSourceProvisos</widget></row>
         <row><widget>AcquisitionMethod</widget></row>
@@ -23,13 +23,21 @@
         <row><widget>AcquisitionReason</widget></row>
         <row><widget>AcquisitionReferenceNumber</widget></row>
         <row><widget>AcquisitionSource</widget></row>
-        <row><widget>GroupPurchasePrice</widget></row>
-        <row><widget>ObjectOfferPrice</widget></row>
-        <row><widget>ObjectPurchaseOfferPrice</widget></row>
-        <row><widget>ObjectPurchasePrice</widget></row>
-        <row><widget>OriginalObjectPurchasePrice</widget></row>
+        <row><widget>GroupPurchasePriceDenomination</widget></row>
+        <row><widget>GroupPurchasePriceValue</widget></row>
+        <row><widget>ObjectOfferPriceDenomination</widget></row>
+        <row><widget>ObjectOfferPriceValue</widget></row>
+        <row><widget>ObjectPurchaseOfferPriceDenomination</widget></row>
+        <row><widget>ObjectPurchaseOfferPriceValue</widget></row>
+        <row><widget>ObjectPurchasePriceDenomination</widget></row>
+        <row><widget>ObjectPurchasePriceValue</widget></row>
         <row><widget>OriginalObjectPurchasePriceDenomination</widget></row>
+        <row><widget>OriginalObjectPurchasePriceValue</widget></row>
         <row><widget>TransferOfTitleNumber</widget></row>
+        <row><widget>fieldCollectionData</widget></row>
+        <row><widget>fieldCollectionEventName</widget></row>
+        <row><widget>fieldCollectionNumber</widget></row>
+        <row><widget>fieldCollector</widget></row>
       </rows>
 
       <widget name="accessionDate" type="text">
@@ -64,7 +72,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field>acq:AcquisitionAuthorizerDate</field>
+          <field>acq:acquisitionAuthorizerDate</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -77,7 +85,7 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field>acq:AcquisitionDate</field>
+          <field>acq:acquisitionDate</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -90,20 +98,46 @@
         </labels>
         <translated>true</translated>
         <fields>
-          <field>acq:AcquisitionFunding</field>
+          <field>acq:acquisitionFunding</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
-      
+
+      <widget name="AcquisitionFundingDenomination" type="text">
+        <labels>
+          <label mode="any">AcquisitionFundingDenomination</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acq:acquisitionFundingDenomination</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="AcquisitionFundingDenomination" type="text">
+        <labels>
+          <label mode="any">AcquisitionFundingValue</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acq:acquisitionFundingValue</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
       <widget name="AcquisitionFundingSource" type="text">
         <labels>
           <label mode="any">AcquisitionFundingSource</label>
         </labels>
         <translated>true</translated>
         <fields>
-          <field>acq:AcquisitionFundingSource</field>
+          <field>acq:acquisitionFundingSource</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -201,71 +235,110 @@
         </properties>
       </widget>
       
-      <widget name="GroupPurchasePrice" type="text">
+      <widget name="GroupPurchasePriceDenomination" type="text">
         <labels>
-          <label mode="any">GroupPurchasePrice</label>
+          <label mode="any">GroupPurchasePriceDenomination</label>
         </labels>
         <translated>true</translated>
         <fields>
-          <field>acq:GroupPurchasePrice</field>
+          <field>acq:groupPurchasePriceDenomination</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="GroupPurchasePriceValue" type="text">
+        <labels>
+          <label mode="any">GroupPurchasePriceValue</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acq:groupPurchasePriceValue</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="ObjectOfferPriceDenomination" type="text">
+        <labels>
+          <label mode="any">ObjectOfferPriceDenomination</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acq:objectOfferPriceDenomination</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+     <widget name="ObjectOfferPriceValue" type="text">
+        <labels>
+          <label mode="any">objectOfferPriceValue</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acq:objectOfferPriceValue</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
       
-      <widget name="ObjectOfferPrice" type="text">
+      <widget name="ObjectPurchaseOfferPriceDenomination" type="text">
         <labels>
-          <label mode="any">ObjectOfferPrice</label>
+          <label mode="any">ObjectPurchaseOfferPriceDenomination</label>
         </labels>
         <translated>true</translated>
         <fields>
-          <field>acq:ObjectOfferPrice</field>
+          <field>acq:objectPurchaseOfferPriceDenomination</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
-      
-      <widget name="ObjectPurchaseOfferPrice" type="text">
+
+       <widget name="ObjectPurchaseOfferPriceValue" type="text">
         <labels>
-          <label mode="any">ObjectPurchaseOfferPrice</label>
+          <label mode="any">ObjectPurchaseOfferPriceValue</label>
         </labels>
         <translated>true</translated>
         <fields>
-          <field>acq:ObjectPurchaseOfferPrice</field>
+          <field>acq:objectPurchaseOfferPriceValue</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
-      
-      <widget name="ObjectPurchasePrice" type="text">
+
+      <widget name="ObjectPurchasePriceDenomination" type="text">
         <labels>
-          <label mode="any">ObjectPurchasePrice</label>
+          <label mode="any">ObjectPurchasePriceDenomination</label>
         </labels>
         <translated>true</translated>
         <fields>
-          <field>acq:ObjectPurchasePrice</field>
+          <field>acq:objectPurchasePriceDenomination</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
-      
-      <widget name="OriginalObjectPurchasePrice" type="text">
+
+       <widget name="ObjectPurchasePriceValue" type="text">
         <labels>
-          <label mode="any">OriginalObjectPurchasePrice</label>
+          <label mode="any">ObjectPurchasePriceValue</label>
         </labels>
         <translated>true</translated>
         <fields>
-          <field>acq:OriginalObjectPurchasePrice</field>
+          <field>acq:objectPurchasePriceValue</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
-      
+
       <widget name="OriginalObjectPurchasePriceDenomination" type="text">
         <labels>
           <label mode="any">OriginalObjectPurchasePriceDenomination</label>
@@ -278,20 +351,85 @@
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
-      
+
+      <widget name="OriginalObjectPurchasePriceValue" type="text">
+        <labels>
+          <label mode="any">OriginalObjectPurchasePriceValue</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acq:originalObjectPurchasePriceValue</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
       <widget name="TransferOfTitleNumber" type="text">
         <labels>
           <label mode="any">TransferOfTitleNumber</label>
         </labels>
         <translated>true</translated>
         <fields>
-          <field>acq:TransferOfTitleNumber</field>
+          <field>acq:transferOfTitleNumber</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
-      
+
+      <widget name="fieldCollectionData" type="text">
+        <labels>
+          <label mode="any">fieldCollectionData</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acq:fieldCollectionData</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="fieldCollectionEventName" type="text">
+        <labels>
+          <label mode="any">fieldCollectionEventName</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acq:fieldCollectionEventName</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="fieldCollectionNumber" type="text">
+        <labels>
+          <label mode="any">fieldCollectionNumber</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acq:fieldCollectionNumber</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
+      <widget name="fieldCollector" type="text">
+        <labels>
+          <label mode="any">fieldCollector</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acq:fieldCollector</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+
     </layout>
   </extension>
 </component>
