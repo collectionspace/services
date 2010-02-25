@@ -104,7 +104,7 @@ public class VocabularyBaseImport {
         final String entryMethodsVocabName = "Entry Methods";
         final String entryReasonsVocabName = "Entry Reasons";
         final String responsibleDeptsVocabName = "Responsible Departments";
-        final String itemStatusVocabName = "Item Status";
+        final String termStatusVocabName = "Term Status";
 
         List<String> acquisitionMethodsEnumValues =
                 Arrays.asList("Gift", "Purchase", "Exchange", "Transfer", "Treasure");
@@ -117,14 +117,14 @@ public class VocabularyBaseImport {
                 "Ethnography", "Herpetology", "Media and Performance Art",
                 "Paintings and Sculpture", "Paleobotany", "Photographs",
                 "Prints and Drawings");
-        List<String> itemStatusEnumValues =
+        List<String> termStatusEnumValues =
                 Arrays.asList("Provisional", "Under Review", "Accepted", "Rejected");
 
         vbi.createEnumeration(acquisitionMethodsVocabName, acquisitionMethodsEnumValues);
         vbi.createEnumeration(entryMethodsVocabName, entryMethodsEnumValues);
         vbi.createEnumeration(entryReasonsVocabName, entryReasonsEnumValues);
         vbi.createEnumeration(responsibleDeptsVocabName, respDeptNamesEnumValues);
-        vbi.createEnumeration(itemStatusVocabName, itemStatusEnumValues);
+        vbi.createEnumeration(termStatusVocabName, termStatusEnumValues);
 
         logger.info("VocabularyBaseImport complete.");
     }
