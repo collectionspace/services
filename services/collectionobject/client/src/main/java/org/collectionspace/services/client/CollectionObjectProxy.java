@@ -7,9 +7,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -27,6 +31,17 @@ public interface CollectionObjectProxy {
     @GET
     @Produces({"application/xml"})
     ClientResponse<CollectionobjectsCommonList> readList();
+
+    @GET
+    @Path("/roundtrip")
+    @Produces({"application/xml"})
+    ClientResponse<Response> roundtrip();
+
+    @GET
+    @Path("/search")
+    @Produces({"application/xml"})
+    ClientResponse<CollectionobjectsCommonList> keywordSearch(
+    		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords);
 
     //(C)reate
     @POST

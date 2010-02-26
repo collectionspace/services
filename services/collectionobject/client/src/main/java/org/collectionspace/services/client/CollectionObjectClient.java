@@ -26,11 +26,17 @@
  */
 package org.collectionspace.services.client;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.query.IQueryManager;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
@@ -39,15 +45,11 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
- * A CollectionObjectClient.
-
- * @version $Revision:$
+ * The Class CollectionObjectClient.
  */
 public class CollectionObjectClient extends AbstractServiceClientImpl {
 
-    /**
-     *
-     */
+    /** The collection object proxy. */
     private CollectionObjectProxy collectionObjectProxy;
     
 	/* (non-Javadoc)
@@ -58,9 +60,7 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
 	}
 
     /**
-     *
-     * Default constructor for CollectionObjectClient class.
-     *
+     * Instantiates a new collection object client.
      */
     public CollectionObjectClient() {
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
@@ -69,7 +69,7 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
     }
 
     /**
-     * allow to reset proxy as per security needs
+     * Sets the proxy.
      */
     public void setProxy() {
         if(useAuth()){
@@ -82,46 +82,79 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
     }
 
     /**
-     * @return
-     * @see org.collectionspace.hello.client.CollectionObjectProxy#readList()
+     * Read list.
+     * 
+     * @return the client response< collectionobjects common list>
      */
     public ClientResponse<CollectionobjectsCommonList> readList() {
         return collectionObjectProxy.readList();
 
     }
-
+    
     /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.hello.client.CollectionObjectProxy#getCollectionObject(java.lang.String)
+     * Roundtrip.
+     * 
+     * This is an intentionally empty method that is used for performance test 
+     * to get a rough time estimate of the client to server response-request overhead.
+     * 
+     * @return the client response< response>
+     */
+    public ClientResponse<Response> roundtrip() {
+        return collectionObjectProxy.roundtrip();
+    }
+    
+    /**
+     * Keyword search.
+     * 
+     * @param keywords the keywords
+     * 
+     * @return the client response< collectionobjects common list>
+     */
+    public ClientResponse<CollectionobjectsCommonList> keywordSearch(String keywords) {
+        return collectionObjectProxy.keywordSearch(keywords);
+
+    }
+    
+    /**
+     * Read.
+     * 
+     * @param csid the csid
+     * 
+     * @return the client response< multipart input>
      */
     public ClientResponse<MultipartInput> read(String csid) {
         return collectionObjectProxy.read(csid);
     }
 
     /**
-     * @param collectionobject
-     * @return
-     * @see org.collectionspace.hello.client.CollectionObjectProxy#create(org.collectionspace.services.collectionobject.CollectionobjectsCommon)
+     * Creates the.
+     * 
+     * @param multipart the multipart
+     * 
+     * @return the client response< response>
      */
     public ClientResponse<Response> create(MultipartOutput multipart) {
         return collectionObjectProxy.create(multipart);
     }
 
     /**
-     * @param csid
-     * @param collectionobject
-     * @return
-     * @see org.collectionspace.hello.client.CollectionObjectProxy#updateCollectionObject(java.lang.Long, org.collectionspace.services.collectionobject.CollectionobjectsCommon)
+     * Update.
+     * 
+     * @param csid the csid
+     * @param multipart the multipart
+     * 
+     * @return the client response< multipart input>
      */
     public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
         return collectionObjectProxy.update(csid, multipart);
     }
 
     /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.hello.client.CollectionObjectProxy#deleteCollectionObject(java.lang.Long)
+     * Delete.
+     * 
+     * @param csid the csid
+     * 
+     * @return the client response< response>
      */
     public ClientResponse<Response> delete(String csid) {
         return collectionObjectProxy.delete(csid);

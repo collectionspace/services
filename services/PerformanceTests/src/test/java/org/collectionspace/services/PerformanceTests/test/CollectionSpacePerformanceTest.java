@@ -27,6 +27,7 @@
 package org.collectionspace.services.PerformanceTests.test;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -46,6 +47,9 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
  */
 public abstract class CollectionSpacePerformanceTest {
 
+	protected final static String OBJECT_NUMBER = "objectNumber_";
+	protected final static String OBJECT_NAME = "objectName_";
+	
 	/*
 	 * Package scoped methods.
 	 */
@@ -57,8 +61,7 @@ public abstract class CollectionSpacePerformanceTest {
 	 * @param identifier the identifier
 	 */
 	void fillCollectionObject(CollectionobjectsCommon co, String identifier) {
-		fillCollectionObject(co, "objectNumber-" + identifier, "objectName-"
-				+ identifier);
+		fillCollectionObject(co, OBJECT_NUMBER + identifier, OBJECT_NAME + identifier);
 	}
 
 	/**

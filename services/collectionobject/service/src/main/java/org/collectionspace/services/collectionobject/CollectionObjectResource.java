@@ -73,15 +73,24 @@ import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommon;
 
 
+/**
+ * The Class CollectionObjectResource.
+ */
 @Path("/collectionobjects")
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
 public class CollectionObjectResource
         extends AbstractCollectionSpaceResourceImpl {
 
+    /** The Constant serviceName. */
     static final public String serviceName = "collectionobjects";
+    
+    /** The logger. */
     final Logger logger = LoggerFactory.getLogger(CollectionObjectResource.class);
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
+     */
     @Override
     protected String getVersionString() {
         /** The last change revision. */
@@ -89,11 +98,17 @@ public class CollectionObjectResource
         return lastChangeRevision;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getServiceName()
+     */
     @Override
     public String getServiceName() {
         return serviceName;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#createDocumentHandler(org.collectionspace.services.common.context.ServiceContext)
+     */
     @Override
     public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
         DocumentHandler docHandler = ctx.getDocumentHandler();
@@ -107,6 +122,13 @@ public class CollectionObjectResource
         return docHandler;
     }
 
+    /**
+     * Creates the collection object.
+     * 
+     * @param input the input
+     * 
+     * @return the response
+     */
     @POST
     public Response createCollectionObject(MultipartInput input) {
         try {
@@ -135,6 +157,13 @@ public class CollectionObjectResource
         }
     }
 
+    /**
+     * Gets the collection object.
+     * 
+     * @param csid the csid
+     * 
+     * @return the collection object
+     */
     @GET
     @Path("{csid}")
     public MultipartOutput getCollectionObject(
@@ -185,6 +214,13 @@ public class CollectionObjectResource
         return result;
     }
 
+    /**
+     * Gets the collection object list.
+     * 
+     * @param ui the ui
+     * 
+     * @return the collection object list
+     */
     @GET
     @Produces("application/xml")
     public CollectionobjectsCommonList getCollectionObjectList(@Context UriInfo ui) {
@@ -209,6 +245,14 @@ public class CollectionObjectResource
         return collectionObjectList;
     }
 
+    /**
+     * Update collection object.
+     * 
+     * @param csid the csid
+     * @param theUpdate the the update
+     * 
+     * @return the multipart output
+     */
     @PUT
     @Path("{csid}")
     public MultipartOutput updateCollectionObject(
@@ -254,6 +298,13 @@ public class CollectionObjectResource
         return result;
     }
 
+    /**
+     * Delete collection object.
+     * 
+     * @param csid the csid
+     * 
+     * @return the response
+     */
     @DELETE
     @Path("{csid}")
     public Response deleteCollectionObject(@PathParam("csid") String csid) {
@@ -292,6 +343,14 @@ public class CollectionObjectResource
 
     }
 
+    /**
+     * Gets the intakes common list.
+     * 
+     * @param ui the ui
+     * @param csid the csid
+     * 
+     * @return the intakes common list
+     */
     @GET
     @Path("{csid}/intakes")
     @Produces("application/xml")
@@ -333,13 +392,46 @@ public class CollectionObjectResource
         }
         
         return result;
-    }    
+    }
+    
+    /**
+     * Roundtrip.
+     * 
+     * This is an intentionally empty method used for getting a rough time estimate
+     * of the overhead required for a client->server request/response cycle.
+     * 
+     * @return the response
+     */
+    @GET
+    @Path("/roundtrip")
+    @Produces("application/xml")
+    public Response roundtrip() {
+    	Response result = null;
+    	
+		if (logger.isDebugEnabled()) {
+			logger.debug("------------------------------------------------------------------------------");
+			logger.debug("Client to server roundtrip called.");
+			logger.debug("------------------------------------------------------------------------------");
+			logger.debug("");
+		}
+		result = Response.status(HttpResponseCodes.SC_OK).build();
+		
+		return result;
+    }
+
 
     //FIXME: Replace this "search" resource with a keyword "kw" query parameter
+    /**
+     * Keywords search collection objects.
+     * 
+     * @param keywords the keywords
+     * 
+     * @return the collectionobjects common list
+     */
     @GET
     @Path("/search")
     @Produces("application/xml")
-    public CollectionobjectsCommonList keywordsSearchCollectionObjects(@Context UriInfo ui,
+    public CollectionobjectsCommonList keywordsSearchCollectionObjects(
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
         CollectionobjectsCommonList collectionObjectList = new CollectionobjectsCommonList();
         try {
