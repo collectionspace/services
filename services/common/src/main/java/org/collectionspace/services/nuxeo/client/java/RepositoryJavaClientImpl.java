@@ -307,8 +307,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
             // We should make this a property that is indexed.
             query.append(" WHERE ecm:path STARTSWITH '/" + domain + "'");
             if ((null != where) && (where.length() > 0)) {
-//              query.append(" AND " + where);
-                query.append(" AND " + where + "AND ecm:isProxy = 0");
+            	// Due to an apparent bug/issue in how Nuxeo translates the NXQL query string
+            	// into SQL, we need to parenthesize our 'where' clause
+                query.append(" AND " + "(" + where +")" + "AND ecm:isProxy = 0");
             }
             DocumentModelList docList = null;
             // If we have limit and/or offset, then pass true to get totalSize
@@ -319,6 +320,11 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
             } else {
                 docList = repoSession.query(query.toString());
             }
+            
+            if (logger.isDebugEnabled()) {
+                logger.debug("Executed NXQL query: " + query.toString());
+            }
+            
             //set repoSession to handle the document
             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
             DocumentWrapper<DocumentModelList> wrapDoc = new DocumentWrapperImpl<DocumentModelList>(docList);
