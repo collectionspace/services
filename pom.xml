@@ -80,6 +80,17 @@
         </repository>
 -->
         <repository>
+            <id>libs-snapshots</id>
+            <url>http://source.collectionspace.org:8081/artifactory/libs-snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
             <id>libs-snapshots-local</id>
             <name>libs-snapshots-local</name>
             <url>http://source.collectionspace.org:8081/artifactory/libs-snapshots-local</url>
@@ -173,6 +184,7 @@
         <enabled>false</enabled>
       </snapshots>
     </repository>
+-->    
     <repository>
       <id>public-snapshot</id>
       <url>http://maven.nuxeo.org/public-snapshot</url>
@@ -183,7 +195,6 @@
         <enabled>true</enabled>
       </snapshots>
     </repository>
- -->
 
     </repositories>
     
@@ -319,4 +330,5 @@
             </plugin>
         </plugins>
     </reporting>
+
 </project>
