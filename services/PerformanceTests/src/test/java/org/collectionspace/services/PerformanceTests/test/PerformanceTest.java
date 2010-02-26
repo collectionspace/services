@@ -91,7 +91,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 	//
 	// Get clients for the CollectionSpace services
 	//
-	private static int MAX_RECORDS = 10000;
+	private static int MAX_RECORDS = 1000;
 
 	@Test
 	public void performanceTest() {
