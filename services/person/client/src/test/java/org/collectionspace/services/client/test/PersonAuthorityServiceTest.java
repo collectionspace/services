@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -106,8 +105,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     	String baseRefName = PersonAuthorityClientUtils.createPersonAuthRefName(displayName, false);
     	String fullRefName = PersonAuthorityClientUtils.createPersonAuthRefName(displayName, true);
     	MultipartOutput multipart = 
-    		PersonAuthorityClientUtils.createPersonAuthorityInstance(
-    				displayName, fullRefName, client.getCommonPartName());
+            PersonAuthorityClientUtils.createPersonAuthorityInstance(
+    	    displayName, fullRefName, client.getCommonPartName());
         ClientResponse<Response> res = client.create(multipart);
         int statusCode = res.getStatus();
 
@@ -140,7 +139,6 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Store the IDs from every resource created by tests,
         // so they can be deleted after tests have been run.
         allResourceIdsCreated.add(newID);
-
     }
 
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
@@ -159,6 +157,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
+        String refName = PersonAuthorityClientUtils.createPersonRefName(authRefName, "John Wayne", true);
         Map<String, String> johnWayneMap = new HashMap<String,String>();
         johnWayneMap.put(PersonJAXBSchema.FORE_NAME, TEST_FORE_NAME);
         johnWayneMap.put(PersonJAXBSchema.SUR_NAME, TEST_SUR_NAME);
@@ -167,15 +166,14 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         johnWayneMap.put(PersonJAXBSchema.BIRTH_PLACE, "Winterset, Iowa");
         johnWayneMap.put(PersonJAXBSchema.DEATH_DATE, TEST_DEATH_DATE);
         johnWayneMap.put(PersonJAXBSchema.BIO_NOTE, "born Marion Robert Morrison and better" +
-        		"known by his stage name John Wayne, was an American film actor, director " +
-        		"and producer. He epitomized rugged masculinity and has become an enduring " +
-        		"American icon. He is famous for his distinctive voice, walk and height. " +
-        		"He was also known for his conservative political views and his support in " +
-        		"the 1950s for anti-communist positions.");
-        String refName = PersonAuthorityClientUtils.createPersonRefName(authRefName, "John Wayne", true);
+            "known by his stage name John Wayne, was an American film actor, director " +
+            "and producer. He epitomized rugged masculinity and has become an enduring " +
+            "American icon. He is famous for his distinctive voice, walk and height. " +
+            "He was also known for his conservative political views and his support in " +
+            "the 1950s for anti-communist positions.");
         MultipartOutput multipart = 
-        	PersonAuthorityClientUtils.createPersonInstance(vcsid, refName, johnWayneMap,
-        			client.getItemCommonPartName() );
+            PersonAuthorityClientUtils.createPersonInstance(vcsid, refName, johnWayneMap,
+                client.getItemCommonPartName() );
         ClientResponse<Response> res = client.createItem(vcsid, multipart);
         int statusCode = res.getStatus();
         String newID = PersonAuthorityClientUtils.extractId(res);
@@ -258,6 +256,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     }
 
     // Failure outcomes
+
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
     @Override
@@ -272,10 +271,10 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     public void createWithWrongXmlSchema(String testName) throws Exception {
     }
 
-    /*
+/*
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "testSubmitRequest"})
+        groups = {"create"}, dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithEmptyEntityBody(String testName) throws Exception {
 
     // Perform setup.
@@ -301,7 +300,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "testSubmitRequest"})
+        groups = {"create"}, dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithMalformedXml(String testName) throws Exception {
 
     // Perform setup.
@@ -327,7 +326,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "testSubmitRequest"})
+        groups = {"create"}, dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithWrongXmlSchema(String testName) throws Exception {
 
     // Perform setup.
@@ -350,7 +349,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
-     */
+*/
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE LIST tests
@@ -366,7 +365,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     }
 
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"createList"}, dependsOnGroups = {"create"})
+        groups = {"createList"}, dependsOnMethods = {"createList"})
     public void createItemList(String testName) throws Exception {
         // Add items to the initially-created, known parent record.
         for (int j = 0; j < nItemsToCreateInList; j++) {
@@ -375,7 +374,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     }
 
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"createList"}, dependsOnGroups = {"create"})
+        groups = {"createList"}, dependsOnMethods = {"createItemList"})
     public void createContactList(String testName) throws Exception {
         // Add contacts to the initially-created, known item record.
         for (int j = 0; j < nItemsToCreateInList; j++) {
@@ -418,37 +417,37 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
     }
 
-    /*
+/*
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
         groups = {"read"}, dependsOnMethods = {"read"})
     public void readByName(String testName) throws Exception {
 
-            // Perform setup.
-            setupRead();
+        // Perform setup.
+        setupRead();
 
-            // Submit the request to the service and store the response.
-            ClientResponse<MultipartInput> res = client.read(knownResourceId);
-            int statusCode = res.getStatus();
+        // Submit the request to the service and store the response.
+        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        int statusCode = res.getStatus();
 
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if(logger.isDebugEnabled()){
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-            //FIXME: remove the following try catch once Aron fixes signatures
-            try {
-                MultipartInput input = (MultipartInput) res.getEntity();
-                PersonauthoritiesCommon personAuthority = (PersonauthoritiesCommon) extractPart(input,
-                        client.getCommonPartName(), PersonauthoritiesCommon.class);
-                Assert.assertNotNull(personAuthority);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
         }
-    */
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        //FIXME: remove the following try catch once Aron fixes signatures
+        try {
+            MultipartInput input = (MultipartInput) res.getEntity();
+            PersonauthoritiesCommon personAuthority = (PersonauthoritiesCommon) extractPart(input,
+                    client.getCommonPartName(), PersonauthoritiesCommon.class);
+            Assert.assertNotNull(personAuthority);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+*/
 
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"read"}, dependsOnMethods = {"read"})
@@ -512,18 +511,18 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         String displayName = person.getDisplayName();
         // Make sure displayName matches computed form
         String expectedDisplayName = 
-        	PersonAuthorityClientUtils.prepareDefaultDisplayName(
-			       			TEST_FORE_NAME, null, TEST_SUR_NAME, 
-			       			TEST_BIRTH_DATE, TEST_DEATH_DATE);
+            PersonAuthorityClientUtils.prepareDefaultDisplayName(
+	        TEST_FORE_NAME, null, TEST_SUR_NAME,
+	        TEST_BIRTH_DATE, TEST_DEATH_DATE);
         Assert.assertNotNull(displayName, expectedDisplayName);
         
         // Update the shortName and verify the computed name is updated.
         person.setDisplayNameComputed(true);
         person.setForeName("updated-" + TEST_FORE_NAME);
         expectedDisplayName = 
-        	PersonAuthorityClientUtils.prepareDefaultDisplayName(
-        			"updated-" + TEST_FORE_NAME, null, TEST_SUR_NAME, 
-	       			TEST_BIRTH_DATE, TEST_DEATH_DATE);
+            PersonAuthorityClientUtils.prepareDefaultDisplayName(
+        	"updated-" + TEST_FORE_NAME, null, TEST_SUR_NAME, 
+	       	TEST_BIRTH_DATE, TEST_DEATH_DATE);
 
         // Submit the updated resource to the service and store the response.
         MultipartOutput output = new MultipartOutput();
@@ -548,13 +547,11 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(updatedPerson);
 
         // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedPerson.getForeName(),
-                person.getForeName(),
-                "Updated ForeName in Person did not match submitted data.");
+        Assert.assertEquals(updatedPerson.getForeName(), person.getForeName(),
+            "Updated ForeName in Person did not match submitted data.");
         // Verify that the updated resource computes the right displayName.
-        Assert.assertEquals(updatedPerson.getDisplayName(),
-        		expectedDisplayName,
-                "Updated ForeName in Person not reflected in computed DisplayName.");
+        Assert.assertEquals(updatedPerson.getDisplayName(), expectedDisplayName,
+            "Updated ForeName in Person not reflected in computed DisplayName.");
 
         // Now Update the displayName, not computed and verify the computed name is overriden.
         person.setDisplayNameComputed(false);
@@ -747,7 +744,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"readList"}, dependsOnGroups = {"create", "read"})
+        groups = {"readList"}, dependsOnGroups = {"createList", "read"})
     public void readList(String testName) throws Exception {
 
         // Perform setup.
@@ -839,6 +836,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        if (showDetails && logger.isDebugEnabled()) {
                 logger.debug("  " + testName + ": list-item[" + i + "] csid=" +
                         item.getCsid());
+                logger.debug("  " + testName + ": list-item[" + i + "] refName=" +
+                        item.getRefName());
                 logger.debug("  " + testName + ": list-item[" + i + "] displayName=" +
                         item.getDisplayName());
                 logger.debug("  " + testName + ": list-item[" + i + "] URI=" +
@@ -1109,7 +1108,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     public void updateWithWrongXmlSchema(String testName) throws Exception {
     }
 
-    /*
+/*
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
         groups = {"update"}, dependsOnMethods = {"update", "testSubmitRequest"})
@@ -1187,8 +1186,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
-     */
-
+*/
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
@@ -1199,9 +1197,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         setupUpdateNonExistent(testName);
 
         // Submit the request to the service and store the response.
-        // Note: The ID used in this 'create' call may be arbitrary.
-        // The only relevant ID may be the one used in update(), below.
-
+        // Note: The ID(s) used when creating the request payload may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
     	String displayName = "displayName-NON_EXISTENT_ID";
     	String fullRefName = PersonAuthorityClientUtils.createPersonAuthRefName(displayName, true);
@@ -1270,7 +1266,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     // before deleting their parents.
 
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class, 
-        groups = {"delete"}, dependsOnGroups = {"create", "read", "update"})
+        groups = {"delete"}, dependsOnGroups = {"create", "read", "readList", "update"})
     public void deleteContact(String testName) throws Exception {
 
         // Perform setup.

@@ -102,13 +102,6 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         return contactResource.getServiceName();
     }
 
-    /*
-    public RemoteServiceContext createItemServiceContext(MultipartInput input) throws Exception {
-    RemoteServiceContext ctx = new RemoteServiceContextImpl(getItemServiceName());
-    ctx.setInput(input);
-    return ctx;
-    }
-     */
     @Override
     public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
         DocumentHandler docHandler = ctx.getDocumentHandler();
@@ -156,7 +149,6 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         return docHandler;
     }
 
-
     @POST
     public Response createPersonAuthority(MultipartInput input) {
         try {
@@ -168,6 +160,10 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
             path.path("" + csid);
             Response response = Response.created(path.build()).build();
             return response;
+        } catch (BadRequestException bre) {
+            Response response = Response.status(
+                    Response.Status.BAD_REQUEST).entity("Create failed reason " + bre.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Create failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -284,6 +280,10 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
+        } catch (BadRequestException bre) {
+            Response response = Response.status(
+                    Response.Status.BAD_REQUEST).entity("Create failed reason " + bre.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -638,13 +638,13 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
             DocumentFilter myFilter = new DocumentFilter();
             myFilter.setPagination(queryParams);
             myFilter.setWhereClause(ContactJAXBSchema.CONTACTS_COMMON + ":" +
-            		ContactJAXBSchema.IN_AUTHORITY +
-            		"='" + parentcsid + "'" +
-                        " AND " +
-                        ContactJAXBSchema.CONTACTS_COMMON + ":" +
-             		ContactJAXBSchema.IN_ITEM +
-            		"='" + itemcsid + "'" +
-                        " AND ecm:isProxy = 0");
+                ContactJAXBSchema.IN_AUTHORITY +
+                "='" + parentcsid + "'" +
+                " AND " +
+                ContactJAXBSchema.CONTACTS_COMMON + ":" +
+                ContactJAXBSchema.IN_ITEM +
+                "='" + itemcsid + "'" +
+                " AND ecm:isProxy = 0");
             handler.setDocumentFilter(myFilter);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             contactObjectList = (ContactsCommonList) handler.getCommonPartList();
