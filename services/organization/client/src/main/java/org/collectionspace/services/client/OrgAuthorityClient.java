@@ -2,6 +2,7 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.organization.OrgauthoritiesCommonList;
 import org.collectionspace.services.organization.OrganizationsCommonList;
 
@@ -163,4 +164,31 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
     public ClientResponse<Response> deleteItem(String vcsid, String csid) {
         return orgAuthorityProxy.deleteItem(vcsid, csid);
     }
+
+        public ClientResponse<Response> createContact(String parentcsid,
+            String itemcsid, MultipartOutput multipart) {
+        return orgAuthorityProxy.createContact(parentcsid, itemcsid, multipart);
+    }
+
+    public ClientResponse<MultipartInput> readContact(String parentcsid,
+            String itemcsid, String csid) {
+        return orgAuthorityProxy.readContact(parentcsid, itemcsid, csid);
+    }
+
+    public ClientResponse<ContactsCommonList> readContactList(String parentcsid,
+            String itemcsid) {
+        return orgAuthorityProxy.readContactList(parentcsid, itemcsid);
+    }
+
+    public ClientResponse<MultipartInput> updateContact(String parentcsid,
+            String itemcsid, String csid, MultipartOutput multipart) {
+        return orgAuthorityProxy.updateContact(parentcsid, itemcsid, csid, multipart);
+    }
+
+    public ClientResponse<Response> deleteContact(String parentcsid,
+        String itemcsid, String csid) {
+        return orgAuthorityProxy.deleteContact(parentcsid,
+            itemcsid, csid);
+    }
+
 }

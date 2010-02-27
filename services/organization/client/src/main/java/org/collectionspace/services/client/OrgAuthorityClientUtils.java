@@ -62,7 +62,7 @@ public class OrgAuthorityClientUtils {
 
     	if(logger.isDebugEnabled()){
     		logger.debug("Import: Create Item: \""+displayName
-    				+"\" in orgAuthorityulary: \"" + orgAuthorityRefName +"\"");
+    				+"\" in orgAuthority: \"" + orgAuthorityRefName +"\"");
     	}
     	MultipartOutput multipart =
     		createOrganizationInstance( vcsid, refName, orgInfo, client.getItemCommonPartName() );

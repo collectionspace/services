@@ -37,7 +37,11 @@
             <artifactId>org.collectionspace.services.client</artifactId>
             <version>${cspace.services.client.version}</version>
         </dependency>
-        
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.contact.client</artifactId>
+            <version>${cspace.services.client.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
