@@ -10,7 +10,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.intake.IntakesCommonList;
+import org.collectionspace.services.person.PersonsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -45,4 +47,11 @@ public interface IntakeProxy {
     @DELETE
     @Path("/{csid}")
     ClientResponse<Response> delete(@PathParam("csid") String csid);
+    
+    // List Items
+    @GET
+    @Produces({"application/xml"})
+    @Path("/{csid}/authorityrefs/")
+    ClientResponse<AuthorityRefList> getAuthorityRefs(@PathParam("csid") String csid);
+    
 }

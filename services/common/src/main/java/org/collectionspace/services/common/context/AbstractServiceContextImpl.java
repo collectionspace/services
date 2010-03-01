@@ -45,6 +45,8 @@ import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.service.ServiceObjectType;
 import org.collectionspace.services.common.tenant.TenantBindingType;
+import org.collectionspace.services.common.types.PropertyItemType;
+import org.collectionspace.services.common.types.PropertyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,6 +128,40 @@ public abstract class AbstractServiceContextImpl<IT, OT>
             objectPartMap.put(objectPartType.getLabel(), objectPartType);
         }
         return objectPartMap;
+    }
+    
+    public List<PropertyType> getPropertiesForPart(String partLabel) {
+    	Map<String, ObjectPartType> partMap = getPartsMetadata();
+    	ObjectPartType part = partMap.get(partLabel);
+    	if(part==null) {
+    		throw new RuntimeException("No such part found: "+partLabel);
+    	}
+    	return part.getProperties();
+    }
+
+    public List<String> getPropertyValuesForPart(String partLabel, String propName) {
+    	List<PropertyType> allProps = getPropertiesForPart(partLabel);
+    	List<String> values = new ArrayList<String>();
+    	if(allProps.size()>0) {
+        	List<PropertyItemType> propItems = allProps.get(0).getItem();
+        	for(PropertyItemType propItem:propItems) {
+        		if(propName.equals(propItem.getKey())) {
+        			String value = propItem.getValue();
+        			if(value!=null) {
+        				values.add(value);
+        			}
+        		}
+        	}
+    	}
+    	return values;
+    }
+
+    public List<PropertyType> getCommonPartProperties() {
+    	return getPropertiesForPart(getCommonPartLabel());
+    }
+
+    public List<String> getCommonPartPropertyValues(String propName) {
+    	return getPropertyValuesForPart(getCommonPartLabel(), propName);
     }
 
     @Override

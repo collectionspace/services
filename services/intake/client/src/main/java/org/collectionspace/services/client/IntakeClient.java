@@ -26,8 +26,11 @@
  */
 package org.collectionspace.services.client;
 
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.intake.IntakesCommonList;
 
 import org.jboss.resteasy.client.ProxyFactory;
@@ -94,16 +97,26 @@ public class IntakeClient extends AbstractServiceClientImpl {
 
     /**
      * @return
-     * @see org.collectionspace.hello.client.IntakeProxy#getIntake()
+     * @see org.collectionspace.services.client.IntakeProxy#getIntake()
      */
     public ClientResponse<IntakesCommonList> readList() {
         return intakeProxy.readList();
     }
+    
+    /**
+     * @param csid
+     * @return
+     * @see org.collectionspace.services.client.IntakeProxy#getAuthorityRefs(java.lang.String)
+     */
+    public ClientResponse<AuthorityRefList> getAuthorityRefs(String csid) {
+        return intakeProxy.getAuthorityRefs(csid);
+    }
+
 
     /**
      * @param csid
      * @return
-     * @see org.collectionspace.hello.client.IntakeProxy#getIntake(java.lang.String)
+     * @see org.collectionspace.services.client.IntakeProxy#getIntake(java.lang.String)
      */
     public ClientResponse<MultipartInput> read(String csid) {
         return intakeProxy.read(csid);
@@ -112,7 +125,7 @@ public class IntakeClient extends AbstractServiceClientImpl {
     /**
      * @param intake
      * @return
-     * @see org.collectionspace.hello.client.IntakeProxy#createIntake(org.collectionspace.hello.Intake)
+     * @see org.collectionspace.services.client.IntakeProxy#createIntake(org.collectionspace.hello.Intake)
      */
     public ClientResponse<Response> create(MultipartOutput multipart) {
         return intakeProxy.create(multipart);
@@ -122,7 +135,7 @@ public class IntakeClient extends AbstractServiceClientImpl {
      * @param csid
      * @param intake
      * @return
-     * @see org.collectionspace.hello.client.IntakeProxy#updateIntake(java.lang.Long, org.collectionspace.hello.Intake)
+     * @see org.collectionspace.services.client.IntakeProxy#updateIntake(java.lang.Long, org.collectionspace.hello.Intake)
      */
     public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
         return intakeProxy.update(csid, multipart);
@@ -132,7 +145,7 @@ public class IntakeClient extends AbstractServiceClientImpl {
     /**
      * @param csid
      * @return
-     * @see org.collectionspace.hello.client.IntakeProxy#deleteIntake(java.lang.Long)
+     * @see org.collectionspace.services.client.IntakeProxy#deleteIntake(java.lang.Long)
      */
     public ClientResponse<Response> delete(String csid) {
         return intakeProxy.delete(csid);

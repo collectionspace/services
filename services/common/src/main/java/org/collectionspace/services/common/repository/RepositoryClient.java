@@ -23,7 +23,12 @@
  */
 package org.collectionspace.services.common.repository;
 
+import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.storage.StorageClient;
+import org.nuxeo.ecm.core.api.DocumentModel;
 
 /**
  * RepositoryClient is a generic Document Repository client
@@ -54,4 +59,16 @@ public interface RepositoryClient extends StorageClient {
      * @throws java.lang.Exception
      */
     public String getWorkspaceId(String tenantDomain, String workspaceName) throws Exception;
+    
+    /**
+     * get wrapped documentModel from the Nuxeo repository
+     * @param ctx service context under which this method is invoked
+     * @param id
+     *            of the document to retrieve
+     * @throws DocumentException
+     */
+    public DocumentWrapper<DocumentModel> getDoc(
+    		ServiceContext ctx, String id)
+            throws DocumentNotFoundException, DocumentException;
+
 }

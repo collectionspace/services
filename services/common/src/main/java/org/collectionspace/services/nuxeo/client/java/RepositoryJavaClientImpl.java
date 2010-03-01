@@ -177,6 +177,49 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         }
     }
 
+    /**
+     * get wrapped documentModel from the Nuxeo repository
+     * @param ctx service context under which this method is invoked
+     * @param id
+     *            of the document to retrieve
+     * @throws DocumentException
+     */
+    @Override
+    public DocumentWrapper<DocumentModel> getDoc(
+    		ServiceContext ctx, String id)
+            throws DocumentNotFoundException, DocumentException {
+        RepositoryInstance repoSession = null;
+        DocumentWrapper<DocumentModel> wrapDoc = null;
+
+        try {
+            repoSession = getRepositorySession();
+            DocumentRef docRef = NuxeoUtils.createPathRef(ctx, id);
+            DocumentModel doc = null;
+            try {
+                doc = repoSession.getDocument(docRef);
+            } catch (ClientException ce) {
+                String msg = "could not find document with id=" + id;
+                logger.error(msg, ce);
+                throw new DocumentNotFoundException(msg, ce);
+            }
+            wrapDoc = new DocumentWrapperImpl<DocumentModel>(doc);
+        } catch (IllegalArgumentException iae) {
+            throw iae;
+        } catch (DocumentException de) {
+            throw de;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw new DocumentException(e);
+        } finally {
+            if (repoSession != null) {
+                releaseRepositorySession(repoSession);
+            }
+        }
+        return wrapDoc;
+    }
+
     @Override
     public void get(ServiceContext ctx, List<String> csidList, DocumentHandler handler)
 		throws DocumentNotFoundException, DocumentException {
