@@ -1,5 +1,6 @@
 package org.collectionspace.services.client;
 
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.contact.ContactsCommonList;
@@ -136,6 +137,14 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      */
     public ClientResponse<PersonsCommonList> readItemList(String vcsid) {
         return personAuthorityProxy.readItemList(vcsid);
+    }
+
+    /**
+     * @return
+     * @see org.collectionspace.services.client.PersonAuthorityProxy#readItemListForNamedAuthority()
+     */
+    public ClientResponse<PersonsCommonList> readItemListForNamedAuthority(String specifier) {
+        return personAuthorityProxy.readItemListForNamedAuthority(specifier);
     }
 
     /**

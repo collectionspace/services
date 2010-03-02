@@ -810,7 +810,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
                         item.getDisplayName());
                 logger.debug(testName + ": list-item[" + i + "] URI=" +
                         item.getUri());
-                readItemList(csid);
+                readItemList(csid, null);
                 i++;
             }
         }
@@ -818,19 +818,31 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
     @Test(groups = {"readList"}, dependsOnMethods = {"readList"})
     public void readItemList() {
-        readItemList(knownResourceId);
+        readItemList(knownResourceId, null);
     }
 
-    private void readItemList(String vcsid) {
+    @Test(groups = {"readList"}, dependsOnMethods = {"readItemList"})
+    public void readItemListByAuthorityName() {
+        readItemList(null, knownResourceDisplayName);
+    }
+    private void readItemList(String vcsid, String name) {
 
         final String testName = "readItemList";
 
         // Perform setup.
         setupReadList(testName);
-
-        // Submit the request to the service and store the response.
-        ClientResponse<PersonsCommonList> res =
-                client.readItemList(vcsid);
+        
+        ClientResponse<PersonsCommonList> res = null;
+        
+        if(vcsid!= null) {
+	        // Submit the request to the service and store the response.
+	        res = client.readItemList(vcsid);
+        } else if(name!= null) {
+    	        // Submit the request to the service and store the response.
+   	        res = client.readItemListForNamedAuthority(name);
+        } else {
+        	Assert.fail("readItemList passed null csid and name!");
+        }
         PersonsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
@@ -946,7 +958,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     // Success outcomes
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"update"}, dependsOnGroups = {"read"})
+        groups = {"update"}, dependsOnGroups = {"read", "readList"})
     public void update(String testName) throws Exception {
 
         // Perform setup.

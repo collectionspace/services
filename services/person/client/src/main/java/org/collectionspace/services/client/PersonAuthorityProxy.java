@@ -60,6 +60,12 @@ public interface PersonAuthorityProxy {
     @Path("/{vcsid}/items/")
     ClientResponse<PersonsCommonList> readItemList(@PathParam("vcsid") String vcsid);
 
+    // List Items for a named authority
+    @GET
+    @Produces({"application/xml"})
+    @Path("/urn:cspace:name({specifier})/items/")
+    ClientResponse<PersonsCommonList> readItemListForNamedAuthority(@PathParam("specifier") String specifier);
+
     //(C)reate Item
     @POST
     @Path("/{vcsid}/items/")
