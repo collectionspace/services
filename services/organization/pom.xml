@@ -17,8 +17,6 @@
         <module>service</module>
         <module>3rdparty</module>
         <module>client</module>
-        <module>import</module>
-        <module>sample</module>
     </modules>
 
     <build>
@@ -66,5 +64,16 @@
             </plugin>
         </plugins>
     </build>
+
+		<profiles>
+			<profile>
+				<id>samples</id>
+		    <modules>
+	        <module>import</module>
+	        <module>sample</module>
+		    </modules>
+			</profile>
+		</profiles>
+
 </project>
 
