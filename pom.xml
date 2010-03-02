@@ -22,8 +22,7 @@
             <id>libs-releases-local</id>
             <name>libs-releases-local</name>
             <url>http://source.collectionspace.org:8081/artifactory/libs-releases-local</url>
-        </repository>
-        
+        </repository>        
         <snapshotRepository>
             <id>libs-snapshots-local</id>
             <name>libs-snapshots-local</name>
@@ -36,49 +35,17 @@
         <module>services</module>
     </modules>
     
-    <repositories>
-        
+    <repositories>        
         <repository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Maven 2 Repository</name>
-            <url>http://download.java.net/maven/2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>maven-repository.dev.java.net</id>
-            <name>Java.net Maven 1 Repository (legacy)</name>
-            <url>http://download.java.net/maven/1</url>
-            <layout>legacy</layout>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-<!--
-        <repository>
-            <id>collectionspace-releases</id>
-            <name>collectionspace-releases</name>
-            <url>http://source.collectionspace.org:8081/artifactory/public-nuxeo</url>
+            <id>libs-releases</id>
+            <url>http://source.collectionspace.org:8081/artifactory/libs-releases</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-        </repository>
-        <repository>
-            <id>collectionspace-snapshots</id>
-            <name>collectionspace-snapshots</name>
-            <url>http://source.collectionspace.org:8081/artifactory/public-snapshot-nuxeo</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
--->
+        </repository>        
         <repository>
             <id>libs-snapshots</id>
             <url>http://source.collectionspace.org:8081/artifactory/libs-snapshots</url>
@@ -88,8 +55,7 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-        </repository>
-
+        </repository>        
         <repository>
             <id>libs-snapshots-local</id>
             <name>libs-snapshots-local</name>
@@ -101,15 +67,51 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
+        <repository>
+            <id>libs-releases-local</id>
+            <name>libs-releases-local</name>
+            <url>http://source.collectionspace.org:8081/artifactory/libs-releases-local</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
         
         <repository>
-            <id>maven repo</id>
-            <name>maven repo</name>
+            <id>repo1</id>
+            <name>Maven repo1</name>
             <url>http://repo1.maven.org/maven2</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+        <repository>
+            <id>repo2</id>
+            <name>Maven repo2</name>
+            <url>http://repo2.maven.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>maven2-repository.dev.java.net</id>
+            <name>Java.net Maven 2 Repository</name>
+            <url>http://download.java.net/maven/2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository><repository>
+            <id>maven1-repository.dev.java.net</id>
+            <name>Java.net Maven 1 Repository</name>
+            <url>http://download.java.net/maven/1</url>
+            <layout>legacy</layout>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        
         <repository>
             <id>maven-restlet</id>
             <name>Public online Restlet repository</name>
@@ -117,38 +119,8 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-        </repository>        
-<!--        
-        <repository>
-            <id>java.net</id>
-            <name>java.net Maven Repository</name>
-            <url>https://maven-repository.dev.java.net/nonav/repository</url>
-            <layout>legacy</layout>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
         </repository>
--->        
         
-        <!--        
-            <repository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Maven 2 Repository</name>
-            <url>http://download.java.net/maven/2</url>
-            <snapshots>
-            <enabled>false</enabled>
-            </snapshots>            
-            </repository>
-        -->        
-        <!--
-            <repository>
-            <id>sun</id>
-            <url>http://download.java.net/maven/2</url>
-            <snapshots>
-            <enabled>false</enabled>
-            </snapshots>            
-            </repository>
-        -->        
         <repository>
             <id>jboss</id>
             <url>http://repository.jboss.org/maven2</url>
@@ -164,41 +136,86 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>                
+        
         <repository>
             <id>mojo</id>
             <name>mojo repo</name>
             <url>http://repository.codehaus.org</url>
             <snapshots>
-                <enabled>true</enabled>
+                <enabled>false</enabled>
             </snapshots>
         </repository>
 
-<!--
-    <repository>
-      <id>public</id>
-      <url>http://maven.nuxeo.org/public</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
--->    
-    <repository>
-      <id>public-snapshot</id>
-      <url>http://maven.nuxeo.org/public-snapshot</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-
+        <repository>
+            <id>public</id>
+            <url>http://maven.nuxeo.org/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository> 
+        <repository> 
+            <id>public-snapshot</id>
+            <url>http://maven.nuxeo.org/public-snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        
+        <repository>
+            <id>collectionspace-releases</id>
+            <name>collectionspace-releases</name>
+            <url>http://source.collectionspace.org:8081/artifactory/public-nuxeo</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>        
+        <repository>
+            <id>collectionspace-snapshots</id>
+            <name>collectionspace-snapshots</name>
+            <url>http://source.collectionspace.org:8081/artifactory/public-snapshot-nuxeo</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        
     </repositories>
     
     <pluginRepositories>
+        <pluginRepository>
+            <id>collectionspace-releases</id>
+            <name>collectionspace-releases</name>
+            <url>http://source.collectionspace.org:8081/artifactory/plugins-releases</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        
+        <pluginRepository>
+            <id>collectionspace-releases</id>
+            <name>collectionspace-releases</name>
+            <url>http://source.collectionspace.org:8081/artifactory/plugins-snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
         
         <pluginRepository>
             <id>maven repo</id>
@@ -214,22 +231,17 @@
             <url>http://download.java.net/maven/2</url>
         </pluginRepository>
         
-        <pluginRepository>
-            <id>maven-repository.dev.java.net</id>
-            <name>Java.net Maven 1 Repository (legacy)</name>
-            <url>http://download.java.net/maven/1</url>
-            <layout>legacy</layout>
-        </pluginRepository>
-
         <!-- use snapshort codehaus for cargo plugin -->
         <pluginRepository>
             <id>codehaus snapshot repository</id>
             <url>http://snapshots.repository.codehaus.org/</url>
-            <releases>
+            <snapshots>
                 <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
             </releases>
         </pluginRepository>
-
     </pluginRepositories>
     
     <build>

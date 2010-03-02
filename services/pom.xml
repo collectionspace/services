@@ -44,6 +44,27 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>jboss-maven-plugin</artifactId>
+                    <version>1.4</version>
+                    <configuration>
+                        <jbossHome>${jboss.dir}</jbossHome>
+                    </configuration>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.jvnet.hyperjaxb3</groupId>
+                    <artifactId>maven-hyperjaxb3-plugin</artifactId>
+                    <version>0.5.4</version>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.jvnet.jaxb2.maven2</groupId>
+                    <artifactId>maven-jaxb2-plugin</artifactId>
+                    <version>0.7.2</version>
+                </plugin>
+                
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
