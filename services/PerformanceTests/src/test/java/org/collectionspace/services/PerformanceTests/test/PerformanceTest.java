@@ -95,10 +95,6 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 
 	@Test
 	public void performanceTest() {
-            if(!isEnabled()) {
-                logger.info("Performance tests are not enabled. Use mvn -Dcspace.perf -DforkMode=never test to enable");
-                return;
-            }
 		roundTripOverhead(10);
 		deleteCollectionObjects();
 		String[] coList = this.createCollectionObjects(MAX_RECORDS);
