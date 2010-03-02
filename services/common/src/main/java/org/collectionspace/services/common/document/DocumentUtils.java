@@ -97,19 +97,25 @@ public class DocumentUtils {
         HashMap<String, Object> objectProps = new HashMap<String, Object>();
         // Get a list of all elements in the document
         Node root = document.getFirstChild();
-        NodeList nodeChildren = root.getChildNodes();
-        for (int i = 0; i < nodeChildren.getLength(); i++) {
-            Node node = nodeChildren.item(i);
+        NodeList rootChildren = root.getChildNodes();
+        for (int i = 0; i < rootChildren.getLength(); i++) {
+            Node node = rootChildren.item(i);
+            String name = node.getNodeName();
             if (node.getNodeType() == Node.ELEMENT_NODE) {
-                NodeList childNodes = node.getChildNodes();
-                Node cnode = childNodes.item(0);
-                if (cnode != null) {
-                    if (cnode.getNodeType() == Node.TEXT_NODE) {
-                        objectProps.put(node.getNodeName(), getTextNodeValue(node));
+                NodeList nodeChildren = node.getChildNodes();
+                int nodeChildrenLen = nodeChildren.getLength();
+                Node firstChild = nodeChildren.item(0);
+                Object value = null;
+                if (firstChild != null) {
+                    //first child node could be a whitespace char CSPACE-1026
+                    //so, check for number of children too
+                    if (firstChild.getNodeType() == Node.TEXT_NODE
+                            && nodeChildrenLen == 1) {
+                        value = getTextNodeValue(node);
                     } else {
-                        String[] vals = getMultiValues(node);
-                        objectProps.put(node.getNodeName(), vals);
+                        value = getMultiValues(node);
                     }
+                    objectProps.put(name, value);
                 }
             }
         }
@@ -118,15 +124,25 @@ public class DocumentUtils {
 
     /**
      * getMultiValues retrieve multi-value element values
+     * assumption: backend does not support more than 1 level deep hierarchy
      * @param node
      * @return
      */
     private static String[] getMultiValues(Node node) {
         ArrayList<String> vals = new ArrayList<String>();
-        NodeList children = node.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            Node cnode = children.item(i);
-            vals.add(qualify(cnode.getNodeName(), getTextNodeValue(cnode)));
+        NodeList nodeChildren = node.getChildNodes();
+        for (int i = 0; i < nodeChildren.getLength(); i++) {
+            Node child = nodeChildren.item(i);
+            String name = child.getNodeName();
+            //assumption: backend does not support more than 1 level deep
+            //hierarchy
+            String value = null;
+            if (child.getNodeType() == Node.ELEMENT_NODE) {
+                value = getTextNodeValue(child);
+                vals.add(qualify(name, value));
+            } else {
+                //skip text nodes with whitespaces
+            }
         }
         return vals.toArray(new String[0]);
     }
@@ -142,7 +158,7 @@ public class DocumentUtils {
         if (ccnode != null && ccnode.getNodeType() == Node.TEXT_NODE) {
             value = ccnode.getNodeValue();
         }
-        return value;
+        return value.trim();
     }
 
     /**

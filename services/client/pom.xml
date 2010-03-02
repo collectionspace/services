@@ -27,9 +27,13 @@
             <artifactId>slf4j-log4j12</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.4.3</version>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.4.3</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -60,7 +64,7 @@
             <version>5.6</version>
         </dependency>
 
-      <!-- javax -->
+        <!-- javax -->
         <dependency>
             <groupId>javax.security</groupId>
             <artifactId>jaas</artifactId>
@@ -74,12 +78,12 @@
             <version>1.6.1</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <!-- jboss -->
 
         <!-- nuxeo -->
     </dependencies>
-    
+
     <build>
         <finalName>collectionspace-services-client</finalName>
         <plugins>

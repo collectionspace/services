@@ -117,34 +117,28 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
-    public void createFromXml(String testName) throws Exception {
+    public void createFromXmlCambridge(String testName) throws Exception {
+        createFromXmlFile(testName, "./test-data/testCambridge.xml", true);
+    }
 
-        // Perform setup, such as initializing the type of service request
-        // (e.g. CREATE, DELETE), its valid and expected status codes, and
-        // its associated HTTP method name (e.g. POST, DELETE).
-        setupCreate(testName);
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    public void createFromXmlRFWS1(String testName) throws Exception {
+        createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp1.xml", false);
+    }
 
-        // Submit the request to the service and store the response.
-        String identifier = createIdentifier();
-        MultipartOutput multipart =
-                createCollectionObjectInstanceFromXml(client.getCommonPartName(),
-                "test-data/testCambridge.xml");
-        ClientResponse<Response> res = client.create(multipart);
-        int statusCode = res.getStatus();
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    public void createFromXmlRFWS2(String testName) throws Exception {
+        createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp2.xml", false);
+    }
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        allResourceIdsCreated.add(extractId(res));
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    public void createFromXmlRFWS3(String testName) throws Exception {
+        createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp3.xml", false);
+    }
+
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    public void createFromXmlRFWS4(String testName) throws Exception {
+        createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp4.xml", false);
     }
 
     /* (non-Javadoc)
@@ -802,10 +796,19 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
     }
 
-    private MultipartOutput createCollectionObjectInstanceFromXml(String commonPartName,
+    /**
+     * createCollectionObjectInstanceFromXml uses JAXB unmarshaller to retrieve
+     * collectionobject from given file
+     * @param commonPartName
+     * @param commonPartFileName
+     * @return
+     * @throws Exception
+     */
+    private MultipartOutput createCollectionObjectInstanceFromXml(String testName, String commonPartName,
             String commonPartFileName) throws Exception {
 
-        CollectionobjectsCommon collectionObject = (CollectionobjectsCommon) getObjectFromFile(CollectionobjectsCommon.class,
+        CollectionobjectsCommon collectionObject =
+                (CollectionobjectsCommon) getObjectFromFile(CollectionobjectsCommon.class,
                 commonPartFileName);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(collectionObject,
@@ -813,10 +816,33 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         commonPart.getHeaders().add("label", commonPartName);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("to be created, collectionobject common");
+            logger.debug(testName + " to be created, collectionobject common");
             logger.debug(objectAsXmlString(collectionObject,
                     CollectionobjectsCommon.class));
         }
+        return multipart;
+
+    }
+
+    /**
+     * createCollectionObjectInstanceFromRawXml uses stringified collectionobject
+     * retrieve from given file
+     * @param commonPartName
+     * @param commonPartFileName
+     * @return
+     * @throws Exception
+     */
+    private MultipartOutput createCollectionObjectInstanceFromRawXml(String testName, String commonPartName,
+            String commonPartFileName) throws Exception {
+
+        MultipartOutput multipart = new MultipartOutput();
+        String stringObject = getXmlDocumentAsString(commonPartFileName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + " to be created, collectionobject common " + "\n" + stringObject);
+        }
+        OutputPart commonPart = multipart.addPart(stringObject,
+                MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", commonPartName);
 
         return multipart;
 
@@ -824,5 +850,32 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
     private String getNHPartName() {
         return "collectionobjects_naturalhistory";
+    }
+
+    private void createFromXmlFile(String testName, String fileName, boolean useJaxb) throws Exception {
+        // Perform setup, such as initializing the type of service request
+        // (e.g. CREATE, DELETE), its valid and expected status codes, and
+        // its associated HTTP method name (e.g. POST, DELETE).
+        setupCreate(testName);
+
+        MultipartOutput multipart = null;
+
+        if (useJaxb) {
+            multipart = createCollectionObjectInstanceFromXml(testName, 
+                    client.getCommonPartName(), fileName);
+        } else {
+            multipart = createCollectionObjectInstanceFromRawXml(testName, 
+                    client.getCommonPartName(), fileName);
+        }
+        ClientResponse<Response> res = client.create(multipart);
+        int statusCode = res.getStatus();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        allResourceIdsCreated.add(extractId(res));
     }
 }

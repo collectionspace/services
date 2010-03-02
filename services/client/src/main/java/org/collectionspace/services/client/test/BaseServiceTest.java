@@ -14,12 +14,14 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.io.FileUtils;
 import org.collectionspace.services.client.TestServiceClient;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
@@ -27,6 +29,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.DataProvider;
+import org.w3c.dom.Document;
 
 public abstract class BaseServiceTest {
 
@@ -342,6 +345,22 @@ public abstract class BaseServiceTest {
         InputStream is = tccl.getResourceAsStream(fileName);
         return getObjectFromStream(jaxbClass, is);
     }
+
+    protected Document getXmlDocument(String fileName) throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        File f = new File(fileName);
+        if (!f.exists()) {
+            throw new IllegalArgumentException("test data file " + fileName + " not found!");
+        }
+        // Create the builder and parse the file
+        return factory.newDocumentBuilder().parse(f);
+    }
+
+    protected String getXmlDocumentAsString(String fileName) throws Exception {
+        byte[] b = FileUtils.readFileToByteArray(new File(fileName));
+        return new String(b);
+    }
+
 
     /**
      * getObjectFromStream get object of given class from given inputstream
