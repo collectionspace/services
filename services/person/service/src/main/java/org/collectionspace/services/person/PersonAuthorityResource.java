@@ -53,6 +53,7 @@ import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.vocabulary.RefNameUtils;
 import org.collectionspace.services.common.query.IQueryManager;
@@ -65,6 +66,7 @@ import org.collectionspace.services.person.nuxeo.PersonDocumentModelHandler;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
+import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -505,6 +507,62 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         try {
             // Note that docType defaults to the ServiceName, so we're fine with that.
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getItemServiceName());
+            DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
+            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+            DocumentFilter myFilter = new DocumentFilter();
+            myFilter.setPagination(queryParams);
+
+            // Add the where clause "persons_common:inAuthority='" + parentcsid + "'"
+            myFilter.setWhereClause(PersonJAXBSchema.PERSONS_COMMON + ":" +
+            		PersonJAXBSchema.IN_AUTHORITY + "='" + parentcsid + "'");
+            
+            // AND persons_common:displayName LIKE '%partialTerm%'
+            if (partialTerm != null && !partialTerm.isEmpty()) {
+            	String ptClause = "AND " +
+            	PersonJAXBSchema.PERSONS_COMMON + ":" +
+            		PersonJAXBSchema.DISPLAY_NAME +
+            		" LIKE " +
+            		"'%" + partialTerm + "%'";
+            	myFilter.appendWhereClause(ptClause);
+            }
+            
+            handler.setDocumentFilter(myFilter);
+            getRepositoryClient(ctx).getFiltered(ctx, handler);
+            personObjectList = (PersonsCommonList) handler.getCommonPartList();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception in getPersonList", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return personObjectList;
+    }
+
+    @GET
+    @Path("urn:cspace:name({specifier})/items")
+    @Produces("application/xml")
+    public PersonsCommonList getPersonListByAuthName(
+    		@PathParam("specifier") String parentSpecifier,
+            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,            
+            @Context UriInfo ui) {
+        PersonsCommonList personObjectList = new PersonsCommonList();
+        try {
+            String whereClause =
+            	PersonAuthorityJAXBSchema.PERSONAUTHORITIES_COMMON+
+            	":"+PersonAuthorityJAXBSchema.DISPLAY_NAME+
+            	"='"+parentSpecifier+"'";
+            // Need to get an Authoirty by name
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+            String parentcsid = 
+            	getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
+
+            ctx = MultipartServiceContextFactory.get().createServiceContext(null, getItemServiceName());
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             DocumentFilter myFilter = new DocumentFilter();

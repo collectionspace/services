@@ -71,4 +71,26 @@ public interface RepositoryClient extends StorageClient {
     		ServiceContext ctx, String id)
             throws DocumentNotFoundException, DocumentException;
 
+    /**
+     * find wrapped documentModel from the Nuxeo repository
+     * @param ctx service context under which this method is invoked
+     * @param specifies docType. If null, uses ctx.getDocumentType()
+     * @param where NXQL where clause to get the document
+     * @throws DocumentException
+     */
+    public DocumentWrapper<DocumentModel> findDoc(
+    		ServiceContext ctx, String where)
+            throws DocumentNotFoundException, DocumentException;
+
+    /**
+     * find doc and return CSID from the Nuxeo repository
+     * @param ctx service context under which this method is invoked
+     * @param specifies docType. If null, uses ctx.getDocumentType()
+     * @param where NXQL where clause to get the document
+     * @throws DocumentException
+     */
+    public String findDocCSID(
+    		ServiceContext ctx, String where)
+            throws DocumentNotFoundException, DocumentException;
+
 }

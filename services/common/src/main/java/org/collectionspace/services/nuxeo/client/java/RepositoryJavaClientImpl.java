@@ -294,6 +294,90 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         return wrapDoc;
     }
 
+    /**
+     * find wrapped documentModel from the Nuxeo repository
+     * @param ctx service context under which this method is invoked
+     * @param where NXQL where clause to get the document
+     * @throws DocumentException
+     */
+    @Override
+    public DocumentWrapper<DocumentModel> findDoc(
+    		ServiceContext ctx, String where)
+            throws DocumentNotFoundException, DocumentException {
+        RepositoryInstance repoSession = null;
+        DocumentWrapper<DocumentModel> wrapDoc = null;
+
+        try {
+        	String docType = ctx.getDocumentType();
+            if (docType == null) {
+                throw new DocumentNotFoundException(
+                       "Unable to find DocumentType for service " + ctx.getServiceName());
+            }
+            String domain = ctx.getRepositoryDomainName();
+            if (domain == null) {
+                throw new DocumentNotFoundException(
+                        "Unable to find Domain for service " + ctx.getServiceName());
+            }
+            repoSession = getRepositorySession();
+            DocumentModelList docList = null;
+            // force limit to 1, and ignore totalSize
+            String query = buildNXQLQuery(docType, where, domain ); 
+            docList = repoSession.query( query, null, 1, 0, false);
+            if(docList.size()!=1) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("findDoc: Query found: "+docList.size()+" items.");
+                    logger.debug(" Query: " + query);
+                }
+                throw new DocumentNotFoundException("No document found matching filter params.");
+            }
+            DocumentModel doc = docList.get(0);
+            wrapDoc = new DocumentWrapperImpl<DocumentModel>(doc);
+        } catch (IllegalArgumentException iae) {
+            throw iae;
+        } catch (DocumentException de) {
+            throw de;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw new DocumentException(e);
+        } finally {
+            if (repoSession != null) {
+                releaseRepositorySession(repoSession);
+            }
+        }
+        return wrapDoc;
+    }
+    
+    /**
+     * find doc and return CSID from the Nuxeo repository
+     * @param ctx service context under which this method is invoked
+     * @param where NXQL where clause to get the document
+     * @throws DocumentException
+     */
+    public String findDocCSID(
+    		ServiceContext ctx, String where)
+            throws DocumentNotFoundException, DocumentException {
+    	String csid = null;
+    	try {
+        	DocumentWrapper<DocumentModel> wrapDoc = findDoc(ctx, where);
+        	DocumentModel docModel = wrapDoc.getWrappedObject();
+            csid = NuxeoUtils.extractId(docModel.getPathAsString());
+   		} catch (DocumentNotFoundException dnfe) {
+            throw dnfe;
+        } catch (IllegalArgumentException iae) {
+            throw iae;
+        } catch (DocumentException de) {
+            throw de;
+   		} catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw new DocumentException(e);
+        }
+   		return csid;
+    }
+
     @Override
     public void get(ServiceContext ctx, List<String> csidList, DocumentHandler handler)
 		throws DocumentNotFoundException, DocumentException {
