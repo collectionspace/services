@@ -39,6 +39,12 @@
                 <service:part id="1" control_group="Managed"
                               versionable="true" auditable="false"
                               label="collectionobjects_common" updated="" order="1">
+                    <service:properties>
+											<types:item><types:key>authRef</types:key><types:value>contentOrganization</types:value></types:item>
+											<types:item><types:key>authRef</types:key><types:value>contentPeople</types:value></types:item>
+											<types:item><types:key>authRef</types:key><types:value>contentPerson</types:value></types:item>
+											<types:item><types:key>authRef</types:key><types:value>inscriber</types:value></types:item>
+										</service:properties>															
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/collectionobject"
@@ -346,7 +352,13 @@
                 <service:part id="1" control_group="Managed"
                               versionable="true" auditable="false"
                               label="acquisitions_common" updated="" order="1">
-                    <service:content contentType="application/xml">
+                    <service:properties>
+											<types:item><types:key>authRef</types:key><types:value>acquisitionAuthorizer</types:value></types:item>
+											<types:item><types:key>authRef</types:key><types:value>acquisitionFundingSource</types:value></types:item>
+											<!-- Need to handle repeating ref fields, like "acquisitionSources" -->
+											<types:item><types:key>authRef</types:key><types:value>fieldCollector</types:value></types:item>
+										</service:properties>
+										<service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/acquisition"
                             schemaLocation="http://collectionspace.org/services/acquisition http://services.collectionspace.org/acquisition/acquisitions_common.xsd">

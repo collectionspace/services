@@ -29,13 +29,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.service.ObjectPartType;
+import org.collectionspace.services.common.vocabulary.RefNameUtils;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -182,4 +188,48 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
             ctx.addOutputPart(schema, doc, partMeta.getContent().getContentType());
         } //TODO: handle other media types
     }
+    
+    public AuthorityRefList getAuthorityRefs(
+    		DocumentWrapper<DocumentModel> docWrapper,
+    		String pathPrefix,
+    		List<String> authRefFields) {
+    	AuthorityRefList authRefList = new AuthorityRefList();
+        try {
+            DocumentModel docModel = docWrapper.getWrappedObject();
+            List<AuthorityRefList.AuthorityRefItem> list = 
+            	authRefList.getAuthorityRefItem();
+
+            for(String field:authRefFields){
+        		String refName = (String)docModel.getPropertyValue(pathPrefix+field);
+        		if(refName==null)
+        			continue;
+            	try{
+            		RefNameUtils.AuthorityTermInfo termInfo =
+            			RefNameUtils.parseAuthorityTermInfo(refName);
+                	AuthorityRefList.AuthorityRefItem ilistItem = 
+                		new AuthorityRefList.AuthorityRefItem();
+                	ilistItem.setRefName(refName);
+                	ilistItem.setAuthDisplayName(termInfo.inAuthority.displayName);
+                	ilistItem.setItemDisplayName(termInfo.displayName);
+                	ilistItem.setSourceField(field);
+                	ilistItem.setUri(termInfo.getRelativeUri());
+                    list.add(ilistItem);
+            	} catch( Exception e ) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Caught exception in getAuthorityRefs", e);
+                    }
+            	}
+            }
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception in getAuthorityRefs", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return authRefList;
+    }
+
+
 }

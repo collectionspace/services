@@ -23,6 +23,8 @@
  */
 package org.collectionspace.services.acquisition;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -39,18 +41,23 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
+import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
+import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.security.UnauthorizedException;
+import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
+import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -308,6 +315,38 @@ public class AcquisitionResource
             throw new WebApplicationException(response);
         }
         return acquisitionObjectList;
-    }    
+    }   
+    
+    @GET
+    @Path("{csid}/authorityrefs")
+    @Produces("application/xml")
+    public AuthorityRefList getAuthorityRefs(
+    		@PathParam("csid") String csid, 
+    		@Context UriInfo ui) {
+    	AuthorityRefList authRefList = null;
+        try {
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+            DocumentWrapper<DocumentModel> docWrapper = 
+            	getRepositoryClient(ctx).getDoc(ctx, csid);
+            RemoteDocumentModelHandlerImpl handler 
+            	= (RemoteDocumentModelHandlerImpl)createDocumentHandler(ctx);
+            List<String> authRefFields = ((MultipartServiceContextImpl)ctx).getCommonPartPropertyValues("authRef");
+            String prefix = ctx.getCommonPartLabel()+":";
+            authRefList = handler.getAuthorityRefs(docWrapper, prefix, authRefFields);
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception in getAuthorityRefs", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return authRefList;
+    }
+    
     
 }

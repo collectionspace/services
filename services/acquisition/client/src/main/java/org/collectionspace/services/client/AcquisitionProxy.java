@@ -11,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.acquisition.AcquisitionsCommonList;
+import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -36,6 +37,12 @@ public interface AcquisitionProxy {
     @Path("/{csid}")
     ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
 
+    // List Authority references
+    @GET
+    @Produces({"application/xml"})
+    @Path("/{csid}/authorityrefs/")
+    ClientResponse<AuthorityRefList> getAuthorityRefs(@PathParam("csid") String csid);
+    
     //(U)pdate
     @PUT
     @Path("/{csid}")

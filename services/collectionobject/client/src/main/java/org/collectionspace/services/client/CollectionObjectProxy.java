@@ -13,6 +13,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
@@ -51,6 +52,13 @@ public interface CollectionObjectProxy {
     @GET
     @Path("/{csid}")
     ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
+    
+    // List Authority references
+    @GET
+    @Produces({"application/xml"})
+    @Path("/{csid}/authorityrefs/")
+    ClientResponse<AuthorityRefList> getAuthorityRefs(@PathParam("csid") String csid);
+    
 
     //(U)pdate
     @PUT

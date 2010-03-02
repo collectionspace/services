@@ -35,6 +35,7 @@ import javax.ws.rs.core.UriInfo;
 
 
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
+import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.jboss.resteasy.client.ProxyFactory;
@@ -84,6 +85,7 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
     /**
      * Read list.
      * 
+     * @see org.collectionspace.services.client.CollectionObjectProxy#readList()
      * @return the client response< collectionobjects common list>
      */
     public ClientResponse<CollectionobjectsCommonList> readList() {
@@ -97,6 +99,7 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
      * This is an intentionally empty method that is used for performance test 
      * to get a rough time estimate of the client to server response-request overhead.
      * 
+     * @see org.collectionspace.services.client.CollectionObjectProxy#roundtrip()
      * @return the client response< response>
      */
     public ClientResponse<Response> roundtrip() {
@@ -108,6 +111,7 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
      * 
      * @param keywords the keywords
      * 
+     * @see org.collectionspace.services.client.CollectionObjectProxy#keywordSearch()
      * @return the client response< collectionobjects common list>
      */
     public ClientResponse<CollectionobjectsCommonList> keywordSearch(String keywords) {
@@ -120,6 +124,7 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
      * 
      * @param csid the csid
      * 
+     * @see org.collectionspace.services.client.CollectionObjectProxy#keywordSearch()
      * @return the client response< multipart input>
      */
     public ClientResponse<MultipartInput> read(String csid) {
@@ -127,10 +132,21 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
     }
 
     /**
+     * @param csid
+     * @return
+     * @see org.collectionspace.services.client.CollectionObjectProxy#getAuthorityRefs(java.lang.String)
+     */
+    public ClientResponse<AuthorityRefList> getAuthorityRefs(String csid) {
+        return collectionObjectProxy.getAuthorityRefs(csid);
+    }
+
+
+    /**
      * Creates the.
      * 
      * @param multipart the multipart
      * 
+     * @see org.collectionspace.services.client.CollectionObjectProxy#create()
      * @return the client response< response>
      */
     public ClientResponse<Response> create(MultipartOutput multipart) {
@@ -143,6 +159,7 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
      * @param csid the csid
      * @param multipart the multipart
      * 
+     * @see org.collectionspace.services.client.CollectionObjectProxy#update()
      * @return the client response< multipart input>
      */
     public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
@@ -154,6 +171,7 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
      * 
      * @param csid the csid
      * 
+     * @see org.collectionspace.services.client.CollectionObjectProxy#delete()
      * @return the client response< response>
      */
     public ClientResponse<Response> delete(String csid) {

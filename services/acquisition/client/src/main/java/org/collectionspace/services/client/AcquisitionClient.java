@@ -3,6 +3,7 @@ package org.collectionspace.services.client;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.acquisition.AcquisitionsCommonList;
+import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
@@ -82,6 +83,15 @@ public class AcquisitionClient extends AbstractServiceClientImpl {
      */
     public ClientResponse<MultipartInput> read(String csid) {
         return acquisitionProxy.read(csid);
+    }
+
+    /**
+     * @param csid
+     * @return
+     * @see org.collectionspace.services.client.CollectionObjectProxy#getAuthorityRefs(java.lang.String)
+     */
+    public ClientResponse<AuthorityRefList> getAuthorityRefs(String csid) {
+        return acquisitionProxy.getAuthorityRefs(csid);
     }
 
     /**

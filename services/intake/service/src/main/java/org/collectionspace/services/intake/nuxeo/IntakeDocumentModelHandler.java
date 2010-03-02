@@ -26,25 +26,11 @@ package org.collectionspace.services.intake.nuxeo;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-
 import org.collectionspace.services.IntakeJAXBSchema;
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.common.context.MultipartServiceContextFactory;
-import org.collectionspace.services.common.context.MultipartServiceContextImpl;
-import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.security.UnauthorizedException;
-import org.collectionspace.services.common.vocabulary.RefNameUtils;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.IntakesCommonList;
 import org.collectionspace.services.intake.IntakesCommonList.IntakeListItem;
-
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -152,48 +138,6 @@ public class IntakeDocumentModelHandler
     public String getQProperty(String prop) {
         return IntakeConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
-    
-    public AuthorityRefList getAuthorityRefs(
-    		DocumentWrapper<DocumentModel> docWrapper,
-    		String pathPrefix,
-    		List<String> authRefFields) {
-    	AuthorityRefList authRefList = new AuthorityRefList();
-        try {
-            DocumentModel docModel = docWrapper.getWrappedObject();
-            List<AuthorityRefList.AuthorityRefItem> list = 
-            	authRefList.getAuthorityRefItem();
-
-            for(String field:authRefFields){
-        		String refName = (String)docModel.getPropertyValue(pathPrefix+field);
-        		if(refName==null)
-        			continue;
-            	try{
-            		RefNameUtils.AuthorityTermInfo termInfo =
-            			RefNameUtils.parseAuthorityTermInfo(refName);
-                	AuthorityRefList.AuthorityRefItem ilistItem = 
-                		new AuthorityRefList.AuthorityRefItem();
-                	ilistItem.setRefName(refName);
-                	ilistItem.setAuthDisplayName(termInfo.inAuthority.displayName);
-                	ilistItem.setItemDisplayName(termInfo.displayName);
-                	ilistItem.setSourceField(field);
-                	ilistItem.setUri(termInfo.getRelativeUri());
-                    list.add(ilistItem);
-            	} catch( Exception e ) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Caught exception in getAuthorityRefs", e);
-                    }
-            	}
-            }
-        } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception in getIntakeList", e);
-            }
-            Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
-            throw new WebApplicationException(response);
-        }
-        return authRefList;
-    }
-
+ 
 }
 
