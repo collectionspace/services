@@ -93,6 +93,15 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
     }
 
     /**
+     * @param name
+     * @return
+     * @see org.collectionspace.services.client.PersonAuthorityProxy#readByName(java.lang.String)
+     */
+    public ClientResponse<MultipartInput> readByName(String name) {
+        return personAuthorityProxy.readByName(name);
+    }
+
+    /**
      * @param personAuthority
      * @return
      * @see org.collectionspace.services.client.PersonAuthorityProxy#createPersonAuthority(org.collectionspace.hello.PersonAuthority)

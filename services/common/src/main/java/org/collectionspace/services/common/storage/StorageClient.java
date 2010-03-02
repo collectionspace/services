@@ -61,6 +61,16 @@ public interface StorageClient {
     void get(ServiceContext ctx, String id, DocumentHandler handler) throws DocumentNotFoundException, DocumentException;
 
     /**
+     * get entity from the persistence store, using the docFilter params. 
+     * @param ctx service context under which this method is invoked
+     * @param handler should be used by the caller to provide and transform the entity.
+     *               Handler must have a docFilter set to return a single item.
+     * @throws DocumentNotFoundException if entity not found
+     * @throws DocumentException
+     */
+    void get(ServiceContext ctx, DocumentHandler handler) throws DocumentNotFoundException, DocumentException;
+
+    /**
      * Gets the.
      * 
      * @param ctx the ctx

@@ -178,6 +178,80 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
     }
 
     /**
+     * get document from the Nuxeo repository, using the docFilter params.
+     * @param ctx service context under which this method is invoked
+     * @param handler
+     *            should be used by the caller to provide and transform the
+     *            document. Handler must have a docFilter set to return a single item.
+     * @throws DocumentException
+     */
+    @Override
+    public void get(ServiceContext ctx, DocumentHandler handler)
+            throws DocumentNotFoundException, DocumentException {
+
+        if (handler == null) {
+            throw new IllegalArgumentException(
+                    "RepositoryJavaClient.get: handler is missing");
+        }
+        DocumentFilter docFilter = handler.getDocumentFilter();
+        if (docFilter == null) {
+            throw new IllegalArgumentException(
+                   "RepositoryJavaClient.get: handler has no Filter specified");
+        }
+        if(docFilter.getPageSize()!= 1) {
+            logger.warn("RepositoryJavaClient.get: forcing docFilter pagesize to 1.");
+        }
+        String docType = ctx.getDocumentType();
+        if (docType == null) {
+            throw new DocumentNotFoundException(
+                   "Unable to find DocumentType for service " + ctx.getServiceName());
+        }
+        String domain = ctx.getRepositoryDomainName();
+        if (domain == null) {
+            throw new DocumentNotFoundException(
+                    "Unable to find Domain for service " + ctx.getServiceName());
+        }
+        RepositoryInstance repoSession = null;
+
+        try {
+            handler.prepare(Action.GET);
+            repoSession = getRepositorySession();
+            
+            DocumentModelList docList = null;
+            // force limit to 1, and ignore totalSize
+            String query = buildNXQLQuery(docType, docFilter.getWhereClause(), domain ); 
+            docList = repoSession.query( query, null, 1, 0, false);
+            if(docList.size()!=1) {
+                throw new DocumentNotFoundException("No document found matching filter params.");
+            }
+            DocumentModel doc = docList.get(0);
+            
+            if (logger.isDebugEnabled()) {
+                logger.debug("Executed NXQL query: " + query);
+            }
+            
+            //set reposession to handle the document
+            ((DocumentModelHandler) handler).setRepositorySession(repoSession);
+            DocumentWrapper<DocumentModel> wrapDoc = new DocumentWrapperImpl<DocumentModel>(doc);
+            handler.handle(Action.GET, wrapDoc);
+            handler.complete(Action.GET, wrapDoc);
+        } catch (IllegalArgumentException iae) {
+            throw iae;
+        } catch (DocumentException de) {
+            throw de;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw new DocumentException(e);
+        } finally {
+            if (repoSession != null) {
+                releaseRepositorySession(repoSession);
+            }
+        }
+    }
+
+    /**
      * get wrapped documentModel from the Nuxeo repository
      * @param ctx service context under which this method is invoked
      * @param id
@@ -343,25 +417,16 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         try {
             handler.prepare(Action.GET_ALL);
             repoSession = getRepositorySession();
-            StringBuilder query = new StringBuilder("SELECT * FROM ");
-            query.append(docType);
-            String where = docFilter.getWhereClause();
-            // TODO This is a slow method for tenant-filter
-            // We should make this a property that is indexed.
-            query.append(" WHERE ecm:path STARTSWITH '/" + domain + "'");
-            if ((null != where) && (where.length() > 0)) {
-            	// Due to an apparent bug/issue in how Nuxeo translates the NXQL query string
-            	// into SQL, we need to parenthesize our 'where' clause
-                query.append(" AND " + "(" + where +")" + "AND ecm:isProxy = 0");
-            }
             DocumentModelList docList = null;
+            String query = buildNXQLQuery(docType, docFilter.getWhereClause(), domain );
+
             // If we have limit and/or offset, then pass true to get totalSize
             // in returned DocumentModelList.
             if ((docFilter.getOffset() > 0) || (docFilter.getPageSize() > 0)) {
-                docList = repoSession.query(query.toString(), null,
+                docList = repoSession.query(query, null,
                         docFilter.getPageSize(), docFilter.getOffset(), true);
             } else {
-                docList = repoSession.query(query.toString());
+                docList = repoSession.query(query);
             }
             
             if (logger.isDebugEnabled()) {
@@ -542,6 +607,20 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
             }
         }
         return workspaceId;
+    }
+    
+    private final String buildNXQLQuery(String docType, String where, String domain ) {
+        StringBuilder query = new StringBuilder("SELECT * FROM ");
+        query.append(docType);
+        // TODO This is a slow method for tenant-filter
+        // We should make this a property that is indexed.
+        query.append(" WHERE ecm:path STARTSWITH '/" + domain + "'");
+        if ((null != where) && (where.length() > 0)) {
+        	// Due to an apparent bug/issue in how Nuxeo translates the NXQL query string
+        	// into SQL, we need to parenthesize our 'where' clause
+            query.append(" AND " + "(" + where +")" + "AND ecm:isProxy = 0");
+        }
+        return query.toString();
     }
 
     private RepositoryInstance getRepositorySession() throws Exception {

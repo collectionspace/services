@@ -42,7 +42,10 @@ public class RefNameUtils {
 
     private final Logger logger = LoggerFactory.getLogger(RefNameUtils.class);
 
-    private static final String URN_PREFIX = "urn:cspace:";
+    public static final String URN_PREFIX = "urn:cspace:";
+    public static final int URN_PREFIX_LEN = 11;
+    public static final String URN_NAME_PREFIX = "urn:cspace:name(";
+    public static final int URN_NAME_PREFIX_LEN = 16;
 	// FIXME Should not be hard-coded
     private static final String ITEMS_REGEX = "item|person|organization";
     // In a list of tokens, these are indices for each part
@@ -57,7 +60,6 @@ public class RefNameUtils {
     private static final int INSTANCE_DISPLAYNAME_TOKEN = 2;// optional displayName suffix
     private static final int INSTANCE_TOKENS_MIN = 2;
     private static final int INSTANCE_TOKENS_MAX = 3;
-    private static final int prefixLen = 11;
     private static final String SEPARATOR = ":";
 
     public static class AuthorityInfo {
@@ -185,14 +187,14 @@ public class RefNameUtils {
             throws Exception {
     	if(refName==null || !refName.startsWith(URN_PREFIX))
     		throw new RuntimeException( "Null or invalid refName syntax");
-    	return new AuthorityInfo(refName.substring(prefixLen).split(SEPARATOR));
+    	return new AuthorityInfo(refName.substring(URN_PREFIX_LEN).split(SEPARATOR));
     }
 
     public static AuthorityTermInfo parseAuthorityTermInfo(String refName)
             throws Exception {
     	if(refName==null || !refName.startsWith(URN_PREFIX))
     		throw new RuntimeException( "Null or invalid refName syntax");
-    	return new AuthorityTermInfo(refName.substring(prefixLen).split(SEPARATOR));
+    	return new AuthorityTermInfo(refName.substring(URN_PREFIX_LEN).split(SEPARATOR));
     }
 
     public static String implodeStringArray(String tokens[], String separator) {

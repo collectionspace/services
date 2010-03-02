@@ -75,6 +75,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     final String TEST_DEATH_DATE = "June 11, 1979";
  
     private String knownResourceId = null;
+    private String knownResourceDisplayName = null;
     private String knownResourceRefName = null;
     private String knownItemResourceId = null;
     private String knownContactResourceId = null;
@@ -132,6 +133,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // for additional tests below.
         if (knownResourceId == null){
             knownResourceId = newID;
+            knownResourceDisplayName = displayName;
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
@@ -416,6 +418,36 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
             throw new RuntimeException(e);
         }
     }
+
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+            groups = {"read"}, dependsOnGroups = {"create"})
+        public void readByName(String testName) throws Exception {
+
+            // Perform setup.
+            setupRead();
+            
+            // Submit the request to the service and store the response.
+            ClientResponse<MultipartInput> res = client.readByName(knownResourceDisplayName);
+            int statusCode = res.getStatus();
+
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if(logger.isDebugEnabled()){
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            //FIXME: remove the following try catch once Aron fixes signatures
+            try {
+                MultipartInput input = (MultipartInput) res.getEntity();
+                PersonauthoritiesCommon personAuthority = (PersonauthoritiesCommon) extractPart(input,
+                        client.getCommonPartName(), PersonauthoritiesCommon.class);
+                Assert.assertNotNull(personAuthority);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
 
 /*
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,

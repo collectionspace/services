@@ -39,6 +39,11 @@ public interface PersonAuthorityProxy {
     @Path("/{csid}")
     ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
 
+    //(R)ead by name
+    @GET
+    @Path("/urn:cspace:name({name})")
+    ClientResponse<MultipartInput> readByName(@PathParam("name") String name);
+
     //(U)pdate
     @PUT
     @Path("/{csid}")

@@ -519,4 +519,10 @@ public class JpaStorageClientImpl implements StorageClient {
 
         return (String) o;
     }
+
+	@Override
+	public void get(ServiceContext ctx, DocumentHandler handler)
+			throws DocumentNotFoundException, DocumentException {
+        throw new UnsupportedOperationException();
+	}
 }
