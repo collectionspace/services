@@ -10,6 +10,12 @@
 -->
 <web-app>
     <display-name>CollectionSpace Services</display-name>
+    <env-entry>
+        <description>Sets the logging context for the Tiger web-app</description>
+        <env-entry-name>cspace-logging-context</env-entry-name>
+        <env-entry-value>CSpaceLoggingContext</env-entry-value>
+        <env-entry-type>java.lang.String</env-entry-type>
+    </env-entry>
 
     <context-param>
         <param-name>javax.ws.rs.Application</param-name>
@@ -31,19 +37,19 @@
             /WEB-INF/applicationContext-security.xml
         </param-value>
     </context-param>
-    
+
     <filter>
         <filter-name>springSecurityFilterChain</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     </filter>
 
     <filter-mapping>
-      <filter-name>springSecurityFilterChain</filter-name>
-      <url-pattern>/*</url-pattern>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <url-pattern>/*</url-pattern>
     </filter-mapping>
 
     <!-- Listeners -->
-    
+
     <!--
       - Loads the root application context of this web app at startup.
       - The application context is then available via
@@ -58,12 +64,12 @@
       - context. Optional unless concurrent session control is being used.
       -->
     <listener>
-      <listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
+        <listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
     </listener>
 
-    <listener>
+    <!--listener>
         <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
-    </listener>
+    </listener-->
 
     <listener>
         <listener-class>
@@ -89,7 +95,7 @@
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
 
-<!-- BEGIN-AUTH uncomment the following
+    <!-- BEGIN-AUTH uncomment the following
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>CollectionSpace Services</web-resource-name>
