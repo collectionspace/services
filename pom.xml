@@ -164,6 +164,7 @@
             </releases>
             <snapshots>
                 <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>         
             </snapshots>
         </repository>
         
@@ -187,6 +188,7 @@
             </releases>
             <snapshots>
                 <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
             </snapshots>
         </repository>
         
