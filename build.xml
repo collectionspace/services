@@ -136,7 +136,7 @@
         </exec>
     </target>
 
-    <target name="install" depends="package,install-unix,install-windows"
+    <target name="install" depends="install-unix,install-windows"
             description="mvn install" />
     <target name="install-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
