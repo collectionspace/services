@@ -52,7 +52,7 @@
         <repository>
             <id>collectionspace-releases</id>
             <name>collectionspace-releases</name>
-            <url>http://source.collectionspace.org:8081/artifactory/public-nuxeo</url>            
+            <url>http://source.collectionspace.org:8081/artifactory/nuxeo-public</url>            
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -61,9 +61,9 @@
             </snapshots>            
         </repository>
         <repository>
-            <id>collectionspace-snapshots</id>
-            <name>collectionspace-snapshots</name>
-            <url>http://source.collectionspace.org:8081/artifactory/public-snapshot-nuxeo</url>
+            <id>nuxeo-public-snapshot</id>
+            <name>nuxeo-public-snapshot</name>
+            <url>http://source.collectionspace.org:8081/artifactory/nuxeo-public-snapshot</url>
             <releases>
                 <enabled>false</enabled>
             </releases>

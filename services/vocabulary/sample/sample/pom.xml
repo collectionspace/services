@@ -36,8 +36,7 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>            
-        </repository>
-        
+        </repository>        
         <repository>
             <id>libs-snapshots-local</id>
             <name>libs-snapshots-local</name>
@@ -49,10 +48,11 @@
                 <enabled>true</enabled>
             </snapshots>            
         </repository>
+
         <repository>
             <id>collectionspace-releases</id>
             <name>collectionspace-releases</name>
-            <url>http://source.collectionspace.org:8081/artifactory/public-nuxeo</url>            
+            <url>http://source.collectionspace.org:8081/artifactory/nuxeo-public</url>            
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -61,9 +61,9 @@
             </snapshots>            
         </repository>
         <repository>
-            <id>collectionspace-snapshots</id>
-            <name>collectionspace-snapshots</name>
-            <url>http://source.collectionspace.org:8081/artifactory/public-snapshot-nuxeo</url>
+            <id>nuxeo-public-snapshot</id>
+            <name>nuxeo-public-snapshot</name>
+            <url>http://source.collectionspace.org:8081/artifactory/nuxeo-public-snapshot</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
@@ -71,6 +71,28 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
+<!--        
+        <repository>
+            <id>nuxeo-public-snapshot</id>
+            <url>http://maven.nuxeo.org/public-snapshot/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>nuxeo-public</id>
+            <url>http://maven.nuxeo.org/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>        
+-->        
     </repositories>    
     
     <build>

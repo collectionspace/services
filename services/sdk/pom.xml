@@ -14,8 +14,7 @@
 		<profile>
 			<id>samples</id>
 	    <modules>
-        <module>import</module>
-        <module>sample</module>
+            <module>sample</module>
 	    </modules>
 		</profile>
 	</profiles>

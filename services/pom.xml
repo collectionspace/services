@@ -241,11 +241,11 @@
                 <artifactId>hibernate-entitymanager</artifactId>
                 <version>3.4.0.GA</version>
             </dependency>
-            <dependency>
+<!--            <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate</artifactId>
                 <version>3.4.0.GA</version>
-            </dependency>
+            </dependency> -->
             <dependency>
                 <groupId>org.jvnet.hyperjaxb3</groupId>
                 <!-- for time type adapters -->
