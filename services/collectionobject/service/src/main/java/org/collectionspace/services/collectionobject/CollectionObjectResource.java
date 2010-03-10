@@ -57,6 +57,7 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.security.UnauthorizedException;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.intake.IntakeResource;
 import org.collectionspace.services.intake.IntakesCommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
@@ -405,9 +406,8 @@ public class CollectionObjectResource
             	getRepositoryClient(ctx).getDoc(ctx, csid);
             RemoteDocumentModelHandlerImpl handler 
             	= (RemoteDocumentModelHandlerImpl)createDocumentHandler(ctx);
-            List<String> authRefFields = ((MultipartServiceContextImpl)ctx).getCommonPartPropertyValues("authRef");
-            String prefix = ctx.getCommonPartLabel()+":";
-            authRefList = handler.getAuthorityRefs(docWrapper, prefix, authRefFields);
+            List<String> authRefFields = ((MultipartServiceContextImpl)ctx).getCommonPartPropertyValues(RefNameServiceUtils.AUTH_REF_PROP);
+            authRefList = handler.getAuthorityRefs(docWrapper, authRefFields);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();

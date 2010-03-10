@@ -23,12 +23,15 @@
  */
 package org.collectionspace.services.common.repository;
 
+import java.util.List;
+
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModelList;
 
 /**
  * RepositoryClient is a generic Document Repository client
@@ -51,7 +54,7 @@ public interface RepositoryClient extends StorageClient {
      */
     public String createWorkspace(String tenantDomain, String workspaceName) throws Exception;
 
-        /**
+    /**
      * getWorkspaceId gets an id of given workspace in default repository under given domain
      * @param tenantDomain domain representing tenant
      * @param workspaceName name of the workspace
@@ -72,7 +75,7 @@ public interface RepositoryClient extends StorageClient {
             throws DocumentNotFoundException, DocumentException;
 
     /**
-     * find wrapped documentModel from the Nuxeo repository
+     * Find wrapped documentModel from the Nuxeo repository
      * @param ctx service context under which this method is invoked
      * @param specifies docType. If null, uses ctx.getDocumentType()
      * @param where NXQL where clause to get the document
@@ -83,7 +86,7 @@ public interface RepositoryClient extends StorageClient {
             throws DocumentNotFoundException, DocumentException;
 
     /**
-     * find doc and return CSID from the Nuxeo repository
+     * Find doc and return CSID from the Nuxeo repository
      * @param ctx service context under which this method is invoked
      * @param specifies docType. If null, uses ctx.getDocumentType()
      * @param where NXQL where clause to get the document
@@ -93,4 +96,15 @@ public interface RepositoryClient extends StorageClient {
     		ServiceContext ctx, String where)
             throws DocumentNotFoundException, DocumentException;
 
+    /**
+     * Find a list of documentModels from the Nuxeo repository
+     * @param docTypes a list of DocType names to match
+     * @param where the clause to qualify on
+     * @param domain the domain for the associated services
+     * @return
+     */
+    public DocumentWrapper<DocumentModelList> findDocs(
+    		List<String> docTypes, String where, String domain,
+    		int pageSize, int pageNum, boolean computeTotal )
+            throws DocumentNotFoundException, DocumentException;
 }

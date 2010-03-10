@@ -121,12 +121,7 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         if (objectPartMap.size() != 0) {
             return objectPartMap;
         }
-        ServiceBindingType serviceBinding = getServiceBinding();
-        ServiceObjectType objectType = serviceBinding.getObject();
-        List<ObjectPartType> objectPartTypes = objectType.getPart();
-        for (ObjectPartType objectPartType : objectPartTypes) {
-            objectPartMap.put(objectPartType.getLabel(), objectPartType);
-        }
+        ServiceBindingUtils.getPartsMetadata(getServiceBinding(), objectPartMap);
         return objectPartMap;
     }
     
@@ -141,21 +136,13 @@ public abstract class AbstractServiceContextImpl<IT, OT>
 
     public List<String> getPropertyValuesForPart(String partLabel, String propName) {
     	List<PropertyType> allProps = getPropertiesForPart(partLabel);
-    	List<String> values = new ArrayList<String>();
-    	if(allProps.size()>0) {
-        	List<PropertyItemType> propItems = allProps.get(0).getItem();
-        	for(PropertyItemType propItem:propItems) {
-        		if(propName.equals(propItem.getKey())) {
-        			String value = propItem.getValue();
-        			if(value!=null) {
-        				values.add(value);
-        			}
-        		}
-        	}
-    	}
-    	return values;
+    	return ServiceBindingUtils.getPropertyValuesByName(allProps, propName);
     }
 
+    public List<String> getPropertyValues(String propName) {
+        return ServiceBindingUtils.getPropertyValues(getServiceBinding(), propName);
+    }
+    
     public List<PropertyType> getCommonPartProperties() {
     	return getPropertiesForPart(getCommonPartLabel());
     }

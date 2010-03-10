@@ -24,7 +24,10 @@
 package org.collectionspace.services.common.config;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
+
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.RepositoryClientConfigType;
 import org.collectionspace.services.common.ServiceMain;
@@ -213,6 +216,28 @@ public class TenantBindingConfigReaderImpl
             String tenantId, String serviceName) {
         String key = getTenantQualifiedServiceName(tenantId, serviceName);
         return serviceBindings.get(key);
+    }
+
+    /**
+     * getServiceBinding gets service binding for given tenant for a given service
+     * @param tenantId
+     * @param serviceName
+     * @return
+     */
+    public List<ServiceBindingType> getServiceBindingsByType(
+            String tenantId, String serviceType) {
+    	ArrayList<ServiceBindingType> list = null;
+    	TenantBindingType tenant = tenantBindings.get(tenantId);
+    	if(tenant!=null) {
+    		for(ServiceBindingType sb:tenant.getServiceBindings()) {
+    			if(sb.getType().equals(serviceType)) {
+    				if(list==null)
+    		        	list = new ArrayList<ServiceBindingType>();
+    				list.add(sb);
+    			}
+    		}
+    	}
+        return list;
     }
 
     /**

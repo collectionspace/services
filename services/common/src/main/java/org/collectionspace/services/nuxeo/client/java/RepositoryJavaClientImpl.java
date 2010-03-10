@@ -378,6 +378,53 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
    		return csid;
     }
 
+    /**
+     * Find a list of documentModels from the Nuxeo repository
+     * @param docTypes a list of DocType names to match
+     * @param where the clause to qualify on
+     * @param domain the domain for the associated services
+     * @return
+     */
+    @Override
+    public DocumentWrapper<DocumentModelList> findDocs(
+    		List<String> docTypes, String where, String domain,
+    		int pageSize, int pageNum, boolean computeTotal )
+            throws DocumentNotFoundException, DocumentException {
+        RepositoryInstance repoSession = null;
+        DocumentWrapper<DocumentModelList> wrapDoc = null;
+
+        try {
+            if (docTypes == null || docTypes.size()<1) {
+                throw new DocumentNotFoundException(
+                       "findDocs must specify at least one DocumentType.");
+            }
+            if (domain == null) {
+                throw new DocumentNotFoundException("findDocs must specify Domain.");
+            }
+            repoSession = getRepositorySession();
+            DocumentModelList docList = null;
+            // force limit to 1, and ignore totalSize
+            String query = buildNXQLQuery(docTypes, where, domain ); 
+            docList = repoSession.query( query, null, pageSize, pageNum, computeTotal);
+            wrapDoc = new DocumentWrapperImpl<DocumentModelList>(docList);
+        } catch (IllegalArgumentException iae) {
+            throw iae;
+        } catch (DocumentException de) {
+            throw de;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw new DocumentException(e);
+        } finally {
+            if (repoSession != null) {
+                releaseRepositorySession(repoSession);
+            }
+        }
+        return wrapDoc;
+    }
+
+    
     @Override
     public void get(ServiceContext ctx, List<String> csidList, DocumentHandler handler)
 		throws DocumentNotFoundException, DocumentException {
@@ -693,9 +740,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         return workspaceId;
     }
     
-    private final String buildNXQLQuery(String docType, String where, String domain ) {
-        StringBuilder query = new StringBuilder("SELECT * FROM ");
-        query.append(docType);
+    private final void appendNXQLWhere(StringBuilder query, String where, String domain ) {
         // TODO This is a slow method for tenant-filter
         // We should make this a property that is indexed.
         query.append(" WHERE ecm:path STARTSWITH '/" + domain + "'");
@@ -704,6 +749,26 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         	// into SQL, we need to parenthesize our 'where' clause
             query.append(" AND " + "(" + where +")" + "AND ecm:isProxy = 0");
         }
+    }
+
+    private final String buildNXQLQuery(String docType, String where, String domain ) {
+        StringBuilder query = new StringBuilder("SELECT * FROM ");
+        query.append(docType);
+        appendNXQLWhere(query, where, domain );
+        return query.toString();
+    }
+
+    private final String buildNXQLQuery(List<String> docTypes, String where, String domain ) {
+        StringBuilder query = new StringBuilder("SELECT * FROM ");
+        boolean fFirst = true;
+        for(String docType:docTypes) {
+        	if(fFirst) {
+                query.append(",");
+                fFirst = false;
+        	}
+            query.append(docType);
+        }
+        appendNXQLWhere(query, where, domain );
         return query.toString();
     }
 

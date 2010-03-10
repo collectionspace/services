@@ -268,7 +268,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
      */
-    // @AfterClass(alwaysRun=true)
+    @AfterClass(alwaysRun=true)
     public void cleanUp() {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");

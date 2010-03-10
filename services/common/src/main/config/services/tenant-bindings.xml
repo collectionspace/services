@@ -13,7 +13,7 @@
     <!-- begin movingimages.us tenant meta-data -->
     <tenant:tenantBinding
         id="1" name="movingimages.us" displayName="Museum of Moving Images" version="0.1" repositoryDomain="default-domain">
-        <tenant:serviceBindings name="CollectionObjects" version="0.1">
+        <tenant:serviceBindings name="CollectionObjects" type="object" version="0.1">
             <!-- begin collectionobject service meta-data -->
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
                 nuxeo-java
@@ -66,7 +66,7 @@
         </tenant:serviceBindings>
         <!--end collectionobject service meta-data -->
         <!-- begin intake service meta-data -->
-        <tenant:serviceBindings name="Intakes" version="0.1">
+        <tenant:serviceBindings name="Intakes" type="procedure" version="0.1">
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
                 nuxeo-java
             </service:repositoryClient>
@@ -327,7 +327,7 @@
         </tenant:serviceBindings>
         <!-- end person service meta-data -->
         <!-- begin acquisition service meta-data -->
-        <tenant:serviceBindings name="Acquisitions" version="0.1">
+        <tenant:serviceBindings name="Acquisitions" type="procedure" version="0.1">
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
                 nuxeo-java
             </service:repositoryClient>

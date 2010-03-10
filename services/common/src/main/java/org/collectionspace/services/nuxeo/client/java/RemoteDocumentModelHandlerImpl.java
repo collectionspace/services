@@ -191,7 +191,6 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
     
     public AuthorityRefList getAuthorityRefs(
     		DocumentWrapper<DocumentModel> docWrapper,
-    		String pathPrefix,
     		List<String> authRefFields) {
     	AuthorityRefList authRefList = new AuthorityRefList();
         try {
@@ -200,7 +199,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
             	authRefList.getAuthorityRefItem();
 
             for(String field:authRefFields){
-        		String refName = (String)docModel.getPropertyValue(pathPrefix+field);
+        		String refName = (String)docModel.getPropertyValue(field);
         		if(refName==null)
         			continue;
             	try{
