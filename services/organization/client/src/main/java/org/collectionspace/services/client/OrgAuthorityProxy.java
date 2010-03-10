@@ -39,6 +39,11 @@ public interface OrgAuthorityProxy {
     @Path("/{csid}")
     ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
 
+    //(R)ead by name
+    @GET
+    @Path("/urn:cspace:name({name})")
+    ClientResponse<MultipartInput> readByName(@PathParam("name") String name);
+
     //(U)pdate
     @PUT
     @Path("/{csid}")
@@ -54,6 +59,12 @@ public interface OrgAuthorityProxy {
     @Produces({"application/xml"})
     @Path("/{vcsid}/items/")
     ClientResponse<OrganizationsCommonList> readItemList(@PathParam("vcsid") String vcsid);
+
+    // List Items for a named authority
+    @GET
+    @Produces({"application/xml"})
+    @Path("/urn:cspace:name({specifier})/items/")
+    ClientResponse<OrganizationsCommonList> readItemListForNamedAuthority(@PathParam("specifier") String specifier);
 
     //(C)reate Item
     @POST
