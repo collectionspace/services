@@ -65,10 +65,15 @@ import org.slf4j.LoggerFactory;
 public class CollectionObjectValidatorHandler implements ValidatorHandler {
 
     final Logger logger = LoggerFactory.getLogger(CollectionObjectValidatorHandler.class);
+    final boolean isValidationOn = false;
 
     @Override
     public void validate(Action action, ServiceContext ctx)
             throws InvalidDocumentException {
+            	
+				// This is a "fix" for CSPACE-1147 at issues.collectionspace.org
+				if (isValidationOn == false) return;
+				         	
         if(logger.isDebugEnabled()) {
             logger.debug("validate() action=" + action.name());
         }
