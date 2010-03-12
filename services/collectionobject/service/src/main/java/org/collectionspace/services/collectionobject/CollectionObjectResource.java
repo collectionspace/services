@@ -212,18 +212,26 @@ public class CollectionObjectResource
         }
         return result;
     }
-
-    /**
-     * Gets the collection object list.
-     * 
-     * @param ui the ui
-     * 
-     * @return the collection object list
-     */
+    
     @GET
     @Produces("application/xml")
-    public CollectionobjectsCommonList getCollectionObjectList(@Context UriInfo ui) {
-        CollectionobjectsCommonList collectionObjectList = new CollectionobjectsCommonList();
+    public CollectionobjectsCommonList getCollectionObjectList(@Context UriInfo ui,
+    		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
+    	CollectionobjectsCommonList result = null;
+    	if (keywords != null) {
+    		result = searchCollectionObjects(keywords);
+    	} else {
+    		result = getCollectionObjectList();
+    	}
+    	
+    	return result;
+    }
+    
+    /**
+     * Gets the collection object list.
+     */
+    private CollectionobjectsCommonList getCollectionObjectList() {
+        CollectionobjectsCommonList collectionObjectList;
         try {
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             DocumentHandler handler = createDocumentHandler(ctx);
@@ -448,9 +456,8 @@ public class CollectionObjectResource
 		return result;
     }
 
-
-    //FIXME: Replace this "search" resource with a keyword "kw" query parameter
     /**
+     * This method is deprecated.  Use kwSearchCollectionObjects() method instead.
      * Keywords search collection objects.
      * 
      * @param keywords the keywords
@@ -462,7 +469,11 @@ public class CollectionObjectResource
     @Produces("application/xml")
     public CollectionobjectsCommonList keywordsSearchCollectionObjects(
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
-        CollectionobjectsCommonList collectionObjectList = new CollectionobjectsCommonList();
+    	return searchCollectionObjects(keywords);
+    }    
+    
+    private CollectionobjectsCommonList searchCollectionObjects(String keywords) {
+        CollectionobjectsCommonList collectionObjectList;
         try {
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             DocumentHandler handler = createDocumentHandler(ctx);

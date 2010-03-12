@@ -62,15 +62,24 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The Class AcquisitionResource.
+ */
 @Path("/acquisitions")
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
 public class AcquisitionResource
         extends AbstractCollectionSpaceResourceImpl {
 
+    /** The service name. */
     final private String serviceName = "acquisitions";
+    
+    /** The logger. */
     final Logger logger = LoggerFactory.getLogger(AcquisitionResource.class);
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
+     */
     @Override
     protected String getVersionString() {
     	/** The last change revision. */
@@ -78,11 +87,17 @@ public class AcquisitionResource
     	return lastChangeRevision;
     }
     
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getServiceName()
+     */
     @Override
     public String getServiceName() {
         return serviceName;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#createDocumentHandler(org.collectionspace.services.common.context.ServiceContext)
+     */
     @Override
     public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
         DocumentHandler docHandler = ctx.getDocumentHandler();
@@ -95,10 +110,20 @@ public class AcquisitionResource
         return docHandler;
     }
 
+    /**
+     * Instantiates a new acquisition resource.
+     */
     public AcquisitionResource() {
         // do nothing
     }
 
+    /**
+     * Creates the acquisition.
+     * 
+     * @param input the input
+     * 
+     * @return the response
+     */
     @POST
     public Response createAcquisition(MultipartInput input) {
 
@@ -124,6 +149,13 @@ public class AcquisitionResource
         }
     }
 
+    /**
+     * Gets the acquisition.
+     * 
+     * @param csid the csid
+     * 
+     * @return the acquisition
+     */
     @GET
     @Path("{csid}")
     public MultipartOutput getAcquisition(
@@ -174,10 +206,35 @@ public class AcquisitionResource
         return result;
     }
 
+    /**
+     * Gets the acquisition list.
+     * 
+     * @param ui the ui
+     * @param keywords the keywords
+     * 
+     * @return the acquisition list
+     */
     @GET
     @Produces("application/xml")
-    public AcquisitionsCommonList getAcquisitionList(@Context UriInfo ui) {
-        AcquisitionsCommonList acquisitionObjectList = new AcquisitionsCommonList();
+    public AcquisitionsCommonList getAcquisitionList(@Context UriInfo ui,
+    		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
+    	AcquisitionsCommonList result = null;
+    	if (keywords != null) {
+    		result = searchAcquisitions(keywords);
+    	} else {
+    		result = getAcquisitionsList();
+    	}
+    	
+    	return result;
+    }
+    
+    /**
+     * Gets the acquisitions list.
+     * 
+     * @return the acquisitions list
+     */
+    private AcquisitionsCommonList getAcquisitionsList() {
+        AcquisitionsCommonList acquisitionObjectList;
         try {
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             DocumentHandler handler = createDocumentHandler(ctx);
@@ -198,6 +255,14 @@ public class AcquisitionResource
         return acquisitionObjectList;
     }
 
+    /**
+     * Update acquisition.
+     * 
+     * @param csid the csid
+     * @param theUpdate the the update
+     * 
+     * @return the multipart output
+     */
     @PUT
     @Path("{csid}")
     public MultipartOutput updateAcquisition(
@@ -242,6 +307,13 @@ public class AcquisitionResource
         return result;
     }
 
+    /**
+     * Delete acquisition.
+     * 
+     * @param csid the csid
+     * 
+     * @return the response
+     */
     @DELETE
     @Path("{csid}")
     public Response deleteAcquisition(@PathParam("csid") String csid) {
@@ -279,12 +351,31 @@ public class AcquisitionResource
         }
     }
     
+    /**
+     * Keywords search acquisitions.
+     * 
+     * @param ui the ui
+     * @param keywords the keywords
+     * 
+     * @return the acquisitions common list
+     */
     @GET
     @Path("/search")    
     @Produces("application/xml")
     public AcquisitionsCommonList keywordsSearchAcquisitions(@Context UriInfo ui,
     		@QueryParam (IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
-    	AcquisitionsCommonList acquisitionObjectList = new AcquisitionsCommonList();
+    	return searchAcquisitions(keywords);
+    }
+    
+    /**
+     * Search acquisitions.
+     * 
+     * @param keywords the keywords
+     * 
+     * @return the acquisitions common list
+     */
+    private AcquisitionsCommonList searchAcquisitions(String keywords) {
+    	AcquisitionsCommonList acquisitionObjectList;    	
         try {
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             DocumentHandler handler = createDocumentHandler(ctx);
@@ -318,6 +409,14 @@ public class AcquisitionResource
         return acquisitionObjectList;
     }   
     
+    /**
+     * Gets the authority refs.
+     * 
+     * @param csid the csid
+     * @param ui the ui
+     * 
+     * @return the authority refs
+     */
     @GET
     @Path("{csid}/authorityrefs")
     @Produces("application/xml")

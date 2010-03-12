@@ -40,6 +40,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
@@ -64,20 +65,33 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The Class IntakeResource.
+ */
 @Path("/intakes")
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
 public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
 
+    /** The Constant serviceName. */
     private final static String serviceName = "intakes";
+    
+    /** The logger. */
     final Logger logger = LoggerFactory.getLogger(IntakeResource.class);
     //FIXME retrieve client type from configuration
+    /** The Constant CLIENT_TYPE. */
     final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType();
 
+    /**
+     * Instantiates a new intake resource.
+     */
     public IntakeResource() {
         // do nothing
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
+     */
     @Override
     protected String getVersionString() {
     	/** The last change revision. */
@@ -85,11 +99,17 @@ public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
     	return lastChangeRevision;
     }
     
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getServiceName()
+     */
     @Override
     public String getServiceName() {
         return serviceName;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#createDocumentHandler(org.collectionspace.services.common.context.ServiceContext)
+     */
     @Override
     public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
         DocumentHandler docHandler = ctx.getDocumentHandler();
@@ -102,6 +122,13 @@ public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
         return docHandler;
     }
 
+    /**
+     * Creates the intake.
+     * 
+     * @param input the input
+     * 
+     * @return the response
+     */
     @POST
     public Response createIntake(MultipartInput input) {
         try {
@@ -127,6 +154,13 @@ public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
         }
     }
 
+    /**
+     * Gets the intake.
+     * 
+     * @param csid the csid
+     * 
+     * @return the intake
+     */
     @GET
     @Path("{csid}")
     public MultipartOutput getIntake(
@@ -176,10 +210,36 @@ public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
         return result;
     }
 
+    /**
+     * Gets the intake list.
+     * 
+     * @param ui the ui
+     * @param keywords the keywords
+     * 
+     * @return the intake list
+     */
     @GET
     @Produces("application/xml")
-    public IntakesCommonList getIntakeList(@Context UriInfo ui) {
-        IntakesCommonList intakeObjectList = new IntakesCommonList();
+    public IntakesCommonList getIntakeList(@Context UriInfo ui,
+    		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
+    	IntakesCommonList result = null;
+    	
+    	if (keywords != null) {
+    		result = searchIntakes(keywords);
+    	} else {
+    		result = getIntakeList();
+    	}
+ 
+    	return result;
+    }
+    
+    /**
+     * Gets the intake list.
+     * 
+     * @return the intake list
+     */
+    private IntakesCommonList getIntakeList() {
+        IntakesCommonList intakeObjectList;
         try {
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             DocumentHandler handler = createDocumentHandler(ctx);
@@ -200,6 +260,14 @@ public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
         return intakeObjectList;
     }
 
+    /**
+     * Gets the authority refs.
+     * 
+     * @param csid the csid
+     * @param ui the ui
+     * 
+     * @return the authority refs
+     */
     @GET
     @Path("{csid}/authorityrefs")
     @Produces("application/xml")
@@ -259,6 +327,14 @@ public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
         return intakeObjectList;
     }
     
+    /**
+     * Update intake.
+     * 
+     * @param csid the csid
+     * @param theUpdate the the update
+     * 
+     * @return the multipart output
+     */
     @PUT
     @Path("{csid}")
     public MultipartOutput updateIntake(
@@ -300,6 +376,13 @@ public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
         return result;
     }
 
+    /**
+     * Delete intake.
+     * 
+     * @param csid the csid
+     * 
+     * @return the response
+     */
     @DELETE
     @Path("{csid}")
     public Response deleteIntake(@PathParam("csid") String csid) {
@@ -337,12 +420,31 @@ public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
         }
     }
     
+    /**
+     * Keywords search intakes.
+     * 
+     * @param ui the ui
+     * @param keywords the keywords
+     * 
+     * @return the intakes common list
+     */
     @GET
     @Path("/search")    
     @Produces("application/xml")
     public IntakesCommonList keywordsSearchIntakes(@Context UriInfo ui,
     		@QueryParam (IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
-    	IntakesCommonList intakesObjectList = new IntakesCommonList();
+    	return searchIntakes(keywords);
+    }
+    	
+    /**
+     * Search intakes.
+     * 
+     * @param keywords the keywords
+     * 
+     * @return the intakes common list
+     */
+    private IntakesCommonList searchIntakes(String keywords) {
+    	IntakesCommonList intakesObjectList;
         try {
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             DocumentHandler handler = createDocumentHandler(ctx);
