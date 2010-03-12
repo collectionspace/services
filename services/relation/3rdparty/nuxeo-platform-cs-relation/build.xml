@@ -10,7 +10,7 @@
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
-    <property name="nuxeo.relation.jar" value="org.collectionspace.services.relation.3rdparty.nuxeo-1.0.jar"/>
+    <property name="nuxeo.relation.jar" value="org.collectionspace.services.relation.3rdparty.nuxeo-${cspace.release}.jar"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />

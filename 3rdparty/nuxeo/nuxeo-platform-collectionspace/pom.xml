@@ -5,10 +5,11 @@
   <parent>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.3rdparty.nuxeo</artifactId>
-    <version>1.0</version>
+    <version>0.6-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
+  <groupId>org.collectionspace.services</groupId>
   <artifactId>nuxeo-platform-collectionspace</artifactId>
   <packaging>pom</packaging>
   <name>Nuxeo CS extensions</name>

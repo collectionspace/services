@@ -1,19 +1,34 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>org.collectionspace.services</groupId>
-        <artifactId>nuxeo-platform-collectionspace</artifactId>
-        <version>1.0</version>
+        <artifactId>org.collectionspace.services.acquisition.3rdparty</artifactId>
+        <version>0.6-SNAPSHOT</version>
     </parent>
-    
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
-    <version>1.0</version>
     <artifactId>org.collectionspace.services.acquisition.3rdparty.nuxeo</artifactId>
-    <packaging>jar</packaging>
     <name>services.acquisition.3rdparty.nuxeo</name>
-    <description>
-        Acquisition Nuxeo Document Type
-    </description>
+    <packaging>jar</packaging>
+    <description> Acquisition Nuxeo Document Type </description>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestFile> src/main/resources/META-INF/MANIFEST.MF </manifestFile>
+                        <manifestEntries>
+                            <Bundle-Version>${eclipseVersion}</Bundle-Version>
+                            <Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

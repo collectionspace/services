@@ -5,16 +5,17 @@
     <parent>
         <artifactId>org.collectionspace.services.intake</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>1.0</version>
+        <version>0.6-SNAPSHOT</version>
     </parent>
+    
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
-    <version>1.0</version>
     <artifactId>org.collectionspace.services.intake.3rdparty</artifactId>
-    <packaging>pom</packaging>
     <name>services.intake.3rdparty</name>
+    <packaging>pom</packaging>
+    
     <description>
-    3rd party build for intake service
+        3rd party build for intake service
     </description>
 
     <modules>

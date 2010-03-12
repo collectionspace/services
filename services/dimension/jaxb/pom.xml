@@ -4,15 +4,14 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <artifactId>org.collectionspace.services.dimension</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>1.0</version>
+        <artifactId>org.collectionspace.services.dimension</artifactId>
+        <version>0.6-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.dimension.jaxb</artifactId>
-    <version>1.0</version>
     <name>services.dimension.jaxb</name>
     
     <dependencies>
@@ -32,6 +31,7 @@
             <version>0.4.1.4</version>
         </dependency>
     </dependencies>
+    
     <build>
         <finalName>collectionspace-services-dimension-jaxb</finalName>
         <defaultGoal>install</defaultGoal>

@@ -1,32 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
     <parent>
         <artifactId>org.collectionspace.services.acquisition</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>1.0</version>
+        <version>0.6-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.acquisition.service</artifactId>
-    <packaging>jar</packaging>
-    <version>1.0</version>
     <name>services.acquisition.service</name>
+    <packaging>jar</packaging>    
 
     <dependencies>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
-            <version>1.0</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.acquisition.jaxb</artifactId>
-            <version>1.0</version>
-        </dependency>
-        
-        <dependency>
+            <version>${project.version}</version>
+        </dependency>        
+<!--       <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.1</version>
@@ -36,11 +33,7 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>5.6</version>
-        </dependency>
-        
-
-      <!-- javax -->
-
+        </dependency>        
 
         <dependency>
             <groupId>javax.security</groupId>
@@ -48,16 +41,13 @@
             <version>1.0.01</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
             <version>1.6.1</version>
             <scope>provided</scope>
-        </dependency>
+        </dependency>        
         
-        <!-- jboss -->
-
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
@@ -78,10 +68,8 @@
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-multipart-provider</artifactId>
             <version>1.0.2.GA</version>
-        </dependency>
+        </dependency>        
         
-        <!-- nuxeo -->
-
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-api</artifactId>
@@ -93,7 +81,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <dependency>
             <groupId>org.restlet</groupId>
             <artifactId>org.restlet</artifactId>
@@ -108,8 +95,7 @@
             <groupId>com.noelios.restlet</groupId>
             <artifactId>com.noelios.restlet</artifactId>
             <version>1.0.7</version>
-        </dependency>
-
+        </dependency> -->
     </dependencies>
     
     <build>

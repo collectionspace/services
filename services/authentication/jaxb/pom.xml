@@ -4,20 +4,21 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <artifactId>org.collectionspace.services.authentication</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>1.0</version>
+        <artifactId>org.collectionspace.services.authentication</artifactId>
+        <version>0.6-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.authentication.jaxb</artifactId>
-    <version>1.0</version>
     <name>services.authentication.jaxb</name>
+    
     <properties>
         <sql.file>authentication.sql</sql.file>
         <sql.dir>src/main/resources/db/mysql</sql.dir>
     </properties>
+    
     <dependencies>
         <!-- keep slf4j dependencies on the top -->
         <dependency>
@@ -30,6 +31,7 @@
             <artifactId>slf4j-log4j12</artifactId>
             <scope>test</scope>
         </dependency>
+<!--        
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
@@ -46,7 +48,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-        </dependency>
+        </dependency> -->
 
         <dependency>
             <groupId>javax.persistence</groupId>
@@ -60,11 +62,12 @@
             <groupId>org.jvnet.hyperjaxb3</groupId>
             <artifactId>hyperjaxb3-ejb-runtime</artifactId>
         </dependency>
+<!--        
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>5.6</version>
-        </dependency>
+        </dependency> -->
     </dependencies>
 
     <build>

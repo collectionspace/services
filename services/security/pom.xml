@@ -3,14 +3,14 @@
     <parent>
         <artifactId>org.collectionspace.services.main</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>1.0</version>
+        <version>0.6-SNAPSHOT</version>
     </parent>
+    
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
-    <version>1.0</version>
     <artifactId>org.collectionspace.services.security</artifactId>
-    <packaging>pom</packaging>
     <name>services.security</name>
+    <packaging>pom</packaging>
 
     <properties>
     </properties>

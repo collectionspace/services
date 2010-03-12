@@ -4,15 +4,14 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <artifactId>org.collectionspace.services.vocabulary</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>1.0</version>
+        <artifactId>org.collectionspace.services.vocabulary</artifactId>
+        <version>0.6-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.vocabulary.client</artifactId>
-    <version>${cspace.services.client.version}</version>
     <name>services.vocabulary.client</name>
     
     <dependencies>
@@ -27,17 +26,18 @@
             <artifactId>slf4j-log4j12</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- CollectionSpace dependencies -->
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.vocabulary.jaxb</artifactId>
-            <version>1.0</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.client</artifactId>
-            <version>${cspace.services.client.version}</version>
+            <version>${project.version}</version>
         </dependency>
-        
+        <!-- External dependencies -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>

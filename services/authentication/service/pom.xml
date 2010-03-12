@@ -1,40 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <artifactId>org.collectionspace.services.main</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>1.0</version>
+        <artifactId>org.collectionspace.services.authentication</artifactId>
+        <version>0.6-SNAPSHOT</version>
     </parent>
+    
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.authentication.service</artifactId>
-    <packaging>jar</packaging>
-    <version>1.0</version>
     <name>services.authentication.service</name>
+    <packaging>jar</packaging>
 
     <properties>
-        <jboss.version>4.2.3.GA</jboss.version>
+<!--        <jboss.version>4.2.3.GA</jboss.version>
         <jboss.ejb.version>3.0</jboss.ejb.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> -->
         <spring.security.version>3.0.1.RELEASE</spring.security.version>
     </properties>
 
     <dependencies>
-        <!-- slf4j not available due to classloading issues perhaps -->
+        <!-- keep slf4j dependencies on the top -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
+        </dependency>        
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.1.1</version>
         </dependency>
-
-        <!-- utilities -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.1</version>
             <scope>test</scope>
         </dependency>
-
         <!-- javax -->
         <dependency>
             <groupId>javax.security</groupId>
@@ -42,8 +49,6 @@
             <version>1.0.01</version>
             <scope>provided</scope>
         </dependency>
-
-        <!-- jboss -->
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging-log4j</artifactId>
@@ -54,14 +59,12 @@
             <artifactId>jbosssx</artifactId>
             <version>4.2.3.GA</version>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
             <version>${spring.security.version}</version>
             <scope>provided</scope>
         </dependency>
-
     </dependencies>
 
     <build>

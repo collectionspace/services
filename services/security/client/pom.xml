@@ -2,18 +2,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
     <parent>
         <artifactId>org.collectionspace.services.security</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>1.0</version>
+        <version>0.6-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.security.client</artifactId>
-    <version>${cspace.services.client.version}</version>
     <name>services.security.client</name>
+    
     <dependencies>
         <!-- keep slf4j dependencies on the top -->
         <dependency>
@@ -26,27 +25,29 @@
             <artifactId>slf4j-log4j12</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- CollectionSpace dependencies -->
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.client</artifactId>
-            <version>${cspace.services.client.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <!-- authentication tests use CollectionObject service and Account service -->
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authentication.client</artifactId>
-            <version>${cspace.services.client.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.account.client</artifactId>
-            <version>${cspace.services.client.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.collectionobject.client</artifactId>
-            <version>${cspace.services.client.version}</version>
+            <version>${project.version}</version>
         </dependency>
+        <!-- External dependencies -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>

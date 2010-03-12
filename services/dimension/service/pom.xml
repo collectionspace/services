@@ -2,30 +2,30 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <artifactId>org.collectionspace.services.dimension</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>1.0</version>
+        <artifactId>org.collectionspace.services.dimension</artifactId>
+        <version>0.6-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.dimension.service</artifactId>
-    <packaging>jar</packaging>
-    <version>1.0</version>
     <name>services.dimension.service</name>
+    <packaging>jar</packaging>
 
     <dependencies>
+        <!-- CollectionSpace dependencies -->
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
-            <version>1.0</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.dimension.jaxb</artifactId>
-            <version>1.0</version>
+            <version>${project.version}</version>
         </dependency>
-        
+        <!-- External dependencies -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -38,9 +38,7 @@
             <version>5.6</version>
         </dependency>
         
-
       <!-- javax -->
-
 
         <dependency>
             <groupId>javax.security</groupId>
@@ -48,7 +46,6 @@
             <version>1.0.01</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
@@ -81,11 +78,10 @@
         </dependency>
         
         <!-- nuxeo -->
-
+        
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-api</artifactId>
-            <version>${nuxeo.version.1.5}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>jboss-remoting</artifactId>
@@ -94,6 +90,7 @@
             </exclusions>
         </dependency>
 
+        <!-- Restlet -->
         <dependency>
             <groupId>org.restlet</groupId>
             <artifactId>org.restlet</artifactId>

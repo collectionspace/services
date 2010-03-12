@@ -5,18 +5,19 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
-    <version>1.0</version>
     <artifactId>org.collectionspace.services</artifactId>
+    <version>0.6-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>services</name>
 
     <properties>
-        <cspace.services.client.version>0.5-SNAPSHOT</cspace.services.client.version>
         <jboss.version>4.2.3.GA</jboss.version>
         <jboss.ejb.version>3.0</jboss.ejb.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <nuxeo.version.5.2>5.2.1-SNAPSHOT</nuxeo.version.5.2>
         <nuxeo.version.1.5>1.5.1-SNAPSHOT</nuxeo.version.1.5>
+        <cspace.services.version>0.6-SNAPSHOT</cspace.services.version>
+        <cspace.services.client.version>0.6.1-SNAPSHOT</cspace.services.client.version>
     </properties>
 
     <distributionManagement>
@@ -123,7 +124,7 @@
                 <updatePolicy>never</updatePolicy>
             </snapshots>
         </repository>
-        
+
         <repository>
             <id>public</id>
             <url>http://maven.nuxeo.org/public</url>
@@ -135,7 +136,7 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        
+
         <repository>
             <id>nuxeo-public</id>
             <name>nuxeo-public</name>
@@ -160,7 +161,7 @@
             </snapshots>
         </repository>
 
-<!--
+        <!--
  -->
 
 
@@ -213,7 +214,6 @@
                         <show>public</show>
                     </configuration>
                 </plugin>
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -240,7 +240,6 @@
                     <artifactId>maven-war-plugin</artifactId>
                     <version>2.0.1</version>
                     <configuration>
-
                         <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
                         <archive>
                             <manifest>
@@ -249,12 +248,22 @@
                         </archive>
                     </configuration>
                 </plugin>
-
             </plugins>
         </pluginManagement>
+
     </build>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.5.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>1.5.2</version>
+            </dependency>
             <dependency>
                 <groupId>net.java.dev.jaxb2-commons</groupId>
                 <artifactId>jaxb-fluent-api</artifactId>
@@ -268,20 +277,56 @@
                 <classifier>jdk15</classifier>
             </dependency>
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>1.5.2</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>1.5.2</version>
-            </dependency>
-            <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>5.1.5</version>
                 <scope>test</scope>
+            </dependency>
+            <!-- Nuxeo Dependencies with versions -->
+            <dependency>
+                <groupId>org.nuxeo.common</groupId>
+                <artifactId>nuxeo-common</artifactId>
+                <version>1.5.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.nuxeo.runtime</groupId>
+                <artifactId>nuxeo-runtime</artifactId>
+                <version>1.5.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.nuxeo.runtime</groupId>
+                <artifactId>nuxeo-runtime-osgi</artifactId>
+                <version>1.5.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.nuxeo.ecm.core</groupId>
+                <artifactId>nuxeo-core-api</artifactId>
+                <version>1.5.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.nuxeo.ecm.core</groupId>
+                <artifactId>nuxeo-core-client</artifactId>
+                <version>1.5.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.nuxeo.ecm.core</groupId>
+                <artifactId>nuxeo-core-query</artifactId>
+                <version>1.5.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.nuxeo.ecm.core</groupId>
+                <artifactId>nuxeo-core-schema</artifactId>
+                <version>1.5.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.nuxeo.ecm.core</groupId>
+                <artifactId>nuxeo-core-io</artifactId>
+                <version>1.5.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.nuxeo.ecm.core</groupId>
+                <artifactId>nuxeo-core-facade</artifactId>
+                <version>1.5.1-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -291,15 +336,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <configuration>
-                </configuration>
-               <reportSets>
-               	<reportSet>
-                  <reports>
-                     <report>dependencies</report>
-                  </reports>
-               </reportSet>
-               </reportSets>
+                <configuration> </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>dependencies</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
             </plugin>
             <!--            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -2,18 +2,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
     <parent>
-        <artifactId>org.collectionspace.services.account</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>1.0</version>
+        <artifactId>org.collectionspace.services.account</artifactId>
+        <version>0.6-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.account.client</artifactId>
-    <version>${cspace.services.client.version}</version>
     <name>services.account.client</name>
+    
     <dependencies>
         <!-- keep slf4j dependencies on the top -->
         <dependency>
@@ -29,33 +28,38 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.account.jaxb</artifactId>
-            <version>1.0</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.client</artifactId>
-            <version>${cspace.services.client.version}</version>
+            <version>${project.version}</version>
         </dependency>
-        <!-- Needed if/when client test framework files are moved into
-/services/client/src/test from /services/client/src/main -->     
-<!--    <dependency>
+
+        <!-- Needed if/when client test framework files are moved into -->
+        <!-- /services/client/src/test from /services/client/src/main -->
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>test</scope>
+        </dependency>        
+        <!-- <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.client</artifactId>
-            <version>1.0</version>
+            <version>${project.version}</version>
             <scope>test</scope>
             <type>test-jar</type>
-        </dependency>-->
-
+        </dependency> -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>5.6</version>
-        </dependency>
+        </dependency>       
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
             <version>1.1.GA</version>
-            <!-- filter out unwanted jars -->
             <exclusions>
                 <exclusion>
                     <groupId>tjws</groupId>
@@ -77,12 +81,6 @@
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
             <version>3.1</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
         </dependency>
     </dependencies>
 

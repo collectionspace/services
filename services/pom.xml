@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <artifactId>org.collectionspace.services</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>1.0</version>
+        <artifactId>org.collectionspace.services</artifactId>
+        <version>0.6-SNAPSHOT</version>
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
-    <version>1.0</version>
     <artifactId>org.collectionspace.services.main</artifactId>
-    <packaging>pom</packaging>
     <name>services.main</name>
+    <packaging>pom</packaging>
 
     <modules>
         <module>authentication</module>
@@ -18,7 +18,7 @@
         <module>client</module>
         <module>account</module>
         <module>relation</module>
-        <!--module>query</module-->
+<!--        <module>query</module> -->
         <module>acquisition</module>
         <module>vocabulary</module>
         <module>organization</module>
@@ -72,6 +72,7 @@
                         <target>1.5</target>
                     </configuration>
                 </plugin>
+                
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
@@ -79,6 +80,7 @@
                         <unzipCommand>/usr/bin/unzip -o &gt; err.txt</unzipCommand>
                     </configuration>
                 </plugin>
+                
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
@@ -88,12 +90,17 @@
                         <archive>
                             <manifest>
                                 <addClasspath>true</addClasspath>
-
                             </manifest>
                         </archive>
                     </configuration>
                 </plugin>
 
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.2</version>
+                </plugin>
+                
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
@@ -109,8 +116,6 @@
                         </execution>
                     </executions>
                 </plugin>
-
-
             </plugins>
         </pluginManagement>
         <plugins>
@@ -256,7 +261,6 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>5.1.5</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

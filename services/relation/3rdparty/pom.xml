@@ -5,16 +5,16 @@
     <parent>
         <artifactId>org.collectionspace.services.relation</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>1.0</version>
+        <version>0.6-SNAPSHOT</version>
     </parent>
+    
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
-    <version>1.0</version>
     <artifactId>org.collectionspace.services.relation.3rdparty</artifactId>
-    <packaging>pom</packaging>
     <name>services.relation.3rdparty</name>
+    <packaging>pom</packaging>
     <description>
-    3rd party build for relation service
+        3rd party build for relation service
     </description>
 
     <modules>

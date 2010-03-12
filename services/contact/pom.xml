@@ -4,15 +4,14 @@
     <parent>
         <artifactId>org.collectionspace.services.main</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>1.0</version>
+        <version>0.6-SNAPSHOT</version>
     </parent>
+    
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
-    <version>1.0</version>
     <artifactId>org.collectionspace.services.contact</artifactId>
-    <packaging>pom</packaging>
     <name>services.contact</name>
-
+    <packaging>pom</packaging>
 
     <modules>
         <module>jaxb</module>
