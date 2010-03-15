@@ -17,19 +17,17 @@
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-            <version>2.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.jvnet.jaxb2-commons</groupId>
             <artifactId>property-listener-injector</artifactId>
-            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>org.jvnet.jaxb2_commons</groupId>
             <artifactId>runtime</artifactId>
-            <version>0.4.1.4</version>
         </dependency>
     </dependencies>
+
     <build>
         <finalName>collectionspace-services-collectionobject-jaxb</finalName>
         <defaultGoal>install</defaultGoal>

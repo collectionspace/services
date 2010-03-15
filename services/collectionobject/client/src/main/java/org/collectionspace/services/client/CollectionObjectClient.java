@@ -36,8 +36,8 @@ import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.query.IQueryManager;
+//import org.collectionspace.services.common.context.ServiceContext;
+//import org.collectionspace.services.common.query.IQueryManager;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;

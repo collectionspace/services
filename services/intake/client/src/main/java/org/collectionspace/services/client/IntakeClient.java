@@ -30,7 +30,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.common.context.ServiceContext;
+//import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.intake.IntakesCommonList;
 
 import org.jboss.resteasy.client.ProxyFactory;

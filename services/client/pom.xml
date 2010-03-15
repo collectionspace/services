@@ -22,11 +22,12 @@
             <artifactId>slf4j-log4j12</artifactId>
         </dependency>
 <!-- CollectionSpace dependencies -->
-        <dependency>
+<!--        <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
             <version>${project.version}</version>
-        </dependency>
+            <optional>true</optional>
+        </dependency> -->
 <!-- External dependencies -->        
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
@@ -73,17 +74,12 @@
             <version>1.0.01</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
             <version>1.6.1</version>
             <scope>provided</scope>
-        </dependency>
-
-        <!-- jboss -->
-
-        <!-- nuxeo -->
+        </dependency>        
     </dependencies>
 
     <build>

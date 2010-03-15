@@ -16,6 +16,11 @@
         <!-- CollectionSpace dependencies -->
         <dependency>
             <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.jaxb</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authentication.jaxb</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -77,7 +82,7 @@
             <groupId>javax.persistence</groupId>
             <artifactId>persistence-api</artifactId>
         </dependency>
-
+        
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
@@ -225,33 +230,22 @@
                         </goals>
                     </execution>
                 </executions>
-
                 <configuration>
                     <args>
                         <arg>-XtoString</arg>
                         <arg>-Xinject-listener-code</arg>
-
                         <!-- <arg>-Xcollection-setter-injector</arg>
                                 <arg>-Xfluent-api</arg> -->
                     </args>
                     <plugins>
                         <plugin>
-                            <groupId>
-                                org.jvnet.jaxb2_commons
-                            </groupId>
+                            <groupId>org.jvnet.jaxb2_commons</groupId>
                             <artifactId>basic</artifactId>
-                            <version>0.4.1</version>
                         </plugin>
                         <plugin>
-                            <groupId>
-                                org.jvnet.jaxb2-commons
-                            </groupId>
-                            <artifactId>
-                                property-listener-injector
-                            </artifactId>
-                            <version>1.0</version>
+                            <groupId>org.jvnet.jaxb2-commons</groupId>
+                            <artifactId>property-listener-injector</artifactId>
                         </plugin>
-
                     </plugins>
                     <!--generatePackage>
                      org.collectionspace.hello

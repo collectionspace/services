@@ -28,7 +28,7 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.common.context.ServiceContext;
+//import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.dimension.DimensionsCommonList;
 
 import org.jboss.resteasy.client.ProxyFactory;

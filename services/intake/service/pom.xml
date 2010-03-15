@@ -87,6 +87,7 @@
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-api</artifactId>
+            <version>1.5.1-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <artifactId>jboss-remoting</artifactId>

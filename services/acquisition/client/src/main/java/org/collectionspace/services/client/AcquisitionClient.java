@@ -4,7 +4,7 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.acquisition.AcquisitionsCommonList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.common.context.ServiceContext;
+//import org.collectionspace.services.common.context.ServiceContext;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;

@@ -29,7 +29,7 @@ import java.util.Properties;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
-import org.collectionspace.services.common.context.ServiceContext;
+//import org.collectionspace.services.common.context.ServiceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +39,13 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractServiceClientImpl implements CollectionSpaceClient {
 
     protected final Logger logger = LoggerFactory.getLogger(AbstractServiceClientImpl.class);
+    
+    /**
+     * The character used to separate the words in a part label
+     */
+    public static final String PART_LABEL_SEPERATOR = "_";
+    public static final String PART_COMMON_LABEL = "common";
+    
     private Properties properties = new Properties();
     private URL url;
     private HttpClient httpClient;
@@ -49,8 +56,8 @@ public abstract class AbstractServiceClientImpl implements CollectionSpaceClient
 
 	public String getCommonPartName(String servicePathComponent) {
 		return servicePathComponent
-		+ ServiceContext.PART_LABEL_SEPERATOR
-		+ ServiceContext.PART_COMMON_LABEL;
+		+ PART_LABEL_SEPERATOR
+		+ PART_COMMON_LABEL;
 	}
 
 	abstract public String getServicePathComponent();

@@ -29,6 +29,11 @@
         <!-- CollectionSpace Dependencies -->
         <dependency>
             <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.jaxb</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.acquisition.jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -42,7 +47,7 @@
             <artifactId>org.collectionspace.services.person.client</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        <!-- External dependencies -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
