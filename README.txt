@@ -1,1 +1,1 @@
-This change should only appear in the trunk.
+This change should was modified on the v0.5 branch. Revision was r1594.
