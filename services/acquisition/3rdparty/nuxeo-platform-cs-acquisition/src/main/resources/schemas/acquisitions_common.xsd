@@ -34,7 +34,6 @@
     <xs:element name="acquisitionProvisos" type="xs:string"/>
     <xs:element name="acquisitionReason" type="xs:string"/>
     <xs:element name="acquisitionReferenceNumber" type="xs:string"/>
-    <xs:element name="acquisitionSource" type="xs:string"/>
     <xs:element name="acquisitionSources">
         <xs:complexType>
             <xs:sequence>
