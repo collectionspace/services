@@ -84,20 +84,29 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         }
     }
 
-    @Override
-    public void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+	@Override
+	public void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc)
+			throws Exception {
 
-        DocumentModel docModel = wrapDoc.getWrappedObject();
-        String[] schemas = docModel.getDeclaredSchemas();
-        Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
-        for(String schema : schemas){
-            ObjectPartType partMeta = partsMetaMap.get(schema);
-            if(partMeta == null){
-                continue; //unknown part, ignore
-            }
-            extractPart(docModel, schema, partMeta);
-        }
-    }
+		DocumentModel docModel = wrapDoc.getWrappedObject();
+		String[] schemas = docModel.getDeclaredSchemas();
+		Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
+		for (String schema : schemas) {
+			ObjectPartType partMeta = partsMetaMap.get(schema);
+			if (partMeta == null) {
+				continue; // unknown part, ignore
+			}
+			Map<String, Object> unQObjectProperties = extractPart(docModel,
+					schema, partMeta);
+			Document doc = DocumentUtils.buildDocument(partMeta, schema,
+					unQObjectProperties);
+			if (logger.isDebugEnabled()) {
+				DocumentUtils.writeDocument(doc, System.out);
+			}
+			MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
+			ctx.addOutputPart(schema, doc, partMeta.getContent().getContentType());
+		}
+	}
 
     @Override
     public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
@@ -167,10 +176,12 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
      * @param partMeta metadata for the object to extract
      * @throws Exception
      */
-    protected void extractPart(DocumentModel docModel, String schema, ObjectPartType partMeta)
+    protected Map<String, Object> extractPart(DocumentModel docModel, String schema, ObjectPartType partMeta)
             throws Exception {
+    	Map<String, Object> result = null;
+    	
         MediaType mt = MediaType.valueOf(partMeta.getContent().getContentType());
-        if(mt.equals(MediaType.APPLICATION_XML_TYPE)){
+        if (mt.equals(MediaType.APPLICATION_XML_TYPE)){
             Map<String, Object> objectProps = docModel.getProperties(schema);
             //unqualify properties before sending the doc over the wire (to save bandwidh)
             //FIXME: is there a better way to avoid duplication of a collection?
@@ -180,13 +191,10 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
                 String unqProp = getUnQProperty(entry.getKey());
                 unQObjectProperties.put(unqProp, entry.getValue());
             }
-            Document doc = DocumentUtils.buildDocument(partMeta, schema, unQObjectProperties);
-            if(logger.isDebugEnabled()){
-                DocumentUtils.writeDocument(doc, System.out);
-            }
-            MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
-            ctx.addOutputPart(schema, doc, partMeta.getContent().getContentType());
+            result = unQObjectProperties;
         } //TODO: handle other media types
+        
+        return result;
     }
     
     public AuthorityRefList getAuthorityRefs(
