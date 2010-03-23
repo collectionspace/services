@@ -116,29 +116,62 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         allResourceIdsCreated.add(extractId(res));
     }
 
+
+    /*
+     * Tests to diagnose and verify the fixed status of CSPACE-1026,
+     * "Whitespace at certain points in payload cause failure"
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createFromXmlCambridge(String testName) throws Exception {
-        createFromXmlFile(testName, "./test-data/testCambridge.xml", true);
+        String newId = 
+            createFromXmlFile(testName, "./test-data/testCambridge.xml", true);
+        testSubmitRequest(newId);
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createFromXmlRFWS1(String testName) throws Exception {
-        createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp1.xml", false);
+        String newId =
+            createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp1.xml", false);
+        testSubmitRequest(newId);
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createFromXmlRFWS2(String testName) throws Exception {
-        createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp2.xml", false);
+        String newId =
+            createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp2.xml", false);
+        testSubmitRequest(newId);
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createFromXmlRFWS3(String testName) throws Exception {
-        createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp3.xml", false);
+        String newId =
+            createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp3.xml", false);
+        testSubmitRequest(newId);
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createFromXmlRFWS4(String testName) throws Exception {
-        createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp4.xml", false);
+        String newId =
+            createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp4.xml", false);
+        testSubmitRequest(newId);
+    }
+
+    /*
+     * Tests to diagnose and verify the fixed status of CSPACE-1248,
+     * "Wedged records created!" (i.e. records with child repeatable
+     * fields, which contain null values, can be successfully created
+     * but an error occurs on trying to retrieve those records).
+     */
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    public void createWithNullValueRepeatableField(String testName) throws Exception {
+        String newId =
+            createFromXmlFile(testName, "./target/test-classes/test-data/repfield_null1.xml", false);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Successfully created record with null value repeatable field.");
+            logger.debug("Attempting to retrieve just-created record ...");
+        }
+        // This test will fail until CSPACE-1248 is fixed:
+        // testSubmitRequest(newId);
     }
 
     /* (non-Javadoc)
@@ -682,15 +715,20 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      * Tests the code for manually submitting data that is used by several
      * of the methods above.
      */
+
     @Test(dependsOnMethods = {"create", "read"})
     public void testSubmitRequest() throws Exception {
+        testSubmitRequest(knownResourceId);
+    }
+
+    private void testSubmitRequest(String resourceId) throws Exception {
 
         // Expected status code: 200 OK
         final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
 
         // Submit the request to the service and store the response.
         String method = ServiceRequestType.READ.httpMethodName();
-        String url = getResourceURL(knownResourceId);
+        String url = getResourceURL(resourceId);
         int statusCode = submitRequest(method, url);
 
         // Check the status code of the response: does it match
@@ -852,7 +890,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         return "collectionobjects_naturalhistory";
     }
 
-    private void createFromXmlFile(String testName, String fileName, boolean useJaxb) throws Exception {
+    private String createFromXmlFile(String testName, String fileName, boolean useJaxb) throws Exception {
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
@@ -876,6 +914,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        allResourceIdsCreated.add(extractId(res));
+        String newId = extractId(res);
+        allResourceIdsCreated.add(newId);
+        return newId;
     }
 }
