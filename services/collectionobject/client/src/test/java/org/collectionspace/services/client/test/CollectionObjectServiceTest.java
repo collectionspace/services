@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
 /**
  * CollectionObjectServiceTest, carries out tests against a
  * deployed and running CollectionObject Service.
- * 
+ *
  * $LastChangedRevision$
  * $LastChangedDate$
  */
@@ -124,7 +124,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "testSubmitRequest"})
     public void createFromXmlCambridge(String testName) throws Exception {
-        String newId = 
+        String newId =
             createFromXmlFile(testName, "./test-data/testCambridge.xml", true);
         testSubmitRequest(newId);
     }
@@ -232,7 +232,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
     dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithEmptyEntityBody(String testName) throwsException {
-    
+
     // Perform setup.
     setupCreateWithEmptyEntityBody(testName);
 
@@ -258,7 +258,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
     dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithMalformedXml(String testName) throws Exception {
-    
+
     // Perform setup.
     setupCreateWithMalformedXml(testName);
 
@@ -284,7 +284,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
     dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithWrongXmlSchema(String testName) throws Exception {
-    
+
     // Perform setup.
     setupCreateWithWrongXmlSchema(testName);
 
@@ -433,28 +433,27 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupUpdate(testName);
 
+        // Read an existing resource that will be updated.
         ClientResponse<MultipartInput> res = updateRetrieve(testName, knownResourceId);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("got object to update with ID: " + knownResourceId);
-        }
+        // Extract its common part.
         MultipartInput input = (MultipartInput) res.getEntity();
         CollectionobjectsCommon collectionObject =
                 (CollectionobjectsCommon) extractPart(input,
                 client.getCommonPartName(), CollectionobjectsCommon.class);
         Assert.assertNotNull(collectionObject);
 
-        // Update the content of this resource.
+        // Change the content of one or more fields in the common part.
         collectionObject.setObjectNumber("updated-" + collectionObject.getObjectNumber());
         collectionObject.setObjectName("updated-" + collectionObject.getObjectName());
         if (logger.isDebugEnabled()) {
-            logger.debug("updated object");
+            logger.debug("sparse update that will be sent in update request:");
             logger.debug(objectAsXmlString(collectionObject,
                     CollectionobjectsCommon.class));
         }
 
+        // Send the changed resource to be updated.
         res = updateSend(testName, knownResourceId, collectionObject);
-
         int statusCode = res.getStatus();
         // Check the status code of the response: does it match the expected response(s)?
         if (logger.isDebugEnabled()) {
@@ -464,13 +463,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-
+        // Read the response and verify that the resource was correctly updated.
         input = (MultipartInput) res.getEntity();
         CollectionobjectsCommon updatedCollectionObject =
                 (CollectionobjectsCommon) extractPart(input,
                 client.getCommonPartName(), CollectionobjectsCommon.class);
         Assert.assertNotNull(updatedCollectionObject);
-
         Assert.assertEquals(updatedCollectionObject.getObjectName(),
                 collectionObject.getObjectName(),
                 "Data in updated object did not match submitted data.");
@@ -478,13 +476,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     }
 
     private ClientResponse<MultipartInput> updateRetrieve(String testName, String id) {
-        ClientResponse<MultipartInput> res =
-                client.read(id);
+        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
+        ClientResponse<MultipartInput> res = client.read(id);
         if (logger.isDebugEnabled()) {
             logger.debug("read in updateRetrieve for " + testName + " status = " + res.getStatus());
         }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
+        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS);
         if (logger.isDebugEnabled()) {
             logger.debug("got object to updateRetrieve for " + testName + " with ID: " + id);
         }
@@ -496,12 +493,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         MultipartOutput output = new MultipartOutput();
         OutputPart commonPart = output.addPart(collectionObject, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getCommonPartName());
-
         ClientResponse<MultipartInput> res = client.update(knownResourceId, output);
-        // Check the status code of the response: does it match the expected response(s)?
-        if (logger.isDebugEnabled()) {
-            logger.debug("updateSend for " + testName + ": status = " + res.getStatus());
-        }
         return res;
     }
 
@@ -524,6 +516,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
             logger.debug(testName + " got object to update with ID: " + knownResourceId);
         }
 
+        // Read an existing record for updating
         ClientResponse<MultipartInput> res = updateRetrieve(testName, knownResourceId);
 
         MultipartInput input = (MultipartInput) res.getEntity();
@@ -561,7 +554,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
     dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithEmptyEntityBody(String testName) throws Exception {
-    
+
     // Perform setup.
     setupUpdateWithEmptyEntityBody(testName);
 
@@ -613,7 +606,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
     dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithWrongXmlSchema(String testName) throws Exception {
-    
+
     // Perform setup.
     setupUpdateWithWrongXmlSchema(String testName);
 
@@ -904,10 +897,10 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         MultipartOutput multipart = null;
 
         if (useJaxb) {
-            multipart = createCollectionObjectInstanceFromXml(testName, 
+            multipart = createCollectionObjectInstanceFromXml(testName,
                     client.getCommonPartName(), fileName);
         } else {
-            multipart = createCollectionObjectInstanceFromRawXml(testName, 
+            multipart = createCollectionObjectInstanceFromRawXml(testName,
                     client.getCommonPartName(), fileName);
         }
         ClientResponse<Response> res = client.create(multipart);
