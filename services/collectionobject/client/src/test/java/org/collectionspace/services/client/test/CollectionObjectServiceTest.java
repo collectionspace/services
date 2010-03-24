@@ -121,35 +121,40 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      * Tests to diagnose and verify the fixed status of CSPACE-1026,
      * "Whitespace at certain points in payload cause failure"
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+        dependsOnMethods = {"create", "testSubmitRequest"})
     public void createFromXmlCambridge(String testName) throws Exception {
         String newId = 
             createFromXmlFile(testName, "./test-data/testCambridge.xml", true);
         testSubmitRequest(newId);
     }
 
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+        dependsOnMethods = {"create", "testSubmitRequest"})
     public void createFromXmlRFWS1(String testName) throws Exception {
         String newId =
             createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp1.xml", false);
         testSubmitRequest(newId);
     }
 
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+        dependsOnMethods = {"create", "testSubmitRequest"})
     public void createFromXmlRFWS2(String testName) throws Exception {
         String newId =
             createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp2.xml", false);
         testSubmitRequest(newId);
     }
 
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+        dependsOnMethods = {"create", "testSubmitRequest"})
     public void createFromXmlRFWS3(String testName) throws Exception {
         String newId =
             createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp3.xml", false);
         testSubmitRequest(newId);
     }
 
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+        dependsOnMethods = {"create", "testSubmitRequest"})
     public void createFromXmlRFWS4(String testName) throws Exception {
         String newId =
             createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp4.xml", false);
@@ -162,7 +167,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      * fields, which contain null values, can be successfully created
      * but an error occurs on trying to retrieve those records).
      */
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+        dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithNullValueRepeatableField(String testName) throws Exception {
         String newId =
             createFromXmlFile(testName, "./target/test-classes/test-data/repfield_null1.xml", false);
@@ -170,8 +176,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
             logger.debug("Successfully created record with null value repeatable field.");
             logger.debug("Attempting to retrieve just-created record ...");
         }
-        // This test will fail until CSPACE-1248 is fixed:
-        // testSubmitRequest(newId);
+        testSubmitRequest(newId);
     }
 
     /* (non-Javadoc)
