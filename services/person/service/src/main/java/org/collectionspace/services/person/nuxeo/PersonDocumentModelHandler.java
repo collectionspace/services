@@ -27,10 +27,12 @@ import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.person.PersonsCommon;
@@ -55,6 +57,11 @@ public class PersonDocumentModelHandler
         extends RemoteDocumentModelHandlerImpl<PersonsCommon, PersonsCommonList> {
 
     private final Logger logger = LoggerFactory.getLogger(PersonDocumentModelHandler.class);
+    /**
+     * Common part schema label
+     */
+    private static final String COMMON_PART_LABEL = "persons_common";
+    
     /**
      * person is used to stash JAXB object to use when handle is called
      * for Action.CREATE, Action.UPDATE or Action.GET
@@ -195,6 +202,20 @@ public class PersonDocumentModelHandler
         this.personList = personList;
     }
 
+    @Override
+    protected Map<String, Object> extractPart(DocumentModel docModel, String schema, ObjectPartType partMeta)
+            throws Exception {
+    	Map<String, Object> unQObjectProperties = super.extractPart(docModel, schema, partMeta);
+    	
+    	// Add the CSID to the common part
+    	if (partMeta.getLabel().equalsIgnoreCase(COMMON_PART_LABEL)) {
+	    	String csid = NuxeoUtils.extractId(docModel.getPathAsString());
+	    	unQObjectProperties.put("csid", csid);
+    	}
+    	
+    	return unQObjectProperties;
+    }
+    
     @Override
     public PersonsCommon extractCommonPart(DocumentWrapper wrapDoc)
             throws Exception {

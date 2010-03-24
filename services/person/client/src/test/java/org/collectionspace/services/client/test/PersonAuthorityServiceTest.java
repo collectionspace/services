@@ -549,6 +549,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(displayName, expectedDisplayName);
         
         // Update the shortName and verify the computed name is updated.
+        person.setCsid(null);
         person.setDisplayNameComputed(true);
         person.setForeName("updated-" + TEST_FORE_NAME);
         expectedDisplayName = 
@@ -1041,12 +1042,13 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(person);
 
         // Update the contents of this resource.
+        person.setCsid(null);
         person.setForeName("updated-" + person.getForeName());
         if(logger.isDebugEnabled()){
             logger.debug("to be updated Person");
             logger.debug(objectAsXmlString(person,
                 PersonsCommon.class));
-        }
+        }        
 
         // Submit the updated resource to the service and store the response.
         MultipartOutput output = new MultipartOutput();

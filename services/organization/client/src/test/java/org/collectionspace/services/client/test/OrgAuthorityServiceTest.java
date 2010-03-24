@@ -524,6 +524,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(displayName, expectedDisplayName);
         
         // Update the shortName and verify the computed name is updated.
+        organization.setCsid(null);
         organization.setDisplayNameComputed(true);
         organization.setShortName("updated-" + TEST_ORG_SHORTNAME);
         expectedDisplayName = 
@@ -1017,6 +1018,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(organization);
 
         // Update the contents of this resource.
+        organization.setCsid(null);
         organization.setShortName("updated-" + organization.getShortName());
         if(logger.isDebugEnabled()){
             logger.debug("to be updated Organization");
