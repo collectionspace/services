@@ -135,7 +135,7 @@
    -->
 
    <!-- collectionspace appender -->
-   <appender name="CSLOG" class="org.jboss.logging.appender.FileAppender">
+   <appender name="CSLOG" class="org.jboss.logging.appender.DailyRollingFileAppender">
       <errorHandler  class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
      <param name="Append" value="false"/>
      <param name="DatePattern" value="'.'yyyy-MM-dd"/>
@@ -161,7 +161,12 @@
     <category name="org.apache" additivity="true">
       <priority value="INFO"/>
    </category>
-   
+
+   <!-- enable catalina.core to debug spring bean configuration -->
+   <category name="org.apache.catalina.core" additivity="true">
+      <priority value="INFO"/>
+   </category>
+
       <!-- Limit JBoss categories
    <category name="org.jboss">
       <priority value="INFO"/>

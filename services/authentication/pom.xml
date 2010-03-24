@@ -11,7 +11,7 @@
     <artifactId>org.collectionspace.services.authentication</artifactId>
     <name>services.authentication</name>
     <packaging>pom</packaging>
-
+    <url>http://www.collectionspace.org</url>
     <properties>
     </properties>
 

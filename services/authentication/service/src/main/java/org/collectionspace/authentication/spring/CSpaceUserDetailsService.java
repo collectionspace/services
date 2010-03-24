@@ -63,6 +63,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * A CollectionSpace UserDetailsService for spring
+ * mockup code to cheat spring config reader...not used by Spring JaasAuthenticationProvider
  */
 //FIXME remove test/mockup code
 public class CSpaceUserDetailsService implements UserDetailsService {
@@ -72,11 +73,6 @@ public class CSpaceUserDetailsService implements UserDetailsService {
 
     public CSpaceUserDetailsService() {
         users.put("test", new User("test", "", true, true, true, true, auths));
-        users.put("valid", new User("valid", "", true, true, true, true, auths));
-        users.put("locked", new User("locked", "", true, true, true, false, auths));
-        users.put("disabled", new User("disabled", "", false, true, true, true, auths));
-        users.put("credentialsExpired", new User("credentialsExpired", "", true, true, false, true, auths));
-        users.put("expired", new User("expired", "", true, false, true, true, auths));
     }
 
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException {

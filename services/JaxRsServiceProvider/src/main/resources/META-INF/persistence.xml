@@ -10,8 +10,8 @@
         <class>org.collectionspace.services.account.AccountTenant</class>
         <class>org.collectionspace.services.account.Status</class>
         <class>org.collectionspace.services.authentication.User</class>
-        <class>org.collectionspace.services.authentication.Role</class>
-        <class>org.collectionspace.services.authentication.UserRole</class>
+        <class>org.collectionspace.services.authorization.Role</class>
+        <class>org.collectionspace.services.authorization.UserRole</class>
 
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>

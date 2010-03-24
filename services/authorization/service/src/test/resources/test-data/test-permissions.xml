@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:permission_config_list xmlns:ns2="http://collectionspace.org/services/authorization">
+    <permission>
+        <resourceName>accounts</resourceName>
+        <action>CREATE</action>
+        <action>READ</action>
+        <action>UPDATE</action>
+        <action>DELETE</action>
+        <role>ROLE_ADMINISTRATOR</role>
+        <effect>PERMIT</effect>
+    </permission>
+    <permission>
+        <resourceName>collectionobjects</resourceName>
+        <action>CREATE</action>
+        <action>READ</action>
+        <action>UPDATE</action>
+        <action>DELETE</action>
+        <role>ROLE_USERS</role>
+        <role>ROLE_ADMINISTRATOR</role>
+        <effect>PERMIT</effect>
+    </permission>
+</ns2:permission_config_list>

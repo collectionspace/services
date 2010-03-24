@@ -47,23 +47,33 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.collectionspace.authentication.spring;
+
 import java.security.Principal;
+import java.security.acl.Group;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 import org.springframework.security.authentication.jaas.AuthorityGranter;
 
 /**
- *
+ * CSpaceAuthorityGranter maps a given prinicpal to role names
  * @author 
  */
 public class CSpaceAuthorityGranter implements AuthorityGranter {
- 
+
     public Set<String> grant(Principal principal) {
-        Set<String> rtnSet = new HashSet<String>();
-
-
-        return rtnSet;
+        Set<String> authorities = new HashSet<String>();
+        if (principal instanceof Group) {
+            Group g = (Group) principal;
+            Enumeration members = g.members();
+            while (members.hasMoreElements()) {
+                Principal p = (Principal) members.nextElement();
+                authorities.add(p.getName());
+            }
+        } else {
+            authorities.add(principal.getName());
+        }
+        return authorities;
     }
 }

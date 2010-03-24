@@ -7,20 +7,64 @@
         spring security namespace for CS service layer
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:s="http://www.springframework.org/schema/security"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:sec="http://www.springframework.org/schema/security"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
-    <s:http use-expressions="true" realm="org.collectionspace.services">
-        <s:intercept-url pattern="/**" access="permitAll" />
-        <s:http-basic />
-        <s:logout />
-        <s:anonymous enabled="false"/>
-    </s:http>
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <s:authentication-manager>
-        <s:authentication-provider ref="jaasAuthenticationProvider" user-service-ref="userDetailsService"/>
-    </s:authentication-manager>
+    <!--sec:http use-expressions="true" realm="org.collectionspace.services">
+        <sec:http-basic />
+        <sec:logout />
+        <sec:anonymous enabled="false"/>
+    </sec:http-->
+
+    <sec:global-method-security >
+        <sec:expression-handler ref="expressionHandler"/>
+    </sec:global-method-security>
+
+
+    <bean id="springSecurityFilterChain" class="org.springframework.security.web.FilterChainProxy">
+        <sec:filter-chain-map path-type="ant">
+            <sec:filter-chain pattern="/**"
+                              filters="securityPersistenceFilter,basicAuthenticationFilter,logoutFilter,exTranslationFilter,filterInvocationInterceptor"/>
+        </sec:filter-chain-map>
+    </bean>
+
+    <bean id="securityPersistenceFilter" class="org.springframework.security.web.context.SecurityContextPersistenceFilter"/>
+
+    <bean id="basicAuthenticationFilter"
+          class="org.springframework.security.web.authentication.www.BasicAuthenticationFilter">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="authenticationEntryPoint" ref="basicAuthenticationEntryPoint"/>
+    </bean>
+
+    <bean id="basicAuthenticationEntryPoint"
+          class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
+        <property name="realmName" value="org.collectionspace.services"/>
+    </bean>
+
+    <bean id="logoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter">
+        <constructor-arg value="/"/>
+        <constructor-arg>
+            <list>
+                <bean class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="exTranslationFilter" class="org.springframework.security.web.access.ExceptionTranslationFilter">
+        <property name="authenticationEntryPoint" ref="preAuthenticatedProcessingFilterEntryPoint"/>
+    </bean>
+
+    <bean id="preAuthenticatedProcessingFilterEntryPoint"
+          class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint"/>
+
+
+    <sec:authentication-manager alias="authenticationManager">
+        <sec:authentication-provider ref="jaasAuthenticationProvider" user-service-ref="userDetailsService"/>
+    </sec:authentication-manager>
 
     <bean id="jaasAuthenticationProvider"
           class="org.springframework.security.authentication.jaas.JaasAuthenticationProvider">
@@ -45,4 +89,33 @@
 
     <bean id="userDetailsService" class="org.collectionspace.authentication.spring.CSpaceUserDetailsService">
     </bean>
+
+    <bean id="filterInvocationInterceptor" class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="accessDecisionManager" ref="httpRequestAccessDecisionManager"/>
+        <!--property name="securityMetadataSource" ref="cspaceMetadataSource"/-->
+        <property name="securityMetadataSource">
+            <sec:filter-security-metadata-source>
+                <sec:intercept-url pattern="/**" access="ROLE_USERS"/>
+            </sec:filter-security-metadata-source>
+        </property>
+    </bean>
+
+    <bean id="httpRequestAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+        <property name="allowIfAllAbstainDecisions" value="false"/>
+        <property name="decisionVoters">
+            <list>
+                <ref bean="roleVoter"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="roleVoter" class="org.springframework.security.access.vote.RoleVoter"/>
+
+    <!--bean id="cspaceMetadataSource" class="org.collectionspace.services.authorization.spring.CSpaceSecurityMetadataSource">
+        <property name="urlProperties">
+            <util:properties location="classpath:urls.properties" />
+        </property>
+    </bean-->
+
 </beans>

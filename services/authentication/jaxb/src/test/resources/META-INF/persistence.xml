@@ -3,8 +3,6 @@
 http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_1_0.xsd" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:orm="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <persistence-unit name="org.collectionspace.services.authentication">
     <class>org.collectionspace.services.authentication.User</class>
-    <class>org.collectionspace.services.authentication.Role</class>
-    <class>org.collectionspace.services.authentication.UserRole</class>
         <properties>
             <property name="hibernate.ejb.cfgfile" value="hibernate.cfg.xml"/>
 

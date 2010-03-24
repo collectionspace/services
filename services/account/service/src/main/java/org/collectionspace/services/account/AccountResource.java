@@ -51,6 +51,7 @@ import org.collectionspace.services.common.storage.StorageClient;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @Path("/accounts")
 @Consumes("application/xml")
@@ -96,6 +97,7 @@ public class AccountResource
     }
 
     @POST
+    @PreAuthorize("hasPermission('account', 'account', 'create')")
     public Response createAccount(AccountsCommon input) {
         try {
             ServiceContext ctx = createServiceContext(input);
@@ -184,7 +186,7 @@ public class AccountResource
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             DocumentFilter myFilter = handler.createDocumentFilter();
             myFilter.setPagination(queryParams);
-            myFilter.setQueryParams(queryParams);           
+            myFilter.setQueryParams(queryParams);
             handler.setDocumentFilter(myFilter);
             getStorageClient(ctx).getFiltered(ctx, handler);
             accountList = (AccountsCommonList) handler.getCommonPartList();

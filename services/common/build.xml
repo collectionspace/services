@@ -150,11 +150,21 @@
 
     <target name="undeploy"
             description="undeploy common elements from ${jboss.server.cspace}">
+        <antcall target="undeploy_spring" />
         <copy tofile="${jboss.server.cspace}/conf/jboss-log4j.xml"
               file="${jboss.server.cspace}/conf/jboss-log4j.xml.org"
               overwrite="true" failonerror="false" />
         <delete failonerror="false" file="${jboss.server.cspace}/conf/jboss-log4j-release.xml"/>
         <delete failonerror="false" dir="${jboss.server.cspace}/cspace/config/services"/>
+    </target>
+
+
+    <target name="undeploy_spring"
+            description="undeploy spring binaries from ${jboss.server.cspace}">
+        <delete>
+            <fileset dir="${jboss.server.cspace}/lib" includes="org.springframework.*.jar"/>
+            <fileset dir="${jboss.server.cspace}/lib" includes="spring-security*.jar"/>
+        </delete>
     </target>
 
     <target name="dist_jpa"

@@ -33,6 +33,7 @@ import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.jacc.PolicyContext;
 import javax.security.jacc.PolicyContextException;
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.authentication.CSpaceTenant;
 
 import org.collectionspace.services.common.ClientType;
@@ -124,14 +125,14 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         ServiceBindingUtils.getPartsMetadata(getServiceBinding(), objectPartMap);
         return objectPartMap;
     }
-    
+
     public List<PropertyType> getPropertiesForPart(String partLabel) {
-    	Map<String, ObjectPartType> partMap = getPartsMetadata();
-    	ObjectPartType part = partMap.get(partLabel);
-    	if(part==null) {
-    		throw new RuntimeException("No such part found: "+partLabel);
-    	}
-    	return part.getProperties();
+        Map<String, ObjectPartType> partMap = getPartsMetadata();
+        ObjectPartType part = partMap.get(partLabel);
+        if (part == null) {
+            throw new RuntimeException("No such part found: " + partLabel);
+        }
+        return part.getProperties();
     }
 
     public List<String> getPropertyValuesForPart(String partLabel, String propName) {
@@ -144,11 +145,11 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     }
     
     public List<PropertyType> getCommonPartProperties() {
-    	return getPropertiesForPart(getCommonPartLabel());
+        return getPropertiesForPart(getCommonPartLabel());
     }
 
     public List<String> getCommonPartPropertyValues(String propName) {
-    	return getPropertyValuesForPart(getCommonPartLabel(), propName);
+        return getPropertyValuesForPart(getCommonPartLabel(), propName);
     }
 
     @Override
@@ -248,53 +249,19 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     public void setProperty(String name, Object o) {
         properties.put(name, o);
     }
-    private static final String SUBJECT_CONTEXT_KEY = "javax.security.auth.Subject.container";
+
 
     private String retrieveTenantId() throws UnauthorizedException {
 
-        String tenantId = null;
-        Subject caller = null;
-        Set<Group> groups = null;
-        try {
-            caller = (Subject) PolicyContext.getContext(SUBJECT_CONTEXT_KEY);
-            if (caller == null) {
-                //logger.warn("security not enabled...");
-                return tenantId;
-            }
-            groups = caller.getPrincipals(Group.class);
-            if (groups != null && groups.size() == 0) {
-                //TODO: find out why subject is not null
-                if (logger.isDebugEnabled()) {
-                    logger.debug("no tenant(s) found!");
-                }
-                return tenantId;
-            }
-        } catch (PolicyContextException pce) {
-            String msg = "Could not retrieve principal information";
-            logger.error(msg, pce);
-            throw new UnauthorizedException(msg);
-        }
-        for (Group g : groups) {
-            if ("Tenants".equals(g.getName())) {
-                Enumeration members = g.members();
-                while (members.hasMoreElements()) {
-                    CSpaceTenant tenant = (CSpaceTenant) members.nextElement();
-                    tenantId = tenant.getId();
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("found tenant id=" + tenant.getId()
-                                + " name=" + tenant.getName());
-                    }
-                }
-            }
-        }
-        //TODO: if a user is associated with more than one tenants, the tenant
-        //id should be matched with sent over the wire
-        if (tenantId == null) {
+        String[] tenantIds = AuthN.get().getTenantIds();
+        if (tenantIds.length == 0) {
             String msg = "Could not find tenant context";
             logger.error(msg);
             throw new UnauthorizedException(msg);
         }
-        return tenantId;
+        //TODO: if a user is associated with more than one tenants, the tenant
+        //id should be matched with the one sent over the wire
+        return tenantIds[0];
     }
 
     @Override
@@ -307,8 +274,8 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         if (DocumentHandler.class.isAssignableFrom(c)) {
             docHandler = (DocumentHandler) c.newInstance();
         } else {
-            throw new IllegalArgumentException("Not of type " +
-                    DocumentHandler.class.getCanonicalName());
+            throw new IllegalArgumentException("Not of type "
+                    + DocumentHandler.class.getCanonicalName());
         }
         docHandler.setServiceContext(this);
         return docHandler;

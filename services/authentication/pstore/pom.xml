@@ -50,7 +50,7 @@
     </dependencies>
 
     <build>
-        <finalName>cspace-services-authentication-client</finalName>
+        <finalName>cspace-services-authentication-pstore</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>

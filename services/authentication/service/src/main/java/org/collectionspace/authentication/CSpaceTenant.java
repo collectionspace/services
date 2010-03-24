@@ -42,7 +42,7 @@ public class CSpaceTenant implements Group, Cloneable {
     private static final long serialVersionUID = 1L;
     private String name;
     private String id;
-    private HashMap members = new HashMap(3);
+    private HashMap<Principal, Principal> members = new HashMap<Principal, Principal>();
 
     public CSpaceTenant(String name, String id) {
         if(name == null || id == null) {

@@ -41,6 +41,7 @@ import org.collectionspace.services.person.PersonAuthorityResource;
 import javax.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Set;
+import org.collectionspace.services.common.security.SecurityInterceptor;
 
 /**
  * CollectionSpaceJaxRsApplication, the root application
@@ -57,6 +58,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
     private Set<Class<?>> empty = new HashSet<Class<?>>();
 
     public CollectionSpaceJaxRsApplication() {
+        singletons.add(new SecurityInterceptor());
         singletons.add(new AccountResource());
         singletons.add(new CollectionObjectResource());
         singletons.add(new IDResource());

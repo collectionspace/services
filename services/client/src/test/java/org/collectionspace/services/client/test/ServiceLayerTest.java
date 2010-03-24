@@ -143,7 +143,7 @@ public class ServiceLayerTest {
         }
     }
 
-    @Test
+//    @Test
     public void serviceSecure() {
         String url = serviceClient.getBaseURL() + "collectionobjects";
         GetMethod method = new GetMethod(url);

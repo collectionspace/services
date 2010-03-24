@@ -3,7 +3,7 @@
 <!--
     CollectionSpace default (security) identity provider schema (XSD)
 
-    Entity(s)  : users, roles, users_roles
+    Entity(s)  : users
     Used for:
 
     $LastChangedRevision: 916 $
@@ -84,110 +84,5 @@
         </xs:complexType>
     </xs:element>
 
-    <xs:element name="role">
-        <xs:complexType>
-            <xs:annotation>
-                <xs:appinfo>
-                    <hj:entity>
-                        <orm:table name="roles"/>
-                    </hj:entity>
-                </xs:appinfo>
-            </xs:annotation>
-            <xs:sequence>
-                <xs:element name="rolename" type="xs:string" minOccurs="1" maxOccurs="1">
-                    <xs:annotation>
-                        <xs:appinfo>
-                            <hj:id>
-                                <orm:column name="rolename" length="200" nullable="false"/>
-                            </hj:id>
-                        </xs:appinfo>
-                    </xs:annotation>
-                </xs:element>
-                <xs:element name="rolegroup" type="xs:string" minOccurs="1" maxOccurs="1">
-                    <xs:annotation>
-                        <xs:appinfo>
-                            <hj:basic>
-                                <orm:column name="rolegroup" nullable="false"/>
-                            </hj:basic>
-                        </xs:appinfo>
-                    </xs:annotation>
-                </xs:element>
-                <xs:element name="createdAt" type="xs:dateTime">
-                    <xs:annotation>
-                        <xs:appinfo>
-                            <hj:basic>
-                                <orm:column name="created_at" nullable="false"/>
-                            </hj:basic>
-                        </xs:appinfo>
-                    </xs:annotation>
-                </xs:element>
-                <xs:element name="updatedAt" type="xs:dateTime">
-                    <xs:annotation>
-                        <xs:appinfo>
-                            <hj:basic>
-                                <orm:column name="updated_at" />
-                            </hj:basic>
-                        </xs:appinfo>
-                    </xs:annotation>
-                </xs:element>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-
-    <xs:element name="user_role">
-        <xs:complexType>
-            <xs:annotation>
-                <xs:appinfo>
-                    <hj:entity>
-                        <orm:table name="users_roles">
-                            <orm:unique-constraint>
-                                <!-- combined length should be < 1000 bytes -->
-                                <orm:column-name>username</orm:column-name>
-                                <orm:column-name>rolename</orm:column-name>
-                            </orm:unique-constraint>
-                        </orm:table>
-                    </hj:entity>
-                </xs:appinfo>
-            </xs:annotation>
-            <xs:sequence>
-                <xs:element name="username" type="xs:string" minOccurs="1" maxOccurs="1">
-                    <xs:annotation>
-                        <xs:appinfo>
-                            <hj:basic>
-                                <orm:column name="username" length="128" nullable="false"/>
-                            </hj:basic>
-                        </xs:appinfo>
-                    </xs:annotation>
-                </xs:element>
-                <xs:element name="rolename" type="xs:string" minOccurs="1" maxOccurs="1">
-                    <xs:annotation>
-                        <xs:appinfo>
-                            <hj:basic>
-                                <orm:column name="rolename" length="200" nullable="false"/>
-                            </hj:basic>
-                        </xs:appinfo>
-                    </xs:annotation>
-                </xs:element>
-                <xs:element name="createdAt" type="xs:dateTime">
-                    <xs:annotation>
-                        <xs:appinfo>
-                            <hj:basic>
-                                <orm:column name="created_at" nullable="false"/>
-                            </hj:basic>
-                        </xs:appinfo>
-                    </xs:annotation>
-                </xs:element>
-                <xs:element name="updatedAt" type="xs:dateTime">
-                    <xs:annotation>
-                        <xs:appinfo>
-                            <hj:basic>
-                                <orm:column name="updated_at" />
-                            </hj:basic>
-                        </xs:appinfo>
-                    </xs:annotation>
-                </xs:element>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
 </xs:schema>
 

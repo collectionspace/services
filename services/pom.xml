@@ -15,6 +15,7 @@
     <modules>
         <module>jaxb</module>
         <module>authentication</module>
+        <module>authorization</module>
         <module>common</module>
         <module>client</module>
         <module>account</module>
@@ -30,7 +31,7 @@
         <module>dimension</module>
         <module>contact</module>
         <module>JaxRsServiceProvider</module>
-        <module>sdk</module>
+        <!--module>sdk</module-->
         <module>IntegrationTests</module>
         <module>PerformanceTests</module>
         <module>security</module>
@@ -52,19 +53,19 @@
                         <jbossHome>${jboss.dir}</jbossHome>
                     </configuration>
                 </plugin>
-                
+
                 <plugin>
                     <groupId>org.jvnet.hyperjaxb3</groupId>
                     <artifactId>maven-hyperjaxb3-plugin</artifactId>
                     <version>0.5.4</version>
                 </plugin>
-                
+
                 <plugin>
                     <groupId>org.jvnet.jaxb2.maven2</groupId>
                     <artifactId>maven-jaxb2-plugin</artifactId>
                     <version>0.7.2</version>
                 </plugin>
-                
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>

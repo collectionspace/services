@@ -128,12 +128,14 @@
     <target name="gen_ddl"
             description="generate service-specific tables(s), indices, etc.">
         <ant antfile="authentication/build.xml" target="gen_ddl" inheritAll="false"/>
+        <ant antfile="authorization/build.xml" target="gen_ddl" inheritAll="false"/>
         <ant antfile="account/build.xml" target="gen_ddl" inheritAll="false"/>
     </target>
 
     <target name="create_db"
             description="create service-specific tables(s), indices, etc.">
         <ant antfile="authentication/build.xml" target="create_db" inheritAll="false"/>
+        <ant antfile="authorization/build.xml" target="create_db" inheritAll="false"/>
         <ant antfile="account/build.xml" target="create_db" inheritAll="false"/>
         <ant antfile="id/build.xml" target="create_db" inheritAll="false"/>
     </target>
@@ -142,6 +144,7 @@
     <target name="deploy" depends="install"
             description="deploy services in ${jboss.server.cspace}">
         <ant antfile="authentication/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="authorization/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="common/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="account/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="relation/build.xml" target="deploy" inheritAll="false"/>
@@ -173,6 +176,7 @@
         <ant antfile="relation/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="account/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="common/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="authorization/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="authentication/build.xml" target="undeploy" inheritAll="false"/>
     </target>
 
@@ -185,6 +189,8 @@
     <target name="dist" depends="doc"
             description="create distribution for services">
         <ant antfile="authentication/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="authorization/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="account/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="common/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="relation/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="id/build.xml" target="dist" inheritAll="false"/>
@@ -213,7 +219,9 @@
         <ant antfile="organization/build.xml" target="dist_installer" inheritAll="false"/>
         <ant antfile="person/build.xml" target="dist_installer" inheritAll="false"/>
         <!--
+        <ant antfile="account/build.xml" target="dist_installer" inheritAll="false"/>
         <ant antfile="common/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="authorization/build.xml" target="dist_installer" inheritAll="false"/>
         <ant antfile="authentication/build.xml" target="dist_installer" inheritAll="false"/>
         <ant antfile="relation/build.xml" target="dist_installer" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="dist_installer" inheritAll="false"/>

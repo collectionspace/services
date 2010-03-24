@@ -16,11 +16,12 @@
 <!--        <jboss.version>4.2.3.GA</jboss.version>
         <jboss.ejb.version>3.0</jboss.ejb.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> -->
-        <spring.security.version>3.0.1.RELEASE</spring.security.version>
+        <spring.security.version>3.0.2.RELEASE</spring.security.version>
     </properties>
 
     <dependencies>
-        <!-- keep slf4j dependencies on the top -->
+
+        <!-- slf4j not available due to classloading issues running in system classpath  -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -36,6 +37,13 @@
             <artifactId>commons-logging</artifactId>
             <version>1.1.1</version>
         </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.14</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- utilities -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
