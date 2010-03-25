@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Loan In schema (XSD)
+    
+    Entity  : Loanin
+    Part    : Common
+    Used for: Nuxeo EP core document type
+
+    $LastChangedRevision: 1442 $
+    $LastChangedDate: 2010-02-25 14:22:30 -0800 (Thu, 25 Feb 2010) $
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/loanin/"
+    xmlns="http://collectionspace.org/loanin/"
+    targetNamespace="http://collectionspace.org/loanin/"
+    version="0.1">
+    
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Loans+In+Schema -->
+
+    <!--  Loan In Information Group -->
+    <xs:element name="loanInNumber" type="xs:string"/>
+    <xs:element name="lenders">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="lender" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="lendersAuthorizer" type="xs:string"/>
+    <xs:element name="lendersAuthorizationDate" type="xs:string"/>
+    <xs:element name="lendersContact" type="xs:string"/>
+    <xs:element name="loanInContact" type="xs:string"/>
+    <xs:element name="loanInConditions" type="xs:string"/>
+    <xs:element name="loanInDate" type="xs:string"/>
+    <xs:element name="loanReturnDate" type="xs:string"/>
+    <xs:element name="loanRenewalApplicationDate" type="xs:string"/>
+    <xs:element name="loanInNote" type="xs:string"/>
+    <xs:element name="loanPurpose" type="xs:string"/>
+    
+</xs:schema>
