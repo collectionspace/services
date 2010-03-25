@@ -151,6 +151,7 @@
         <ant antfile="id/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="loanin/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="vocabulary/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="organization/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="person/build.xml" target="deploy" inheritAll="false"/>
@@ -170,6 +171,7 @@
         <ant antfile="contact/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="dimension/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="acquisition/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="loanin/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="id/build.xml" target="undeploy" inheritAll="false"/>
@@ -196,6 +198,7 @@
         <ant antfile="id/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="loanin/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="vocabulary/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="organization/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="person/build.xml" target="dist" inheritAll="false"/>
@@ -225,6 +228,7 @@
         <ant antfile="authentication/build.xml" target="dist_installer" inheritAll="false"/>
         <ant antfile="relation/build.xml" target="dist_installer" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="dist_installer" inheritAll="false"/>
+        <ant antfile="loanin/build.xml" target="dist_installer" inheritAll="false"/>
         <ant antfile="acquisition/build.xml" target="dist_installer" inheritAll="false"/>
         <ant antfile="JaxRsServiceProvider/build.xml" target="dist_installer" inheritAll="false"/>
 -->        

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Loan In schema (XSD)
+    
+    Entity  : Loanin 
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+
+    $LastChangedRevision$
+    $LastChangedDate$
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/loanin"
+  xmlns="http://collectionspace.org/services/loanin"
+  targetNamespace="http://collectionspace.org/services/loanin"
+  version="0.1"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Loans+In+Schema -->    
+    
+    <!-- loanin -->
+    <xs:element name="loansin_common">
+        <xs:complexType>
+            <xs:sequence>                
+                <!--  Loan In Information Group -->
+                <xs:element name="loanInNumber" type="xs:string"/>
+                <xs:element name="lenders" type="lenderList"/>
+                <xs:element name="lendersAuthorizer" type="xs:string"/>
+                <xs:element name="lendersAuthorizationDate" type="xs:string"/>
+                <xs:element name="lendersContact" type="xs:string"/>
+                <xs:element name="loanInContact" type="xs:string"/>
+                <xs:element name="loanInConditions" type="xs:string"/>
+                <xs:element name="loanInDate" type="xs:string"/>
+                <xs:element name="loanReturnDate" type="xs:string"/>
+                <xs:element name="loanRenewalApplicationDate" type="xs:string"/>
+                <xs:element name="loanInNote" type="xs:string"/>
+                <xs:element name="loanPurpose" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="lenderList">
+        <xs:sequence>
+            <xs:element name="lender" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <!-- loansin records, as in nuxeo repository -->
+    <xs:element name="loansin-common-list">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="loanin-list-item" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="loanInNumber" type="xs:string"
+                                minOccurs="1" />
+                            <xs:element name="loanReturnDate" type="xs:string"
+                                minOccurs="1" />
+                            <!-- uri to retrive details -->
+                            <xs:element name="uri" type="xs:anyURI"
+                                minOccurs="1" />
+                            <xs:element name="csid" type="xs:string"
+                                minOccurs="1" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+</xs:schema>
+

@@ -28,6 +28,7 @@
         <module>id</module>
         <module>collectionobject</module>
         <module>intake</module>
+        <module>loanin</module>
         <module>dimension</module>
         <module>contact</module>
         <module>JaxRsServiceProvider</module>
