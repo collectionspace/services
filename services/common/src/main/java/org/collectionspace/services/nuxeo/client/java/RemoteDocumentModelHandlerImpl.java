@@ -45,6 +45,7 @@ import org.collectionspace.services.common.vocabulary.RefNameUtils;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -204,8 +205,8 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
     }
     
     public AuthorityRefList getAuthorityRefs(
-    		DocumentWrapper<DocumentModel> docWrapper,
-    		List<String> authRefFields) {
+                DocumentWrapper<DocumentModel> docWrapper,
+    		List<String> authRefFields) throws PropertyException {
     	AuthorityRefList authRefList = new AuthorityRefList();
         try {
             DocumentModel docModel = docWrapper.getWrappedObject();
@@ -213,32 +214,39 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
             	authRefList.getAuthorityRefItem();
 
             for(String field:authRefFields){
-        		String refName = (String)docModel.getPropertyValue(field);
-        		if(refName==null)
-        			continue;
+                String refName = (String)docModel.getPropertyValue(field);
+                if(refName==null)
+                    continue;
             	try{
-            		RefNameUtils.AuthorityTermInfo termInfo =
-            			RefNameUtils.parseAuthorityTermInfo(refName);
-                	AuthorityRefList.AuthorityRefItem ilistItem = 
-                		new AuthorityRefList.AuthorityRefItem();
-                	ilistItem.setRefName(refName);
-                	ilistItem.setAuthDisplayName(termInfo.inAuthority.displayName);
-                	ilistItem.setItemDisplayName(termInfo.displayName);
-                	ilistItem.setSourceField(field);
-                	ilistItem.setUri(termInfo.getRelativeUri());
+                    RefNameUtils.AuthorityTermInfo termInfo =
+                        RefNameUtils.parseAuthorityTermInfo(refName);
+                    AuthorityRefList.AuthorityRefItem ilistItem =
+                        new AuthorityRefList.AuthorityRefItem();
+                    ilistItem.setRefName(refName);
+                    ilistItem.setAuthDisplayName(termInfo.inAuthority.displayName);
+                    ilistItem.setItemDisplayName(termInfo.displayName);
+                    ilistItem.setSourceField(field);
+                    ilistItem.setUri(termInfo.getRelativeUri());
                     list.add(ilistItem);
             	} catch( Exception e ) {
+                    // FIXME: Do we need to throw this Exception here?
                     if (logger.isDebugEnabled()) {
                         logger.debug("Caught exception in getAuthorityRefs", e);
                     }
             	}
             }
+        } catch (PropertyException pe) {
+            String msg =
+                "Attempted to retrieve value for invalid or missing authority field. " +
+                "Check authority field properties in tenant bindings.";
+            logger.warn(msg, pe);
+            throw pe;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in getAuthorityRefs", e);
             }
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to retrieve authority references").type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return authRefList;
