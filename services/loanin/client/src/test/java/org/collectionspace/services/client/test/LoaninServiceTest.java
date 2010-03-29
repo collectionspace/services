@@ -30,6 +30,8 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.client.LoaninClient;
 import org.collectionspace.services.loanin.LoansinCommon;
 import org.collectionspace.services.loanin.LoansinCommonList;
+import org.collectionspace.services.loanin.LenderList;
+
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -616,6 +618,13 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         LoansinCommon loanin = new LoansinCommon();
         loanin.setLoanInNumber(loanInNumber);
         loanin.setLoanReturnDate(returnDate);
+        LenderList lenderList = new LenderList();
+        lenderList.getLender().add(
+            "urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth):person:name(Harry Lender)'Harry Lender'");
+        lenderList.getLender().add(
+            "urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth):person:name(Sally Lender)'Sally Lender'");
+        loanin.setLenders(lenderList);
+        loanin.setLoanPurpose("For Surfboards of the 1960s exhibition.");
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(loanin, MediaType.APPLICATION_XML_TYPE);

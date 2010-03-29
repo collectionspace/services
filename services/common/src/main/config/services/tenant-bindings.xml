@@ -135,6 +135,12 @@
                 <service:part id="1" control_group="Managed"
                               versionable="true" auditable="false"
                               label="loansin_common" updated="" order="1">
+                    <service:properties>
+                    	<!-- Need to handle repeating ref fields, like "lenders" -->
+                        <types:item><types:key>authRef</types:key><types:value>lendersAuthorizer</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>lendersContact</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>loanInContact</types:value></types:item>
+					</service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/loanin"
