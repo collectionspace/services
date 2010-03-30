@@ -49,6 +49,7 @@
  */
 package org.collectionspace.services.authorization;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -102,14 +103,22 @@ public class AuthZ {
      * addPermissions add permissions from given permission configuration
      * @param permission configuration
      */
-    public void addPermissions(PermissionConfig pConfig) {
-        List<String> principals = pConfig.getRole();
-        List<String> users = pConfig.getUser();
-        principals.addAll(users);
-        List<ActionType> actions = pConfig.getAction();
-        for (ActionType action : actions) {
-            URIResourceImpl uriRes = new URIResourceImpl(pConfig.getResourceName(),
-                    action);
+    public void addPermissions(Permission perm,
+            List<PermissionRole> permRoles) {
+        List<String> principals = new ArrayList<String>();
+        for (PermissionRole permRole : permRoles) {
+            if (!perm.getCsid().equals(permRole.getPermissionId())) {
+                throw new IllegalArgumentException("permission ids do not"
+                        + " match role=" + permRole.getRoleName()
+                        + " permission=" + perm.getCsid());
+            }
+            //assuming permrole belongs to the same perm
+            principals.add(permRole.getRoleName());
+        }
+        List<PermissionAction> permActions = perm.getAction();
+        for (PermissionAction permAction : permActions) {
+            URIResourceImpl uriRes = new URIResourceImpl(perm.getResourceName(),
+                    permAction.getName());
             addPermission(uriRes, principals.toArray(new String[0]));
         }
     }

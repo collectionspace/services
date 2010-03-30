@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:permissions_roles_list xmlns:ns2="http://collectionspace.org/services/authorization">
+    <permissionRole>
+        <permissionId>1</permissionId>
+        <roleName>ROLE_USERS</roleName>
+    </permissionRole>
+    <permissionRole>
+        <permissionId>1</permissionId>
+        <roleName>ROLE_ADMINISTRATOR</roleName>
+    </permissionRole>
+    <permissionRole>
+        <permissionId>2</permissionId>
+        <roleName>ROLE_USERS</roleName>
+    </permissionRole>
+    <permissionRole>
+        <permissionId>2</permissionId>
+        <roleName>ROLE_ADMINISTRATOR</roleName>
+    </permissionRole>
+</ns2:permissions_roles_list>

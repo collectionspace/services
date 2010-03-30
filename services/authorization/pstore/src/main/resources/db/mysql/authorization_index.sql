@@ -7,3 +7,5 @@ use cspace;
 CREATE INDEX index_rolename ON roles (rolegroup);
 CREATE INDEX index_username ON users_roles (username);
 CREATE INDEX index_rolename ON users_roles (rolename);
+CREATE INDEX index_permission_id ON permissions_roles (permission_id);
+CREATE INDEX index_rolename ON permissions_roles (rolename);
