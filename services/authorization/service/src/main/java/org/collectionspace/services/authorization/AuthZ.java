@@ -103,17 +103,19 @@ public class AuthZ {
      * addPermissions add permissions from given permission configuration
      * @param permission configuration
      */
+    //FIXME this method should be in the restful web service resource of authz
     public void addPermissions(Permission perm,
             List<PermissionRole> permRoles) {
         List<String> principals = new ArrayList<String>();
         for (PermissionRole permRole : permRoles) {
             if (!perm.getCsid().equals(permRole.getPermissionId())) {
                 throw new IllegalArgumentException("permission ids do not"
-                        + " match role=" + permRole.getRoleName()
+                        + " match role=" + permRole.getRoleId()
                         + " permission=" + perm.getCsid());
             }
             //assuming permrole belongs to the same perm
-            principals.add(permRole.getRoleName());
+            //FIXME should use role name
+            principals.add(permRole.getRoleId());
         }
         List<PermissionAction> permActions = perm.getAction();
         for (PermissionAction permAction : permActions) {

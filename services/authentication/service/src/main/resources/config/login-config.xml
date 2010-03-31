@@ -145,7 +145,7 @@ $Revision: 64598 $
                 select passwd from users where username=?
             </module-option>
             <module-option name="rolesQuery">
-                select rolename, 'Roles' from users_roles where username=?
+                 select r.rolename, 'Role' from roles as r, users_roles as ur where ur.username=? and ur.role_id=r.csid
             </module-option>
             <module-option name="tenantsQuery">
                 select t.id, t.name, 'Tenants' from accounts_common as a, accounts_tenants as at, tenants as t where a.userid=? and a.csid = at.TENANTS_ACCOUNTSCOMMON_CSID and at.tenant_id = t.id

@@ -116,11 +116,13 @@ public class AuthorizationGenTest extends AbstractAuthorizationTestImpl {
         ArrayList<PermissionRole> prl = new ArrayList<PermissionRole>();
         PermissionRole pr = new PermissionRole();
         pr.setPermissionId(id);
-        pr.setRoleName("ROLE_USERS");
+        //FIXME should using role id
+        pr.setRoleId("ROLE_USERS");
         prl.add(pr);
         PermissionRole pr1 = new PermissionRole();
         pr1.setPermissionId(id);
-        pr1.setRoleName("ROLE_ADMINISTRATOR");
+        //FIXME shoudl use role id
+        pr1.setRoleId("ROLE_ADMINISTRATOR");
         prl.add(pr1);
         return prl;
     }

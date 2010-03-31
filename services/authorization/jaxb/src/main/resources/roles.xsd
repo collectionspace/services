@@ -54,7 +54,11 @@
             <xs:documentation>Role definition in CollectionSpace</xs:documentation>
             <xs:appinfo>
                 <hj:entity>
-                    <orm:table name="roles"/>
+                    <orm:table name="roles">
+                        <orm:unique-constraint>
+                            <orm:column-name>rolename</orm:column-name>
+                        </orm:unique-constraint>
+                    </orm:table>
                 </hj:entity>
             </xs:appinfo>
         </xs:annotation>
@@ -62,9 +66,9 @@
             <xs:element name="roleName" type="xs:string" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
                     <xs:appinfo>
-                        <hj:id>
+                        <hj:basic>
                             <orm:column name="rolename" length="200" nullable="false"/>
-                        </hj:id>
+                        </hj:basic>
                     </xs:appinfo>
                 </xs:annotation>
             </xs:element>
@@ -105,6 +109,15 @@
                 </xs:annotation>
             </xs:element>
         </xs:sequence>
+        <xs:attribute name="csid" type="xs:string">
+            <xs:annotation>
+                <xs:appinfo>
+                    <hj:id>
+                        <orm:column name="csid" length="128" nullable="false"/>
+                    </hj:id>
+                </xs:appinfo>
+            </xs:annotation>
+        </xs:attribute>
     </xs:complexType>
 
 

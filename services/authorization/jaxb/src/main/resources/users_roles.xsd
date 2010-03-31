@@ -58,7 +58,7 @@
                         <orm:unique-constraint>
                             <!-- combined length should be < 1000 bytes -->
                             <orm:column-name>username</orm:column-name>
-                            <orm:column-name>rolename</orm:column-name>
+                            <orm:column-name>role_id</orm:column-name>
                         </orm:unique-constraint>
                     </orm:table>
                 </hj:entity>
@@ -74,11 +74,11 @@
                     </xs:appinfo>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="roleName" type="xs:string" minOccurs="1" maxOccurs="1">
+            <xs:element name="roleId" type="xs:string" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
                     <xs:appinfo>
                         <hj:basic>
-                            <orm:column name="rolename" length="200" nullable="false"/>
+                            <orm:column name="role_id" length="128" nullable="false"/>
                         </hj:basic>
                     </xs:appinfo>
                 </xs:annotation>
