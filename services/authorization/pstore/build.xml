@@ -158,6 +158,7 @@
              userid="${db.user}"
              password="${db.user.password}"
              src="${db.script.dir}/authorization.sql"
+             onerror="continue"
              >
             <classpath>
                 <pathelement path="${db.driver.jar}"/>
