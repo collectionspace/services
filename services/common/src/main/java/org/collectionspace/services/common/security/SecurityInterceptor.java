@@ -85,7 +85,7 @@ public class SecurityInterceptor implements PreProcessInterceptor {
             logger.debug("received " + httpMethod + " on " + uriPath);
         }
         AuthZ authZ = AuthZ.get();
-        CSpaceResource res = new URIResourceImpl(uriPath, httpMethod);
+//        CSpaceResource res = new URIResourceImpl(uriPath, httpMethod);
 //        if (!authZ.isAccessAllowed(res)) {
 //            logger.error("Access to " + res.getId() + " is NOT allowed to " +
 //                    " user=" + AuthN.get().getUserId());
@@ -93,10 +93,10 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 //                    Response.Status.FORBIDDEN).entity(uriPath + " " + httpMethod).type("text/plain").build();
 //            throw new WebApplicationException(response);
 //        }
-        if(logger.isDebugEnabled()) {
-            logger.debug("Access to " + res.getId() + " is allowed to " +
-                    " user=" + AuthN.get().getUserId());
-        }
+//        if(logger.isDebugEnabled()) {
+//            logger.debug("Access to " + res.getId() + " is allowed to " +
+//                    " user=" + AuthN.get().getUserId());
+//        }
         return null;
     }
 }
