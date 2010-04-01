@@ -104,15 +104,6 @@
             <version>1.1.GA</version>
         </dependency>
 
-        <!-- dependencies on spring security & framework are runtime deps only -->
-        <!-- the following list is kept to make sure domain has these packages -->
-        <!-- in the cspace/lib directory -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-core</artifactId>
-            <version>${spring.security.version}</version>
-            <scope>provided</scope>
-        </dependency>
 
     </dependencies>
 
