@@ -39,6 +39,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.OrgAuthorityJAXBSchema;
 import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
@@ -50,13 +51,13 @@ import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
-import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.contact.ContactJAXBSchema;
 import org.collectionspace.services.contact.nuxeo.ContactDocumentModelHandler;
+import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.organization.nuxeo.OrganizationDocumentModelHandler;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -181,6 +182,65 @@ public class OrgAuthorityResource extends AbstractCollectionSpaceResourceImpl {
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Create failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
+    }
+
+
+    @GET
+    @Path("urn:cspace:name({specifier})")
+    public MultipartOutput getOrgAuthorityByName(@PathParam("specifier") String specifier) {
+        String idValue = null;
+        if (specifier == null) {
+            logger.error("getOrgAuthority: missing name!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "get failed on OrgAuthority (missing specifier)").type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        String whereClause =
+        	OrgAuthorityJAXBSchema.ORGAUTHORITIES_COMMON+
+        	":"+OrgAuthorityJAXBSchema.DISPLAY_NAME+
+        	"='"+specifier+"'";
+        // We only get a single doc - if there are multiple,
+        // it is an error in use.
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("getOrgAuthority with name=" + specifier);
+        } 
+        MultipartOutput result = null;
+        try {
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+            DocumentHandler handler = createDocumentHandler(ctx);
+            DocumentFilter myFilter = new DocumentFilter(whereClause, 0, 1);
+            handler.setDocumentFilter(myFilter);
+            getRepositoryClient(ctx).get(ctx, handler);
+            result = (MultipartOutput) ctx.getOutput();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getOrgAuthority", dnfe);
+            }
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Get failed on OrgAuthority spec=" + specifier).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getOrgAuthority", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        if (result == null) {
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Get failed, the requested OrgAuthority spec:" + specifier + ": was not found.").type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return result;
     }
 
     @GET
@@ -480,6 +540,62 @@ public class OrgAuthorityResource extends AbstractCollectionSpaceResourceImpl {
             throw new WebApplicationException(response);
         }
         return organizationObjectList;
+    }
+
+    @GET
+    @Path("urn:cspace:name({specifier})/items")
+    @Produces("application/xml")
+    public OrganizationsCommonList getOrganizationListByAuthName(
+    		@PathParam("specifier") String parentSpecifier,
+            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,            
+            @Context UriInfo ui) {
+    	OrganizationsCommonList personObjectList = new OrganizationsCommonList();
+        try {
+            String whereClause =
+            	OrgAuthorityJAXBSchema.ORGAUTHORITIES_COMMON+
+            	":"+OrgAuthorityJAXBSchema.DISPLAY_NAME+
+            	"='"+parentSpecifier+"'";
+            // Need to get an Authority by name
+            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+            String parentcsid = 
+            	getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
+
+            ctx = MultipartServiceContextFactory.get().createServiceContext(null, getItemServiceName());
+            DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
+            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+            DocumentFilter myFilter = new DocumentFilter();
+            myFilter.setPagination(queryParams);
+
+            // Add the where clause "organizations_common:inAuthority='" + parentcsid + "'"
+            myFilter.setWhereClause(OrganizationJAXBSchema.ORGANIZATIONS_COMMON + ":" +
+            		OrganizationJAXBSchema.IN_AUTHORITY + "='" + parentcsid + "'");
+            
+            // AND organizations_common:displayName LIKE '%partialTerm%'
+            if (partialTerm != null && !partialTerm.isEmpty()) {
+            	String ptClause = "AND " +
+            	OrganizationJAXBSchema.ORGANIZATIONS_COMMON + ":" +
+            	OrganizationJAXBSchema.DISPLAY_NAME +
+            		" LIKE " +
+            		"'%" + partialTerm + "%'";
+            	myFilter.appendWhereClause(ptClause);
+            }
+            
+            handler.setDocumentFilter(myFilter);
+            getRepositoryClient(ctx).getFiltered(ctx, handler);
+            personObjectList = (OrganizationsCommonList) handler.getCommonPartList();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception in getOrganizationListByAuthName", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return personObjectList;
     }
 
     @PUT

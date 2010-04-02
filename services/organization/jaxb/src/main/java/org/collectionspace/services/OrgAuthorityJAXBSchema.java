@@ -8,6 +8,7 @@ package org.collectionspace.services;
  *
  */
 public interface OrgAuthorityJAXBSchema {
+	final static String ORGAUTHORITIES_COMMON = "orgauthorities_common";
 	final static String DISPLAY_NAME = "displayName";
 	final static String REF_NAME = "refName";
 	final static String VOCAB_TYPE = "vocabType";

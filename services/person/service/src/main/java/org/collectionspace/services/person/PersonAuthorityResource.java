@@ -557,7 +557,7 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
             	PersonAuthorityJAXBSchema.PERSONAUTHORITIES_COMMON+
             	":"+PersonAuthorityJAXBSchema.DISPLAY_NAME+
             	"='"+parentSpecifier+"'";
-            // Need to get an Authoirty by name
+            // Need to get an Authority by name
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             String parentcsid = 
             	getRepositoryClient(ctx).findDocCSID(ctx, whereClause);

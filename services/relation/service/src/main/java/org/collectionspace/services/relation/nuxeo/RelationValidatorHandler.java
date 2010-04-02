@@ -7,7 +7,7 @@ import org.collectionspace.services.common.document.DocumentHandler.Action;
 
 public class RelationValidatorHandler implements ValidatorHandler {
 
-	@Override
+//	@Override
 	public void validate(Action action, ServiceContext ctx)
 			throws InvalidDocumentException {
 		// TODO Auto-generated method stub

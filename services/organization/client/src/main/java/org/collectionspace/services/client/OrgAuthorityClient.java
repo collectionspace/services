@@ -1,5 +1,6 @@
 package org.collectionspace.services.client;
 
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.contact.ContactsCommonList;
@@ -91,6 +92,15 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
     }
 
     /**
+     * @param name
+     * @return
+     * @see org.collectionspace.services.client.OrgAuthorityProxy#readByName(java.lang.String)
+     */
+    public ClientResponse<MultipartInput> readByName(String name) {
+        return orgAuthorityProxy.readByName(name);
+    }
+
+    /**
      * @param orgAuthority
      * @return
      * @see org.collectionspace.services.client.OrgAuthorityProxy#createOrgAuthority(org.collectionspace.hello.OrgAuthority)
@@ -125,6 +135,14 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
      */
     public ClientResponse<OrganizationsCommonList> readItemList(String vcsid) {
         return orgAuthorityProxy.readItemList(vcsid);
+    }
+
+    /**
+     * @return
+     * @see org.collectionspace.services.client.OrgAuthorityProxy#readItemListForNamedAuthority()
+     */
+    public ClientResponse<OrganizationsCommonList> readItemListForNamedAuthority(String specifier) {
+        return orgAuthorityProxy.readItemListForNamedAuthority(specifier);
     }
 
     /**

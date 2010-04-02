@@ -72,6 +72,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     private final String TEST_ORG_SHORTNAME = "Test Org";
     private final String TEST_ORG_FOUNDING_PLACE = "Anytown, USA";
     private String knownResourceId = null;
+    private String knownResourceDisplayName = null;
     private String knownResourceRefName = null;
     private String knownItemResourceId = null;
     private String knownContactResourceId = null;
@@ -128,6 +129,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         // for additional tests below.
         if (knownResourceId == null){
             knownResourceId = newID;
+            knownResourceDisplayName = displayName;
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
@@ -392,6 +394,36 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
             throw new RuntimeException(e);
         }
     }
+
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+            groups = {"read"}, dependsOnGroups = {"create"})
+        public void readByName(String testName) throws Exception {
+
+            // Perform setup.
+            setupRead();
+            
+            // Submit the request to the service and store the response.
+            ClientResponse<MultipartInput> res = client.readByName(knownResourceDisplayName);
+            int statusCode = res.getStatus();
+
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if(logger.isDebugEnabled()){
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            //FIXME: remove the following try catch once Aron fixes signatures
+            try {
+                MultipartInput input = (MultipartInput) res.getEntity();
+                OrgauthoritiesCommon orgAuthority = (OrgauthoritiesCommon) extractPart(input,
+                        client.getCommonPartName(), OrgauthoritiesCommon.class);
+                Assert.assertNotNull(orgAuthority);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
 
 /*
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
@@ -753,7 +785,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
                         item.getDisplayName());
                 logger.debug(testName + ": list-item[" + i + "] URI=" +
                         item.getUri());
-                readItemList(csid);
+                readItemList(csid, null);
                 i++;
             }
         }
@@ -761,10 +793,15 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
     @Test(groups = {"readList"}, dependsOnMethods = {"readList"})
     public void readItemList() {
-        readItemList(knownResourceId);
+        readItemList(knownResourceId, null);
     }
 
-    private void readItemList(String vcsid) {
+    @Test(groups = {"readList"}, dependsOnMethods = {"readItemList"})
+    public void readItemListByAuthorityName() {
+        readItemList(null, knownResourceDisplayName);
+    }
+
+    private void readItemList(String vcsid, String name) {
 
         final String testName = "readItemList";
 
@@ -772,8 +809,17 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
-        ClientResponse<OrganizationsCommonList> res =
-                client.readItemList(vcsid);
+        ClientResponse<OrganizationsCommonList> res = null;
+        
+        if(vcsid!= null) {
+	        // Submit the request to the service and store the response.
+	        res = client.readItemList(vcsid);
+        } else if(name!= null) {
+    	        // Submit the request to the service and store the response.
+   	        res = client.readItemListForNamedAuthority(name);
+        } else {
+        	Assert.fail("readItemList passed null csid and name!");
+        }
         OrganizationsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
@@ -889,7 +935,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     // Success outcomes
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"update"}, dependsOnGroups = {"create"})
+        groups = {"update"}, dependsOnGroups = {"read", "readList"})
     public void update(String testName) throws Exception {
 
         // Perform setup.
