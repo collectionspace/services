@@ -8,27 +8,24 @@
         <artifactId>org.collectionspace.services.dimension</artifactId>
         <version>0.6-SNAPSHOT</version>
     </parent>
-    
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.dimension.jaxb</artifactId>
     <name>services.dimension.jaxb</name>
-    
+
     <dependencies>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-            <version>2.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.jvnet.jaxb2-commons</groupId>
             <artifactId>property-listener-injector</artifactId>
-            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>org.jvnet.jaxb2_commons</groupId>
             <artifactId>runtime</artifactId>
-            <version>0.4.1.4</version>
         </dependency>
     </dependencies>
     
@@ -39,65 +36,6 @@
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <dependencies>
-               <!-- javax.activation.DataSource provider is required by spec -->
-                    <dependency>
-                        <groupId>javax.activation</groupId>
-                        <artifactId>activation</artifactId>
-                        <version>1.1</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.sun.xml.bind</groupId>
-                        <artifactId>jaxb-impl</artifactId>
-                        <version>2.1.9</version>
-                     </dependency>
-                </dependencies>
-                <configuration>
-                    <args>
-                        <arg>-XtoString</arg>
-                        <arg>-Xinject-listener-code</arg>
-
-                     <!-- <arg>-Xcollection-setter-injector</arg>
-                                <arg>-Xfluent-api</arg> -->
-                    </args>
-                    <plugins>
-                        <plugin>
-                            <groupId>
-                           org.jvnet.jaxb2_commons
-                            </groupId>
-                            <artifactId>basic</artifactId>
-                            <version>0.4.1</version>
-                        </plugin>
-                        <plugin>
-                            <groupId>
-                           org.jvnet.jaxb2-commons
-                            </groupId>
-                            <artifactId>
-                           property-listener-injector
-                            </artifactId>
-                            <version>1.0</version>
-                        </plugin>
-
-                    </plugins>
-                    <!--generatePackage>
-                     org.collectionspace.hello
-                    </generatePackage-->
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.0.2</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
             </plugin>
         </plugins>
     </build>

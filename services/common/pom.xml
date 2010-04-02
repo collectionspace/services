@@ -241,46 +241,6 @@
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
-                <!-- version is very important here as we want to explicitly
-                use jaxb2 plugin only and not jaxb2 bundled with hyperjaxb3
-                that does not allow to invoke generate from base plugin -->
-                <version>0.7.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <args>
-                        <arg>-XtoString</arg>
-                        <arg>-Xinject-listener-code</arg>
-                        <!-- <arg>-Xcollection-setter-injector</arg>
-                                <arg>-Xfluent-api</arg> -->
-                    </args>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.jvnet.jaxb2_commons</groupId>
-                            <artifactId>basic</artifactId>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.jvnet.jaxb2-commons</groupId>
-                            <artifactId>property-listener-injector</artifactId>
-                        </plugin>
-                    </plugins>
-                    <!--generatePackage>
-                     org.collectionspace.hello
-                    </generatePackage-->
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
             </plugin>
         </plugins>
     </build>

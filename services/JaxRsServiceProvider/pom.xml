@@ -12,13 +12,13 @@
     <artifactId>org.collectionspace.services.jaxrs.provider</artifactId>
     <name>services.jaxrs.provider</name>
     <packaging>war</packaging>
-    
+
     <properties>
         <cs.release>0.5</cs.release>
         <spring.version>3.0.0.RELEASE</spring.version>
         <spring.security.version>3.0.2.RELEASE</spring.security.version>
     </properties>
-    
+
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -48,7 +48,7 @@
             <version>1.2.14</version>
             <scope>provided</scope>
         </dependency>
-<!-- CollectionSpace dependencies -->
+        <!-- CollectionSpace dependencies -->
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authorization.service</artifactId>
@@ -65,6 +65,11 @@
             <artifactId>org.collectionspace.services.account.service</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!--dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.authorization-mgt.service</artifactId>
+            <version>${project.version}</version>
+        </dependency-->
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.collectionobject.service</artifactId>
@@ -351,7 +356,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.0</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -366,14 +370,7 @@
                     </archive>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
+
         </plugins>
     </build>
 </project>
