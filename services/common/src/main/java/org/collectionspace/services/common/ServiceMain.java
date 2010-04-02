@@ -4,8 +4,13 @@
 package org.collectionspace.services.common;
 
 import java.util.Hashtable;
+import java.util.List;
+
 import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.tenant.TenantBindingType;
+import org.collectionspace.services.common.types.PropertyItemType;
+import org.collectionspace.services.common.types.PropertyType;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +65,7 @@ public class ServiceMain {
     private void initialize() throws Exception {
         setServerRootDir();
         readConfig();
+        propagateConfiguredProperties();
         if(getClientType().equals(ClientType.JAVA)){
             nuxeoConnector = NuxeoConnector.getInstance();
             nuxeoConnector.initialize(
@@ -90,6 +96,17 @@ public class ServiceMain {
 
         tenantBindingConfigReader = new TenantBindingConfigReaderImpl(getServerRootDir());
         getTenantBindingConfigReader().read();
+    }
+    
+    private void propagateConfiguredProperties() {
+    	List<PropertyType> repoPropListHolder = 
+    		servicesConfigReader.getConfiguration().getRepositoryClient().getProperties();
+    	if(repoPropListHolder != null && !repoPropListHolder.isEmpty()) {
+        	List<PropertyItemType> propList = repoPropListHolder.get(0).getItem();
+        	if(propList != null && !propList.isEmpty()) {
+       			tenantBindingConfigReader.setDefaultPropertiesOnTenants(propList, true);
+        	}
+    	}
     }
 
     void retrieveAllWorkspaceIds() throws Exception {

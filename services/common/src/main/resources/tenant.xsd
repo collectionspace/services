@@ -41,6 +41,7 @@
     -->
     <xs:complexType name="TenantBindingType">
         <xs:sequence>
+						<xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="serviceBindings" type="service:ServiceBindingType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <!-- tenant id, a UUID -->

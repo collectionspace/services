@@ -182,7 +182,7 @@ public class AccountResource
             ServiceContext ctx = createServiceContext((AccountsCommonList) null);
             DocumentHandler handler = createDocumentHandler(ctx);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            DocumentFilter myFilter = handler.createDocumentFilter();
+            DocumentFilter myFilter = handler.createDocumentFilter(ctx);
             myFilter.setPagination(queryParams);
             myFilter.setQueryParams(queryParams);
             handler.setDocumentFilter(myFilter);

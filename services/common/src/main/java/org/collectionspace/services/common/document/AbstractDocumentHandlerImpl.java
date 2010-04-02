@@ -44,7 +44,7 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
 
     private final Logger logger = LoggerFactory.getLogger(AbstractDocumentHandlerImpl.class);
     private Map<String, Object> properties = new HashMap<String, Object>();
-    private DocumentFilter docFilter = new DocumentFilter();
+    private DocumentFilter docFilter = null;
     private ServiceContext serviceContext;
 
     public AbstractDocumentHandlerImpl() {
@@ -77,7 +77,7 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     }
 
     @Override
-    public abstract DocumentFilter createDocumentFilter();
+    public abstract DocumentFilter createDocumentFilter(ServiceContext ctx);
 
     /**
      * @return the DocumentFilter

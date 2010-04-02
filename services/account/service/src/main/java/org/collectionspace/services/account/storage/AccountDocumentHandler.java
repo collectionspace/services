@@ -145,8 +145,12 @@ public class AccountDocumentHandler
     }
 
     @Override
-    public DocumentFilter createDocumentFilter() {
-        return new AccountJpaFilter();
+    public DocumentFilter createDocumentFilter(ServiceContext ctx) {
+    	DocumentFilter  filter = new AccountJpaFilter();
+    	filter.setPageSize(
+    			ctx.getServiceBindingPropertyValue(
+    					DocumentFilter.PAGE_SIZE_DEFAULT_PROPERTY));
+    	return filter;
     }
 
     private void setTenant(AccountsCommon account) {

@@ -195,6 +195,12 @@ public interface ServiceContext<IT, OT> {
      * setProperty sets user-defined property with given name
      */
     public void setProperty(String name, Object o);
+    
+    /**
+     * getServiceBindingPropertyValue returns configured property
+     */
+    public String getServiceBindingPropertyValue(String propName);
+
 
 
     /**

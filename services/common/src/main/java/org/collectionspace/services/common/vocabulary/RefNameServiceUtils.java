@@ -68,7 +68,7 @@ public class RefNameServiceUtils {
     	ArrayList<String> docTypes = new ArrayList<String>(); 
     	StringBuilder whereClause = new StringBuilder();
     	for(ServiceBindingType sb:servicebindings) {
-    		List<String> authRefFields = ServiceBindingUtils.getPropertyValues(sb, AUTH_REF_PROP);
+    		List<String> authRefFields = ServiceBindingUtils.getAllPartsPropertyValues(sb, AUTH_REF_PROP);
     		String docType = sb.getObject().getName();
     		docTypes.add(docType);
     		for(String field:authRefFields) {

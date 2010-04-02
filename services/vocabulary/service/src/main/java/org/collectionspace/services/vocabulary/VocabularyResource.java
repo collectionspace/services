@@ -206,7 +206,7 @@ public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             DocumentHandler handler = createDocumentHandler(ctx);
-            DocumentFilter myFilter = new DocumentFilter();
+            DocumentFilter myFilter = handler.createDocumentFilter(ctx); //new DocumentFilter();
             myFilter.setPagination(queryParams);
             String nameQ = queryParams.getFirst("refName");
             if (nameQ != null) {
@@ -413,7 +413,7 @@ public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getItemServiceName());
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            DocumentFilter myFilter = new DocumentFilter();
+            DocumentFilter myFilter = handler.createDocumentFilter(ctx); //new DocumentFilter();
             myFilter.setPagination(queryParams);
             // "vocabularyitems_common:inVocabulary='" + parentcsid + "'");
             myFilter.setWhereClause(

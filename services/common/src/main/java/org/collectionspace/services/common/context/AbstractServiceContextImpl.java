@@ -38,6 +38,7 @@ import org.collectionspace.authentication.CSpaceTenant;
 
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.config.PropertyItemUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.ValidatorHandler;
@@ -126,25 +127,30 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         return objectPartMap;
     }
 
-    public List<PropertyType> getPropertiesForPart(String partLabel) {
-        Map<String, ObjectPartType> partMap = getPartsMetadata();
-        ObjectPartType part = partMap.get(partLabel);
-        if (part == null) {
-            throw new RuntimeException("No such part found: " + partLabel);
-        }
-        return part.getProperties();
+    public List<PropertyItemType> getPropertiesForPart(String partLabel) {
+    	Map<String, ObjectPartType> partMap = getPartsMetadata();
+    	ObjectPartType part = partMap.get(partLabel);
+    	if(part==null) {
+    		throw new RuntimeException("No such part found: "+partLabel);
+    	}
+    	List<PropertyType> propNodeList = part.getProperties();
+    	return propNodeList.isEmpty()?null:propNodeList.get(0).getItem();
     }
 
     public List<String> getPropertyValuesForPart(String partLabel, String propName) {
-    	List<PropertyType> allProps = getPropertiesForPart(partLabel);
-    	return ServiceBindingUtils.getPropertyValuesByName(allProps, propName);
+    	List<PropertyItemType> allProps = getPropertiesForPart(partLabel);
+    	return PropertyItemUtils.getPropertyValuesByName(allProps, propName);
     }
 
-    public List<String> getPropertyValues(String propName) {
-        return ServiceBindingUtils.getPropertyValues(getServiceBinding(), propName);
+    public List<String> getAllPartsPropertyValues(String propName) {
+        return ServiceBindingUtils.getAllPartsPropertyValues(getServiceBinding(), propName);
     }
     
-    public List<PropertyType> getCommonPartProperties() {
+    public String getServiceBindingPropertyValue(String propName) {
+        return ServiceBindingUtils.getPropertyValue(getServiceBinding(), propName);
+    }
+    
+    public List<PropertyItemType> getCommonPartProperties() {
         return getPropertiesForPart(getCommonPartLabel());
     }
 

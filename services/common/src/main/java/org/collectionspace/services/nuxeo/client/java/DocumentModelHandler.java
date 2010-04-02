@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.nuxeo.client.java;
 
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.AbstractMultipartDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
@@ -114,8 +115,12 @@ public abstract class DocumentModelHandler<T, TL>
     public abstract void setCommonPartList(TL obj);
 
     @Override
-    public DocumentFilter createDocumentFilter() {
-        return new NuxeoDocumentFilter();
+    public DocumentFilter createDocumentFilter(ServiceContext ctx) {
+    	DocumentFilter filter = new NuxeoDocumentFilter();
+    	filter.setPageSize(
+    			ctx.getServiceBindingPropertyValue(
+    					DocumentFilter.PAGE_SIZE_DEFAULT_PROPERTY));
+    	return filter;
     }
 
 }

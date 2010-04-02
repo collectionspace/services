@@ -127,7 +127,7 @@ public class JpaStorageClientImpl implements StorageClient {
             throw new IllegalArgumentException(
                     "JpaStorageClient.get: handler is missing");
         }
-        DocumentFilter docFilter = handler.getDocumentFilter();
+        DocumentFilter docFilter = handler.createDocumentFilter(ctx);
         if (docFilter == null) {
             throw new IllegalArgumentException(
                     "JpaStorageClient.get: handler has no Filter specified");
@@ -212,7 +212,7 @@ public class JpaStorageClientImpl implements StorageClient {
             throw new IllegalArgumentException(
                     "JpaStorageClient.getFiltered: handler is missing");
         }
-        DocumentFilter docFilter = handler.getDocumentFilter();
+        DocumentFilter docFilter = handler.createDocumentFilter(ctx);
         if (docFilter == null) {
             throw new IllegalArgumentException(
                     "JpaStorageClient.getFiltered: handler has no Filter specified");

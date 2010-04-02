@@ -33,6 +33,7 @@ import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
  */
 public class DocumentFilter {
 
+    public static final String PAGE_SIZE_DEFAULT_PROPERTY = "pageSizeDefault";
     public static final String PAGE_SIZE_PARAM = "pgSz";
     public static final String START_PAGE_PARAM = "pgNum";
     public static final int DEFAULT_PAGE_SIZE_INIT = 40;
@@ -103,16 +104,10 @@ public class DocumentFilter {
         if (list != null) {
             pageSizeStr = list.get(0);
         }
+        setPageSize(pageSizeStr);
         list = queryParams.remove(START_PAGE_PARAM);
         if (list != null) {
             startPageStr = list.get(0);
-        }
-        if (pageSizeStr != null) {
-            try {
-                pageSize = Integer.valueOf(pageSizeStr);
-            } catch (NumberFormatException e) {
-                throw new NumberFormatException("Bad value for: " + PAGE_SIZE_PARAM);
-            }
         }
         if (startPageStr != null) {
             try {
@@ -203,6 +198,19 @@ public class DocumentFilter {
      */
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
+    }
+
+    /**
+     * @param pageSize the max number of items to return for list requests
+     */
+    public void setPageSize(String pageSizeStr) {
+        if (pageSizeStr != null) {
+            try {
+                pageSize = Integer.valueOf(pageSizeStr);
+            } catch (NumberFormatException e) {
+                throw new NumberFormatException("Bad value for: " + PAGE_SIZE_PARAM);
+            }
+        }
     }
 
     /**

@@ -229,9 +229,11 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * createDocumentFilter is a factory method to create a document
      * filter that is relevant to be used with this document handler
      * and corresponding storage client
+     * 
+     * @param ctx ServiceContext used to fetch default pagination, etc.
      * @return
      */
-    public DocumentFilter createDocumentFilter();
+    public DocumentFilter createDocumentFilter(ServiceContext ctx);
 
     /**
      * getDocumentFilter

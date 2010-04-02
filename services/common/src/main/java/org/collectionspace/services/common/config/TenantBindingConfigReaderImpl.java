@@ -36,6 +36,8 @@ import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.tenant.TenantBindingType;
 import org.collectionspace.services.common.tenant.TenantBindingConfig;
+import org.collectionspace.services.common.types.PropertyItemType;
+import org.collectionspace.services.common.types.PropertyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -258,5 +260,22 @@ public class TenantBindingConfigReaderImpl
 
     private RepositoryClient getRepositoryClient(String clientName) {
         return RepositoryClientFactory.getInstance().getClient(clientName);
+    }
+    
+    public void setDefaultPropertiesOnTenants(List<PropertyItemType> propList,
+    		boolean propagateToServices) {
+    	// For each tenant, set properties in list that are not already set
+       	if(propList == null || propList.isEmpty())
+       		return;
+    	for(TenantBindingType tenant:tenantBindings.values()) {
+    		for(PropertyItemType prop:propList){
+    			TenantBindingUtils.setPropertyValue(tenant,
+    		    		prop, TenantBindingUtils.SET_PROP_IF_MISSING );
+    		}
+    		if(propagateToServices) {
+    			TenantBindingUtils.propagatePropertiesToServices(tenant, 
+    					TenantBindingUtils.SET_PROP_IF_MISSING);
+    		}
+    	}
     }
 }

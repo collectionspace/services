@@ -300,7 +300,7 @@ public class OrgAuthorityResource extends AbstractCollectionSpaceResourceImpl {
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             DocumentHandler handler = createDocumentHandler(ctx);
-            DocumentFilter myFilter = new DocumentFilter();
+            DocumentFilter myFilter = handler.createDocumentFilter(ctx); //new DocumentFilter();
             myFilter.setPagination(queryParams);
             String nameQ = queryParams.getFirst("refName");
             if (nameQ != null) {
@@ -511,7 +511,7 @@ public class OrgAuthorityResource extends AbstractCollectionSpaceResourceImpl {
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getItemServiceName());
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            DocumentFilter myFilter = new DocumentFilter();
+            DocumentFilter myFilter = handler.createDocumentFilter(ctx); //new DocumentFilter();
             myFilter.setPagination(queryParams);
             myFilter.setWhereClause(OrganizationJAXBSchema.ORGANIZATIONS_COMMON +
             		":" + OrganizationJAXBSchema.IN_AUTHORITY + "=" +
@@ -563,7 +563,7 @@ public class OrgAuthorityResource extends AbstractCollectionSpaceResourceImpl {
             ctx = MultipartServiceContextFactory.get().createServiceContext(null, getItemServiceName());
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            DocumentFilter myFilter = new DocumentFilter();
+            DocumentFilter myFilter = handler.createDocumentFilter(ctx);// new DocumentFilter();
             myFilter.setPagination(queryParams);
 
             // Add the where clause "organizations_common:inAuthority='" + parentcsid + "'"
@@ -751,7 +751,7 @@ public class OrgAuthorityResource extends AbstractCollectionSpaceResourceImpl {
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getContactServiceName());
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            DocumentFilter myFilter = new DocumentFilter();
+            DocumentFilter myFilter = handler.createDocumentFilter(ctx); //new DocumentFilter();
             myFilter.setPagination(queryParams);
             myFilter.setWhereClause(ContactJAXBSchema.CONTACTS_COMMON + ":" +
                 ContactJAXBSchema.IN_AUTHORITY +

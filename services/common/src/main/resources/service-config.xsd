@@ -13,9 +13,12 @@
 <xs:schema 
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns="http://collectionspace.org/services/common"
+  xmlns:types="http://collectionspace.org/services/common/types"
   targetNamespace="http://collectionspace.org/services/common"
   version="0.1"
 >
+
+    <xs:import namespace="http://collectionspace.org/services/common/types" schemaLocation="types.xsd" />
 
     <xs:element name="service-config">
         <xs:complexType>
@@ -40,6 +43,7 @@
             <xs:element name="client-type" type="ClientType" minOccurs="1"  maxOccurs="1" />
             <!-- default client is org.collectionspace.services.nuxeo.client.java.RepositoryJavaClient -->
             <xs:element name="client-class" type="xs:string" minOccurs="1"  maxOccurs="1" />
+						<xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <!-- name of the client -->
         <xs:attribute name="name" type="xs:string" use="required"/>

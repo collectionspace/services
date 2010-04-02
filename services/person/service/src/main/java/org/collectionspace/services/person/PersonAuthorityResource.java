@@ -243,8 +243,6 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
     @GET
     @Path("{csid}")
     public MultipartOutput getPersonAuthority(@PathParam("csid") String csid) {
-        String idValue = null;
-        DocumentFilter myFilter = null;
         if (csid == null) {
             logger.error("getPersonAuthority: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
@@ -298,7 +296,7 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             DocumentHandler handler = createDocumentHandler(ctx);
-            DocumentFilter myFilter = new DocumentFilter();
+            DocumentFilter myFilter = handler.createDocumentFilter(ctx); //new DocumentFilter();
             myFilter.setPagination(queryParams);
             String nameQ = queryParams.getFirst("refName");
             if (nameQ != null) {
@@ -509,7 +507,7 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getItemServiceName());
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            DocumentFilter myFilter = new DocumentFilter();
+            DocumentFilter myFilter = handler.createDocumentFilter(ctx); //new DocumentFilter();
             myFilter.setPagination(queryParams);
 
             // Add the where clause "persons_common:inAuthority='" + parentcsid + "'"
@@ -565,7 +563,7 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
             ctx = MultipartServiceContextFactory.get().createServiceContext(null, getItemServiceName());
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            DocumentFilter myFilter = new DocumentFilter();
+            DocumentFilter myFilter = handler.createDocumentFilter(ctx); //new DocumentFilter();
             myFilter.setPagination(queryParams);
 
             // Add the where clause "persons_common:inAuthority='" + parentcsid + "'"
@@ -753,7 +751,7 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
             ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getContactServiceName());
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            DocumentFilter myFilter = new DocumentFilter();
+            DocumentFilter myFilter = handler.createDocumentFilter(ctx); //new DocumentFilter();
             myFilter.setPagination(queryParams);
             myFilter.setWhereClause(ContactJAXBSchema.CONTACTS_COMMON + ":" +
                 ContactJAXBSchema.IN_AUTHORITY +
