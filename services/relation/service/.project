@@ -4,6 +4,7 @@
 	<comment></comment>
 	<projects>
 		<project>org.collectionspace.services.common</project>
+		<project>org.collectionspace.services.jaxb</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

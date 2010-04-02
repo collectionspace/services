@@ -3,6 +3,7 @@
 	<name>org.collectionspace.services.PerformanceTests</name>
 	<comment></comment>
 	<projects>
+		<project>org.collectionspace.services.jaxb</project>
 		<project>org.collectionspace.services.client</project>
 		<project>org.collectionspace.services.collectionobject.client</project>
 		<project>org.collectionspace.services.collectionobject.jaxb</project>
