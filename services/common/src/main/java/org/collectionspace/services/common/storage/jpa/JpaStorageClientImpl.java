@@ -50,7 +50,6 @@ public class JpaStorageClientImpl implements StorageClient {
 
     /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(JpaStorageClientImpl.class);
-    
     /** The Constant CS_PERSISTENCE_UNIT. */
     public final static String CS_PERSISTENCE_UNIT = "org.collectionspace.services";
 
@@ -113,10 +112,10 @@ public class JpaStorageClientImpl implements StorageClient {
      * @see org.collectionspace.services.common.storage.StorageClient#get(org.collectionspace.services.common.context.ServiceContext, java.util.List, org.collectionspace.services.common.document.DocumentHandler)
      */
     public void get(ServiceContext ctx, List<String> csidList, DocumentHandler handler)
-		throws DocumentNotFoundException, DocumentException {
+            throws DocumentNotFoundException, DocumentException {
         throw new UnsupportedOperationException();
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.storage.StorageClient#get(org.collectionspace.services.common.context.ServiceContext, java.lang.String, org.collectionspace.services.common.document.DocumentHandler)
      */
@@ -127,10 +126,9 @@ public class JpaStorageClientImpl implements StorageClient {
             throw new IllegalArgumentException(
                     "JpaStorageClient.get: handler is missing");
         }
-        DocumentFilter docFilter = handler.createDocumentFilter(ctx);
+        DocumentFilter docFilter = handler.getDocumentFilter();
         if (docFilter == null) {
-            throw new IllegalArgumentException(
-                    "JpaStorageClient.get: handler has no Filter specified");
+            docFilter = handler.createDocumentFilter(ctx);
         }
         String docType = ctx.getDocumentType();
         if (docType == null) {
@@ -212,10 +210,9 @@ public class JpaStorageClientImpl implements StorageClient {
             throw new IllegalArgumentException(
                     "JpaStorageClient.getFiltered: handler is missing");
         }
-        DocumentFilter docFilter = handler.createDocumentFilter(ctx);
+        DocumentFilter docFilter = handler.getDocumentFilter();
         if (docFilter == null) {
-            throw new IllegalArgumentException(
-                    "JpaStorageClient.getFiltered: handler has no Filter specified");
+            docFilter = handler.createDocumentFilter(ctx);
         }
         String docType = ctx.getDocumentType();
         if (docType == null) {
@@ -238,7 +235,7 @@ public class JpaStorageClientImpl implements StorageClient {
             String queryStr = queryStrBldr.toString(); //for debugging
             Query q = em.createQuery(queryStr);
             //bind parameters
-            for(DocumentFilter.ParamBinding p : params) {
+            for (DocumentFilter.ParamBinding p : params) {
                 q.setParameter(p.getName(), p.getValue());
             }
             if (docFilter.getOffset() > 0) {
@@ -520,9 +517,9 @@ public class JpaStorageClientImpl implements StorageClient {
         return (String) o;
     }
 
-	@Override
-	public void get(ServiceContext ctx, DocumentHandler handler)
-			throws DocumentNotFoundException, DocumentException {
+    @Override
+    public void get(ServiceContext ctx, DocumentHandler handler)
+            throws DocumentNotFoundException, DocumentException {
         throw new UnsupportedOperationException();
-	}
+    }
 }
