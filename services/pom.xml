@@ -19,7 +19,7 @@
         <module>jaxb</module>
         <module>common</module>
         <module>account</module>
-        <!--module>authorization-mgt</module-->
+        <module>authorization-mgt</module>
         <module>relation</module>
         <!--        <module>query</module> -->
         <module>acquisition</module>
