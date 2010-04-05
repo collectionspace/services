@@ -65,11 +65,11 @@
             <artifactId>org.collectionspace.services.account.service</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!--dependency>
+        <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authorization-mgt.service</artifactId>
             <version>${project.version}</version>
-        </dependency-->
+        </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.collectionobject.service</artifactId>

@@ -19,6 +19,7 @@ package org.collectionspace.services.common.storage.jpa;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -43,6 +44,36 @@ import org.slf4j.LoggerFactory;
  * It uses @see DocumentHandler as IOHandler with the client.
  * All the operations in this client are carried out under their own transactions.
  * A call to any method would start and commit/rollback a transaction.
+ * 
+ * Assumption: each persistent entity has the following 3 attributes
+<xs:element name="createdAt" type="xs:dateTime">
+<xs:annotation>
+<xs:appinfo>
+<hj:basic>
+<orm:column name="created_at" nullable="false"/>
+</hj:basic>
+</xs:appinfo>
+</xs:annotation>
+</xs:element>
+<xs:element name="updatedAt" type="xs:dateTime">
+<xs:annotation>
+<xs:appinfo>
+<hj:basic>
+<orm:column name="updated_at" />
+</hj:basic>
+</xs:appinfo>
+</xs:annotation>
+</xs:element>
+</xs:sequence>
+<xs:attribute name="csid" type="xs:string">
+<xs:annotation>
+<xs:appinfo>
+<hj:id>
+<orm:column name="csid" length="128" nullable="false"/>
+</hj:id>
+</xs:appinfo>
+</xs:annotation>
+</xs:attribute>
  *
  * $LastChangedRevision: $ $LastChangedDate: $
  */
@@ -83,6 +114,7 @@ public class JpaStorageClientImpl implements StorageClient {
             Object entity = handler.getCommonPart();
             DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entity);
             handler.handle(Action.CREATE, wrapDoc);
+            setValue(entity, "setCreatedAtItem", Date.class, new Date());
             emf = getEntityManagerFactory();
             em = emf.createEntityManager();
             em.getTransaction().begin();
@@ -90,6 +122,11 @@ public class JpaStorageClientImpl implements StorageClient {
             em.getTransaction().commit();
             handler.complete(Action.CREATE, wrapDoc);
             return (String) getValue(entity, "getCsid");
+        } catch (BadRequestException bre) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw bre;
         } catch (DocumentException de) {
             throw de;
         } catch (Exception e) {
@@ -288,6 +325,7 @@ public class JpaStorageClientImpl implements StorageClient {
             handler.prepare(Action.UPDATE);
             Object entity = handler.getCommonPart();
             setCsid(entity, id);
+            setValue(entity, "setUpdatedAtItem", Date.class, new Date());
             DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entity);
             handler.handle(Action.UPDATE, wrapDoc);
             emf = getEntityManagerFactory();
@@ -305,6 +343,11 @@ public class JpaStorageClientImpl implements StorageClient {
             em.merge(entity);
             em.getTransaction().commit();
             handler.complete(Action.UPDATE, wrapDoc);
+        } catch (BadRequestException bre) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw bre;
         } catch (DocumentException de) {
             throw de;
         } catch (Exception e) {

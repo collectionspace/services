@@ -10,7 +10,9 @@
         <class>org.collectionspace.services.account.Status</class>
         <class>org.collectionspace.services.authentication.User</class>
         <class>org.collectionspace.services.authorization.Role</class>
+        <class>org.collectionspace.services.authorization.RolesList</class>
         <class>org.collectionspace.services.authorization.UserRole</class>
+        <class>org.collectionspace.services.authorization.UsersRolesList</class>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
             <property name="hibernate.max_fetch_depth" value="3"/>

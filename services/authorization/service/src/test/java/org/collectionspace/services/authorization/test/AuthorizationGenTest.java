@@ -69,7 +69,7 @@ public class AuthorizationGenTest extends AbstractAuthorizationTestImpl {
     public void genPermissions() {
         PermissionsList pcList = new PermissionsList();
         ArrayList<Permission> apcList = new ArrayList<Permission>();
-        pcList.setPermission(apcList);
+        pcList.setPermissions(apcList);
 
         Permission accPerm = buildCommonPermission("1", "accounts");
         apcList.add(accPerm);
@@ -86,7 +86,7 @@ public class AuthorizationGenTest extends AbstractAuthorizationTestImpl {
         perm.setEffect(EffectType.PERMIT);
 
         ArrayList<PermissionAction> pas = new ArrayList<PermissionAction>();
-        perm.setAction(pas);
+        perm.setActions(pas);
 
         PermissionAction pa = new PermissionAction();
         pa.setName(ActionType.CREATE);
@@ -108,7 +108,7 @@ public class AuthorizationGenTest extends AbstractAuthorizationTestImpl {
         PermissionsRolesList psrsl = new PermissionsRolesList();
         ArrayList<PermissionRole> prl = buildCommonPermissionRoles("1");
         prl.addAll(buildCommonPermissionRoles("2"));
-        psrsl.setPermissionRole(prl);
+        psrsl.setPermissionRoles(prl);
         toFile(psrsl, PermissionsRolesList.class, "./target/test-permissions-roles.xml");
     }
 

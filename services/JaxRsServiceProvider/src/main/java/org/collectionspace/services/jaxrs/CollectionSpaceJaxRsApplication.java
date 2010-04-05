@@ -20,7 +20,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.collectionspace.services.jaxrs;
 
 import org.collectionspace.services.account.AccountResource;
@@ -42,6 +41,7 @@ import org.collectionspace.services.person.PersonAuthorityResource;
 import javax.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Set;
+import org.collectionspace.services.authorization.RoleResource;
 import org.collectionspace.services.common.security.SecurityInterceptor;
 
 /**
@@ -52,7 +52,6 @@ import org.collectionspace.services.common.security.SecurityInterceptor;
  * $LastChangedRevision$
  * $LastChangedDate$
  */
-
 public class CollectionSpaceJaxRsApplication extends Application {
 
     private Set<Object> singletons = new HashSet<Object>();
@@ -61,6 +60,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
     public CollectionSpaceJaxRsApplication() {
         singletons.add(new SecurityInterceptor());
         singletons.add(new AccountResource());
+        singletons.add(new RoleResource());
         singletons.add(new CollectionObjectResource());
         singletons.add(new IDResource());
         singletons.add(new IntakeResource());

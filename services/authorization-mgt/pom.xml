@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>org.collectionspace.services.main</artifactId>
+        <groupId>org.collectionspace.services</groupId>
+        <version>0.6-SNAPSHOT</version>
+    </parent>
+    <groupId>org.collectionspace.services</groupId>
+    <artifactId>org.collectionspace.services.authorization-mgt</artifactId>
+    <name>services.authorization-mgt</name>
+    <packaging>pom</packaging>
+    <url>http://www.collectionspace.org</url>
+    <modules>
+        <module>service</module>
+        <module>client</module>
+    </modules>
+</project>

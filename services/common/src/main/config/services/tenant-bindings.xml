@@ -5,11 +5,11 @@
     Description: tenant bindings
 -->
 <tenant:TenantBindingConfig
-		xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-		xmlns:tenant='http://collectionspace.org/services/common/tenant'
-		xmlns:types='http://collectionspace.org/services/common/types'
-		xsi:schemaLocation='http://collectionspace.org/services/common/tenant http://collectionspace.org/services/common/tenant.xsd'
-                             >
+    xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xmlns:tenant='http://collectionspace.org/services/common/tenant'
+    xmlns:types='http://collectionspace.org/services/common/types'
+    xsi:schemaLocation='http://collectionspace.org/services/common/tenant http://collectionspace.org/services/common/tenant.xsd'
+    >
     <!-- begin movingimages.us tenant meta-data -->
     <tenant:tenantBinding
         id="1" name="movingimages.us" displayName="Museum of Moving Images" version="0.1" repositoryDomain="default-domain">
@@ -40,11 +40,11 @@
                               versionable="true" auditable="false"
                               label="collectionobjects_common" updated="" order="1">
                     <service:properties>
-											<types:item><types:key>authRef</types:key><types:value>contentOrganization</types:value></types:item>
-											<types:item><types:key>authRef</types:key><types:value>contentPeople</types:value></types:item>
-											<types:item><types:key>authRef</types:key><types:value>contentPerson</types:value></types:item>
-											<types:item><types:key>authRef</types:key><types:value>inscriber</types:value></types:item>
-										</service:properties>															
+                        <types:item><types:key>authRef</types:key><types:value>contentOrganization</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>contentPeople</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>contentPerson</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>inscriber</types:value></types:item>
+                    </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/collectionobject"
@@ -92,13 +92,13 @@
                               versionable="true" auditable="false"
                               label="intakes_common" updated="" order="1">
                     <service:properties>
-											<types:item><types:key>authRef</types:key><types:value>currentOwner</types:value></types:item>
-											<types:item><types:key>authRef</types:key><types:value>depositor</types:value></types:item>
-											<types:item><types:key>authRef</types:key><types:value>conditionCheckAssesor</types:value></types:item>
-											<types:item><types:key>authRef</types:key><types:value>insurer</types:value></types:item>
-											<types:item><types:key>authRef</types:key><types:value>fieldCollector</types:value></types:item>
-											<types:item><types:key>authRef</types:key><types:value>valuer</types:value></types:item>
-										</service:properties>
+                        <types:item><types:key>authRef</types:key><types:value>currentOwner</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>depositor</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>conditionCheckAssesor</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>insurer</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>fieldCollector</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>valuer</types:value></types:item>
+                    </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/intake"
@@ -136,11 +136,11 @@
                               versionable="true" auditable="false"
                               label="loansin_common" updated="" order="1">
                     <service:properties>
-                    	<!-- Need to handle repeating ref fields, like "lenders" -->
+                        <!-- Need to handle repeating ref fields, like "lenders" -->
                         <types:item><types:key>authRef</types:key><types:value>lendersAuthorizer</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>lendersContact</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>loanInContact</types:value></types:item>
-					</service:properties>
+                    </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/loanin"
@@ -395,12 +395,12 @@
                               versionable="true" auditable="false"
                               label="acquisitions_common" updated="" order="1">
                     <service:properties>
-											<types:item><types:key>authRef</types:key><types:value>acquisitionAuthorizer</types:value></types:item>
-											<types:item><types:key>authRef</types:key><types:value>acquisitionFundingSource</types:value></types:item>
-											<!-- Need to handle repeating ref fields, like "acquisitionSources" -->
-											<types:item><types:key>authRef</types:key><types:value>fieldCollector</types:value></types:item>
-										</service:properties>
-										<service:content contentType="application/xml">
+                        <types:item><types:key>authRef</types:key><types:value>acquisitionAuthorizer</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>acquisitionFundingSource</types:value></types:item>
+                        <!-- Need to handle repeating ref fields, like "acquisitionSources" -->
+                        <types:item><types:key>authRef</types:key><types:value>fieldCollector</types:value></types:item>
+                    </service:properties>
+                    <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/acquisition"
                             schemaLocation="http://collectionspace.org/services/acquisition http://services.collectionspace.org/acquisition/acquisitions_common.xsd">
@@ -472,7 +472,7 @@
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/account"
-                            schemaLocation="http://collectionspace.org/services/account http://services.collectionspace.org/relation/accounts_common.xsd">
+                            schemaLocation="http://collectionspace.org/services/account http://collectionspace.org/services/account/accounts_common.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -545,6 +545,39 @@
             </service:object>
         </tenant:serviceBindings>
         <!-- end contact service meta-data -->
+        <!-- begin role service meta-data -->
+        <tenant:serviceBindings name="authorization/roles" version="0.1">
+            <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.authorization.storage.RoleDocumentHandler
+            </service:documentHandler>
+            <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.authorization.storage.RoleValidatorHandler
+            </service:validatorHandler>
+            <service:object name="Role" version="0.1"
+                            xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:part id="0" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="roles_system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/common/system"
+                            schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="roles" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/authorization"
+                            schemaLocation="http://collectionspace.org/services/authorization http://services.collectionspace.org/authorization/roles.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end role service meta-data -->
     </tenant:tenantBinding>
     <!-- end movingimages.us tenant meta-data -->
 </tenant:TenantBindingConfig>

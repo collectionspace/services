@@ -1,12 +1,12 @@
-alter table permissions_actions drop foreign key FK85F8204295972CE9;
+alter table permissions_actions drop foreign key FK85F82042E2DC84FD;
 drop table if exists permissions;
 drop table if exists permissions_actions;
 drop table if exists permissions_roles;
 drop table if exists roles;
 drop table if exists users_roles;
 create table permissions (csid varchar(128) not null, attribute_name varchar(128), created_at datetime not null, description varchar(255), effect varchar(32) not null, resource_name varchar(128) not null, updated_at datetime, primary key (csid));
-create table permissions_actions (HJID bigint not null auto_increment, name varchar(128) not null, ACTION__PERMISSION_CSID varchar(128), primary key (HJID));
+create table permissions_actions (HJID bigint not null auto_increment, name varchar(128) not null, ACTIONS_PERMISSION_CSID varchar(128), primary key (HJID));
 create table permissions_roles (HJID bigint not null auto_increment, created_at datetime not null, permission_id varchar(128) not null, role_id varchar(128) not null, updated_at datetime, primary key (HJID), unique (permission_id, role_id));
-create table roles (csid varchar(128) not null, created_at datetime not null, description varchar(255), rolegroup varchar(255) not null, rolename varchar(200) not null, updated_at datetime, primary key (csid), unique (rolename));
+create table roles (csid varchar(128) not null, created_at datetime not null, description varchar(255), rolegroup varchar(255), rolename varchar(200) not null, updated_at datetime, primary key (csid), unique (rolename));
 create table users_roles (HJID bigint not null auto_increment, created_at datetime not null, role_id varchar(128) not null, updated_at datetime, username varchar(128) not null, primary key (HJID), unique (username, role_id));
-alter table permissions_actions add index FK85F8204295972CE9 (ACTION__PERMISSION_CSID), add constraint FK85F8204295972CE9 foreign key (ACTION__PERMISSION_CSID) references permissions (csid);
+alter table permissions_actions add index FK85F82042E2DC84FD (ACTIONS_PERMISSION_CSID), add constraint FK85F82042E2DC84FD foreign key (ACTIONS_PERMISSION_CSID) references permissions (csid);

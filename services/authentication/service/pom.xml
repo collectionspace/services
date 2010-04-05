@@ -66,6 +66,7 @@
             <groupId>jboss</groupId>
             <artifactId>jbosssx</artifactId>
             <version>4.2.3.GA</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>

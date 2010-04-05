@@ -13,42 +13,38 @@
 <xs:schema 
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
     xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
     xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
     xmlns:ns="http://collectionspace.org/services/authorization"
     xmlns="http://collectionspace.org/services/authorization"
     targetNamespace="http://collectionspace.org/services/authorization"
     version="0.1"
-    jaxb:extensionBindingPrefixes="hj orm"
+    jaxb:version="1.0"
+    jaxb:extensionBindingPrefixes="hj orm xjc"
     >
 
     <!--
-    Avoid XmlRootElement nightmare:
-    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
--->
-<!--
     Notes for MySQL
     MySQL puts key length limit of 1000 bytes
     username - rolename constraint should be within 1000 bytes
     hbm2ddl makes column length >= 256 as long text, such as column cannot be used
     in defining a key (pk, fk or constraint)
     -->
-    <xs:element name="roles_list">
-        <xs:complexType>
-            <xs:annotation>
-                <xs:appinfo>
-                    <hj:ignored/>
-                </xs:appinfo>
-            </xs:annotation>
-            <xs:sequence>
-                <xs:annotation>
-                    <xs:documentation>role list</xs:documentation>
-                </xs:annotation>
-                <xs:element name="role" type="role" minOccurs="1" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
 
+    <!--
+    see http://weblogs.java.net/blog/2006/03/03/why-does-jaxb-put-xmlrootelement-sometimes-not-always
+    for more details behind xjc:simple
+    -->
+    <xs:annotation>
+        <xs:appinfo>
+            <jaxb:globalBindings>
+                <xjc:simple />
+            </jaxb:globalBindings>
+        </xs:appinfo>
+    </xs:annotation>
+    <xs:element name="role" type="role"/>
+    <!-- role type has a name so that it could be referred from roles_list -->
     <xs:complexType name="role">
         <xs:annotation>
             <xs:documentation>Role definition in CollectionSpace</xs:documentation>
@@ -72,20 +68,20 @@
                     </xs:appinfo>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="description" type="xs:string" minOccurs="1" maxOccurs="1">
+            <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:appinfo>
                         <hj:basic>
-                            <orm:column name="description" />
+                            <orm:column name="description" nullable="true"/>
                         </hj:basic>
                     </xs:appinfo>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="roleGroup" type="xs:string" minOccurs="1" maxOccurs="1">
+            <xs:element name="roleGroup" type="xs:string" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:appinfo>
                         <hj:basic>
-                            <orm:column name="rolegroup" nullable="false"/>
+                            <orm:column name="rolegroup" nullable="true"/>
                         </hj:basic>
                     </xs:appinfo>
                 </xs:annotation>
@@ -119,7 +115,5 @@
             </xs:annotation>
         </xs:attribute>
     </xs:complexType>
-
-
 </xs:schema>
 

@@ -95,7 +95,7 @@ public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
                 "./test-data/test-permissions-roles.xml");
 
         AuthZ authZ = AuthZ.get();
-        for (Permission p : pcList.getPermission()) {
+        for (Permission p : pcList.getPermissions()) {
             if (logger.isDebugEnabled()) {
                 logger.debug("adding permission for res=" + p.getResourceName());
             }
@@ -106,7 +106,7 @@ public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
 
     private List<PermissionRole> getPermissionRoles(PermissionsRolesList pcrList, String permId) {
         List<PermissionRole> prList = new ArrayList<PermissionRole>();
-        for (PermissionRole pr : pcrList.getPermissionRole()) {
+        for (PermissionRole pr : pcrList.getPermissionRoles()) {
             if (pr.getPermissionId().equals(permId)) {
                 prList.add(pr);
             }

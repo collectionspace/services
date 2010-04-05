@@ -117,7 +117,7 @@ public class AuthZ {
             //FIXME should use role name
             principals.add(permRole.getRoleId());
         }
-        List<PermissionAction> permActions = perm.getAction();
+        List<PermissionAction> permActions = perm.getActions();
         for (PermissionAction permAction : permActions) {
             URIResourceImpl uriRes = new URIResourceImpl(perm.getResourceName(),
                     permAction.getName());
