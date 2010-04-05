@@ -325,7 +325,6 @@ public class JpaStorageClientImpl implements StorageClient {
             handler.prepare(Action.UPDATE);
             Object entity = handler.getCommonPart();
             setCsid(entity, id);
-            setValue(entity, "setUpdatedAtItem", Date.class, new Date());
             DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entity);
             handler.handle(Action.UPDATE, wrapDoc);
             emf = getEntityManagerFactory();
@@ -340,7 +339,11 @@ public class JpaStorageClientImpl implements StorageClient {
                 logger.error(msg);
                 throw new DocumentNotFoundException(msg);
             }
-            em.merge(entity);
+            entity = em.merge(entity);
+            setValue(entity, "setUpdatedAtItem", Date.class, new Date());
+            if (logger.isDebugEnabled()) {
+                logger.debug("merged entity=" + entity.toString());
+            }
             em.getTransaction().commit();
             handler.complete(Action.UPDATE, wrapDoc);
         } catch (BadRequestException bre) {

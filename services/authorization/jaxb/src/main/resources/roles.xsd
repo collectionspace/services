@@ -86,6 +86,15 @@
                     </xs:appinfo>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="tenant_id" type="xs:string" minOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>
+                        <hj:basic>
+                            <orm:column name="tenant_id" length="128" nullable="false"/>
+                        </hj:basic>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:element>
             <xs:element name="createdAt" type="xs:dateTime">
                 <xs:annotation>
                     <xs:appinfo>

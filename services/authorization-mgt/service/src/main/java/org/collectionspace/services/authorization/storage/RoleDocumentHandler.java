@@ -53,10 +53,17 @@ public class RoleDocumentHandler
         String id = UUID.randomUUID().toString();
         Role role = wrapDoc.getWrappedObject();
         role.setCsid(id);
+        //FIXME: if admin updating the role is a CS admin rather than
+        //the tenant admin, tenant id should be retrieved from the request
+        role.setTenantId(getServiceContext().getTenantId());
     }
 
     @Override
     public void handleUpdate(DocumentWrapper<Role> wrapDoc) throws Exception {
+        Role role = wrapDoc.getWrappedObject();
+        //FIXME: if admin updating the role is a CS admin rather than
+        //the tenant admin, tenant id should be retrieved from the request
+        role.setTenantId(getServiceContext().getTenantId());
     }
 
     @Override
@@ -103,6 +110,7 @@ public class RoleDocumentHandler
         rolesList.setRoles(list);
         for (Object obj : wrapDoc.getWrappedObject()) {
             Role role = (Role) obj;
+            sanitize(role);
             list.add(role);
         }
         return rolesList;
@@ -148,5 +156,6 @@ public class RoleDocumentHandler
      * @param role
      */
     private void sanitize(Role role) {
+        role.setTenantId(null);
     }
 }

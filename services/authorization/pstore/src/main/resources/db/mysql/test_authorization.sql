@@ -5,10 +5,10 @@
 --
 use cspace;
 
-insert into `roles` (`csid`, `rolename`, `rolegroup`, `created_at`) values ('1', 'ROLE_ADMINISTRATOR', 'admin', '2010-02-17 16:31:48');
-insert into `roles` (`csid`, `rolename`, `rolegroup`, `created_at`) values ('2', 'ROLE_USERS', 'collections', '2010-02-17 16:31:48');
-insert into `roles` (`csid`, `rolename`, `rolegroup`, `created_at`) values ('3', 'ROLE_COLLECTIONS_MANAGER', 'collections', '2010-02-17 16:31:48');
-insert into `roles` (`csid`, `rolename`, `rolegroup`, `created_at`) values ('4', 'ROLE_COLLECTIONS_REGISTRAR', 'collections', '2010-02-17 16:31:48');
+insert into `roles` (`csid`, `rolename`, `rolegroup`, `created_at`, `tenant_id`) values ('1', 'ROLE_ADMINISTRATOR', 'admin', '2010-02-17 16:31:48', '0');
+insert into `roles` (`csid`, `rolename`, `rolegroup`, `created_at`, `tenant_id`) values ('2', 'ROLE_USERS', 'collections', '2010-02-17 16:31:48', '1');
+insert into `roles` (`csid`, `rolename`, `rolegroup`, `created_at`, `tenant_id`) values ('3', 'ROLE_COLLECTIONS_MANAGER', 'collections', '2010-02-17 16:31:48', '1');
+insert into `roles` (`csid`, `rolename`, `rolegroup`, `created_at`, `tenant_id`) values ('4', 'ROLE_COLLECTIONS_REGISTRAR', 'collections', '2010-02-17 16:31:48', '1');
 
 insert into `users_roles`(`username`, `role_id`, `created_at`) values ('test', '1', '2010-02-17 16:31:48');
 insert into `users_roles`(`username`, `role_id`, `created_at`) values ('test', '2', '2010-02-17 16:31:48');
