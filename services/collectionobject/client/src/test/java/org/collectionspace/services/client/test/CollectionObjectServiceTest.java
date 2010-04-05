@@ -199,6 +199,14 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     public void createWithEmptyEntityBody(String testName) throws Exception {
     }
 
+   /**
+    * Test how the service handles XML that is not well formed,
+    * when sent in the payload of a Create request.
+    *
+    * @param testName  The name of this test method.  This name is supplied
+    *     automatically, via reflection, by a TestNG 'data provider' in
+    *     a base class.
+    */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createWithMalformedXml(String testName) throws Exception {
@@ -227,7 +235,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     }
 
 
-    /*
+/*
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
     dependsOnMethods = {"create", "testSubmitRequest"})
@@ -305,7 +313,74 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
-     */
+*/
+
+   /**
+    * Test how the service handles, in a Create request, payloads
+    * containing null values (or, in the case of String fields,
+    * empty String values) in one or more fields which must be
+    * present and are required to contain non-empty values.
+    *
+    * This is a test of code and/or configuration in the service's
+    * validation routine(s).
+    *
+    * @param testName  The name of this test method.  This name is supplied
+    *     automatically, via reflection, by a TestNG 'data provider' in
+    *     a base class.
+    */
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    public void createWithRequiredValuesNullOrEmpty(String testName) throws Exception {
+        setupCreate(testName);
+
+        // Build a payload with invalid content, by omitting a
+        // field (objectNumber) which must be present, and in which
+        // a non-empty value is required, as enforced by the service's
+        // validation routine(s).
+        CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
+        collectionObject.setTitle("atitle");
+        collectionObject.setObjectName("some name");
+
+        // Submit the request to the service and store the response.
+        MultipartOutput multipart =
+                createCollectionObjectInstance(client.getCommonPartName(), collectionObject, null);
+        ClientResponse<Response> res = client.create(multipart);
+        int statusCode = res.getStatus();
+
+        // Read the response and verify that the create attempt failed.
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+
+        // FIXME: Consider splitting off the following into its own test method.
+        
+        // Build a payload with invalid content, by setting a value to the
+        // empty String, in a field that requires a non-empty value,
+        // as enforced by the service's validation routine(s).
+        collectionObject = new CollectionobjectsCommon();
+        collectionObject.setTitle("atitle");
+        collectionObject.setObjectName("some name");
+        collectionObject.setObjectNumber("");
+
+        // Submit the request to the service and store the response.
+        multipart =
+            createCollectionObjectInstance(client.getCommonPartName(), collectionObject, null);
+        res = client.create(multipart);
+        statusCode = res.getStatus();
+
+        // Read the response and verify that the create attempt failed.
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+
+    }
+
+
     // ---------------------------------------------------------------
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
@@ -506,6 +581,14 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     public void updateWithEmptyEntityBody(String testName) throws Exception {
     }
 
+   /**
+    * Test how the service handles XML that is not well formed,
+    * when sent in the payload of an Update request.
+    *
+    * @param testName  The name of this test method.  This name is supplied
+    *     automatically, via reflection, by a TestNG 'data provider' in
+    *     a base class.
+    */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read"})
@@ -549,7 +632,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     public void updateWithWrongXmlSchema(String testName) throws Exception {
     }
 
-    /*
+/*
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
     dependsOnMethods = {"create", "update", "testSubmitRequest"})
@@ -627,7 +710,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
-     */
+*/
+
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"update", "testSubmitRequest"})
@@ -655,6 +739,59 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    }
+
+   /**
+    * Test how the service handles, in an Update request, payloads
+    * containing null values (or, in the case of String fields,
+    * empty String values) in one or more fields in which non-empty
+    * values are required.
+    *
+    * This is a test of code and/or configuration in the service's
+    * validation routine(s).
+    *
+    * @param testName  The name of this test method.  This name is supplied
+    *     automatically, via reflection, by a TestNG 'data provider' in
+    *     a base class.
+    */
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"read"})
+    public void updateWithRequiredValuesNullOrEmpty(String testName) throws Exception {
+        // Perform setup.
+        setupUpdate(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + " got object to update with ID: " + knownResourceId);
+        }
+
+        // Read an existing record for updating.
+        ClientResponse<MultipartInput> res = updateRetrieve(testName, knownResourceId);
+
+        MultipartInput input = (MultipartInput) res.getEntity();
+        CollectionobjectsCommon collectionObject =
+                (CollectionobjectsCommon) extractPart(input,
+                client.getCommonPartName(), CollectionobjectsCommon.class);
+        Assert.assertNotNull(collectionObject);
+
+        // Update with invalid content, by setting a value to the
+        // empty String, in a field that requires a non-empty value,
+        // as enforced by the service's validation routine(s).
+        collectionObject.setObjectNumber("");
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + " updated object");
+            logger.debug(objectAsXmlString(collectionObject,
+                    CollectionobjectsCommon.class));
+        }
+
+        // Submit the request to the service and store the response.
+        res = updateSend(testName, knownResourceId, collectionObject);
+        int statusCode = res.getStatus();
+
+        // Read the response and verify that the update attempt failed.
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+
     }
 
     // ---------------------------------------------------------------
