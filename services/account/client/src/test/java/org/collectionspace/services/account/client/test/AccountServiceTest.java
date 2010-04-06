@@ -874,7 +874,6 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
 
     }
 
-
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
@@ -902,8 +901,19 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
             account.setUserId(userName);
         }
         if (usePassword) {
-            account.setPassword(Base64.encodeBase64(passwd.getBytes()));
+            //jaxb marshaller already b64 encodes the xs:base64Binary types
+            //no need to double encode
+//            byte[] b64pass = Base64.encodeBase64(passwd.getBytes());
+//            account.setPassword(b64pass);
+            if (logger.isDebugEnabled()) {
+                logger.debug("user=" + userName + " password=" + passwd
+                        + " password length=" + passwd.getBytes().length);
+//
+            }
+            //jaxb encodes password too
+            account.setPassword(passwd.getBytes());
         }
+
         account.setPersonRefName(screenName);
         account.setEmail(email);
         account.setPhone("1234567890");
