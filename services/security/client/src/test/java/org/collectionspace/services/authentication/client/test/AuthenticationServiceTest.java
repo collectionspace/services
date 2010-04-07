@@ -418,7 +418,8 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         AccountsCommon account = new AccountsCommon();
         account.setScreenName(screenName);
         account.setUserId(screenName);
-        account.setPassword(Base64.encodeBase64(passwd.getBytes()));
+        //jaxb would encode b64
+        account.setPassword(passwd.getBytes());
         account.setEmail(email);
         account.setPhone("1234567890");
         List<AccountTenant> atl = new ArrayList<AccountTenant>();
