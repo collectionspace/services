@@ -3,7 +3,7 @@
 <!--
     CollectionSpace default (security) authorization provider schema (XSD)
 
-    Entity(s)  : roles, users_roles
+    Entity(s)  : permission
     Used for:
 
     $LastChangedRevision: 916 $
@@ -11,15 +11,17 @@
 -->
 
 <xs:schema 
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
     xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
     xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
     xmlns:ns="http://collectionspace.org/services/authorization"
     xmlns="http://collectionspace.org/services/authorization"
     targetNamespace="http://collectionspace.org/services/authorization"
     version="0.1"
-    jaxb:extensionBindingPrefixes="hj orm"
+    jaxb:version="1.0"
+    jaxb:extensionBindingPrefixes="hj orm xjc"
     >
 
     <!--
@@ -27,23 +29,21 @@
     See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
 -->
 
-
-    <xs:element name="permissions_list">
-        <xs:complexType>
-            <xs:annotation>
-                <xs:appinfo>
-                    <hj:ignored/>
-                </xs:appinfo>
-            </xs:annotation>
-            <xs:sequence>
-                <xs:annotation>
-                    <xs:documentation>permission configuration list</xs:documentation>
-                </xs:annotation>
-                <xs:element name="permission" type="permission" minOccurs="1" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-
+    <!--
+    see http://weblogs.java.net/blog/2006/03/03/why-does-jaxb-put-xmlrootelement-sometimes-not-always
+    for more details behind xjc:simple
+    -->
+    <!--xs:annotation>
+    Note that roles.xsd already defines global bindings for the authorization namespace
+    so, it is not necessary to give the bindingings here because all the xsds are compiled
+    at once for this namespace
+        <xs:appinfo>
+            <jaxb:globalBindings>
+                <xjc:simple />
+            </jaxb:globalBindings>
+        </xs:appinfo>
+    </xs:annotation-->
+    <xs:element name="permission" type="permission"/>
     <xs:complexType name="permission">
         <xs:annotation>
             <xs:documentation>
@@ -97,6 +97,15 @@
                     <xs:appinfo>
                         <hj:basic>
                             <orm:column name="effect" length="32"  nullable="false"/>
+                        </hj:basic>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="tenant_id" type="xs:string" minOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>
+                        <hj:basic>
+                            <orm:column name="tenant_id" length="128" nullable="false"/>
                         </hj:basic>
                     </xs:appinfo>
                 </xs:annotation>

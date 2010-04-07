@@ -9,6 +9,9 @@
         <class>org.collectionspace.services.account.AccountTenant</class>
         <class>org.collectionspace.services.account.Status</class>
         <class>org.collectionspace.services.authentication.User</class>
+        <class>org.collectionspace.services.authorization.Permission</class>
+        <class>org.collectionspace.services.authorization.PermissionAction</class>
+        <class>org.collectionspace.services.authorization.PermissionsList</class>
         <class>org.collectionspace.services.authorization.Role</class>
         <class>org.collectionspace.services.authorization.RolesList</class>
         <class>org.collectionspace.services.authorization.UserRole</class>

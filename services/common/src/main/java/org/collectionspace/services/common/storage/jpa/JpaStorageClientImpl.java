@@ -83,11 +83,16 @@ public class JpaStorageClientImpl implements StorageClient {
     private final Logger logger = LoggerFactory.getLogger(JpaStorageClientImpl.class);
     /** The Constant CS_PERSISTENCE_UNIT. */
     public final static String CS_PERSISTENCE_UNIT = "org.collectionspace.services";
+    private Class entityClazz;
 
     /**
      * Instantiates a new jpa storage client.
      */
     public JpaStorageClientImpl() {
+    }
+
+    public JpaStorageClientImpl(Class entityClazz) {
+        this.entityClazz = entityClazz;
     }
 
     /* (non-Javadoc)
@@ -98,11 +103,6 @@ public class JpaStorageClientImpl implements StorageClient {
             DocumentHandler handler) throws BadRequestException,
             DocumentException {
 
-        String docType = ctx.getDocumentType();
-        if (docType == null) {
-            throw new DocumentNotFoundException(
-                    "Unable to find DocumentType for service " + ctx.getServiceName());
-        }
         if (handler == null) {
             throw new IllegalArgumentException(
                     "JpaStorageClient.create: handler is missing");
@@ -166,11 +166,6 @@ public class JpaStorageClientImpl implements StorageClient {
         DocumentFilter docFilter = handler.getDocumentFilter();
         if (docFilter == null) {
             docFilter = handler.createDocumentFilter(ctx);
-        }
-        String docType = ctx.getDocumentType();
-        if (docType == null) {
-            throw new DocumentNotFoundException(
-                    "Unable to find DocumentType for service " + ctx.getServiceName());
         }
         EntityManagerFactory emf = null;
         EntityManager em = null;
@@ -251,12 +246,6 @@ public class JpaStorageClientImpl implements StorageClient {
         if (docFilter == null) {
             docFilter = handler.createDocumentFilter(ctx);
         }
-        String docType = ctx.getDocumentType();
-        if (docType == null) {
-            throw new DocumentNotFoundException(
-                    "Unable to find DocumentType for service " + ctx.getServiceName());
-        }
-
         EntityManagerFactory emf = null;
         EntityManager em = null;
         try {
@@ -310,11 +299,6 @@ public class JpaStorageClientImpl implements StorageClient {
     public void update(ServiceContext ctx, String id, DocumentHandler handler)
             throws BadRequestException, DocumentNotFoundException,
             DocumentException {
-        String docType = ctx.getDocumentType();
-        if (docType == null) {
-            throw new DocumentNotFoundException(
-                    "Unable to find DocumentType for service " + ctx.getServiceName());
-        }
         if (handler == null) {
             throw new IllegalArgumentException(
                     "JpaStorageClient.update: handler is missing");
@@ -365,7 +349,7 @@ public class JpaStorageClientImpl implements StorageClient {
         }
     }
 
-    /* (non-Javadoc)
+    /* delete use delete to remove parent entity along with child entities
      * @see org.collectionspace.services.common.storage.StorageClient#delete(org.collectionspace.services.common.context.ServiceContext, java.lang.String)
      */
     @Override
@@ -376,10 +360,60 @@ public class JpaStorageClientImpl implements StorageClient {
         if (logger.isDebugEnabled()) {
             logger.debug("deleting entity with id=" + id);
         }
-        String docType = ctx.getDocumentType();
-        if (docType == null) {
-            throw new DocumentNotFoundException(
-                    "Unable to find DocumentType for service " + ctx.getServiceName());
+        EntityManagerFactory emf = null;
+        EntityManager em = null;
+        try {
+
+            //TODO: add tenant id
+
+            emf = getEntityManagerFactory();
+            em = emf.createEntityManager();
+
+            em.getTransaction().begin();
+            Object entityFound = getEntity(em, id);
+            if (entityFound == null) {
+                if (em != null && em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                String msg = "could not find entity with id=" + id;
+                logger.error(msg);
+                throw new DocumentNotFoundException(msg);
+            }
+            em.remove(entityFound);
+            em.getTransaction().commit();
+
+        } catch (DocumentException de) {
+            throw de;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw new DocumentException(e);
+        } finally {
+            if (emf != null) {
+                releaseEntityManagerFactory(emf);
+            }
+        }
+    }
+
+    /**
+     * deleteWhere uses the where clause to delete an entity represented by the id
+     * it does not delete any child entities.
+     * @param ctx
+     * @param id
+     * @throws DocumentNotFoundException
+     * @throws DocumentException
+     */
+    public void deleteWhere(ServiceContext ctx, String id)
+            throws DocumentNotFoundException,
+            DocumentException {
+
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("deleting entity with id=" + id);
         }
         EntityManagerFactory emf = null;
         EntityManager em = null;
@@ -561,6 +595,37 @@ public class JpaStorageClientImpl implements StorageClient {
         }
 
         return (String) o;
+    }
+
+    /**
+     * getEntity returns persistent entity for given id. it assumes that
+     * JpaStorageClientImpl is implemented using the JpaStorageClientImpl(entityClazz)
+     * constructor
+     * @param em
+     * @param id
+     * @return
+     * @throws DocumentNotFoundException
+     * @throws UnsupportedOperationException if JpaStorageClientImpl is not implemented
+     * using the JpaStorageClientImpl(entityClazz)
+     * constructor
+     */
+    protected Object getEntity(EntityManager em, String id) throws DocumentNotFoundException {
+        if (entityClazz == null) {
+            String msg = "Not constructed with JpaStorageClientImpl(entityClazz) ctor";
+            logger.error(msg);
+            throw new UnsupportedOperationException(msg);
+        }
+        Object entityFound = em.find(entityClazz, id);
+        if (entityFound == null) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            String msg = "could not find entity of type=" + entityClazz.getName()
+                    + " with id=" + id;
+            logger.error(msg);
+            throw new DocumentNotFoundException(msg);
+        }
+        return entityFound;
     }
 
     @Override

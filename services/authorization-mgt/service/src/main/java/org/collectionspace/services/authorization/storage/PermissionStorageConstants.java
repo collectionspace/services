@@ -20,18 +20,19 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
+ 
  */
 
 package org.collectionspace.services.authorization.storage;
 
 /**
- * RoleStorageConstants declares query params, etc.
+ * PermissionStorageConstants declares query params, etc.
  * @author
  */
-public class RoleStorageConstants {
+public class PermissionStorageConstants {
 
-    final public static String Q_ROLE_NAME = "r";
+    final public static String Q_RESOURCE_NAME = "res";
 
-    final public static String ROLE_NAME = "roleName";
+    final public static String RESOURCE_NAME = "resourceName";
 
 }

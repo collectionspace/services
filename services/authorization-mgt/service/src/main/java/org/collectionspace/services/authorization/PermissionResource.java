@@ -52,16 +52,15 @@ import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-@Path("/authorization/roles")
+@Path("/authorization/permissions")
 @Consumes("application/xml")
 @Produces("application/xml")
-public class RoleResource
+public class PermissionResource
         extends AbstractCollectionSpaceResourceImpl {
 
-    final private String serviceName = "authorization/roles";
-    final Logger logger = LoggerFactory.getLogger(RoleResource.class);
-    final StorageClient storageClient = new JpaStorageClientImpl();
+    final private String serviceName = "authorization/permissions";
+    final Logger logger = LoggerFactory.getLogger(PermissionResource.class);
+    final StorageClient storageClient = new JpaStorageClientImpl(Permission.class);
 
     @Override
     protected String getVersionString() {
@@ -78,8 +77,8 @@ public class RoleResource
     private <T> ServiceContext createServiceContext(T obj) throws Exception {
         ServiceContext ctx = new RemoteServiceContextImpl<T, T>(getServiceName());
         ctx.setInput(obj);
-        ctx.setDocumentType(Role.class.getPackage().getName()); //persistence unit
-        ctx.setProperty("entity-name", Role.class.getName());
+        ctx.setDocumentType(Permission.class.getPackage().getName()); //persistence unit
+        ctx.setProperty("entity-name", Permission.class.getName());
         return ctx;
     }
 
@@ -97,77 +96,82 @@ public class RoleResource
     }
 
     @POST
-    public Response createRole(Role input) {
+    public Response createPermission(Permission input) {
         try {
             ServiceContext ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getStorageClient(ctx).create(ctx, handler);
-            UriBuilder path = UriBuilder.fromResource(RoleResource.class);
+            UriBuilder path = UriBuilder.fromResource(PermissionResource.class);
             path.path("" + csid);
             Response response = Response.created(path.build()).build();
             return response;
         } catch (BadRequestException bre) {
             Response response = Response.status(
-                    Response.Status.BAD_REQUEST).entity("Create failed reason " + bre.getErrorReason()).type("text/plain").build();
+                    Response.Status.BAD_REQUEST).entity("Create failed reason "
+                    + bre.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Create failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity("Create failed reason "
+                    + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception in createRole", e);
+                logger.debug("Caught exception in createPermission", e);
             }
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Create failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    "Create failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
     }
 
     @GET
     @Path("{csid}")
-    public Role getRole(
+    public Permission getPermission(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
-            logger.debug("getRole with csid=" + csid);
+            logger.debug("getPermission with csid=" + csid);
         }
         if (csid == null || "".equals(csid)) {
-            logger.error("getRole: missing csid!");
+            logger.error("getPermission: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "get failed on Role csid=" + csid).type(
+                    "get failed on Permission csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        Role result = null;
+        Permission result = null;
         try {
-            ServiceContext ctx = createServiceContext((Role) null);
+            ServiceContext ctx = createServiceContext((Permission) null);
             DocumentHandler handler = createDocumentHandler(ctx);
             getStorageClient(ctx).get(ctx, csid, handler);
-            result = (Role) ctx.getOutput();
+            result = (Permission) ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity("Get failed reason "
+                    + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
-                logger.debug("getRole", dnfe);
+                logger.debug("getPermission", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed on Role csid=" + csid).type(
+                    "Get failed on Permission csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
-                logger.debug("getRole", e);
+                logger.debug("getPermission", e);
             }
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    "Get failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
 
         if (result == null) {
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed, the requested Role CSID:" + csid + ": was not found.").type(
+                    "Get failed, the requested Permission CSID:" + csid + ": was not found.").type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -176,11 +180,11 @@ public class RoleResource
 
     @GET
     @Produces("application/xml")
-    public RolesList getRoleList(
+    public PermissionsList getPermissionList(
             @Context UriInfo ui) {
-        RolesList roleList = new RolesList();
+        PermissionsList permissionList = new PermissionsList();
         try {
-            ServiceContext ctx = createServiceContext((RolesList) null);
+            ServiceContext ctx = createServiceContext((PermissionsList) null);
             DocumentHandler handler = createDocumentHandler(ctx);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             DocumentFilter myFilter = handler.createDocumentFilter(ctx);
@@ -188,63 +192,68 @@ public class RoleResource
             myFilter.setQueryParams(queryParams);
             handler.setDocumentFilter(myFilter);
             getStorageClient(ctx).getFiltered(ctx, handler);
-            roleList = (RolesList) handler.getCommonPartList();
+            permissionList = (PermissionsList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity("Index failed reason "
+                    + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
 
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception in getRoleList", e);
+                logger.debug("Caught exception in getPermissionsList", e);
             }
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    "Index failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return roleList;
+        return permissionList;
     }
 
     @PUT
     @Path("{csid}")
-    public Role updateRole(
+    public Permission updatePermission(
             @PathParam("csid") String csid,
-            Role theUpdate) {
+            Permission theUpdate) {
         if (logger.isDebugEnabled()) {
-            logger.debug("updateRole with csid=" + csid);
+            logger.debug("updatePermission with csid=" + csid);
         }
         if (csid == null || "".equals(csid)) {
-            logger.error("updateRole: missing csid!");
+            logger.error("updatePermission: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "update failed on Role csid=" + csid).type(
+                    "update failed on Permission csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        Role result = null;
+        Permission result = null;
         try {
             ServiceContext ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getStorageClient(ctx).update(ctx, csid, handler);
-            result = (Role) ctx.getOutput();
+            result = (Permission) ctx.getOutput();
         } catch (BadRequestException bre) {
             Response response = Response.status(
-                    Response.Status.BAD_REQUEST).entity("Update failed reason " + bre.getErrorReason()).type("text/plain").build();
+                    Response.Status.BAD_REQUEST).entity("Update failed reason "
+                    + bre.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity("Update failed reason "
+                    + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
-                logger.debug("caugth exception in updateRole", dnfe);
+                logger.debug("caugth exception in updatePermission", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Update failed on Role csid=" + csid).type(
+                    "Update failed on Permission csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    "Update failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return result;
@@ -252,38 +261,40 @@ public class RoleResource
 
     @DELETE
     @Path("{csid}")
-    public Response deleteRole(@PathParam("csid") String csid) {
+    public Response deletePermission(@PathParam("csid") String csid) {
 
         if (logger.isDebugEnabled()) {
-            logger.debug("deleteRole with csid=" + csid);
+            logger.debug("deletePermission with csid=" + csid);
         }
         if (csid == null || "".equals(csid)) {
-            logger.error("deleteRole: missing csid!");
+            logger.error("deletePermission: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "delete failed on Role csid=" + csid).type(
+                    "delete failed on Permission csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
         try {
-            ServiceContext ctx = createServiceContext((Role) null);
-            ((JpaStorageClientImpl)getStorageClient(ctx)).deleteWhere(ctx, csid);
+            ServiceContext ctx = createServiceContext((Permission) null);
+            getStorageClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Delete failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity("Delete failed reason "
+                    + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
 
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
-                logger.debug("caught exception in deleteRole", dnfe);
+                logger.debug("caught exception in deletePermission", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Delete failed on Role csid=" + csid).type(
+                    "Delete failed on Permission csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Delete failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    "Delete failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
 

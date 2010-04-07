@@ -41,6 +41,7 @@ import org.collectionspace.services.person.PersonAuthorityResource;
 import javax.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Set;
+import org.collectionspace.services.authorization.PermissionResource;
 import org.collectionspace.services.authorization.RoleResource;
 import org.collectionspace.services.common.security.SecurityInterceptor;
 
@@ -61,6 +62,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new SecurityInterceptor());
         singletons.add(new AccountResource());
         singletons.add(new RoleResource());
+        singletons.add(new PermissionResource());
         singletons.add(new CollectionObjectResource());
         singletons.add(new IDResource());
         singletons.add(new IntakeResource());

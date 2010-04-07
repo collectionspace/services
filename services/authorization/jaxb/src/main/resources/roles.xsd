@@ -3,7 +3,7 @@
 <!--
     CollectionSpace default (security) authorization provider schema (XSD)
 
-    Entity(s)  : roles, users_roles
+    Entity(s)  : role
     Used for:
 
     $LastChangedRevision: 916 $

@@ -20,7 +20,9 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
+
  */
+
 package org.collectionspace.services.authorization.storage;
 
 import java.util.ArrayList;
@@ -30,12 +32,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * RoleJpaFilter is to build where clause for role queries
+ * PermissionJpaFilter is to build where clause for role queries
  * @author 
  */
-public class RoleJpaFilter extends JpaDocumentFilter {
+public class PermissionJpaFilter extends JpaDocumentFilter {
 
-    private final Logger logger = LoggerFactory.getLogger(RoleJpaFilter.class);
+    private final Logger logger = LoggerFactory.getLogger(PermissionJpaFilter.class);
 
     @Override
     public List<ParamBinding> buildWhereForSearch(StringBuilder queryStrBldr) {
@@ -44,19 +46,19 @@ public class RoleJpaFilter extends JpaDocumentFilter {
         boolean hasWhere = false;
         //TODO: add tenant id
 
-        String roleName = null;
-        List<String> rn = getQueryParam(RoleStorageConstants.Q_ROLE_NAME);
+        String resName = null;
+        List<String> rn = getQueryParam(PermissionStorageConstants.Q_RESOURCE_NAME);
         if (null != rn) {
-            roleName = rn.get(0);
+            resName = rn.get(0);
         }
-        if (null != roleName && !roleName.isEmpty()) {
+        if (null != resName && !resName.isEmpty()) {
             hasWhere = true;
             queryStrBldr.append(" WHERE");
-            queryStrBldr.append(" UPPER(a." + RoleStorageConstants.ROLE_NAME + ")");
+            queryStrBldr.append(" UPPER(a." + PermissionStorageConstants.RESOURCE_NAME + ")");
             queryStrBldr.append(" LIKE");
-            queryStrBldr.append(" :" + RoleStorageConstants.Q_ROLE_NAME);
-            paramList.add(new ParamBinding(RoleStorageConstants.Q_ROLE_NAME, "%"
-                    + roleName.toUpperCase() + "%"));
+            queryStrBldr.append(" :" + PermissionStorageConstants.Q_RESOURCE_NAME);
+            paramList.add(new ParamBinding(PermissionStorageConstants.Q_RESOURCE_NAME, "%"
+                    + resName.toUpperCase() + "%"));
         }
 
         if (logger.isDebugEnabled()) {

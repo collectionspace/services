@@ -20,12 +20,11 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
-
  */
 
 package org.collectionspace.services.authorization.storage;
 
-import org.collectionspace.services.authorization.Role;
+import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.InvalidDocumentException;
@@ -34,12 +33,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * RoleValidatorHandler executes validation rules for role
+ * PermissionValidatorHandler executes validation rules for permission
  * @author 
  */
-public class RoleValidatorHandler implements ValidatorHandler {
+public class PermissionValidatorHandler implements ValidatorHandler {
 
-    final Logger logger = LoggerFactory.getLogger(RoleValidatorHandler.class);
+    final Logger logger = LoggerFactory.getLogger(PermissionValidatorHandler.class);
 
     @Override
     public void validate(Action action, ServiceContext ctx)
@@ -48,22 +47,22 @@ public class RoleValidatorHandler implements ValidatorHandler {
             logger.debug("validate() action=" + action.name());
         }
         try {
-            Role role = (Role) ctx.getInput();
+            Permission permission = (Permission) ctx.getInput();
             StringBuilder msgBldr = new StringBuilder("validate() ");
             boolean invalid = false;
 
             if (action.equals(Action.CREATE)) {
 
                 //create specific validation here
-                if (role.getRoleName() == null || role.getRoleName().isEmpty()) {
+                if (permission.getResourceName() == null || permission.getResourceName().isEmpty()) {
                     invalid = true;
-                    msgBldr.append("\nroleName : missing");
+                    msgBldr.append("\npermissionName : missing");
                 }
             } else if (action.equals(Action.UPDATE)) {
                 //update specific validation here
-                if (role.getRoleName() != null && role.getRoleName().isEmpty()) {
+                if (permission.getResourceName() != null && permission.getResourceName().isEmpty()) {
                     invalid = true;
-                    msgBldr.append("\nroleName : cannot be changed!");
+                    msgBldr.append("\npermissionName : cannot be changed!");
                 }
             }
             if (invalid) {

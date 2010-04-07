@@ -198,12 +198,6 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             //query an delete is inefficient
             AccountsCommon accountFound = getAccount(em, id);
 
-            StringBuilder accDelStr = new StringBuilder("DELETE FROM ");
-            accDelStr.append(getEntityName(ctx));
-            accDelStr.append(" WHERE csid = :csid");
-            //TODO: add tenant id
-            Query accDel = em.createQuery(accDelStr.toString());
-            accDel.setParameter("csid", id);
             //TODO: add tenant id
 
             //if userid gives any indication about the id provider, it should
@@ -219,12 +213,7 @@ public class AccountStorageClient extends JpaStorageClientImpl {
                 usrDel.setParameter("username", accountFound.getUserId());
             }
             em.getTransaction().begin();
-//            int accDelCount = accDel.executeUpdate();
-//            if (accDelCount != 1) {
-//                if (em != null && em.getTransaction().isActive()) {
-//                    em.getTransaction().rollback();
-//                }
-//            }
+
             if (userLocal != null) {
                 int usrDelCount = usrDel.executeUpdate();
                 if (usrDelCount != 1) {
