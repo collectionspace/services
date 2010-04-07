@@ -902,7 +902,13 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
             account.setUserId(userName);
         }
         if (usePassword) {
-            account.setPassword(Base64.encodeBase64(passwd.getBytes()));
+	    if (logger.isDebugEnabled()) {
+		logger.debug("user=" + userName + " password=" + passwd
+			     + " password length=" + passwd.getBytes().length);
+	    }
+            //jaxb marshaller already b64 encodes the xs:base64Binary types
+ 	    //no need to double encode
+            account.setPassword(passwd.getBytes());
         }
         account.setPersonRefName(screenName);
         account.setEmail(email);

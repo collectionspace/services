@@ -320,10 +320,11 @@ public class AccountStorageClient extends JpaStorageClientImpl {
     }
 
     private String getEncPassword(AccountsCommon account) {
-        byte[] bpass = Base64.decodeBase64(account.getPassword());
-        SecurityUtils.validatePassword(new String(bpass));
+        //jaxb unmarshaller already unmarshal xs:base64Binary, no need to b64 decode
+        //byte[] bpass = Base64.decodeBase64(account.getPassword());
+        SecurityUtils.validatePassword(new String(account.getPassword()));
         String secEncPasswd = SecurityUtils.createPasswordHash(
-                account.getUserId(), new String(bpass));
+                account.getUserId(), new String(account.getPassword()));
         return secEncPasswd;
     }
 
