@@ -27,8 +27,7 @@
     See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
 -->
 
-    <xs:import namespace="http://collectionspace.org/services/authorization"
-            schemaLocation="permissions.xsd"/>
+    <xs:include schemaLocation="permissions.xsd"/>
     <xs:element name="permissions_list">
         <xs:complexType>
             <xs:annotation>
