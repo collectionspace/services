@@ -96,7 +96,7 @@
         <!--property name="securityMetadataSource" ref="cspaceMetadataSource"/-->
         <property name="securityMetadataSource">
             <sec:filter-security-metadata-source>
-                <sec:intercept-url pattern="/**" access="ROLE_USERS"/>
+                <sec:intercept-url pattern="/**" access="IS_AUTHENTICATED_REMEMBERED"/>
             </sec:filter-security-metadata-source>
         </property>
     </bean>
@@ -110,8 +110,7 @@
         </property>
     </bean>
 
-    <bean id="roleVoter" class="org.springframework.security.access.vote.RoleVoter"/>
-
+    <bean id="roleVoter" class="org.springframework.security.access.vote.AuthenticatedVoter"/>
     <!--bean id="cspaceMetadataSource" class="org.collectionspace.services.authorization.spring.CSpaceSecurityMetadataSource">
         <property name="urlProperties">
             <util:properties location="classpath:urls.properties" />
