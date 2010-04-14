@@ -43,7 +43,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.collectionspace.services.authorization.test;
 
 import java.util.ArrayList;
@@ -71,6 +70,9 @@ public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
         setup();
         TransactionStatus status = beginTransaction("seedData");
         try {
+            AuthorizationGen authzGen = new AuthorizationGen();
+            authzGen.genPermissions();
+            authzGen.genPermissionsRoles();
             seedRoles();
             seedPermissions();
         } catch (Exception ex) {
@@ -88,12 +90,14 @@ public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
 
         PermissionsList pcList =
                 (PermissionsList) fromFile(PermissionsList.class,
-                "./test-data/test-permissions.xml");
-
+                 AbstractAuthorizationTestImpl.testDataDir + "test-permissions.xml");
+        logger.info("read permissions from "
+                + AbstractAuthorizationTestImpl.testDataDir + "test-permissions.xml");
         PermissionsRolesList pcrList =
                 (PermissionsRolesList) fromFile(PermissionsRolesList.class,
-                "./test-data/test-permissions-roles.xml");
-
+                AbstractAuthorizationTestImpl.testDataDir + "test-permissions-roles.xml");
+        logger.info("read permissions-roles from "
+                + AbstractAuthorizationTestImpl.testDataDir + "test-permissions.xml");
         AuthZ authZ = AuthZ.get();
         for (Permission p : pcList.getPermissions()) {
             if (logger.isDebugEnabled()) {
@@ -107,9 +111,9 @@ public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
     private List<PermissionRole> getPermissionRoles(PermissionsRolesList pcrList, String permId) {
         List<PermissionRole> prList = new ArrayList<PermissionRole>();
         for (PermissionRole pr : pcrList.getPermissionRoles()) {
-            if (pr.getPermissionId().equals(permId)) {
-                prList.add(pr);
-            }
+            if (pr.getPermissionIds().get(0).equals(permId)) {
+            prList.add(pr);
+        }
         }
         return prList;
     }

@@ -4,13 +4,9 @@
     <persistence-unit name="org.collectionspace.services.authorization">
         <class>org.collectionspace.services.authorization.Permission</class>
         <class>org.collectionspace.services.authorization.PermissionAction</class>
-        <class>org.collectionspace.services.authorization.PermissionsList</class>
-        <class>org.collectionspace.services.authorization.PermissionRole</class>
-        <class>org.collectionspace.services.authorization.PermissionsRolesList</class>
+        <class>org.collectionspace.services.authorization.PermissionRoleRel</class>
         <class>org.collectionspace.services.authorization.Role</class>
-        <class>org.collectionspace.services.authorization.RolesList</class>
         <class>org.collectionspace.services.authorization.UserRole</class>
-        <class>org.collectionspace.services.authorization.UsersRolesList</class>
         <properties>
             <property name="hibernate.ejb.cfgfile" value="hibernate.cfg.xml"/>
 

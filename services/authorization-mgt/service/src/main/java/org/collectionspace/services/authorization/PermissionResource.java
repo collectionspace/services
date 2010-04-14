@@ -299,4 +299,140 @@ public class PermissionResource
         }
 
     }
+
+    @POST
+    @Path("{csid}/permroles")
+    public Response createPermissionRole(@PathParam("csid") String permCsid,
+            PermissionRole input) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("createPermissionRole with permCsid=" + permCsid);
+        }
+        if (permCsid == null || "".equals(permCsid)) {
+            logger.error("createPermissionRole: missing permCsid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "create failed on PermissionRole permCsid=" + permCsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        try {
+            PermissionRoleSubResource subResource = new PermissionRoleSubResource();
+            String permrolecsid = subResource.createPermissionRole(input, SubjectType.ROLE);
+            UriBuilder path = UriBuilder.fromResource(PermissionResource.class);
+            path.path(permCsid + "/permroles/" + permrolecsid);
+            Response response = Response.created(path.build()).build();
+            return response;
+        } catch (BadRequestException bre) {
+            Response response = Response.status(
+                    Response.Status.BAD_REQUEST).entity("Create failed reason "
+                    + bre.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Create failed reason "
+                    + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception in createPermissionRole", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    "Create failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+    }
+
+    @GET
+    @Path("{csid}/permroles/{permrolecsid}")
+    public PermissionRole getPermissionRole(
+            @PathParam("csid") String permCsid,
+            @PathParam("permrolecsid") String permrolecsid) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("getPermissionRole with permCsid=" + permCsid);
+        }
+        if (permCsid == null || "".equals(permCsid)) {
+            logger.error("getPermissionRole: missing permCsid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "get failed on PermissionRole permCsid=" + permCsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        PermissionRole result = null;
+        try {
+            PermissionRoleSubResource subResource = new PermissionRoleSubResource();
+            //get relationships for a permission
+            result = subResource.getPermissionRole(permCsid, SubjectType.ROLE);
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Get failed reason "
+                    + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getPermissionRole", dnfe);
+            }
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Get failed on PermissionRole permrolecsid=" + permrolecsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getPermissionRole", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    "Get failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        if (result == null) {
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Get failed, the requested PermissionRole permrolecsid:" + permrolecsid
+                    + ": was not found.").type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return result;
+    }
+
+    @DELETE
+    @Path("{csid}/permroles/{permrolecsid}")
+    public Response deletePermissionRole(
+            @PathParam("csid") String permCsid,
+            @PathParam("permrolecsid") String permrolecsid) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("deletePermissionRole with permCsid=" + permCsid);
+        }
+        if (permCsid == null || "".equals(permCsid)) {
+            logger.error("deletePermissionRole: missing permCsid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "delete failed on PermissionRole permCsid=" + permCsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        try {
+            PermissionRoleSubResource subResource = new PermissionRoleSubResource();
+            //delete all relationships for a permission
+            subResource.deletePermissionRole(permCsid, SubjectType.ROLE);
+            return Response.status(HttpResponseCodes.SC_OK).build();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Delete failed reason "
+                    + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("caught exception in deletePermissionRole", dnfe);
+            }
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Delete failed on PermissionRole permrolecsid=" + permrolecsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    "Delete failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+
+    }
 }

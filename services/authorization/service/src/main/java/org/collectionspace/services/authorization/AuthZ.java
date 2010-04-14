@@ -108,14 +108,15 @@ public class AuthZ {
             List<PermissionRole> permRoles) {
         List<String> principals = new ArrayList<String>();
         for (PermissionRole permRole : permRoles) {
-            if (!perm.getCsid().equals(permRole.getPermissionId())) {
+            if (!perm.getCsid().equals(permRole.getPermissionIds().get(0))) {
                 throw new IllegalArgumentException("permission ids do not"
-                        + " match role=" + permRole.getRoleId()
-                        + " permission=" + perm.getCsid());
+                        + " match for role=" + permRole.getRoleIds().get(0)
+                        + " with permissionId=" + permRole.getPermissionIds().get(0)
+                        + " for permission with csid=" + perm.getCsid());
             }
             //assuming permrole belongs to the same perm
             //FIXME should use role name
-            principals.add(permRole.getRoleId());
+            principals.add(permRole.getRoleIds().get(0));
         }
         List<PermissionAction> permActions = perm.getActions();
         for (PermissionAction permAction : permActions) {

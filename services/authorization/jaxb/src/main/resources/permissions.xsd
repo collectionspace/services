@@ -11,7 +11,7 @@
 -->
 
 <xs:schema 
-xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
     xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
     xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
@@ -92,7 +92,7 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 </xs:annotation>
             </xs:element>
             <xs:element name="action" type="permission_action" minOccurs="1" maxOccurs="unbounded"/>
-            <xs:element name="effect" type="EffectType" minOccurs="1" maxOccurs="1">
+            <xs:element name="effect" type="effect_type" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
                     <xs:appinfo>
                         <hj:basic>
@@ -150,7 +150,7 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema"
             </xs:appinfo>
         </xs:annotation>
         <xs:sequence>
-            <xs:element name="name" type="ActionType" minOccurs="1">
+            <xs:element name="name" type="action_type" minOccurs="1">
                 <xs:annotation>
                     <xs:appinfo>
                         <hj:basic>
@@ -162,7 +162,7 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema"
         </xs:sequence>
     </xs:complexType>
 
-    <xs:simpleType name = "ActionType">
+    <xs:simpleType name = "action_type">
         <xs:restriction base = "xs:string">
             <xs:enumeration value = "CREATE"/>
             <xs:enumeration value = "READ"/>
@@ -176,7 +176,7 @@ xmlns:xs="http://www.w3.org/2001/XMLSchema"
         </xs:restriction>
     </xs:simpleType>
 
-    <xs:simpleType name = "EffectType">
+    <xs:simpleType name = "effect_type">
         <xs:restriction base = "xs:string">
             <xs:enumeration value = "PERMIT"/>
             <xs:enumeration value = "DENY"/>

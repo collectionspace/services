@@ -590,7 +590,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(toUpdateAccount);
 
         //change password
-        toUpdateAccount.setPassword(Base64.encodeBase64("imagination".getBytes()));
+        toUpdateAccount.setPassword("imagination".getBytes());
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": updated object");
             logger.debug(objectAsXmlString(toUpdateAccount,
@@ -640,7 +640,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
 
         toUpdateAccount.setUserId(null);
         //change password
-        toUpdateAccount.setPassword(Base64.encodeBase64("imagination".getBytes()));
+        toUpdateAccount.setPassword("imagination".getBytes());
         if (logger.isDebugEnabled()) {
             logger.debug(testName + " : updated object");
             logger.debug(objectAsXmlString(toUpdateAccount,

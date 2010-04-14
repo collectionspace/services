@@ -103,6 +103,10 @@ public class JpaStorageClientImpl implements StorageClient {
             DocumentHandler handler) throws BadRequestException,
             DocumentException {
 
+        if (ctx == null) {
+            throw new IllegalArgumentException(
+                    "JpaStorageClient.create: ctx is missing");
+        }
         if (handler == null) {
             throw new IllegalArgumentException(
                     "JpaStorageClient.create: handler is missing");
@@ -159,6 +163,10 @@ public class JpaStorageClientImpl implements StorageClient {
     @Override
     public void get(ServiceContext ctx, String id, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
+        if (ctx == null) {
+            throw new IllegalArgumentException(
+                    "JpaStorageClient.get: ctx is missing");
+        }
         if (handler == null) {
             throw new IllegalArgumentException(
                     "JpaStorageClient.get: handler is missing");
@@ -238,6 +246,10 @@ public class JpaStorageClientImpl implements StorageClient {
     @Override
     public void getFiltered(ServiceContext ctx, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
+        if (ctx == null) {
+            throw new IllegalArgumentException(
+                    "JpaStorageClient.getFiltered: ctx is missing");
+        }
         if (handler == null) {
             throw new IllegalArgumentException(
                     "JpaStorageClient.getFiltered: handler is missing");
@@ -299,6 +311,10 @@ public class JpaStorageClientImpl implements StorageClient {
     public void update(ServiceContext ctx, String id, DocumentHandler handler)
             throws BadRequestException, DocumentNotFoundException,
             DocumentException {
+        if (ctx == null) {
+            throw new IllegalArgumentException(
+                    "JpaStorageClient.update: ctx is missing");
+        }
         if (handler == null) {
             throw new IllegalArgumentException(
                     "JpaStorageClient.update: handler is missing");
@@ -357,6 +373,11 @@ public class JpaStorageClientImpl implements StorageClient {
             throws DocumentNotFoundException,
             DocumentException {
 
+        if (ctx == null) {
+            throw new IllegalArgumentException(
+                    "JpaStorageClient.delete: ctx is missing");
+        }
+
         if (logger.isDebugEnabled()) {
             logger.debug("deleting entity with id=" + id);
         }
@@ -411,6 +432,10 @@ public class JpaStorageClientImpl implements StorageClient {
             throws DocumentNotFoundException,
             DocumentException {
 
+        if (ctx == null) {
+            throw new IllegalArgumentException(
+                    "JpaStorageClient.deleteWhere: ctx is missing");
+        }
 
         if (logger.isDebugEnabled()) {
             logger.debug("deleting entity with id=" + id);
@@ -427,7 +452,7 @@ public class JpaStorageClientImpl implements StorageClient {
             em = emf.createEntityManager();
             Query q = em.createQuery(deleteStr.toString());
             q.setParameter("csid", id);
-            //TODO: add tenant id
+
             int rcount = 0;
             em.getTransaction().begin();
             rcount = q.executeUpdate();

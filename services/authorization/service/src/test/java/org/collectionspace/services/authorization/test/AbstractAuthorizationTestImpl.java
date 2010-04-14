@@ -50,24 +50,16 @@
 package org.collectionspace.services.authorization.test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashSet;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import org.collectionspace.services.authorization.ActionType;
 import org.collectionspace.services.authorization.AuthZ;
-import org.collectionspace.services.authorization.Permission;
-import org.collectionspace.services.authorization.EffectType;
-import org.collectionspace.services.authorization.PermissionAction;
-import org.collectionspace.services.authorization.PermissionsList;
-import org.collectionspace.services.authorization.PermissionRole;
-import org.collectionspace.services.authorization.PermissionsList;
-import org.collectionspace.services.authorization.PermissionsRolesList;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -77,7 +69,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -89,6 +80,7 @@ public abstract class AbstractAuthorizationTestImpl {
 
     final Logger logger = LoggerFactory.getLogger(AbstractAuthorizationTestImpl.class);
     private org.springframework.jdbc.datasource.DataSourceTransactionManager txManager;
+    final static String testDataDir = "src/test/resources/test-data/";
 
     /**
      * Returns the name of the currently running test.
@@ -106,7 +98,6 @@ public abstract class AbstractAuthorizationTestImpl {
                     new Object[]{m.getName()}
                 };
     }
-
 
     protected void setup() {
         ClassPathXmlApplicationContext appContext = new ClassPathXmlApplicationContext(
@@ -144,8 +135,7 @@ public abstract class AbstractAuthorizationTestImpl {
         txManager.commit(status);
     }
 
-
-    protected void toFile(Object o, Class jaxbClass, String fileName) {
+    static void toFile(Object o, Class jaxbClass, String fileName) {
         File f = new File(fileName);
         try {
             JAXBContext jc = JAXBContext.newInstance(jaxbClass);
@@ -158,14 +148,22 @@ public abstract class AbstractAuthorizationTestImpl {
         }
     }
 
-    protected Object fromFile(Class jaxbClass, String fileName) throws Exception {
-        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        InputStream is = tccl.getResourceAsStream(fileName);
-        JAXBContext context = JAXBContext.newInstance(jaxbClass);
-        Unmarshaller unmarshaller = context.createUnmarshaller();
-        //note: setting schema to null will turn validator off
-        unmarshaller.setSchema(null);
-        return jaxbClass.cast(unmarshaller.unmarshal(is));
+    static Object fromFile(Class jaxbClass, String fileName) throws Exception {
+        InputStream is = new FileInputStream(fileName);
+        try {
+            JAXBContext context = JAXBContext.newInstance(jaxbClass);
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            //note: setting schema to null will turn validator off
+            unmarshaller.setSchema(null);
+            return jaxbClass.cast(unmarshaller.unmarshal(is));
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (Exception e) {
+                }
+            }
+        }
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractAuthorizationTestImpl.class)

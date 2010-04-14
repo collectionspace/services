@@ -48,6 +48,7 @@ package org.collectionspace.services.authorization.test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
+import java.util.List;
 import org.collectionspace.services.authorization.ActionType;
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.EffectType;
@@ -55,17 +56,16 @@ import org.collectionspace.services.authorization.PermissionAction;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionsList;
 import org.collectionspace.services.authorization.PermissionsRolesList;
-import org.testng.annotations.Test;
+import org.collectionspace.services.authorization.SubjectType;
 
 /**
  *
  * @author 
  */
-public class AuthorizationGenTest extends AbstractAuthorizationTestImpl {
+public class AuthorizationGen {
 
-    final Logger logger = LoggerFactory.getLogger(AuthorizationGenTest.class);
+    final Logger logger = LoggerFactory.getLogger(AuthorizationGen.class);
 
-    @Test
     public void genPermissions() {
         PermissionsList pcList = new PermissionsList();
         ArrayList<Permission> apcList = new ArrayList<Permission>();
@@ -75,7 +75,10 @@ public class AuthorizationGenTest extends AbstractAuthorizationTestImpl {
         apcList.add(accPerm);
         Permission coPerm = buildCommonPermission("2", "collectionobjects");
         apcList.add(coPerm);
-        toFile(pcList, PermissionsList.class, "./target/test-permissions.xml");
+        AbstractAuthorizationTestImpl.toFile(pcList, PermissionsList.class,
+                AbstractAuthorizationTestImpl.testDataDir + "test-permissions.xml");
+        logger.info("generated permissions to "
+                + AbstractAuthorizationTestImpl.testDataDir + "test-permissions.xml");
 
     }
 
@@ -103,27 +106,31 @@ public class AuthorizationGenTest extends AbstractAuthorizationTestImpl {
         return perm;
     }
 
-    @Test
     public void genPermissionsRoles() {
         PermissionsRolesList psrsl = new PermissionsRolesList();
-        ArrayList<PermissionRole> prl = buildCommonPermissionRoles("1");
-        prl.addAll(buildCommonPermissionRoles("2"));
+        ArrayList<PermissionRole> prl = new ArrayList<PermissionRole>();
+        prl.add(buildCommonPermissionRoles("1"));
+        prl.add(buildCommonPermissionRoles("2"));
         psrsl.setPermissionRoles(prl);
-        toFile(psrsl, PermissionsRolesList.class, "./target/test-permissions-roles.xml");
+        AbstractAuthorizationTestImpl.toFile(psrsl, PermissionsRolesList.class,
+                AbstractAuthorizationTestImpl.testDataDir + "test-permissions-roles.xml");
+        logger.info("generated permissions-roles to "
+                + AbstractAuthorizationTestImpl.testDataDir + "test-permissions-roles.xml");
     }
 
-    private ArrayList<PermissionRole> buildCommonPermissionRoles(String id) {
-        ArrayList<PermissionRole> prl = new ArrayList<PermissionRole>();
+    private PermissionRole buildCommonPermissionRoles(String id) {
+
         PermissionRole pr = new PermissionRole();
-        pr.setPermissionId(id);
+        pr.setSubject(SubjectType.ROLE);
+        List<String> permIds = new ArrayList<String>();
+        permIds.add(id);
+        pr.setPermissionIds(permIds);
         //FIXME should using role id
-        pr.setRoleId("ROLE_USERS");
-        prl.add(pr);
-        PermissionRole pr1 = new PermissionRole();
-        pr1.setPermissionId(id);
-        //FIXME shoudl use role id
-        pr1.setRoleId("ROLE_ADMINISTRATOR");
-        prl.add(pr1);
-        return prl;
+        List<String> roleIds = new ArrayList<String>();
+        roleIds.add("ROLE_USERS");
+        roleIds.add("ROLE_ADMINISTRATOR");
+        pr.setRoleIds(roleIds);
+        return pr;
+
     }
 }

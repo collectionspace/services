@@ -61,10 +61,9 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             DocumentHandler handler) throws BadRequestException,
             DocumentException {
 
-        String docType = ctx.getDocumentType();
-        if (docType == null) {
-            throw new DocumentNotFoundException(
-                    "Unable to find DocumentType for service " + ctx.getServiceName());
+        if (ctx == null) {
+            throw new IllegalArgumentException(
+                    "AccountStorageClient.create : ctx is missing");
         }
         if (handler == null) {
             throw new IllegalArgumentException(
@@ -119,10 +118,9 @@ public class AccountStorageClient extends JpaStorageClientImpl {
     public void update(ServiceContext ctx, String id, DocumentHandler handler)
             throws BadRequestException, DocumentNotFoundException,
             DocumentException {
-        String docType = ctx.getDocumentType();
-        if (docType == null) {
-            throw new DocumentNotFoundException(
-                    "Unable to find DocumentType for service " + ctx.getServiceName());
+        if (ctx == null) {
+            throw new IllegalArgumentException(
+                    "AccountStorageClient.update : ctx is missing");
         }
         if (handler == null) {
             throw new IllegalArgumentException(
@@ -184,10 +182,9 @@ public class AccountStorageClient extends JpaStorageClientImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("deleting entity with id=" + id);
         }
-        String docType = ctx.getDocumentType();
-        if (docType == null) {
-            throw new DocumentNotFoundException(
-                    "Unable to find DocumentType for service " + ctx.getServiceName());
+        if (ctx == null) {
+            throw new IllegalArgumentException(
+                    "AccountStorageClient.delete : ctx is missing");
         }
         EntityManagerFactory emf = null;
         EntityManager em = null;
@@ -265,7 +262,8 @@ public class AccountStorageClient extends JpaStorageClientImpl {
 
     private boolean checkAllowedUpdates(AccountsCommon toAccount, AccountsCommon fromAccount) throws BadRequestException {
         if (!fromAccount.getUserId().equals(toAccount.getUserId())) {
-            String msg = "User id " + toAccount.getUserId() + " not found!";
+            String msg = "User id " + toAccount.getUserId() + " does not match " + 
+                    "for given account with csid=" + fromAccount.getCsid();
             logger.error(msg);
             logger.debug(msg + " found userid=" + fromAccount.getUserId());
             throw new BadRequestException(msg);

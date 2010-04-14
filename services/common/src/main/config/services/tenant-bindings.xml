@@ -578,7 +578,7 @@
             </service:object>
         </tenant:serviceBindings>
         <!-- end role service meta-data -->
-                <!-- begin permission service meta-data -->
+        <!-- begin permission service meta-data -->
         <tenant:serviceBindings name="authorization/permissions" version="0.1">
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.authorization.storage.PermissionDocumentHandler
@@ -611,6 +611,39 @@
             </service:object>
         </tenant:serviceBindings>
         <!-- end permission service meta-data -->
+        <!-- begin permission-role service meta-data -->
+        <tenant:serviceBindings name="authorization/permroles" version="0.1">
+            <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.authorization.storage.PermissionRoleDocumentHandler
+            </service:documentHandler>
+            <!--service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.authorization.storage.PermissionRoleValidatorHandler
+            </service:validatorHandler-->
+            <service:object name="PermissionRole" version="0.1"
+                            xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:part id="0" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="permroles_system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/common/system"
+                            schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="permroles" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/authorization"
+                            schemaLocation="http://collectionspace.org/services/authorization http://services.collectionspace.org/authorization/permissions_roles.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end permission-role service meta-data -->
     </tenant:tenantBinding>
     <!-- end movingimages.us tenant meta-data -->
 </tenant:TenantBindingConfig>

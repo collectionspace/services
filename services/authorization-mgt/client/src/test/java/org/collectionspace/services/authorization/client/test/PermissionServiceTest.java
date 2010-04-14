@@ -52,7 +52,7 @@ import org.testng.annotations.AfterClass;
  */
 public class PermissionServiceTest extends AbstractServiceTestImpl {
 
-    private final Logger logger =
+    static private final Logger logger =
             LoggerFactory.getLogger(PermissionServiceTest.class);
     // Instance variables specific to this test.
     private PermissionClient client = new PermissionClient();
@@ -163,8 +163,8 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         allResourceIdsCreated.add(extractId(res));
 
-        Permission permission2 = createPermissionInstance("intakes",
-                "default permissions for intakes",
+        Permission permission2 = createPermissionInstance("acquisitions",
+                "default permissions for acquisitions",
                 actions,
                 EffectType.PERMIT,
                 true,
@@ -300,7 +300,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
-        ClientResponse<PermissionsList> res = client.readSearchList("intake");
+        ClientResponse<PermissionsList> res = client.readSearchList("acquisition");
         PermissionsList list = res.getEntity();
         int statusCode = res.getStatus();
         // Check the status code of the response: does it match
@@ -409,8 +409,8 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in updatePermission(), below.
         List<PermissionAction> actions = getDefaultActions();
-        Permission permission = createPermissionInstance("intakes",
-                "default permissions for intakes",
+        Permission permission = createPermissionInstance("acquisitions",
+                "default permissions for acquisitions",
                 actions,
                 EffectType.PERMIT,
                 true,
@@ -521,7 +521,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
      * @param useEffect
      * @return
      */
-    private Permission createPermissionInstance(String resourceName,
+    static Permission createPermissionInstance(String resourceName,
             String description,
             List<PermissionAction> actionList,
             EffectType effect,
@@ -548,7 +548,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         return permission;
     }
 
-    private List<PermissionAction> getDefaultActions() {
+    static List<PermissionAction> getDefaultActions() {
         List<PermissionAction> actions = new ArrayList<PermissionAction>();
         PermissionAction create = new PermissionAction();
         create.setName(ActionType.CREATE);
