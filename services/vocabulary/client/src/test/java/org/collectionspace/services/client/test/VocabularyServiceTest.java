@@ -60,7 +60,6 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         LoggerFactory.getLogger(VocabularyServiceTest.class);
 
     // Instance variables specific to this test.
-    private VocabularyClient client = new VocabularyClient();
     final String SERVICE_PATH_COMPONENT = "vocabularies";
     final String ITEM_SERVICE_PATH_COMPONENT = "items";
     private String knownResourceId = null;
@@ -90,6 +89,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         setupCreate(testName);
 
         // Submit the request to the service and store the response.
+        VocabularyClient client = new VocabularyClient();
         String identifier = createIdentifier();
         String displayName = "displayName-" + identifier;
     	String refName = VocabularyClientUtils.createVocabularyRefName(displayName, false);
@@ -128,12 +128,16 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"create"})
     public void createItem(String testName) {
+
+        // Perform setup.
         setupCreate(testName);
 
+        VocabularyClient client = new VocabularyClient();
         HashMap<String, String> itemInfo = new HashMap<String, String>();
         itemInfo.put(VocabularyItemJAXBSchema.DISPLAY_NAME, createIdentifier());
         String newID = VocabularyClientUtils.createItemInVocabulary(knownResourceId,
 				knownResourceRefName, itemInfo, client);
+
         // Store the ID returned from the first item resource created
         // for additional tests below.
         if (knownItemResourceId == null){
@@ -271,6 +275,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         setupRead();
 
         // Submit the request to the service and store the response.
+        VocabularyClient client = new VocabularyClient();
         ClientResponse<MultipartInput> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -333,6 +338,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         setupRead(testName);
 
         // Submit the request to the service and store the response.
+        VocabularyClient client = new VocabularyClient();
         ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
         int statusCode = res.getStatus();
 
@@ -362,6 +368,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     	setupUpdateWithWrongXmlSchema(testName);
 
         // Submit the request to the service and store the response.
+        VocabularyClient client = new VocabularyClient();
         ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
         int statusCode = res.getStatus();
 
@@ -427,6 +434,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         setupReadNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        VocabularyClient client = new VocabularyClient();
         ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -448,6 +456,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         setupReadNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        VocabularyClient client = new VocabularyClient();
         ClientResponse<MultipartInput> res = client.readItem(knownResourceId, NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -474,6 +483,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
+        VocabularyClient client = new VocabularyClient();
         ClientResponse<VocabulariesCommonList> res = client.readList();
         VocabulariesCommonList list = res.getEntity();
         int statusCode = res.getStatus();
@@ -520,6 +530,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
+        VocabularyClient client = new VocabularyClient();
         ClientResponse<VocabularyitemsCommonList> res =
                 client.readItemList(vcsid);
         VocabularyitemsCommonList list = res.getEntity();
@@ -575,6 +586,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         setupUpdate(testName);
 
         // Retrieve the contents of a resource to update.
+        VocabularyClient client = new VocabularyClient();
         ClientResponse<MultipartInput> res =
                 client.read(knownResourceId);
         if(logger.isDebugEnabled()){
@@ -633,6 +645,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupUpdate(testName);
 
+        // Retrieve the contents of a resource to update.
+        VocabularyClient client = new VocabularyClient();
         ClientResponse<MultipartInput> res =
                 client.readItem(knownResourceId, knownItemResourceId);
         if(logger.isDebugEnabled()){
@@ -793,8 +807,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
-
-        // The only relevant ID may be the one used in update(), below.
+        VocabularyClient client = new VocabularyClient();
     	String displayName = "displayName-" + NON_EXISTENT_ID;
     	String refName = VocabularyClientUtils.createVocabularyRefName(displayName, false);
     	MultipartOutput multipart = VocabularyClientUtils.createEnumerationInstance(
@@ -823,8 +836,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
-
-        // The only relevant ID may be the one used in update(), below.
+        VocabularyClient client = new VocabularyClient();
         HashMap<String, String> itemInfo = new HashMap<String, String>();
         itemInfo.put(VocabularyItemJAXBSchema.DISPLAY_NAME, "nonex");
         MultipartOutput multipart = 
@@ -858,6 +870,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         setupDelete(testName);
 
         // Submit the request to the service and store the response.
+        VocabularyClient client = new VocabularyClient();
         ClientResponse<Response> res = client.delete(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -880,6 +893,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         setupDelete(testName);
 
         // Submit the request to the service and store the response.
+        VocabularyClient client = new VocabularyClient();
         ClientResponse<Response> res = client.deleteItem(knownResourceId, knownItemResourceId);
         int statusCode = res.getStatus();
 
@@ -903,6 +917,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         setupDeleteNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        VocabularyClient client = new VocabularyClient();
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -924,6 +939,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         setupDeleteNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        VocabularyClient client = new VocabularyClient();
         ClientResponse<Response> res = client.deleteItem(knownResourceId, NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -1004,9 +1020,10 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
-        // Clean up vocabulary item resources.
+        VocabularyClient client = new VocabularyClient();
         String vocabularyResourceId;
         String vocabularyItemResourceId;
+        // Clean up vocabulary item resources.
         for (Map.Entry<String, String> entry : allResourceItemIdsCreated.entrySet()) {
             vocabularyItemResourceId = entry.getKey();
             vocabularyResourceId = entry.getValue();

@@ -56,7 +56,6 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     private final Logger logger =
             LoggerFactory.getLogger(CollectionObjectServiceTest.class);
     // Instance variables specific to this test.
-    private CollectionObjectClient client = new CollectionObjectClient();
     private String knownResourceId = null;
     private List<String> allResourceIdsCreated = new ArrayList();
     private boolean multivalue; //toggle
@@ -66,7 +65,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     protected String getServicePathComponent() {
-        return client.getServicePathComponent();
+        return new CollectionObjectClient().getServicePathComponent();
     }
 
     // ---------------------------------------------------------------
@@ -83,6 +82,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         setupCreate(testName);
 
         // Submit the request to the service and store the response.
+        CollectionObjectClient client = new CollectionObjectClient();
         String identifier = createIdentifier();
         MultipartOutput multipart =
                 createCollectionObjectInstance(client.getCommonPartName(), identifier);
@@ -325,6 +325,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         collectionObject.setObjectName("some name");
 
         // Submit the request to the service and store the response.
+        CollectionObjectClient client = new CollectionObjectClient();
         MultipartOutput multipart =
                 createCollectionObjectInstance(client.getCommonPartName(), collectionObject, null);
         ClientResponse<Response> res = client.create(multipart);
@@ -378,6 +379,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         setupRead(testName);
 
         // Submit the request to the service and store the response.
+        CollectionObjectClient client = new CollectionObjectClient();
         ClientResponse<MultipartInput> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -419,6 +421,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         setupReadNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        CollectionObjectClient client = new CollectionObjectClient();
         ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -445,6 +448,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
+        CollectionObjectClient client = new CollectionObjectClient();
         ClientResponse<CollectionobjectsCommonList> res = client.readList();
         CollectionobjectsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
@@ -496,6 +500,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         ClientResponse<MultipartInput> res = updateRetrieve(testName, knownResourceId);
 
         // Extract its common part.
+        CollectionObjectClient client = new CollectionObjectClient();
         MultipartInput input = (MultipartInput) res.getEntity();
         CollectionobjectsCommon collectionObject =
                 (CollectionobjectsCommon) extractPart(input,
@@ -536,6 +541,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
     private ClientResponse<MultipartInput> updateRetrieve(String testName, String id) {
         final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
+        CollectionObjectClient client = new CollectionObjectClient();
         ClientResponse<MultipartInput> res = client.read(id);
         if (logger.isDebugEnabled()) {
             logger.debug("read in updateRetrieve for " + testName + " status = " + res.getStatus());
@@ -551,6 +557,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
             CollectionobjectsCommon collectionObject) {
         MultipartOutput output = new MultipartOutput();
         OutputPart commonPart = output.addPart(collectionObject, MediaType.APPLICATION_XML_TYPE);
+        CollectionObjectClient client = new CollectionObjectClient();
         commonPart.getHeaders().add("label", client.getCommonPartName());
         ClientResponse<MultipartInput> res = client.update(knownResourceId, output);
         return res;
@@ -677,6 +684,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         //
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in updateCollectionObject(), below.
+        CollectionObjectClient client = new CollectionObjectClient();
         MultipartOutput multipart =
                 createCollectionObjectInstance(client.getCommonPartName(),
                 NON_EXISTENT_ID);
@@ -719,6 +727,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         // Read an existing record for updating.
         ClientResponse<MultipartInput> res = updateRetrieve(testName, knownResourceId);
 
+        CollectionObjectClient client = new CollectionObjectClient();
         MultipartInput input = (MultipartInput) res.getEntity();
         CollectionobjectsCommon collectionObject =
                 (CollectionobjectsCommon) extractPart(input,
@@ -760,6 +769,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         setupDelete(testName);
 
         // Submit the request to the service and store the response.
+        CollectionObjectClient client = new CollectionObjectClient();
         ClientResponse<Response> res = client.delete(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -783,6 +793,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         setupDeleteNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        CollectionObjectClient client = new CollectionObjectClient();
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -845,7 +856,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
-        for (String resourceId : allResourceIdsCreated) {
+       CollectionObjectClient client = new CollectionObjectClient();
+       for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             ClientResponse<Response> res = client.delete(resourceId);
         }
@@ -986,6 +998,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
         MultipartOutput multipart = null;
 
+        CollectionObjectClient client = new CollectionObjectClient();
         if (useJaxb) {
             multipart = createCollectionObjectInstanceFromXml(testName,
                     client.getCommonPartName(), fileName);

@@ -57,7 +57,6 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         LoggerFactory.getLogger(AcquisitionServiceTest.class);
 
     // Instance variables specific to this test.
-    private AcquisitionClient client = new AcquisitionClient();
     private String knownResourceId = null;
     private List<String> allResourceIdsCreated = new ArrayList();
 
@@ -77,6 +76,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
 
+        AcquisitionClient client = new AcquisitionClient();
         MultipartOutput multipart = createAcquisitionInstance(identifier);
         ClientResponse<Response> res = client.create(multipart);
 
@@ -197,6 +197,8 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupRead(testName);
 
+        AcquisitionClient client = new AcquisitionClient();
+
         // Submit the request to the service and store the response.
         ClientResponse<MultipartInput> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
@@ -227,6 +229,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         setupReadNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        AcquisitionClient client = new AcquisitionClient();
         ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -253,6 +256,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
+        AcquisitionClient client = new AcquisitionClient();
         ClientResponse<AcquisitionsCommonList> res = client.readList();
         AcquisitionsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
@@ -301,8 +305,9 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupUpdate(testName);
 
-        ClientResponse<MultipartInput> res =
-                client.read(knownResourceId);
+        // Retrieve the contents of a resource to update.
+        AcquisitionClient client = new AcquisitionClient();
+        ClientResponse<MultipartInput> res = client.read(knownResourceId);
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": read status = " + res.getStatus());
         }
@@ -312,6 +317,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
             logger.debug("got object to update with ID: " + knownResourceId);
         }
         MultipartInput input = (MultipartInput) res.getEntity();
+
         AcquisitionsCommon acquisition = (AcquisitionsCommon) extractPart(input,
                 client.getCommonPartName(), AcquisitionsCommon.class);
         Assert.assertNotNull(acquisition);
@@ -478,9 +484,10 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
+        AcquisitionClient client = new AcquisitionClient();
         MultipartOutput multipart = createAcquisitionInstance(NON_EXISTENT_ID);
         ClientResponse<MultipartInput> res =
-                client.update(NON_EXISTENT_ID, multipart);
+            client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -506,6 +513,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         setupDelete(testName);
 
         // Submit the request to the service and store the response.
+        AcquisitionClient client = new AcquisitionClient();
         ClientResponse<Response> res = client.delete(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -529,6 +537,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         setupDeleteNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        AcquisitionClient client = new AcquisitionClient();
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -587,6 +596,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
+        AcquisitionClient client = new AcquisitionClient();
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             ClientResponse<Response> res = client.delete(resourceId);
@@ -598,7 +608,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     @Override
     public String getServicePathComponent() {
-        return client.getServicePathComponent();
+        return new AcquisitionClient().getServicePathComponent();
     }
 
 
@@ -614,7 +624,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(acquisition,
             MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
+        commonPart.getHeaders().add("label", new AcquisitionClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, acquisition common");

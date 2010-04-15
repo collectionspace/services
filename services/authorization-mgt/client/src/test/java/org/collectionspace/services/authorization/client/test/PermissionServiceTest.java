@@ -55,7 +55,6 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     static private final Logger logger =
             LoggerFactory.getLogger(PermissionServiceTest.class);
     // Instance variables specific to this test.
-    private PermissionClient client = new PermissionClient();
     private String knownResourceId = null;
     private List<String> allResourceIdsCreated = new ArrayList();
     boolean addTenant = true;
@@ -65,7 +64,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
 
     @Override
     protected String getServicePathComponent() {
-        return client.getServicePathComponent();
+        return new PermissionClient().getServicePathComponent();
     }
 
     // ---------------------------------------------------------------
@@ -90,6 +89,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
                 true,
                 true,
                 true);
+        PermissionClient client = new PermissionClient();
         ClientResponse<Response> res = client.create(permission);
         int statusCode = res.getStatus();
 
@@ -129,6 +129,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
                 false,
                 true,
                 true);
+        PermissionClient client = new PermissionClient();
         ClientResponse<Response> res = client.create(permission);
         int statusCode = res.getStatus();
         // Does it exactly match the expected status code?
@@ -156,6 +157,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
                 true,
                 true,
                 true);
+        PermissionClient client = new PermissionClient();
         ClientResponse<Response> res = client.create(permission1);
         int statusCode = res.getStatus();
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -220,6 +222,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         setupRead(testName);
 
         // Submit the request to the service and store the response.
+        PermissionClient client = new PermissionClient();
         ClientResponse<Permission> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -246,6 +249,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         setupReadNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        PermissionClient client = new PermissionClient();
         ClientResponse<Permission> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -272,6 +276,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
+        PermissionClient client = new PermissionClient();
         ClientResponse<PermissionsList> res = client.readList();
         PermissionsList list = res.getEntity();
         int statusCode = res.getStatus();
@@ -300,6 +305,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
+        PermissionClient client = new PermissionClient();
         ClientResponse<PermissionsList> res = client.readSearchList("acquisition");
         PermissionsList list = res.getEntity();
         int statusCode = res.getStatus();
@@ -338,7 +344,8 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupUpdate(testName);
 
-
+        // Retrieve the contents of a resource to update.
+        PermissionClient client = new PermissionClient();
         ClientResponse<Permission> res =
                 client.read(knownResourceId);
         if (logger.isDebugEnabled()) {
@@ -408,6 +415,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         //
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in updatePermission(), below.
+        PermissionClient client = new PermissionClient();
         List<PermissionAction> actions = getDefaultActions();
         Permission permission = createPermissionInstance("acquisitions",
                 "default permissions for acquisitions",
@@ -443,6 +451,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         setupDelete(testName);
 
         // Submit the request to the service and store the response.
+        PermissionClient client = new PermissionClient();
         ClientResponse<Response> res = client.delete(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -466,6 +475,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         setupDeleteNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        PermissionClient client = new PermissionClient();
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -543,7 +553,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
 
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, permission common");
-            logger.debug(objectAsXmlString(permission, Permission.class));
+        logger.debug(objectAsXmlString(permission, Permission.class));
         }
         return permission;
     }
@@ -579,6 +589,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
+        PermissionClient client = new PermissionClient();
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             ClientResponse<Response> res = client.delete(resourceId);

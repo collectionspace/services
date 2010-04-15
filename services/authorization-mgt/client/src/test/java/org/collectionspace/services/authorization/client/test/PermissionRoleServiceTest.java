@@ -59,7 +59,6 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
     private final Logger logger =
             LoggerFactory.getLogger(PermissionRoleServiceTest.class);
     // Instance variables specific to this test.
-    private PermissionRoleClient client = new PermissionRoleClient();
     private String knownResourceId = null;
     private List<String> allResourceIdsCreated = new ArrayList();
     private Hashtable<String, String> permIds = new Hashtable<String, String>();
@@ -70,7 +69,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
 
     @Override
     protected String getServicePathComponent() {
-        return client.getServicePathComponent();
+        return new PermissionRoleClient().getServicePathComponent();
     }
 
     @BeforeClass(alwaysRun = true)
@@ -107,6 +106,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         PermissionRole permRole = createPermissionRoleInstance(permIds.get("accounts"),
                 roleIds.values().toArray(new String[0]), true, true);
+        PermissionRoleClient client = new PermissionRoleClient();
         ClientResponse<Response> res = client.create(permIds.get("accounts"), permRole);
         int statusCode = res.getStatus();
 
@@ -134,6 +134,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
 
         setupCreate(testName);
         // Submit the request to the service and store the response.
+        PermissionRoleClient client = new PermissionRoleClient();
         PermissionRole permRole = createPermissionRoleInstance(permIds.get("collectionobjects"),
                 roleIds.values().toArray(new String[0]), true, true);
         ClientResponse<Response> res = client.create(permIds.get("collectionobjects"), permRole);
@@ -184,6 +185,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         setupRead(testName);
 
         // Submit the request to the service and store the response.
+        PermissionRoleClient client = new PermissionRoleClient();
         ClientResponse<PermissionRole> res = client.read(permIds.get("accounts"), "123");
         int statusCode = res.getStatus();
 
@@ -209,6 +211,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         setupReadNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        PermissionRoleClient client = new PermissionRoleClient();
         ClientResponse<PermissionRole> res = client.read(NON_EXISTENT_ID, "123");
         int statusCode = res.getStatus();
 
@@ -278,6 +281,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         setupDelete(testName);
 
         // Submit the request to the service and store the response.
+        PermissionRoleClient client = new PermissionRoleClient();
         ClientResponse<Response> res = client.delete(permIds.get("accounts"), "123");
         int statusCode = res.getStatus();
 
@@ -301,6 +305,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         setupDeleteNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        PermissionRoleClient client = new PermissionRoleClient();
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID, "123");
         int statusCode = res.getStatus();
 
@@ -388,6 +393,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
+        PermissionRoleClient client = new PermissionRoleClient();
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             ClientResponse<Response> res = client.delete(resourceId, "123");

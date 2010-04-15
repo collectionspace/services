@@ -58,7 +58,6 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
        LoggerFactory.getLogger(LoaninServiceTest.class);
 
     // Instance variables specific to this test.
-    private LoaninClient client = new LoaninClient();
     final String SERVICE_PATH_COMPONENT = "loansin";
     private String knownResourceId = null;
     private List<String> allResourceIdsCreated = new ArrayList();
@@ -77,8 +76,8 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         setupCreate(testName);
 
         // Submit the request to the service and store the response.
+        LoaninClient client = new LoaninClient();
         String identifier = createIdentifier();
-
         MultipartOutput multipart = createLoaninInstance(identifier);
         ClientResponse<Response> res = client.create(multipart);
 
@@ -228,6 +227,7 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         setupRead(testName);
 
         // Submit the request to the service and store the response.
+        LoaninClient client = new LoaninClient();
         ClientResponse<MultipartInput> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -256,6 +256,7 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         setupReadNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        LoaninClient client = new LoaninClient();
         ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -282,6 +283,7 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
+        LoaninClient client = new LoaninClient();
         ClientResponse<LoansinCommonList> res = client.readList();
         LoansinCommonList list = res.getEntity();
         int statusCode = res.getStatus();
@@ -328,6 +330,8 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupUpdate(testName);
 
+        // Retrieve the contents of a resource to update.
+        LoaninClient client = new LoaninClient();
         ClientResponse<MultipartInput> res =
                 client.read(knownResourceId);
         if(logger.isDebugEnabled()){
@@ -482,8 +486,7 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
-
-        // The only relevant ID may be the one used in update(), below.
+        LoaninClient client = new LoaninClient();
         MultipartOutput multipart = createLoaninInstance(NON_EXISTENT_ID);
         ClientResponse<MultipartInput> res =
                 client.update(NON_EXISTENT_ID, multipart);
@@ -512,6 +515,7 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         setupDelete(testName);
 
         // Submit the request to the service and store the response.
+        LoaninClient client = new LoaninClient();
         ClientResponse<Response> res = client.delete(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -535,6 +539,7 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         setupDeleteNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        LoaninClient client = new LoaninClient();
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -593,7 +598,8 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
-        for (String resourceId : allResourceIdsCreated) {
+       LoaninClient client = new LoaninClient();
+       for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             ClientResponse<Response> res = client.delete(resourceId);
         }
@@ -628,7 +634,7 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(loanin, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
+        commonPart.getHeaders().add("label", new LoaninClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, loanin common");

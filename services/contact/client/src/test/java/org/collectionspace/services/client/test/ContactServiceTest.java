@@ -57,7 +57,6 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
        LoggerFactory.getLogger(ContactServiceTest.class);
 
     // Instance variables specific to this test.
-    private ContactClient client = new ContactClient();
     final String SERVICE_PATH_COMPONENT = "contacts";
     private String knownResourceId = null;
     private List<String> allResourceIdsCreated = new ArrayList();
@@ -76,8 +75,8 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         setupCreate(testName);
 
         // Submit the request to the service and store the response.
+        ContactClient client = new ContactClient();
         String identifier = createIdentifier();
-
         MultipartOutput multipart =
             ContactClientUtils.createContactInstance(identifier, client.getCommonPartName());
         ClientResponse<Response> res = client.create(multipart);
@@ -228,6 +227,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         setupRead(testName);
 
         // Submit the request to the service and store the response.
+        ContactClient client = new ContactClient();
         ClientResponse<MultipartInput> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -256,6 +256,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         setupReadNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        ContactClient client = new ContactClient();
         ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -282,6 +283,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
+        ContactClient client = new ContactClient();
         ClientResponse<ContactsCommonList> res = client.readList();
         ContactsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
@@ -328,6 +330,8 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupUpdate(testName);
 
+        // Submit the request to the service and store the response.
+        ContactClient client = new ContactClient();
         ClientResponse<MultipartInput> res =
                 client.read(knownResourceId);
         if(logger.isDebugEnabled()){
@@ -483,8 +487,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
-
-        // The only relevant ID may be the one used in update(), below.
+        ContactClient client = new ContactClient();
         MultipartOutput multipart =
                 ContactClientUtils.createContactInstance(NON_EXISTENT_ID, client.getCommonPartName());
         ClientResponse<MultipartInput> res =
@@ -514,6 +517,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         setupDelete(testName);
 
         // Submit the request to the service and store the response.
+        ContactClient client = new ContactClient();
         ClientResponse<Response> res = client.delete(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -537,6 +541,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         setupDeleteNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        ContactClient client = new ContactClient();
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -595,6 +600,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
+        ContactClient client = new ContactClient();
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             ClientResponse<Response> res = client.delete(resourceId);

@@ -63,8 +63,6 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
        LoggerFactory.getLogger(CollectionObjectAuthRefsTest.class);
 
     // Instance variables specific to this test.
-    private CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-    private PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     final String SERVICE_PATH_COMPONENT = "collectionobjects";
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     private String knownResourceId = null;
@@ -94,6 +92,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         // Create all the person refs and entities
         createPersonRefs();
         
+        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         MultipartOutput multipart = createCollectionObjectInstance(
         						"Obj Title",
         						"ObjNum-1234",
@@ -136,6 +135,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     protected void createPersonRefs(){
     	String authRefName = 
     		PersonAuthorityClientUtils.createPersonAuthRefName(PERSON_AUTHORITY_NAME, false);
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     			PERSON_AUTHORITY_NAME, authRefName, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
@@ -167,6 +167,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     	MultipartOutput multipart = 
     		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
     				refName, personInfo, personAuthClient.getItemCommonPartName());
@@ -188,6 +189,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         testSetup(OK_STATUS, ServiceRequestType.READ,testName);
 
         // Submit the request to the service and store the response.
+        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         ClientResponse<MultipartInput> res = collectionObjectClient.read(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -259,10 +261,12 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
-        // Note: Any non-success responses are ignored and not reported.
+        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+       // Note: Any non-success responses are ignored and not reported.
         for (String resourceId : collectionObjectIdsCreated) {
             ClientResponse<Response> res = collectionObjectClient.delete(resourceId);
         }
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Delete persons before PersonAuth
         for (String resourceId : personIdsCreated) {
             ClientResponse<Response> res = personAuthClient.deleteItem(personAuthCSID, resourceId);
@@ -295,7 +299,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(collectionObject, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", collectionObjectClient.getCommonPartName());
+        commonPart.getHeaders().add("label", new CollectionObjectClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, collectionObject common");

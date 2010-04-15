@@ -56,7 +56,6 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
    private final Logger logger =
         LoggerFactory.getLogger(RelationServiceTest.class);
 
-    private RelationClient client = new RelationClient();
     final String SERVICE_PATH_COMPONENT = "relations";
     private String knownResourceId = null;
     private List<String> allResourceIdsCreated = new ArrayList();
@@ -75,6 +74,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         setupCreate(testName);
 
         // Submit the request to the service and store the response.
+        RelationClient client = new RelationClient();
         String identifier = createIdentifier();
         MultipartOutput multipart = createRelationInstance(identifier);
         ClientResponse<Response> res = client.create(multipart);
@@ -220,6 +220,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         setupRead(testName);
 
         // Submit the request to the service and store the response.
+        RelationClient client = new RelationClient();
         ClientResponse<MultipartInput> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -250,6 +251,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         setupReadNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        RelationClient client = new RelationClient();
         ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -276,6 +278,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
+        RelationClient client = new RelationClient();
         ClientResponse<RelationsCommonList> res = client.readList();
         RelationsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
@@ -323,6 +326,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         setupUpdate(testName);
 
         // Retrieve an existing resource that we can update.
+        RelationClient client = new RelationClient();
         ClientResponse<MultipartInput> res =
                 client.read(knownResourceId);
         if(logger.isDebugEnabled()){
@@ -484,6 +488,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
+        RelationClient client = new RelationClient();
         MultipartOutput multipart = createRelationInstance(NON_EXISTENT_ID);
         ClientResponse<MultipartInput> res =
                 client.update(NON_EXISTENT_ID, multipart);
@@ -512,6 +517,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         setupDelete(testName);
 
         // Submit the request to the service and store the response.
+        RelationClient client = new RelationClient();
         ClientResponse<Response> res = client.delete(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -535,6 +541,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         setupDeleteNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        RelationClient client = new RelationClient();
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -600,6 +607,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
+        RelationClient client = new RelationClient();
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             ClientResponse<Response> res = client.delete(resourceId);
@@ -621,7 +629,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
                 multipart.addPart(relation, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
+        commonPart.getHeaders().add("label", new RelationClient().getCommonPartName());
         if(logger.isDebugEnabled()){
           logger.debug("to be created, relation common");
           logger.debug(objectAsXmlString(relation, RelationsCommon.class));

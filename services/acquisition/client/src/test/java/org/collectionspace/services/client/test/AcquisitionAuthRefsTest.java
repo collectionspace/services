@@ -63,8 +63,6 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
        LoggerFactory.getLogger(AcquisitionAuthRefsTest.class);
 
     // Instance variables specific to this test.
-    private AcquisitionClient acquisitionClient = new AcquisitionClient();
-    private PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     final String SERVICE_PATH_COMPONENT = "acquisitions";
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     private String knownResourceId = null;
@@ -101,6 +99,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
 								acquisitionFundingSourceRefName,
 								fieldCollectorRefName );
 
+        AcquisitionClient acquisitionClient = new AcquisitionClient();
         ClientResponse<Response> res = acquisitionClient.create(multipart);
 
         int statusCode = res.getStatus();
@@ -135,6 +134,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
     protected void createPersonRefs(){
     	String authRefName = 
     		PersonAuthorityClientUtils.createPersonAuthRefName(PERSON_AUTHORITY_NAME, false);
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     			PERSON_AUTHORITY_NAME, authRefName, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
@@ -163,6 +163,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     	MultipartOutput multipart = 
     		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
     				refName, personInfo, personAuthClient.getItemCommonPartName());
@@ -184,6 +185,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         testSetup(OK_STATUS, ServiceRequestType.READ,testName);
 
         // Submit the request to the service and store the response.
+        AcquisitionClient acquisitionClient = new AcquisitionClient();
         ClientResponse<MultipartInput> res = acquisitionClient.read(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -205,7 +207,8 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         Assert.assertEquals(acquisition.getFieldCollector(), fieldCollectorRefName);
         
         // Get the auth refs and check them
-        ClientResponse<AuthorityRefList> res2 = acquisitionClient.getAuthorityRefs(knownResourceId);
+        ClientResponse<AuthorityRefList> res2 =
+            acquisitionClient.getAuthorityRefs(knownResourceId);
         statusCode = res2.getStatus();
 
         if(logger.isDebugEnabled()){
@@ -252,13 +255,18 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
      */
     // @AfterClass(alwaysRun=true)
     public void cleanUp() {
+
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
+
+        AcquisitionClient acquisitionClient = new AcquisitionClient();
         // Note: Any non-success responses are ignored and not reported.
         for (String resourceId : acquisitionIdsCreated) {
             ClientResponse<Response> res = acquisitionClient.delete(resourceId);
         }
+
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Delete persons before PersonAuth
         for (String resourceId : personIdsCreated) {
             ClientResponse<Response> res = personAuthClient.deleteItem(personAuthCSID, resourceId);
@@ -287,6 +295,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(acquisition, MediaType.APPLICATION_XML_TYPE);
+        AcquisitionClient acquisitionClient = new AcquisitionClient();
         commonPart.getHeaders().add("label", acquisitionClient.getCommonPartName());
 
         if(logger.isDebugEnabled()){

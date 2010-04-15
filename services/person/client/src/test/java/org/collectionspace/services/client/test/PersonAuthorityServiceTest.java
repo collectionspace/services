@@ -63,8 +63,6 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         LoggerFactory.getLogger(PersonAuthorityServiceTest.class);
 
     // Instance variables specific to this test.
-    private PersonAuthorityClient client = new PersonAuthorityClient();
-    private ContactClient contactClient = new ContactClient();
     final String SERVICE_PATH_COMPONENT = "personauthorities";
     final String ITEM_SERVICE_PATH_COMPONENT = "items";
     final String CONTACT_SERVICE_PATH_COMPONENT = "contacts";
@@ -101,6 +99,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         setupCreate(testName);
 
         // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         String identifier = createIdentifier();
     	String displayName = "displayName-" + identifier;
     	String baseRefName = PersonAuthorityClientUtils.createPersonAuthRefName(displayName, false);
@@ -158,6 +157,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
 
         // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         String identifier = createIdentifier();
         String refName = PersonAuthorityClientUtils.createPersonRefName(authRefName, "John Wayne", true);
         Map<String, String> johnWayneMap = new HashMap<String,String>();
@@ -222,10 +222,11 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
 
         // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         String identifier = createIdentifier();
         MultipartOutput multipart =
             ContactClientUtils.createContactInstance(parentcsid,
-            itemcsid, identifier, contactClient.getCommonPartName());
+            itemcsid, identifier, new ContactClient().getCommonPartName());
         ClientResponse<Response> res =
              client.createContact(parentcsid, itemcsid, multipart);
         int statusCode = res.getStatus();
@@ -397,6 +398,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         setupRead();
         
         // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<MultipartInput> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -424,30 +426,31 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         public void readByName(String testName) throws Exception {
 
             // Perform setup.
-            setupRead();
-            
-            // Submit the request to the service and store the response.
-            ClientResponse<MultipartInput> res = client.readByName(knownResourceDisplayName);
-            int statusCode = res.getStatus();
+        setupRead();
 
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if(logger.isDebugEnabled()){
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-            //FIXME: remove the following try catch once Aron fixes signatures
-            try {
-                MultipartInput input = (MultipartInput) res.getEntity();
-                PersonauthoritiesCommon personAuthority = (PersonauthoritiesCommon) extractPart(input,
-                        client.getCommonPartName(), PersonauthoritiesCommon.class);
-                Assert.assertNotNull(personAuthority);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+        // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
+        ClientResponse<MultipartInput> res = client.readByName(knownResourceDisplayName);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
         }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        //FIXME: remove the following try catch once Aron fixes signatures
+        try {
+            MultipartInput input = (MultipartInput) res.getEntity();
+            PersonauthoritiesCommon personAuthority = (PersonauthoritiesCommon) extractPart(input,
+                    client.getCommonPartName(), PersonauthoritiesCommon.class);
+            Assert.assertNotNull(personAuthority);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 /*
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
@@ -489,6 +492,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         setupRead(testName);
 
         // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
         int statusCode = res.getStatus();
 
@@ -523,6 +527,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         setupUpdate(testName);
 
         // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
         int statusCode = res.getStatus();
 
@@ -630,6 +635,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     	setupUpdateWithWrongXmlSchema(testName);
 
         // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
         int statusCode = res.getStatus();
 
@@ -675,6 +681,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         setupRead(testName);
 
         // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<MultipartInput> res =
             client.readContact(knownResourceId, knownItemResourceId,
             knownContactResourceId);
@@ -692,7 +699,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Check whether we've received a contact.
         MultipartInput input = (MultipartInput) res.getEntity();
         ContactsCommon contact = (ContactsCommon) extractPart(input,
-                contactClient.getCommonPartName(), ContactsCommon.class);
+                new ContactClient().getCommonPartName(), ContactsCommon.class);
         Assert.assertNotNull(contact);
         boolean showFull = true;
         if(showFull && logger.isDebugEnabled()){
@@ -714,6 +721,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         setupReadNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -735,6 +743,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         setupReadNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<MultipartInput> res = client.readItem(knownResourceId, NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -756,6 +765,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         setupReadNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<MultipartInput> res =
             client.readContact(knownResourceId, knownItemResourceId, NON_EXISTENT_ID);
         int statusCode = res.getStatus();
@@ -784,6 +794,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<PersonauthoritiesCommonList> res = client.readList();
         PersonauthoritiesCommonList list = res.getEntity();
         int statusCode = res.getStatus();
@@ -833,13 +844,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupReadList(testName);
         
+	// Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<PersonsCommonList> res = null;
-        
         if(vcsid!= null) {
-	        // Submit the request to the service and store the response.
 	        res = client.readItemList(vcsid);
         } else if(name!= null) {
-    	        // Submit the request to the service and store the response.
    	        res = client.readItemListForNamedAuthority(name);
         } else {
         	Assert.fail("readItemList passed null csid and name!");
@@ -904,6 +914,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<ContactsCommonList> res =
                 client.readContactList(parentcsid, itemcsid);
         ContactsCommonList list = res.getEntity();
@@ -966,6 +977,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         setupUpdate(testName);
 
         // Retrieve the contents of a resource to update.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<MultipartInput> res =
                 client.read(knownResourceId);
         if(logger.isDebugEnabled()){
@@ -1024,6 +1036,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupUpdate(testName);
 
+        // Retrieve the contents of a resource to update.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<MultipartInput> res =
                 client.readItem(knownResourceId, knownItemResourceId);
         if(logger.isDebugEnabled()){
@@ -1085,6 +1099,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupUpdate(testName);
 
+        // Retrieve the contents of a resource to update.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<MultipartInput> res =
                 client.readContact(knownResourceId, knownItemResourceId, knownContactResourceId);
         if(logger.isDebugEnabled()){
@@ -1100,7 +1116,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
         MultipartInput input = (MultipartInput) res.getEntity();
         ContactsCommon contact = (ContactsCommon) extractPart(input,
-                contactClient.getCommonPartName(), ContactsCommon.class);
+                new ContactClient().getCommonPartName(), ContactsCommon.class);
         Assert.assertNotNull(contact);
 
         // Update the contents of this resource.
@@ -1114,7 +1130,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the updated resource to the service and store the response.
         MultipartOutput output = new MultipartOutput();
         OutputPart commonPart = output.addPart(contact, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", contactClient.getCommonPartName());
+        commonPart.getHeaders().add("label", new ContactClient().getCommonPartName());
         res = client.updateContact(knownResourceId, knownItemResourceId, knownContactResourceId, output);
         int statusCode = res.getStatus();
 
@@ -1130,7 +1146,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         input = (MultipartInput) res.getEntity();
         ContactsCommon updatedContact =
                 (ContactsCommon) extractPart(input,
-                        contactClient.getCommonPartName(), ContactsCommon.class);
+                        new ContactClient().getCommonPartName(), ContactsCommon.class);
         Assert.assertNotNull(updatedContact);
 
         // Verify that the updated resource received the correct data.
@@ -1245,7 +1261,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         // Note: The ID(s) used when creating the request payload may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
-    	String displayName = "displayName-NON_EXISTENT_ID";
+        PersonAuthorityClient client = new PersonAuthorityClient();
+   	String displayName = "displayName-NON_EXISTENT_ID";
     	String fullRefName = PersonAuthorityClientUtils.createPersonAuthRefName(displayName, true);
     	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     				displayName, fullRefName, client.getCommonPartName());
@@ -1273,8 +1290,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
-
-        // The only relevant ID may be the one used in update(), below.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         Map<String, String> nonexMap = new HashMap<String,String>();
         nonexMap.put(PersonJAXBSchema.FORE_NAME, "John");
         nonexMap.put(PersonJAXBSchema.SUR_NAME, "Wayne");
@@ -1325,6 +1341,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
 
         // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<Response> res =
             client.deleteContact(knownResourceId, knownItemResourceId, knownContactResourceId);
         int statusCode = res.getStatus();
@@ -1352,6 +1369,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
 
         // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<Response> res = client.deleteItem(knownResourceId, knownItemResourceId);
         int statusCode = res.getStatus();
 
@@ -1378,6 +1396,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
 
         // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<Response> res = client.delete(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -1401,6 +1420,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         setupDeleteNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -1422,6 +1442,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         setupDeleteNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<Response> res = client.deleteItem(knownResourceId, NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -1443,6 +1464,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         setupDeleteNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<Response> res =
             client.deleteContact(knownResourceId, knownItemResourceId, NON_EXISTENT_ID);
         int statusCode = res.getStatus();
@@ -1551,6 +1573,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         String itemResourceId;
         String contactResourceId;
         // Clean up contact resources.
+        PersonAuthorityClient client = new PersonAuthorityClient();
         parentResourceId = knownResourceId;
         for (Map.Entry<String, String> entry : allContactResourceIdsCreated.entrySet()) {
             contactResourceId = entry.getKey();

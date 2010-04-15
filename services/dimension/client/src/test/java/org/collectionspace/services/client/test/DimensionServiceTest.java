@@ -56,7 +56,6 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
        LoggerFactory.getLogger(DimensionServiceTest.class);
 
     // Instance variables specific to this test.
-    private DimensionClient client = new DimensionClient();
     final String SERVICE_PATH_COMPONENT = "dimensions";
     private String knownResourceId = null;
     private List<String> allResourceIdsCreated = new ArrayList();
@@ -75,8 +74,8 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         setupCreate(testName);
 
         // Submit the request to the service and store the response.
+        DimensionClient client = new DimensionClient();
         String identifier = createIdentifier();
-
         MultipartOutput multipart = createDimensionInstance(identifier);
         ClientResponse<Response> res = client.create(multipart);
 
@@ -226,6 +225,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         setupRead(testName);
 
         // Submit the request to the service and store the response.
+        DimensionClient client = new DimensionClient();
         ClientResponse<MultipartInput> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -254,6 +254,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         setupReadNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        DimensionClient client = new DimensionClient();
         ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -280,6 +281,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
+        DimensionClient client = new DimensionClient();
         ClientResponse<DimensionsCommonList> res = client.readList();
         DimensionsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
@@ -326,6 +328,8 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupUpdate(testName);
 
+        // Retrieve the contents of a resource to update.
+        DimensionClient client = new DimensionClient();
         ClientResponse<MultipartInput> res =
                 client.read(knownResourceId);
         if(logger.isDebugEnabled()){
@@ -341,7 +345,6 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
                 client.getCommonPartName(), DimensionsCommon.class);
         Assert.assertNotNull(dimension);
 
-        // Update the content of this resource.
         // Update the content of this resource.
         dimension.setValue("updated-" + dimension.getValue());
         dimension.setValueDate("updated-" + dimension.getValueDate());
@@ -481,8 +484,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
-
-        // The only relevant ID may be the one used in update(), below.
+        DimensionClient client = new DimensionClient();
         MultipartOutput multipart = createDimensionInstance(NON_EXISTENT_ID);
         ClientResponse<MultipartInput> res =
                 client.update(NON_EXISTENT_ID, multipart);
@@ -511,6 +513,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         setupDelete(testName);
 
         // Submit the request to the service and store the response.
+        DimensionClient client = new DimensionClient();
         ClientResponse<Response> res = client.delete(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -534,6 +537,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         setupDeleteNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        DimensionClient client = new DimensionClient();
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -592,6 +596,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
+        DimensionClient client = new DimensionClient();
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             ClientResponse<Response> res = client.delete(resourceId);
@@ -621,7 +626,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(dimension, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
+        commonPart.getHeaders().add("label", new DimensionClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, dimension common");

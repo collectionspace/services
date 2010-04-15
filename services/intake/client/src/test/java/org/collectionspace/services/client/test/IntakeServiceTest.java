@@ -56,7 +56,6 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
        LoggerFactory.getLogger(IntakeServiceTest.class);
 
     // Instance variables specific to this test.
-    private IntakeClient client = new IntakeClient();
     final String SERVICE_PATH_COMPONENT = "intakes";
     private String knownResourceId = null;
     private List<String> allResourceIdsCreated = new ArrayList();
@@ -75,8 +74,8 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         setupCreate(testName);
 
         // Submit the request to the service and store the response.
+        IntakeClient client = new IntakeClient();
         String identifier = createIdentifier();
-
         MultipartOutput multipart = createIntakeInstance(identifier);
         ClientResponse<Response> res = client.create(multipart);
 
@@ -226,6 +225,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         setupRead(testName);
 
         // Submit the request to the service and store the response.
+        IntakeClient client = new IntakeClient();
         ClientResponse<MultipartInput> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -254,6 +254,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         setupReadNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        IntakeClient client = new IntakeClient();
         ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -280,6 +281,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
+        IntakeClient client = new IntakeClient();
         ClientResponse<IntakesCommonList> res = client.readList();
         IntakesCommonList list = res.getEntity();
         int statusCode = res.getStatus();
@@ -326,6 +328,8 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupUpdate(testName);
 
+        // Retrieve the contents of a resource to update.
+        IntakeClient client = new IntakeClient();
         ClientResponse<MultipartInput> res =
                 client.read(knownResourceId);
         if(logger.isDebugEnabled()){
@@ -481,8 +485,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
-
-        // The only relevant ID may be the one used in update(), below.
+        IntakeClient client = new IntakeClient();
         MultipartOutput multipart = createIntakeInstance(NON_EXISTENT_ID);
         ClientResponse<MultipartInput> res =
                 client.update(NON_EXISTENT_ID, multipart);
@@ -511,6 +514,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         setupDelete(testName);
 
         // Submit the request to the service and store the response.
+        IntakeClient client = new IntakeClient();
         ClientResponse<Response> res = client.delete(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -534,6 +538,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         setupDeleteNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        IntakeClient client = new IntakeClient();
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -592,6 +597,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
+        IntakeClient client = new IntakeClient();
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             ClientResponse<Response> res = client.delete(resourceId);
@@ -623,7 +629,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
+        commonPart.getHeaders().add("label", new IntakeClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, intake common");

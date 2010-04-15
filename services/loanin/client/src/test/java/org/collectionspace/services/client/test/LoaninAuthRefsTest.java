@@ -64,8 +64,6 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
        LoggerFactory.getLogger(LoaninAuthRefsTest.class);
 
     // Instance variables specific to this test.
-    private LoaninClient loaninClient = new LoaninClient();
-    private PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     final String SERVICE_PATH_COMPONENT = "loansin";
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     private String knownResourceId = null;
@@ -100,15 +98,14 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         //
         // One or more fields in this resource will be PersonAuthority
         // references, and will refer to Person resources by their refNames.
+        LoaninClient loaninClient = new LoaninClient();
         MultipartOutput multipart = createLoaninInstance(
                 "loanInNumber-" + identifier,
                 "returnDate-" + identifier,
                 lendersAuthorizerRefName,
                 lendersContactRefName,
                 loanInContactRefName);
-
         ClientResponse<Response> res = loaninClient.create(multipart);
-
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -140,6 +137,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
     
     protected void createPersonRefs(){
 
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding
         // refName by which it can be identified.
     	String authRefName = 
@@ -175,6 +173,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
     }
     
     protected String createPerson(String firstName, String surName, String refName ) {
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
@@ -199,6 +198,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         testSetup(OK_STATUS, ServiceRequestType.READ,testName);
 
         // Submit the request to the service and store the response.
+        LoaninClient loaninClient = new LoaninClient();
         ClientResponse<MultipartInput> res = loaninClient.read(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -278,6 +278,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         }
         // Note: Any non-success responses are ignored and not reported.
 
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Delete Person resource(s) (before PersonAuthority resources).
         ClientResponse<Response> res;
         for (String resourceId : personIdsCreated) {
@@ -286,6 +287,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         // Delete PersonAuthority resource(s).
         res = personAuthClient.delete(personAuthCSID);
         // Delete Loans In resource(s).
+        LoaninClient loaninClient = new LoaninClient();
         for (String resourceId : loaninIdsCreated) {
             res = loaninClient.delete(resourceId);
         }
@@ -313,7 +315,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(loanin, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", loaninClient.getCommonPartName());
+        commonPart.getHeaders().add("label", new LoaninClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, loanin common");

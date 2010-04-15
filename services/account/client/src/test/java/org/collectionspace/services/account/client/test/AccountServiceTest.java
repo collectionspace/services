@@ -56,7 +56,6 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     private final Logger logger =
             LoggerFactory.getLogger(AccountServiceTest.class);
     // Instance variables specific to this test.
-    private AccountClient client = new AccountClient();
     private String knownResourceId = null;
     private List<String> allResourceIdsCreated = new ArrayList();
     boolean addTenant = true;
@@ -66,7 +65,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
 
     @Override
     protected String getServicePathComponent() {
-        return client.getServicePathComponent();
+        return new AccountClient().getServicePathComponent();
     }
 
     // ---------------------------------------------------------------
@@ -86,6 +85,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         AccountsCommon account =
                 createAccountInstance("barney", "barney", "hithere08", "barney@dinoland.com",
                 true, false, true, true);
+        AccountClient client = new AccountClient();
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
 
@@ -120,6 +120,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         AccountsCommon account =
                 createAccountInstance("barney1", "barney", "hithere08", "barney@dinoland.com",
                 true, false, true, true);
+        AccountClient client = new AccountClient();
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
 
@@ -141,6 +142,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         AccountsCommon account =
                 createAccountInstance("barney", "otherUser", "hithere08", "barney@dinoland.com",
                 true, false, true, true);
+        AccountClient client = new AccountClient();
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
 
@@ -162,6 +164,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "hithere08", "babybop@dinoland.com",
                 true, true, true, true);
+        AccountClient client = new AccountClient();
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
         // Does it exactly match the expected status code?
@@ -184,6 +187,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "hithere08", "babybop@dinoland.com",
                 true, false, false, true);
+        AccountClient client = new AccountClient();
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
         // Does it exactly match the expected status code?
@@ -205,6 +209,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "hithere08", "babybop.dinoland.com",
                 true, false, true, true);
+        AccountClient client = new AccountClient();
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
         // Does it exactly match the expected status code?
@@ -226,6 +231,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "hithere08", "babybop@dinoland.com",
                 false, false, true, true);
+        AccountClient client = new AccountClient();
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
         // Does it exactly match the expected status code?
@@ -247,6 +253,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "hithere08", "babybop/dinoland.com",
                 false, true, false, false);
+        AccountClient client = new AccountClient();
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
         // Does it exactly match the expected status code?
@@ -269,6 +276,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         AccountsCommon account1 =
                 createAccountInstance("curious", "curious", "hithere08", "curious@george.com",
                 true, false, true, true);
+        AccountClient client = new AccountClient();
         ClientResponse<Response> res = client.create(account1);
         int statusCode = res.getStatus();
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -327,6 +335,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         setupRead(testName);
 
         // Submit the request to the service and store the response.
+        AccountClient client = new AccountClient();
         ClientResponse<AccountsCommon> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -353,6 +362,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         setupReadNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        AccountClient client = new AccountClient();
         ClientResponse<AccountsCommon> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -379,6 +389,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
+        AccountClient client = new AccountClient();
         ClientResponse<AccountsCommonList> res = client.readList();
         AccountsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
@@ -407,7 +418,9 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
-        ClientResponse<AccountsCommonList> res = client.readSearchList("tom", null, null);
+        AccountClient client = new AccountClient();
+        ClientResponse<AccountsCommonList> res =
+            client.readSearchList("tom", null, null);
         AccountsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
@@ -435,7 +448,9 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
-        ClientResponse<AccountsCommonList> res = client.readSearchList(null, "tom", null);
+        AccountClient client = new AccountClient();
+        ClientResponse<AccountsCommonList> res =
+            client.readSearchList(null, "tom", null);
         AccountsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
@@ -463,7 +478,9 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
-        ClientResponse<AccountsCommonList> res = client.readSearchList(null, null, "dinoland");
+        AccountClient client = new AccountClient();
+        ClientResponse<AccountsCommonList> res =
+            client.readSearchList(null, null, "dinoland");
         AccountsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
@@ -491,7 +508,9 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
-        ClientResponse<AccountsCommonList> res = client.readSearchList("tom", null, "jerry");
+        AccountClient client = new AccountClient();
+        ClientResponse<AccountsCommonList> res =
+            client.readSearchList("tom", null, "jerry");
         AccountsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
@@ -525,9 +544,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupUpdate(testName);
 
-
-        ClientResponse<AccountsCommon> res =
-                client.read(knownResourceId);
+        AccountClient client = new AccountClient();
+        ClientResponse<AccountsCommon> res = client.read(knownResourceId);
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": read status = " + res.getStatus());
         }
@@ -575,8 +593,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupUpdate(testName);
 
-        ClientResponse<AccountsCommon> res =
-                client.read(knownResourceId);
+        AccountClient client = new AccountClient();
+        ClientResponse<AccountsCommon> res = client.read(knownResourceId);
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": read status = " + res.getStatus());
         }
@@ -624,8 +642,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupUpdate(testName);
 
-        ClientResponse<AccountsCommon> res =
-                client.read(knownResourceId);
+        AccountClient client = new AccountClient();
+        ClientResponse<AccountsCommon> res = client.read(knownResourceId);
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": read status = " + res.getStatus());
         }
@@ -667,8 +685,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupUpdate(testName);
 
-        ClientResponse<AccountsCommon> res =
-                client.read(knownResourceId);
+        AccountClient client = new AccountClient();
+        ClientResponse<AccountsCommon> res = client.read(knownResourceId);
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": read status = " + res.getStatus());
         }
@@ -737,11 +755,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         //
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in updateAccount(), below.
+        AccountClient client = new AccountClient();
         AccountsCommon account =
                 createAccountInstance("simba", "simba", "tiger", "simba@lionking.com",
                 true, false, true, true);
         ClientResponse<AccountsCommon> res =
-                client.update(NON_EXISTENT_ID, account);
+            client.update(NON_EXISTENT_ID, account);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -759,12 +778,13 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     public void updateWrongUser(String testName) throws Exception {
 
         setupUpdate();
+
         // Submit the request to the service and store the response.
         //
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in updateAccount(), below.
-        ClientResponse<AccountsCommon> res =
-                client.read(knownResourceId);
+        AccountClient client = new AccountClient();
+        ClientResponse<AccountsCommon> res = client.read(knownResourceId);
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": read status = " + res.getStatus());
         }
@@ -810,6 +830,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         setupDelete(testName);
 
         // Submit the request to the service and store the response.
+        AccountClient client = new AccountClient();
         ClientResponse<Response> res = client.delete(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -833,6 +854,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         setupDeleteNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        AccountClient client = new AccountClient();
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -950,6 +972,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
+        AccountClient client = new AccountClient();
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             ClientResponse<Response> res = client.delete(resourceId);

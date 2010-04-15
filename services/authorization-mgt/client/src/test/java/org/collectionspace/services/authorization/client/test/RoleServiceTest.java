@@ -52,7 +52,6 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     static private final Logger logger =
             LoggerFactory.getLogger(RoleServiceTest.class);
     // Instance variables specific to this test.
-    private RoleClient client = new RoleClient();
     private String knownResourceId = null;
     private List<String> allResourceIdsCreated = new ArrayList();
     boolean addTenant = true;
@@ -62,7 +61,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
 
     @Override
     protected String getServicePathComponent() {
-        return client.getServicePathComponent();
+        return new RoleClient().getServicePathComponent();
     }
 
     // ---------------------------------------------------------------
@@ -79,6 +78,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         setupCreate(testName);
 
         // Submit the request to the service and store the response.
+        RoleClient client = new RoleClient();
         Role role = createRoleInstance("ROLE_USERS_TEST",
                 "all users are required to be in this role",
                 true);
@@ -113,6 +113,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         setupCreate(testName);
 
         // Submit the request to the service and store the response.
+        RoleClient client = new RoleClient();
         Role role = createRoleInstance("ROLE_USERS",
                 "role users",
                 true);
@@ -134,6 +135,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         setupCreate(testName);
 
         // Submit the request to the service and store the response.
+        RoleClient client = new RoleClient();
         Role role = createRoleInstance("ROLE_USERS",
                 "role for users",
                 false);
@@ -155,8 +157,10 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     public void createList(String testName) throws Exception {
 
         setupCreate(testName);
+
         // Submit the request to the service and store the response.
-        Role role1 = createRoleInstance("ROLE_COLLECTIONS_MANGER_TEST",
+         RoleClient client = new RoleClient();
+       Role role1 = createRoleInstance("ROLE_COLLECTIONS_MANGER_TEST",
                 "collection manager",
                 true);
         ClientResponse<Response> res = client.create(role1);
@@ -217,6 +221,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         setupRead(testName);
 
         // Submit the request to the service and store the response.
+        RoleClient client = new RoleClient();
         ClientResponse<Role> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -243,6 +248,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         setupReadNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        RoleClient client = new RoleClient();
         ClientResponse<Role> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -269,6 +275,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
+        RoleClient client = new RoleClient();
         ClientResponse<RolesList> res = client.readList();
         RolesList list = res.getEntity();
         int statusCode = res.getStatus();
@@ -297,6 +304,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
+        RoleClient client = new RoleClient();
         ClientResponse<RolesList> res = client.readSearchList("movingImage");
         RolesList list = res.getEntity();
         int statusCode = res.getStatus();
@@ -335,7 +343,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupUpdate(testName);
 
-
+        RoleClient client = new RoleClient();
         ClientResponse<Role> res =
                 client.read(knownResourceId);
         if (logger.isDebugEnabled()) {
@@ -405,6 +413,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         //
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in updateRole(), below.
+        RoleClient client = new RoleClient();
         Role role = createRoleInstance("ROLE_XXX",
                 "xxx",
                 true);
@@ -435,6 +444,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         setupDelete(testName);
 
         // Submit the request to the service and store the response.
+        RoleClient client = new RoleClient();
         ClientResponse<Response> res = client.delete(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -458,6 +468,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         setupDeleteNonExistent(testName);
 
         // Submit the request to the service and store the response.
+        RoleClient client = new RoleClient();
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
@@ -532,6 +543,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
+        RoleClient client = new RoleClient();
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             ClientResponse<Response> res = client.delete(resourceId);
