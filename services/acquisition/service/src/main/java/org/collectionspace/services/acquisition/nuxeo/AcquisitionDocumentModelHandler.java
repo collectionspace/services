@@ -32,6 +32,7 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
 import org.collectionspace.services.acquisition.AcquisitionsCommonList;
 import org.collectionspace.services.acquisition.AcquisitionsCommonList.AcquisitionListItem;
+import org.collectionspace.services.acquisition.AcquisitionSourceList;
 
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
@@ -120,8 +121,18 @@ public class AcquisitionDocumentModelHandler
             AcquisitionListItem listItem = new AcquisitionListItem();
             listItem.setAcquisitionReferenceNumber((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     AcquisitionListItemJAXBSchema.ACQUISITION_REFERENCE_NUMBER));
-            listItem.setAcquisitionSource((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-                    AcquisitionListItemJAXBSchema.ACQUISITION_SOURCE));
+            // logger.warn("Before getting acquisitionSources ...");
+            // Investigate what is returned here by Nuxeo's DocumentModel.getProperty ... List<String> or?
+            // AcquisitionSourceList acquisitionSources =
+            //     (AcquisitionSourceList) docModel.getProperty(qetServiceContext().getCommonPartLabel(),
+            //         AcquisitionListItemJAXBSchema.ACQUISITION_SOURCES);
+            // logger.warn("acquisitionSources size = " + acquisitionSources.getAcquisitionSource().size());
+            if (logger.isDebugEnabled()) {
+              logger.debug("Before setting acquisition sources ...");
+            }
+            AcquisitionSourceList acquisitionSources = new AcquisitionSourceList();
+            acquisitionSources.getAcquisitionSource().add("Currently stubbed - see CSPACE-1494.");
+            listItem.setAcquisitionSources(acquisitionSources);
             //need fully qualified context for URI
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
             listItem.setUri(getServiceContextPath() + id);
