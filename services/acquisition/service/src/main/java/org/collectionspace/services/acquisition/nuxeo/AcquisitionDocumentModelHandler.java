@@ -25,15 +25,14 @@ package org.collectionspace.services.acquisition.nuxeo;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 
-import org.collectionspace.services.AcquisitionJAXBSchema;
 import org.collectionspace.services.AcquisitionListItemJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
 import org.collectionspace.services.acquisition.AcquisitionsCommonList;
 import org.collectionspace.services.acquisition.AcquisitionsCommonList.AcquisitionListItem;
 import org.collectionspace.services.acquisition.AcquisitionSourceList;
-
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
@@ -121,18 +120,21 @@ public class AcquisitionDocumentModelHandler
             AcquisitionListItem listItem = new AcquisitionListItem();
             listItem.setAcquisitionReferenceNumber((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     AcquisitionListItemJAXBSchema.ACQUISITION_REFERENCE_NUMBER));
-            // logger.warn("Before getting acquisitionSources ...");
-            // Investigate what is returned here by Nuxeo's DocumentModel.getProperty ... List<String> or?
-            // AcquisitionSourceList acquisitionSources =
-            //     (AcquisitionSourceList) docModel.getProperty(qetServiceContext().getCommonPartLabel(),
-            //         AcquisitionListItemJAXBSchema.ACQUISITION_SOURCES);
-            // logger.warn("acquisitionSources size = " + acquisitionSources.getAcquisitionSource().size());
-            if (logger.isDebugEnabled()) {
-              logger.debug("Before setting acquisition sources ...");
+            // docModel.getProperty returns an ArrayList here.
+            List<String> acquisitionSources =
+                 (List<String>) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+                     AcquisitionListItemJAXBSchema.ACQUISITION_SOURCES);
+            AcquisitionSourceList acquisitionSourceList = new AcquisitionSourceList();
+            NameValue nv = new NameValue();
+            for (String acquisitionSource : acquisitionSources) {
+                try {
+                  nv = unqualify(acquisitionSource);
+                  acquisitionSourceList.getAcquisitionSource().add(nv.value);
+                } catch (IllegalStateException ise) {
+                    logger.warn("acquisition source=" + acquisitionSource, ise);
+                }
             }
-            AcquisitionSourceList acquisitionSources = new AcquisitionSourceList();
-            acquisitionSources.getAcquisitionSource().add("Currently stubbed - see CSPACE-1494.");
-            listItem.setAcquisitionSources(acquisitionSources);
+            listItem.setAcquisitionSources(acquisitionSourceList);
             //need fully qualified context for URI
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
             listItem.setUri(getServiceContextPath() + id);
@@ -167,6 +169,32 @@ public class AcquisitionDocumentModelHandler
     @Override
     public String getQProperty(String prop) {
         return AcquisitionConstants.NUXEO_SCHEMA_NAME + ":" + prop;
+    }
+
+    // The following are all private in DocumentUtils;
+    // might be moved to a common class.
+    private static String NAME_VALUE_SEPARATOR = "|";
+
+    private static class NameValue {
+        String name;
+        String value;
+    };
+
+    private static NameValue unqualify(String input) {
+        NameValue nv = new NameValue();
+        StringTokenizer stz = new StringTokenizer(input, NAME_VALUE_SEPARATOR);
+        int tokens = stz.countTokens();
+        if (tokens == 2) {
+            nv.name = stz.nextToken();
+            nv.value = stz.nextToken();
+        // Allow null or empty values
+        } else if (tokens == 1) {
+            nv.name = stz.nextToken();
+            nv.value = "";
+        } else {
+            throw new IllegalStateException("Unexpected format for multi valued element: " + input);
+        }
+        return nv;
     }
 }
 

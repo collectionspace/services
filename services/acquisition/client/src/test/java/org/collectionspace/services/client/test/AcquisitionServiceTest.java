@@ -278,11 +278,16 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
             int i = 0;
             for(AcquisitionsCommonList.AcquisitionListItem item : items){
                 logger.debug(testName + ": list-item[" + i + "] csid=" +
-                        item.getCsid());
+                    item.getCsid());
                 logger.debug(testName + ": list-item[" + i + "] objectNumber=" +
-                        item.getAcquisitionReferenceNumber());
+                    item.getAcquisitionReferenceNumber());
+                logger.debug(testName + ": list-item[" + i + "] acquisitionSources:");
+                AcquisitionSourceList acqSource = item.getAcquisitionSources();
+                for (String acquisitionSource : acqSource.getAcquisitionSource()) {
+                    logger.debug("acquisitionSource=" + acquisitionSource);
+                }
                 logger.debug(testName + ": list-item[" + i + "] URI=" +
-                        item.getUri());
+                    item.getUri());
                 i++;
             }
         }
@@ -591,7 +596,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
      */
-    @AfterClass(alwaysRun=true)
+    // @AfterClass(alwaysRun=true)
     public void cleanUp() {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
@@ -619,8 +624,9 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         List<String> sources = acqSourcesList.getAcquisitionSource();
         // @TODO Use properly formatted refNames for representative acquisition
         // sources in this example test record. The following are mere placeholders.
-        sources.add("Donor Acquisition Source " + identifier);
-        sources.add("Museum Acquisition Source" + identifier);
+        sources.add("Donor Acquisition Source-" + identifier);
+        sources.add("Museum Acquisition Source-" + identifier);
+        acquisition.setAcquisitionSources(acqSourcesList);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(acquisition,
             MediaType.APPLICATION_XML_TYPE);
