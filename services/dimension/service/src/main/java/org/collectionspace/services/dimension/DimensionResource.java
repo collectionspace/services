@@ -33,12 +33,13 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
-import org.collectionspace.services.dimension.DimensionsCommonList.*;
+import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
+//import org.collectionspace.services.dimension.DimensionsCommonList.*;
 
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
@@ -53,20 +54,34 @@ import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The Class DimensionResource.
+ */
 @Path("/dimensions")
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
-public class DimensionResource extends AbstractCollectionSpaceResourceImpl {
+public class DimensionResource extends
+		AbstractMultiPartCollectionSpaceResourceImpl {
 
+    /** The Constant serviceName. */
     private final static String serviceName = "dimensions";
+    
+    /** The logger. */
     final Logger logger = LoggerFactory.getLogger(DimensionResource.class);
     //FIXME retrieve client type from configuration
+    /** The Constant CLIENT_TYPE. */
     final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType();
 
+    /**
+     * Instantiates a new dimension resource.
+     */
     public DimensionResource() {
         // do nothing
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
+     */
     @Override
     protected String getVersionString() {
     	/** The last change revision. */
@@ -74,27 +89,45 @@ public class DimensionResource extends AbstractCollectionSpaceResourceImpl {
     	return lastChangeRevision;
     }
     
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getServiceName()
+     */
     @Override
     public String getServiceName() {
         return serviceName;
     }
 
-    @Override
-    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-        DocumentHandler docHandler = ctx.getDocumentHandler();
-        if (ctx.getInput() != null) {
-            Object obj = ((MultipartServiceContext)ctx).getInputPart(ctx.getCommonPartLabel(), DimensionsCommon.class);
-            if (obj != null) {
-                docHandler.setCommonPart((DimensionsCommon) obj);
-            }
-        }
-        return docHandler;
+//    @Override
+//    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
+//        DocumentHandler docHandler = ctx.getDocumentHandler();
+//        if (ctx.getInput() != null) {
+//            Object obj = ((MultipartServiceContext)ctx).getInputPart(ctx.getCommonPartLabel(), DimensionsCommon.class);
+//            if (obj != null) {
+//                docHandler.setCommonPart((DimensionsCommon) obj);
+//            }
+//        }
+//        return docHandler;
+//    }
+    
+    /* (non-Javadoc)
+ * @see org.collectionspace.services.common.CollectionSpaceResource#getCommonPartClass()
+ */
+@Override
+    public Class<DimensionsCommon> getCommonPartClass() {
+    	return DimensionsCommon.class;
     }
 
+    /**
+     * Creates the dimension.
+     * 
+     * @param input the input
+     * 
+     * @return the response
+     */
     @POST
     public Response createDimension(MultipartInput input) {
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(input, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             //dimensionObject.setCsid(csid);
@@ -112,6 +145,13 @@ public class DimensionResource extends AbstractCollectionSpaceResourceImpl {
         }
     }
 
+    /**
+     * Gets the dimension.
+     * 
+     * @param csid the csid
+     * 
+     * @return the dimension
+     */
     @GET
     @Path("{csid}")
     public MultipartOutput getDimension(
@@ -128,7 +168,7 @@ public class DimensionResource extends AbstractCollectionSpaceResourceImpl {
         }
         MultipartOutput result = null;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
@@ -157,12 +197,20 @@ public class DimensionResource extends AbstractCollectionSpaceResourceImpl {
         return result;
     }
 
+    /**
+     * Gets the dimension list.
+     * 
+     * @param ui the ui
+     * 
+     * @return the dimension list
+     */
     @GET
     @Produces("application/xml")
     public DimensionsCommonList getDimensionList(@Context UriInfo ui) {
         DimensionsCommonList dimensionObjectList = new DimensionsCommonList();
+        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getAll(ctx, handler);
             dimensionObjectList = (DimensionsCommonList) handler.getCommonPartList();
@@ -177,6 +225,14 @@ public class DimensionResource extends AbstractCollectionSpaceResourceImpl {
         return dimensionObjectList;
     }
 
+    /**
+     * Update dimension.
+     * 
+     * @param csid the csid
+     * @param theUpdate the the update
+     * 
+     * @return the multipart output
+     */
     @PUT
     @Path("{csid}")
     public MultipartOutput updateDimension(
@@ -194,7 +250,7 @@ public class DimensionResource extends AbstractCollectionSpaceResourceImpl {
         }
         MultipartOutput result = null;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(theUpdate, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
@@ -214,6 +270,13 @@ public class DimensionResource extends AbstractCollectionSpaceResourceImpl {
         return result;
     }
 
+    /**
+     * Delete dimension.
+     * 
+     * @param csid the csid
+     * 
+     * @return the response
+     */
     @DELETE
     @Path("{csid}")
     public Response deleteDimension(@PathParam("csid") String csid) {
@@ -229,7 +292,7 @@ public class DimensionResource extends AbstractCollectionSpaceResourceImpl {
             throw new WebApplicationException(response);
         }
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (DocumentNotFoundException dnfe) {

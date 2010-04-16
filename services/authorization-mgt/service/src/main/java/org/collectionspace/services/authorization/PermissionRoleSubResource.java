@@ -33,8 +33,10 @@ import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.authorization.storage.PermissionRoleStorageClient;
 
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
+import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.RemoteServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.storage.StorageClient;
@@ -47,14 +49,22 @@ import org.slf4j.LoggerFactory;
  * @author
  */
 public class PermissionRoleSubResource
-        extends AbstractCollectionSpaceResourceImpl {
+        extends AbstractCollectionSpaceResourceImpl<PermissionRole, PermissionRole> {
 
     //this service is never exposed as standalone RESTful service...just use unique
     //service name to identify binding
+    /** The service name. */
     final private String serviceName = "authorization/permroles";
+    
+    /** The logger. */
     final Logger logger = LoggerFactory.getLogger(PermissionRoleSubResource.class);
+    
+    /** The storage client. */
     final StorageClient storageClient = new PermissionRoleStorageClient();
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
+     */
     @Override
     protected String getVersionString() {
         /** The last change revision. */
@@ -62,14 +72,45 @@ public class PermissionRoleSubResource
         return lastChangeRevision;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getServiceName()
+     */
     @Override
     public String getServiceName() {
         return serviceName;
     }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.CollectionSpaceResource#getCommonPartClass()
+     */
+    @Override
+    public Class<PermissionRole> getCommonPartClass() {
+    	return PermissionRole.class;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.CollectionSpaceResource#getServiceContextFactory()
+     */
+    @Override
+    public ServiceContextFactory<PermissionRole, PermissionRole> getServiceContextFactory() {
+    	return RemoteServiceContextFactory.get();
+    }    
 
-    private <T> ServiceContext createServiceContext(T obj, SubjectType subject) throws Exception {
-        ServiceContext ctx = new RemoteServiceContextImpl<T, T>(getServiceName());
-        ctx.setInput(obj);
+    /**
+     * Creates the service context.
+     * 
+     * @param input the input
+     * @param subject the subject
+     * 
+     * @return the service context< permission role, permission role>
+     * 
+     * @throws Exception the exception
+     */
+    private ServiceContext<PermissionRole, PermissionRole> createServiceContext(PermissionRole input,
+    		SubjectType subject) throws Exception {
+    	ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext(input);
+//      ServiceContext ctx = new RemoteServiceContextImpl<T, T>(getServiceName());
+//      ctx.setInput(input);
         ctx.setDocumentType(PermissionRole.class.getPackage().getName()); //persistence unit
         ctx.setProperty("entity-name", PermissionRoleRel.class.getName());
         //subject name is necessary to indicate if role or permission is a subject
@@ -77,18 +118,21 @@ public class PermissionRoleSubResource
         return ctx;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getStorageClient(org.collectionspace.services.common.context.ServiceContext)
+     */
     @Override
-    public StorageClient getStorageClient(ServiceContext ctx) {
+    public StorageClient getStorageClient(ServiceContext<PermissionRole, PermissionRole> ctx) {
         //FIXME use ctx to identify storage client
         return storageClient;
     }
 
-    @Override
-    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-        DocumentHandler docHandler = ctx.getDocumentHandler();
-        docHandler.setCommonPart(ctx.getInput());
-        return docHandler;
-    }
+//    @Override
+//    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
+//        DocumentHandler docHandler = ctx.getDocumentHandler();
+//        docHandler.setCommonPart(ctx.getInput());
+//        return docHandler;
+//    }
 
     /**
      * createPermissionRole creates one or more permission-role relationships
@@ -101,7 +145,7 @@ public class PermissionRoleSubResource
     public String createPermissionRole(PermissionRole input, SubjectType subject)
             throws Exception {
 
-        ServiceContext ctx = createServiceContext(input, subject);
+        ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext(input, subject);
         DocumentHandler handler = createDocumentHandler(ctx);
         return getStorageClient(ctx).create(ctx, handler);
     }
@@ -121,7 +165,7 @@ public class PermissionRoleSubResource
             logger.debug("getPermissionRole with csid=" + csid);
         }
         PermissionRole result = null;
-        ServiceContext ctx = createServiceContext((PermissionRole) null, subject);
+        ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext((PermissionRole) null, subject);
         DocumentHandler handler = createDocumentHandler(ctx);
         getStorageClient(ctx).get(ctx, csid, handler);
         result = (PermissionRole) ctx.getOutput();
@@ -143,7 +187,7 @@ public class PermissionRoleSubResource
         if (logger.isDebugEnabled()) {
             logger.debug("deletePermissionRole with csid=" + csid);
         }
-        ServiceContext ctx = createServiceContext((PermissionRole) null, subject);
+        ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext((PermissionRole) null, subject);
         getStorageClient(ctx).delete(ctx, csid);
     }
 }

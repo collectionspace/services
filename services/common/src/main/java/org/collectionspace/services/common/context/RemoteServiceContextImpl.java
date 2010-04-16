@@ -24,6 +24,11 @@
 package org.collectionspace.services.common.context;
 
 import java.lang.reflect.Constructor;
+
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,20 +43,65 @@ public class RemoteServiceContextImpl<IT, OT>
         extends AbstractServiceContextImpl<IT, OT>
         implements RemoteServiceContext<IT, OT> {
 
+    /** The logger. */
     final Logger logger = LoggerFactory.getLogger(RemoteServiceContextImpl.class);
     //input stores original content as received over the wire
+    /** The input. */
     private IT input;
+    
+    /** The output. */
     private OT output;
 
-    public RemoteServiceContextImpl(String serviceName) throws UnauthorizedException {
+    /**
+     * Instantiates a new remote service context impl.
+     * 
+     * @param serviceName the service name
+     * 
+     * @throws UnauthorizedException the unauthorized exception
+     */
+    protected RemoteServiceContextImpl(String serviceName) throws UnauthorizedException {
         super(serviceName);
     }
 
+    /**
+     * Instantiates a new remote service context impl. (This is "package" protected for the Factory class)
+     * 
+     * @param serviceName the service name
+     * 
+     * @throws UnauthorizedException the unauthorized exception
+     */
+    protected RemoteServiceContextImpl(String serviceName, IT theInput) throws UnauthorizedException {
+    	this(serviceName);
+        this.input = theInput;
+    }
+
+    /**
+     * Instantiates a new remote service context impl. (This is "package" protected for the Factory class)
+     * 
+     * @param serviceName the service name
+     * @param theInput the the input
+     * @param queryParams the query params
+     * 
+     * @throws UnauthorizedException the unauthorized exception
+     */
+    protected RemoteServiceContextImpl(String serviceName,
+    		IT theInput,
+    		MultivaluedMap<String, String> queryParams) throws UnauthorizedException {
+        this(serviceName, theInput);
+        this.setQueryParams(queryParams);
+    }
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.AbstractServiceContextImpl#getInput()
+     */
     @Override
     public IT getInput() {
         return input;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.AbstractServiceContextImpl#setInput(java.lang.Object)
+     */
     @Override
     public void setInput(IT input) {
         //for security reasons, do not allow to set input again (from handlers)
@@ -63,16 +113,25 @@ public class RemoteServiceContextImpl<IT, OT>
         this.input = input;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.AbstractServiceContextImpl#getOutput()
+     */
     @Override
     public OT getOutput() {
         return output;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.AbstractServiceContextImpl#setOutput(java.lang.Object)
+     */
     @Override
     public void setOutput(OT output) {
         this.output = output;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.RemoteServiceContext#getLocalContext(java.lang.String)
+     */
     @Override
     public ServiceContext getLocalContext(String localContextClassName) throws Exception {
         ClassLoader cloader = Thread.currentThread().getContextClassLoader();
@@ -85,5 +144,5 @@ public class RemoteServiceContextImpl<IT, OT>
         Constructor ctor = ctxClass.getConstructor(java.lang.String.class);
         ServiceContext ctx = (ServiceContext) ctor.newInstance(getServiceName());
         return ctx;
-    }
+    }    
 }

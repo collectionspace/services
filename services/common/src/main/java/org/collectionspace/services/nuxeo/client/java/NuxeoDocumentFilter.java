@@ -51,10 +51,14 @@
 package org.collectionspace.services.nuxeo.client.java;
 
 import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.context.ServiceContext;
 
 /**
  * NXQL specific document filter
  */
 public class NuxeoDocumentFilter extends DocumentFilter {
+	public NuxeoDocumentFilter(ServiceContext ctx) {
+		super(ctx);
+	}
 
 }

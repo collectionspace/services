@@ -40,10 +40,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
+import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -69,7 +67,7 @@ import org.slf4j.LoggerFactory;
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
 public class AcquisitionResource
-        extends AbstractCollectionSpaceResourceImpl {
+        extends AbstractMultiPartCollectionSpaceResourceImpl {
 
     /** The service name. */
     final private String serviceName = "acquisitions";
@@ -94,21 +92,26 @@ public class AcquisitionResource
     public String getServiceName() {
         return serviceName;
     }
+    
+    @Override
+    public Class<AcquisitionsCommon> getCommonPartClass() {
+    	return AcquisitionsCommon.class;
+    }    
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#createDocumentHandler(org.collectionspace.services.common.context.ServiceContext)
      */
-    @Override
-    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-        DocumentHandler docHandler = ctx.getDocumentHandler();
-        if (ctx.getInput() != null) {
-            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), AcquisitionsCommon.class);
-            if (obj != null) {
-                docHandler.setCommonPart((AcquisitionsCommon) obj);
-            }
-        }
-        return docHandler;
-    }
+//    @Override
+//    public DocumentHandler createDocumentHandler(ServiceContext<MultipartInput, MultipartOutput> ctx) throws Exception {
+//        DocumentHandler docHandler = ctx.getDocumentHandler();
+//        if (ctx.getInput() != null) {
+//            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), AcquisitionsCommon.class);
+//            if (obj != null) {
+//                docHandler.setCommonPart((AcquisitionsCommon) obj);
+//            }
+//        }
+//        return docHandler;
+//    }
 
     /**
      * Instantiates a new acquisition resource.
@@ -128,7 +131,7 @@ public class AcquisitionResource
     public Response createAcquisition(MultipartInput input) {
 
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(input, getServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(AcquisitionResource.class);
@@ -172,7 +175,7 @@ public class AcquisitionResource
         }
         MultipartOutput result = null;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
@@ -236,7 +239,7 @@ public class AcquisitionResource
     private AcquisitionsCommonList getAcquisitionsList() {
         AcquisitionsCommonList acquisitionObjectList;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getAll(ctx, handler);
             acquisitionObjectList = (AcquisitionsCommonList) handler.getCommonPartList();
@@ -283,7 +286,7 @@ public class AcquisitionResource
         }
         MultipartOutput result = null;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(theUpdate, getServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
@@ -329,7 +332,7 @@ public class AcquisitionResource
             throw new WebApplicationException(response);
         }
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
@@ -377,13 +380,13 @@ public class AcquisitionResource
     private AcquisitionsCommonList searchAcquisitions(String keywords) {
     	AcquisitionsCommonList acquisitionObjectList;    	
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
 
             // perform a keyword search
             if (keywords != null && !keywords.isEmpty()) {
             	String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
-	            DocumentFilter documentFilter = handler.createDocumentFilter(ctx);
+	            DocumentFilter documentFilter = handler.getDocumentFilter();
 	            documentFilter.setWhereClause(whereClause);
 	            if (logger.isDebugEnabled()) {
 	            	logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
@@ -425,7 +428,7 @@ public class AcquisitionResource
     		@Context UriInfo ui) {
     	AuthorityRefList authRefList = null;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             DocumentWrapper<DocumentModel> docWrapper = 
             	getRepositoryClient(ctx).getDoc(ctx, csid);
             RemoteDocumentModelHandlerImpl handler 

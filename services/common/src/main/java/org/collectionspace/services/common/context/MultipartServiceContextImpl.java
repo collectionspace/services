@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
@@ -49,14 +51,59 @@ public class MultipartServiceContextImpl
         extends RemoteServiceContextImpl<MultipartInput, MultipartOutput>
         implements MultipartServiceContext {
 
+    /** The logger. */
     final Logger logger = LoggerFactory.getLogger(MultipartServiceContextImpl.class);
 
-    public MultipartServiceContextImpl(String serviceName) throws UnauthorizedException {
-        super(serviceName);
+    /**
+     * Instantiates a new multipart service context impl.
+     * 
+     * @param serviceName the service name
+     * 
+     * @throws UnauthorizedException the unauthorized exception
+     */
+    protected MultipartServiceContextImpl(String serviceName)
+			throws UnauthorizedException {
+    	super(serviceName);
+    	setOutput(new MultipartOutput());
+    }
+    
+    /**
+     * Instantiates a new multipart service context impl.
+     * 
+     * @param serviceName the service name
+     * 
+     * @throws UnauthorizedException the unauthorized exception
+     */
+    protected MultipartServiceContextImpl(String serviceName, MultipartInput theInput)
+    		throws UnauthorizedException {
+        super(serviceName, theInput);
         setOutput(new MultipartOutput());
     }
 
+    /**
+     * Instantiates a new multipart service context impl.
+     * 
+     * @param serviceName the service name
+     * @param queryParams the query params
+     * 
+     * @throws UnauthorizedException the unauthorized exception
+     */
+    protected MultipartServiceContextImpl(String serviceName,
+    		MultipartInput theInput,
+    		MultivaluedMap<String, String> queryParams) throws UnauthorizedException {
+    	super(serviceName, theInput, queryParams);
+    	setOutput(new MultipartOutput());
+    }
 
+    /**
+     * Gets the input part.
+     * 
+     * @param label the label
+     * 
+     * @return the input part
+     * 
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private InputPart getInputPart(String label) throws IOException {
         if (getInput() != null) {
             MultipartInput fdip = getInput();
@@ -75,6 +122,9 @@ public class MultipartServiceContextImpl
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.MultipartServiceContext#getInputPart(java.lang.String, java.lang.Class)
+     */
     @Override
     public Object getInputPart(String label, Class clazz) throws IOException {
         Object obj = null;
@@ -85,6 +135,9 @@ public class MultipartServiceContextImpl
         return obj;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.MultipartServiceContext#getInputPartAsString(java.lang.String)
+     */
     @Override
     public String getInputPartAsString(String label) throws IOException {
         InputPart part = getInputPart(label);
@@ -94,6 +147,9 @@ public class MultipartServiceContextImpl
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.MultipartServiceContext#getInputPartAsStream(java.lang.String)
+     */
     @Override
     public InputStream getInputPartAsStream(String label) throws IOException {
         InputPart part = getInputPart(label);
@@ -103,8 +159,9 @@ public class MultipartServiceContextImpl
         return null;
     }
 
- 
-
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.MultipartServiceContext#addOutputPart(java.lang.String, org.w3c.dom.Document, java.lang.String)
+     */
     @Override
     public void addOutputPart(String label, Document doc, String contentType) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -124,6 +181,9 @@ public class MultipartServiceContextImpl
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.RemoteServiceContextImpl#getLocalContext(java.lang.String)
+     */
     @Override
     public ServiceContext getLocalContext(String localContextClassName) throws Exception {
         ClassLoader cloader = Thread.currentThread().getContextClassLoader();

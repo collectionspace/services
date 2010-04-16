@@ -76,8 +76,13 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
         this.properties = properties;
     }
 
+//    public void initializeDocumentFilter(ServiceContext ctx) {
+//    	DocumentFilter docFilter = this.createDocumentFilter(ctx);
+//    	this.setDocumentFilter(docFilter);
+//    }
+    
     @Override
-    public abstract DocumentFilter createDocumentFilter(ServiceContext ctx);
+    public abstract DocumentFilter createDocumentFilter();
 
     /**
      * @return the DocumentFilter

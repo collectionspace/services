@@ -113,13 +113,10 @@ public abstract class DocumentModelHandler<T, TL>
 
     @Override
     public abstract void setCommonPartList(TL obj);
-
+    
     @Override
-    public DocumentFilter createDocumentFilter(ServiceContext ctx) {
-    	DocumentFilter filter = new NuxeoDocumentFilter();
-    	filter.setPageSize(
-    			ctx.getServiceBindingPropertyValue(
-    					DocumentFilter.PAGE_SIZE_DEFAULT_PROPERTY));
+    public DocumentFilter createDocumentFilter() {
+    	DocumentFilter filter = new NuxeoDocumentFilter(this.getServiceContext());
     	return filter;
     }
 

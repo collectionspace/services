@@ -36,17 +36,18 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
-import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
+//import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
+import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.context.MultipartServiceContextFactory;
+//import org.collectionspace.services.common.context.MultipartServiceContext;
+//import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -71,7 +72,8 @@ import org.slf4j.LoggerFactory;
 @Path("/intakes")
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
-public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
+public class IntakeResource extends
+		AbstractMultiPartCollectionSpaceResourceImpl {
 
     /** The Constant serviceName. */
     private final static String serviceName = "intakes";
@@ -108,19 +110,27 @@ public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
     }
 
     /* (non-Javadoc)
-     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#createDocumentHandler(org.collectionspace.services.common.context.ServiceContext)
+     * @see org.collectionspace.services.common.CollectionSpaceResource#getCommonPartClass()
      */
     @Override
-    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-        DocumentHandler docHandler = ctx.getDocumentHandler();
-        if (ctx.getInput() != null) {
-            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), IntakesCommon.class);
-            if (obj != null) {
-                docHandler.setCommonPart((IntakesCommon) obj);
-            }
-        }
-        return docHandler;
+    public Class<IntakesCommon> getCommonPartClass() {
+    	return IntakesCommon.class;
     }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#createDocumentHandler(org.collectionspace.services.common.context.ServiceContext)
+     */
+//    @Override
+//    public DocumentHandler createDocumentHandler(ServiceContext<MultipartInput, MultipartOutput> ctx) throws Exception {
+//        DocumentHandler docHandler = ctx.getDocumentHandler();
+//        if (ctx.getInput() != null) {
+//            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), IntakesCommon.class);
+//            if (obj != null) {
+//                docHandler.setCommonPart((IntakesCommon) obj);
+//            }
+//        }
+//        return docHandler;
+//    }
 
     /**
      * Creates the intake.
@@ -132,7 +142,7 @@ public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
     @POST
     public Response createIntake(MultipartInput input) {
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(input, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             //intakeObject.setCsid(csid);
@@ -177,7 +187,7 @@ public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
         }
         MultipartOutput result = null;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
@@ -223,11 +233,12 @@ public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
     public IntakesCommonList getIntakeList(@Context UriInfo ui,
     		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
     	IntakesCommonList result = null;
+    	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
     	
     	if (keywords != null) {
-    		result = searchIntakes(keywords);
+    		result = searchIntakes(queryParams, keywords);
     	} else {
-    		result = getIntakeList();
+    		result = getIntakeList(queryParams);
     	}
  
     	return result;
@@ -238,10 +249,10 @@ public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
      * 
      * @return the intake list
      */
-    private IntakesCommonList getIntakeList() {
+    private IntakesCommonList getIntakeList(MultivaluedMap<String, String> queryParams) {
         IntakesCommonList intakeObjectList;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getAll(ctx, handler);
             intakeObjectList = (IntakesCommonList) handler.getCommonPartList();
@@ -276,7 +287,8 @@ public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
     		@Context UriInfo ui) {
     	AuthorityRefList authRefList = null;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+        	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();        	
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentWrapper<DocumentModel> docWrapper = 
             	getRepositoryClient(ctx).getDoc(ctx, csid);
             RemoteDocumentModelHandlerImpl handler 
@@ -305,10 +317,11 @@ public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
      * 
      * @return the intake list
      */
+    @Deprecated
     public IntakesCommonList getIntakeList(List<String> csidList) {
         IntakesCommonList intakeObjectList = new IntakesCommonList();
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csidList, handler);
             intakeObjectList = (IntakesCommonList) handler.getCommonPartList();
@@ -352,7 +365,7 @@ public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
         }
         MultipartOutput result = null;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(theUpdate, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
@@ -398,7 +411,7 @@ public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
             throw new WebApplicationException(response);
         }
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
@@ -431,9 +444,11 @@ public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
     @GET
     @Path("/search")    
     @Produces("application/xml")
+    @Deprecated
     public IntakesCommonList keywordsSearchIntakes(@Context UriInfo ui,
     		@QueryParam (IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
-    	return searchIntakes(keywords);
+    	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+    	return searchIntakes(queryParams, keywords);
     }
     	
     /**
@@ -443,16 +458,17 @@ public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
      * 
      * @return the intakes common list
      */
-    private IntakesCommonList searchIntakes(String keywords) {
+    private IntakesCommonList searchIntakes(MultivaluedMap<String, String> queryParams,
+    		String keywords) {
     	IntakesCommonList intakesObjectList;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
 
             // perform a keyword search
             if (keywords != null && !keywords.isEmpty()) {
             	String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
-	            DocumentFilter documentFilter = handler.createDocumentFilter(ctx);
+	            DocumentFilter documentFilter = handler.getDocumentFilter();
 	            documentFilter.setWhereClause(whereClause);
 	            if (logger.isDebugEnabled()) {
 	            	logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
@@ -476,6 +492,5 @@ public class IntakeResource extends AbstractCollectionSpaceResourceImpl {
             throw new WebApplicationException(response);
         }
         return intakesObjectList;
-    }    
-    
+    }
 }

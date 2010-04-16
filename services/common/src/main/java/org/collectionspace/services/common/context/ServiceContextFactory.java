@@ -23,21 +23,70 @@
  */
 package org.collectionspace.services.common.context;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 /**
  *
  * ServiceContextFactory creates a service context
  *
  */
-public interface ServiceContextFactory<T> {
-
+public interface ServiceContextFactory<IT, OT> {
 
     /**
-     * createServiceContext is a factory method to create a service context
-     * a service context is created on every service request call
-     * @param input
-     * @param serviceName which service/repository context to use
-     * @return
+     * Creates a new ServiceContext object.
+     * 
+     * @param serviceName the service name
+     * @param input the input
+     * 
+     * @return the service context
+     * 
+     * @throws Exception the exception
      */
-    public ServiceContext createServiceContext(T input, String serviceName) throws Exception;
+    public ServiceContext<IT, OT> createServiceContext(String serviceName, IT input) throws Exception;
+    
+    /**
+     * Creates a new ServiceContext object.
+     * 
+     * @param serviceName the service name
+     * 
+     * @return the service context< i t, o t>
+     * 
+     * @throws Exception the exception
+     */
+    public ServiceContext<IT, OT> createServiceContext(String serviceName) throws Exception;
 
+    /**
+     * Creates a new ServiceContext object.
+     * 
+     * @param serviceName the service name
+     * @param input the input
+     * @param queryParams the query params
+     * 
+     * @return the service context
+     * 
+     * @throws Exception the exception
+     */
+    public ServiceContext<IT, OT> createServiceContext(String serviceName,
+    		IT input,
+    		MultivaluedMap<String, String> queryParams) throws Exception;    
+        
+    /**
+     * Creates a new ServiceContext object.
+     * 
+     * @param serviceName the service name
+     * @param input the input
+     * @param queryParams the query params
+     * @param documentType the document type
+     * @param entityName the entity name
+     * 
+     * @return the service context
+     * 
+     * @throws Exception the exception
+     */
+    public ServiceContext<IT, OT> createServiceContext(
+    		String serviceName,
+    		IT input, 
+    		MultivaluedMap<String, String> queryParams,
+    		String documentType,
+    		String entityName) throws Exception;
 }

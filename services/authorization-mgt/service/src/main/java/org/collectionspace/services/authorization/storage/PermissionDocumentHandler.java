@@ -143,11 +143,8 @@ public class PermissionDocumentHandler
     }
 
     @Override
-    public DocumentFilter createDocumentFilter(ServiceContext ctx) {
-        DocumentFilter filter = new PermissionJpaFilter();
-        filter.setPageSize(
-                ctx.getServiceBindingPropertyValue(
-                DocumentFilter.PAGE_SIZE_DEFAULT_PROPERTY));
+    public DocumentFilter createDocumentFilter() {
+        DocumentFilter filter = new PermissionJpaFilter(this.getServiceContext());
         return filter;
     }
 

@@ -145,11 +145,8 @@ public class AccountDocumentHandler
     }
 
     @Override
-    public DocumentFilter createDocumentFilter(ServiceContext ctx) {
-    	DocumentFilter  filter = new AccountJpaFilter();
-    	filter.setPageSize(
-    			ctx.getServiceBindingPropertyValue(
-    					DocumentFilter.PAGE_SIZE_DEFAULT_PROPERTY));
+    public DocumentFilter createDocumentFilter() {
+    	DocumentFilter  filter = new AccountJpaFilter(this.getServiceContext());
     	return filter;
     }
 
@@ -174,5 +171,12 @@ public class AccountDocumentHandler
     private void sanitize(AccountsCommon account) {
         account.setPassword(null);
         account.setTenants(new ArrayList<AccountTenant>(0));
+    }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#initializeDocumentFilter(org.collectionspace.services.common.context.ServiceContext)
+     */
+    public void initializeDocumentFilter(ServiceContext ctx) {
+    	// set a default document filter in this method
     }
 }

@@ -42,17 +42,18 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
-import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.context.MultipartServiceContextFactory;
+import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
+//import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.relation.IRelationsManager;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.security.UnauthorizedException;
+
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +63,8 @@ import org.slf4j.LoggerFactory;
 @Path("/relations")
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
-public class NewRelationResource extends AbstractCollectionSpaceResourceImpl {
+public class NewRelationResource extends
+		AbstractMultiPartCollectionSpaceResourceImpl {
 
 	/** The Constant serviceName. */
 	public final static String serviceName = "relations";
@@ -89,21 +91,29 @@ public class NewRelationResource extends AbstractCollectionSpaceResourceImpl {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.collectionspace.services.common.AbstractCollectionSpaceResource#createDocumentHandler(org.collectionspace.services.common.context.ServiceContext)
+	 * @see org.collectionspace.services.common.CollectionSpaceResource#getCommonPartClass()
 	 */
 	@Override
-	public DocumentHandler createDocumentHandler(ServiceContext ctx)
-			throws Exception {
-		DocumentHandler docHandler = ctx.getDocumentHandler();
-		if (ctx.getInput() != null) {
-			Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx
-					.getCommonPartLabel(), RelationsCommon.class);
-			if (obj != null) {
-				docHandler.setCommonPart((RelationsCommon) obj);
-			}
-		}
-		return docHandler;
-	}
+    public Class<RelationsCommon> getCommonPartClass() {
+    	return RelationsCommon.class;
+    }
+	
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.common.AbstractCollectionSpaceResource#createDocumentHandler(org.collectionspace.services.common.context.ServiceContext)
+	 */
+//	@Override
+//	public DocumentHandler createDocumentHandler(ServiceContext<MultipartInput, MultipartOutput> ctx)
+//			throws Exception {
+//		DocumentHandler docHandler = ctx.getDocumentHandler();
+//		if (ctx.getInput() != null) {
+//			Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx
+//					.getCommonPartLabel(), RelationsCommon.class);
+//			if (obj != null) {
+//				docHandler.setCommonPart((RelationsCommon) obj);
+//			}
+//		}
+//		return docHandler;
+//	}
 
 	/**
 	 * Creates the relation.
@@ -114,10 +124,8 @@ public class NewRelationResource extends AbstractCollectionSpaceResourceImpl {
 	 */
 	@POST
 	public Response createRelation(MultipartInput input) {
-
 		try {
-			ServiceContext ctx = MultipartServiceContextFactory.get()
-					.createServiceContext(input, getServiceName());
+			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
 			DocumentHandler handler = createDocumentHandler(ctx);
 			String csid = getRepositoryClient(ctx).create(ctx, handler);
 			UriBuilder path = UriBuilder
@@ -163,8 +171,7 @@ public class NewRelationResource extends AbstractCollectionSpaceResourceImpl {
 		}
 		MultipartOutput result = null;
 		try {
-			ServiceContext ctx = MultipartServiceContextFactory.get()
-					.createServiceContext(null, getServiceName());
+			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
 			DocumentHandler handler = createDocumentHandler(ctx);
 			getRepositoryClient(ctx).get(ctx, csid, handler);
 			result = (MultipartOutput) ctx.getOutput();
@@ -406,8 +413,7 @@ public class NewRelationResource extends AbstractCollectionSpaceResourceImpl {
 		}
 		MultipartOutput result = null;
 		try {
-			ServiceContext ctx = MultipartServiceContextFactory.get()
-					.createServiceContext(theUpdate, getServiceName());
+			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
 			DocumentHandler handler = createDocumentHandler(ctx);
 			getRepositoryClient(ctx).update(ctx, csid, handler);
 			result = (MultipartOutput) ctx.getOutput();
@@ -455,8 +461,7 @@ public class NewRelationResource extends AbstractCollectionSpaceResourceImpl {
 			throw new WebApplicationException(response);
 		}
 		try {
-			ServiceContext ctx = MultipartServiceContextFactory.get()
-					.createServiceContext(null, getServiceName());
+			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
 			getRepositoryClient(ctx).delete(ctx, csid);
 			return Response.status(HttpResponseCodes.SC_OK).build();
 		} catch (UnauthorizedException ue) {
@@ -493,10 +498,9 @@ public class NewRelationResource extends AbstractCollectionSpaceResourceImpl {
 			String predicate, String objectCsid) throws WebApplicationException {
 		RelationsCommonList relationList = new RelationsCommonList();
 		try {
-			ServiceContext ctx = MultipartServiceContextFactory.get()
-					.createServiceContext(null, getServiceName());
+			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
 			DocumentHandler handler = createDocumentHandler(ctx);
-			Map propsFromPath = handler.getProperties();
+			Map<String, Object> propsFromPath = handler.getProperties();
 			propsFromPath.put(IRelationsManager.SUBJECT, subjectCsid);
 			propsFromPath.put(IRelationsManager.PREDICATE, predicate);
 			propsFromPath.put(IRelationsManager.OBJECT, objectCsid);

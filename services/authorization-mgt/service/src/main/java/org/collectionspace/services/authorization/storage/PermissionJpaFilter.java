@@ -27,6 +27,7 @@ package org.collectionspace.services.authorization.storage;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,15 @@ public class PermissionJpaFilter extends JpaDocumentFilter {
 
     private final Logger logger = LoggerFactory.getLogger(PermissionJpaFilter.class);
 
+    /**
+     * Instantiates a new permission jpa filter.
+     * 
+     * @param ctx the ctx
+     */
+    public PermissionJpaFilter(ServiceContext ctx) {
+    	super(ctx);
+    }
+    
     @Override
     public List<ParamBinding> buildWhereForSearch(StringBuilder queryStrBldr) {
 

@@ -23,7 +23,10 @@
  */
 package org.collectionspace.services.common.context;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
  *
@@ -32,28 +35,67 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
  *
  */
 public class MultipartServiceContextFactory
-        implements ServiceContextFactory<MultipartInput> {
+        implements ServiceContextFactory<MultipartInput, MultipartOutput> {
 
+    /** The Constant self. */
     final private static MultipartServiceContextFactory self = new MultipartServiceContextFactory();
 
-    private MultipartServiceContextFactory() {
-    }
+    /**
+     * Instantiates a new multipart service context factory.
+     */
+    private MultipartServiceContextFactory() {} // private constructor as part of the singleton pattern
 
+    /**
+     * Gets the.
+     * 
+     * @return the multipart service context factory
+     */
     public static MultipartServiceContextFactory get() {
         return self;
     }
 
-    /**
-     * createServiceContext is a factory method to create a service context
-     * a service context is created on every service request call
-     * @param input
-     * @param serviceName which service/repository context to use
-     * @return
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContextFactory#createServiceContext(java.lang.String)
      */
     @Override
-    public ServiceContext createServiceContext(MultipartInput input, String serviceName) throws Exception {
+    public ServiceContext<MultipartInput, MultipartOutput> createServiceContext(String serviceName) throws Exception {
         MultipartServiceContext ctx = new MultipartServiceContextImpl(serviceName);
-        ctx.setInput(input);
         return ctx;
+    }
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContextFactory#createServiceContext(java.lang.String, java.lang.Object)
+     */
+    @Override
+    public ServiceContext<MultipartInput, MultipartOutput> createServiceContext(String serviceName,
+    		MultipartInput input) throws Exception {
+        MultipartServiceContext ctx = new MultipartServiceContextImpl(serviceName, input);
+        return ctx;
+    }
+        
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContextFactory#createServiceContext(java.lang.String, java.lang.Object, javax.ws.rs.core.MultivaluedMap)
+     */
+    @Override
+    public ServiceContext<MultipartInput, MultipartOutput> createServiceContext(String serviceName,
+    		MultipartInput input, 
+    		MultivaluedMap<String, String> queryParams)
+    			throws Exception {
+    	ServiceContext<MultipartInput, MultipartOutput> ctx = new MultipartServiceContextImpl(serviceName,
+    			input,
+    			queryParams);
+    	return ctx;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContextFactory#createServiceContext(java.lang.String, java.lang.Object, javax.ws.rs.core.MultivaluedMap, java.lang.String, java.lang.String)
+     */
+    @Override
+    public ServiceContext<MultipartInput, MultipartOutput> createServiceContext(String serviceName, 
+    		MultipartInput input,
+    		MultivaluedMap<String, String> queryParams,
+    		String documentType,
+    		String entityName) throws Exception {
+    	return this.createServiceContext(serviceName, input, queryParams);
     }
 }

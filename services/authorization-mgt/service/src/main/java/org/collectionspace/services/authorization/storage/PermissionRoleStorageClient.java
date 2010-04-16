@@ -145,7 +145,7 @@ public class PermissionRoleStorageClient extends JpaStorageClientImpl {
         }
         DocumentFilter docFilter = handler.getDocumentFilter();
         if (docFilter == null) {
-            docFilter = handler.createDocumentFilter(ctx);
+            docFilter = handler.createDocumentFilter();
         }
         EntityManagerFactory emf = null;
         EntityManager em = null;

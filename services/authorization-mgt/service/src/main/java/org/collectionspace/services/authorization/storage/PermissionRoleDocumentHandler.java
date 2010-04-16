@@ -174,7 +174,7 @@ public class PermissionRoleDocumentHandler
     }
 
     @Override
-    public DocumentFilter createDocumentFilter(ServiceContext ctx) {
-        return new DocumentFilter();
+    public DocumentFilter createDocumentFilter() {
+        return new DocumentFilter(this.getServiceContext());
     }
 }

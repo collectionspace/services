@@ -25,6 +25,9 @@ package org.collectionspace.services.common.context;
 
 import java.util.List;
 import java.util.Map;
+
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.ValidatorHandler;
@@ -43,6 +46,8 @@ public interface ServiceContext<IT, OT> {
      * The character used to separate the words in a part label
      */
     public static final String PART_LABEL_SEPERATOR = "_";
+    
+    /** The Constant PART_COMMON_LABEL. */
     public static final String PART_COMMON_LABEL = "common";
 	
     /**
@@ -201,14 +206,23 @@ public interface ServiceContext<IT, OT> {
      */
     public String getServiceBindingPropertyValue(String propName);
 
-
-
     /**
      * getDocumentHanlder returns document handler configured in the the binding
      * it creates the handler if necessary.
      * @return document handler
      */
     public DocumentHandler getDocumentHandler() throws Exception;
+    
+    /**
+     * Gets the document hanlder.
+     * 
+     * @param queryParams the query params
+     * 
+     * @return the document hanlder
+     * 
+     * @throws Exception the exception
+     */
+    public DocumentHandler getDocumentHandler(MultivaluedMap<String, String> queryParams) throws Exception;   
 
     /**
      * getValidatorHandlers returns registered (from binding) validtor handlers
@@ -216,7 +230,20 @@ public interface ServiceContext<IT, OT> {
      * @return validation handlers
      */
     public List<ValidatorHandler> getValidatorHandlers() throws Exception;
-
+    
+    /**
+     * Gets the query params.
+     * 
+     * @return the query params
+     */
+    public MultivaluedMap<String, String> getQueryParams();
+    
+    /**
+     * Sets the query params.
+     * 
+     * @param queryParams the query params
+     */
+    public void setQueryParams(MultivaluedMap<String, String> queryParams);    
 }
 
 

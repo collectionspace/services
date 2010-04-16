@@ -40,7 +40,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.VocabularyItemJAXBSchema;
-import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
+import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.MultipartServiceContext;
@@ -59,21 +59,37 @@ import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The Class VocabularyResource.
+ */
 @Path("/vocabularies")
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
-public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
+public class VocabularyResource extends
+		AbstractMultiPartCollectionSpaceResourceImpl {
 
+    /** The Constant vocabularyServiceName. */
     private final static String vocabularyServiceName = "vocabularies";
+    
+    /** The Constant vocabularyItemServiceName. */
     private final static String vocabularyItemServiceName = "vocabularyitems";
+    
+    /** The logger. */
     final Logger logger = LoggerFactory.getLogger(VocabularyResource.class);
     //FIXME retrieve client type from configuration
+    /** The Constant CLIENT_TYPE. */
     final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType();
 
+    /**
+     * Instantiates a new vocabulary resource.
+     */
     public VocabularyResource() {
         // do nothing
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
+     */
     @Override
     protected String getVersionString() {
         /** The last change revision. */
@@ -81,11 +97,27 @@ public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
         return lastChangeRevision;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getServiceName()
+     */
     @Override
     public String getServiceName() {
         return vocabularyServiceName;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.CollectionSpaceResource#getCommonPartClass()
+     */
+    @Override
+    public Class<VocabulariesCommon> getCommonPartClass() {
+    	return VocabulariesCommon.class;
+    }
+    
+    /**
+     * Gets the item service name.
+     * 
+     * @return the item service name
+     */
     public String getItemServiceName() {
         return vocabularyItemServiceName;
     }
@@ -97,37 +129,60 @@ public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
     return ctx;
     }
      */
-    @Override
-    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-        DocumentHandler docHandler = ctx.getDocumentHandler();
-        if (ctx.getInput() != null) {
-            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), VocabulariesCommon.class);
-            if (obj != null) {
-                docHandler.setCommonPart((VocabulariesCommon) obj);
-            }
-        }
-        return docHandler;
-    }
-
+//    @Override
+//    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
+//        DocumentHandler docHandler = ctx.getDocumentHandler();
+//        if (ctx.getInput() != null) {
+//            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), VocabulariesCommon.class);
+//            if (obj != null) {
+//                docHandler.setCommonPart((VocabulariesCommon) obj);
+//            }
+//        }
+//        return docHandler;
+//    }
+    
+//    @Override
+//    public DocumentHandler createDocumentHandler(ServiceContext ctx)
+//    		throws Exception {
+//        DocumentHandler docHandler = createDocumentHandler(ctx, VocabulariesCommon.class);
+//        return docHandler;
+//    }
+    
+    /**
+     * Creates the item document handler.
+     * 
+     * @param ctx the ctx
+     * @param inVocabulary the in vocabulary
+     * 
+     * @return the document handler
+     * 
+     * @throws Exception the exception
+     */
     private DocumentHandler createItemDocumentHandler(
-            ServiceContext ctx,
-            String inVocabulary) throws Exception {
-        DocumentHandler docHandler = ctx.getDocumentHandler();
-        ((VocabularyItemDocumentModelHandler) docHandler).setInVocabulary(inVocabulary);
-        if (ctx.getInput() != null) {
-            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(getItemServiceName()),
-                    VocabularyitemsCommon.class);
-            if (obj != null) {
-                docHandler.setCommonPart((VocabularyitemsCommon) obj);
-            }
-        }
+    		ServiceContext<MultipartInput, MultipartOutput> ctx,
+            String inVocabulary)
+    			throws Exception {
+    	VocabularyItemDocumentModelHandler docHandler;
+    	
+    	docHandler = (VocabularyItemDocumentModelHandler)createDocumentHandler(ctx,
+    			ctx.getCommonPartLabel(getItemServiceName()),
+    			VocabularyitemsCommon.class);        	
+        docHandler.setInVocabulary(inVocabulary);
+
         return docHandler;
     }
 
+    /**
+     * Creates the vocabulary.
+     * 
+     * @param input the input
+     * 
+     * @return the response
+     */
     @POST
     public Response createVocabulary(MultipartInput input) {
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(input, getServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             //vocabularyObject.setCsid(csid);
@@ -149,6 +204,13 @@ public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
         }
     }
 
+    /**
+     * Gets the vocabulary.
+     * 
+     * @param csid the csid
+     * 
+     * @return the vocabulary
+     */
     @GET
     @Path("{csid}")
     public MultipartOutput getVocabulary(@PathParam("csid") String csid) {
@@ -165,7 +227,7 @@ public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
         }
         MultipartOutput result = null;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
@@ -189,30 +251,40 @@ public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
+        
         if (result == null) {
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Get failed, the requested Vocabulary CSID:" + csid + ": was not found.").type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
+        
         return result;
     }
 
+    /**
+     * Gets the vocabulary list.
+     * 
+     * @param ui the ui
+     * 
+     * @return the vocabulary list
+     */
     @GET
     @Produces("application/xml")
     public VocabulariesCommonList getVocabularyList(@Context UriInfo ui) {
         VocabulariesCommonList vocabularyObjectList = new VocabulariesCommonList();
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
-            DocumentFilter myFilter = handler.createDocumentFilter(ctx); //new DocumentFilter();
-            myFilter.setPagination(queryParams);
+//            DocumentFilter myFilter = handler.createDocumentFilter(); //new DocumentFilter();
+            DocumentFilter myFilter = handler.getDocumentFilter();
+//            myFilter.setPagination(queryParams);
             String nameQ = queryParams.getFirst("refName");
             if (nameQ != null) {
                 myFilter.setWhereClause("vocabularies_common:refName='" + nameQ + "'");
             }
-            handler.setDocumentFilter(myFilter);
+//            handler.setDocumentFilter(myFilter);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             vocabularyObjectList = (VocabulariesCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
@@ -230,6 +302,14 @@ public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
         return vocabularyObjectList;
     }
 
+    /**
+     * Update vocabulary.
+     * 
+     * @param csid the csid
+     * @param theUpdate the the update
+     * 
+     * @return the multipart output
+     */
     @PUT
     @Path("{csid}")
     public MultipartOutput updateVocabulary(
@@ -247,7 +327,7 @@ public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
         }
         MultipartOutput result = null;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(theUpdate, getServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
@@ -271,6 +351,13 @@ public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
         return result;
     }
 
+    /**
+     * Delete vocabulary.
+     * 
+     * @param csid the csid
+     * 
+     * @return the response
+     */
     @DELETE
     @Path("{csid}")
     public Response deleteVocabulary(@PathParam("csid") String csid) {
@@ -286,7 +373,7 @@ public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
             throw new WebApplicationException(response);
         }
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
@@ -316,7 +403,8 @@ public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
     @Path("{csid}/items")
     public Response createVocabularyItem(@PathParam("csid") String parentcsid, MultipartInput input) {
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(input, getItemServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getItemServiceName(),
+            		input);
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
             String itemcsid = getRepositoryClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(VocabularyResource.class);
@@ -341,6 +429,14 @@ public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
         }
     }
 
+    /**
+     * Gets the vocabulary item.
+     * 
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * 
+     * @return the vocabulary item
+     */
     @GET
     @Path("{csid}/items/{itemcsid}")
     public MultipartOutput getVocabularyItem(
@@ -366,7 +462,7 @@ public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
         MultipartOutput result = null;
         try {
             // Note that we have to create the service context for the Items, not the main service
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getItemServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getItemServiceName());
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
             getRepositoryClient(ctx).get(ctx, itemcsid, handler);
             // TODO should we assert that the item is in the passed vocab?
@@ -400,6 +496,15 @@ public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
         return result;
     }
 
+    /**
+     * Gets the vocabulary item list.
+     * 
+     * @param parentcsid the parentcsid
+     * @param partialTerm the partial term
+     * @param ui the ui
+     * 
+     * @return the vocabulary item list
+     */
     @GET
     @Path("{csid}/items")
     @Produces("application/xml")
@@ -409,12 +514,14 @@ public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
             @Context UriInfo ui) {
         VocabularyitemsCommonList vocabularyItemObjectList = new VocabularyitemsCommonList();
         try {
-            // Note that docType defaults to the ServiceName, so we're fine with that.
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getItemServiceName());
-            DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            DocumentFilter myFilter = handler.createDocumentFilter(ctx); //new DocumentFilter();
-            myFilter.setPagination(queryParams);
+            // Note that docType defaults to the ServiceName, so we're fine with that.
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getItemServiceName(),
+            		queryParams);
+            DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
+//            DocumentFilter myFilter = handler.createDocumentFilter(); //new DocumentFilter();
+            DocumentFilter myFilter = handler.getDocumentFilter(); //new DocumentFilter();
+//            myFilter.setPagination(queryParams);
             // "vocabularyitems_common:inVocabulary='" + parentcsid + "'");
             myFilter.setWhereClause(
                     VocabularyItemJAXBSchema.VOCABULARYITEMS_COMMON + ":"
@@ -455,6 +562,15 @@ public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
         return vocabularyItemObjectList;
     }
 
+    /**
+     * Update vocabulary item.
+     * 
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * @param theUpdate the the update
+     * 
+     * @return the multipart output
+     */
     @PUT
     @Path("{csid}/items/{itemcsid}")
     public MultipartOutput updateVocabularyItem(
@@ -481,7 +597,8 @@ public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
         MultipartOutput result = null;
         try {
             // Note that we have to create the service context for the Items, not the main service
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(theUpdate, getItemServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getItemServiceName(),
+            		theUpdate);
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
             getRepositoryClient(ctx).update(ctx, itemcsid, handler);
             result = (MultipartOutput) ctx.getOutput();
@@ -509,6 +626,14 @@ public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
         return result;
     }
 
+    /**
+     * Delete vocabulary item.
+     * 
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * 
+     * @return the response
+     */
     @DELETE
     @Path("{csid}/items/{itemcsid}")
     public Response deleteVocabularyItem(
@@ -533,7 +658,7 @@ public class VocabularyResource extends AbstractCollectionSpaceResourceImpl {
         }
         try {
             // Note that we have to create the service context for the Items, not the main service
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getItemServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getItemServiceName());
             getRepositoryClient(ctx).delete(ctx, itemcsid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {

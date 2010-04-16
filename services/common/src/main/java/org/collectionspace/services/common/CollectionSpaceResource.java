@@ -24,6 +24,7 @@
 package org.collectionspace.services.common;
 
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.storage.StorageClient;
@@ -32,25 +33,31 @@ import org.collectionspace.services.common.storage.StorageClient;
  * CollectionSpaceResource is a resource interface implemented by every
  * entity/service in CollectionSpace
  */
-public interface CollectionSpaceResource {
+public interface CollectionSpaceResource<IT, OT> {
 
     /**
      * getServiceName returns the name of the service
      */
     public String getServiceName();
-
+    
+    /**
+     * Gets the common class.
+     * 
+     * @return the common class
+     */
+    public Class getCommonPartClass();
 
     /**
      * getRepositoryClient
      * @param ctx service context
      */
-    public RepositoryClient getRepositoryClient(ServiceContext ctx);
+    public RepositoryClient getRepositoryClient(ServiceContext<IT, OT> ctx);
 
     /**
      * getStorageClient
      * @param ctx service context
      */
-    public StorageClient getStorageClient(ServiceContext ctx);
+    public StorageClient getStorageClient(ServiceContext<IT, OT> ctx);
     
     /**
      * createDocumentHandler creates a document handler and populates it with given
@@ -60,5 +67,9 @@ public interface CollectionSpaceResource {
      * @param ctx
      * @return
      */
-    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception;
+    public DocumentHandler createDocumentHandler(ServiceContext<IT, OT> ctx) throws Exception;
+    
+    
+    public ServiceContextFactory<IT, OT> getServiceContextFactory();
+
 }

@@ -33,6 +33,8 @@ import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.jacc.PolicyContext;
 import javax.security.jacc.PolicyContextException;
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.authentication.CSpaceTenant;
 
@@ -41,6 +43,7 @@ import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.config.PropertyItemUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.ValidatorHandler;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.service.ObjectPartType;
@@ -61,16 +64,43 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractServiceContextImpl<IT, OT>
         implements ServiceContext<IT, OT> {
 
+    /** The logger. */
     final Logger logger = LoggerFactory.getLogger(AbstractServiceContextImpl.class);
+    
+    /** The properties. */
     Map<String, Object> properties = new HashMap<String, Object>();
+    
+    /** The object part map. */
     Map<String, ObjectPartType> objectPartMap = new HashMap<String, ObjectPartType>();
+    
+    /** The service binding. */
     private ServiceBindingType serviceBinding;
+    
+    /** The tenant binding. */
     private TenantBindingType tenantBinding;
+    
+    /** The override document type. */
     private String overrideDocumentType = null;
+    
+    /** The val handlers. */
     private List<ValidatorHandler> valHandlers = null;
+    
+    /** The doc handler. */
     private DocumentHandler docHandler = null;
 
-    public AbstractServiceContextImpl(String serviceName) throws UnauthorizedException {
+    private AbstractServiceContextImpl() {} // private constructor for singleton pattern
+    
+    // request query params
+    private MultivaluedMap<String, String> queryParams;
+    
+    /**
+     * Instantiates a new abstract service context impl.
+     * 
+     * @param serviceName the service name
+     * 
+     * @throws UnauthorizedException the unauthorized exception
+     */
+    protected AbstractServiceContextImpl(String serviceName) throws UnauthorizedException {
         TenantBindingConfigReaderImpl tReader =
                 ServiceMain.getInstance().getTenantBindingConfigReader();
         //FIXME retrieveTenantId is not working consistently in non-auth mode
@@ -118,6 +148,9 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         return schemaName.toLowerCase() + PART_LABEL_SEPERATOR + PART_COMMON_LABEL;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getPartsMetadata()
+     */
     @Override
     public Map<String, ObjectPartType> getPartsMetadata() {
         if (objectPartMap.size() != 0) {
@@ -127,6 +160,13 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         return objectPartMap;
     }
 
+    /**
+     * Gets the properties for part.
+     * 
+     * @param partLabel the part label
+     * 
+     * @return the properties for part
+     */
     public List<PropertyItemType> getPropertiesForPart(String partLabel) {
     	Map<String, ObjectPartType> partMap = getPartsMetadata();
     	ObjectPartType part = partMap.get(partLabel);
@@ -137,32 +177,68 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     	return propNodeList.isEmpty()?null:propNodeList.get(0).getItem();
     }
 
+    /**
+     * Gets the property values for part.
+     * 
+     * @param partLabel the part label
+     * @param propName the prop name
+     * 
+     * @return the property values for part
+     */
     public List<String> getPropertyValuesForPart(String partLabel, String propName) {
     	List<PropertyItemType> allProps = getPropertiesForPart(partLabel);
     	return PropertyItemUtils.getPropertyValuesByName(allProps, propName);
     }
 
+    /**
+     * Gets the all parts property values.
+     * 
+     * @param propName the prop name
+     * 
+     * @return the all parts property values
+     */
     public List<String> getAllPartsPropertyValues(String propName) {
         return ServiceBindingUtils.getAllPartsPropertyValues(getServiceBinding(), propName);
     }
     
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getServiceBindingPropertyValue(java.lang.String)
+     */
     public String getServiceBindingPropertyValue(String propName) {
         return ServiceBindingUtils.getPropertyValue(getServiceBinding(), propName);
     }
     
+    /**
+     * Gets the common part properties.
+     * 
+     * @return the common part properties
+     */
     public List<PropertyItemType> getCommonPartProperties() {
         return getPropertiesForPart(getCommonPartLabel());
     }
 
+    /**
+     * Gets the common part property values.
+     * 
+     * @param propName the prop name
+     * 
+     * @return the common part property values
+     */
     public List<String> getCommonPartPropertyValues(String propName) {
         return getPropertyValuesForPart(getCommonPartLabel(), propName);
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getQualifiedServiceName()
+     */
     @Override
     public String getQualifiedServiceName() {
         return TenantBindingConfigReaderImpl.getTenantQualifiedServiceName(getTenantId(), getServiceName());
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getRepositoryClientName()
+     */
     @Override
     public String getRepositoryClientName() {
         if (serviceBinding.getRepositoryClient() == null) {
@@ -171,39 +247,60 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         return serviceBinding.getRepositoryClient().trim();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getRepositoryClientType()
+     */
     @Override
     public ClientType getRepositoryClientType() {
         //assumption: there is only one repository client configured
         return ServiceMain.getInstance().getClientType();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getRepositoryDomainName()
+     */
     @Override
     public String getRepositoryDomainName() {
         return tenantBinding.getRepositoryDomain();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getRepositoryWorkspaceId()
+     */
     @Override
     public String getRepositoryWorkspaceId() {
         TenantBindingConfigReaderImpl tbConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
         return tbConfigReader.getWorkspaceId(getTenantId(), getServiceName());
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getRepositoryWorkspaceName()
+     */
     @Override
     public String getRepositoryWorkspaceName() {
         //service name is workspace name by convention
         return serviceBinding.getName();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getServiceBinding()
+     */
     @Override
     public ServiceBindingType getServiceBinding() {
         return serviceBinding;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getServiceName()
+     */
     @Override
     public String getServiceName() {
         return serviceBinding.getName();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getDocumentType()
+     */
     @Override
     public String getDocumentType() {
         // If they have not overridden the setting, use the type of the service
@@ -211,52 +308,92 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         return (overrideDocumentType != null) ? overrideDocumentType : serviceBinding.getObject().getName();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#setDocumentType(java.lang.String)
+     */
     @Override
     public void setDocumentType(String docType) {
         overrideDocumentType = docType;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getTenantId()
+     */
     @Override
     public String getTenantId() {
         return tenantBinding.getId();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getTenantName()
+     */
     @Override
     public String getTenantName() {
         return tenantBinding.getName();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getInput()
+     */
     @Override
     public abstract IT getInput();
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#setInput(java.lang.Object)
+     */
     @Override
     public abstract void setInput(IT input);
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getOutput()
+     */
     @Override
     public abstract OT getOutput();
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#setOutput(java.lang.Object)
+     */
     @Override
     public abstract void setOutput(OT output);
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getProperties()
+     */
     @Override
     public Map<String, Object> getProperties() {
         return properties;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#setProperties(java.util.Map)
+     */
     @Override
     public void setProperties(Map<String, Object> props) {
         properties.putAll(props);
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getProperty(java.lang.String)
+     */
     public Object getProperty(String name) {
         return properties.get(name);
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#setProperty(java.lang.String, java.lang.Object)
+     */
     public void setProperty(String name, Object o) {
         properties.put(name, o);
     }
 
 
+    /**
+     * Retrieve tenant id.
+     * 
+     * @return the string
+     * 
+     * @throws UnauthorizedException the unauthorized exception
+     */
     private String retrieveTenantId() throws UnauthorizedException {
 
         String[] tenantIds = AuthN.get().getTenantIds();
@@ -269,12 +406,15 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         //id should be matched with the one sent over the wire
         return tenantIds[0];
     }
-
-    @Override
-    public DocumentHandler getDocumentHandler() throws Exception {
-        if (docHandler != null) {
-            return docHandler;
-        }
+    
+    /**
+     * Creates the document handler instance.
+     * 
+     * @return the document handler
+     * 
+     * @throws Exception the exception
+     */
+    private DocumentHandler createDocumentHandlerInstance() throws Exception {
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         Class c = tccl.loadClass(getDocumentHandlerClass());
         if (DocumentHandler.class.isAssignableFrom(c)) {
@@ -283,10 +423,47 @@ public abstract class AbstractServiceContextImpl<IT, OT>
             throw new IllegalArgumentException("Not of type "
                     + DocumentHandler.class.getCanonicalName());
         }
+        //
+        // create a default document filter with pagination if the context
+        // was created with query params
+        //
         docHandler.setServiceContext(this);
-        return docHandler;
+        DocumentFilter docFilter = docHandler.createDocumentFilter();
+        docFilter.setPagination(this.getQueryParams());
+        docHandler.setDocumentFilter(docFilter);
+        
+        return docHandler;    	
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getDocumentHandler()
+     */
+    @Override
+    public DocumentHandler getDocumentHandler() throws Exception {
+    	DocumentHandler result = docHandler;    	
+    	// create a new instance if one does not yet exist
+    	if (result == null) {
+    		result = createDocumentHandlerInstance();
+    	}    	
+    	return result;
+    }
+        
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getDocumentHanlder(javax.ws.rs.core.MultivaluedMap)
+     */
+    @Override
+    public DocumentHandler getDocumentHandler(MultivaluedMap<String, String> queryParams) throws Exception {
+    	DocumentHandler result = getDocumentHandler();
+    	DocumentFilter documentFilter = result.getDocumentFilter(); //to see results in debugger variables view
+    	documentFilter.setPagination(queryParams);
+    	return result;
+    }
+
+    /**
+     * Gets the document handler class.
+     * 
+     * @return the document handler class
+     */
     private String getDocumentHandlerClass() {
         if (serviceBinding.getDocumentHandler() == null
                 || serviceBinding.getDocumentHandler().isEmpty()) {
@@ -299,6 +476,9 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         return serviceBinding.getDocumentHandler().trim();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getValidatorHandlers()
+     */
     @Override
     public List<ValidatorHandler> getValidatorHandlers() throws Exception {
         if (valHandlers != null) {
@@ -318,6 +498,9 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         return valHandlers;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         StringBuilder msg = new StringBuilder();
@@ -334,4 +517,14 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         msg.append("]");
         return msg.toString();
     }
+    
+    @Override
+    public MultivaluedMap<String, String> getQueryParams() {
+    	return this.queryParams;
+    }
+    
+    @Override
+    public void setQueryParams(MultivaluedMap<String, String> queryParams) {
+    	this.queryParams = queryParams;
+    }    
 }

@@ -51,11 +51,14 @@
 package org.collectionspace.services.common.storage.jpa;
 
 import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.context.ServiceContext;
+
 
 /**
  * JPA query specific document filter
  */
 public class JpaDocumentFilter extends DocumentFilter {
-
-
+	public JpaDocumentFilter(ServiceContext ctx) {
+		super(ctx);
+	}
 }

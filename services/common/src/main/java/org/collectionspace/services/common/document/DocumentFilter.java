@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 import org.collectionspace.services.common.query.IQueryManager;
+import org.collectionspace.services.common.context.ServiceContext;
 
 //TODO: would be great to not rely on resteasy directly
 import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
@@ -41,7 +42,8 @@ public class DocumentFilter {
     protected String whereClause;	// Filtering clause. Omit the "WHERE".
     protected int startPage;		// Pagination offset for list results
     protected int pageSize;			// Pagination limit for list results
-    private MultivaluedMap<String, String> queryParams = new MultivaluedMapImpl<String, String>();
+    private boolean pageSizeDirty = false; // True if default page size explicitly set/overridden
+    private MultivaluedMap<String, String> queryParams = null;
 
 
     /**
@@ -86,6 +88,16 @@ public class DocumentFilter {
         }
     }
     
+    /**
+     * Instantiates a new document filter.
+     * 
+     * @param ctx the ctx
+     */
+    public DocumentFilter(ServiceContext ctx) {
+    	this.setPageSize(ctx.getServiceBindingPropertyValue(
+    			DocumentFilter.PAGE_SIZE_DEFAULT_PROPERTY));
+    }
+    
     public DocumentFilter() {
         this("", 0, defaultPageSize);			// Use empty string for easy concatenation
     }
@@ -96,26 +108,36 @@ public class DocumentFilter {
         this.pageSize = (pageSize > 0) ? pageSize : defaultPageSize;
     }
 
-    public void setPagination(MultivaluedMap<String, String> queryParams) {
-
-        String startPageStr = null;
-        String pageSizeStr = null;
+    /**
+     * Sets the pagination.
+     * 
+     * @param queryParams the query params
+     */
+    public void setPagination(MultivaluedMap<String, String> queryParams) {    	
+    	//
+    	// Bail if there are no params
+    	//
+    	if (queryParams == null) return;
+    	
+        //
+    	// Set the page size
+    	//
+    	String pageSizeStr = null;
         List<String> list = queryParams.remove(PAGE_SIZE_PARAM);
         if (list != null) {
             pageSizeStr = list.get(0);
         }
         setPageSize(pageSizeStr);
+
+        //
+        // Set the start page
+        //
+        String startPageStr = null;
         list = queryParams.remove(START_PAGE_PARAM);
         if (list != null) {
             startPageStr = list.get(0);
         }
-        if (startPageStr != null) {
-            try {
-                startPage = Integer.valueOf(startPageStr);
-            } catch (NumberFormatException e) {
-                throw new NumberFormatException("Bad value for: " + START_PAGE_PARAM);
-            }
-        }
+        setStartPage(startPageStr);
     }
 
     /**
@@ -192,23 +214,48 @@ public class DocumentFilter {
     public int getPageSize() {
         return pageSize;
     }
+    
+    public boolean getPageSizeDirty() {
+    	return this.getPageSizeDirty();
+    }
 
     /**
      * @param pageSize the max number of items to return for list requests
      */
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
+        this.pageSizeDirty = true; // page size explicity set/overriden
     }
 
     /**
      * @param pageSize the max number of items to return for list requests
      */
     public void setPageSize(String pageSizeStr) {
+    	int pageSize = this.defaultPageSize;
         if (pageSizeStr != null) {
             try {
-                pageSize = Integer.valueOf(pageSizeStr);
+            	pageSize = Integer.valueOf(pageSizeStr);
             } catch (NumberFormatException e) {
+            	//FIXME This should cause a warning in the log file and should result in the
+            	//FIXME page size being set to the default.  We don't need to throw an exception here.
                 throw new NumberFormatException("Bad value for: " + PAGE_SIZE_PARAM);
+            }
+        }
+        
+        setPageSize(pageSize);
+    }
+
+    /**
+     * Sets the start page.
+     * 
+     * @param startPageStr the new start page
+     */
+    protected void setStartPage(String startPageStr) {
+        if (startPageStr != null) {
+            try {
+            	startPage = Integer.valueOf(startPageStr);
+            } catch (NumberFormatException e) {
+                throw new NumberFormatException("Bad value for: " + START_PAGE_PARAM);
             }
         }
     }

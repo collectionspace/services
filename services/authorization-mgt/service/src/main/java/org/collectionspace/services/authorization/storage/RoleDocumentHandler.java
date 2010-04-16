@@ -143,11 +143,8 @@ public class RoleDocumentHandler
     }
 
     @Override
-    public DocumentFilter createDocumentFilter(ServiceContext ctx) {
-        DocumentFilter filter = new RoleJpaFilter();
-        filter.setPageSize(
-                ctx.getServiceBindingPropertyValue(
-                DocumentFilter.PAGE_SIZE_DEFAULT_PROPERTY));
+    public DocumentFilter createDocumentFilter() {
+        DocumentFilter filter = new RoleJpaFilter(this.getServiceContext());
         return filter;
     }
 

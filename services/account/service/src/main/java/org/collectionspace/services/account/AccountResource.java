@@ -40,8 +40,9 @@ import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.account.storage.AccountStorageClient;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
-import org.collectionspace.services.common.context.RemoteServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.context.ServiceContextFactory;
+import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
@@ -52,16 +53,27 @@ import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The Class AccountResource.
+ */
 @Path("/accounts")
 @Consumes("application/xml")
 @Produces("application/xml")
 public class AccountResource
-        extends AbstractCollectionSpaceResourceImpl {
+        extends AbstractCollectionSpaceResourceImpl<AccountsCommon, AccountsCommon> {
 
+    /** The service name. */
     final private String serviceName = "accounts";
+    
+    /** The logger. */
     final Logger logger = LoggerFactory.getLogger(AccountResource.class);
+    
+    /** The storage client. */
     final StorageClient storageClient = new AccountStorageClient();
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
+     */
     @Override
     protected String getVersionString() {
         /** The last change revision. */
@@ -69,36 +81,62 @@ public class AccountResource
         return lastChangeRevision;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getServiceName()
+     */
     @Override
     public String getServiceName() {
         return serviceName;
     }
-
-    private <T> ServiceContext createServiceContext(T obj) throws Exception {
-        ServiceContext ctx = new RemoteServiceContextImpl<T, T>(getServiceName());
-        ctx.setInput(obj);
-        ctx.setDocumentType(AccountsCommon.class.getPackage().getName()); //persistence unit
-        ctx.setProperty("entity-name", AccountsCommon.class.getName());
-        return ctx;
-    }
-
+    
     @Override
-    public StorageClient getStorageClient(ServiceContext ctx) {
-        //FIXME use ctx to identify storage client
+    public Class<AccountsCommon> getCommonPartClass() {
+    	return AccountsCommon.class;
+    }    
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.CollectionSpaceResource#getServiceContextFactory()
+     */
+    @Override
+    public ServiceContextFactory<AccountsCommon, AccountsCommon> getServiceContextFactory() {
+    	return (ServiceContextFactory<AccountsCommon, AccountsCommon>)RemoteServiceContextFactory.get();
+    }
+    
+//    private <T> ServiceContext createServiceContext(T obj) throws Exception {
+//        ServiceContext ctx = new RemoteServiceContextImpl<T, T>(getServiceName());
+//        ctx.setInput(obj);
+//        ctx.setDocumentType(AccountsCommon.class.getPackage().getName()); //persistence unit
+//        ctx.setProperty("entity-name", AccountsCommon.class.getName());
+//        return ctx;
+//    }
+
+    /* (non-Javadoc)
+ * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getStorageClient(org.collectionspace.services.common.context.ServiceContext)
+ */
+@Override
+    public StorageClient getStorageClient(ServiceContext<AccountsCommon, AccountsCommon> ctx) {
+    	//FIXME use ctx to identify storage client
         return storageClient;
     }
 
-    @Override
-    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-        DocumentHandler docHandler = ctx.getDocumentHandler();
-        docHandler.setCommonPart(ctx.getInput());
-        return docHandler;
-    }
+//    @Override
+//    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
+//        DocumentHandler docHandler = ctx.getDocumentHandler();
+//        docHandler.setCommonPart(ctx.getInput());
+//        return docHandler;
+//    }
 
-    @POST
+    /**
+ * Creates the account.
+ * 
+ * @param input the input
+ * 
+ * @return the response
+ */
+@POST
     public Response createAccount(AccountsCommon input) {
         try {
-            ServiceContext ctx = createServiceContext(input);
+            ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext(input, AccountsCommon.class);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getStorageClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(AccountResource.class);
@@ -123,6 +161,13 @@ public class AccountResource
         }
     }
 
+    /**
+     * Gets the account.
+     * 
+     * @param csid the csid
+     * 
+     * @return the account
+     */
     @GET
     @Path("{csid}")
     public AccountsCommon getAccount(
@@ -139,7 +184,7 @@ public class AccountResource
         }
         AccountsCommon result = null;
         try {
-            ServiceContext ctx = createServiceContext((AccountsCommon) null);
+            ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext((AccountsCommon) null, AccountsCommon.class);
             DocumentHandler handler = createDocumentHandler(ctx);
             getStorageClient(ctx).get(ctx, csid, handler);
             result = (AccountsCommon) ctx.getOutput();
@@ -173,16 +218,23 @@ public class AccountResource
         return result;
     }
 
+    /**
+     * Gets the account list.
+     * 
+     * @param ui the ui
+     * 
+     * @return the account list
+     */
     @GET
     @Produces("application/xml")
     public AccountsCommonList getAccountList(
             @Context UriInfo ui) {
         AccountsCommonList accountList = new AccountsCommonList();
         try {
-            ServiceContext ctx = createServiceContext((AccountsCommonList) null);
+            ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext((AccountsCommon) null, AccountsCommon.class);
             DocumentHandler handler = createDocumentHandler(ctx);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            DocumentFilter myFilter = handler.createDocumentFilter(ctx);
+            DocumentFilter myFilter = handler.createDocumentFilter();
             myFilter.setPagination(queryParams);
             myFilter.setQueryParams(queryParams);
             handler.setDocumentFilter(myFilter);
@@ -204,6 +256,14 @@ public class AccountResource
         return accountList;
     }
 
+    /**
+     * Update account.
+     * 
+     * @param csid the csid
+     * @param theUpdate the the update
+     * 
+     * @return the accounts common
+     */
     @PUT
     @Path("{csid}")
     public AccountsCommon updateAccount(
@@ -221,7 +281,7 @@ public class AccountResource
         }
         AccountsCommon result = null;
         try {
-            ServiceContext ctx = createServiceContext(theUpdate);
+            ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext(theUpdate, AccountsCommon.class);
             DocumentHandler handler = createDocumentHandler(ctx);
             getStorageClient(ctx).update(ctx, csid, handler);
             result = (AccountsCommon) ctx.getOutput();
@@ -249,6 +309,13 @@ public class AccountResource
         return result;
     }
 
+    /**
+     * Delete account.
+     * 
+     * @param csid the csid
+     * 
+     * @return the response
+     */
     @DELETE
     @Path("{csid}")
     public Response deleteAccount(@PathParam("csid") String csid) {
@@ -264,7 +331,8 @@ public class AccountResource
             throw new WebApplicationException(response);
         }
         try {
-            ServiceContext ctx = createServiceContext((AccountsCommon) null);
+            ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext((AccountsCommon) null,
+            		AccountsCommon.class);
             getStorageClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {

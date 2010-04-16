@@ -224,7 +224,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @param properties
      */
     public void setProperties(Map<String, Object> properties);
-
+    
     /**
      * createDocumentFilter is a factory method to create a document
      * filter that is relevant to be used with this document handler
@@ -233,7 +233,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @param ctx ServiceContext used to fetch default pagination, etc.
      * @return
      */
-    public DocumentFilter createDocumentFilter(ServiceContext ctx);
+    public DocumentFilter createDocumentFilter();
 
     /**
      * getDocumentFilter

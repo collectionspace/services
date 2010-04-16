@@ -37,7 +37,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
+import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.MultipartServiceContext;
@@ -53,20 +53,34 @@ import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The Class ContactResource.
+ */
 @Path("/contacts")
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
-public class ContactResource extends AbstractCollectionSpaceResourceImpl {
+public class ContactResource extends 
+		AbstractMultiPartCollectionSpaceResourceImpl {
 
+    /** The Constant serviceName. */
     private final static String serviceName = "contacts";
+    
+    /** The logger. */
     final Logger logger = LoggerFactory.getLogger(ContactResource.class);
     //FIXME retrieve client type from configuration
+    /** The Constant CLIENT_TYPE. */
     final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType();
 
+    /**
+     * Instantiates a new contact resource.
+     */
     public ContactResource() {
         // do nothing
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
+     */
     @Override
     protected String getVersionString() {
     	/** The last change revision. */
@@ -74,27 +88,45 @@ public class ContactResource extends AbstractCollectionSpaceResourceImpl {
     	return lastChangeRevision;
     }
     
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getServiceName()
+     */
     @Override
     public String getServiceName() {
         return serviceName;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.CollectionSpaceResource#getCommonPartClass()
+     */
     @Override
-    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-        DocumentHandler docHandler = ctx.getDocumentHandler();
-        if (ctx.getInput() != null) {
-            Object obj = ((MultipartServiceContext)ctx).getInputPart(ctx.getCommonPartLabel(), ContactsCommon.class);
-            if (obj != null) {
-                docHandler.setCommonPart((ContactsCommon) obj);
-            }
-        }
-        return docHandler;
+    public Class<ContactsCommon> getCommonPartClass() {
+    	return ContactsCommon.class;
     }
+    
+//    @Override
+//    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
+//        DocumentHandler docHandler = ctx.getDocumentHandler();
+//        if (ctx.getInput() != null) {
+//            Object obj = ((MultipartServiceContext)ctx).getInputPart(ctx.getCommonPartLabel(), ContactsCommon.class);
+//            if (obj != null) {
+//                docHandler.setCommonPart((ContactsCommon) obj);
+//            }
+//        }
+//        return docHandler;
+//    }
 
-    @POST
+    /**
+ * Creates the contact.
+ * 
+ * @param input the input
+ * 
+ * @return the response
+ */
+@POST
     public Response createContact(MultipartInput input) {
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(input, getServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             //contactObject.setCsid(csid);
@@ -112,6 +144,13 @@ public class ContactResource extends AbstractCollectionSpaceResourceImpl {
         }
     }
 
+    /**
+     * Gets the contact.
+     * 
+     * @param csid the csid
+     * 
+     * @return the contact
+     */
     @GET
     @Path("{csid}")
     public MultipartOutput getContact(
@@ -128,7 +167,7 @@ public class ContactResource extends AbstractCollectionSpaceResourceImpl {
         }
         MultipartOutput result = null;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
@@ -157,12 +196,19 @@ public class ContactResource extends AbstractCollectionSpaceResourceImpl {
         return result;
     }
 
+    /**
+     * Gets the contact list.
+     * 
+     * @param ui the ui
+     * 
+     * @return the contact list
+     */
     @GET
     @Produces("application/xml")
     public ContactsCommonList getContactList(@Context UriInfo ui) {
         ContactsCommonList contactObjectList = new ContactsCommonList();
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getAll(ctx, handler);
             contactObjectList = (ContactsCommonList) handler.getCommonPartList();
@@ -177,6 +223,14 @@ public class ContactResource extends AbstractCollectionSpaceResourceImpl {
         return contactObjectList;
     }
 
+    /**
+     * Update contact.
+     * 
+     * @param csid the csid
+     * @param theUpdate the the update
+     * 
+     * @return the multipart output
+     */
     @PUT
     @Path("{csid}")
     public MultipartOutput updateContact(
@@ -194,7 +248,7 @@ public class ContactResource extends AbstractCollectionSpaceResourceImpl {
         }
         MultipartOutput result = null;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(theUpdate, getServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
@@ -214,6 +268,13 @@ public class ContactResource extends AbstractCollectionSpaceResourceImpl {
         return result;
     }
 
+    /**
+     * Delete contact.
+     * 
+     * @param csid the csid
+     * 
+     * @return the response
+     */
     @DELETE
     @Path("{csid}")
     public Response deleteContact(@PathParam("csid") String csid) {
@@ -229,7 +290,7 @@ public class ContactResource extends AbstractCollectionSpaceResourceImpl {
             throw new WebApplicationException(response);
         }
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (DocumentNotFoundException dnfe) {

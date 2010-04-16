@@ -39,8 +39,10 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
-import org.collectionspace.services.common.context.RemoteServiceContextImpl;
+//import org.collectionspace.services.common.context.RemoteServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.context.RemoteServiceContextFactory;
+import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
@@ -52,16 +54,27 @@ import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The Class PermissionResource.
+ */
 @Path("/authorization/permissions")
 @Consumes("application/xml")
 @Produces("application/xml")
 public class PermissionResource
-        extends AbstractCollectionSpaceResourceImpl {
+        extends AbstractCollectionSpaceResourceImpl<Permission, Permission> {
 
+    /** The service name. */
     final private String serviceName = "authorization/permissions";
+    
+    /** The logger. */
     final Logger logger = LoggerFactory.getLogger(PermissionResource.class);
+    
+    /** The storage client. */
     final StorageClient storageClient = new JpaStorageClientImpl(Permission.class);
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
+     */
     @Override
     protected String getVersionString() {
         /** The last change revision. */
@@ -69,36 +82,57 @@ public class PermissionResource
         return lastChangeRevision;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getServiceName()
+     */
     @Override
     public String getServiceName() {
         return serviceName;
     }
-
-    private <T> ServiceContext createServiceContext(T obj) throws Exception {
-        ServiceContext ctx = new RemoteServiceContextImpl<T, T>(getServiceName());
-        ctx.setInput(obj);
-        ctx.setDocumentType(Permission.class.getPackage().getName()); //persistence unit
-        ctx.setProperty("entity-name", Permission.class.getName());
-        return ctx;
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.CollectionSpaceResource#getCommonPartClass()
+     */
+    @Override
+    public Class<Permission> getCommonPartClass() {
+    	return Permission.class;
     }
-
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.CollectionSpaceResource#getServiceContextFactory()
+     */
+    @Override
+    public ServiceContextFactory<Permission, Permission> getServiceContextFactory() {
+    	return RemoteServiceContextFactory.get();
+    }
+                
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getStorageClient(org.collectionspace.services.common.context.ServiceContext)
+     */
     @Override
     public StorageClient getStorageClient(ServiceContext ctx) {
         //FIXME use ctx to identify storage client
         return storageClient;
     }
 
-    @Override
-    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-        DocumentHandler docHandler = ctx.getDocumentHandler();
-        docHandler.setCommonPart(ctx.getInput());
-        return docHandler;
-    }
+//    @Override
+//    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
+//        DocumentHandler docHandler = ctx.getDocumentHandler();
+//        docHandler.setCommonPart(ctx.getInput());
+//        return docHandler;
+//    }
 
-    @POST
+    /**
+ * Creates the permission.
+ * 
+ * @param input the input
+ * 
+ * @return the response
+ */
+@POST
     public Response createPermission(Permission input) {
         try {
-            ServiceContext ctx = createServiceContext(input);
+            ServiceContext<Permission, Permission> ctx = createServiceContext(input, Permission.class);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getStorageClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(PermissionResource.class);
@@ -126,6 +160,13 @@ public class PermissionResource
         }
     }
 
+    /**
+     * Gets the permission.
+     * 
+     * @param csid the csid
+     * 
+     * @return the permission
+     */
     @GET
     @Path("{csid}")
     public Permission getPermission(
@@ -142,7 +183,7 @@ public class PermissionResource
         }
         Permission result = null;
         try {
-            ServiceContext ctx = createServiceContext((Permission) null);
+            ServiceContext<Permission, Permission> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getStorageClient(ctx).get(ctx, csid, handler);
             result = (Permission) ctx.getOutput();
@@ -178,16 +219,23 @@ public class PermissionResource
         return result;
     }
 
+    /**
+     * Gets the permission list.
+     * 
+     * @param ui the ui
+     * 
+     * @return the permission list
+     */
     @GET
     @Produces("application/xml")
     public PermissionsList getPermissionList(
             @Context UriInfo ui) {
         PermissionsList permissionList = new PermissionsList();
         try {
-            ServiceContext ctx = createServiceContext((PermissionsList) null);
+            ServiceContext<Permission, Permission> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            DocumentFilter myFilter = handler.createDocumentFilter(ctx);
+            DocumentFilter myFilter = handler.createDocumentFilter();
             myFilter.setPagination(queryParams);
             myFilter.setQueryParams(queryParams);
             handler.setDocumentFilter(myFilter);
@@ -211,6 +259,14 @@ public class PermissionResource
         return permissionList;
     }
 
+    /**
+     * Update permission.
+     * 
+     * @param csid the csid
+     * @param theUpdate the the update
+     * 
+     * @return the permission
+     */
     @PUT
     @Path("{csid}")
     public Permission updatePermission(
@@ -228,7 +284,7 @@ public class PermissionResource
         }
         Permission result = null;
         try {
-            ServiceContext ctx = createServiceContext(theUpdate);
+            ServiceContext<Permission, Permission> ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getStorageClient(ctx).update(ctx, csid, handler);
             result = (Permission) ctx.getOutput();
@@ -259,6 +315,13 @@ public class PermissionResource
         return result;
     }
 
+    /**
+     * Delete permission.
+     * 
+     * @param csid the csid
+     * 
+     * @return the response
+     */
     @DELETE
     @Path("{csid}")
     public Response deletePermission(@PathParam("csid") String csid) {
@@ -274,7 +337,7 @@ public class PermissionResource
             throw new WebApplicationException(response);
         }
         try {
-            ServiceContext ctx = createServiceContext((Permission) null);
+            ServiceContext<Permission, Permission> ctx = createServiceContext();
             getStorageClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {

@@ -23,6 +23,8 @@
  */
 package org.collectionspace.services.common.context;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 /**
  * RemoteServiceContext is used to encapsulate the service context of a
  * remotely invokable service
@@ -68,4 +70,19 @@ public interface RemoteServiceContext<IT, OT>
      * @return local service context
      */
     public ServiceContext getLocalContext(String localContextClassName) throws Exception;
+    
+    /**
+     * Gets the query params.
+     * 
+     * @return the query params
+     */
+    public MultivaluedMap<String, String> getQueryParams();
+
+    /**
+     * Gets the query params.
+     * 
+     * @return the query params
+     */
+    public void setQueryParams(MultivaluedMap<String, String> queryParams);
 }
+

@@ -23,7 +23,7 @@
  */
 package org.collectionspace.services.person;
 
-import java.net.URI;
+//import java.net.URI;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -35,7 +35,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
+//import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -43,19 +43,19 @@ import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.PersonAuthorityJAXBSchema;
 import org.collectionspace.services.PersonJAXBSchema;
-import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
+import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.context.MultipartServiceContextFactory;
+//import org.collectionspace.services.common.context.MultipartServiceContext;
+//import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
-import org.collectionspace.services.common.document.DocumentWrapper;
+//import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.security.UnauthorizedException;
-import org.collectionspace.services.common.vocabulary.RefNameUtils;
+//import org.collectionspace.services.common.vocabulary.RefNameUtils;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.contact.ContactsCommon;
@@ -66,26 +66,44 @@ import org.collectionspace.services.person.nuxeo.PersonDocumentModelHandler;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
-import org.nuxeo.ecm.core.api.DocumentModel;
+//import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The Class PersonAuthorityResource.
+ */
 @Path("/personauthorities")
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
-public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl {
+public class PersonAuthorityResource extends
+		AbstractMultiPartCollectionSpaceResourceImpl {
 
+    /** The Constant personAuthorityServiceName. */
     private final static String personAuthorityServiceName = "personauthorities";
+    
+    /** The Constant personServiceName. */
     private final static String personServiceName = "persons";
+    
+    /** The logger. */
     final Logger logger = LoggerFactory.getLogger(PersonAuthorityResource.class);
     //FIXME retrieve client type from configuration
+    /** The Constant CLIENT_TYPE. */
     final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType();
+    
+    /** The contact resource. */
     private ContactResource contactResource = new ContactResource();
 
+    /**
+     * Instantiates a new person authority resource.
+     */
     public PersonAuthorityResource() {
         // do nothing
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
+     */
     @Override
     protected String getVersionString() {
     	/** The last change revision. */
@@ -93,70 +111,117 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
     	return lastChangeRevision;
     }
     
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getServiceName()
+     */
     @Override
     public String getServiceName() {
         return personAuthorityServiceName;
     }
 
+    @Override
+    public Class<PersonauthoritiesCommon> getCommonPartClass() {
+    	return PersonauthoritiesCommon.class;
+    }
+    
+    /**
+     * Gets the item service name.
+     * 
+     * @return the item service name
+     */
     public String getItemServiceName() {
         return personServiceName;
     }
 
+    /**
+     * Gets the contact service name.
+     * 
+     * @return the contact service name
+     */
     public String getContactServiceName() {
         return contactResource.getServiceName();
     }
 
-    @Override
-    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-        DocumentHandler docHandler = ctx.getDocumentHandler();
-        if (ctx.getInput() != null) {
-            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), PersonauthoritiesCommon.class);
-            if (obj != null) {
-                docHandler.setCommonPart((PersonauthoritiesCommon) obj);
-            }
-        }
+//    @Override
+//    public DocumentHandler createDocumentHandler(ServiceContext<MultipartInput, MultipartOutput> ctx) throws Exception {
+//        DocumentHandler docHandler = ctx.getDocumentHandler();
+//        if (ctx.getInput() != null) {
+//            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), PersonauthoritiesCommon.class);
+//            if (obj != null) {
+//                docHandler.setCommonPart((PersonauthoritiesCommon) obj);
+//            }
+//        }
+//        return docHandler;
+//    }
+
+    /**
+ * Creates the item document handler.
+ * 
+ * @param ctx the ctx
+ * @param inAuthority the in authority
+ * 
+ * @return the document handler
+ * 
+ * @throws Exception the exception
+ */
+    private DocumentHandler createItemDocumentHandler(ServiceContext<MultipartInput, MultipartOutput> ctx,
+            String inAuthority) throws Exception {    
+        PersonDocumentModelHandler docHandler = (PersonDocumentModelHandler)createDocumentHandler(ctx,
+    			ctx.getCommonPartLabel(getItemServiceName()),
+    			PersonsCommon.class);        	
+        docHandler.setInAuthority(inAuthority);
+        
         return docHandler;
     }
 
-    private DocumentHandler createItemDocumentHandler(
-            ServiceContext ctx,
-            String inAuthority) throws Exception {
-        DocumentHandler docHandler = ctx.getDocumentHandler();
-        ((PersonDocumentModelHandler) docHandler).setInAuthority(inAuthority);
-        if (ctx.getInput() != null) {
-            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(getItemServiceName()),
-                    PersonsCommon.class);
-            if (obj != null) {
-                docHandler.setCommonPart((PersonsCommon) obj);
-            }
-        }
-        return docHandler;
-    }
-
+    /**
+     * Creates the contact document handler.
+     * 
+     * @param ctx the ctx
+     * @param inAuthority the in authority
+     * @param inItem the in item
+     * 
+     * @return the document handler
+     * 
+     * @throws Exception the exception
+     */
     private DocumentHandler createContactDocumentHandler(
-            ServiceContext ctx, String inAuthority,
+    		ServiceContext<MultipartInput, MultipartOutput> ctx, String inAuthority,
             String inItem) throws Exception {
-        DocumentHandler docHandler = ctx.getDocumentHandler();
-        // Set the inAuthority and inItem values, which specify the
-        // parent authority (e.g. PersonAuthority, OrgAuthority) and the item
-        // (e.g. Person, Organization) with which the Contact is associated.
-        ((ContactDocumentModelHandler) docHandler).setInAuthority(inAuthority);
-        ((ContactDocumentModelHandler) docHandler).setInItem(inItem);
-        if (ctx.getInput() != null) {
-            Object obj = ((MultipartServiceContext) ctx)
-                .getInputPart(ctx.getCommonPartLabel(getContactServiceName()),
-                ContactsCommon.class);
-            if (obj != null) {
-                docHandler.setCommonPart((ContactsCommon) obj);
-            }
-        }
+    	ContactDocumentModelHandler docHandler = (ContactDocumentModelHandler)createDocumentHandler(ctx,
+    			ctx.getCommonPartLabel(getContactServiceName()),
+    			ContactsCommon.class);        	
+        docHandler.setInAuthority(inAuthority);
+        docHandler.setInItem(inItem);
+    	
+//        DocumentHandler docHandler = ctx.getDocumentHandler();
+//        // Set the inAuthority and inItem values, which specify the
+//        // parent authority (e.g. PersonAuthority, OrgAuthority) and the item
+//        // (e.g. Person, Organization) with which the Contact is associated.
+//        ((ContactDocumentModelHandler) docHandler).setInAuthority(inAuthority);
+//        ((ContactDocumentModelHandler) docHandler).setInItem(inItem);
+//        if (ctx.getInput() != null) {
+//            Object obj = ((MultipartServiceContext) ctx)
+//                .getInputPart(ctx.getCommonPartLabel(getContactServiceName()),
+//                ContactsCommon.class);
+//            if (obj != null) {
+//                docHandler.setCommonPart((ContactsCommon) obj);
+//            }
+//        }
         return docHandler;
     }
 
+    /**
+     * Creates the person authority.
+     * 
+     * @param input the input
+     * 
+     * @return the response
+     */
     @POST
     public Response createPersonAuthority(MultipartInput input) {
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(input, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             //personAuthorityObject.setCsid(csid);
@@ -182,6 +247,13 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         }
     }
 
+    /**
+     * Gets the person authority by name.
+     * 
+     * @param specifier the specifier
+     * 
+     * @return the person authority by name
+     */
     @GET
     @Path("urn:cspace:name({specifier})")
     public MultipartOutput getPersonAuthorityByName(@PathParam("specifier") String specifier) {
@@ -205,7 +277,7 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         } 
         MultipartOutput result = null;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             DocumentFilter myFilter = new DocumentFilter(whereClause, 0, 1);
             handler.setDocumentFilter(myFilter);
@@ -240,6 +312,13 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         return result;
     }
 
+    /**
+     * Gets the person authority.
+     * 
+     * @param csid the csid
+     * 
+     * @return the person authority
+     */
     @GET
     @Path("{csid}")
     public MultipartOutput getPersonAuthority(@PathParam("csid") String csid) {
@@ -255,7 +334,7 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         } 
         MultipartOutput result = null;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
@@ -288,16 +367,23 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         return result;
     }
 
+    /**
+     * Gets the person authority list.
+     * 
+     * @param ui the ui
+     * 
+     * @return the person authority list
+     */
     @GET
     @Produces("application/xml")
     public PersonauthoritiesCommonList getPersonAuthorityList(@Context UriInfo ui) {
         PersonauthoritiesCommonList personAuthorityObjectList = new PersonauthoritiesCommonList();
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             DocumentHandler handler = createDocumentHandler(ctx);
-            DocumentFilter myFilter = handler.createDocumentFilter(ctx); //new DocumentFilter();
-            myFilter.setPagination(queryParams);
+            DocumentFilter myFilter = handler.createDocumentFilter(); //new DocumentFilter();
+            myFilter.setPagination(queryParams); //FIXME
             String nameQ = queryParams.getFirst("refName");
             if (nameQ != null) {
                 myFilter.setWhereClause("personauthorities_common:refName='" + nameQ + "'");
@@ -320,6 +406,14 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         return personAuthorityObjectList;
     }
 
+    /**
+     * Update person authority.
+     * 
+     * @param csid the csid
+     * @param theUpdate the the update
+     * 
+     * @return the multipart output
+     */
     @PUT
     @Path("{csid}")
     public MultipartOutput updatePersonAuthority(
@@ -337,7 +431,7 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         }
         MultipartOutput result = null;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(theUpdate, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
@@ -365,6 +459,13 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         return result;
     }
 
+    /**
+     * Delete person authority.
+     * 
+     * @param csid the csid
+     * 
+     * @return the response
+     */
     @DELETE
     @Path("{csid}")
     public Response deletePersonAuthority(@PathParam("csid") String csid) {
@@ -380,7 +481,7 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
             throw new WebApplicationException(response);
         }
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
@@ -410,7 +511,7 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
     @Path("{csid}/items")
     public Response createPerson(@PathParam("csid") String parentcsid, MultipartInput input) {
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(input, getItemServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getItemServiceName(), input);
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
             String itemcsid = getRepositoryClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(PersonAuthorityResource.class);
@@ -435,6 +536,14 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         }
     }
 
+    /**
+     * Gets the person.
+     * 
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * 
+     * @return the person
+     */
     @GET
     @Path("{csid}/items/{itemcsid}")
     public MultipartOutput getPerson(
@@ -460,7 +569,7 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         MultipartOutput result = null;
         try {
             // Note that we have to create the service context for the Items, not the main service
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getItemServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getItemServiceName());
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
             getRepositoryClient(ctx).get(ctx, itemcsid, handler);
             // TODO should we assert that the item is in the passed personAuthority?
@@ -494,6 +603,15 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         return result;
     }
 
+    /**
+     * Gets the person list.
+     * 
+     * @param parentcsid the parentcsid
+     * @param partialTerm the partial term
+     * @param ui the ui
+     * 
+     * @return the person list
+     */
     @GET
     @Path("{csid}/items")
     @Produces("application/xml")
@@ -504,11 +622,12 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         PersonsCommonList personObjectList = new PersonsCommonList();
         try {
             // Note that docType defaults to the ServiceName, so we're fine with that.
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getItemServiceName());
-            DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            DocumentFilter myFilter = handler.createDocumentFilter(ctx); //new DocumentFilter();
-            myFilter.setPagination(queryParams);
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getItemServiceName(),
+        			queryParams);
+            DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
+            DocumentFilter myFilter = handler.createDocumentFilter(); //new DocumentFilter();
+            myFilter.setPagination(queryParams); //FIXME (this is unnecessary since it is already set by "createContactDocumentHandler" method
 
             // Add the where clause "persons_common:inAuthority='" + parentcsid + "'"
             myFilter.setWhereClause(PersonJAXBSchema.PERSONS_COMMON + ":" +
@@ -542,6 +661,15 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         return personObjectList;
     }
 
+    /**
+     * Gets the person list by auth name.
+     * 
+     * @param parentSpecifier the parent specifier
+     * @param partialTerm the partial term
+     * @param ui the ui
+     * 
+     * @return the person list by auth name
+     */
     @GET
     @Path("urn:cspace:name({specifier})/items")
     @Produces("application/xml")
@@ -551,20 +679,20 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
             @Context UriInfo ui) {
         PersonsCommonList personObjectList = new PersonsCommonList();
         try {
+            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             String whereClause =
             	PersonAuthorityJAXBSchema.PERSONAUTHORITIES_COMMON+
             	":"+PersonAuthorityJAXBSchema.DISPLAY_NAME+
             	"='"+parentSpecifier+"'";
             // Need to get an Authority by name
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             String parentcsid = 
             	getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
 
-            ctx = MultipartServiceContextFactory.get().createServiceContext(null, getItemServiceName());
+            ctx = createServiceContext(getItemServiceName(), queryParams);
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            DocumentFilter myFilter = handler.createDocumentFilter(ctx); //new DocumentFilter();
-            myFilter.setPagination(queryParams);
+            DocumentFilter myFilter = handler.createDocumentFilter(); //new DocumentFilter();
+            myFilter.setPagination(queryParams); //FIXME
 
             // Add the where clause "persons_common:inAuthority='" + parentcsid + "'"
             myFilter.setWhereClause(PersonJAXBSchema.PERSONS_COMMON + ":" +
@@ -598,6 +726,15 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         return personObjectList;
     }
 
+    /**
+     * Update person.
+     * 
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * @param theUpdate the the update
+     * 
+     * @return the multipart output
+     */
     @PUT
     @Path("{csid}/items/{itemcsid}")
     public MultipartOutput updatePerson(
@@ -624,7 +761,8 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         MultipartOutput result = null;
         try {
             // Note that we have to create the service context for the Items, not the main service
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(theUpdate, getItemServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getItemServiceName(),
+        			theUpdate);
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
             getRepositoryClient(ctx).update(ctx, itemcsid, handler);
             result = (MultipartOutput) ctx.getOutput();
@@ -652,6 +790,14 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         return result;
     }
 
+    /**
+     * Delete person.
+     * 
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * 
+     * @return the response
+     */
     @DELETE
     @Path("{csid}/items/{itemcsid}")
     public Response deletePerson(
@@ -676,7 +822,7 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         }
         try {
             // Note that we have to create the service context for the Items, not the main service
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getItemServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getItemServiceName());
             getRepositoryClient(ctx).delete(ctx, itemcsid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
@@ -711,7 +857,7 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         try {
             // Note that we have to create the service context and document
             // handler for the Contact service, not the main service.
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(input, getContactServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getContactServiceName(), input);
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(PersonAuthorityResource.class);
@@ -739,6 +885,15 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         
     }
         
+    /**
+     * Gets the contact list.
+     * 
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * @param ui the ui
+     * 
+     * @return the contact list
+     */
     @GET
     @Produces({"application/xml"})
     @Path("{parentcsid}/items/{itemcsid}/contacts/")
@@ -748,11 +903,12 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
             @Context UriInfo ui) {
         ContactsCommonList contactObjectList = new ContactsCommonList();
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getContactServiceName());
-            DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            DocumentFilter myFilter = handler.createDocumentFilter(ctx); //new DocumentFilter();
-            myFilter.setPagination(queryParams);
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getContactServiceName(),
+        			queryParams);
+            DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
+            DocumentFilter myFilter = handler.createDocumentFilter(); //new DocumentFilter();
+            myFilter.setPagination(queryParams); //FIXME (this is unnecessary since it is already set by "createContactDocumentHandler" method
             myFilter.setWhereClause(ContactJAXBSchema.CONTACTS_COMMON + ":" +
                 ContactJAXBSchema.IN_AUTHORITY +
                 "='" + parentcsid + "'" +
@@ -779,6 +935,15 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         return contactObjectList;
     }
 
+    /**
+     * Gets the contact.
+     * 
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * @param csid the csid
+     * 
+     * @return the contact
+     */
     @GET
     @Path("{parentcsid}/items/{itemcsid}/contacts/{csid}")
     public MultipartOutput getContact(
@@ -793,7 +958,7 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         try {
             // Note that we have to create the service context and document
             // handler for the Contact service, not the main service.
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getContactServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getContactServiceName());
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
@@ -828,6 +993,16 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
 
     }
 
+    /**
+     * Update contact.
+     * 
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * @param csid the csid
+     * @param theUpdate the the update
+     * 
+     * @return the multipart output
+     */
     @PUT
     @Path("{parentcsid}/items/{itemcsid}/contacts/{csid}")
     public MultipartOutput updateContact(
@@ -864,8 +1039,8 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         try {
             // Note that we have to create the service context and document
             // handler for the Contact service, not the main service.
-            ServiceContext ctx = MultipartServiceContextFactory.get()
-                .createServiceContext(theUpdate, getContactServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getContactServiceName(),
+        			theUpdate);
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
@@ -893,6 +1068,15 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         return result;
     }
 
+    /**
+     * Delete contact.
+     * 
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * @param csid the csid
+     * 
+     * @return the response
+     */
     @DELETE
     @Path("{parentcsid}/items/{itemcsid}/contacts/{csid}")
     public Response deleteContact(
@@ -927,8 +1111,7 @@ public class PersonAuthorityResource extends AbstractCollectionSpaceResourceImpl
         try {
             // Note that we have to create the service context for the
             // Contact service, not the main service.
-            ServiceContext ctx =
-                MultipartServiceContextFactory.get().createServiceContext(null, getContactServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getContactServiceName());
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();   
          } catch (UnauthorizedException ue) {

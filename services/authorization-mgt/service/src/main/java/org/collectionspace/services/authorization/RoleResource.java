@@ -39,8 +39,10 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
-import org.collectionspace.services.common.context.RemoteServiceContextImpl;
+//import org.collectionspace.services.common.context.RemoteServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.context.ServiceContextFactory;
+import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
@@ -53,16 +55,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+/**
+ * The Class RoleResource.
+ */
 @Path("/authorization/roles")
 @Consumes("application/xml")
 @Produces("application/xml")
 public class RoleResource
         extends AbstractCollectionSpaceResourceImpl {
 
+    /** The service name. */
     final private String serviceName = "authorization/roles";
+    
+    /** The logger. */
     final Logger logger = LoggerFactory.getLogger(RoleResource.class);
+    
+    /** The storage client. */
     final StorageClient storageClient = new JpaStorageClientImpl();
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
+     */
     @Override
     protected String getVersionString() {
         /** The last change revision. */
@@ -70,36 +83,66 @@ public class RoleResource
         return lastChangeRevision;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getServiceName()
+     */
     @Override
     public String getServiceName() {
         return serviceName;
     }
-
-    private <T> ServiceContext createServiceContext(T obj) throws Exception {
-        ServiceContext ctx = new RemoteServiceContextImpl<T, T>(getServiceName());
-        ctx.setInput(obj);
-        ctx.setDocumentType(Role.class.getPackage().getName()); //persistence unit
-        ctx.setProperty("entity-name", Role.class.getName());
-        return ctx;
-    }
-
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.CollectionSpaceResource#getCommonPartClass()
+     */
     @Override
+    public Class<RoleResource> getCommonPartClass() {
+    	return RoleResource.class;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.CollectionSpaceResource#getServiceContextFactory()
+     */
+    @Override
+    public ServiceContextFactory getServiceContextFactory() {
+    	return RemoteServiceContextFactory.get();
+    }
+    
+
+//    private <T> ServiceContext createServiceContext(T obj) throws Exception {
+//        ServiceContext ctx = new RemoteServiceContextImpl<T, T>(getServiceName());
+//        ctx.setInput(obj);
+//        ctx.setDocumentType(Role.class.getPackage().getName()); //persistence unit
+//        ctx.setProperty("entity-name", Role.class.getName());
+//        return ctx;
+//    }
+
+    /* (non-Javadoc)
+ * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getStorageClient(org.collectionspace.services.common.context.ServiceContext)
+ */
+@Override
     public StorageClient getStorageClient(ServiceContext ctx) {
         //FIXME use ctx to identify storage client
         return storageClient;
     }
 
-    @Override
-    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-        DocumentHandler docHandler = ctx.getDocumentHandler();
-        docHandler.setCommonPart(ctx.getInput());
-        return docHandler;
-    }
+//    @Override
+//    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
+//        DocumentHandler docHandler = ctx.getDocumentHandler();
+//        docHandler.setCommonPart(ctx.getInput());
+//        return docHandler;
+//    }
 
-    @POST
+    /**
+ * Creates the role.
+ * 
+ * @param input the input
+ * 
+ * @return the response
+ */
+@POST
     public Response createRole(Role input) {
         try {
-            ServiceContext ctx = createServiceContext(input);
+            ServiceContext ctx = createServiceContext(input, Role.class);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getStorageClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(RoleResource.class);
@@ -124,6 +167,13 @@ public class RoleResource
         }
     }
 
+    /**
+     * Gets the role.
+     * 
+     * @param csid the csid
+     * 
+     * @return the role
+     */
     @GET
     @Path("{csid}")
     public Role getRole(
@@ -140,7 +190,7 @@ public class RoleResource
         }
         Role result = null;
         try {
-            ServiceContext ctx = createServiceContext((Role) null);
+            ServiceContext ctx = createServiceContext((Role) null, Role.class);
             DocumentHandler handler = createDocumentHandler(ctx);
             getStorageClient(ctx).get(ctx, csid, handler);
             result = (Role) ctx.getOutput();
@@ -174,16 +224,23 @@ public class RoleResource
         return result;
     }
 
+    /**
+     * Gets the role list.
+     * 
+     * @param ui the ui
+     * 
+     * @return the role list
+     */
     @GET
     @Produces("application/xml")
     public RolesList getRoleList(
             @Context UriInfo ui) {
         RolesList roleList = new RolesList();
         try {
-            ServiceContext ctx = createServiceContext((RolesList) null);
+            ServiceContext ctx = createServiceContext((RolesList) null, Role.class);
             DocumentHandler handler = createDocumentHandler(ctx);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            DocumentFilter myFilter = handler.createDocumentFilter(ctx);
+            DocumentFilter myFilter = handler.createDocumentFilter();
             myFilter.setPagination(queryParams);
             myFilter.setQueryParams(queryParams);
             handler.setDocumentFilter(myFilter);
@@ -205,6 +262,14 @@ public class RoleResource
         return roleList;
     }
 
+    /**
+     * Update role.
+     * 
+     * @param csid the csid
+     * @param theUpdate the the update
+     * 
+     * @return the role
+     */
     @PUT
     @Path("{csid}")
     public Role updateRole(
@@ -222,7 +287,7 @@ public class RoleResource
         }
         Role result = null;
         try {
-            ServiceContext ctx = createServiceContext(theUpdate);
+            ServiceContext ctx = createServiceContext(theUpdate, Role.class);
             DocumentHandler handler = createDocumentHandler(ctx);
             getStorageClient(ctx).update(ctx, csid, handler);
             result = (Role) ctx.getOutput();
@@ -250,6 +315,13 @@ public class RoleResource
         return result;
     }
 
+    /**
+     * Delete role.
+     * 
+     * @param csid the csid
+     * 
+     * @return the response
+     */
     @DELETE
     @Path("{csid}")
     public Response deleteRole(@PathParam("csid") String csid) {
@@ -265,7 +337,7 @@ public class RoleResource
             throw new WebApplicationException(response);
         }
         try {
-            ServiceContext ctx = createServiceContext((Role) null);
+            ServiceContext ctx = createServiceContext((Role) null, Role.class);
             ((JpaStorageClientImpl)getStorageClient(ctx)).deleteWhere(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {

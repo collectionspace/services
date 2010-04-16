@@ -173,7 +173,7 @@ public class JpaStorageClientImpl implements StorageClient {
         }
         DocumentFilter docFilter = handler.getDocumentFilter();
         if (docFilter == null) {
-            docFilter = handler.createDocumentFilter(ctx);
+            docFilter = handler.createDocumentFilter();
         }
         EntityManagerFactory emf = null;
         EntityManager em = null;
@@ -256,7 +256,7 @@ public class JpaStorageClientImpl implements StorageClient {
         }
         DocumentFilter docFilter = handler.getDocumentFilter();
         if (docFilter == null) {
-            docFilter = handler.createDocumentFilter(ctx);
+            docFilter = handler.createDocumentFilter();
         }
         EntityManagerFactory emf = null;
         EntityManager em = null;

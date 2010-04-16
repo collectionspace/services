@@ -27,6 +27,7 @@ package org.collectionspace.services.account.storage;
 import java.util.ArrayList;
 import java.util.List;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentFilter;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +39,10 @@ public class AccountJpaFilter extends JpaDocumentFilter {
 
     private final Logger logger = LoggerFactory.getLogger(AccountJpaFilter.class);
 
+    public AccountJpaFilter(ServiceContext ctx) {
+    	super(ctx);
+    }
+    
     @Override
     public List<ParamBinding> buildWhereForSearch(StringBuilder queryStrBldr) {
 

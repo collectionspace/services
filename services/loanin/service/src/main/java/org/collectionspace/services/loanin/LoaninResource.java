@@ -36,11 +36,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
+import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
@@ -70,7 +71,8 @@ import org.slf4j.LoggerFactory;
 @Path("/loansin")
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
-public class LoaninResource extends AbstractCollectionSpaceResourceImpl {
+public class LoaninResource extends
+		AbstractMultiPartCollectionSpaceResourceImpl {
 
     /** The Constant serviceName. */
     private final static String serviceName = "loansin";
@@ -107,19 +109,27 @@ public class LoaninResource extends AbstractCollectionSpaceResourceImpl {
     }
 
     /* (non-Javadoc)
-     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#createDocumentHandler(org.collectionspace.services.common.context.ServiceContext)
+     * @see org.collectionspace.services.common.CollectionSpaceResource#getCommonPartClass()
      */
     @Override
-    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-        DocumentHandler docHandler = ctx.getDocumentHandler();
-        if (ctx.getInput() != null) {
-            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), LoansinCommon.class);
-            if (obj != null) {
-                docHandler.setCommonPart((LoansinCommon) obj);
-            }
-        }
-        return docHandler;
+    public Class<LoansinCommon> getCommonPartClass() {
+    	return LoansinCommon.class;
     }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#createDocumentHandler(org.collectionspace.services.common.context.ServiceContext)
+     */
+//    @Override
+//    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
+//        DocumentHandler docHandler = ctx.getDocumentHandler();
+//        if (ctx.getInput() != null) {
+//            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), LoansinCommon.class);
+//            if (obj != null) {
+//                docHandler.setCommonPart((LoansinCommon) obj);
+//            }
+//        }
+//        return docHandler;
+//    }
 
     /**
      * Creates the loanin.
@@ -131,7 +141,7 @@ public class LoaninResource extends AbstractCollectionSpaceResourceImpl {
     @POST
     public Response createLoanin(MultipartInput input) {
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(input, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             //loaninObject.setCsid(csid);
@@ -176,7 +186,7 @@ public class LoaninResource extends AbstractCollectionSpaceResourceImpl {
         }
         MultipartOutput result = null;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
@@ -222,11 +232,11 @@ public class LoaninResource extends AbstractCollectionSpaceResourceImpl {
     public LoansinCommonList getLoaninList(@Context UriInfo ui,
     		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
     	LoansinCommonList result = null;
-    	
+    	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
     	if (keywords != null) {
-    		result = searchLoansin(keywords);
+    		result = searchLoansin(queryParams, keywords);
     	} else {
-    		result = getLoaninList();
+    		result = getLoaninList(queryParams);
     	}
  
     	return result;
@@ -237,10 +247,10 @@ public class LoaninResource extends AbstractCollectionSpaceResourceImpl {
      * 
      * @return the loanin list
      */
-    private LoansinCommonList getLoaninList() {
+    private LoansinCommonList getLoaninList(MultivaluedMap<String, String> queryParams) {
         LoansinCommonList loaninObjectList;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getAll(ctx, handler);
             loaninObjectList = (LoansinCommonList) handler.getCommonPartList();
@@ -275,7 +285,8 @@ public class LoaninResource extends AbstractCollectionSpaceResourceImpl {
     		@Context UriInfo ui) {
     	AuthorityRefList authRefList = null;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+        	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentWrapper<DocumentModel> docWrapper = 
             	getRepositoryClient(ctx).getDoc(ctx, csid);
             RemoteDocumentModelHandlerImpl handler 
@@ -304,10 +315,11 @@ public class LoaninResource extends AbstractCollectionSpaceResourceImpl {
      * 
      * @return the loanin list
      */
+    @Deprecated
     public LoansinCommonList getLoaninList(List<String> csidList) {
         LoansinCommonList loaninObjectList = new LoansinCommonList();
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csidList, handler);
             loaninObjectList = (LoansinCommonList) handler.getCommonPartList();
@@ -351,7 +363,7 @@ public class LoaninResource extends AbstractCollectionSpaceResourceImpl {
         }
         MultipartOutput result = null;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(theUpdate, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
@@ -397,7 +409,7 @@ public class LoaninResource extends AbstractCollectionSpaceResourceImpl {
             throw new WebApplicationException(response);
         }
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
@@ -418,23 +430,7 @@ public class LoaninResource extends AbstractCollectionSpaceResourceImpl {
             throw new WebApplicationException(response);
         }
     }
-    
-    /**
-     * Keywords search loansin.
-     * 
-     * @param ui the ui
-     * @param keywords the keywords
-     * 
-     * @return the loansin common list
-     */
-    @GET
-    @Path("/search")    
-    @Produces("application/xml")
-    public LoansinCommonList keywordsSearchLoansin(@Context UriInfo ui,
-    		@QueryParam (IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
-    	return searchLoansin(keywords);
-    }
-    	
+        	
     /**
      * Search loansin.
      * 
@@ -442,10 +438,11 @@ public class LoaninResource extends AbstractCollectionSpaceResourceImpl {
      * 
      * @return the loansin common list
      */
-    private LoansinCommonList searchLoansin(String keywords) {
+    private LoansinCommonList searchLoansin(MultivaluedMap<String, String> queryParams,
+    		String keywords) {
     	LoansinCommonList loansinObjectList;
         try {
-            ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(null, getServiceName());
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
 
             // perform a keyword search
@@ -475,6 +472,5 @@ public class LoaninResource extends AbstractCollectionSpaceResourceImpl {
             throw new WebApplicationException(response);
         }
         return loansinObjectList;
-    }    
-    
+    }
 }
