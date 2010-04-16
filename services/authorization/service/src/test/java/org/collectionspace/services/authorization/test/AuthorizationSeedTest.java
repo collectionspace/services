@@ -90,7 +90,7 @@ public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
 
         PermissionsList pcList =
                 (PermissionsList) fromFile(PermissionsList.class,
-                 AbstractAuthorizationTestImpl.testDataDir + "test-permissions.xml");
+                AbstractAuthorizationTestImpl.testDataDir + "test-permissions.xml");
         logger.info("read permissions from "
                 + AbstractAuthorizationTestImpl.testDataDir + "test-permissions.xml");
         PermissionsRolesList pcrList =
@@ -103,18 +103,11 @@ public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
             if (logger.isDebugEnabled()) {
                 logger.debug("adding permission for res=" + p.getResourceName());
             }
-            List<PermissionRole> prl = getPermissionRoles(pcrList, p.getCsid());
-            authZ.addPermissions(p, prl);
+            for (PermissionRole pr : pcrList.getPermissionRoles()) {
+                if (pr.getPermissions().get(0).getPermissionId().equals(p.getCsid())) {
+                    authZ.addPermissions(p, pr);
+                }
+            }
         }
-    }
-
-    private List<PermissionRole> getPermissionRoles(PermissionsRolesList pcrList, String permId) {
-        List<PermissionRole> prList = new ArrayList<PermissionRole>();
-        for (PermissionRole pr : pcrList.getPermissionRoles()) {
-            if (pr.getPermissionIds().get(0).equals(permId)) {
-            prList.add(pr);
-        }
-        }
-        return prList;
     }
 }

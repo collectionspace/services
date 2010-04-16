@@ -46,25 +46,7 @@
         </xs:appinfo>
     </xs:annotation-->
 
-    <xs:element name="permissions_roles_list">
-        <xs:complexType>
-            <xs:annotation>
-                <xs:documentation>
-                    A list of permission_role association for a permission or a role
-                </xs:documentation>
-                <xs:appinfo>
-                    <hj:ignored/>
-                </xs:appinfo>
-            </xs:annotation>
-            <xs:sequence>
-                <xs:annotation>
-                    <xs:documentation>permission role list</xs:documentation>
-                </xs:annotation>
-                <xs:element name="permissionRole" type="permission_role" minOccurs="1" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-
+    <xs:include schemaLocation="authorization_common.xsd"/>
 
     <xs:element name="permission_role" type="permission_role"/>
     <xs:complexType name="permission_role">
@@ -78,28 +60,21 @@
             </xs:appinfo>
         </xs:annotation>
         <xs:sequence>
-            <xs:element name="subject" type="subject_type" minOccurs="1" maxOccurs="1"/>
-            <xs:element name="permissionId" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
-            <xs:element name="roleId" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
-            <xs:element name="createdAt" type="xs:dateTime"/>
-            <xs:element name="updatedAt" type="xs:dateTime"/>
+            <!-- subject is not required to be given by the service consumer -->
+            <!-- subject is for service use only -->
+            <xs:element name="subject" type="ns:subject_type" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="permission" type="ns:permission_value" minOccurs="1" maxOccurs="unbounded"/>
+            <xs:element name="role" type="ns:role_value" minOccurs="1" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
-
-
-    <xs:simpleType name="subject_type">
-        <xs:restriction base = "xs:string">
-            <xs:enumeration value = "PERMISSION"/>
-            <xs:enumeration value = "ROLE"/>
-        </xs:restriction>
-    </xs:simpleType>
 
     <xs:complexType name="permission_role_rel">
         <xs:annotation>
             <xs:documentation>
                 PermissionRoleRel defines 1-1 association between
-                permission and role in CollectionSpace. Note that this relation 
-                is defined exclusively for service-side use only.
+                permission and role in CollectionSpace.
+                Note that this relation is defined exclusively for service-side
+                use only.
             </xs:documentation>
             <xs:appinfo>
                 <hj:entity>
@@ -123,11 +98,29 @@
                     </xs:appinfo>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="permissionResource" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>
+                        <hj:basic>
+                            <orm:column name="permission_resource" nullable="true"/>
+                        </hj:basic>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:element>
             <xs:element name="roleId" type="xs:string" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
                     <xs:appinfo>
                         <hj:basic>
                             <orm:column name="role_id" length="128" nullable="false"/>
+                        </hj:basic>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="roleName" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>
+                        <hj:basic>
+                            <orm:column name="role_name" nullable="true"/>
                         </hj:basic>
                     </xs:appinfo>
                 </xs:annotation>
@@ -152,6 +145,27 @@
             </xs:element>
         </xs:sequence>
     </xs:complexType>
+
+
+
+    <xs:element name="permissions_roles_list">
+        <xs:complexType>
+            <xs:annotation>
+                <xs:documentation>
+                    A list of permission_role association for a permission or a role (for test only)
+                </xs:documentation>
+                <xs:appinfo>
+                    <hj:ignored/>
+                </xs:appinfo>
+            </xs:annotation>
+            <xs:sequence>
+                <xs:annotation>
+                    <xs:documentation>permission role list</xs:documentation>
+                </xs:annotation>
+                <xs:element name="permissionRole" type="permission_role" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
 
 </xs:schema>
 

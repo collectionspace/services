@@ -2,14 +2,32 @@
 <ns2:permissions_roles_list xmlns:ns2="http://collectionspace.org/services/authorization">
     <permissionRole>
         <subject>ROLE</subject>
-        <permissionId>1</permissionId>
-        <roleId>ROLE_USERS</roleId>
-        <roleId>ROLE_ADMINISTRATOR</roleId>
+        <permission>
+            <permissionId>1</permissionId>
+            <resourceName>accounts</resourceName>
+        </permission>
+        <role>
+            <roleId>1</roleId>
+            <roleName>ROLE_USERS</roleName>
+        </role>
+        <role>
+            <roleId>2</roleId>
+            <roleName>ROLE_ADMINISTRATOR</roleName>
+        </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
-        <permissionId>2</permissionId>
-        <roleId>ROLE_USERS</roleId>
-        <roleId>ROLE_ADMINISTRATOR</roleId>
+        <permission>
+            <permissionId>2</permissionId>
+            <resourceName>collectionobjects</resourceName>
+        </permission>
+        <role>
+            <roleId>1</roleId>
+            <roleName>ROLE_USERS</roleName>
+        </role>
+        <role>
+            <roleId>2</roleId>
+            <roleName>ROLE_ADMINISTRATOR</roleName>
+        </role>
     </permissionRole>
 </ns2:permissions_roles_list>

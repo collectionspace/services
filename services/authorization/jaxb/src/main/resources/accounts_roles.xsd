@@ -46,7 +46,29 @@
         </xs:appinfo>
     </xs:annotation-->
 
-    <xs:element name="user_role" type="user_role"/>
+    <xs:include schemaLocation="authorization_common.xsd"/>
+
+    <xs:element name="account_role" type="account_role"/>
+    <xs:complexType name="account_role">
+        <xs:annotation>
+            <xs:documentation>
+                AccountRole defines 1-n association between
+                either account and role or role and account
+            </xs:documentation>
+            <xs:appinfo>
+                <hj:ignored/>
+            </xs:appinfo>
+        </xs:annotation>
+        <xs:sequence>
+            <!-- subject is not required to be given by the service consumer -->
+            <!-- subject is for service use only -->
+            <xs:element name="subject" type="ns:subject_type" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="account" type="ns:account_value" minOccurs="1" maxOccurs="unbounded"/>
+            <xs:element name="role" type="ns:role_value" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+
     <xs:complexType name="user_role">
         <xs:annotation>
             <xs:documentation>UserRole defines association between user and role in CollectionSpace</xs:documentation>
@@ -102,22 +124,6 @@
         </xs:sequence>
     </xs:complexType>
 
-    <xs:element name="users_roles_list" >
-        <xs:complexType>
-            <xs:annotation>
-                <xs:documentation>users roles list</xs:documentation>
-                <xs:appinfo>
-                    <hj:ignored/>
-                </xs:appinfo>
-            </xs:annotation>
-            <xs:sequence>
-                <xs:annotation>
-                    <xs:documentation>account role list</xs:documentation>
-                </xs:annotation>
-                <xs:element name="userRole" type="user_role" minOccurs="1" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
 
 
 </xs:schema>

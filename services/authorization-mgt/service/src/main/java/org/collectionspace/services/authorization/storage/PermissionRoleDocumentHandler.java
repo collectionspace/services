@@ -28,7 +28,9 @@ import java.util.List;
 
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionRoleRel;
+import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.PermissionsRolesList;
+import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.common.context.ServiceContext;
 
@@ -82,29 +84,43 @@ public class PermissionRoleDocumentHandler
         List<PermissionRoleRel> prrl = wrapDoc.getWrappedObject();
         PermissionRole pr = new PermissionRole();
         SubjectType subject = PermissionRoleUtil.getSubject(getServiceContext());
-        pr.setSubject(subject);
+        PermissionRoleRel prr0 = prrl.get(0);
         if (SubjectType.ROLE.equals(subject)) {
-            List<String> permIds = new ArrayList<String>();
-            permIds.add(prrl.get(0).getPermissionId());
-            pr.setPermissionIds(permIds);
-            List<String> roleIds = new ArrayList<String>();
+
+            List<PermissionValue> pvs = new ArrayList<PermissionValue>();
+            pr.setPermissions(pvs);
+            PermissionValue pv = new PermissionValue();
+            pv.setPermissionId(prr0.getPermissionId());
+            pv.setResourceName(prr0.getPermissionResource());
+            pvs.add(pv);
+
+            //add roles
+            List<RoleValue> rvs = new ArrayList<RoleValue>();
+            pr.setRoles(rvs);
             for (PermissionRoleRel prr : prrl) {
-                roleIds.add(prr.getRoleId());
-                pr.setCreatedAt(prr.getCreatedAt());
-                pr.setUpdatedAt(prr.getUpdatedAt());
+                RoleValue rv = new RoleValue();
+                rv.setRoleId(prr.getRoleId());
+                rv.setRoleName(prr.getRoleName());
+                rvs.add(rv);
             }
-            pr.setRoleIds(roleIds);
-        } else {
-            List<String> roleIds = new ArrayList<String>();
-            roleIds.add(prrl.get(0).getRoleId());
-            pr.setRoleIds(roleIds);
-            List<String> permIds = new ArrayList<String>();
+        } else if (SubjectType.PERMISSION.equals(subject)) {
+
+            List<RoleValue> rvs = new ArrayList<RoleValue>();
+            pr.setRoles(rvs);
+            RoleValue rv = new RoleValue();
+            rv.setRoleId(prr0.getRoleId());
+            rv.setRoleName(prr0.getRoleName());
+            rvs.add(rv);
+
+            //add permssions
+            List<PermissionValue> pvs = new ArrayList<PermissionValue>();
+            pr.setPermissions(pvs);
             for (PermissionRoleRel prr : prrl) {
-                permIds.add(prr.getPermissionId());
-                pr.setCreatedAt(prr.getCreatedAt());
-                pr.setUpdatedAt(prr.getUpdatedAt());
+                PermissionValue pv = new PermissionValue();
+                pv.setPermissionId(prr.getPermissionId());
+                pv.setResourceName(prr.getPermissionResource());
+                pvs.add(pv);
             }
-            pr.setPermissionIds(permIds);
         }
         return pr;
     }
@@ -121,19 +137,21 @@ public class PermissionRoleDocumentHandler
             //subject mismatch should have been checked during validation
         }
         if (subject.equals(SubjectType.ROLE)) {
-            String permId = pr.getPermissionIds().get(0);
-            for (String roleId : pr.getRoleIds()) {
+            String permId = pr.getPermissions().get(0).getPermissionId();
+            for (RoleValue rv : pr.getRoles()) {
                 PermissionRoleRel prr = new PermissionRoleRel();
                 prr.setPermissionId(permId);
-                prr.setRoleId(roleId);
+                prr.setRoleId(rv.getRoleId());
+                prr.setRoleName(rv.getRoleName());
                 prrl.add(prr);
             }
-        } else {
-            String roleId = pr.getRoleIds().get(0);
-            for (String permId : pr.getPermissionIds()) {
+        } else if (SubjectType.PERMISSION.equals(subject)) {
+            String roleId = pr.getRoles().get(0).getRoleId();
+            for (PermissionValue pv : pr.getPermissions()) {
                 PermissionRoleRel prr = new PermissionRoleRel();
-                prr.setPermissionId(permId);
+                prr.setPermissionId(pv.getPermissionId());
                 prr.setRoleId(roleId);
+                prr.setPermissionResource(pv.getResourceName());
                 prrl.add(prr);
             }
         }

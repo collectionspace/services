@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    CollectionSpace default (security) authorization provider schema (XSD)
+
+    Entity(s)  : common xml types for authorization service
+    Used for:
+
+    $LastChangedRevision: 916 $
+    $LastChangedDate: 2009-11-05 16:59:20 -0800 (Thu, 05 Nov 2009) $
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+    xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
+    xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:ns="http://collectionspace.org/services/authorization"
+    xmlns="http://collectionspace.org/services/authorization"
+    targetNamespace="http://collectionspace.org/services/authorization"
+    version="0.1"
+    jaxb:version="1.0"
+    jaxb:extensionBindingPrefixes="hj orm xjc"
+    >
+
+    <!--
+    see http://weblogs.java.net/blog/2006/03/03/why-does-jaxb-put-xmlrootelement-sometimes-not-always
+    for more details behind xjc:simple
+    -->
+    <!--xs:annotation>
+    Note that roles.xsd already defines global bindings for the authorization namespace
+    so, it is not necessary to give the bindingings here because all the xsds are compiled
+    at once for this namespace
+        <xs:appinfo>
+            <jaxb:globalBindings>
+                <xjc:simple />
+            </jaxb:globalBindings>
+        </xs:appinfo>
+    </xs:annotation-->
+
+
+    <xs:complexType name="account_value" >
+        <xs:annotation>
+            <xs:documentation>
+                AccountValue is used relationships
+            </xs:documentation>
+            <xs:appinfo>
+                <hj:ignored/>
+            </xs:appinfo>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="accountId" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="screenName" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="userId" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="role_value" >
+        <xs:annotation>
+            <xs:documentation>
+                RoleValue is used relationships
+            </xs:documentation>
+            <xs:appinfo>
+                <hj:ignored/>
+            </xs:appinfo>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="roleId" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="roleName" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="permission_value" >
+        <xs:annotation>
+            <xs:documentation>
+                PermissionValue is used relationships
+            </xs:documentation>
+            <xs:appinfo>
+                <hj:ignored/>
+            </xs:appinfo>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="permissionId" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="resourceName" type="xs:string" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="subject_type">
+        <xs:restriction base = "xs:string">
+            <xs:enumeration value = "ACCOUNT"/>
+            <xs:enumeration value = "PERMISSION"/>
+            <xs:enumeration value = "ROLE"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>
+

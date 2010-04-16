@@ -105,18 +105,16 @@ public class AuthZ {
      */
     //FIXME this method should be in the restful web service resource of authz
     public void addPermissions(Permission perm,
-            List<PermissionRole> permRoles) {
+            PermissionRole permRole) {
         List<String> principals = new ArrayList<String>();
-        for (PermissionRole permRole : permRoles) {
-            if (!perm.getCsid().equals(permRole.getPermissionIds().get(0))) {
-                throw new IllegalArgumentException("permission ids do not"
-                        + " match for role=" + permRole.getRoleIds().get(0)
-                        + " with permissionId=" + permRole.getPermissionIds().get(0)
-                        + " for permission with csid=" + perm.getCsid());
-            }
-            //assuming permrole belongs to the same perm
-            //FIXME should use role name
-            principals.add(permRole.getRoleIds().get(0));
+        if (!perm.getCsid().equals(permRole.getPermissions().get(0).getPermissionId())) {
+            throw new IllegalArgumentException("permission ids do not"
+                    + " match for role=" + permRole.getRoles().get(0).getRoleName()
+                    + " with permissionId=" + permRole.getPermissions().get(0).getPermissionId()
+                    + " for permission with csid=" + perm.getCsid());
+        }
+        for (RoleValue roleValue : permRole.getRoles()) {
+            principals.add(roleValue.getRoleName());
         }
         List<PermissionAction> permActions = perm.getActions();
         for (PermissionAction permAction : permActions) {

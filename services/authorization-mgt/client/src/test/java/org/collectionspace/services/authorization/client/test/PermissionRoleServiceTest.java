@@ -23,6 +23,7 @@
 package org.collectionspace.services.authorization.client.test;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 import javax.ws.rs.core.Response;
@@ -31,7 +32,9 @@ import org.collectionspace.services.authorization.EffectType;
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.PermissionAction;
 import org.collectionspace.services.authorization.PermissionRole;
+import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.Role;
+import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.client.PermissionClient;
 import org.collectionspace.services.client.PermissionRoleClient;
 import org.collectionspace.services.client.RoleClient;
@@ -61,8 +64,8 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
     // Instance variables specific to this test.
     private String knownResourceId = null;
     private List<String> allResourceIdsCreated = new ArrayList();
-    private Hashtable<String, String> permIds = new Hashtable<String, String>();
-    private Hashtable<String, String> roleIds = new Hashtable<String, String>();
+    private Hashtable<String, PermissionValue> permValues = new Hashtable<String, PermissionValue>();
+    private Hashtable<String, RoleValue> roleValues = new Hashtable<String, RoleValue>();
     /*
      * This method is called only by the parent class, AbstractServiceTestImpl
      */
@@ -74,20 +77,40 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
 
     @BeforeClass(alwaysRun = true)
     public void seedData() {
-        String accPermId = createPermission("accounts", EffectType.PERMIT);
-        permIds.put("accounts", accPermId);
+        String ra = "accounts";
+        String accPermId = createPermission(ra, EffectType.PERMIT);
+        PermissionValue pva = new PermissionValue();
+        pva.setResourceName(ra);
+        pva.setPermissionId(accPermId);
+        permValues.put(pva.getResourceName(), pva);
 
-        String coPermId = createPermission("collectionobjects", EffectType.DENY);
-        permIds.put("collectionobjects", coPermId);
+        String rc = "collectionobjects";
+        String coPermId = createPermission(rc, EffectType.DENY);
+        PermissionValue pvc = new PermissionValue();
+        pvc.setResourceName(rc);
+        pvc.setPermissionId(coPermId);
+        permValues.put(pvc.getResourceName(), pvc);
 
-        String iPermId = createPermission("intakes", EffectType.DENY);
-        permIds.put("intakes", iPermId);
+        String ri = "intakes";
+        String iPermId = createPermission(ri, EffectType.DENY);
+        PermissionValue pvi = new PermissionValue();
+        pvi.setResourceName(ri);
+        pvi.setPermissionId(iPermId);
+        permValues.put(pvi.getResourceName(), pvi);
 
-        String r1RoleId = createRole("ROLE_CO1");
-        roleIds.put("ROLE_1", r1RoleId);
+        String rn1 = "ROLE_CO1";
+        String r1RoleId = createRole(rn1);
+        RoleValue rv1 = new RoleValue();
+        rv1.setRoleId(r1RoleId);
+        rv1.setRoleName(rn1);
+        roleValues.put(rv1.getRoleName(), rv1);
 
-        String r2RoleId = createRole("ROLE_CO2");
-        roleIds.put("ROLE_2", r2RoleId);
+        String rn2 = "ROLE_CO2";
+        String r2RoleId = createRole(rn2);
+        RoleValue rv2 = new RoleValue();
+        rv2.setRoleId(r2RoleId);
+        rv2.setRoleName(rn2);
+        roleValues.put(rv2.getRoleName(), rv2);
     }
 
     // ---------------------------------------------------------------
@@ -104,10 +127,11 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         setupCreate(testName);
 
         // Submit the request to the service and store the response.
-        PermissionRole permRole = createPermissionRoleInstance(permIds.get("accounts"),
-                roleIds.values().toArray(new String[0]), true, true);
+        PermissionValue pv = permValues.get("accounts");
+        PermissionRole permRole = createPermissionRoleInstance(pv,
+                roleValues.values(), true, true);
         PermissionRoleClient client = new PermissionRoleClient();
-        ClientResponse<Response> res = client.create(permIds.get("accounts"), permRole);
+        ClientResponse<Response> res = client.create(pv.getPermissionId(), permRole);
         int statusCode = res.getStatus();
 
         if (logger.isDebugEnabled()) {
@@ -135,25 +159,27 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         setupCreate(testName);
         // Submit the request to the service and store the response.
         PermissionRoleClient client = new PermissionRoleClient();
-        PermissionRole permRole = createPermissionRoleInstance(permIds.get("collectionobjects"),
-                roleIds.values().toArray(new String[0]), true, true);
-        ClientResponse<Response> res = client.create(permIds.get("collectionobjects"), permRole);
+        PermissionValue pv = permValues.get("collectionobjects");
+        PermissionRole permRole = createPermissionRoleInstance(pv,
+                roleValues.values(), true, true);
+        ClientResponse<Response> res = client.create(pv.getPermissionId(), permRole);
         int statusCode = res.getStatus();
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         //id of relationship is not important
-        allResourceIdsCreated.add(permIds.get("collectionobjects"));
+        allResourceIdsCreated.add(pv.getPermissionId());
 
-        PermissionRole permRole2 = createPermissionRoleInstance(permIds.get("intakes"),
-                roleIds.values().toArray(new String[0]), true, true);
-        res = client.create(permIds.get("intakes"), permRole2);
+        PermissionValue pv2 = permValues.get("intakes");
+        PermissionRole permRole2 = createPermissionRoleInstance(pv2,
+                roleValues.values(), true, true);
+        res = client.create(pv2.getPermissionId(), permRole2);
         statusCode = res.getStatus();
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         //id of relationship is not important
-        allResourceIdsCreated.add(permIds.get("intakes"));
+        allResourceIdsCreated.add(pv2.getPermissionId());
 
     }
 
@@ -186,7 +212,8 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PermissionRoleClient client = new PermissionRoleClient();
-        ClientResponse<PermissionRole> res = client.read(permIds.get("accounts"), "123");
+        ClientResponse<PermissionRole> res = client.read(
+                permValues.get("accounts").getPermissionId(), "123");
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -282,7 +309,8 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PermissionRoleClient client = new PermissionRoleClient();
-        ClientResponse<Response> res = client.delete(permIds.get("accounts"), "123");
+        ClientResponse<Response> res = client.delete(
+                permValues.get("accounts").getPermissionId(), "123");
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -293,7 +321,6 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
     }
 
     // Failure outcomes
@@ -334,7 +361,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         String method = ServiceRequestType.READ.httpMethodName();
-        String url = getResourceURL(permIds.get("accounts"));
+        String url = getResourceURL(permValues.get("accounts").getPermissionId());
         int statusCode = submitRequest(method, url);
 
         // Check the status code of the response: does it match
@@ -353,13 +380,13 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
     /**
      * create permRolerole instance
      * @param permId
-     * @param roleIds array of role ids
+     * @param roleValues array of role ids
      * @param userPermId
      * @param useRoleId
      * @return
      */
-    private PermissionRole createPermissionRoleInstance(String permId,
-            String[] roleIds,
+    private PermissionRole createPermissionRoleInstance(PermissionValue pv,
+            Collection<RoleValue> rvs,
             boolean usePermId,
             boolean useRoleId) {
 
@@ -368,16 +395,17 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         //from URI used
 //        permRole.setSubject(SubjectType.ROLE);
         if (usePermId) {
-            ArrayList<String> pl = new ArrayList<String>();
-            pl.add(permId);
-            permRole.setPermissionIds(pl);
+            ArrayList<PermissionValue> pvs = new ArrayList<PermissionValue>();
+            pvs.add(pv);
+            permRole.setPermissions(pvs);
         }
         if (useRoleId) {
-            ArrayList<String> rl = new ArrayList<String>();
-            for (String roleId : roleIds) {
-                rl.add(roleId);
+            //FIXME is there a better way?
+            ArrayList<RoleValue> rvas = new ArrayList<RoleValue>();
+            for (RoleValue rv : rvs) {
+                rvas.add(rv);
             }
-            permRole.setRoleIds(rl);
+            permRole.setRoles(rvas);
         }
 
         if (logger.isDebugEnabled()) {
@@ -391,24 +419,29 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
     public void cleanUp() {
         setupDelete("delete");
         if (logger.isDebugEnabled()) {
-            logger.debug("Cleaning up temporary resources created for testing ...");
+            logger.debug("clenaup: Cleaning up temporary resources created for testing ...");
         }
         PermissionRoleClient client = new PermissionRoleClient();
         for (String resourceId : allResourceIdsCreated) {
+
             // Note: Any non-success responses are ignored and not reported.
             ClientResponse<Response> res = client.delete(resourceId, "123");
             int statusCode = res.getStatus();
+            if (logger.isDebugEnabled()) {
+                logger.debug("clenaup: delete relationships for permission id="
+                        + resourceId + " status=" + statusCode);
+            }
             Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
             Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         }
 
-        for (String permId : permIds.values()) {
-            deletePermission(permId);
+        for (PermissionValue pv : permValues.values()) {
+            deletePermission(pv.getPermissionId());
         }
 
-        for (String roleId : roleIds.values()) {
-            deleteRole(roleId);
+        for (RoleValue rv : roleValues.values()) {
+            deleteRole(rv.getRoleId());
         }
     }
 
@@ -422,7 +455,8 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         ClientResponse<Response> res = permClient.create(permission);
         int statusCode = res.getStatus();
         if (logger.isDebugEnabled()) {
-            logger.debug("createPermission" + ": status = " + statusCode);
+            logger.debug("createPermission: resName=" + resName +
+                    " status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -435,6 +469,10 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         PermissionClient permClient = new PermissionClient();
         ClientResponse<Response> res = permClient.delete(permId);
         int statusCode = res.getStatus();
+        if (logger.isDebugEnabled()) {
+            logger.debug("deletePermission: delete permission id="
+                    + permId + " status=" + statusCode);
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -449,7 +487,8 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         ClientResponse<Response> res = roleClient.create(role);
         int statusCode = res.getStatus();
         if (logger.isDebugEnabled()) {
-            logger.debug("createRole" + ": status = " + statusCode);
+            logger.debug("createRole: name=" + roleName +
+                    " status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
@@ -462,6 +501,10 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         RoleClient roleClient = new RoleClient();
         ClientResponse<Response> res = roleClient.delete(roleId);
         int statusCode = res.getStatus();
+                if (logger.isDebugEnabled()) {
+            logger.debug("deleteRole: delete role id=" + roleId +
+                    " status=" + statusCode);
+        }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);

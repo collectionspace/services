@@ -54,8 +54,10 @@ import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.EffectType;
 import org.collectionspace.services.authorization.PermissionAction;
 import org.collectionspace.services.authorization.PermissionRole;
+import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.PermissionsList;
 import org.collectionspace.services.authorization.PermissionsRolesList;
+import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
 
 /**
@@ -109,8 +111,8 @@ public class AuthorizationGen {
     public void genPermissionsRoles() {
         PermissionsRolesList psrsl = new PermissionsRolesList();
         ArrayList<PermissionRole> prl = new ArrayList<PermissionRole>();
-        prl.add(buildCommonPermissionRoles("1"));
-        prl.add(buildCommonPermissionRoles("2"));
+        prl.add(buildCommonPermissionRoles("1", "accounts"));
+        prl.add(buildCommonPermissionRoles("2", "collectionobjects"));
         psrsl.setPermissionRoles(prl);
         AbstractAuthorizationTestImpl.toFile(psrsl, PermissionsRolesList.class,
                 AbstractAuthorizationTestImpl.testDataDir + "test-permissions-roles.xml");
@@ -118,18 +120,29 @@ public class AuthorizationGen {
                 + AbstractAuthorizationTestImpl.testDataDir + "test-permissions-roles.xml");
     }
 
-    private PermissionRole buildCommonPermissionRoles(String id) {
+    private PermissionRole buildCommonPermissionRoles(String id, String resName) {
 
         PermissionRole pr = new PermissionRole();
         pr.setSubject(SubjectType.ROLE);
-        List<String> permIds = new ArrayList<String>();
-        permIds.add(id);
-        pr.setPermissionIds(permIds);
-        //FIXME should using role id
-        List<String> roleIds = new ArrayList<String>();
-        roleIds.add("ROLE_USERS");
-        roleIds.add("ROLE_ADMINISTRATOR");
-        pr.setRoleIds(roleIds);
+
+        List<PermissionValue> permValues = new ArrayList<PermissionValue>();
+        pr.setPermissions(permValues);
+        PermissionValue permValue = new PermissionValue();
+        permValue.setPermissionId(id);
+        permValue.setResourceName(resName);
+        permValues.add(permValue);
+
+        List<RoleValue> roleValues = new ArrayList<RoleValue>();
+        RoleValue rv1 = new RoleValue();
+        rv1.setRoleName("ROLE_USERS");
+        rv1.setRoleId("1");
+        roleValues.add(rv1);
+        RoleValue rv2 = new RoleValue();
+        rv2.setRoleName("ROLE_ADMINISTRATOR");
+        rv2.setRoleId("2");
+        roleValues.add(rv2);
+        pr.setRoles(roleValues);
+        
         return pr;
 
     }
