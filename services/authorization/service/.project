@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.collectionspace.services.account.service</name>
+	<name>org.collectionspace.services.authorization.service</name>
 	<comment></comment>
 	<projects>
-		<project>org.collectionspace.services.account.jaxb</project>
-		<project>org.collectionspace.services.authentication.jaxb</project>
 		<project>org.collectionspace.services.authorization.jaxb</project>
-		<project>org.collectionspace.services.common</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

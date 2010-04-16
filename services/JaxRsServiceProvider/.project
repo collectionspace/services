@@ -3,6 +3,7 @@
 	<name>org.collectionspace.services.jaxrs.provider</name>
 	<comment></comment>
 	<projects>
+		<project>org.collectionspace.services.authorization-mgt</project>
 		<project>org.collectionspace.services.acquisition.jaxb</project>
 		<project>org.collectionspace.services.acquisition.service</project>
 		<project>org.collectionspace.services.collectionobject.jaxb</project>
