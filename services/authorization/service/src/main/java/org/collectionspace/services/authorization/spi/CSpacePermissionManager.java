@@ -21,12 +21,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
-
 package org.collectionspace.services.authorization.spi;
 
 import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.CSpaceAction;
+import org.collectionspace.services.authorization.PermissionException;
+import org.collectionspace.services.authorization.PermissionNotFoundException;
 
 /**
  * Permission management interface for CSpace services
@@ -34,7 +34,9 @@ import org.collectionspace.services.authorization.CSpaceAction;
  */
 public interface CSpacePermissionManager {
 
-    public void addPermission(CSpaceResource res, String[] principals, CSpaceAction perm);
+    public void addPermission(CSpaceResource res, String[] principals, CSpaceAction perm)
+            throws PermissionException;
 
-    public void deletePermission(CSpaceResource res, String[] principals, CSpaceAction perm);
+    public void deletePermission(CSpaceResource res, String[] principals, CSpaceAction perm)
+            throws PermissionNotFoundException, PermissionException;
 }

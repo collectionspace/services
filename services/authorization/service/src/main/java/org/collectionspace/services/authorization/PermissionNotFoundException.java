@@ -20,32 +20,34 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
-
  */
-
-
 package org.collectionspace.services.authorization;
 
 /**
- * CSpaceResource represents the resource to secure
- * @author 
+ *
+ * @author sanjaydalal
  */
-public interface CSpaceResource {
-
-    public enum TYPE {
-        URI,
-        CLASS,
-        OBJECT,
-        ATTRIBUTE
-    }
-    public String getId();
-
-    public TYPE getType();
+public class PermissionNotFoundException extends PermissionException {
 
     /**
-     * getAction is a conveneniece method to get corresponding action to be invoked
-     * on the resource for which permission is sought
-     * @return
+     * Creates a new instance of <code>PermissionNotFoundException</code> without detail message.
      */
-    public CSpaceAction getAction();
+    public PermissionNotFoundException() {
+    }
+
+    /**
+     * Constructs an instance of <code>PermissionNotFoundException</code> with the specified detail message.
+     * @param msg the detail message.
+     */
+    public PermissionNotFoundException(String msg) {
+        super(msg);
+    }
+
+    public PermissionNotFoundException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
+    public PermissionNotFoundException(Throwable cause) {
+        super(cause);
+    }
 }

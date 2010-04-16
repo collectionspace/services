@@ -20,32 +20,7 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *//**
- *  This document is a part of the source code and related artifacts
- *  for CollectionSpace, an open source collections management system
- *  for museums and related institutions:
 
- *  http://www.collectionspace.org
- *  http://wiki.collectionspace.org
-
- *  Copyright 2009 University of California at Berkeley
-
- *  Licensed under the Educational Community License (ECL), Version 2.0.
- *  You may not use this file except in compliance with this License.
-
- *  You may obtain a copy of the ECL 2.0 License at
-
- *  https://source.collectionspace.org/collection-space/LICENSE.txt
-
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
  */
 package org.collectionspace.services.authorization;
 
@@ -105,7 +80,7 @@ public class AuthZ {
      */
     //FIXME this method should be in the restful web service resource of authz
     public void addPermissions(Permission perm,
-            PermissionRole permRole) {
+            PermissionRole permRole) throws PermissionException {
         List<String> principals = new ArrayList<String>();
         if (!perm.getCsid().equals(permRole.getPermissions().get(0).getPermissionId())) {
             throw new IllegalArgumentException("permission ids do not"
@@ -130,7 +105,7 @@ public class AuthZ {
      * @param res
      * @param principals
      */
-    public void addPermission(CSpaceResource res, String[] principals) {
+    public void addPermission(CSpaceResource res, String[] principals) throws PermissionException {
         CSpaceAction action = res.getAction();
         addPermission(res, principals, action);
     }
@@ -141,7 +116,8 @@ public class AuthZ {
      * @param principals
      * @param perm
      */
-    public void addPermission(CSpaceResource res, String[] principals, CSpaceAction action) {
+    public void addPermission(CSpaceResource res, String[] principals, CSpaceAction action)
+            throws PermissionException {
         provider.getPermissionManager().addPermission(res, principals, action);
         if (log.isDebugEnabled()) {
             log.debug("added permission resource=" + res.getId() + " action=" + action.name());
@@ -154,7 +130,8 @@ public class AuthZ {
      * @param res
      * @param principals
      */
-    public void deletePermission(CSpaceResource res, String[] principals) {
+    public void deletePermission(CSpaceResource res, String[] principals)
+            throws PermissionNotFoundException, PermissionException {
         CSpaceAction action = res.getAction();
         deletePermission(res, principals, action);
     }
@@ -165,7 +142,8 @@ public class AuthZ {
      * @param principals
      * @param perm
      */
-    public void deletePermission(CSpaceResource res, String[] principals, CSpaceAction action) {
+    public void deletePermission(CSpaceResource res, String[] principals, CSpaceAction action)
+            throws PermissionNotFoundException, PermissionException {
         provider.getPermissionManager().deletePermission(res, principals, action);
         if (log.isDebugEnabled()) {
             log.debug("removed permission resource=" + res.getId() + " action=" + action.name());

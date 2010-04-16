@@ -168,4 +168,20 @@ public class URIResourceImpl extends CSpaceResourceImpl {
         }
         throw new IllegalArgumentException("action = " + action.toString());
     }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("URIResourceImpl [");
+        builder.append("action=");
+        builder.append(action);
+        builder.append(", method=");
+        builder.append(method);
+        builder.append(", uri=");
+        builder.append(uri);
+        builder.append("]");
+        return builder.toString() + " " + super.toString();
+    }
+
+
 }
