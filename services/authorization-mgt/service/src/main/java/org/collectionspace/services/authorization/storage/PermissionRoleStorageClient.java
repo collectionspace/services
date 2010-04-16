@@ -133,15 +133,16 @@ public class PermissionRoleStorageClient extends JpaStorageClientImpl {
      * @throws DocumentNotFoundException
      * @throws DocumentException
      */
+    @Override
     public void get(ServiceContext ctx, String id, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
         if (ctx == null) {
             throw new IllegalArgumentException(
-                    "JpaStorageClient.get: ctx is missing");
+                    "PermissionRoleStorageClient.get: ctx is missing");
         }
         if (handler == null) {
             throw new IllegalArgumentException(
-                    "JpaStorageClient.get: handler is missing");
+                    "PermissionRoleStorageClient.get: handler is missing");
         }
         DocumentFilter docFilter = handler.getDocumentFilter();
         if (docFilter == null) {

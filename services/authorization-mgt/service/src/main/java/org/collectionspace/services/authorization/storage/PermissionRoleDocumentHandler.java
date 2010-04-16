@@ -32,7 +32,6 @@ import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.PermissionsRolesList;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
-import org.collectionspace.services.common.context.ServiceContext;
 
 import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -89,36 +88,28 @@ public class PermissionRoleDocumentHandler
 
             List<PermissionValue> pvs = new ArrayList<PermissionValue>();
             pr.setPermissions(pvs);
-            PermissionValue pv = new PermissionValue();
-            pv.setPermissionId(prr0.getPermissionId());
-            pv.setResourceName(prr0.getPermissionResource());
+            PermissionValue pv = buildPermissionValue(prr0);
             pvs.add(pv);
 
             //add roles
             List<RoleValue> rvs = new ArrayList<RoleValue>();
             pr.setRoles(rvs);
             for (PermissionRoleRel prr : prrl) {
-                RoleValue rv = new RoleValue();
-                rv.setRoleId(prr.getRoleId());
-                rv.setRoleName(prr.getRoleName());
+                RoleValue rv = buildRoleValue(prr);
                 rvs.add(rv);
             }
         } else if (SubjectType.PERMISSION.equals(subject)) {
 
             List<RoleValue> rvs = new ArrayList<RoleValue>();
             pr.setRoles(rvs);
-            RoleValue rv = new RoleValue();
-            rv.setRoleId(prr0.getRoleId());
-            rv.setRoleName(prr0.getRoleName());
+            RoleValue rv = buildRoleValue(prr0);
             rvs.add(rv);
 
             //add permssions
             List<PermissionValue> pvs = new ArrayList<PermissionValue>();
             pr.setPermissions(pvs);
             for (PermissionRoleRel prr : prrl) {
-                PermissionValue pv = new PermissionValue();
-                pv.setPermissionId(prr.getPermissionId());
-                pv.setResourceName(prr.getPermissionResource());
+                PermissionValue pv = buildPermissionValue(prr);
                 pvs.add(pv);
             }
         }
@@ -137,21 +128,15 @@ public class PermissionRoleDocumentHandler
             //subject mismatch should have been checked during validation
         }
         if (subject.equals(SubjectType.ROLE)) {
-            String permId = pr.getPermissions().get(0).getPermissionId();
+            PermissionValue pv = pr.getPermissions().get(0);
             for (RoleValue rv : pr.getRoles()) {
-                PermissionRoleRel prr = new PermissionRoleRel();
-                prr.setPermissionId(permId);
-                prr.setRoleId(rv.getRoleId());
-                prr.setRoleName(rv.getRoleName());
+                PermissionRoleRel prr = buildPermissonRoleRel(pv, rv);
                 prrl.add(prr);
             }
         } else if (SubjectType.PERMISSION.equals(subject)) {
-            String roleId = pr.getRoles().get(0).getRoleId();
+            RoleValue rv = pr.getRoles().get(0);
             for (PermissionValue pv : pr.getPermissions()) {
-                PermissionRoleRel prr = new PermissionRoleRel();
-                prr.setPermissionId(pv.getPermissionId());
-                prr.setRoleId(roleId);
-                prr.setPermissionResource(pv.getResourceName());
+                PermissionRoleRel prr = buildPermissonRoleRel(pv, rv);
                 prrl.add(prr);
             }
         }
@@ -194,5 +179,28 @@ public class PermissionRoleDocumentHandler
     @Override
     public DocumentFilter createDocumentFilter() {
         return new DocumentFilter(this.getServiceContext());
+    }
+
+    private PermissionValue buildPermissionValue(PermissionRoleRel prr) {
+        PermissionValue pv = new PermissionValue();
+        pv.setPermissionId(prr.getPermissionId());
+        pv.setResourceName(prr.getPermissionResource());
+        return pv;
+    }
+
+    private RoleValue buildRoleValue(PermissionRoleRel prr) {
+        RoleValue rv = new RoleValue();
+        rv.setRoleId(prr.getRoleId());
+        rv.setRoleName(prr.getRoleName());
+        return rv;
+    }
+
+    private PermissionRoleRel buildPermissonRoleRel(PermissionValue pv, RoleValue rv) {
+        PermissionRoleRel prr = new PermissionRoleRel();
+        prr.setPermissionId(pv.getPermissionId());
+        prr.setPermissionResource(pv.getResourceName());
+        prr.setRoleId(rv.getRoleId());
+        prr.setRoleName(rv.getRoleName());
+        return prr;
     }
 }
