@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Loan Out schema (XSD)
+    
+    Entity  : Loanout
+    Part    : Common
+    Used for: Nuxeo EP core document type
+
+    $LastChangedRevision: 1442 $
+    $LastChangedDate: 2010-02-25 14:22:30 -0800 (Thu, 25 Feb 2010) $
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/loanout/"
+    xmlns="http://collectionspace.org/loanout/"
+    targetNamespace="http://collectionspace.org/loanout/"
+    version="0.1">
+    
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Loans+Out+Schema -->
+
+    <!--  Loan Out Information Group -->
+    <xs:element name="loanOutNumber" type="xs:string"/>
+    <xs:element name="borrower" type="xs:string"/>
+    <xs:element name="borrowersContact" type="xs:string"/>
+    <xs:element name="lendersAuthorizer" type="xs:string"/>
+    <xs:element name="lendersAuthorizationDate" type="xs:string"/>
+    <xs:element name="lendersContact" type="xs:string"/>
+    
+    <!--
+         Omitting loaned object status fields in release 0.5.2,
+         as these are likely to be repeatable or else handled
+         in some alternate way in release 0.7.
+    -->
+    <!-- xs:element name="loanedObjectStatus" type="xs:string"/ -->
+    <!-- xs:element name="loanedObjectStatusDate" type="xs:string"/ -->
+    <!-- xs:element name="loanedObjectStatusNote" type="xs:string"/ -->
+    
+    <xs:element name="loanOutDate" type="xs:string"/>
+    <xs:element name="loanReturnDate" type="xs:string"/>
+    <xs:element name="loanRenewalApplicationDate" type="xs:string"/>
+    <xs:element name="specialConditionsOfLoan" type="xs:string"/>
+    <xs:element name="loanOutNote" type="xs:string"/>
+    <xs:element name="loanPurpose" type="xs:string"/>
+    
+</xs:schema>

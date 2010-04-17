@@ -151,6 +151,48 @@
             </service:object>
         </tenant:serviceBindings>
         <!-- end loanin service meta-data -->
+        <!-- begin loanout service meta-data -->
+        <tenant:serviceBindings name="Loansout" type="procedure" version="0.1">
+            <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
+                nuxeo-java
+            </service:repositoryClient>
+            <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.loanout.nuxeo.LoanoutDocumentModelHandler
+            </service:documentHandler>
+            <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.loanout.nuxeo.LoanoutValidatorHandler
+            </service:validatorHandler>
+            <service:object name="Loanout" version="0.1"
+                            xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:part id="0" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="loansout-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/common/system"
+                            schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="loansout_common" updated="" order="1">
+                    <service:properties>
+                        <types:item><types:key>authRef</types:key><types:value>borrower</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>borrowersContact</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>lendersAuthorizer</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>lendersContact</types:value></types:item>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/loanout"
+                            schemaLocation="http://collectionspace.org/services/loanout http://services.collectionspace.org/loanout/loansout_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end loanout service meta-data -->
         <!-- begin vocabulary service meta-data -->
         <tenant:serviceBindings name="Vocabularies" version="0.1">
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>

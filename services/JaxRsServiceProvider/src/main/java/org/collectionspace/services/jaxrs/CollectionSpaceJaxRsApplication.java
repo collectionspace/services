@@ -27,6 +27,7 @@ import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.id.IDResource;
 import org.collectionspace.services.intake.IntakeResource;
 import org.collectionspace.services.loanin.LoaninResource;
+import org.collectionspace.services.loanout.LoanoutResource;
 import org.collectionspace.services.relation.NewRelationResource;
 import org.collectionspace.services.acquisition.AcquisitionResource;
 import org.collectionspace.services.dimension.DimensionResource;
@@ -67,6 +68,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new IDResource());
         singletons.add(new IntakeResource());
         singletons.add(new LoaninResource());
+        singletons.add(new LoanoutResource());
         singletons.add(new AcquisitionResource());
         singletons.add(new NewRelationResource());
         singletons.add(new VocabularyResource());
