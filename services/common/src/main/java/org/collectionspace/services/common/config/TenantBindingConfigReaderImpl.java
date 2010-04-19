@@ -37,7 +37,6 @@ import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.tenant.TenantBindingType;
 import org.collectionspace.services.common.tenant.TenantBindingConfig;
 import org.collectionspace.services.common.types.PropertyItemType;
-import org.collectionspace.services.common.types.PropertyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,9 +137,9 @@ public class TenantBindingConfigReaderImpl
             String repositoryClientName = serviceBinding.getRepositoryClient();
             if (repositoryClientName == null) {
                 //no repository needed for this service...skip
-                if (logger.isDebugEnabled()) {
-                    logger.debug("No repository configured for service " + serviceName
-                            + " skipping...");
+                if (logger.isInfoEnabled()) {
+                    logger.info("The service " + serviceName
+                            + " does not seem to require a document repository.");
                 }
                 continue;
             }
@@ -161,34 +160,44 @@ public class TenantBindingConfigReaderImpl
             }
             String workspaceId = null;
             //workspace name is service name by convention
-            String workspace = serviceBinding.getName().toLowerCase();
+            String workspace = serviceName.toLowerCase();
             if (clientType.equals(ClientType.JAVA)) {
                 workspaceId = workspaceIds.get(workspace);
                 if (workspaceId == null) {
-                    logger.warn("Failed to retrieve workspace ID for " + workspace);
-                    logger.warn("Trying to create a new workspace ...");
+                    if (logger.isWarnEnabled()) {
+                        logger.warn("Failed to retrieve workspace ID for " + workspace
+                                + " from repository, trying to create a new workspace ...");
+                    }
                     workspaceId = repositoryClient.createWorkspace(
                             tenantBinding.getRepositoryDomain(),
                             serviceBinding.getName());
                     if (workspaceId == null) {
-                        logger.warn("Failed to create workspace for " + workspace);
+                        if (logger.isWarnEnabled()) {
+                            logger.warn("Failed to create workspace in repository"
+                                    + " for service=" + workspace);
+                        }
                         continue;
+                    }
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Successfully created workspace in repository" +
+                                " id=" + workspaceId + " for service=" + workspace);
                     }
                 }
             } else {
                 workspaceId = serviceBinding.getRepositoryWorkspaceId();
                 if (workspaceId == null || "".equals(workspaceId)) {
-                    logger.error("Could not find workspace ID for " + workspace);
+                    logger.error("Could not find workspace in repository for" +
+                            " service=" + workspace);
                     //FIXME: should we throw an exception here?
                     continue;
                 }
             }
             String tenantService = getTenantQualifiedServiceName(tenantBinding.getId(), serviceName);
             serviceWorkspaces.put(tenantService, workspaceId);
-            if (logger.isDebugEnabled()) {
-                logger.debug("retrieved workspace id=" + workspaceId
-                        + " service=" + serviceName
-                        + " workspace=" + workspace);
+            if (logger.isInfoEnabled()) {
+                logger.info("Created/retrieved repository workspace=" +
+                        workspace + " id=" + workspaceId
+                        + " for service=" + serviceName);
             }
         }
     }
@@ -228,17 +237,18 @@ public class TenantBindingConfigReaderImpl
      */
     public List<ServiceBindingType> getServiceBindingsByType(
             String tenantId, String serviceType) {
-    	ArrayList<ServiceBindingType> list = null;
-    	TenantBindingType tenant = tenantBindings.get(tenantId);
-    	if(tenant!=null) {
-    		for(ServiceBindingType sb:tenant.getServiceBindings()) {
-    			if(sb.getType().equals(serviceType)) {
-    				if(list==null)
-    		        	list = new ArrayList<ServiceBindingType>();
-    				list.add(sb);
-    			}
-    		}
-    	}
+        ArrayList<ServiceBindingType> list = null;
+        TenantBindingType tenant = tenantBindings.get(tenantId);
+        if (tenant != null) {
+            for (ServiceBindingType sb : tenant.getServiceBindings()) {
+                if (sb.getType().equals(serviceType)) {
+                    if (list == null) {
+                        list = new ArrayList<ServiceBindingType>();
+                    }
+                    list.add(sb);
+                }
+            }
+        }
         return list;
     }
 
@@ -261,21 +271,22 @@ public class TenantBindingConfigReaderImpl
     private RepositoryClient getRepositoryClient(String clientName) {
         return RepositoryClientFactory.getInstance().getClient(clientName);
     }
-    
+
     public void setDefaultPropertiesOnTenants(List<PropertyItemType> propList,
-    		boolean propagateToServices) {
-    	// For each tenant, set properties in list that are not already set
-       	if(propList == null || propList.isEmpty())
-       		return;
-    	for(TenantBindingType tenant:tenantBindings.values()) {
-    		for(PropertyItemType prop:propList){
-    			TenantBindingUtils.setPropertyValue(tenant,
-    		    		prop, TenantBindingUtils.SET_PROP_IF_MISSING );
-    		}
-    		if(propagateToServices) {
-    			TenantBindingUtils.propagatePropertiesToServices(tenant, 
-    					TenantBindingUtils.SET_PROP_IF_MISSING);
-    		}
-    	}
+            boolean propagateToServices) {
+        // For each tenant, set properties in list that are not already set
+        if (propList == null || propList.isEmpty()) {
+            return;
+        }
+        for (TenantBindingType tenant : tenantBindings.values()) {
+            for (PropertyItemType prop : propList) {
+                TenantBindingUtils.setPropertyValue(tenant,
+                        prop, TenantBindingUtils.SET_PROP_IF_MISSING);
+            }
+            if (propagateToServices) {
+                TenantBindingUtils.propagatePropertiesToServices(tenant,
+                        TenantBindingUtils.SET_PROP_IF_MISSING);
+            }
+        }
     }
 }
