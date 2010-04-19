@@ -134,15 +134,6 @@
                     </xs:appinfo>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="updatedAt" type="xs:dateTime">
-                <xs:annotation>
-                    <xs:appinfo>
-                        <hj:basic>
-                            <orm:column name="updated_at" />
-                        </hj:basic>
-                    </xs:appinfo>
-                </xs:annotation>
-            </xs:element>
         </xs:sequence>
     </xs:complexType>
 

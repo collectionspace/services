@@ -10,9 +10,10 @@ insert into `roles` (`csid`, `rolename`, `rolegroup`, `created_at`, `tenant_id`)
 insert into `roles` (`csid`, `rolename`, `rolegroup`, `created_at`, `tenant_id`) values ('3', 'ROLE_COLLECTIONS_MANAGER', 'collections', '2010-02-17 16:31:48', '1');
 insert into `roles` (`csid`, `rolename`, `rolegroup`, `created_at`, `tenant_id`) values ('4', 'ROLE_COLLECTIONS_REGISTRAR', 'collections', '2010-02-17 16:31:48', '1');
 
-insert into `users_roles`(`username`, `role_id`, `created_at`) values ('test', '1', '2010-02-17 16:31:48');
-insert into `users_roles`(`username`, `role_id`, `created_at`) values ('test', '2', '2010-02-17 16:31:48');
-insert into `users_roles`(`username`, `role_id`, `created_at`) values ('test', '3', '2010-02-17 16:31:48');
+insert into `accounts_roles`(`account_id`, `user_id`, `role_id`, `role_name`, `created_at`) values ('eeca40d7-dc77-4cc5-b489-16a53c75525a', 'test', '1', 'ROLE_ADMINISTRATOR', '2010-02-17 16:31:48');
+insert into `accounts_roles`(`account_id`, `user_id`, `role_id`, `role_name`, `created_at`) values ('eeca40d7-dc77-4cc5-b489-16a53c75525a', 'test', '2', 'ROLE_USERS', '2010-02-17 16:31:48');
+insert into `accounts_roles`(`account_id`, `user_id`, `role_id`, `role_name`, `created_at`) values ('eeca40d7-dc77-4cc5-b489-16a53c75525a', 'test', '3', 'ROLE_COLLECTIONS_MANAGER', '2010-02-17 16:31:48');
 
-insert into `users_roles`(`username`, `role_id`, `created_at`) values ('barney', '2', '2010-02-17 16:31:48');
-insert into `users_roles`(`username`, `role_id`, `created_at`) values ('barney', '3', '2010-02-17 16:31:48');
+-- todo: barney is created in security test but accountrole is not yet created there, so add fake account id
+insert into `accounts_roles`(`account_id`, `user_id`, `role_id`, `role_name`, `created_at`) values ('1', 'barney', '2', 'ROLE_USERS', '2010-02-17 16:31:48');
+insert into `accounts_roles`(`account_id`, `user_id`, `role_id`, `role_name`, `created_at`) values ('1', 'barney', '3', 'ROLE_COLLECTIONS_MANAGER', '2010-02-17 16:31:48');

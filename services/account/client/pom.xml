@@ -12,18 +12,16 @@
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.account.client</artifactId>
     <name>services.account.client</name>
-    
+
     <dependencies>
         <!-- keep slf4j dependencies on the top -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
@@ -32,7 +30,17 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.authorization.jaxb</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.authorization-mgt.client</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -43,7 +51,7 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <scope>test</scope>
-        </dependency>        
+        </dependency>
         <!-- <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.client</artifactId>
@@ -55,7 +63,7 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>5.6</version>
-        </dependency>       
+        </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>

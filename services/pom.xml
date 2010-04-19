@@ -18,8 +18,8 @@
         <module>client</module>
         <module>jaxb</module>
         <module>common</module>
-        <module>account</module>
-        <module>authorization-mgt</module>
+        <module>authorization-mgt</module> <!-- relies on authorization -->
+        <module>account</module> <!-- relies on authorization-mgt.client -->
         <module>relation</module>
         <!--        <module>query</module> -->
         <module>acquisition</module>
@@ -69,7 +69,7 @@
                         </systemProperties>
                     </configuration>
                 </plugin-->
-                
+
                 <plugin>
                     <groupId>org.jvnet.hyperjaxb3</groupId>
                     <artifactId>maven-hyperjaxb3-plugin</artifactId>
@@ -94,7 +94,7 @@
                     <artifactId>maven-jaxb2-plugin</artifactId>
                     <version>0.7.2</version>
                 </plugin-->
-                
+
                 <plugin>
                     <groupId>org.jvnet.jaxb2.maven2</groupId>
                     <artifactId>maven-jaxb2-plugin</artifactId>

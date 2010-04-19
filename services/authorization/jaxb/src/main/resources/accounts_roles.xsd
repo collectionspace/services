@@ -69,15 +69,15 @@
     </xs:complexType>
 
 
-    <xs:complexType name="user_role">
+    <xs:complexType name="account_role_rel">
         <xs:annotation>
-            <xs:documentation>UserRole defines association between user and role in CollectionSpace</xs:documentation>
+            <xs:documentation>AccountRole defines association between account and role in CollectionSpace</xs:documentation>
             <xs:appinfo>
                 <hj:entity>
-                    <orm:table name="users_roles">
+                    <orm:table name="accounts_roles">
                         <orm:unique-constraint>
                             <!-- combined length should be < 1000 bytes -->
-                            <orm:column-name>username</orm:column-name>
+                            <orm:column-name>account_id</orm:column-name>
                             <orm:column-name>role_id</orm:column-name>
                         </orm:unique-constraint>
                     </orm:table>
@@ -85,11 +85,29 @@
             </xs:appinfo>
         </xs:annotation>
         <xs:sequence>
-            <xs:element name="userName" type="xs:string" minOccurs="1" maxOccurs="1">
+            <xs:element name="accountId" type="xs:string" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:appinfo>
                         <hj:basic>
-                            <orm:column name="username" length="128" nullable="false"/>
+                            <orm:column name="account_id" length="128" nullable="false"/>
+                        </hj:basic>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="screenName" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>
+                        <hj:basic>
+                            <orm:column name="screen_name" nullable="true"/>
+                        </hj:basic>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="userId" type="xs:string" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>
+                        <hj:basic>
+                            <orm:column name="user_id" length="128" nullable="false"/>
                         </hj:basic>
                     </xs:appinfo>
                 </xs:annotation>
@@ -103,20 +121,20 @@
                     </xs:appinfo>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="roleName" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>
+                        <hj:basic>
+                            <orm:column name="role_name" nullable="true"/>
+                        </hj:basic>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:element>
             <xs:element name="createdAt" type="xs:dateTime">
                 <xs:annotation>
                     <xs:appinfo>
                         <hj:basic>
                             <orm:column name="created_at" nullable="false"/>
-                        </hj:basic>
-                    </xs:appinfo>
-                </xs:annotation>
-            </xs:element>
-            <xs:element name="updatedAt" type="xs:dateTime">
-                <xs:annotation>
-                    <xs:appinfo>
-                        <hj:basic>
-                            <orm:column name="updated_at" />
                         </hj:basic>
                     </xs:appinfo>
                 </xs:annotation>

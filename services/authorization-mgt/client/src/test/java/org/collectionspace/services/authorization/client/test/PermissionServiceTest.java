@@ -32,6 +32,7 @@ import org.collectionspace.services.client.PermissionClient;
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.PermissionAction;
 import org.collectionspace.services.authorization.PermissionsList;
+import org.collectionspace.services.client.PermissionFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.jboss.resteasy.client.ClientResponse;
@@ -81,7 +82,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         setupCreate(testName);
 
         // Submit the request to the service and store the response.
-        List<PermissionAction> actions = getDefaultActions();
+        List<PermissionAction> actions = PermissionFactory.createDefaultActions();
         Permission permission = createPermissionInstance("accounts",
                 "default permissions for account",
                 actions,
@@ -121,7 +122,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         setupCreate(testName);
 
         // Submit the request to the service and store the response.
-        List<PermissionAction> actions = getDefaultActions();
+        List<PermissionAction> actions = PermissionFactory.createDefaultActions();
         Permission permission = createPermissionInstance(null,
                 "default permissions for account",
                 actions,
@@ -149,7 +150,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
 
         setupCreate(testName);
         // Submit the request to the service and store the response.
-        List<PermissionAction> actions = getDefaultActions();
+        List<PermissionAction> actions = PermissionFactory.createDefaultActions();
         Permission permission1 = createPermissionInstance("collectionobjects",
                 "default permissions for collectionobjects",
                 actions,
@@ -416,7 +417,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in updatePermission(), below.
         PermissionClient client = new PermissionClient();
-        List<PermissionAction> actions = getDefaultActions();
+        List<PermissionAction> actions = PermissionFactory.createDefaultActions();
         Permission permission = createPermissionInstance("acquisitions",
                 "default permissions for acquisitions",
                 actions,
@@ -531,7 +532,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
      * @param useEffect
      * @return
      */
-    static Permission createPermissionInstance(String resourceName,
+    public static Permission createPermissionInstance(String resourceName,
             String description,
             List<PermissionAction> actionList,
             EffectType effect,
@@ -539,49 +540,17 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
             boolean useAction,
             boolean useEffect) {
 
-        Permission permission = new Permission();
-        if (useResourceName) {
-            permission.setResourceName(resourceName);
-        }
-        if (useAction) {
-            permission.setActions(actionList);
-        }
-        if (useEffect) {
-            permission.setEffect(effect);
-        }
-
+        Permission permission = PermissionFactory.createPermissionInstance(resourceName,
+                description, actionList, effect,
+                useResourceName, useAction, useEffect);
 
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, permission common");
-        logger.debug(objectAsXmlString(permission, Permission.class));
+            logger.debug(objectAsXmlString(permission, Permission.class));
         }
         return permission;
     }
 
-    static List<PermissionAction> getDefaultActions() {
-        List<PermissionAction> actions = new ArrayList<PermissionAction>();
-        PermissionAction create = new PermissionAction();
-        create.setName(ActionType.CREATE);
-        actions.add(create);
-
-        PermissionAction read = new PermissionAction();
-        read.setName(ActionType.READ);
-        actions.add(read);
-
-        PermissionAction update = new PermissionAction();
-        update.setName(ActionType.UPDATE);
-        actions.add(update);
-
-        PermissionAction delete = new PermissionAction();
-        delete.setName(ActionType.DELETE);
-        actions.add(delete);
-
-        PermissionAction search = new PermissionAction();
-        search.setName(ActionType.SEARCH);
-        actions.add(search);
-
-        return actions;
-    }
 
     @AfterClass(alwaysRun = true)
     public void cleanUp() {

@@ -6,7 +6,7 @@
         <class>org.collectionspace.services.authorization.PermissionAction</class>
         <class>org.collectionspace.services.authorization.PermissionRoleRel</class>
         <class>org.collectionspace.services.authorization.Role</class>
-        <class>org.collectionspace.services.authorization.UserRole</class>
+        <class>org.collectionspace.services.authorization.AccountRoleRel</class>
         <properties>
             <property name="hibernate.ejb.cfgfile" value="hibernate.cfg.xml"/>
 

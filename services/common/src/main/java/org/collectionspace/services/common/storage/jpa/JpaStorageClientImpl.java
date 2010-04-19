@@ -152,6 +152,7 @@ public class JpaStorageClientImpl implements StorageClient {
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.storage.StorageClient#get(org.collectionspace.services.common.context.ServiceContext, java.util.List, org.collectionspace.services.common.document.DocumentHandler)
      */
+    @Override
     public void get(ServiceContext ctx, List<String> csidList, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
         throw new UnsupportedOperationException();

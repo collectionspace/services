@@ -24,15 +24,13 @@ package org.collectionspace.services.account.client.test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.codec.binary.Base64;
 import org.collectionspace.services.client.AccountClient;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.account.Status;
-import org.collectionspace.services.account.AccountTenant;
+import org.collectionspace.services.client.AccountFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.jboss.resteasy.client.ClientResponse;
@@ -53,12 +51,12 @@ import org.testng.annotations.AfterClass;
  */
 public class AccountServiceTest extends AbstractServiceTestImpl {
 
-    private final Logger logger =
+    static private final Logger logger =
             LoggerFactory.getLogger(AccountServiceTest.class);
     // Instance variables specific to this test.
     private String knownResourceId = null;
     private List<String> allResourceIdsCreated = new ArrayList();
-    boolean addTenant = true;
+    static boolean addTenant = true;
     /*
      * This method is called only by the parent class, AbstractServiceTestImpl
      */
@@ -911,51 +909,13 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @param usePassword
      * @return
      */
-    private AccountsCommon createAccountInstance(String screenName,
+   AccountsCommon createAccountInstance(String screenName,
             String userName, String passwd, String email,
             boolean useScreenName, boolean invalidTenant, boolean useUser, boolean usePassword) {
 
-        AccountsCommon account = new AccountsCommon();
-        if (useScreenName) {
-            account.setScreenName(screenName);
-        }
-        if (useUser) {
-            account.setUserId(userName);
-        }
-        if (usePassword) {
-            //jaxb marshaller already b64 encodes the xs:base64Binary types
-            //no need to double encode
-//            byte[] b64pass = Base64.encodeBase64(passwd.getBytes());
-//            account.setPassword(b64pass);
-            if (logger.isDebugEnabled()) {
-                logger.debug("user=" + userName + " password=" + passwd
-                        + " password length=" + passwd.getBytes().length);
-//
-            }
-            //jaxb encodes password too
-            account.setPassword(passwd.getBytes());
-        }
-
-        account.setPersonRefName(screenName);
-        account.setEmail(email);
-        account.setPhone("1234567890");
-        List<AccountTenant> atList = new ArrayList<AccountTenant>();
-        AccountTenant at = new AccountTenant();
-        if (!invalidTenant) {
-            //tenant is not required to be added during create, service layer
-            //picks up tenant from security context if needed
-            if (addTenant) {
-                at.setTenantId("1");
-                atList.add(at);
-                account.setTenants(atList);
-                addTenant = !addTenant;
-            }
-        } else {
-            //use invalid tenant id...called from validation test
-            at.setTenantId(UUID.randomUUID().toString());
-            atList.add(at);
-            account.setTenants(atList);
-        }
+        AccountsCommon account = AccountFactory.createAccountInstance(screenName,
+                userName, passwd, email, useScreenName,
+                addTenant, invalidTenant, useUser, usePassword);
 
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, account common");

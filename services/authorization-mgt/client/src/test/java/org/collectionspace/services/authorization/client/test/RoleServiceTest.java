@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RolesList;
+import org.collectionspace.services.client.RoleFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.jboss.resteasy.client.ClientResponse;
@@ -49,7 +50,7 @@ import org.testng.annotations.AfterClass;
  */
 public class RoleServiceTest extends AbstractServiceTestImpl {
 
-    static private final Logger logger =
+    private final Logger logger =
             LoggerFactory.getLogger(RoleServiceTest.class);
     // Instance variables specific to this test.
     private String knownResourceId = null;
@@ -520,15 +521,12 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
      * @param useRoleName
      * @return
      */
-    static Role createRoleInstance(String roleName,
+    public Role createRoleInstance(String roleName,
             String description,
             boolean useRoleName) {
 
-        Role role = new Role();
-        if (useRoleName) {
-            role.setRoleName(roleName);
-        }
-        role.setDescription(description);
+        Role role = RoleFactory.createRoleInstance(roleName, description,
+                useRoleName);
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, role common");
             logger.debug(objectAsXmlString(role, Role.class));

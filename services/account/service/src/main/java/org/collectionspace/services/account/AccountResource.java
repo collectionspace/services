@@ -39,6 +39,8 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.account.storage.AccountStorageClient;
+import org.collectionspace.services.authorization.AccountRole;
+import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
@@ -351,6 +353,143 @@ public class AccountResource
         } catch (Exception e) {
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Delete failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+
+    }
+
+
+    @POST
+    @Path("{csid}/accountroles")
+    public Response createAccountRole(@PathParam("csid") String accCsid,
+            AccountRole input) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("createAccountRole with accCsid=" + accCsid);
+        }
+        if (accCsid == null || "".equals(accCsid)) {
+            logger.error("createAccountRole: missing accCsid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "create failed on AccountRole accCsid=" + accCsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        try {
+            AccountRoleSubResource subResource = new AccountRoleSubResource();
+            String accrolecsid = subResource.createAccountRole(input, SubjectType.ROLE);
+            UriBuilder path = UriBuilder.fromResource(AccountResource.class);
+            path.path(accCsid + "/accountroles/" + accrolecsid);
+            Response response = Response.created(path.build()).build();
+            return response;
+        } catch (BadRequestException bre) {
+            Response response = Response.status(
+                    Response.Status.BAD_REQUEST).entity("Create failed reason "
+                    + bre.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Create failed reason "
+                    + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception in createAccountRole", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    "Create failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+    }
+
+    @GET
+    @Path("{csid}/accountroles/{accrolecsid}")
+    public AccountRole getAccountRole(
+            @PathParam("csid") String accCsid,
+            @PathParam("accrolecsid") String accrolecsid) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("getAccountRole with accCsid=" + accCsid);
+        }
+        if (accCsid == null || "".equals(accCsid)) {
+            logger.error("getAccountRole: missing accCsid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "get failed on AccountRole accCsid=" + accCsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        AccountRole result = null;
+        try {
+            AccountRoleSubResource subResource = new AccountRoleSubResource();
+            //get relationships for an account
+            result = subResource.getAccountRole(accCsid, SubjectType.ROLE);
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Get failed reason "
+                    + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getAccountRole", dnfe);
+            }
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Get failed on AccountRole accrolecsid=" + accrolecsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getAccountRole", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    "Get failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        if (result == null) {
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Get failed, the requested AccountRole accrolecsid:" + accrolecsid
+                    + ": was not found.").type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return result;
+    }
+
+    @DELETE
+    @Path("{csid}/accountroles/{accrolecsid}")
+    public Response deleteAccountRole(
+            @PathParam("csid") String accCsid,
+            @PathParam("accrolecsid") String accrolecsid) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("deleteAccountRole with accCsid=" + accCsid);
+        }
+        if (accCsid == null || "".equals(accCsid)) {
+            logger.error("deleteAccountRole: missing accCsid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "delete failed on AccountRole accCsid=" + accCsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        try {
+            AccountRoleSubResource subResource = new AccountRoleSubResource();
+            //delete all relationships for an account
+            subResource.deleteAccountRole(accCsid, SubjectType.ROLE);
+            return Response.status(HttpResponseCodes.SC_OK).build();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Delete failed reason "
+                    + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("caught exception in deleteAccountRole", dnfe);
+            }
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Delete failed on AccountRole accrolecsid=" + accrolecsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    "Delete failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
 
