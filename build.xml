@@ -210,7 +210,7 @@
     <target name="create_db"
             description="create database(s), grant privileges to test users">
         <sql driver="com.mysql.jdbc.Driver"
-             url="jdbc:mysql://${db.host}:${db.port}/cspace"
+             url="jdbc:mysql://${db.host}:${db.port}"
              userid="${db.user}"
              password="${db.user.password}"
              src="${db.script.dir}/init_db.sql"
