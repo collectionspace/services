@@ -152,6 +152,7 @@
         <ant antfile="collectionobject/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="loanin/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="loanout/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="vocabulary/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="organization/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="person/build.xml" target="deploy" inheritAll="false"/>
@@ -161,7 +162,7 @@
         <ant antfile="JaxRsServiceProvider/build.xml" target="deploy" inheritAll="false"/>
     </target>
 
-    <!-- this target is called in revese order of deploy targets -->
+    <!-- this target is called in reverse order of deploy targets -->
     <target name="undeploy"
             description="undeploy services from ${jboss.server.cspace}">
         <ant antfile="JaxRsServiceProvider/build.xml" target="undeploy" inheritAll="false"/>
@@ -171,6 +172,7 @@
         <ant antfile="contact/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="dimension/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="acquisition/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="loanout/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="loanin/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="undeploy" inheritAll="false"/>
@@ -199,6 +201,7 @@
         <ant antfile="collectionobject/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="loanin/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="loanout/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="vocabulary/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="organization/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="person/build.xml" target="dist" inheritAll="false"/>
