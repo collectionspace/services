@@ -282,9 +282,12 @@ public class DocumentUtils {
         if (tokens == 2) {
             nv.name = stz.nextToken();
             nv.value = stz.nextToken();
+        // Allow null or empty values
+        } else if (tokens == 1) {
+            nv.name = stz.nextToken();
+            nv.value = "";
         } else {
-            throw new IllegalStateException("Found multi valued element " + input
-                    + " without qualification");
+            throw new IllegalStateException("Unexpected format for multi valued element: " + input);
         }
         return nv;
     }
