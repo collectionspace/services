@@ -204,6 +204,12 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         return result;
     }
     
+    /**
+     * @param docWrapper
+     * @param authRefFields list of schema-qualified field names
+     * @return
+     * @throws PropertyException
+     */
     public AuthorityRefList getAuthorityRefs(
                 DocumentWrapper<DocumentModel> docWrapper,
     		List<String> authRefFields) throws PropertyException {

@@ -409,8 +409,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
             wrapDoc = new DocumentWrapperImpl<DocumentModelList>(docList);
         } catch (IllegalArgumentException iae) {
             throw iae;
-        } catch (DocumentException de) {
-            throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
@@ -763,8 +761,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         boolean fFirst = true;
         for(String docType:docTypes) {
         	if(fFirst) {
-                query.append(",");
                 fFirst = false;
+        	} else {
+        		query.append(",");
         	}
             query.append(docType);
         }

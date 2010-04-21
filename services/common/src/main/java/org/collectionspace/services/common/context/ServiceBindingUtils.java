@@ -11,8 +11,23 @@ import org.collectionspace.services.common.service.ServiceObjectType;
 import org.collectionspace.services.common.tenant.TenantBindingType;
 import org.collectionspace.services.common.types.PropertyItemType;
 import org.collectionspace.services.common.types.PropertyType;
+import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.DocumentModel;
 
 public class ServiceBindingUtils {
+	public static final boolean QUALIFIED_PROP_NAMES = true;
+	public static final boolean UNQUALIFIED_PROP_NAMES = false;
+	public static final String AUTH_REF_PROP = "authRef";
+	public static final String OBJ_NUMBER_PROP = "objectNumberProperty";
+	public static final String OBJ_NAME_PROP = "objectNameProperty";
+	public static final String SERVICE_TYPE_PROP = "type";
+	public static final String SERVICE_TYPE_OBJECT = "object";
+	public static final String SERVICE_TYPE_PROCEDURE = "procedure";
+	
+	// TODO consider building up a hashTable of the properties for each
+	// service binding. There will be generic properties, as well as
+	// properties on each part. Could build up a key from tenant id, 
+	// servicename, (partname for those props), propName
 
     public static void getPartsMetadata(ServiceBindingType serviceBinding, 
     		Map<String, ObjectPartType> objectPartMap) {
@@ -23,7 +38,7 @@ public class ServiceBindingUtils {
         }
     }
     
-    public static List<PropertyItemType> getPropertiesForPart(ServiceBindingType serviceBinding,
+    private static List<PropertyItemType> getPropertiesForPart(ServiceBindingType serviceBinding,
     		String partLabel) {
         ServiceObjectType objectType = serviceBinding.getObject();
         List<ObjectPartType> objectPartTypes = objectType.getPart();
@@ -37,19 +52,27 @@ public class ServiceBindingUtils {
     }
 
     public static List<String> getPropertyValuesForPart(ServiceBindingType serviceBinding,
-    		String partLabel, String propName) {
+    		String partLabel, String propName, boolean qualify) {
     	List<PropertyItemType> partProps = getPropertiesForPart(serviceBinding, partLabel);
-    	return PropertyItemUtils.getPropertyValuesByName(partProps, propName);
+    	return PropertyItemUtils.getPropertyValuesByName(partProps, propName, 
+    													(qualify?(partLabel+":"):null));
     }
 
+	/**
+	 * @param serviceBinding the service to work from
+	 * @param propName the name of the property of interest
+	 * @param qualify if QUALIFIED_PROP_NAMES, will prefix all values with the part label
+	 * @return a list of (qualified)
+	 */
 	public static List<String> getAllPartsPropertyValues(ServiceBindingType serviceBinding,
-    		String propName) {
+    		String propName, boolean qualify) {
     	List<String> values = new ArrayList<String>();
         ServiceObjectType objectType = serviceBinding.getObject();
         List<ObjectPartType> objectPartTypes = objectType.getPart();
         for (ObjectPartType objectPartType : objectPartTypes) {
         	List<PropertyType> propNodeList = objectPartType.getProperties();
-        	PropertyItemUtils.getPropertyValuesByNameInNodeList(propNodeList, propName, values);
+        	PropertyItemUtils.getPropertyValuesByNameInNodeList(propNodeList, 
+        			propName, (qualify?(objectPartType.getLabel()+":"):null), values);
         }
     	return values;
     }
@@ -65,7 +88,7 @@ public class ServiceBindingUtils {
     		throw new IllegalArgumentException("ServiceBindingUtils.getPropertyValues: null property name!");
     	}
 		List<PropertyType> servicePropList = service.getProperties();
-		return PropertyItemUtils.getPropertyValueFromNodeList(servicePropList, propName );
+		return PropertyItemUtils.getPropertyValueByNameFromNodeList(servicePropList, propName );
     }
     
     /**
@@ -103,4 +126,27 @@ public class ServiceBindingUtils {
 				propName, value, onlyIfNotSet);
     }
     
+    public static String getMappedFieldInDoc( ServiceBindingType sb,
+    		String logicalFieldName, DocumentModel docModel ) {
+    	// Now we have to get the number, which is configured as some field
+    	// on each docType
+    	/* If we go to qualified field names, we'll need this
+    	String[] strings = qPropName.split(":");
+    	if(strings.length!=2) {
+    		throw new RuntimeException(
+    				"getMappedFieldInDoc: Bad configuration of "
+    				+logicalFieldName+" field for: "+docModel.getDocumentType().getName());
+    	}
+    	*/
+    	String propName = getPropertyValue(sb, logicalFieldName);
+    	if(propName==null||propName.isEmpty())
+    		return null;
+    	try {
+    		return (String)docModel.getPropertyValue(propName);
+    	} catch(ClientException ce) {
+    		throw new RuntimeException(
+    				"getMappedFieldInDoc: Problem fetching: "+propName, ce);
+    	}
+    } 
+
 }

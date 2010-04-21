@@ -241,7 +241,7 @@ public class TenantBindingConfigReaderImpl
         TenantBindingType tenant = tenantBindings.get(tenantId);
         if (tenant != null) {
             for (ServiceBindingType sb : tenant.getServiceBindings()) {
-                if (sb.getType().equals(serviceType)) {
+                if (serviceType.equals(sb.getType())) {
                     if (list == null) {
                         list = new ArrayList<ServiceBindingType>();
                     }
@@ -263,6 +263,11 @@ public class TenantBindingConfigReaderImpl
         return serviceWorkspaces.get(tenantService);
     }
 
+    /**
+     * @param tenantId
+     * @param serviceName
+     * @return the properly qualified service name
+     */
     public static String getTenantQualifiedServiceName(
             String tenantId, String serviceName) {
         return tenantId + "." + serviceName.toLowerCase();
@@ -272,6 +277,14 @@ public class TenantBindingConfigReaderImpl
         return RepositoryClientFactory.getInstance().getClient(clientName);
     }
 
+    /**
+     * Sets properties in the passed list on the local properties for this TenantBinding.
+     * Note: will only set properties not already set on the TenantBinding.
+     * 
+     * @param propList
+     * @param propagateToServices If true, recurses to set set properties 
+     * 			on the associated services.
+     */
     public void setDefaultPropertiesOnTenants(List<PropertyItemType> propList,
             boolean propagateToServices) {
         // For each tenant, set properties in list that are not already set

@@ -25,7 +25,7 @@ public class TenantBindingUtils {
     		throw new IllegalArgumentException("TenantBindingUtils.getPropertyValues: null property name!");
     	}
 		List<PropertyType> tenantPropList = tenantBinding.getProperties();
-		return PropertyItemUtils.getPropertyValueFromNodeList(tenantPropList, propName );
+		return PropertyItemUtils.getPropertyValueByNameFromNodeList(tenantPropList, propName );
     }
     
     /**

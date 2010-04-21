@@ -23,7 +23,8 @@
  */
 package org.collectionspace.services.person;
 
-//import java.net.URI;
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -35,7 +36,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
-//import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -46,27 +46,35 @@ import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
-//import org.collectionspace.services.common.context.MultipartServiceContext;
-//import org.collectionspace.services.common.context.MultipartServiceContextFactory;
+import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
+import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.common.context.MultipartServiceContext;
+import org.collectionspace.services.common.context.MultipartServiceContextFactory;
+import org.collectionspace.services.common.context.MultipartServiceContextImpl;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
-//import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.security.UnauthorizedException;
-//import org.collectionspace.services.common.vocabulary.RefNameUtils;
+import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
+import org.collectionspace.services.common.vocabulary.RefNameUtils;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.contact.ContactJAXBSchema;
 import org.collectionspace.services.contact.nuxeo.ContactDocumentModelHandler;
+import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.person.nuxeo.PersonDocumentModelHandler;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
-//import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -313,12 +321,88 @@ public class PersonAuthorityResource extends
     }
 
     /**
-     * Gets the person authority.
+     * Gets the entities referencing this Person instance. The service type
+     * can be passed as a query param "type", and must match a configured type
+     * for the service bindings. If not set, the type defaults to
+     * ServiceBindingUtils.SERVICE_TYPE_PROCEDURE.
      * 
-     * @param csid the csid
+     * @param csid the parent csid
+     * @param itemcsid the person csid
+     * @param ui the ui
      * 
-     * @return the person authority
+     * @return the info for the referencing objects
      */
+    @GET
+    @Path("{csid}/items/{itemcsid}/refObjs")
+    @Produces("application/xml")
+    public AuthorityRefDocList getReferencingObjects(
+            @PathParam("csid") String parentcsid,
+            @PathParam("itemcsid") String itemcsid,
+    		@Context UriInfo ui) {
+    	AuthorityRefDocList authRefDocList = null;
+        if (logger.isDebugEnabled()) {
+            logger.debug("getReferencingObjects with parentcsid=" 
+            		+ parentcsid + " and itemcsid=" + itemcsid);
+        }
+        if (parentcsid == null || "".equals(parentcsid)
+                || itemcsid == null || "".equals(itemcsid)) {
+            logger.error("getPerson: missing parentcsid or itemcsid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "get failed on Person with parentcsid=" 
+            		+ parentcsid + " and itemcsid=" + itemcsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+    try {
+        // Note that we have to create the service context for the Items, not the main service
+        ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(getItemServiceName());
+        DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
+        RepositoryClient repoClient = getRepositoryClient(ctx); 
+        DocumentFilter myFilter = handler.createDocumentFilter();
+        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+        myFilter.setPagination(queryParams);
+    	String serviceType = ServiceBindingUtils.SERVICE_TYPE_PROCEDURE;
+        List<String> list = queryParams.remove(ServiceBindingUtils.SERVICE_TYPE_PROP);
+        if (list != null) {
+        	serviceType = list.get(0);
+        }
+        DocumentWrapper<DocumentModel> docWrapper = repoClient.getDoc(ctx, itemcsid);
+        DocumentModel docModel = docWrapper.getWrappedObject();
+        String refName = (String)docModel.getPropertyValue(PersonJAXBSchema.REF_NAME);
+
+        authRefDocList = RefNameServiceUtils.getAuthorityRefDocs(repoClient, 
+        		ctx.getTenantId(), serviceType, refName,
+        		myFilter.getPageSize(), myFilter.getStartPage(), true );
+    } catch (UnauthorizedException ue) {
+        Response response = Response.status(
+                Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
+        throw new WebApplicationException(response);
+    } catch (DocumentNotFoundException dnfe) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("getReferencingObjects", dnfe);
+        }
+        Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                "GetReferencingObjects failed with parentcsid=" 
+            		+ parentcsid + " and itemcsid=" + itemcsid).type(
+                "text/plain").build();
+        throw new WebApplicationException(response);
+    } catch (Exception e) {	// Includes DocumentException
+        if (logger.isDebugEnabled()) {
+            logger.debug("GetReferencingObjects", e);
+        }
+        Response response = Response.status(
+                Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed").type("text/plain").build();
+        throw new WebApplicationException(response);
+    }
+    if (authRefDocList == null) {
+        Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                "Get failed, the requested Person CSID:" + itemcsid + ": was not found.").type(
+                "text/plain").build();
+        throw new WebApplicationException(response);
+    }
+    return authRefDocList;
+    }
+
     @GET
     @Path("{csid}")
     public MultipartOutput getPersonAuthority(@PathParam("csid") String csid) {
@@ -552,17 +636,12 @@ public class PersonAuthorityResource extends
         if (logger.isDebugEnabled()) {
             logger.debug("getPerson with parentcsid=" + parentcsid + " and itemcsid=" + itemcsid);
         }
-        if (parentcsid == null || "".equals(parentcsid)) {
-            logger.error("getPerson: missing csid!");
+        if (parentcsid == null || "".equals(parentcsid)
+            || itemcsid == null || "".equals(itemcsid)) {
+            logger.error("getPerson: missing parentcsid or itemcsid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "get failed on Person csid=" + parentcsid).type(
-                    "text/plain").build();
-            throw new WebApplicationException(response);
-        }
-        if (itemcsid == null || "".equals(itemcsid)) {
-            logger.error("getPerson: missing itemcsid!");
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "get failed on Person itemcsid=" + itemcsid).type(
+                    "get failed on Person with parentcsid=" 
+            		+ parentcsid + " and itemcsid=" + itemcsid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -660,6 +739,7 @@ public class PersonAuthorityResource extends
         }
         return personObjectList;
     }
+    
 
     /**
      * Gets the person list by auth name.

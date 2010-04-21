@@ -10,6 +10,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.person.PersonauthoritiesCommonList;
 import org.collectionspace.services.person.PersonsCommonList;
@@ -59,6 +60,18 @@ public interface PersonAuthorityProxy {
     @Produces({"application/xml"})
     @Path("/{vcsid}/items/")
     ClientResponse<PersonsCommonList> readItemList(@PathParam("vcsid") String vcsid);
+
+    /**
+     * @param csid
+     * @return
+     * @see org.collectionspace.services.client.IntakeProxy#getAuthorityRefs(java.lang.String)
+     */
+    @GET
+    @Path("{csid}/items/{itemcsid}/refObjs")
+    @Produces("application/xml")
+    ClientResponse<AuthorityRefDocList> getReferencingObjects(
+            @PathParam("csid") String parentcsid,
+            @PathParam("itemcsid") String itemcsid);
 
     // List Items for a named authority
     @GET

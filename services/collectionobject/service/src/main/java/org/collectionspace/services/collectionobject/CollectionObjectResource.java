@@ -49,6 +49,7 @@ import org.collectionspace.services.common.context.ServiceContextFactory;
 //import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.MultipartServiceContextImpl;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -439,7 +440,9 @@ public class CollectionObjectResource
             	getRepositoryClient(ctx).getDoc(ctx, csid);
             RemoteDocumentModelHandlerImpl handler 
             	= (RemoteDocumentModelHandlerImpl)createDocumentHandler(ctx);
-            List<String> authRefFields = ((MultipartServiceContextImpl)ctx).getCommonPartPropertyValues(RefNameServiceUtils.AUTH_REF_PROP);
+            List<String> authRefFields = 
+            	((MultipartServiceContextImpl)ctx).getCommonPartPropertyValues(
+            			ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
             authRefList = handler.getAuthorityRefs(docWrapper, authRefFields);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(

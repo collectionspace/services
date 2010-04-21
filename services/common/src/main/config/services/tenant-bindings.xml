@@ -24,7 +24,11 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.collectionobject.nuxeo.CollectionObjectValidatorHandler
             </service:validatorHandler>
-            <service:object name="CollectionObject" version="0.1"
+						<service:properties xmlns:service='http://collectionspace.org/services/common/service'>
+							<types:item><types:key>objectNameProperty</types:key><types:value>objectName</types:value></types:item>
+							<types:item><types:key>objectNumberProperty</types:key><types:value>objectNumber</types:value></types:item>
+						</service:properties>															
+		<service:object name="CollectionObject" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
                               versionable="true" auditable="false"
@@ -76,6 +80,11 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.intake.nuxeo.IntakeValidatorHandler
             </service:validatorHandler>
+						<service:properties xmlns:service='http://collectionspace.org/services/common/service'>
+							<!-- What to use for name??? 
+							<types:item><types:key>objectNameProperty</types:key><types:value>objectName</types:value></types:item> -->
+							<types:item><types:key>objectNumberProperty</types:key><types:value>entryNumber</types:value></types:item>
+						</service:properties>															
             <service:object name="Intake" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -120,6 +129,11 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.loanin.nuxeo.LoaninValidatorHandler
             </service:validatorHandler>
+						<service:properties xmlns:service='http://collectionspace.org/services/common/service'>
+							<!-- What to use for name??? 
+							<types:item><types:key>objectNameProperty</types:key><types:value>objectName</types:value></types:item> -->
+							<types:item><types:key>objectNumberProperty</types:key><types:value>loanInNumber</types:value></types:item>
+						</service:properties>															
             <service:object name="Loanin" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -182,7 +196,7 @@
                         <types:item><types:key>authRef</types:key><types:value>borrowersContact</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>lendersAuthorizer</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>lendersContact</types:value></types:item>
-                    </service:properties>
+											</service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/loanout"
@@ -328,6 +342,10 @@
                 <service:part id="1" control_group="Managed"
                               versionable="true" auditable="false"
                               label="organizations_common" updated="" order="1">
+										<service:properties>
+											<types:item><types:key>authRef</types:key><types:value>contactName</types:value></types:item>
+										</service:properties>
+
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/organization"
@@ -421,6 +439,11 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.acquisition.nuxeo.AcquisitionValidatorHandler
             </service:validatorHandler>
+						<service:properties xmlns:service='http://collectionspace.org/services/common/service'>
+							<!-- What to use for name??? 
+							<types:item><types:key>objectNameProperty</types:key><types:value>objectName</types:value></types:item> -->
+							<types:item><types:key>objectNumberProperty</types:key><types:value>acquisitionReferenceNumber</types:value></types:item>
+						</service:properties>															
             <service:object name="Acquisition" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"

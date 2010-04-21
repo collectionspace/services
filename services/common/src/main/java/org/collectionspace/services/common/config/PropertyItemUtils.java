@@ -13,12 +13,12 @@ public class PropertyItemUtils {
      * @param propName the property to fetch
      * @return the String value of the named property
      */
-    public static String getPropertyValueFromNodeList(List<PropertyType> propNodeList,
+    public static String getPropertyValueByNameFromNodeList(List<PropertyType> propNodeList,
     		String propName) {
 		if(propNodeList.isEmpty()) {
 			return null;
 		}
-		return getPropertyValue(propNodeList.get(0).getItem(), propName);
+		return getPropertyValueByName(propNodeList.get(0).getItem(), propName);
     }
     	
 	
@@ -27,7 +27,7 @@ public class PropertyItemUtils {
      * @param propName the property to fetch
      * @return the String value of the named property
      */
-    public static String getPropertyValue(List<PropertyItemType> propList,
+    public static String getPropertyValueByName(List<PropertyItemType> propList,
     		String propName) {
     	if(propName==null) {
     		throw new IllegalArgumentException("PropertyItemUtils.getPropertyValues: null property name!");
@@ -40,27 +40,56 @@ public class PropertyItemUtils {
     	return null;
     }
     
+    /**
+     * @param propNodeList the JAXB wrapping node of for the list to search for the named property
+     * @param propName the name of the property of interest
+     * @param qualPrefix a namespace qualifier prefix (with ':') to prepend, or null
+     * @return a List of string values found for the named property
+     */
     public static List<String> getPropertyValuesByNameInNodeList(
-    		List<PropertyType> propNodeList, String propName) {
-    	return getPropertyValuesByNameInNodeList(propNodeList, propName, null);
+    		List<PropertyType> propNodeList, String propName, String qualPrefix) {
+    	return getPropertyValuesByNameInNodeList(propNodeList, propName, qualPrefix, null);
     }
     
+    /**
+     * @param propNodeList the JAXB wrapping node of for the list to search for the named property
+     * @param propName the name of the property of interest
+     * @param qualPrefix a namespace qualifier prefix (with ':') to prepend, or null
+     * @param values and existing list to append values to. If null, a new one will be created.
+     * @return values, or that is null, a new List of string values found for the named property
+     */
     public static List<String> getPropertyValuesByNameInNodeList(
-    		List<PropertyType> propNodeList, String propName, List<String> values) {
+    		List<PropertyType> propNodeList, String propName, String qualPrefix,
+    		List<String> values) {
 		if(propNodeList.isEmpty()) {
 	    	if(values==null)
-	    		return new ArrayList<String>();
+	    		values = new ArrayList<String>();
+	    	return values;
 		}
-    	return getPropertyValuesByName(propNodeList.get(0).getItem(), propName, null);
+    	return getPropertyValuesByName(propNodeList.get(0).getItem(), 
+    									propName, qualPrefix, values);
     }
     
+    /**
+     * @param propNodeList the Item list to search for the named property
+     * @param propName the name of the property of interest
+     * @param qualPrefix a namespace qualifier prefix (with ':') to prepend, or null
+     * @return a List of string values found for the named property
+     */
     public static List<String> getPropertyValuesByName(
-    		List<PropertyItemType> propItems, String propName) {
-    	return getPropertyValuesByName(propItems, propName, null);
+    		List<PropertyItemType> propItems, String propName, String qualPrefix) {
+    	return getPropertyValuesByName(propItems, propName, qualPrefix, null);
     }
     
+    /**
+     * @param propNodeList the Item list to search for the named property
+     * @param propName the name of the property of interest
+     * @param qualPrefix a namespace qualifier prefix (with ':') to prepend, or null
+     * @param values and existing list to append values to. If null, a new one will be created.
+     * @return values, or that is null, a new List of string values found for the named property
+     */
     public static List<String> getPropertyValuesByName(
-    		List<PropertyItemType> propItems, String propName,
+    		List<PropertyItemType> propItems, String propName, String qualPrefix,
     		List<String> values ) {
     	if(values==null)
     		values = new ArrayList<String>();
@@ -68,7 +97,7 @@ public class PropertyItemUtils {
     		if(propName.equals(propItem.getKey())) {
     			String value = propItem.getValue();
     			if(value!=null) {
-    				values.add(value);
+    				values.add((qualPrefix!=null)?(qualPrefix+value):value);
     			}
     		}
     	}

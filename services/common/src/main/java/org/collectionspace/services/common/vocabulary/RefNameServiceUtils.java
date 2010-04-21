@@ -24,8 +24,12 @@
 package org.collectionspace.services.common.vocabulary;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
+import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +43,7 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.service.ServiceBindingType;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
 /**
  * RefNameServiceUtils is a collection of services utilities related to refName usage.
@@ -47,12 +52,10 @@ import org.collectionspace.services.common.service.ServiceBindingType;
  * $LastChangedDate: $
  */
 public class RefNameServiceUtils {
-	
-	public static final String AUTH_REF_PROP = "authRef";
 
     private final Logger logger = LoggerFactory.getLogger(RefNameServiceUtils.class);
     
-    public AuthorityRefDocList getAuthorityRefDocs(RepositoryClient repoClient, 
+    public static AuthorityRefDocList getAuthorityRefDocs(RepositoryClient repoClient, 
     		String tenantId, String serviceType, String refName,
     		int pageSize, int pageNum, boolean computeTotal )
     		throws DocumentException, DocumentNotFoundException {
@@ -62,26 +65,127 @@ public class RefNameServiceUtils {
     	TenantBindingConfigReaderImpl tReader =
             ServiceMain.getInstance().getTenantBindingConfigReader();
     	List<ServiceBindingType> servicebindings = tReader.getServiceBindingsByType(tenantId, serviceType);
-    	if(servicebindings==null || servicebindings.size()>0)
+    	if(servicebindings==null || servicebindings.isEmpty())
     		return null;
+    	// Need to escape the quotes in the refName
+    	// TODO What if they are already escaped?
+    	String escapedRefName = refName.replaceAll("'", "\\\\'");
     	String domain = tReader.getTenantBinding(tenantId).getRepositoryDomain();
     	ArrayList<String> docTypes = new ArrayList<String>(); 
+    	HashMap<String, ServiceBindingType> queriedServiceBindings = new HashMap<String, ServiceBindingType>(); 
+    	HashMap<String, List<String>> authRefFieldsByService = new HashMap<String, List<String>>(); 
     	StringBuilder whereClause = new StringBuilder();
+    	boolean fFirst = true;
     	for(ServiceBindingType sb:servicebindings) {
-    		List<String> authRefFields = ServiceBindingUtils.getAllPartsPropertyValues(sb, AUTH_REF_PROP);
+    		List<String> authRefFields = 
+    			ServiceBindingUtils.getAllPartsPropertyValues(sb, 
+    				ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
+    		if(authRefFields.isEmpty())
+    			continue;
     		String docType = sb.getObject().getName();
+    		queriedServiceBindings.put(docType, sb);
+    		authRefFieldsByService.put(docType, authRefFields);
     		docTypes.add(docType);
+    		/*
+    		// HACK - need to get qualified properties from the ServiceBinding
+    		String prefix = "";
+    		if(docType.equalsIgnoreCase("Intake"))
+    			prefix = "intakes_common:";
+    		else if(docType.equalsIgnoreCase("Loanin"))
+    			prefix = "loansin_common:";
+    		else if(docType.equalsIgnoreCase("Acquisition"))
+    			prefix = "acquisitions_common:";
+    		*/
     		for(String field:authRefFields) {
     			// Build up the where clause for each authRef field
-    			throw new UnsupportedOperationException();
+    			if(fFirst) {
+    				fFirst = false;
+    			} else {
+    				whereClause.append(" OR ");
+    			}
+    			//whereClause.append(prefix);
+    			whereClause.append(field);
+    			whereClause.append("='");
+    			whereClause.append(escapedRefName);
+    			whereClause.append("'");
     		}
     	}
+    	if(fFirst) // found no authRef fields - nothing to query
+    		return wrapperList;
+    	String fullQuery = whereClause.toString(); // for debug
 		// Now we have to issue the search
 		DocumentWrapper<DocumentModelList> docListWrapper = repoClient.findDocs(
 	    		docTypes, whereClause.toString(), domain, pageSize, pageNum, computeTotal );
-    	return null;
+		// Now we gather the info for each document into the list and return
+        DocumentModelList docList = docListWrapper.getWrappedObject();
+        Iterator<DocumentModel> iter = docList.iterator();
+        while(iter.hasNext()){
+            DocumentModel docModel = iter.next();
+            AuthorityRefDocList.AuthorityRefDocItem ilistItem = new AuthorityRefDocList.AuthorityRefDocItem();
+            String csid = NuxeoUtils.extractId(docModel.getPathAsString());
+            String docType = docModel.getDocumentType().getName();
+            ServiceBindingType sb = queriedServiceBindings.get(docType);
+            if(sb==null) {
+            	throw new RuntimeException(
+            			"getAuthorityRefDocs: No Service Binding for docType: "+docType);
+            }
+            String serviceContextPath = "/" + sb.getName().toLowerCase() + "/";
+            // The id and URI are the same on all doctypes
+            ilistItem.setDocId(csid);
+            ilistItem.setUri(serviceContextPath+csid);
+            ilistItem.setDocType(docType);
+            ilistItem.setDocNumber(
+            		ServiceBindingUtils.getMappedFieldInDoc(sb, ServiceBindingUtils.OBJ_NUMBER_PROP, docModel));
+            ilistItem.setDocName(
+            		ServiceBindingUtils.getMappedFieldInDoc(sb, ServiceBindingUtils.OBJ_NAME_PROP, docModel));
+            // Now, we have to loop over the authRefFieldsByService to figure
+            // out which field matched this. Ignore multiple matches.
+            List<String> authRefFields = authRefFieldsByService.get(docType);
+            if(authRefFields==null || authRefFields.isEmpty()){
+            	throw new RuntimeException(
+            			"getAuthorityRefDocs: internal logic error: can't fetch authRefFields for DocType." );
+            }
+            boolean fRefFound = false;
+            /* Use this if we go to qualified field names
+            for(String field:authRefFields){
+                String[] strings = field.split(":");
+                if(strings.length!=2) {
+                	throw new RuntimeException(
+                			"getAuthorityRefDocs: Bad configuration of authRefField.");
+                }
+            	try {
+                    if(refName.equals(docModel.getProperty(strings[0], strings[1]))) {
+                        ilistItem.setSourceField(field);
+                        fRefFound = true;
+                        break;
+                    }
+            	} catch(ClientException ce) {
+            		throw new RuntimeException(
+            				"getAuthorityRefDocs: Problem fetching: "+field, ce);
+            	}
+            }
+            */
+            for(String field:authRefFields){
+            	try {
+                    if(refName.equals(docModel.getPropertyValue(field))) {
+                        ilistItem.setSourceField(field);
+                        fRefFound = true;
+                        break;
+                    }
+            	} catch(ClientException ce) {
+            		throw new RuntimeException(
+            				"getAuthorityRefDocs: Problem fetching: "+field, ce);
+            	}
+            }
+            if(!fRefFound) {
+            	throw new RuntimeException(
+            			"getAuthorityRefDocs: Could not find refname in object:"
+            			+docType+":"+csid);
+            }
+            list.add(ilistItem);
+        }
+    	return wrapperList;
     }
 
-		
 }
 

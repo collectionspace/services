@@ -3,6 +3,8 @@ package org.collectionspace.services.client;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.person.PersonauthoritiesCommonList;
 import org.collectionspace.services.person.PersonsCommonList;
@@ -137,6 +139,15 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      */
     public ClientResponse<PersonsCommonList> readItemList(String vcsid) {
         return personAuthorityProxy.readItemList(vcsid);
+    }
+
+    /**
+     * @param csid
+     * @return
+     * @see org.collectionspace.services.client.IntakeProxy#getAuthorityRefs(java.lang.String)
+     */
+    public ClientResponse<AuthorityRefDocList> getReferencingObjects(String parentcsid, String csid) {
+        return personAuthorityProxy.getReferencingObjects(parentcsid, csid);
     }
 
     /**

@@ -230,7 +230,6 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * filter that is relevant to be used with this document handler
      * and corresponding storage client
      * 
-     * @param ctx ServiceContext used to fetch default pagination, etc.
      * @return
      */
     public DocumentFilter createDocumentFilter();

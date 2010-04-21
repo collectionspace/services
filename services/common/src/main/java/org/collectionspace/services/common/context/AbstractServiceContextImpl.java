@@ -61,6 +61,18 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
+/**
+ * @author pschmitz
+ *
+ * @param <IT>
+ * @param <OT>
+ */
+/**
+ * @author pschmitz
+ *
+ * @param <IT>
+ * @param <OT>
+ */
 public abstract class AbstractServiceContextImpl<IT, OT>
         implements ServiceContext<IT, OT> {
 
@@ -178,27 +190,26 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     }
 
     /**
-     * Gets the property values for part.
-     * 
-     * @param partLabel the part label
-     * @param propName the prop name
-     * 
-     * @return the property values for part
+     * @param partLabel The name of the scehma part to search in
+     * @param propName The name of the property (or properties) to find
+     * @param qualified Whether the returned values should be qualified with the
+     * 		partLabel. This is when the property values are schema field references.
+     * @return List of property values for the matched property on the named schema part.
      */
-    public List<String> getPropertyValuesForPart(String partLabel, String propName) {
+    public List<String> getPropertyValuesForPart(String partLabel, String propName, boolean qualified) {
     	List<PropertyItemType> allProps = getPropertiesForPart(partLabel);
-    	return PropertyItemUtils.getPropertyValuesByName(allProps, propName);
+    	return PropertyItemUtils.getPropertyValuesByName(allProps, propName, 
+    													(qualified?(partLabel+":"):null));
     }
 
     /**
-     * Gets the all parts property values.
-     * 
-     * @param propName the prop name
-     * 
-     * @return the all parts property values
+     * @param propName The name of the property (or properties) to find
+     * @param qualified Whether the returned values should be qualified with the
+     * 		partLabel. This is when the property values are schema field references.
+     * @return List of property values for the matched property on any schema part.
      */
-    public List<String> getAllPartsPropertyValues(String propName) {
-        return ServiceBindingUtils.getAllPartsPropertyValues(getServiceBinding(), propName);
+    public List<String> getAllPartsPropertyValues(String propName, boolean qualified) {
+        return ServiceBindingUtils.getAllPartsPropertyValues(getServiceBinding(), propName, qualified);
     }
     
     /* (non-Javadoc)
@@ -218,14 +229,13 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     }
 
     /**
-     * Gets the common part property values.
-     * 
-     * @param propName the prop name
-     * 
-     * @return the common part property values
+     * @param propName The name of the property (or properties) to find
+     * @param qualified Whether the returned values should be qualified with the
+     * 		partLabel. This is when the property values are schema field references.
+     * @return List of property values for the matched property on the common schema part.
      */
-    public List<String> getCommonPartPropertyValues(String propName) {
-        return getPropertyValuesForPart(getCommonPartLabel(), propName);
+    public List<String> getCommonPartPropertyValues(String propName, boolean qualified) {
+        return getPropertyValuesForPart(getCommonPartLabel(), propName, qualified);
     }
 
     /* (non-Javadoc)
