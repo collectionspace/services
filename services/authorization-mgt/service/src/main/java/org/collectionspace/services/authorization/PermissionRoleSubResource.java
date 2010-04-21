@@ -23,16 +23,13 @@
  */
 package org.collectionspace.services.authorization;
 
-import org.collectionspace.services.authorization.storage.PermissionRoleStorageClient;
-
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
-import org.collectionspace.services.common.context.RemoteServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
-import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.storage.StorageClient;
+import org.collectionspace.services.common.storage.jpa.JpaRelationshipStorageClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,12 +44,10 @@ public class PermissionRoleSubResource
     //service name to identify binding
     /** The service name. */
     final private String serviceName = "authorization/permroles";
-    
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(PermissionRoleSubResource.class);
-    
     /** The storage client. */
-    final StorageClient storageClient = new PermissionRoleStorageClient();
+    final StorageClient storageClient = new JpaRelationshipStorageClient();
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
@@ -71,22 +66,22 @@ public class PermissionRoleSubResource
     public String getServiceName() {
         return serviceName;
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.CollectionSpaceResource#getCommonPartClass()
      */
     @Override
     public Class<PermissionRole> getCommonPartClass() {
-    	return PermissionRole.class;
+        return PermissionRole.class;
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.CollectionSpaceResource#getServiceContextFactory()
      */
     @Override
     public ServiceContextFactory<PermissionRole, PermissionRole> getServiceContextFactory() {
-    	return RemoteServiceContextFactory.get();
-    }    
+        return RemoteServiceContextFactory.get();
+    }
 
     /**
      * Creates the service context.
@@ -99,14 +94,16 @@ public class PermissionRoleSubResource
      * @throws Exception the exception
      */
     private ServiceContext<PermissionRole, PermissionRole> createServiceContext(PermissionRole input,
-    		SubjectType subject) throws Exception {
-    	ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext(input);
+            SubjectType subject) throws Exception {
+        ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext(input);
 //      ServiceContext ctx = new RemoteServiceContextImpl<T, T>(getServiceName());
 //      ctx.setInput(input);
         ctx.setDocumentType(PermissionRole.class.getPackage().getName()); //persistence unit
         ctx.setProperty("entity-name", PermissionRoleRel.class.getName());
         //subject name is necessary to indicate if role or permission is a subject
         ctx.setProperty("subject", subject);
+        //set context for the relationship query
+        ctx.setProperty("objectId", "permission_id");
         return ctx;
     }
 
@@ -125,7 +122,6 @@ public class PermissionRoleSubResource
 //        docHandler.setCommonPart(ctx.getInput());
 //        return docHandler;
 //    }
-
     /**
      * createPermissionRole creates one or more permission-role relationships
      * between object (permission/role) and subject (role/permission)
