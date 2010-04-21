@@ -27,7 +27,6 @@ import java.util.Date;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
-import org.apache.commons.codec.binary.Base64;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.authentication.User;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -40,6 +39,7 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
+import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +77,7 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             DocumentWrapper<AccountsCommon> wrapDoc =
                     new DocumentWrapperImpl<AccountsCommon>(account);
             handler.handle(Action.CREATE, wrapDoc);
-            emf = getEntityManagerFactory();
+            emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
             em.getTransaction().begin();
             //if userid and password are given, add to default id provider
@@ -109,7 +109,7 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             throw new DocumentException(e);
         } finally {
             if (em != null) {
-                releaseEntityManagerFactory(emf);
+                JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }
     }
@@ -135,7 +135,7 @@ public class AccountStorageClient extends JpaStorageClientImpl {
                     new DocumentWrapperImpl<AccountsCommon>(account);
             setCsid(account, id); //set id just in case it was not populated by consumer
             handler.handle(Action.UPDATE, wrapDoc);
-            emf = getEntityManagerFactory();
+            emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
             em.getTransaction().begin();
             AccountsCommon accountFound = getAccount(em, id);
@@ -169,7 +169,7 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             throw new DocumentException(e);
         } finally {
             if (emf != null) {
-                releaseEntityManagerFactory(emf);
+                JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }
     }
@@ -189,7 +189,7 @@ public class AccountStorageClient extends JpaStorageClientImpl {
         EntityManagerFactory emf = null;
         EntityManager em = null;
         try {
-            emf = getEntityManagerFactory();
+            emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
             //TODO investigate if deep delete is possible
             //query an delete is inefficient
@@ -242,7 +242,7 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             throw new DocumentException(e);
         } finally {
             if (emf != null) {
-                releaseEntityManagerFactory(emf);
+                JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }
     }

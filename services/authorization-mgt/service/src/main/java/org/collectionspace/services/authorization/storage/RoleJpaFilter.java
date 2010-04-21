@@ -51,7 +51,7 @@ public class RoleJpaFilter extends JpaDocumentFilter {
 
         String roleName = null;
         List<String> rn = getQueryParam(RoleStorageConstants.Q_ROLE_NAME);
-        if (null != rn) {
+        if (null != rn && rn.size() > 0) {
             roleName = rn.get(0);
         }
         if (null != roleName && !roleName.isEmpty()) {

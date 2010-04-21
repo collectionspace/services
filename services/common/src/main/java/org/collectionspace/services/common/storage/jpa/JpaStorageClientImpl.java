@@ -81,8 +81,6 @@ public class JpaStorageClientImpl implements StorageClient {
 
     /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(JpaStorageClientImpl.class);
-    /** The Constant CS_PERSISTENCE_UNIT. */
-    public final static String CS_PERSISTENCE_UNIT = "org.collectionspace.services";
     private Class entityClazz;
 
     /**
@@ -119,7 +117,7 @@ public class JpaStorageClientImpl implements StorageClient {
             DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entity);
             handler.handle(Action.CREATE, wrapDoc);
             setValue(entity, "setCreatedAtItem", Date.class, new Date());
-            emf = getEntityManagerFactory();
+            emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
             em.getTransaction().begin();
             em.persist(entity);
@@ -143,7 +141,7 @@ public class JpaStorageClientImpl implements StorageClient {
             throw new DocumentException(e);
         } finally {
             if (em != null) {
-                releaseEntityManagerFactory(emf);
+                JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }
 
@@ -180,33 +178,9 @@ public class JpaStorageClientImpl implements StorageClient {
         EntityManager em = null;
         try {
             handler.prepare(Action.GET);
-            StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
-            queryStrBldr.append(getEntityName(ctx));
-            queryStrBldr.append(" a");
-            queryStrBldr.append(" WHERE csid = :csid");
-            //TODO: add tenant id
-            String where = docFilter.getWhereClause();
-            if ((null != where) && (where.length() > 0)) {
-                queryStrBldr.append(" AND " + where);
-            }
-            emf = getEntityManagerFactory();
-            em = emf.createEntityManager();
-            String queryStr = queryStrBldr.toString(); //for debugging
-            Query q = em.createQuery(queryStr);
-            q.setParameter("csid", id);
-            //TODO: add tenant id
-
-            //TODO: get page
-            if ((docFilter.getOffset() > 0) || (docFilter.getPageSize() > 0)) {
-            } else {
-            }
             Object o = null;
-
             try {
-                //require transaction for get?
-                em.getTransaction().begin();
-                o = q.getSingleResult();
-                em.getTransaction().commit();
+                o = JpaStorageUtils.getEntity(getEntityName(ctx), id, docFilter);
             } catch (NoResultException nre) {
                 if (em != null && em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
@@ -227,7 +201,7 @@ public class JpaStorageClientImpl implements StorageClient {
             throw new DocumentException(e);
         } finally {
             if (emf != null) {
-                releaseEntityManagerFactory(emf);
+                JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }
     }
@@ -255,6 +229,7 @@ public class JpaStorageClientImpl implements StorageClient {
             throw new IllegalArgumentException(
                     "JpaStorageClient.getFiltered: handler is missing");
         }
+
         DocumentFilter docFilter = handler.getDocumentFilter();
         if (docFilter == null) {
             docFilter = handler.createDocumentFilter();
@@ -269,7 +244,7 @@ public class JpaStorageClientImpl implements StorageClient {
             queryStrBldr.append(" a");
             List<DocumentFilter.ParamBinding> params = docFilter.buildWhereForSearch(queryStrBldr);
             //TODO: add tenant id
-            emf = getEntityManagerFactory();
+            emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
             String queryStr = queryStrBldr.toString(); //for debugging
             Query q = em.createQuery(queryStr);
@@ -300,7 +275,7 @@ public class JpaStorageClientImpl implements StorageClient {
             throw new DocumentException(e);
         } finally {
             if (emf != null) {
-                releaseEntityManagerFactory(emf);
+                JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }
     }
@@ -328,7 +303,7 @@ public class JpaStorageClientImpl implements StorageClient {
             setCsid(entity, id);
             DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entity);
             handler.handle(Action.UPDATE, wrapDoc);
-            emf = getEntityManagerFactory();
+            emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
             em.getTransaction().begin();
             Object entityFound = em.find(entity.getClass(), id);
@@ -361,7 +336,7 @@ public class JpaStorageClientImpl implements StorageClient {
             throw new DocumentException(e);
         } finally {
             if (emf != null) {
-                releaseEntityManagerFactory(emf);
+                JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }
     }
@@ -388,7 +363,7 @@ public class JpaStorageClientImpl implements StorageClient {
 
             //TODO: add tenant id
 
-            emf = getEntityManagerFactory();
+            emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
 
             em.getTransaction().begin();
@@ -416,7 +391,7 @@ public class JpaStorageClientImpl implements StorageClient {
             throw new DocumentException(e);
         } finally {
             if (emf != null) {
-                releaseEntityManagerFactory(emf);
+                JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }
     }
@@ -449,7 +424,7 @@ public class JpaStorageClientImpl implements StorageClient {
             deleteStr.append(" WHERE csid = :csid");
             //TODO: add tenant id
 
-            emf = getEntityManagerFactory();
+            emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
             Query q = em.createQuery(deleteStr.toString());
             q.setParameter("csid", id);
@@ -479,44 +454,12 @@ public class JpaStorageClientImpl implements StorageClient {
             throw new DocumentException(e);
         } finally {
             if (emf != null) {
-                releaseEntityManagerFactory(emf);
+                JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }
     }
 
-    /**
-     * Gets the entity manager factory.
-     * 
-     * @return the entity manager factory
-     */
-    public EntityManagerFactory getEntityManagerFactory() {
-        return getEntityManagerFactory(CS_PERSISTENCE_UNIT);
-    }
 
-    /**
-     * Gets the entity manager factory.
-     * 
-     * @param persistenceUnit the persistence unit
-     * 
-     * @return the entity manager factory
-     */
-    public EntityManagerFactory getEntityManagerFactory(
-            String persistenceUnit) {
-        return Persistence.createEntityManagerFactory(persistenceUnit);
-
-    }
-
-    /**
-     * Release entity manager factory.
-     * 
-     * @param emf the emf
-     */
-    public void releaseEntityManagerFactory(EntityManagerFactory emf) {
-        if (emf != null) {
-            emf.close();
-        }
-
-    }
 
     /**
      * getValue gets invokes specified accessor method on given object. Assumption

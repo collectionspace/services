@@ -91,7 +91,7 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             DocumentWrapper<List<T>> wrapDoc =
                     new DocumentWrapperImpl<List<T>>(rl);
             handler.handle(Action.CREATE, wrapDoc);
-            emf = getEntityManagerFactory();
+            emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
             em.getTransaction().begin();
             for (T r : rl) {
@@ -116,7 +116,7 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             throw new DocumentException(e);
         } finally {
             if (em != null) {
-                releaseEntityManagerFactory(emf);
+                JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }
     }
@@ -161,7 +161,7 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             if ((null != where) && (where.length() > 0)) {
                 queryStrBldr.append(" AND " + where);
             }
-            emf = getEntityManagerFactory();
+            emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
             String queryStr = queryStrBldr.toString(); //for debugging
             if (logger.isDebugEnabled()) {
@@ -202,7 +202,7 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             throw new DocumentException(e);
         } finally {
             if (emf != null) {
-                releaseEntityManagerFactory(emf);
+                JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }
     }
@@ -237,7 +237,7 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
                 logger.debug("delete: using objectId=" + objectId);
             }
             deleteStr.append(" WHERE " + objectId + " = :objectId");
-            emf = getEntityManagerFactory();
+            emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
             if (logger.isDebugEnabled()) {
                 logger.debug("delete: jql=" + deleteStr.toString());
@@ -272,7 +272,7 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             throw new DocumentException(e);
         } finally {
             if (emf != null) {
-                releaseEntityManagerFactory(emf);
+                JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }
     }

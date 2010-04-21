@@ -52,7 +52,7 @@ public class AccountJpaFilter extends JpaDocumentFilter {
 
         String screenName = null;
         List<String> snvals = getQueryParam(AccountStorageConstants.Q_SCREEN_NAME);
-        if (snvals != null) {
+        if (null != snvals && snvals.size() > 0) {
             screenName = snvals.get(0);
         }
         if (null != screenName && !screenName.isEmpty()) {
@@ -67,7 +67,7 @@ public class AccountJpaFilter extends JpaDocumentFilter {
 
         String uid = null;
         List<String> uidvals = getQueryParam(AccountStorageConstants.Q_USER_ID);
-        if (uidvals != null) {
+        if (null != uidvals && uidvals.size() > 0) {
             uid = uidvals.get(0);
         }
         if (null != uid && !uid.isEmpty()) {
@@ -86,7 +86,7 @@ public class AccountJpaFilter extends JpaDocumentFilter {
 
         String email = null;
         List<String> emailvals = getQueryParam(AccountStorageConstants.Q_EMAIL);
-        if (emailvals != null) {
+        if (null != emailvals && emailvals.size() > 0) {
             email = emailvals.get(0);
         }
         if (null != email && !email.isEmpty()) {

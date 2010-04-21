@@ -106,7 +106,7 @@ public class AccountRoleSubResource
         ctx.setProperty("entity-name", AccountRoleRel.class.getName());
         //subject name is necessary to indicate if role or account is a subject
         ctx.setProperty("subject", subject);
-        //set context that for the relationship query
+        //set context for the relationship query
         ctx.setProperty("objectId", "account_id");
         return ctx;
     }

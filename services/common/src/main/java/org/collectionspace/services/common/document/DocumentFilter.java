@@ -43,8 +43,11 @@ public class DocumentFilter {
     protected int startPage;		// Pagination offset for list results
     protected int pageSize;			// Pagination limit for list results
     private boolean pageSizeDirty = false; // True if default page size explicitly set/overridden
-    private MultivaluedMap<String, String> queryParams = null;
 
+    //queryParams is not initialized as it would require a multi-valued map implementation
+    //unless it is used from opensource lib...this variable holds ref to
+    //implementation available in JBoss RESTeasy
+    private MultivaluedMap<String, String> queryParams = null;
 
     /**
      * ParamBinding encapsulates parameter binding for query
@@ -87,17 +90,17 @@ public class DocumentFilter {
             this.value = value;
         }
     }
-    
+
     /**
      * Instantiates a new document filter.
      * 
      * @param ctx the ctx
      */
     public DocumentFilter(ServiceContext ctx) {
-    	this.setPageSize(ctx.getServiceBindingPropertyValue(
-    			DocumentFilter.PAGE_SIZE_DEFAULT_PROPERTY));
+        this.setPageSize(ctx.getServiceBindingPropertyValue(
+                DocumentFilter.PAGE_SIZE_DEFAULT_PROPERTY));
     }
-    
+
     public DocumentFilter() {
         this("", 0, defaultPageSize);			// Use empty string for easy concatenation
     }
@@ -113,16 +116,18 @@ public class DocumentFilter {
      * 
      * @param queryParams the query params
      */
-    public void setPagination(MultivaluedMap<String, String> queryParams) {    	
-    	//
-    	// Bail if there are no params
-    	//
-    	if (queryParams == null) return;
-    	
+    public void setPagination(MultivaluedMap<String, String> queryParams) {
         //
-    	// Set the page size
-    	//
-    	String pageSizeStr = null;
+        // Bail if there are no params
+        //
+        if (queryParams == null) {
+            return;
+        }
+
+        //
+        // Set the page size
+        //
+        String pageSizeStr = null;
         List<String> list = queryParams.remove(PAGE_SIZE_PARAM);
         if (list != null) {
             pageSizeStr = list.get(0);
@@ -214,9 +219,9 @@ public class DocumentFilter {
     public int getPageSize() {
         return pageSize;
     }
-    
+
     public boolean getPageSizeDirty() {
-    	return this.getPageSizeDirty();
+        return this.getPageSizeDirty();
     }
 
     /**
@@ -231,17 +236,17 @@ public class DocumentFilter {
      * @param pageSize the max number of items to return for list requests
      */
     public void setPageSize(String pageSizeStr) {
-    	int pageSize = this.defaultPageSize;
+        int pageSize = this.defaultPageSize;
         if (pageSizeStr != null) {
             try {
-            	pageSize = Integer.valueOf(pageSizeStr);
+                pageSize = Integer.valueOf(pageSizeStr);
             } catch (NumberFormatException e) {
-            	//FIXME This should cause a warning in the log file and should result in the
-            	//FIXME page size being set to the default.  We don't need to throw an exception here.
+                //FIXME This should cause a warning in the log file and should result in the
+                //FIXME page size being set to the default.  We don't need to throw an exception here.
                 throw new NumberFormatException("Bad value for: " + PAGE_SIZE_PARAM);
             }
         }
-        
+
         setPageSize(pageSize);
     }
 
@@ -253,7 +258,7 @@ public class DocumentFilter {
     protected void setStartPage(String startPageStr) {
         if (startPageStr != null) {
             try {
-            	startPage = Integer.valueOf(startPageStr);
+                startPage = Integer.valueOf(startPageStr);
             } catch (NumberFormatException e) {
                 throw new NumberFormatException("Bad value for: " + START_PAGE_PARAM);
             }
@@ -268,11 +273,17 @@ public class DocumentFilter {
     }
 
     public void addQueryParam(String key, String value) {
-        queryParams.add(key, value);
+        if (queryParams != null) {
+            queryParams.add(key, value);
+        }
     }
 
     public List<String> getQueryParam(String key) {
-        return queryParams.get(key);
+        if (queryParams != null) {
+            return queryParams.get(key);
+        } else {
+            return new ArrayList<String>();
+        }
     }
 
     public MultivaluedMap<String, String> getQueryParams() {

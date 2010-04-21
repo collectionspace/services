@@ -58,7 +58,7 @@ public class PermissionJpaFilter extends JpaDocumentFilter {
 
         String resName = null;
         List<String> rn = getQueryParam(PermissionStorageConstants.Q_RESOURCE_NAME);
-        if (null != rn) {
+        if (null != rn && rn.size() > 0) {
             resName = rn.get(0);
         }
         if (null != resName && !resName.isEmpty()) {

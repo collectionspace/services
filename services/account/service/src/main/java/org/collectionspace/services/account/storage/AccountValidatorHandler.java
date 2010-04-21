@@ -52,8 +52,6 @@ package org.collectionspace.services.account.storage;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import org.collectionspace.services.account.AccountTenant;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.Tenant;
@@ -61,7 +59,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.InvalidDocumentException;
 import org.collectionspace.services.common.document.ValidatorHandler;
-import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
+import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -152,28 +150,19 @@ public class AccountValidatorHandler implements ValidatorHandler {
 
     private boolean isInvalidTenant(List<AccountTenant> atList, StringBuilder msgBldr) {
         boolean invalid = false;
-        JpaStorageClientImpl store = new JpaStorageClientImpl();
-        EntityManagerFactory emf = store.getEntityManagerFactory();
-        EntityManager em = emf.createEntityManager();
-        try {
-            for (AccountTenant at : atList) {
-                String tid = at.getTenantId();
-                if (tid == null || tid.isEmpty()) {
-                    invalid = true;
-                    msgBldr.append("\n tenant : tenantId is missing");
-                    break;
-                }
-                Tenant tenantFound = em.find(Tenant.class, tid);
-                if (tenantFound == null) {
-                    invalid = true;
-                    msgBldr.append("\n tenant : tenantId=" + tid
-                            + " not found");
-                    break;
-                }
+        for (AccountTenant at : atList) {
+            String tid = at.getTenantId();
+            if (tid == null || tid.isEmpty()) {
+                invalid = true;
+                msgBldr.append("\n tenant : tenantId is missing");
+                break;
             }
-        } finally {
-            if (em != null) {
-                store.releaseEntityManagerFactory(emf);
+            Tenant tenantFound = (Tenant) JpaStorageUtils.getEntity(tid, Tenant.class);
+            if (tenantFound == null) {
+                invalid = true;
+                msgBldr.append("\n tenant : tenantId=" + tid
+                        + " not found");
+                break;
             }
         }
         return invalid;
