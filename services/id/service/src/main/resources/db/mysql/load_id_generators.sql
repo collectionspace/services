@@ -288,7 +288,7 @@ INSERT INTO `id_generators`
   VALUES 
     ('ed87e7c6-0678-4f42-9d33-f671835586ef',
      'Loans-in Number',
-     'Identifies individual collection objects that are
+     'Identifies activities in which collection objects are
 received on loan.',
      '9',
      '',
@@ -322,11 +322,93 @@ received on loan.',
   </parts>
 </org.collectionspace.services.id.SettableIDGenerator>');
 
+-- LOANS_OUT_NUMBER
+
+INSERT INTO `id_generators`
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
+  VALUES
+-- Need to change this CSID
+    ('4b984865-f93d-4481-b874-3dba863ec589',
+     'Loans Out Number',
+     'Identifies activities in which collection objects are
+loaned out of the institution.',
+     '9',
+     '',
+'<org.collectionspace.services.id.SettableIDGenerator>
+  <parts>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>LO</initialValue>
+      <currentValue>LO</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.YearIDGeneratorPart>
+      <currentValue></currentValue>
+    </org.collectionspace.services.id.YearIDGeneratorPart>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>.</initialValue>
+      <currentValue>.</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.NumericIDGeneratorPart>
+      <maxLength>6</maxLength>
+      <initialValue>1</initialValue>
+      <currentValue>-1</currentValue>
+    </org.collectionspace.services.id.NumericIDGeneratorPart>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>.</initialValue>
+      <currentValue>.</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.NumericIDGeneratorPart>
+      <maxLength>6</maxLength>
+      <initialValue>1</initialValue>
+      <currentValue>-1</currentValue>
+    </org.collectionspace.services.id.NumericIDGeneratorPart>
+  </parts>
+</org.collectionspace.services.id.SettableIDGenerator>');
+
+-- MOVEMENT_REFERENCE_NUMBER
+
+INSERT INTO `id_generators`
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
+  VALUES
+    ('49ca9d8d-7136-47ff-a70e-4a47b9038b70',
+     'Movement Reference Number',
+     'Identifies a movement of a collection object or a group of collection objects.',
+     '9',
+     '',
+'<org.collectionspace.services.id.SettableIDGenerator>
+  <parts>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>MV</initialValue>
+      <currentValue>MV</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.YearIDGeneratorPart>
+      <currentValue></currentValue>
+    </org.collectionspace.services.id.YearIDGeneratorPart>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>.</initialValue>
+      <currentValue>.</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.NumericIDGeneratorPart>
+      <maxLength>6</maxLength>
+      <initialValue>1</initialValue>
+      <currentValue>-1</currentValue>
+    </org.collectionspace.services.id.NumericIDGeneratorPart>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>.</initialValue>
+      <currentValue>.</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.NumericIDGeneratorPart>
+      <maxLength>6</maxLength>
+      <initialValue>1</initialValue>
+      <currentValue>-1</currentValue>
+    </org.collectionspace.services.id.NumericIDGeneratorPart>
+  </parts>
+</org.collectionspace.services.id.SettableIDGenerator>');
+
 -- STUDY_NUMBER
 
 INSERT INTO `id_generators`
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
-  VALUES 
+  VALUES
     ('0518132e-dd8c-4773-8fa9-07c9af4444ee',
      'Study Number',
      'Identifies study-related intake activities,
