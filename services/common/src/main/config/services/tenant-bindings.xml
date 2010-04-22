@@ -158,7 +158,7 @@
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/loanin"
-                            schemaLocation="http://collectionspace.org/services/loanin http://services.collectionspace.org/intake/loansin_common.xsd">
+                            schemaLocation="http://collectionspace.org/services/loanin http://services.collectionspace.org/loanin/loansin_common.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
