@@ -179,15 +179,13 @@ public class JpaStorageClientImpl implements StorageClient {
         try {
             handler.prepare(Action.GET);
             Object o = null;
-            try {
-                o = JpaStorageUtils.getEntity(getEntityName(ctx), id, docFilter);
-            } catch (NoResultException nre) {
+            o = JpaStorageUtils.getEntity(getEntityName(ctx), id, docFilter);
+            if (null == o) {
                 if (em != null && em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
                 }
                 String msg = "could not find entity with id=" + id;
-                logger.error(msg, nre);
-                throw new DocumentNotFoundException(msg, nre);
+                throw new DocumentNotFoundException(msg);
             }
             DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(o);
             handler.handle(Action.GET, wrapDoc);
@@ -458,8 +456,6 @@ public class JpaStorageClientImpl implements StorageClient {
             }
         }
     }
-
-
 
     /**
      * getValue gets invokes specified accessor method on given object. Assumption

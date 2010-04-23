@@ -66,10 +66,8 @@ public class AccountResource
 
     /** The service name. */
     final private String serviceName = "accounts";
-    
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(AccountResource.class);
-    
     /** The storage client. */
     final StorageClient storageClient = new AccountStorageClient();
 
@@ -90,20 +88,20 @@ public class AccountResource
     public String getServiceName() {
         return serviceName;
     }
-    
+
     @Override
     public Class<AccountsCommon> getCommonPartClass() {
-    	return AccountsCommon.class;
-    }    
+        return AccountsCommon.class;
+    }
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.CollectionSpaceResource#getServiceContextFactory()
      */
     @Override
     public ServiceContextFactory<AccountsCommon, AccountsCommon> getServiceContextFactory() {
-    	return (ServiceContextFactory<AccountsCommon, AccountsCommon>)RemoteServiceContextFactory.get();
+        return (ServiceContextFactory<AccountsCommon, AccountsCommon>) RemoteServiceContextFactory.get();
     }
-    
+
 //    private <T> ServiceContext createServiceContext(T obj) throws Exception {
 //        ServiceContext ctx = new RemoteServiceContextImpl<T, T>(getServiceName());
 //        ctx.setInput(obj);
@@ -113,11 +111,11 @@ public class AccountResource
 //    }
 
     /* (non-Javadoc)
- * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getStorageClient(org.collectionspace.services.common.context.ServiceContext)
- */
-@Override
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getStorageClient(org.collectionspace.services.common.context.ServiceContext)
+     */
+    @Override
     public StorageClient getStorageClient(ServiceContext<AccountsCommon, AccountsCommon> ctx) {
-    	//FIXME use ctx to identify storage client
+        //FIXME use ctx to identify storage client
         return storageClient;
     }
 
@@ -127,15 +125,14 @@ public class AccountResource
 //        docHandler.setCommonPart(ctx.getInput());
 //        return docHandler;
 //    }
-
     /**
- * Creates the account.
- * 
- * @param input the input
- * 
- * @return the response
- */
-@POST
+     * Creates the account.
+     *
+     * @param input the input
+     *
+     * @return the response
+     */
+    @POST
     public Response createAccount(AccountsCommon input) {
         try {
             ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext(input, AccountsCommon.class);
@@ -333,8 +330,12 @@ public class AccountResource
             throw new WebApplicationException(response);
         }
         try {
+            //FIXME ideally the following two ops shoudl be in the same tx CSPACE-658
+            //delete all relationships
+            AccountRoleSubResource subResource = new AccountRoleSubResource();
+            subResource.deleteAccountRole(csid, SubjectType.ROLE);
             ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext((AccountsCommon) null,
-            		AccountsCommon.class);
+                    AccountsCommon.class);
             getStorageClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
@@ -357,7 +358,6 @@ public class AccountResource
         }
 
     }
-
 
     @POST
     @Path("{csid}/accountroles")

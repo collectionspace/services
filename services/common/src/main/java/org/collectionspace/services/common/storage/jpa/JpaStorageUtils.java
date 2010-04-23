@@ -26,6 +26,7 @@ package org.collectionspace.services.common.storage.jpa;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -47,7 +48,6 @@ public class JpaStorageUtils {
      * @param id
      * @param entityClazz
      * @return null if entity is not found
-     * @throws Exception
      */
     public static Object getEntity(String id, Class entityClazz) {
         EntityManagerFactory emf = null;
@@ -75,11 +75,9 @@ public class JpaStorageUtils {
      * @param entityName fully qualified entity name
      * @param id
      * @param docFilter
-     * @return
-     * @throws Exception
+     * @return null if entity is not found
      */
-    public static Object getEntity(String entityName, String id, DocumentFilter docFilter)
-            throws Exception {
+    public static Object getEntity(String entityName, String id, DocumentFilter docFilter) {
         EntityManagerFactory emf = null;
         EntityManager em = null;
         Object o = null;
@@ -96,7 +94,6 @@ public class JpaStorageUtils {
             if ((null != where) && (where.length() > 0)) {
                 queryStrBldr.append(" AND " + where);
             }
-
             emf = getEntityManagerFactory();
             em = emf.createEntityManager();
             String queryStr = queryStrBldr.toString(); //for debugging
@@ -107,11 +104,15 @@ public class JpaStorageUtils {
             for (DocumentFilter.ParamBinding p : params) {
                 q.setParameter(p.getName(), p.getValue());
             }
-
-            //require transaction for get?
-            em.getTransaction().begin();
             o = q.getSingleResult();
-            em.getTransaction().commit();
+        } catch (NoResultException nre) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("could not find entity with id=" + id);
+            }
+            //returns null
         } finally {
             if (em != null) {
                 releaseEntityManagerFactory(emf);

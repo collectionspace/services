@@ -96,14 +96,13 @@ public class PermissionRoleSubResource
     private ServiceContext<PermissionRole, PermissionRole> createServiceContext(PermissionRole input,
             SubjectType subject) throws Exception {
         ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext(input);
-//      ServiceContext ctx = new RemoteServiceContextImpl<T, T>(getServiceName());
-//      ctx.setInput(input);
         ctx.setDocumentType(PermissionRole.class.getPackage().getName()); //persistence unit
         ctx.setProperty("entity-name", PermissionRoleRel.class.getName());
         //subject name is necessary to indicate if role or permission is a subject
         ctx.setProperty("subject", subject);
         //set context for the relationship query
-        ctx.setProperty("objectId", "permission_id");
+        ctx.setProperty("object-class", Permission.class);
+        ctx.setProperty("object-id", "permission_id");
         return ctx;
     }
 

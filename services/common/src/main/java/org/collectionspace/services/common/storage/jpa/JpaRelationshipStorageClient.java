@@ -141,6 +141,12 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             throw new IllegalArgumentException(
                     "JpaRelationshipStorageClient.get: handler is missing");
         }
+        if (getObject(ctx, id) == null) {
+            String msg = "JpaRelationshipStorageClient.get: "
+                    + "could not find the object entity with id=" + id;
+            logger.error(msg);
+            throw new DocumentNotFoundException(msg);
+        }
         DocumentFilter docFilter = handler.getDocumentFilter();
         if (docFilter == null) {
             docFilter = handler.createDocumentFilter();
@@ -180,12 +186,14 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
                 if (em != null && em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
                 }
-                String msg = "could not find entity with id=" + id;
+                String msg = "JpaRelationshipStorageClient.get: "
+                        + " could not find entity with id=" + id;
                 logger.error(msg, nre);
                 throw new DocumentNotFoundException(msg, nre);
             }
             if (rl.size() == 0) {
-                String msg = "could not find entity with id=" + id;
+                String msg = "JpaRelationshipStorageClient.get: "
+                        + " could not find entity with id=" + id;
                 logger.error(msg);
                 throw new DocumentNotFoundException(msg);
             }
@@ -220,18 +228,22 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             throws DocumentNotFoundException,
             DocumentException {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("deleting entity with id=" + id);
-        }
         if (ctx == null) {
             throw new IllegalArgumentException(
                     "JpaRelationshipStorageClient.delete : ctx is missing");
+        }
+        if (getObject(ctx, id) == null) {
+            String msg = "JpaRelationshipStorageClient.delete : "
+                    + "could not find the object entity with id=" + id;
+            logger.error(msg);
+            throw new DocumentNotFoundException(msg);
         }
         EntityManagerFactory emf = null;
         EntityManager em = null;
         try {
             StringBuilder deleteStr = new StringBuilder("DELETE FROM ");
-            deleteStr.append(getEntityName(ctx));
+            String entityName = getEntityName(ctx);
+            deleteStr.append(entityName);
             String objectId = getObjectId(ctx);
             if (logger.isDebugEnabled()) {
                 logger.debug("delete: using objectId=" + objectId);
@@ -247,21 +259,12 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             int rcount = 0;
             em.getTransaction().begin();
             rcount = q.executeUpdate();
-            if (rcount == 0) {
-                if (em != null && em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
-                String msg = "could not find entity with id=" + id;
-                logger.error(msg);
-                throw new DocumentNotFoundException(msg);
+            if (logger.isDebugEnabled()) {
+                logger.debug("deleted " + rcount + " relationships for entity " + entityName
+                        + " with objectId=" + objectId);
             }
             em.getTransaction().commit();
 
-        } catch (DocumentException de) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
@@ -278,13 +281,29 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
     }
 
     protected String getObjectId(ServiceContext ctx) {
-        String objectId = (String) ctx.getProperty("objectId");
+        String objectId = (String) ctx.getProperty("object-id");
         if (objectId == null) {
-            String msg = "objectId is missing in the context";
+            String msg = "object-id is missing in the context";
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }
 
         return objectId;
+    }
+
+    /**
+     * getObject returns the object in the relationship
+     * @param ctx
+     * @param id
+     * @return
+     */
+    protected Object getObject(ServiceContext ctx, String id) {
+        Class objectClass = (Class) ctx.getProperty("object-class");
+        if (objectClass == null) {
+            String msg = "object-class is missing in the context";
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        return JpaStorageUtils.getEntity(id, objectClass);
     }
 }

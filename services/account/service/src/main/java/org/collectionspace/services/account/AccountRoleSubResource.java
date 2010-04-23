@@ -34,6 +34,7 @@ import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaRelationshipStorageClient;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,10 +49,8 @@ public class AccountRoleSubResource
     //service name to identify binding
     /** The service name. */
     final private String serviceName = "accounts/accountroles";
-    
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(AccountRoleSubResource.class);
-    
     /** The storage client. */
     final StorageClient storageClient = new JpaRelationshipStorageClient();
 
@@ -72,22 +71,22 @@ public class AccountRoleSubResource
     public String getServiceName() {
         return serviceName;
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.CollectionSpaceResource#getCommonPartClass()
      */
     @Override
     public Class<AccountRole> getCommonPartClass() {
-    	return AccountRole.class;
+        return AccountRole.class;
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.CollectionSpaceResource#getServiceContextFactory()
      */
     @Override
     public ServiceContextFactory<AccountRole, AccountRole> getServiceContextFactory() {
-    	return RemoteServiceContextFactory.get();
-    }    
+        return RemoteServiceContextFactory.get();
+    }
 
     /**
      * Creates the service context.
@@ -100,14 +99,15 @@ public class AccountRoleSubResource
      * @throws Exception the exception
      */
     private ServiceContext<AccountRole, AccountRole> createServiceContext(AccountRole input,
-    		SubjectType subject) throws Exception {
-    	ServiceContext<AccountRole, AccountRole> ctx = createServiceContext(input);
+            SubjectType subject) throws Exception {
+        ServiceContext<AccountRole, AccountRole> ctx = createServiceContext(input);
         ctx.setDocumentType(AccountRole.class.getPackage().getName()); //persistence unit
         ctx.setProperty("entity-name", AccountRoleRel.class.getName());
         //subject name is necessary to indicate if role or account is a subject
         ctx.setProperty("subject", subject);
         //set context for the relationship query
-        ctx.setProperty("objectId", "account_id");
+        ctx.setProperty("object-class", AccountsCommon.class);
+        ctx.setProperty("object-id", "account_id");
         return ctx;
     }
 
@@ -119,7 +119,6 @@ public class AccountRoleSubResource
         //FIXME use ctx to identify storage client
         return storageClient;
     }
-
 
     /**
      * createAccountRole creates one or more account-role relationships

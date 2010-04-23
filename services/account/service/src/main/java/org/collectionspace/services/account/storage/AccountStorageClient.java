@@ -217,8 +217,6 @@ public class AccountStorageClient extends JpaStorageClientImpl {
                     if (em != null && em.getTransaction().isActive()) {
                         em.getTransaction().rollback();
                     }
-                }
-                if (usrDelCount != 1) {
                     String msg = "could not find user with username=" + accountFound.getUserId();
                     logger.error(msg);
                     throw new DocumentNotFoundException(msg);

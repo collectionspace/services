@@ -65,10 +65,8 @@ public class PermissionResource
 
     /** The service name. */
     final private String serviceName = "authorization/permissions";
-    
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(PermissionResource.class);
-    
     /** The storage client. */
     final StorageClient storageClient = new JpaStorageClientImpl(Permission.class);
 
@@ -89,23 +87,23 @@ public class PermissionResource
     public String getServiceName() {
         return serviceName;
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.CollectionSpaceResource#getCommonPartClass()
      */
     @Override
     public Class<Permission> getCommonPartClass() {
-    	return Permission.class;
+        return Permission.class;
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.CollectionSpaceResource#getServiceContextFactory()
      */
     @Override
     public ServiceContextFactory<Permission, Permission> getServiceContextFactory() {
-    	return RemoteServiceContextFactory.get();
+        return RemoteServiceContextFactory.get();
     }
-                
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getStorageClient(org.collectionspace.services.common.context.ServiceContext)
      */
@@ -121,15 +119,14 @@ public class PermissionResource
 //        docHandler.setCommonPart(ctx.getInput());
 //        return docHandler;
 //    }
-
     /**
- * Creates the permission.
- * 
- * @param input the input
- * 
- * @return the response
- */
-@POST
+     * Creates the permission.
+     *
+     * @param input the input
+     *
+     * @return the response
+     */
+    @POST
     public Response createPermission(Permission input) {
         try {
             ServiceContext<Permission, Permission> ctx = createServiceContext(input, Permission.class);
@@ -337,6 +334,10 @@ public class PermissionResource
             throw new WebApplicationException(response);
         }
         try {
+            //FIXME ideally the following two ops shoudl be in the same tx CSPACE-658
+            //delete all relationships for this permission
+            PermissionRoleSubResource subResource = new PermissionRoleSubResource();
+            subResource.deletePermissionRole(csid, SubjectType.ROLE);
             ServiceContext<Permission, Permission> ctx = createServiceContext();
             getStorageClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
