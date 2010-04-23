@@ -42,6 +42,7 @@ import org.collectionspace.services.account.storage.AccountStorageClient;
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
+import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
@@ -56,7 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The Class AccountResource.
+ * AccountResource provides RESTful interface to the account service
  */
 @Path("/accounts")
 @Consumes("application/xml")
@@ -144,18 +145,22 @@ public class AccountResource
             return response;
         } catch (BadRequestException bre) {
             Response response = Response.status(
-                    Response.Status.BAD_REQUEST).entity("Create failed reason " + bre.getErrorReason()).type("text/plain").build();
+                    Response.Status.BAD_REQUEST).entity(ServiceMessages.POST_FAILED +
+                    bre.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Create failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.POST_FAILED +
+                    ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in createAccount", e);
             }
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Create failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.POST_FAILED + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
     }
@@ -177,7 +182,7 @@ public class AccountResource
         if (csid == null || "".equals(csid)) {
             logger.error("getAccount: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "get failed on Account csid=" + csid).type(
+                    ServiceMessages.GET_FAILED + ServiceMessages.MISSING_INVALID_CSID + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -189,28 +194,31 @@ public class AccountResource
             result = (AccountsCommon) ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.GET_FAILED +
+                    ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getAccount", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed on Account csid=" + csid).type(
+                    ServiceMessages.GET_FAILED + "csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getAccount", e);
             }
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.GET_FAILED +
+                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
 
         if (result == null) {
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed, the requested Account CSID:" + csid + ": was not found.").type(
+                    ServiceMessages.GET_FAILED + "csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -241,15 +249,18 @@ public class AccountResource
             accountList = (AccountsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.LIST_FAILED +
+                    ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
 
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in getAccountList", e);
             }
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.LIST_FAILED +
+                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return accountList;
@@ -274,7 +285,7 @@ public class AccountResource
         if (csid == null || "".equals(csid)) {
             logger.error("updateAccount: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "update failed on Account csid=" + csid).type(
+                    ServiceMessages.PUT_FAILED + ServiceMessages.MISSING_INVALID_CSID + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -286,23 +297,27 @@ public class AccountResource
             result = (AccountsCommon) ctx.getOutput();
         } catch (BadRequestException bre) {
             Response response = Response.status(
-                    Response.Status.BAD_REQUEST).entity("Update failed reason " + bre.getErrorReason()).type("text/plain").build();
+                    Response.Status.BAD_REQUEST).entity(ServiceMessages.PUT_FAILED +
+                    bre.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.PUT_FAILED +
+                    ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("caugth exception in updateAccount", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Update failed on Account csid=" + csid).type(
+                    ServiceMessages.PUT_FAILED + "csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.PUT_FAILED +
+                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return result;
@@ -325,7 +340,7 @@ public class AccountResource
         if (csid == null || "".equals(csid)) {
             logger.error("deleteAccount: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "delete failed on Account csid=" + csid).type(
+                    ServiceMessages.DELETE_FAILED + ServiceMessages.MISSING_INVALID_CSID + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -340,7 +355,8 @@ public class AccountResource
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Delete failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.DELETE_FAILED +
+                    ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
 
         } catch (DocumentNotFoundException dnfe) {
@@ -348,12 +364,14 @@ public class AccountResource
                 logger.debug("caught exception in deleteAccount", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Delete failed on Account csid=" + csid).type(
+                    ServiceMessages.DELETE_FAILED + "csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Delete failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.DELETE_FAILED +
+                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
 
@@ -369,7 +387,8 @@ public class AccountResource
         if (accCsid == null || "".equals(accCsid)) {
             logger.error("createAccountRole: missing accCsid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "create failed on AccountRole accCsid=" + accCsid).type(
+                    ServiceMessages.POST_FAILED + "accountroles account " + 
+                    ServiceMessages.MISSING_INVALID_CSID + accCsid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -382,21 +401,23 @@ public class AccountResource
             return response;
         } catch (BadRequestException bre) {
             Response response = Response.status(
-                    Response.Status.BAD_REQUEST).entity("Create failed reason "
+                    Response.Status.BAD_REQUEST).entity(ServiceMessages.POST_FAILED
                     + bre.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Create failed reason "
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.POST_FAILED
                     + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in createAccountRole", e);
             }
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    "Create failed").type("text/plain").build();
+                    ServiceMessages.POST_FAILED +
+                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
     }
@@ -412,7 +433,8 @@ public class AccountResource
         if (accCsid == null || "".equals(accCsid)) {
             logger.error("getAccountRole: missing accCsid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "get failed on AccountRole accCsid=" + accCsid).type(
+                    ServiceMessages.GET_FAILED + "accountroles account " +
+                    ServiceMessages.MISSING_INVALID_CSID + accCsid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -423,7 +445,7 @@ public class AccountResource
             result = subResource.getAccountRole(accCsid, SubjectType.ROLE);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Get failed reason "
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.GET_FAILED
                     + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
@@ -431,22 +453,22 @@ public class AccountResource
                 logger.debug("getAccountRole", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed on AccountRole accrolecsid=" + accrolecsid).type(
+                    ServiceMessages.GET_FAILED + "account csid=" + accrolecsid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getAccountRole", e);
             }
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    "Get failed").type("text/plain").build();
+                    ServiceMessages.GET_FAILED + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         if (result == null) {
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed, the requested AccountRole accrolecsid:" + accrolecsid
-                    + ": was not found.").type(
+                    ServiceMessages.GET_FAILED + "account csid=" + accCsid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -464,7 +486,8 @@ public class AccountResource
         if (accCsid == null || "".equals(accCsid)) {
             logger.error("deleteAccountRole: missing accCsid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "delete failed on AccountRole accCsid=" + accCsid).type(
+                    ServiceMessages.DELETE_FAILED + "accountroles account " +
+                    ServiceMessages.MISSING_INVALID_CSID + accCsid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -475,7 +498,7 @@ public class AccountResource
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Delete failed reason "
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.DELETE_FAILED
                     + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
@@ -483,13 +506,14 @@ public class AccountResource
                 logger.debug("caught exception in deleteAccountRole", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Delete failed on AccountRole accrolecsid=" + accrolecsid).type(
+                    ServiceMessages.DELETE_FAILED + "account csid=" + accCsid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    "Delete failed").type("text/plain").build();
+                    ServiceMessages.DELETE_FAILED + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
 

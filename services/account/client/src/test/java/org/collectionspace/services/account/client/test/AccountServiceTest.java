@@ -243,6 +243,28 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
+    public void createWithInvalidPassword(String testName) throws Exception {
+
+        setupCreate(testName);
+
+        // Submit the request to the service and store the response.
+        AccountsCommon account =
+                createAccountInstance("babybop", "babybop", "shpswd", "babybop@dinoland.com",
+                true, false, true, true);
+        AccountClient client = new AccountClient();
+        ClientResponse<Response> res = client.create(account);
+        int statusCode = res.getStatus();
+        // Does it exactly match the expected status code?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+    }
+
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"create"})
     public void createWithMostInvalid(String testName) throws Exception {
 
         setupCreate(testName);
@@ -418,7 +440,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
         ClientResponse<AccountsCommonList> res =
-            client.readSearchList("tom", null, null);
+                client.readSearchList("tom", null, null);
         AccountsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
@@ -448,7 +470,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
         ClientResponse<AccountsCommonList> res =
-            client.readSearchList(null, "tom", null);
+                client.readSearchList(null, "tom", null);
         AccountsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
@@ -478,7 +500,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
         ClientResponse<AccountsCommonList> res =
-            client.readSearchList(null, null, "dinoland");
+                client.readSearchList(null, null, "dinoland");
         AccountsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
@@ -508,7 +530,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
         ClientResponse<AccountsCommonList> res =
-            client.readSearchList("tom", null, "jerry");
+                client.readSearchList("tom", null, "jerry");
         AccountsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
@@ -677,6 +699,48 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"update"})
+    public void updateInvalidPassword(String testName) throws Exception {
+
+        // Perform setup.
+        setupUpdate(testName);
+
+        AccountClient client = new AccountClient();
+        ClientResponse<AccountsCommon> res = client.read(knownResourceId);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": read status = " + res.getStatus());
+        }
+        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": got object to update password with ID: " + knownResourceId);
+        }
+        AccountsCommon toUpdateAccount =
+                (AccountsCommon) res.getEntity();
+        Assert.assertNotNull(toUpdateAccount);
+
+        //change password
+        toUpdateAccount.setPassword("abc123".getBytes());
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": updated object");
+            logger.debug(objectAsXmlString(toUpdateAccount,
+                    AccountsCommon.class));
+        }
+
+        // Submit the request to the service and store the response.
+        res = client.update(knownResourceId, toUpdateAccount);
+        int statusCode = res.getStatus();
+        // Check the status code of the response: does it match the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+
+    }
+
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"updatePasswordWithoutUser"})
     public void deactivate(String testName) throws Exception {
 
@@ -758,7 +822,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
                 createAccountInstance("simba", "simba", "tiger", "simba@lionking.com",
                 true, false, true, true);
         ClientResponse<AccountsCommon> res =
-            client.update(NON_EXISTENT_ID, account);
+                client.update(NON_EXISTENT_ID, account);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -909,7 +973,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @param usePassword
      * @return
      */
-   AccountsCommon createAccountInstance(String screenName,
+    AccountsCommon createAccountInstance(String screenName,
             String userName, String passwd, String email,
             boolean useScreenName, boolean invalidTenant, boolean useUser, boolean usePassword) {
 

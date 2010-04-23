@@ -40,6 +40,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 //import org.collectionspace.services.common.context.RemoteServiceContextImpl;
+import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContextFactory;
@@ -138,21 +139,23 @@ public class PermissionResource
             return response;
         } catch (BadRequestException bre) {
             Response response = Response.status(
-                    Response.Status.BAD_REQUEST).entity("Create failed reason "
+                    Response.Status.BAD_REQUEST).entity(ServiceMessages.POST_FAILED
                     + bre.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Create failed reason "
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.POST_FAILED
                     + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in createPermission", e);
             }
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    "Create failed").type("text/plain").build();
+                    ServiceMessages.POST_FAILED +
+                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
     }
@@ -174,7 +177,8 @@ public class PermissionResource
         if (csid == null || "".equals(csid)) {
             logger.error("getPermission: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "get failed on Permission csid=" + csid).type(
+                    ServiceMessages.GET_FAILED + "permission " +
+                    ServiceMessages.MISSING_INVALID_CSID + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -186,7 +190,7 @@ public class PermissionResource
             result = (Permission) ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Get failed reason "
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.GET_FAILED
                     + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
@@ -194,22 +198,24 @@ public class PermissionResource
                 logger.debug("getPermission", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed on Permission csid=" + csid).type(
+                    ServiceMessages.GET_FAILED + "permission csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getPermission", e);
             }
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    "Get failed").type("text/plain").build();
+                    ServiceMessages.GET_FAILED +
+                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
 
         if (result == null) {
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed, the requested Permission CSID:" + csid + ": was not found.").type(
+                    ServiceMessages.GET_FAILED + " permission csid=" + csid + ": was not found.").type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -240,7 +246,7 @@ public class PermissionResource
             permissionList = (PermissionsList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Index failed reason "
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.LIST_FAILED
                     + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
 
@@ -248,9 +254,11 @@ public class PermissionResource
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in getPermissionsList", e);
             }
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    "Index failed").type("text/plain").build();
+                    ServiceMessages.LIST_FAILED +
+                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return permissionList;
@@ -275,7 +283,8 @@ public class PermissionResource
         if (csid == null || "".equals(csid)) {
             logger.error("updatePermission: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "update failed on Permission csid=" + csid).type(
+                    ServiceMessages.PUT_FAILED  + "permission " +
+                    ServiceMessages.MISSING_INVALID_CSID + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -287,12 +296,12 @@ public class PermissionResource
             result = (Permission) ctx.getOutput();
         } catch (BadRequestException bre) {
             Response response = Response.status(
-                    Response.Status.BAD_REQUEST).entity("Update failed reason "
+                    Response.Status.BAD_REQUEST).entity(ServiceMessages.PUT_FAILED
                     + bre.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Update failed reason "
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.PUT_FAILED
                     + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
@@ -300,13 +309,15 @@ public class PermissionResource
                 logger.debug("caugth exception in updatePermission", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Update failed on Permission csid=" + csid).type(
+                    ServiceMessages.PUT_FAILED + "permission csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    "Update failed").type("text/plain").build();
+                    ServiceMessages.PUT_FAILED +
+                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return result;
@@ -329,7 +340,8 @@ public class PermissionResource
         if (csid == null || "".equals(csid)) {
             logger.error("deletePermission: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "delete failed on Permission csid=" + csid).type(
+                    ServiceMessages.DELETE_FAILED + "permission " +
+                    ServiceMessages.MISSING_INVALID_CSID + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -343,7 +355,7 @@ public class PermissionResource
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Delete failed reason "
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.DELETE_FAILED
                     + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
 
@@ -352,13 +364,15 @@ public class PermissionResource
                 logger.debug("caught exception in deletePermission", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Delete failed on Permission csid=" + csid).type(
+                    ServiceMessages.DELETE_FAILED + "permission csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    "Delete failed").type("text/plain").build();
+                    ServiceMessages.DELETE_FAILED +
+                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
 
@@ -374,7 +388,8 @@ public class PermissionResource
         if (permCsid == null || "".equals(permCsid)) {
             logger.error("createPermissionRole: missing permCsid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "create failed on PermissionRole permCsid=" + permCsid).type(
+                    ServiceMessages.POST_FAILED + "permroles permission " +
+                    ServiceMessages.MISSING_INVALID_CSID + permCsid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -399,9 +414,11 @@ public class PermissionResource
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in createPermissionRole", e);
             }
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    "Create failed").type("text/plain").build();
+                    ServiceMessages.POST_FAILED +
+                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
     }
@@ -417,7 +434,8 @@ public class PermissionResource
         if (permCsid == null || "".equals(permCsid)) {
             logger.error("getPermissionRole: missing permCsid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "get failed on PermissionRole permCsid=" + permCsid).type(
+                    ServiceMessages.GET_FAILED + "permroles permission " + 
+                    ServiceMessages.MISSING_INVALID_CSID + permCsid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -428,7 +446,7 @@ public class PermissionResource
             result = subResource.getPermissionRole(permCsid, SubjectType.ROLE);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Get failed reason "
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.GET_FAILED
                     + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
@@ -436,21 +454,23 @@ public class PermissionResource
                 logger.debug("getPermissionRole", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed on PermissionRole permrolecsid=" + permrolecsid).type(
+                    ServiceMessages.GET_FAILED + "permroles permission csid=" + permCsid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getPermissionRole", e);
             }
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    "Get failed").type("text/plain").build();
+                    ServiceMessages.GET_FAILED +
+                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         if (result == null) {
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed, the requested PermissionRole permrolecsid:" + permrolecsid
+                    ServiceMessages.GET_FAILED + "permroles permisison csid=" + permCsid
                     + ": was not found.").type(
                     "text/plain").build();
             throw new WebApplicationException(response);
@@ -469,7 +489,8 @@ public class PermissionResource
         if (permCsid == null || "".equals(permCsid)) {
             logger.error("deletePermissionRole: missing permCsid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "delete failed on PermissionRole permCsid=" + permCsid).type(
+                    ServiceMessages.DELETE_FAILED + "permroles permission " +
+                    ServiceMessages.MISSING_INVALID_CSID + permCsid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -480,7 +501,7 @@ public class PermissionResource
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Delete failed reason "
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.DELETE_FAILED
                     + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
@@ -488,13 +509,15 @@ public class PermissionResource
                 logger.debug("caught exception in deletePermissionRole", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Delete failed on PermissionRole permrolecsid=" + permrolecsid).type(
+                    ServiceMessages.DELETE_FAILED + "permisison csid=" + permCsid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    "Delete failed").type("text/plain").build();
+                    ServiceMessages.DELETE_FAILED +
+                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
 

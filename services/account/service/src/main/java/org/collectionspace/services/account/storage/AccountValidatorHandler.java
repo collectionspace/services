@@ -55,6 +55,7 @@ import java.util.regex.Pattern;
 import org.collectionspace.services.account.AccountTenant;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.Tenant;
+import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.InvalidDocumentException;
@@ -79,7 +80,7 @@ public class AccountValidatorHandler implements ValidatorHandler {
         }
         try {
             AccountsCommon account = (AccountsCommon) ctx.getInput();
-            StringBuilder msgBldr = new StringBuilder("validate() ");
+            StringBuilder msgBldr = new StringBuilder(ServiceMessages.VALIDATION_FAILURE);
             boolean invalid = false;
 
             List<AccountTenant> tl = account.getTenants();

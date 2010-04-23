@@ -260,8 +260,8 @@ public class AccountStorageClient extends JpaStorageClientImpl {
 
     private boolean checkAllowedUpdates(AccountsCommon toAccount, AccountsCommon fromAccount) throws BadRequestException {
         if (!fromAccount.getUserId().equals(toAccount.getUserId())) {
-            String msg = "User id " + toAccount.getUserId() + " does not match " + 
-                    "for given account with csid=" + fromAccount.getCsid();
+            String msg = "User id " + toAccount.getUserId() + " does not match "
+                    + "for given account with csid=" + fromAccount.getCsid();
             logger.error(msg);
             logger.debug(msg + " found userid=" + fromAccount.getUserId());
             throw new BadRequestException(msg);
@@ -269,7 +269,7 @@ public class AccountStorageClient extends JpaStorageClientImpl {
         return true;
     }
 
-    private User createUser(AccountsCommon account) {
+    private User createUser(AccountsCommon account) throws Exception {
         User user = new User();
         user.setUsername(account.getUserId());
         if (hasPassword(account.getPassword())) {
@@ -304,10 +304,14 @@ public class AccountStorageClient extends JpaStorageClientImpl {
         }
     }
 
-    private String getEncPassword(AccountsCommon account) {
+    private String getEncPassword(AccountsCommon account) throws BadRequestException {
         //jaxb unmarshaller already unmarshal xs:base64Binary, no need to b64 decode
         //byte[] bpass = Base64.decodeBase64(account.getPassword());
-        SecurityUtils.validatePassword(new String(account.getPassword()));
+        try {
+            SecurityUtils.validatePassword(new String(account.getPassword()));
+        } catch (Exception e) {
+            throw new BadRequestException(e.getMessage());
+        }
         String secEncPasswd = SecurityUtils.createPasswordHash(
                 account.getUserId(), new String(account.getPassword()));
         return secEncPasswd;

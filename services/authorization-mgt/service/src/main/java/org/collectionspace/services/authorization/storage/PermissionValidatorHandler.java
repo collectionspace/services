@@ -25,6 +25,7 @@
 package org.collectionspace.services.authorization.storage;
 
 import org.collectionspace.services.authorization.Permission;
+import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.InvalidDocumentException;
@@ -48,7 +49,7 @@ public class PermissionValidatorHandler implements ValidatorHandler {
         }
         try {
             Permission permission = (Permission) ctx.getInput();
-            StringBuilder msgBldr = new StringBuilder("validate() ");
+            StringBuilder msgBldr = new StringBuilder(ServiceMessages.VALIDATION_FAILURE);
             boolean invalid = false;
 
             if (action.equals(Action.CREATE)) {

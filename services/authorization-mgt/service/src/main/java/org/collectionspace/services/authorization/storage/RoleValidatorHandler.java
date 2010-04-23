@@ -26,6 +26,7 @@
 package org.collectionspace.services.authorization.storage;
 
 import org.collectionspace.services.authorization.Role;
+import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.InvalidDocumentException;
@@ -49,7 +50,7 @@ public class RoleValidatorHandler implements ValidatorHandler {
         }
         try {
             Role role = (Role) ctx.getInput();
-            StringBuilder msgBldr = new StringBuilder("validate() ");
+            StringBuilder msgBldr = new StringBuilder(ServiceMessages.VALIDATION_FAILURE);
             boolean invalid = false;
 
             if (action.equals(Action.CREATE)) {

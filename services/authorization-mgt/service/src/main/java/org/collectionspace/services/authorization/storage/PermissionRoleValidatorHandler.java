@@ -29,6 +29,7 @@ import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
+import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.InvalidDocumentException;
@@ -53,7 +54,7 @@ public class PermissionRoleValidatorHandler implements ValidatorHandler {
         }
         try {
             PermissionRole permRole = (PermissionRole) ctx.getInput();
-            StringBuilder msgBldr = new StringBuilder("validate() ");
+            StringBuilder msgBldr = new StringBuilder(ServiceMessages.VALIDATION_FAILURE);
             boolean invalid = false;
 
             if (action.equals(Action.CREATE)) {

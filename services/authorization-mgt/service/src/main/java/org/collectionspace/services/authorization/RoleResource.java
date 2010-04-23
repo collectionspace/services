@@ -40,6 +40,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 //import org.collectionspace.services.common.context.RemoteServiceContextImpl;
+import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
@@ -54,7 +55,6 @@ import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * The Class RoleResource.
  */
@@ -66,10 +66,8 @@ public class RoleResource
 
     /** The service name. */
     final private String serviceName = "authorization/roles";
-    
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(RoleResource.class);
-    
     /** The storage client. */
     final StorageClient storageClient = new JpaStorageClientImpl();
 
@@ -90,23 +88,22 @@ public class RoleResource
     public String getServiceName() {
         return serviceName;
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.CollectionSpaceResource#getCommonPartClass()
      */
     @Override
     public Class<RoleResource> getCommonPartClass() {
-    	return RoleResource.class;
+        return RoleResource.class;
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.CollectionSpaceResource#getServiceContextFactory()
      */
     @Override
     public ServiceContextFactory getServiceContextFactory() {
-    	return RemoteServiceContextFactory.get();
+        return RemoteServiceContextFactory.get();
     }
-    
 
 //    private <T> ServiceContext createServiceContext(T obj) throws Exception {
 //        ServiceContext ctx = new RemoteServiceContextImpl<T, T>(getServiceName());
@@ -117,9 +114,9 @@ public class RoleResource
 //    }
 
     /* (non-Javadoc)
- * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getStorageClient(org.collectionspace.services.common.context.ServiceContext)
- */
-@Override
+     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getStorageClient(org.collectionspace.services.common.context.ServiceContext)
+     */
+    @Override
     public StorageClient getStorageClient(ServiceContext ctx) {
         //FIXME use ctx to identify storage client
         return storageClient;
@@ -131,15 +128,14 @@ public class RoleResource
 //        docHandler.setCommonPart(ctx.getInput());
 //        return docHandler;
 //    }
-
     /**
- * Creates the role.
- * 
- * @param input the input
- * 
- * @return the response
- */
-@POST
+     * Creates the role.
+     *
+     * @param input the input
+     *
+     * @return the response
+     */
+    @POST
     public Response createRole(Role input) {
         try {
             ServiceContext ctx = createServiceContext(input, Role.class);
@@ -151,18 +147,22 @@ public class RoleResource
             return response;
         } catch (BadRequestException bre) {
             Response response = Response.status(
-                    Response.Status.BAD_REQUEST).entity("Create failed reason " + bre.getErrorReason()).type("text/plain").build();
+                    Response.Status.BAD_REQUEST).entity(ServiceMessages.POST_FAILED
+                    + bre.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Create failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.POST_FAILED +
+                    ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in createRole", e);
             }
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Create failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.POST_FAILED +
+                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
     }
@@ -184,7 +184,7 @@ public class RoleResource
         if (csid == null || "".equals(csid)) {
             logger.error("getRole: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "get failed on Role csid=" + csid).type(
+                    ServiceMessages.GET_FAILED + "role csid=").type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -196,28 +196,31 @@ public class RoleResource
             result = (Role) ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.GET_FAILED +
+                    ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getRole", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed on Role csid=" + csid).type(
+                    ServiceMessages.GET_FAILED + "role csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getRole", e);
             }
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.GET_FAILED +
+                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
 
         if (result == null) {
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed, the requested Role CSID:" + csid + ": was not found.").type(
+                    ServiceMessages.GET_FAILED + "role csid=" + csid + ": was not found.").type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -248,15 +251,18 @@ public class RoleResource
             roleList = (RolesList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.LIST_FAILED +
+                    ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
 
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in getRoleList", e);
             }
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.LIST_FAILED +
+                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return roleList;
@@ -281,7 +287,8 @@ public class RoleResource
         if (csid == null || "".equals(csid)) {
             logger.error("updateRole: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "update failed on Role csid=" + csid).type(
+                    ServiceMessages.PUT_FAILED + "role " +
+                    ServiceMessages.MISSING_INVALID_CSID + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -293,23 +300,28 @@ public class RoleResource
             result = (Role) ctx.getOutput();
         } catch (BadRequestException bre) {
             Response response = Response.status(
-                    Response.Status.BAD_REQUEST).entity("Update failed reason " + bre.getErrorReason()).type("text/plain").build();
+                    Response.Status.BAD_REQUEST).entity(ServiceMessages.PUT_FAILED +
+                    bre.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.PUT_FAILED  +
+                    ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("caugth exception in updateRole", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Update failed on Role csid=" + csid).type(
+                    ServiceMessages.PUT_FAILED + "role csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.PUT_FAILED +
+                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return result;
@@ -332,17 +344,17 @@ public class RoleResource
         if (csid == null || "".equals(csid)) {
             logger.error("deleteRole: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "delete failed on Role csid=" + csid).type(
+                    ServiceMessages.DELETE_FAILED + "role csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
         try {
             ServiceContext ctx = createServiceContext((Role) null, Role.class);
-            ((JpaStorageClientImpl)getStorageClient(ctx)).deleteWhere(ctx, csid);
+            ((JpaStorageClientImpl) getStorageClient(ctx)).deleteWhere(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Delete failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.DELETE_FAILED  + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
 
         } catch (DocumentNotFoundException dnfe) {
@@ -350,12 +362,14 @@ public class RoleResource
                 logger.debug("caught exception in deleteRole", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Delete failed on Role csid=" + csid).type(
+                    ServiceMessages.DELETE_FAILED + "role csid=" + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Delete failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.DELETE_FAILED + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
 
