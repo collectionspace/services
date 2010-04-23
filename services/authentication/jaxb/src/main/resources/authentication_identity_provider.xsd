@@ -36,6 +36,11 @@
     <xs:element name="user">
         <xs:complexType>
             <xs:annotation>
+                <xs:documentation>
+                    User definition of CollectionSpace Identity Provider (CSIP)
+                    - username is unique within all the realms in CollectionSpace
+                    including the one managed by CSIP
+                </xs:documentation>
                 <xs:appinfo>
                     <hj:entity>
                         <orm:table name="users"/>
