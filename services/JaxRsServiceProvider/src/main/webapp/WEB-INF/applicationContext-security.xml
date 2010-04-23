@@ -25,14 +25,16 @@
     </sec:global-method-security>
 
 
-    <bean id="springSecurityFilterChain" class="org.springframework.security.web.FilterChainProxy">
+    <bean id="springSecurityFilterChain"
+          class="org.springframework.security.web.FilterChainProxy">
         <sec:filter-chain-map path-type="ant">
             <sec:filter-chain pattern="/**"
                               filters="securityPersistenceFilter,basicAuthenticationFilter,logoutFilter,exTranslationFilter,filterInvocationInterceptor"/>
         </sec:filter-chain-map>
     </bean>
 
-    <bean id="securityPersistenceFilter" class="org.springframework.security.web.context.SecurityContextPersistenceFilter"/>
+    <bean id="securityPersistenceFilter"
+          class="org.springframework.security.web.context.SecurityContextPersistenceFilter"/>
 
     <bean id="basicAuthenticationFilter"
           class="org.springframework.security.web.authentication.www.BasicAuthenticationFilter">
@@ -45,7 +47,8 @@
         <property name="realmName" value="org.collectionspace.services"/>
     </bean>
 
-    <bean id="logoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter">
+    <bean id="logoutFilter"
+          class="org.springframework.security.web.authentication.logout.LogoutFilter">
         <constructor-arg value="/"/>
         <constructor-arg>
             <list>
@@ -54,7 +57,8 @@
         </constructor-arg>
     </bean>
 
-    <bean id="exTranslationFilter" class="org.springframework.security.web.access.ExceptionTranslationFilter">
+    <bean id="exTranslationFilter"
+          class="org.springframework.security.web.access.ExceptionTranslationFilter">
         <property name="authenticationEntryPoint" ref="preAuthenticatedProcessingFilterEntryPoint"/>
     </bean>
 
@@ -87,10 +91,12 @@
         </property>
     </bean>
 
-    <bean id="userDetailsService" class="org.collectionspace.authentication.spring.CSpaceUserDetailsService">
+    <bean id="userDetailsService"
+          class="org.collectionspace.authentication.spring.CSpaceUserDetailsService">
     </bean>
 
-    <bean id="filterInvocationInterceptor" class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
+    <bean id="filterInvocationInterceptor"
+          class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
         <property name="authenticationManager" ref="authenticationManager"/>
         <property name="accessDecisionManager" ref="httpRequestAccessDecisionManager"/>
         <!--property name="securityMetadataSource" ref="cspaceMetadataSource"/-->
@@ -101,16 +107,21 @@
         </property>
     </bean>
 
-    <bean id="httpRequestAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+    <bean id="httpRequestAccessDecisionManager"
+          class="org.springframework.security.access.vote.AffirmativeBased">
         <property name="allowIfAllAbstainDecisions" value="false"/>
         <property name="decisionVoters">
             <list>
                 <ref bean="roleVoter"/>
+                <ref bean="authenticatedVoter"/>
             </list>
         </property>
     </bean>
 
-    <bean id="roleVoter" class="org.springframework.security.access.vote.AuthenticatedVoter"/>
+    <bean id="authenticatedVoter"
+          class="org.springframework.security.access.vote.AuthenticatedVoter"/>
+    <bean id="roleVoter"
+          class="org.springframework.security.access.vote.RoleVoter"/>
     <!--bean id="cspaceMetadataSource" class="org.collectionspace.services.authorization.spring.CSpaceSecurityMetadataSource">
         <property name="urlProperties">
             <util:properties location="classpath:urls.properties" />
