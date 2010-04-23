@@ -63,8 +63,6 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
        LoggerFactory.getLogger(PersonAuthRefDocsTest.class);
 
     // Instance variables specific to this test.
-    private IntakeClient intakeClient = new IntakeClient();
-    private PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     final String SERVICE_PATH_COMPONENT = "intakes";
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     private String knownIntakeId = null;
@@ -96,7 +94,8 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         
         // Create all the person refs and entities
         createPersonRefs();
-        
+
+        IntakeClient intakeClient = new IntakeClient();
         MultipartOutput multipart = createIntakeInstance(
                 "entryNumber-" + identifier,
                 "entryDate-" + identifier,
@@ -139,6 +138,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
     }
     
     protected void createPersonRefs(){
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     	String authRefName = 
     		PersonAuthorityClientUtils.createPersonAuthRefName(PERSON_AUTHORITY_NAME, false);
     	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
@@ -180,6 +180,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
     }
     
     protected String createPerson(String firstName, String surName, String refName ) {
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
@@ -204,7 +205,8 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         testSetup(OK_STATUS, ServiceRequestType.READ,testName);
         
         // Get the auth ref docs and check them
-        ClientResponse<AuthorityRefDocList> refDocListResp =
+       PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+       ClientResponse<AuthorityRefDocList> refDocListResp =
         	personAuthClient.getReferencingObjects(personAuthCSID, currentOwnerPersonCSID);
 
         int statusCode = refDocListResp.getStatus();
@@ -263,6 +265,8 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
             }
             return;
     	}
+        IntakeClient intakeClient = new IntakeClient();
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
@@ -305,7 +309,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", intakeClient.getCommonPartName());
+        commonPart.getHeaders().add("label", new IntakeClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, intake common");
