@@ -33,12 +33,18 @@
     <xs:element name="accounts_common">
         <xs:complexType>
             <xs:annotation>
+                <xs:documentation>
+                    AccountsCommon is the account definition in CollectionSpace
+                    - userId is unique across all realms and across all tenants in CollectionSpace
+                    - password should be &gt;8 and &lt;24 chars in length
+                    - tenant association is usually not required to be provided by the
+                    service consumer. only in cases where a user in CollectionSpace
+                    has access to the spaces of multiple tenants, this is used
+                    to associate that user with more than one tenants
+                </xs:documentation>
                 <xs:appinfo>
                     <hj:entity>
                         <orm:table name="accounts_common">
-                            <orm:unique-constraint>
-                                <orm:column-name>screen_name</orm:column-name>
-                            </orm:unique-constraint>
                         </orm:table>
                     </hj:entity>
                 </xs:appinfo>
@@ -92,6 +98,9 @@
                 <!-- userid, could be calnet id, openid URI -->
                 <xs:element name="userId" type="xs:string" minOccurs="1" maxOccurs="1">
                     <xs:annotation>
+                        <xs:documentation>
+                            userId is unique across all tenants in CollectionSpace
+                        </xs:documentation>
                         <xs:appinfo>
                             <hj:basic>
                                 <orm:column name="userid" length="128"  nullable="false"/>
@@ -102,12 +111,23 @@
                 <!-- optional base64 encoded password for default identity provider only -->
                 <xs:element name="password" type="xs:base64Binary" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
+                        <xs:documentation>
+                            password should be &gt;8 and &lt;24 chars in length
+                        </xs:documentation>
                         <xs:appinfo>
                             <hj:ignored/>
                         </xs:appinfo>
                     </xs:annotation>
                 </xs:element>
                 <xs:element name="tenants" type="account_tenant" minOccurs="1" maxOccurs="unbounded">
+                    <xs:annotation>
+                        <xs:documentation>
+                            tenant association is usually not required to be provided by the
+                            service consumer. only in cases where a user in CollectionSpace
+                            has access to the spaces of multiple tenants, this is used
+                            to associate that user with more than one tenants
+                        </xs:documentation>
+                    </xs:annotation>
                 </xs:element>
                 <xs:element name="status" type="status">
                     <xs:annotation>
@@ -152,6 +172,11 @@
     <xs:element name="accounts-common-list">
         <xs:complexType>
             <xs:annotation>
+                <xs:documentation>
+                    AccountsCommonList contains information about one or more
+                    accounts. An instance of this type could be returned on
+                    index and search operations.
+                </xs:documentation>
                 <xs:appinfo>
                     <hj:ignored/>
                 </xs:appinfo>
@@ -180,6 +205,11 @@
     </xs:element>
 
     <xs:simpleType name="status">
+        <xs:annotation>
+            <xs:documentation>
+                Status of the account in CollectionSpace
+            </xs:documentation>
+        </xs:annotation>
         <xs:restriction base="xs:string">
             <xs:enumeration value="active" />
             <xs:enumeration value="inactive" />
@@ -188,6 +218,9 @@
 
     <xs:complexType name="account_tenant">
         <xs:annotation>
+            <xs:documentation>
+                AccountTenant defines the relationship between an account and a tenant
+            </xs:documentation>
             <xs:appinfo>
                 <hj:entity>
                     <orm:table name="accounts_tenants">
@@ -208,8 +241,12 @@
         </xs:sequence>
     </xs:complexType>
 
+    <!-- FIXME tenant definition could be in a separate schema -->
     <xs:complexType name="tenant">
         <xs:annotation>
+            <xs:documentation>
+                Tenant defines the tenant in CollectionSpace
+            </xs:documentation>
             <xs:appinfo>
                 <hj:entity>
                     <orm:table name="tenants"/>

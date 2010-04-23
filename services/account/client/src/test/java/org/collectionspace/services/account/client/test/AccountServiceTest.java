@@ -130,27 +130,6 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
     }
 
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
-    public void createForUniqueScreenName(String testName) throws Exception {
-
-        setupCreate(testName);
-
-        // Submit the request to the service and store the response.
-        AccountsCommon account =
-                createAccountInstance("barney", "otherUser", "hithere08", "barney@dinoland.com",
-                true, false, true, true);
-        AccountClient client = new AccountClient();
-        ClientResponse<Response> res = client.create(account);
-        int statusCode = res.getStatus();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
-    }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
