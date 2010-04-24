@@ -320,7 +320,6 @@ public class IntakeResource extends
      * 
      * @return the intake list
      */
-    @Deprecated
     public IntakesCommonList getIntakeList(List<String> csidList) {
         IntakesCommonList intakeObjectList = new IntakesCommonList();
         try {

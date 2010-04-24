@@ -93,7 +93,7 @@ public class CollectionObjectResource
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
      */
     @Override
-    protected String getVersionString() {
+    public String getVersionString() {
         /** The last change revision. */
         final String lastChangeRevision = "$LastChangedRevision$";
         return lastChangeRevision;

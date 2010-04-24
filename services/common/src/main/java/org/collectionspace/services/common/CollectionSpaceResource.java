@@ -30,46 +30,58 @@ import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.storage.StorageClient;
 
 /**
- * CollectionSpaceResource is a resource interface implemented by every
- * entity/service in CollectionSpace
+ * The Interface CollectionSpaceResource.
+ *
+ * @param <IT> the generic type
+ * @param <OT> the generic type
  */
 public interface CollectionSpaceResource<IT, OT> {
 
     /**
-     * getServiceName returns the name of the service
+     * Gets the service name.
+     *
+     * @return the service name
      */
     public String getServiceName();
     
     /**
-     * Gets the common class.
-     * 
-     * @return the common class
+     * Gets the common part class.
+     *
+     * @return the common part class
      */
-    public Class getCommonPartClass();
+    public Class<?> getCommonPartClass();
 
     /**
-     * getRepositoryClient
-     * @param ctx service context
+     * Gets the repository client.
+     *
+     * @param ctx the ctx
+     * @return the repository client
      */
     public RepositoryClient getRepositoryClient(ServiceContext<IT, OT> ctx);
 
     /**
-     * getStorageClient
-     * @param ctx service context
+     * Gets the storage client.
+     *
+     * @param ctx the ctx
+     * @return the storage client
      */
     public StorageClient getStorageClient(ServiceContext<IT, OT> ctx);
     
     /**
-     * createDocumentHandler creates a document handler and populates it with given
-     * service context. document handler should never be used
-     * across service invocations. it is a stateful object that holds request,
-     * response and service context
-     * @param ctx
-     * @return
+     * Creates the document handler.
+     *
+     * @param ctx the ctx
+     * @return the document handler
+     * @throws Exception the exception
      */
     public DocumentHandler createDocumentHandler(ServiceContext<IT, OT> ctx) throws Exception;
     
     
+    /**
+     * Gets the service context factory.
+     *
+     * @return the service context factory
+     */
     public ServiceContextFactory<IT, OT> getServiceContextFactory();
 
 }

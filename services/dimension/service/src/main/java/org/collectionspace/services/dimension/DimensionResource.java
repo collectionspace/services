@@ -43,8 +43,8 @@ import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResou
 
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.context.MultipartServiceContextFactory;
+//import org.collectionspace.services.common.context.MultipartServiceContext;
+//import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
@@ -83,7 +83,7 @@ public class DimensionResource extends
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
      */
     @Override
-    protected String getVersionString() {
+    public String getVersionString() {
     	/** The last change revision. */
     	final String lastChangeRevision = "$LastChangedRevision$";
     	return lastChangeRevision;

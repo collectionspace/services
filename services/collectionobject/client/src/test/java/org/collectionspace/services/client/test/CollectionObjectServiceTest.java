@@ -132,32 +132,39 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "testSubmitRequest"})
     public void createFromXmlRFWS1(String testName) throws Exception {
+    	String testDataDir = System.getProperty("test-data.fileName");
         String newId =
-            createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp1.xml", false);
+            //createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp1.xml", false);
+        	createFromXmlFile(testName, testDataDir + "/repfield_whitesp1.xml", false);
         testSubmitRequest(newId);
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "testSubmitRequest"})
     public void createFromXmlRFWS2(String testName) throws Exception {
+    	String testDataDir = System.getProperty("test-data.fileName");
         String newId =
-            createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp2.xml", false);
+            //createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp2.xml", false);
+        	createFromXmlFile(testName, testDataDir + "/repfield_whitesp2.xml", false);
         testSubmitRequest(newId);
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "testSubmitRequest"})
     public void createFromXmlRFWS3(String testName) throws Exception {
+    	String testDataDir = System.getProperty("test-data.fileName");
         String newId =
-            createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp3.xml", false);
+            //createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp3.xml", false);
+        	createFromXmlFile(testName, testDataDir + "/repfield_whitesp3.xml", false);
         testSubmitRequest(newId);
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "testSubmitRequest"})
     public void createFromXmlRFWS4(String testName) throws Exception {
+    	String testDataDir = System.getProperty("test-data.fileName");
         String newId =
-            createFromXmlFile(testName, "./target/test-classes/test-data/repfield_whitesp4.xml", false);
+            createFromXmlFile(testName, testDataDir + "/repfield_whitesp4.xml", false);
         testSubmitRequest(newId);
     }
 
@@ -170,8 +177,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithNullValueRepeatableField(String testName) throws Exception {
-        String newId =
-            createFromXmlFile(testName, "./target/test-classes/test-data/repfield_null1.xml", false);
+    	String testDataDir = System.getProperty("test-data.fileName");
+    	String newId =
+            createFromXmlFile(testName, testDataDir + "/repfield_null1.xml", false);
         if (logger.isDebugEnabled()) {
             logger.debug("Successfully created record with null value repeatable field.");
             logger.debug("Attempting to retrieve just-created record ...");

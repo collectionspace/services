@@ -38,7 +38,10 @@ import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
 
 /**
- * The Class AbstractCollectionSpaceResource.
+ * The Class AbstractCollectionSpaceResourceImpl.
+ *
+ * @param <IT> the generic type
+ * @param <OT> the generic type
  */
 public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         implements CollectionSpaceResource<IT, OT> {
