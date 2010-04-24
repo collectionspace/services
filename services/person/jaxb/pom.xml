@@ -27,6 +27,7 @@
             <artifactId>runtime</artifactId>
         </dependency>
     </dependencies>
+
     <build>
         <finalName>collectionspace-services-person-jaxb</finalName>
         <defaultGoal>install</defaultGoal>

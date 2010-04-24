@@ -14,7 +14,7 @@
 
     <modules>
         <module>authentication</module>
-        <module>authorization</module>
+<!--        <module>authorization</module> -->
         <module>client</module>
         <module>jaxb</module>
         <module>common</module>
@@ -39,6 +39,15 @@
         <module>PerformanceTests</module>
         <module>security</module>
     </modules>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+            <classifier>jdk15</classifier>
+        </dependency>
+    </dependencies>
 
     <repositories> </repositories>
 
@@ -49,6 +58,18 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <systemProperties>
+                            <property>
+                                <name>log4j.configuration</name>
+                                <value>file:${project.build.directory}/test-classes/log4j.properties</value>
+                            </property>
+                        </systemProperties>
+                    </configuration>
+                </plugin>                
+                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>jboss-maven-plugin</artifactId>
                     <version>1.4</version>
@@ -56,20 +77,6 @@
                         <jbossHome>${jboss.dir}</jbossHome>
                     </configuration>
                 </plugin>
-
-                <!--plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <configuration>
-                        <systemProperties>
-                            <property>
-                                <name>log4j.configuration</name>
-                                <value>file:target/test-classes/log4j.properties</value>
-                            </property>
-                        </systemProperties>
-                    </configuration>
-                </plugin-->
-
                 <plugin>
                     <groupId>org.jvnet.hyperjaxb3</groupId>
                     <artifactId>maven-hyperjaxb3-plugin</artifactId>
@@ -88,13 +95,6 @@
                         <persistenceUnitName>garbage</persistenceUnitName>
                     </configuration>
                 </plugin>
-
-                <!--plugin>
-                    <groupId>org.jvnet.jaxb2.maven2</groupId>
-                    <artifactId>maven-jaxb2-plugin</artifactId>
-                    <version>0.7.2</version>
-                </plugin-->
-
                 <plugin>
                     <groupId>org.jvnet.jaxb2.maven2</groupId>
                     <artifactId>maven-jaxb2-plugin</artifactId>
@@ -133,25 +133,26 @@
                                 <version>1.0</version>
                             </plugin>
                         </plugins>
-                        <!--generatePackage>
-                     org.collectionspace.hello
-                    </generatePackage-->
                     </configuration>
                 </plugin>
-
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-site-plugin</artifactId>
-                    <configuration>
-                        <unzipCommand>/usr/bin/unzip -o &gt; err.txt</unzipCommand>
-                    </configuration>
-                </plugin>
-
             </plugins>
         </pluginManagement>
-
+        
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <configuration>
+                    <unzipCommand>/usr/bin/unzip -o &gt; err.txt</unzipCommand>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>            
+        </plugins>        
     </build>
+    
     <reporting>
         <plugins>
             <plugin>
@@ -196,10 +197,15 @@
     </reporting>
     <dependencyManagement>
         <dependencies>
-            <dependency>
+<!--            <dependency>
                 <groupId>net.java.dev.jaxb2-commons</groupId>
                 <artifactId>jaxb-fluent-api</artifactId>
                 <version>2.0.1</version>
+            </dependency> -->
+            <dependency>
+                <groupId>net.java.dev.jaxb2-commons</groupId>
+                <artifactId>jaxb-fluent-api</artifactId>
+                <version>2.0.2</version>
             </dependency>
             <dependency>
                 <groupId>org.testng</groupId>
@@ -219,11 +225,6 @@
                 <version>0.4.1</version>
             </dependency>
             <dependency>
-                <groupId>net.java.dev.jaxb2-commons</groupId>
-                <artifactId>jaxb-fluent-api</artifactId>
-                <version>2.0.2</version>
-            </dependency>
-            <dependency>
                 <groupId>org.jvnet.jaxb2-commons</groupId>
                 <artifactId>property-listener-injector</artifactId>
                 <version>1.0</version>
@@ -233,7 +234,6 @@
                 <artifactId>runtime</artifactId>
                 <version>0.4.1.4</version>
             </dependency>
-
             <dependency>
                 <groupId>org.jboss.resteasy</groupId>
                 <artifactId>resteasy-jaxrs</artifactId>

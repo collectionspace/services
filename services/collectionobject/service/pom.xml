@@ -146,7 +146,6 @@
     <build>
         <finalName>collectionspace-services-collectionobject</finalName>
         <plugins>
-
         </plugins>
     </build>
 </project>

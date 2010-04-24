@@ -97,27 +97,15 @@
     <build>
         <finalName>collectionspace-services-PerformanceTests</finalName>
         <plugins>
+            <!-- By default, skip running these tests.  Use the profile "perftests" below
+                    to run the tests -i.e., mvn test -Pperftests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
+                <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <skip>true</skip>
                 </configuration>
             </plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<skip>true</skip>
-					<systemProperties>
-						<property>
-							<name>log4j.configuration</name>
-							<value>file:target/test-classes/log4j.properties</value>
-						</property>
-					</systemProperties>
-				</configuration>
-			</plugin>
         </plugins>
     </build>
 

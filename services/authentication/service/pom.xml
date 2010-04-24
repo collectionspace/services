@@ -78,9 +78,6 @@
 
     <build>
         <finalName>cspace-services-authn</finalName>
-        <plugins>
-            
-        </plugins>
     </build>
 </project>
 
