@@ -379,17 +379,23 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
     @AfterClass(alwaysRun = true)
     public void cleanUp() {
         setupDelete("delete");
+        String noTest = System.getProperty("noTestCleanup");
+    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Skipping Cleanup phase ...");
+            }
+            return;
+    	}
         if (logger.isDebugEnabled()) {
-            logger.debug("clenaup: Cleaning up temporary resources created for testing ...");
+            logger.debug("Cleaning up temporary resources created for testing ...");
         }
         PermissionRoleClient client = new PermissionRoleClient();
         for (String resourceId : allResourceIdsCreated) {
 
-            // Note: Any non-success responses are ignored and not reported.
             ClientResponse<Response> res = client.delete(resourceId, "123");
             int statusCode = res.getStatus();
             if (logger.isDebugEnabled()) {
-                logger.debug("clenaup: delete relationships for permission id="
+                logger.debug("cleanup: delete relationships for permission id="
                         + resourceId + " status=" + statusCode);
             }
             Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),

@@ -596,8 +596,15 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
      */
-    // @AfterClass(alwaysRun=true)
+    @AfterClass(alwaysRun=true)
     public void cleanUp() {
+        String noTest = System.getProperty("noTestCleanup");
+    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Skipping Cleanup phase ...");
+            }
+            return;
+    	}
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }

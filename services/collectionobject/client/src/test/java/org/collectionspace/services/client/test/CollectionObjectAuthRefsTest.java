@@ -256,19 +256,28 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
      */
-    // @AfterClass(alwaysRun=true)
+    @AfterClass(alwaysRun=true)
     public void cleanUp() {
+        String noTest = System.getProperty("noTestCleanup");
+    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Skipping Cleanup phase ...");
+            }
+            return;
+    	}
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-       // Note: Any non-success responses are ignored and not reported.
         for (String resourceId : collectionObjectIdsCreated) {
+            // Note: Any non-success responses are ignored and not reported.
             ClientResponse<Response> res = collectionObjectClient.delete(resourceId);
         }
+        // Note: Any non-success response is ignored and not reported.
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Delete persons before PersonAuth
         for (String resourceId : personIdsCreated) {
+            // Note: Any non-success responses are ignored and not reported.
             ClientResponse<Response> res = personAuthClient.deleteItem(personAuthCSID, resourceId);
         }
         ClientResponse<Response> res = personAuthClient.delete(personAuthCSID);

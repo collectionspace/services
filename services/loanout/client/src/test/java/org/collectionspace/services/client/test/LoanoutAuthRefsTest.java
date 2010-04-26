@@ -269,22 +269,30 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
      */
     @AfterClass(alwaysRun=true)
     public void cleanUp() {
+        String noTest = System.getProperty("noTestCleanup");
+    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Skipping Cleanup phase ...");
+            }
+            return;
+    	}
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
-        // Note: Any non-success responses are ignored and not reported.
-
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Delete Person resource(s) (before PersonAuthority resources).
         ClientResponse<Response> res;
         for (String resourceId : personIdsCreated) {
+            // Note: Any non-success responses are ignored and not reported.
             res = personAuthClient.deleteItem(personAuthCSID, resourceId);
         }
         // Delete PersonAuthority resource(s).
+        // Note: Any non-success response is ignored and not reported.
         res = personAuthClient.delete(personAuthCSID);
         // Delete Loans In resource(s).
         LoanoutClient loanoutClient = new LoanoutClient();
         for (String resourceId : loanoutIdsCreated) {
+            // Note: Any non-success responses are ignored and not reported.
             res = loanoutClient.delete(resourceId);
         }
     }

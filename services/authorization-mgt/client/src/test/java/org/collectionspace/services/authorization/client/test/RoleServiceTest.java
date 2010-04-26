@@ -538,12 +538,18 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     @AfterClass(alwaysRun = true)
     public void cleanUp() {
         setupDelete("delete");
+        String noTest = System.getProperty("noTestCleanup");
+    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Skipping Cleanup phase ...");
+            }
+            return;
+    	}
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
         RoleClient client = new RoleClient();
         for (String resourceId : allResourceIdsCreated) {
-            // Note: Any non-success responses are ignored and not reported.
             ClientResponse<Response> res = client.delete(resourceId);
             int statusCode = res.getStatus();
             Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),

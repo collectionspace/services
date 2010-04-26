@@ -258,18 +258,18 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
      */
     @AfterClass(alwaysRun=true)
     public void cleanUp() {
-    	String noTest = System.getProperty("noTestCleanup");
-    	if("true".equalsIgnoreCase(noTest)) {
+        String noTest = System.getProperty("noTestCleanup");
+    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Skipping Cleanup phase");
+                logger.debug("Skipping Cleanup phase ...");
             }
             return;
     	}
-        IntakeClient intakeClient = new IntakeClient();
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
+        IntakeClient intakeClient = new IntakeClient();
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Note: Any non-success responses are ignored and not reported.
         for (String resourceId : intakeIdsCreated) {
             ClientResponse<Response> res = intakeClient.delete(resourceId);

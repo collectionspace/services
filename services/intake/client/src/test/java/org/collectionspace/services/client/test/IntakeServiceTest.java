@@ -594,6 +594,13 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
      */
     @AfterClass(alwaysRun=true)
     public void cleanUp() {
+        String noTest = System.getProperty("noTestCleanup");
+    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Skipping Cleanup phase ...");
+            }
+            return;
+    	}
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
