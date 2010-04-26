@@ -14,7 +14,7 @@
 
     <modules>
         <module>authentication</module>
-<!--        <module>authorization</module> -->
+        <module>authorization</module>
         <module>client</module>
         <module>jaxb</module>
         <module>common</module>
