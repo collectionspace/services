@@ -42,6 +42,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
@@ -62,7 +63,8 @@ import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.intake.IntakeResource;
 import org.collectionspace.services.intake.IntakesCommonList;
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
+//import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
+import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.relation.NewRelationResource;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationshipType;
@@ -236,10 +238,11 @@ public class CollectionObjectResource
     public CollectionobjectsCommonList getCollectionObjectList(@Context UriInfo ui,
     		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
     	CollectionobjectsCommonList result = null;
+    	MultivaluedMap queryParams = ui.getQueryParameters();
     	if (keywords != null) {
-    		result = searchCollectionObjects(keywords);
+    		result = searchCollectionObjects(queryParams, keywords);
     	} else {
-    		result = getCollectionObjectList();
+    		result = getCollectionObjectList(queryParams);
     	}
     	
     	return result;
@@ -248,12 +251,12 @@ public class CollectionObjectResource
     /**
      * Gets the collection object list.
      */
-    private CollectionobjectsCommonList getCollectionObjectList() {
+    private CollectionobjectsCommonList getCollectionObjectList(MultivaluedMap queryParams) {
         CollectionobjectsCommonList collectionObjectList;
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
-            getRepositoryClient(ctx).getAll(ctx, handler);
+            getRepositoryClient(ctx).getFiltered(ctx, handler);
             collectionObjectList = (CollectionobjectsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
@@ -438,12 +441,12 @@ public class CollectionObjectResource
             ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             DocumentWrapper<DocumentModel> docWrapper = 
             	getRepositoryClient(ctx).getDoc(ctx, csid);
-            RemoteDocumentModelHandlerImpl handler 
-            	= (RemoteDocumentModelHandlerImpl)createDocumentHandler(ctx);
+            DocumentModelHandler<MultipartInput, MultipartOutput> docHandler = 
+            	(DocumentModelHandler<MultipartInput, MultipartOutput>)createDocumentHandler(ctx);
             List<String> authRefFields = 
             	((MultipartServiceContextImpl)ctx).getCommonPartPropertyValues(
             			ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
-            authRefList = handler.getAuthorityRefs(docWrapper, authRefFields);
+            authRefList = docHandler.getAuthorityRefs(docWrapper, authRefFields);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -487,6 +490,7 @@ public class CollectionObjectResource
     /**
      * This method is deprecated.  Use kwSearchCollectionObjects() method instead.
      * Keywords search collection objects.
+     * @param ui 
      * 
      * @param keywords the keywords
      * 
@@ -495,9 +499,10 @@ public class CollectionObjectResource
     @GET
     @Path("/search")
     @Produces("application/xml")
-    public CollectionobjectsCommonList keywordsSearchCollectionObjects(
+    public CollectionobjectsCommonList keywordsSearchCollectionObjects(@Context UriInfo ui,
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
-    	return searchCollectionObjects(keywords);
+    	MultivaluedMap queryParams = ui.getQueryParameters();
+    	return searchCollectionObjects(queryParams, keywords);
     }    
     
     /**
@@ -507,27 +512,25 @@ public class CollectionObjectResource
      * 
      * @return the collectionobjects common list
      */
-    private CollectionobjectsCommonList searchCollectionObjects(String keywords) {
+    private CollectionobjectsCommonList searchCollectionObjects(
+    		MultivaluedMap<String, String> queryParams,
+    		String keywords) {
         CollectionobjectsCommonList collectionObjectList;
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
 
             // perform a keyword search
             if (keywords != null && !keywords.isEmpty()) {
                 String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
-                //DocumentFilter documentFilter = handler.createDocumentFilter(ctx);
                 DocumentFilter documentFilter = handler.getDocumentFilter();
                 documentFilter.setWhereClause(whereClause);
                 if (logger.isDebugEnabled()) {
                     logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
                 }
-                getRepositoryClient(ctx).getFiltered(ctx, handler);
-            } else {
-                getRepositoryClient(ctx).getAll(ctx, handler);
             }
+            getRepositoryClient(ctx).getFiltered(ctx, handler);
             collectionObjectList = (CollectionobjectsCommonList) handler.getCommonPartList();
-
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();

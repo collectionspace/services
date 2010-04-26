@@ -204,59 +204,54 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         return result;
     }
     
-    /**
-     * @param docWrapper
-     * @param authRefFields list of schema-qualified field names
-     * @return
-     * @throws PropertyException
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#getAuthorityRefs(org.collectionspace.services.common.document.DocumentWrapper, java.util.List)
      */
+    @Override
     public AuthorityRefList getAuthorityRefs(
-                DocumentWrapper<DocumentModel> docWrapper,
+    		DocumentWrapper<DocumentModel> docWrapper,
     		List<String> authRefFields) throws PropertyException {
     	AuthorityRefList authRefList = new AuthorityRefList();
-        try {
-            DocumentModel docModel = docWrapper.getWrappedObject();
-            List<AuthorityRefList.AuthorityRefItem> list = 
-            	authRefList.getAuthorityRefItem();
+    	try {
+    		DocumentModel docModel = docWrapper.getWrappedObject();
+    		List<AuthorityRefList.AuthorityRefItem> list = authRefList.getAuthorityRefItem();
 
-            for(String field:authRefFields){
-                String refName = (String)docModel.getPropertyValue(field);
-                if(refName==null)
-                    continue;
-            	try{
-                    RefNameUtils.AuthorityTermInfo termInfo =
-                        RefNameUtils.parseAuthorityTermInfo(refName);
-                    AuthorityRefList.AuthorityRefItem ilistItem =
-                        new AuthorityRefList.AuthorityRefItem();
-                    ilistItem.setRefName(refName);
-                    ilistItem.setAuthDisplayName(termInfo.inAuthority.displayName);
-                    ilistItem.setItemDisplayName(termInfo.displayName);
-                    ilistItem.setSourceField(field);
-                    ilistItem.setUri(termInfo.getRelativeUri());
-                    list.add(ilistItem);
-            	} catch( Exception e ) {
-                    // FIXME: Do we need to throw this Exception here?
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Caught exception in getAuthorityRefs", e);
-                    }
-            	}
-            }
-        } catch (PropertyException pe) {
-            String msg =
-                "Attempted to retrieve value for invalid or missing authority field. " +
-                "Check authority field properties in tenant bindings.";
-            logger.warn(msg, pe);
-            throw pe;
-        } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception in getAuthorityRefs", e);
-            }
-            Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to retrieve authority references").type("text/plain").build();
-            throw new WebApplicationException(response);
-        }
-        return authRefList;
+    		for (String field : authRefFields) {
+    			String refName = (String) docModel.getPropertyValue(field);
+    			if (refName == null)
+    				continue;
+    			try {
+    				RefNameUtils.AuthorityTermInfo termInfo = RefNameUtils
+    				.parseAuthorityTermInfo(refName);
+    				AuthorityRefList.AuthorityRefItem ilistItem = new AuthorityRefList.AuthorityRefItem();
+    				ilistItem.setRefName(refName);
+    				ilistItem.setAuthDisplayName(termInfo.inAuthority.displayName);
+    				ilistItem.setItemDisplayName(termInfo.displayName);
+    				ilistItem.setSourceField(field);
+    				ilistItem.setUri(termInfo.getRelativeUri());
+    				list.add(ilistItem);
+    			} catch (Exception e) {
+    				// FIXME: Do we need to throw this Exception here?
+    				if (logger.isDebugEnabled()) {
+    					logger.debug("Caught exception in getAuthorityRefs", e);
+    				}
+    			}
+    		}
+    	} catch (PropertyException pe) {
+    		String msg = "Attempted to retrieve value for invalid or missing authority field. "
+    			+ "Check authority field properties in tenant bindings.";
+    		logger.warn(msg, pe);
+    		throw pe;
+    	} catch (Exception e) {
+    		if (logger.isDebugEnabled()) {
+    			logger.debug("Caught exception in getAuthorityRefs", e);
+    		}
+    		Response response = Response.status(
+    				Response.Status.INTERNAL_SERVER_ERROR).entity(
+    				"Failed to retrieve authority references").type(
+    				"text/plain").build();
+    		throw new WebApplicationException(response);
+    	}
+    	return authRefList;
     }
-
-
 }

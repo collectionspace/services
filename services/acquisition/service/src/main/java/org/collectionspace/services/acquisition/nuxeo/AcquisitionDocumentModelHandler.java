@@ -176,6 +176,9 @@ public class AcquisitionDocumentModelHandler
     private static String NAME_VALUE_SEPARATOR = "|";
 
     private static class NameValue {
+    	NameValue() {
+    			// default scoped constructor to remove "synthetic accessor" warning
+    		}
         String name;
         String value;
     };

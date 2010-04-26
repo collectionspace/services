@@ -745,8 +745,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         if ((null != where) && (where.length() > 0)) {
         	// Due to an apparent bug/issue in how Nuxeo translates the NXQL query string
         	// into SQL, we need to parenthesize our 'where' clause
-            query.append(" AND " + "(" + where +")" + "AND ecm:isProxy = 0");
+            query.append(" AND " + "(" + where +")");
         }
+        query.append(" AND ecm:isProxy = 0");
     }
 
     private final String buildNXQLQuery(String docType, String where, String domain ) {

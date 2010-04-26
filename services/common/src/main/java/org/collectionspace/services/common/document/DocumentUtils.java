@@ -56,7 +56,9 @@ public class DocumentUtils {
     private static String NAME_VALUE_SEPARATOR = "|";
 
     private static class NameValue {
-
+    	NameValue() {
+    		// default scoped constructor to removed "synthetic accessor" warning
+    	}
         String name;
         String value;
     };

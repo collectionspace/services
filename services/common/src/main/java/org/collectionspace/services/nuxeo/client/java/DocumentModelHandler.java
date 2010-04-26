@@ -23,6 +23,9 @@
  */
 package org.collectionspace.services.nuxeo.client.java;
 
+import java.util.List;
+
+import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.AbstractMultipartDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -30,6 +33,7 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.nuxeo.client.*;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,5 +123,17 @@ public abstract class DocumentModelHandler<T, TL>
     	DocumentFilter filter = new NuxeoDocumentFilter(this.getServiceContext());
     	return filter;
     }
+    
+    /**
+     * Gets the authority refs.
+     *
+     * @param docWrapper the doc wrapper
+     * @param authRefFields the auth ref fields
+     * @return the authority refs
+     * @throws PropertyException the property exception
+     */
+    abstract public AuthorityRefList getAuthorityRefs(
+            DocumentWrapper<DocumentModel> docWrapper,
+		List<String> authRefFields) throws PropertyException;    
 
 }
