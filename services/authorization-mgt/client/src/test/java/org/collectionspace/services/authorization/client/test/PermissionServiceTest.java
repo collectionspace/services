@@ -345,32 +345,18 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupUpdate(testName);
 
-        // Retrieve the contents of a resource to update.
-        PermissionClient client = new PermissionClient();
-        ClientResponse<Permission> res =
-                client.read(knownResourceId);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("got object to update with ID: " + knownResourceId);
-        }
-        Permission toUpdatePermission =
-                (Permission) res.getEntity();
-        Assert.assertNotNull(toUpdatePermission);
-
+        Permission permToUpdate = new Permission();
+        permToUpdate.setCsid(knownResourceId);
         // Update the content of this resource.
-        toUpdatePermission.setResourceName("updated-" + toUpdatePermission.getResourceName());
+        permToUpdate.setResourceName("updated-resource");
         if (logger.isDebugEnabled()) {
             logger.debug("updated object");
-            logger.debug(objectAsXmlString(toUpdatePermission,
+            logger.debug(objectAsXmlString(permToUpdate,
                     Permission.class));
         }
-
+        PermissionClient client = new PermissionClient();
         // Submit the request to the service and store the response.
-        res = client.update(knownResourceId, toUpdatePermission);
+        ClientResponse<Permission> res = client.update(knownResourceId, permToUpdate);
         int statusCode = res.getStatus();
         // Check the status code of the response: does it match the expected response(s)?
         if (logger.isDebugEnabled()) {
@@ -381,11 +367,11 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
 
-        Permission updatedPermission = (Permission) res.getEntity();
-        Assert.assertNotNull(updatedPermission);
+        Permission permUpdated = (Permission) res.getEntity();
+        Assert.assertNotNull(permUpdated);
 
-        Assert.assertEquals(updatedPermission.getResourceName(),
-                toUpdatePermission.getResourceName(),
+        Assert.assertEquals(permUpdated.getResourceName(),
+                permToUpdate.getResourceName(),
                 "Data in updated object did not match submitted data.");
     }
 

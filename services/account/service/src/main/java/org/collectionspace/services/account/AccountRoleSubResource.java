@@ -34,6 +34,7 @@ import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaRelationshipStorageClient;
+import org.collectionspace.services.common.context.ServiceContextProperties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +53,7 @@ public class AccountRoleSubResource
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(AccountRoleSubResource.class);
     /** The storage client. */
-    final StorageClient storageClient = new JpaRelationshipStorageClient();
+    final StorageClient storageClient = new JpaRelationshipStorageClient<AccountRole>();
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
@@ -102,12 +103,13 @@ public class AccountRoleSubResource
             SubjectType subject) throws Exception {
         ServiceContext<AccountRole, AccountRole> ctx = createServiceContext(input);
         ctx.setDocumentType(AccountRole.class.getPackage().getName()); //persistence unit
-        ctx.setProperty("entity-name", AccountRoleRel.class.getName());
+        ctx.setProperty(ServiceContextProperties.ENTITY_NAME, AccountRoleRel.class.getName());
+        ctx.setProperty(ServiceContextProperties.ENTITY_CLASS, AccountRoleRel.class);
         //subject name is necessary to indicate if role or account is a subject
-        ctx.setProperty("subject", subject);
+        ctx.setProperty(ServiceContextProperties.SUBJECT, subject);
         //set context for the relationship query
-        ctx.setProperty("object-class", AccountsCommon.class);
-        ctx.setProperty("object-id", "account_id");
+        ctx.setProperty(ServiceContextProperties.OBJECT_CLASS, AccountsCommon.class);
+        ctx.setProperty(ServiceContextProperties.OBJECT_ID, "account_id");
         return ctx;
     }
 

@@ -24,16 +24,17 @@
 package org.collectionspace.services.authorization.storage;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.PermissionsList;
-import org.collectionspace.services.common.context.ServiceContext;
 
 import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.JaxbUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,10 +61,41 @@ public class PermissionDocumentHandler
 
     @Override
     public void handleUpdate(DocumentWrapper<Permission> wrapDoc) throws Exception {
-        Permission permission = wrapDoc.getWrappedObject();
-        //FIXME: if admin updating the permission is a CS admin rather than
-        //the tenant admin, tenant id should be retrieved from the request
-        permission.setTenantId(getServiceContext().getTenantId());
+        Permission permissionFound = wrapDoc.getWrappedObject();
+        Permission permissionReceived = getCommonPart();
+        merge(permissionReceived, permissionFound);
+    }
+
+    /**
+     * merge manually merges the from from to the to permission
+     * -this method is created due to inefficiency of JPA EM merge
+     * @param from
+     * @param to
+     * @return merged permission
+     */
+    private Permission merge(Permission from, Permission to) {
+        Date now = new Date();
+        to.setUpdatedAtItem(now);
+        if (from.getResourceName() != null) {
+            to.setResourceName(from.getResourceName());
+        }
+        if (from.getAttributeName() != null) {
+            to.setAttributeName(from.getAttributeName());
+        }
+        if (from.getDescription() != null) {
+            to.setDescription(from.getDescription());
+        }
+        if (from.getEffect() != null) {
+            to.setEffect(from.getEffect());
+        }
+
+        //fixme update on actions
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("merged permission=" + JaxbUtils.toString(to, Permission.class));
+        }
+
+        return to;
     }
 
     @Override

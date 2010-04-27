@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.common.storage.jpa;
 
+import org.collectionspace.services.common.context.ServiceContextProperties;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,6 +41,7 @@ import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
+import org.collectionspace.services.common.document.JaxbUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +97,7 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             em = emf.createEntityManager();
             em.getTransaction().begin();
             for (T r : rl) {
-                setValue(r, "setCreatedAtItem", Date.class, new Date());
+                JaxbUtils.setValue(r, "setCreatedAtItem", Date.class, new Date());
                 em.persist(r);
             }
             em.getTransaction().commit();
@@ -280,10 +282,16 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
         }
     }
 
+    /**
+     * getObjectId returns the id of the object in a relationship
+     * @param ctx
+     * @return
+     */
     protected String getObjectId(ServiceContext ctx) {
-        String objectId = (String) ctx.getProperty("object-id");
+        String objectId = (String) ctx.getProperty(ServiceContextProperties.OBJECT_ID);
         if (objectId == null) {
-            String msg = "object-id is missing in the context";
+            String msg = ServiceContextProperties.OBJECT_ID +
+                    " property is missing in the context";
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }
@@ -298,9 +306,10 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
      * @return
      */
     protected Object getObject(ServiceContext ctx, String id) {
-        Class objectClass = (Class) ctx.getProperty("object-class");
+        Class objectClass = (Class) ctx.getProperty(ServiceContextProperties.OBJECT_CLASS);
         if (objectClass == null) {
-            String msg = "object-class is missing in the context";
+            String msg = ServiceContextProperties.OBJECT_CLASS +
+                    " property is missing in the context";
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }

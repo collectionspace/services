@@ -57,17 +57,29 @@ public class JpaStorageUtils {
             emf = getEntityManagerFactory();
             em = emf.createEntityManager();
             entityFound = em.find(entityClazz, id);
-            if (entityFound == null) {
-                if (em != null && em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
-            }
         } finally {
             if (em != null) {
                 releaseEntityManagerFactory(emf);
             }
         }
         return entityFound;
+    }
+
+    /**
+     * getEntity with given id and class using given entity manager
+     * 
+     * @param em
+     * @param id
+     * @param entityClazz
+     * @return
+     */
+    public static Object getEntity(EntityManager em, String id, Class entityClazz) {
+        if (entityClazz == null) {
+            String msg = "Not constructed with JpaStorageClientImpl(entityClazz) ctor";
+            logger.error(msg);
+            throw new UnsupportedOperationException(msg);
+        }
+        return em.find(entityClazz, id);
     }
 
     /**

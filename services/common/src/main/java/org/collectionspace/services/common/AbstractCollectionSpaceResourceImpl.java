@@ -28,9 +28,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.context.ServiceContextFactory;
+import org.collectionspace.services.common.context.ServiceContextProperties;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
@@ -285,6 +284,9 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
         		queryParams,
         		theClass != null ? theClass.getPackage().getName() : null,
         		theClass != null ? theClass.getName() : null);
+        if(theClass != null) {
+            ctx.setProperty(ServiceContextProperties.ENTITY_CLASS, theClass);
+        }
         return ctx;
     }
         

@@ -37,6 +37,7 @@ import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
+import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
@@ -45,8 +46,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * AccountStorageClient deals with both Account and Default Identity Provider's
- * state in persistent storage
+ * AccountStorageClient deals with both Account and CSIP's
+ * state in persistent storage. The rationale behind creating this class is that
+ * this class manages pesistence for both account and CSIP's user. Transactions
+ * are used where possible to permorme the persistence operations atomically.
  * @author 
  */
 public class AccountStorageClient extends JpaStorageClientImpl {
@@ -85,15 +88,15 @@ public class AccountStorageClient extends JpaStorageClientImpl {
                 User user = createUser(account);
                 em.persist(user);
             }
-//            if (account.getTenant() != null) {
-//                UserTenant ut = createTenantAssoc(account);
+//            if (accountReceived.getTenant() != null) {
+//                UserTenant ut = createTenantAssoc(accountReceived);
 //                em.persist(ut);
 //            }
             account.setCreatedAtItem(new Date());
             em.persist(account);
             em.getTransaction().commit();
             handler.complete(Action.CREATE, wrapDoc);
-            return (String) getValue(account, "getCsid");
+            return (String) JaxbUtils.getValue(account, "getCsid");
         } catch (BadRequestException bre) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -130,26 +133,20 @@ public class AccountStorageClient extends JpaStorageClientImpl {
         EntityManager em = null;
         try {
             handler.prepare(Action.UPDATE);
-            AccountsCommon account = (AccountsCommon) handler.getCommonPart();
-            DocumentWrapper<AccountsCommon> wrapDoc =
-                    new DocumentWrapperImpl<AccountsCommon>(account);
-            setCsid(account, id); //set id just in case it was not populated by consumer
-            handler.handle(Action.UPDATE, wrapDoc);
+            AccountsCommon accountReceived = (AccountsCommon) handler.getCommonPart();
             emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
             em.getTransaction().begin();
             AccountsCommon accountFound = getAccount(em, id);
-            Date now = new Date();
-            checkAllowedUpdates(account, accountFound);
+            checkAllowedUpdates(accountReceived, accountFound);
             //if userid and password are given, add to default id provider
-            if (account.getUserId() != null && hasPassword(account.getPassword())) {
-                updateUser(em, account);
+            if (accountReceived.getUserId() != null
+                    && hasPassword(accountReceived.getPassword())) {
+                updateUser(em, accountReceived);
             }
-            account = em.merge(account);
-            account.setUpdatedAtItem(now);
-            if (logger.isDebugEnabled()) {
-                logger.debug("merged account=" + account.toString());
-            }
+            DocumentWrapper<AccountsCommon> wrapDoc =
+                    new DocumentWrapperImpl<AccountsCommon>(accountFound);
+            handler.handle(Action.UPDATE, wrapDoc);
             em.getTransaction().commit();
             handler.complete(Action.UPDATE, wrapDoc);
         } catch (BadRequestException bre) {
@@ -298,7 +295,7 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             userFound.setPasswd(getEncPassword(account));
             userFound.setUpdatedAtItem(new Date());
             if (logger.isDebugEnabled()) {
-                logger.debug("updated user=" + userFound.toString());
+                logger.debug("updated user=" + JaxbUtils.toString(userFound, User.class));
             }
             em.persist(userFound);
         }
@@ -306,7 +303,7 @@ public class AccountStorageClient extends JpaStorageClientImpl {
 
     private String getEncPassword(AccountsCommon account) throws BadRequestException {
         //jaxb unmarshaller already unmarshal xs:base64Binary, no need to b64 decode
-        //byte[] bpass = Base64.decodeBase64(account.getPassword());
+        //byte[] bpass = Base64.decodeBase64(accountReceived.getPassword());
         try {
             SecurityUtils.validatePassword(new String(account.getPassword()));
         } catch (Exception e) {
@@ -320,10 +317,10 @@ public class AccountStorageClient extends JpaStorageClientImpl {
     private boolean hasPassword(byte[] bpass) {
         return bpass != null && bpass.length > 0;
     }
-//    private UserTenant createTenantAssoc(AccountsCommon account) {
+//    private UserTenant createTenantAssoc(AccountsCommon accountReceived) {
 //        UserTenant userTenant = new UserTenant();
-//        userTenant.setUserId(account.getUserId());
-//        List<AccountsCommon.Tenant> atl = account.getTenant();
+//        userTenant.setUserId(accountReceived.getUserId());
+//        List<AccountsCommon.Tenant> atl = accountReceived.getTenant();
 //        List<UserTenant.Tenant> utl =
 //                new ArrayList<UserTenant.Tenant>();
 //        for (AccountsCommon.Tenant at : atl) {

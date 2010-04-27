@@ -30,6 +30,7 @@ import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaRelationshipStorageClient;
+import org.collectionspace.services.common.context.ServiceContextProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,7 @@ public class PermissionRoleSubResource
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(PermissionRoleSubResource.class);
     /** The storage client. */
-    final StorageClient storageClient = new JpaRelationshipStorageClient();
+    final StorageClient storageClient = new JpaRelationshipStorageClient<PermissionRole>();
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
@@ -97,12 +98,13 @@ public class PermissionRoleSubResource
             SubjectType subject) throws Exception {
         ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext(input);
         ctx.setDocumentType(PermissionRole.class.getPackage().getName()); //persistence unit
-        ctx.setProperty("entity-name", PermissionRoleRel.class.getName());
+        ctx.setProperty(ServiceContextProperties.ENTITY_NAME, PermissionRoleRel.class.getName());
+        ctx.setProperty(ServiceContextProperties.ENTITY_CLASS, PermissionRoleRel.class);
         //subject name is necessary to indicate if role or permission is a subject
-        ctx.setProperty("subject", subject);
+        ctx.setProperty(ServiceContextProperties.SUBJECT, subject);
         //set context for the relationship query
-        ctx.setProperty("object-class", Permission.class);
-        ctx.setProperty("object-id", "permission_id");
+        ctx.setProperty(ServiceContextProperties.OBJECT_CLASS, Permission.class);
+        ctx.setProperty(ServiceContextProperties.OBJECT_ID, "permission_id");
         return ctx;
     }
 

@@ -17,14 +17,10 @@
  */
 package org.collectionspace.services.common.storage.jpa;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
-import javax.persistence.Persistence;
 import javax.persistence.Query;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
@@ -35,7 +31,9 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
+import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.storage.StorageClient;
+import org.collectionspace.services.common.context.ServiceContextProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * All the operations in this client are carried out under their own transactions.
  * A call to any method would start and commit/rollback a transaction.
  * 
- * Assumption: each persistent entity has the following 3 attributes
+ * Assumption: each persistent entityReceived has the following 3 attributes
 <xs:element name="createdAt" type="xs:dateTime">
 <xs:annotation>
 <xs:appinfo>
@@ -65,12 +63,12 @@ import org.slf4j.LoggerFactory;
 </xs:annotation>
 </xs:element>
 </xs:sequence>
-<xs:attribute name="csid" type="xs:string">
+<xs:attribute name="csidFound" type="xs:string">
 <xs:annotation>
 <xs:appinfo>
-<hj:id>
-<orm:column name="csid" length="128" nullable="false"/>
-</hj:id>
+<hj:csidReceived>
+<orm:column name="csidFound" length="128" nullable="false"/>
+</hj:csidReceived>
 </xs:appinfo>
 </xs:annotation>
 </xs:attribute>
@@ -81,16 +79,11 @@ public class JpaStorageClientImpl implements StorageClient {
 
     /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(JpaStorageClientImpl.class);
-    private Class entityClazz;
 
     /**
      * Instantiates a new jpa storage client.
      */
     public JpaStorageClientImpl() {
-    }
-
-    public JpaStorageClientImpl(Class entityClazz) {
-        this.entityClazz = entityClazz;
     }
 
     /* (non-Javadoc)
@@ -116,14 +109,14 @@ public class JpaStorageClientImpl implements StorageClient {
             Object entity = handler.getCommonPart();
             DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entity);
             handler.handle(Action.CREATE, wrapDoc);
-            setValue(entity, "setCreatedAtItem", Date.class, new Date());
+            JaxbUtils.setValue(entity, "setCreatedAtItem", Date.class, new Date());
             emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
             em.getTransaction().begin();
             em.persist(entity);
             em.getTransaction().commit();
             handler.complete(Action.CREATE, wrapDoc);
-            return (String) getValue(entity, "getCsid");
+            return (String) JaxbUtils.getValue(entity, "getCsid");
         } catch (BadRequestException bre) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -241,7 +234,7 @@ public class JpaStorageClientImpl implements StorageClient {
             queryStrBldr.append(getEntityName(ctx));
             queryStrBldr.append(" a");
             List<DocumentFilter.ParamBinding> params = docFilter.buildWhereForSearch(queryStrBldr);
-            //TODO: add tenant id
+            //TODO: add tenant csidReceived
             emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
             String queryStr = queryStrBldr.toString(); //for debugging
@@ -297,14 +290,11 @@ public class JpaStorageClientImpl implements StorageClient {
         EntityManager em = null;
         try {
             handler.prepare(Action.UPDATE);
-            Object entity = handler.getCommonPart();
-            setCsid(entity, id);
-            DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entity);
-            handler.handle(Action.UPDATE, wrapDoc);
+            Object entityReceived = handler.getCommonPart();
             emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
             em.getTransaction().begin();
-            Object entityFound = em.find(entity.getClass(), id);
+            Object entityFound = em.find(entityReceived.getClass(), id);
             if (entityFound == null) {
                 if (em != null && em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
@@ -313,11 +303,8 @@ public class JpaStorageClientImpl implements StorageClient {
                 logger.error(msg);
                 throw new DocumentNotFoundException(msg);
             }
-            entity = em.merge(entity);
-            setValue(entity, "setUpdatedAtItem", Date.class, new Date());
-            if (logger.isDebugEnabled()) {
-                logger.debug("merged entity=" + entity.toString());
-            }
+            DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entityFound);
+            handler.handle(Action.UPDATE, wrapDoc);
             em.getTransaction().commit();
             handler.complete(Action.UPDATE, wrapDoc);
         } catch (BadRequestException bre) {
@@ -339,7 +326,7 @@ public class JpaStorageClientImpl implements StorageClient {
         }
     }
 
-    /* delete use delete to remove parent entity along with child entities
+    /* delete use delete to remove parent entityReceived along with child entities
      * @see org.collectionspace.services.common.storage.StorageClient#delete(org.collectionspace.services.common.context.ServiceContext, java.lang.String)
      */
     @Override
@@ -359,13 +346,11 @@ public class JpaStorageClientImpl implements StorageClient {
         EntityManager em = null;
         try {
 
-            //TODO: add tenant id
-
             emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
 
             em.getTransaction().begin();
-            Object entityFound = getEntity(em, id);
+            Object entityFound = getEntity(ctx, em, id);
             if (entityFound == null) {
                 if (em != null && em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
@@ -395,10 +380,10 @@ public class JpaStorageClientImpl implements StorageClient {
     }
 
     /**
-     * deleteWhere uses the where clause to delete an entity represented by the id
+     * deleteWhere uses the where clause to delete an entityReceived represented by the csidReceived
      * it does not delete any child entities.
      * @param ctx
-     * @param id
+     * @param csidReceived
      * @throws DocumentNotFoundException
      * @throws DocumentException
      */
@@ -420,7 +405,7 @@ public class JpaStorageClientImpl implements StorageClient {
             StringBuilder deleteStr = new StringBuilder("DELETE FROM ");
             deleteStr.append(getEntityName(ctx));
             deleteStr.append(" WHERE csid = :csid");
-            //TODO: add tenant id
+            //TODO: add tenant csidReceived
 
             emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
@@ -458,104 +443,17 @@ public class JpaStorageClientImpl implements StorageClient {
     }
 
     /**
-     * getValue gets invokes specified accessor method on given object. Assumption
-     * is that this is used for JavaBean pattern getXXX methods only.
-     * @param o object to return value from
-     * @param methodName of method to invoke
-     * @return value returned of invocation
-     * @throws NoSuchMethodException
-     * @throws IllegalAccessException
-     * @throws InvocationTargetException
-     */
-    protected Object getValue(Object o, String methodName)
-            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        if (methodName == null) {
-            String msg = methodName + " cannot be null";
-            logger.error(msg);
-            throw new IllegalArgumentException(msg);
-        }
-        Class c = o.getClass();
-        Method m = c.getMethod(methodName);
-
-        Object r = m.invoke(o);
-        if (logger.isDebugEnabled()) {
-            logger.debug("getValue returned value=" + r
-                    + " for " + c.getName());
-        }
-        return r;
-    }
-
-    /**
-     * setValue mutates the given object by invoking specified method. Assumption
-     * is that this is used for JavaBean pattern setXXX methods only.
-     * @param o object to mutate
-     * @param methodName indicates method to invoke
-     * @param argType type of the only argument (assumed) to method
-     * @param argValue value of the only argument (assumed) to method
-     * @return
-     * @throws NoSuchMethodException
-     * @throws IllegalAccessException
-     * @throws InvocationTargetException
-     */
-    protected Object setValue(Object o, String methodName, Class argType, Object argValue)
-            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        if (methodName == null) {
-            String msg = methodName + " cannot be null";
-            logger.error(msg);
-            throw new IllegalArgumentException(msg);
-        }
-        if (argType == null) {
-            String msg = "argType cannot be null";
-            logger.error(msg);
-            throw new IllegalArgumentException(msg);
-        }
-        Class c = o.getClass();
-        Method m = c.getMethod(methodName, argType);
-        Object r = m.invoke(o, argValue);
-        if (logger.isDebugEnabled()) {
-            logger.debug("completed invocation of " + methodName
-                    + " for " + c.getName());
-        }
-        return r;
-    }
-
-    /**
-     * Sets the csid.
-     * 
-     * @param o the o
-     * @param csid the csid
-     * 
-     * @throws Exception the exception
-     */
-    protected void setCsid(Object o, String csid) throws Exception {
-        //verify csid
-        String id = (String) getValue(o, "getCsid");
-        if (id != null) {
-            if (!id.equals(csid)) {
-                String msg = "Csids do not match!";
-                logger.error(msg);
-                throw new BadRequestException(msg);
-            } else {
-                //no need to set
-                return;
-            }
-
-        }
-        //set csid
-        setValue(o, "setCsid", java.lang.String.class, csid);
-    }
-
-    /**
-     * Gets the entity name.
+     * Gets the entityReceived name.
      * 
      * @param ctx the ctx
      * 
-     * @return the entity name
+     * @return the entityReceived name
      */
     protected String getEntityName(ServiceContext ctx) {
-        Object o = ctx.getProperty("entity-name");
+        Object o = ctx.getProperty(ServiceContextProperties.ENTITY_NAME);
         if (o == null) {
-            throw new IllegalArgumentException("property entity-name missing in context "
+            throw new IllegalArgumentException(ServiceContextProperties.ENTITY_NAME +
+                    "property is missing in context "
                     + ctx.toString());
         }
 
@@ -566,21 +464,24 @@ public class JpaStorageClientImpl implements StorageClient {
      * getEntity returns persistent entity for given id. it assumes that
      * JpaStorageClientImpl is implemented using the JpaStorageClientImpl(entityClazz)
      * constructor
-     * @param em
-     * @param id
+     * @param ctx service context
+     * @param em entity manager
+     * @param csid received
      * @return
      * @throws DocumentNotFoundException
      * @throws UnsupportedOperationException if JpaStorageClientImpl is not implemented
      * using the JpaStorageClientImpl(entityClazz)
      * constructor
      */
-    protected Object getEntity(EntityManager em, String id) throws DocumentNotFoundException {
+    protected Object getEntity(ServiceContext ctx, EntityManager em, String id) throws DocumentNotFoundException {
+        Class entityClazz = (Class) ctx.getProperty(ServiceContextProperties.ENTITY_CLASS);
         if (entityClazz == null) {
-            String msg = "Not constructed with JpaStorageClientImpl(entityClazz) ctor";
+            String msg = ServiceContextProperties.ENTITY_CLASS +
+                    " property is missing in the context";
             logger.error(msg);
-            throw new UnsupportedOperationException(msg);
+            throw new IllegalArgumentException(msg);
         }
-        Object entityFound = em.find(entityClazz, id);
+        Object entityFound = JpaStorageUtils.getEntity(em, id, entityClazz);
         if (entityFound == null) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();

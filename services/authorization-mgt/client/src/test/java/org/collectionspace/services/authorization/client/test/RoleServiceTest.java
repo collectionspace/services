@@ -344,31 +344,19 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupUpdate(testName);
 
-        RoleClient client = new RoleClient();
-        ClientResponse<Role> res =
-                client.read(knownResourceId);
-        if (logger.isDebugEnabled()) {
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("got object to update with ID: " + knownResourceId);
-        }
-        Role toUpdateRole =
-                (Role) res.getEntity();
-        Assert.assertNotNull(toUpdateRole);
+        Role roleToUpdate = new Role();
+        roleToUpdate.setCsid(knownResourceId);
 
         // Update the content of this resource.
-        toUpdateRole.setRoleName("updated-" + toUpdateRole.getRoleName());
+        roleToUpdate.setRoleName("updated-role");
         if (logger.isDebugEnabled()) {
             logger.debug("updated object");
-            logger.debug(objectAsXmlString(toUpdateRole,
+            logger.debug(objectAsXmlString(roleToUpdate,
                     Role.class));
         }
-
+        RoleClient client = new RoleClient();
         // Submit the request to the service and store the response.
-        res = client.update(knownResourceId, toUpdateRole);
+        ClientResponse<Role> res = client.update(knownResourceId, roleToUpdate);
         int statusCode = res.getStatus();
         // Check the status code of the response: does it match the expected response(s)?
         if (logger.isDebugEnabled()) {
@@ -379,11 +367,11 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
 
-        Role updatedRole = (Role) res.getEntity();
-        Assert.assertNotNull(updatedRole);
+        Role roleUpdated = (Role) res.getEntity();
+        Assert.assertNotNull(roleUpdated);
 
-        Assert.assertEquals(updatedRole.getRoleName(),
-                toUpdateRole.getRoleName(),
+        Assert.assertEquals(roleUpdated.getRoleName(),
+                roleToUpdate.getRoleName(),
                 "Data in updated object did not match submitted data.");
     }
 

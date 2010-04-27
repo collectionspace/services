@@ -21,25 +21,18 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.collectionspace.services.authorization.storage;
 
-import org.collectionspace.services.authorization.SubjectType;
-import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.context.ServiceContextProperties;
+package org.collectionspace.services.common.context;
 
 /**
- *
+ * Constants used to store persistence related info in the context
  * @author 
  */
-public class PermissionRoleUtil {
+public interface ServiceContextProperties {
 
-    static SubjectType getSubject(ServiceContext ctx) {
-        Object o = ctx.getProperty(ServiceContextProperties.SUBJECT);
-        if (o == null) {
-            throw new IllegalArgumentException(ServiceContextProperties.SUBJECT +
-                    " property is missing in context "
-                    + ctx.toString());
-        }
-        return (SubjectType) o;
-    }
+    public final static String ENTITY_NAME = "entity-name";
+    public final static String ENTITY_CLASS = "entity-class";
+    public final static String SUBJECT = "subject";
+    public final static String OBJECT_ID = "object-id";
+    public final static String OBJECT_CLASS = "object-class";
 }

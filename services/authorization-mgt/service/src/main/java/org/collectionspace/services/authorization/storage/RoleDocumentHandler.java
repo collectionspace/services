@@ -24,16 +24,17 @@
 package org.collectionspace.services.authorization.storage;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RolesList;
-import org.collectionspace.services.common.context.ServiceContext;
 
 import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.JaxbUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,17 +54,39 @@ public class RoleDocumentHandler
         String id = UUID.randomUUID().toString();
         Role role = wrapDoc.getWrappedObject();
         role.setCsid(id);
-        //FIXME: if admin updating the role is a CS admin rather than
-        //the tenant admin, tenant id should be retrieved from the request
         role.setTenantId(getServiceContext().getTenantId());
     }
 
     @Override
     public void handleUpdate(DocumentWrapper<Role> wrapDoc) throws Exception {
-        Role role = wrapDoc.getWrappedObject();
-        //FIXME: if admin updating the role is a CS admin rather than
-        //the tenant admin, tenant id should be retrieved from the request
-        role.setTenantId(getServiceContext().getTenantId());
+        Role roleFound = wrapDoc.getWrappedObject();
+        Role roleReceived = getCommonPart();
+        merge(roleReceived, roleFound);
+    }
+
+    /**
+     * merge manually merges the from from to the to role
+     * -this method is created due to inefficiency of JPA EM merge
+     * @param from
+     * @param to
+     * @return merged role
+     */
+    private Role merge(Role from, Role to) {
+        Date now = new Date();
+        to.setUpdatedAtItem(now);
+        if (from.getRoleName() != null) {
+            to.setRoleName(from.getRoleName());
+        }
+        if (from.getRoleGroup() != null) {
+            to.setRoleGroup(from.getRoleGroup());
+        }
+        if (from.getDescription() != null) {
+            to.setDescription(from.getDescription());
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("merged role=" + JaxbUtils.toString(to, Role.class));
+        }
+        return to;
     }
 
     @Override
@@ -150,7 +173,7 @@ public class RoleDocumentHandler
 
     /**
      * sanitize removes data not needed to be sent to the consumer
-     * @param role
+     * @param roleFound
      */
     private void sanitize(Role role) {
         role.setTenantId(null);

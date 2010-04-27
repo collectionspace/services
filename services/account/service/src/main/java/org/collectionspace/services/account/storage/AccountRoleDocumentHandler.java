@@ -37,6 +37,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.context.ServiceContextProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -210,9 +211,10 @@ public class AccountRoleDocumentHandler
     }
 
     static SubjectType getSubject(ServiceContext ctx) {
-        Object o = ctx.getProperty("subject");
+        Object o = ctx.getProperty(ServiceContextProperties.SUBJECT);
         if (o == null) {
-            throw new IllegalArgumentException("property subject missing in context "
+            throw new IllegalArgumentException(ServiceContextProperties.SUBJECT +
+                    " property is missing in context "
                     + ctx.toString());
         }
         return (SubjectType) o;

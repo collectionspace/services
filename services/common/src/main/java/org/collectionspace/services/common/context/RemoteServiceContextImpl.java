@@ -27,8 +27,6 @@ import java.lang.reflect.Constructor;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.collectionspace.services.common.document.DocumentFilter;
-import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +70,7 @@ public class RemoteServiceContextImpl<IT, OT>
      */
     protected RemoteServiceContextImpl(String serviceName, IT theInput) throws UnauthorizedException {
     	this(serviceName);
-        this.input = theInput;
+        this.input = theInput;        
     }
 
     /**

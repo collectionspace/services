@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.common.document;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -284,7 +285,7 @@ public class DocumentUtils {
         if (tokens == 2) {
             nv.name = stz.nextToken();
             nv.value = stz.nextToken();
-        // Allow null or empty values
+            // Allow null or empty values
         } else if (tokens == 1) {
             nv.name = stz.nextToken();
             nv.value = "";
@@ -308,5 +309,21 @@ public class DocumentUtils {
         DOMSource source = new DOMSource(document);
         StreamResult result = new StreamResult(os);
         transformer.transform(source, result);
+    }
+
+    /**
+     * getXmlDocoument retrieve w3c.Document from given file
+     * @param fileName
+     * @return
+     * @throws Exception
+     */
+    public static Document getXmlDocument(String fileName) throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        File f = new File(fileName);
+        if (!f.exists()) {
+            throw new IllegalArgumentException("test data file " + fileName + " not found!");
+        }
+        // Create the builder and parse the file
+        return factory.newDocumentBuilder().parse(f);
     }
 }

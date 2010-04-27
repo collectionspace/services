@@ -240,7 +240,7 @@ public class RoleResource
             @Context UriInfo ui) {
         RolesList roleList = new RolesList();
         try {
-            ServiceContext ctx = createServiceContext((RolesList) null, Role.class);
+            ServiceContext ctx = createServiceContext((Role) null, Role.class);
             DocumentHandler handler = createDocumentHandler(ctx);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             DocumentFilter myFilter = handler.createDocumentFilter();

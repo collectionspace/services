@@ -28,8 +28,6 @@ package org.collectionspace.services.common.context;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
  * A factory for creating RemoteServiceContext objects.
@@ -100,8 +98,7 @@ public class RemoteServiceContextFactory<IT, OT>
     			input,
     			queryParams);
         ctx.setDocumentType(documentType); //persistence unit
-        ctx.setProperty("entity-name", entityName);
-        
+        ctx.setProperty(ServiceContextProperties.ENTITY_NAME, entityName);
         return ctx;
     }
     

@@ -51,6 +51,7 @@ import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
+import org.collectionspace.services.common.context.ServiceContextProperties;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +70,7 @@ public class PermissionResource
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(PermissionResource.class);
     /** The storage client. */
-    final StorageClient storageClient = new JpaStorageClientImpl(Permission.class);
+    final StorageClient storageClient = new JpaStorageClientImpl();
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
@@ -154,8 +155,8 @@ public class PermissionResource
             logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    ServiceMessages.POST_FAILED +
-                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+                    ServiceMessages.POST_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
     }
@@ -177,14 +178,14 @@ public class PermissionResource
         if (csid == null || "".equals(csid)) {
             logger.error("getPermission: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    ServiceMessages.GET_FAILED + "permission " +
-                    ServiceMessages.MISSING_INVALID_CSID + csid).type(
+                    ServiceMessages.GET_FAILED + "permission "
+                    + ServiceMessages.MISSING_INVALID_CSID + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
         Permission result = null;
         try {
-            ServiceContext<Permission, Permission> ctx = createServiceContext();
+            ServiceContext<Permission, Permission> ctx = createServiceContext((Permission)null, Permission.class);
             DocumentHandler handler = createDocumentHandler(ctx);
             getStorageClient(ctx).get(ctx, csid, handler);
             result = (Permission) ctx.getOutput();
@@ -208,8 +209,8 @@ public class PermissionResource
             logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    ServiceMessages.GET_FAILED +
-                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+                    ServiceMessages.GET_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
 
@@ -235,7 +236,7 @@ public class PermissionResource
             @Context UriInfo ui) {
         PermissionsList permissionList = new PermissionsList();
         try {
-            ServiceContext<Permission, Permission> ctx = createServiceContext();
+            ServiceContext<Permission, Permission> ctx = createServiceContext((Permission)null, Permission.class);
             DocumentHandler handler = createDocumentHandler(ctx);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             DocumentFilter myFilter = handler.createDocumentFilter();
@@ -257,8 +258,8 @@ public class PermissionResource
             logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    ServiceMessages.LIST_FAILED +
-                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+                    ServiceMessages.LIST_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return permissionList;
@@ -283,14 +284,14 @@ public class PermissionResource
         if (csid == null || "".equals(csid)) {
             logger.error("updatePermission: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    ServiceMessages.PUT_FAILED  + "permission " +
-                    ServiceMessages.MISSING_INVALID_CSID + csid).type(
+                    ServiceMessages.PUT_FAILED + "permission "
+                    + ServiceMessages.MISSING_INVALID_CSID + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
         Permission result = null;
         try {
-            ServiceContext<Permission, Permission> ctx = createServiceContext(theUpdate);
+            ServiceContext<Permission, Permission> ctx = createServiceContext(theUpdate, Permission.class);
             DocumentHandler handler = createDocumentHandler(ctx);
             getStorageClient(ctx).update(ctx, csid, handler);
             result = (Permission) ctx.getOutput();
@@ -316,8 +317,8 @@ public class PermissionResource
             logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    ServiceMessages.PUT_FAILED +
-                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+                    ServiceMessages.PUT_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return result;
@@ -340,8 +341,8 @@ public class PermissionResource
         if (csid == null || "".equals(csid)) {
             logger.error("deletePermission: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    ServiceMessages.DELETE_FAILED + "permission " +
-                    ServiceMessages.MISSING_INVALID_CSID + csid).type(
+                    ServiceMessages.DELETE_FAILED + "permission "
+                    + ServiceMessages.MISSING_INVALID_CSID + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -350,7 +351,7 @@ public class PermissionResource
             //delete all relationships for this permission
             PermissionRoleSubResource subResource = new PermissionRoleSubResource();
             subResource.deletePermissionRole(csid, SubjectType.ROLE);
-            ServiceContext<Permission, Permission> ctx = createServiceContext();
+            ServiceContext<Permission, Permission> ctx = createServiceContext((Permission)null, Permission.class);
             getStorageClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
@@ -371,8 +372,8 @@ public class PermissionResource
             logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    ServiceMessages.DELETE_FAILED +
-                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+                    ServiceMessages.DELETE_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
 
@@ -388,8 +389,8 @@ public class PermissionResource
         if (permCsid == null || "".equals(permCsid)) {
             logger.error("createPermissionRole: missing permCsid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    ServiceMessages.POST_FAILED + "permroles permission " +
-                    ServiceMessages.MISSING_INVALID_CSID + permCsid).type(
+                    ServiceMessages.POST_FAILED + "permroles permission "
+                    + ServiceMessages.MISSING_INVALID_CSID + permCsid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -417,8 +418,8 @@ public class PermissionResource
             logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    ServiceMessages.POST_FAILED +
-                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+                    ServiceMessages.POST_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
     }
@@ -434,8 +435,8 @@ public class PermissionResource
         if (permCsid == null || "".equals(permCsid)) {
             logger.error("getPermissionRole: missing permCsid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    ServiceMessages.GET_FAILED + "permroles permission " + 
-                    ServiceMessages.MISSING_INVALID_CSID + permCsid).type(
+                    ServiceMessages.GET_FAILED + "permroles permission "
+                    + ServiceMessages.MISSING_INVALID_CSID + permCsid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -464,8 +465,8 @@ public class PermissionResource
             logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    ServiceMessages.GET_FAILED +
-                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+                    ServiceMessages.GET_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         if (result == null) {
@@ -489,8 +490,8 @@ public class PermissionResource
         if (permCsid == null || "".equals(permCsid)) {
             logger.error("deletePermissionRole: missing permCsid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    ServiceMessages.DELETE_FAILED + "permroles permission " +
-                    ServiceMessages.MISSING_INVALID_CSID + permCsid).type(
+                    ServiceMessages.DELETE_FAILED + "permroles permission "
+                    + ServiceMessages.MISSING_INVALID_CSID + permCsid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -516,8 +517,8 @@ public class PermissionResource
             logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    ServiceMessages.DELETE_FAILED +
-                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+                    ServiceMessages.DELETE_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
 
