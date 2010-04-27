@@ -3,6 +3,7 @@ package org.collectionspace.services.client;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.organization.OrgauthoritiesCommonList;
 import org.collectionspace.services.organization.OrganizationsCommonList;
@@ -145,6 +146,10 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
         return orgAuthorityProxy.readItemListForNamedAuthority(specifier);
     }
 
+    public ClientResponse<AuthorityRefList> getItemAuthorityRefs(String parentcsid, String csid) {
+        return orgAuthorityProxy.getItemAuthorityRefs(parentcsid, csid);
+    }
+
     /**
      * @param csid
      * @return
@@ -183,7 +188,7 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
         return orgAuthorityProxy.deleteItem(vcsid, csid);
     }
 
-        public ClientResponse<Response> createContact(String parentcsid,
+    public ClientResponse<Response> createContact(String parentcsid,
             String itemcsid, MultipartOutput multipart) {
         return orgAuthorityProxy.createContact(parentcsid, itemcsid, multipart);
     }

@@ -10,6 +10,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.organization.OrgauthoritiesCommonList;
 import org.collectionspace.services.organization.OrganizationsCommonList;
@@ -65,6 +66,14 @@ public interface OrgAuthorityProxy {
     @Produces({"application/xml"})
     @Path("/urn:cspace:name({specifier})/items/")
     ClientResponse<OrganizationsCommonList> readItemListForNamedAuthority(@PathParam("specifier") String specifier);
+
+    // List Item Authority References
+    @GET
+    @Produces({"application/xml"})
+    @Path("/{parentcsid}/items/{itemcsid}/authorityrefs/")
+    public ClientResponse<AuthorityRefList> getItemAuthorityRefs(
+            @PathParam("parentcsid") String parentcsid,
+            @PathParam("itemcsid") String itemcsid);
 
     //(C)reate Item
     @POST
@@ -126,6 +135,5 @@ public interface OrgAuthorityProxy {
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid);
-
 
 }

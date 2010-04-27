@@ -41,6 +41,11 @@
             <artifactId>org.collectionspace.services.contact.client</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.person.client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- External dependencies -->
         <dependency>
             <groupId>org.testng</groupId>

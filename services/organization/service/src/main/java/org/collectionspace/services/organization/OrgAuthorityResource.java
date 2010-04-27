@@ -23,6 +23,8 @@
  */
 package org.collectionspace.services.organization;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -44,13 +46,17 @@ import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.MultipartServiceContext;
+import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 //import org.collectionspace.services.common.context.MultipartServiceContextFactory;
+import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.contact.ContactsCommon;
@@ -58,10 +64,12 @@ import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.contact.ContactJAXBSchema;
 import org.collectionspace.services.contact.nuxeo.ContactDocumentModelHandler;
 import org.collectionspace.services.common.security.UnauthorizedException;
+import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.organization.nuxeo.OrganizationDocumentModelHandler;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
+import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -563,10 +571,10 @@ public class OrgAuthorityResource extends
     /**
      * Gets the organization.
      * 
-     * @param parentcsid the parentcsid
-     * @param itemcsid the itemcsid
+     * @param csid The organization authority (parent) CSID.
+     * @param itemcsid The organization item CSID.
      * 
-     * @return the organization
+     * @return the organization.
      */
     @GET
     @Path("{csid}/items/{itemcsid}")
@@ -625,6 +633,49 @@ public class OrgAuthorityResource extends
             throw new WebApplicationException(response);
         }
         return result;
+    }
+
+    /**
+     * Gets the authority refs for an Organization item.
+     *
+     * @param csid The organization authority (parent) CSID.
+     * @param itemcsid The organization item CSID.
+     *
+     * @return the authority refs for the Organization item.
+     */
+    @GET
+    @Path("{csid}/items/{itemcsid}/authorityrefs")
+    @Produces("application/xml")
+    public AuthorityRefList getOrganizationAuthorityRefs(
+    		@PathParam("csid") String parentcsid,
+                @PathParam("itemcsid") String itemcsid,
+    		@Context UriInfo ui) {
+    	AuthorityRefList authRefList = null;
+        try {
+            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+            ServiceContext<MultipartInput, MultipartOutput> ctx =
+                createServiceContext(getItemServiceName(), queryParams);
+            RemoteDocumentModelHandlerImpl handler =
+                (RemoteDocumentModelHandlerImpl) createItemDocumentHandler(ctx, parentcsid);
+            DocumentWrapper<DocumentModel> docWrapper =
+               getRepositoryClient(ctx).getDoc(ctx, itemcsid);
+            List<String> authRefFields =
+            	((MultipartServiceContextImpl)ctx).getCommonPartPropertyValues(
+            	ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
+            authRefList = handler.getAuthorityRefs(docWrapper, authRefFields);
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Failed to retrieve authority references: reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception in getAuthorityRefs", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to retrieve authority references").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return authRefList;
     }
 
     /**
