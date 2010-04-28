@@ -263,8 +263,13 @@ public class IDResource {
                 new Namespace(ID_SERVICE_NAMESPACE_PREFIX, ID_SERVICE_NAMESPACE);
             doc.getRootElement().add(namespace);
 
-            // Make a new element for the components of this ID generator
-            // instance, and attach it to the root element.
+            // Make new elements for each of the components of this ID generator
+            // instance, and attach them to the root element.
+
+            // Append display name information for this ID generator instance.
+            String displayname = instance.getDisplayName();
+            root = appendDisplayNameIDGeneratorInformation(root, displayname);
+            // Append detailed information for this ID generator instance.
             root = appendDetailedIDGeneratorInformation(root, instance);
 
             resourceRepresentation = prettyPrintXML(doc);
@@ -489,13 +494,18 @@ public class IDResource {
         Document doc = baseListDocument();
 
         Element listitem = null;
+        String displayname = "";
         // Retrieve the CSIDs from each ID generator instance,
         // and use these in summary information returned about
         // each instance.
-        for (String csid : generators.keySet() )
+        for (String csid : generators.keySet())
         {
+            // Add a new element for each item in the list.
             listitem =
                 doc.getRootElement().addElement(ID_GENERATOR_LIST_ITEM_NAME);
+            // Append display name information for this ID generator instance.
+            displayname = generators.get(csid).getDisplayName();
+            listitem = appendDisplayNameIDGeneratorInformation(listitem, displayname);
             // Append summary information about this ID generator instance.
             listitem = appendSummaryIDGeneratorInformation(listitem, csid);
        }
@@ -518,10 +528,15 @@ public class IDResource {
         Document doc = baseListDocument();
 
         Element listitem = null;
-        for (String csid : generators.keySet() )
+        String displayname = "";
+        for (String csid : generators.keySet())
         {
+            // Add a new element for each item in the list.
             listitem =
                 doc.getRootElement().addElement(ID_GENERATOR_LIST_ITEM_NAME);
+            // Append display name information for this ID generator instance.
+            displayname = generators.get(csid).getDisplayName();
+            listitem = appendDisplayNameIDGeneratorInformation(listitem, displayname);
             // Append summary information about this ID generator instance.
             listitem = appendSummaryIDGeneratorInformation(listitem, csid);
             // Append details of this ID generator instance.
@@ -532,6 +547,29 @@ public class IDResource {
 
         return prettyPrintXML(doc);
     }
+    
+    //////////////////////////////////////////////////////////////////////
+    /**
+     * Appends a display name to an element representing
+     * an ID generator instance.
+     *
+     * @param   instanceElement  An XML element representing an
+     *                           ID generator instance.
+     *
+     * @param   displayname      A displayname for the resource representing that instance.
+     *
+     * @return  The XML element representing an ID generator instance,
+     *          with the display name appended.
+     */
+   private Element appendDisplayNameIDGeneratorInformation(Element instanceElement,
+        String displaynameValue) {
+
+        Element displayname = instanceElement.addElement("displayname");
+        displayname.addText(displaynameValue);
+
+        return instanceElement;
+    }
+
 
     //////////////////////////////////////////////////////////////////////
     /**
@@ -574,9 +612,7 @@ public class IDResource {
     private Element appendDetailedIDGeneratorInformation(
         Element instanceElement, IDGeneratorInstance generatorInstance) {
 
-        // Append naming and description information.
-        Element displayname = instanceElement.addElement("displayname");
-        displayname.addText(generatorInstance.getDisplayName());
+        // Append description information.
         Element description = instanceElement.addElement("description");
         description.addText(generatorInstance.getDescription());
 
