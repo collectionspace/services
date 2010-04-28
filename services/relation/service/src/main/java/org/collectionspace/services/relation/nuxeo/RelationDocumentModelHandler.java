@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 public class RelationDocumentModelHandler
         extends RemoteDocumentModelHandlerImpl<RelationsCommon, RelationsCommonList> {
 
+    /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(RelationDocumentModelHandler.class);
     /**
      * relation is used to stash JAXB object to use when handle is called
@@ -92,40 +93,49 @@ public class RelationDocumentModelHandler
         return relationList;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#setCommonPartList(java.lang.Object)
+     */
     @Override
     public void setCommonPartList(RelationsCommonList relationList) {
         this.relationList = relationList;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public RelationsCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
             throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#fillCommonPart(java.lang.Object, org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void fillCommonPart(RelationsCommon relation, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public RelationsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        DocumentModelList docList = wrapDoc.getWrappedObject();
-
         Map propsFromResource = this.getProperties();
         String subjectCsid = (String) propsFromResource.get(IRelationsManager.SUBJECT);
         String predicate = (String) propsFromResource.get(IRelationsManager.PREDICATE);
         String objectCsid = (String) propsFromResource.get(IRelationsManager.OBJECT);
 
-        RelationsCommonList relList = new RelationsCommonList();
+        //FIXME - Need to change this into a NXQL on subject, predicate, object terms.  Currently,
+        //FIXME - we're performing a post query filter which is far from ideal and not scalable.
+        RelationsCommonList relList = this.extractPagingInfo(new RelationsCommonList(), wrapDoc) ;
         List<RelationsCommonList.RelationListItem> itemList = relList.getRelationListItem();
-
-        //FIXME: iterating over a long itemList of documents is not a long term
-        //strategy...need to change to more efficient iterating in future
-        Iterator<DocumentModel> iter = docList.iterator();
+        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
-            if(RelationsUtils.isQueryMatch(docModel, subjectCsid,
+            if (RelationsUtils.isQueryMatch(docModel, subjectCsid,
                     predicate, objectCsid) == true){
                 RelationListItem relListItem = RelationsUtils.getRelationListItem(getServiceContext(),
                         docModel, getServiceContextPath());
@@ -137,12 +147,21 @@ public class RelationDocumentModelHandler
 
   
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#fillAllParts(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         super.fillAllParts(wrapDoc);
         fillDublinCoreObject(wrapDoc); //dublincore might not be needed in future
     }
 
+    /**
+     * Fill dublin core object.
+     *
+     * @param wrapDoc the wrap doc
+     * @throws Exception the exception
+     */
     private void fillDublinCoreObject(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         DocumentModel docModel = wrapDoc.getWrappedObject();
         //FIXME property setter should be dynamically set using schema inspection
@@ -152,6 +171,9 @@ public class RelationDocumentModelHandler
     }
 
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.AbstractMultipartDocumentHandlerImpl#getQProperty(java.lang.String)
+     */
     @Override
     public String getQProperty(String prop) {
         return "/" + RelationConstants.NUXEO_SCHEMA_ROOT_ELEMENT + "/" + prop;

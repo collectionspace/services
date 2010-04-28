@@ -13,12 +13,13 @@
 
 <xs:schema 
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
   xmlns:ns="http://collectionspace.org/services/collectionobject"
   xmlns="http://collectionspace.org/services/collectionobject"
   targetNamespace="http://collectionspace.org/services/collectionobject"
-  version="0.1"
->
-
+  version="0.1">
+            
 <!--
     Avoid XmlRootElement nightmare:
     See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
@@ -153,28 +154,40 @@
         </xs:sequence>
     </xs:complexType>
     
-    <!-- collection objects as in nuxeo repository -->
+    <!-- This is the base class for paginated lists -->
+    <xs:complexType name="abstractCommonList">
+        <xs:annotation>
+            <xs:appinfo>
+                <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
+            </xs:appinfo>
+        </xs:annotation>
+    </xs:complexType>
+    
     <xs:element name="collectionobjects-common-list">
         <xs:complexType>
-            <xs:sequence>
-                <xs:element name="collection-object-list-item" maxOccurs="unbounded">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element name="objectNumber" type="xs:string"
-                                minOccurs="1" />
-                            <xs:element name="title" type="xs:string"
-                                minOccurs="1" />
-                            <!-- uri to retrive collection object details -->
-                            <xs:element name="uri" type="xs:anyURI"
-                                minOccurs="1" />
-                            <xs:element name="csid" type="xs:string"
-                                minOccurs="1" />
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
-            </xs:sequence>
+            <xs:complexContent>
+                <xs:extension base="abstractCommonList">
+                    <xs:sequence>
+                        <xs:element name="collection-object-list-item" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="objectNumber" type="xs:string"
+                                        minOccurs="1" />
+                                    <xs:element name="title" type="xs:string"
+                                        minOccurs="1" />
+                                    <!-- uri to retrive collection object details -->
+                                    <xs:element name="uri" type="xs:anyURI"
+                                        minOccurs="1" />
+                                    <xs:element name="csid" type="xs:string"
+                                        minOccurs="1" />
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:extension>
+            </xs:complexContent>        
         </xs:complexType>
     </xs:element>
-    
+        
 </xs:schema>
 

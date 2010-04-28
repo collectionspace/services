@@ -3,6 +3,7 @@
 	<name>org.collectionspace.services.collectionobject.jaxb</name>
 	<comment></comment>
 	<projects>
+		<project>org.collectionspace.services.jaxb</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

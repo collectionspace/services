@@ -107,14 +107,9 @@ public class DimensionDocumentModelHandler
 
     @Override
     public DimensionsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        DocumentModelList docList = wrapDoc.getWrappedObject();
-
-        DimensionsCommonList coList = new DimensionsCommonList();
+        DimensionsCommonList coList = extractPagingInfo(new DimensionsCommonList(), wrapDoc) ;
         List<DimensionsCommonList.DimensionListItem> list = coList.getDimensionListItem();
-
-        //FIXME: iterating over a long list of documents is not a long term
-        //strategy...need to change to more efficient iterating in future
-        Iterator<DocumentModel> iter = docList.iterator();
+        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
             DimensionListItem ilistItem = new DimensionListItem();

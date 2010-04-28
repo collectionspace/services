@@ -108,13 +108,9 @@ public class AcquisitionDocumentModelHandler
 
     @Override
     public AcquisitionsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        DocumentModelList docList = wrapDoc.getWrappedObject();
-        AcquisitionsCommonList coList = new AcquisitionsCommonList();
+        AcquisitionsCommonList coList = this.extractPagingInfo(new AcquisitionsCommonList(), wrapDoc);
         List<AcquisitionsCommonList.AcquisitionListItem> list = coList.getAcquisitionListItem();
-
-        //FIXME: iterating over a long list of documents is not a long term
-        //strategy...need to change to more efficient iterating in future
-        Iterator<DocumentModel> iter = docList.iterator();
+        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while (iter.hasNext()) {
             DocumentModel docModel = iter.next();
             AcquisitionListItem listItem = new AcquisitionListItem();

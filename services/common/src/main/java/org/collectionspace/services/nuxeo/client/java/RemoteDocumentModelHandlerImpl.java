@@ -34,17 +34,21 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.vocabulary.RefNameUtils;
+//import org.collectionspace.services.vocabulary.VocabulariesCommonList;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +101,32 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
 		MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
 		ctx.addOutputPart(schema, doc, partMeta.getContent().getContentType());
     }
+    
+    
+    /**
+     * Extract paging info.
+     *
+     * @param commonsList the commons list
+     * @return the tL
+     * @throws Exception the exception
+     */
+    protected TL extractPagingInfo(TL theCommonList, DocumentWrapper<DocumentModelList> wrapDoc)
+    	throws Exception {
+    	AbstractCommonList commonList = (AbstractCommonList)theCommonList;
+    	
+    	DocumentFilter docFilter = this.getDocumentFilter();
+    	long pageSize = docFilter.getPageSize();
+    	long pageNum = docFilter.getOffset() / pageSize;
+    	// set the page size and page numer
+    	commonList.setPageNum(pageNum);
+    	commonList.setPageSize(pageSize);
+    	// set the total result size
+    	DocumentModelList docList = wrapDoc.getWrappedObject();
+    	commonList.setTotalItems(docList.totalSize());
+    	
+    	return (TL)commonList;
+    }
+    
     
 	@Override
 	public void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc)

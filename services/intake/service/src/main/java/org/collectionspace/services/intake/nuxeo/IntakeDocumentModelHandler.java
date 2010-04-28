@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 public class IntakeDocumentModelHandler
         extends RemoteDocumentModelHandlerImpl<IntakesCommon, IntakesCommonList> {
 
+    /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(IntakeDocumentModelHandler.class);
     /**
      * intake is used to stash JAXB object to use when handle is called
@@ -87,32 +88,39 @@ public class IntakeDocumentModelHandler
         return intakeList;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#setCommonPartList(java.lang.Object)
+     */
     @Override
     public void setCommonPartList(IntakesCommonList intakeList) {
         this.intakeList = intakeList;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public IntakesCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
             throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#fillCommonPart(java.lang.Object, org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void fillCommonPart(IntakesCommon intakeObject, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public IntakesCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        DocumentModelList docList = wrapDoc.getWrappedObject();
-
-        IntakesCommonList coList = new IntakesCommonList();
+        IntakesCommonList coList = this.extractPagingInfo(new IntakesCommonList(), wrapDoc);
         List<IntakesCommonList.IntakeListItem> list = coList.getIntakeListItem();
-
-        //FIXME: iterating over a long list of documents is not a long term
-        //strategy...need to change to more efficient iterating in future
-        Iterator<DocumentModel> iter = docList.iterator();
+        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
             IntakeListItem ilistItem = new IntakeListItem();

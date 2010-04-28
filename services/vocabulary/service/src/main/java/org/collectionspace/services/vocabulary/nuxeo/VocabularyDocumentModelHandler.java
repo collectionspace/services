@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
 public class VocabularyDocumentModelHandler
         extends RemoteDocumentModelHandlerImpl<VocabulariesCommon, VocabulariesCommonList> {
 
+    /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(VocabularyDocumentModelHandler.class);
     /**
      * vocabulary is used to stash JAXB object to use when handle is called
@@ -90,44 +91,40 @@ public class VocabularyDocumentModelHandler
         return vocabularyList;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#setCommonPartList(java.lang.Object)
+     */
     @Override
     public void setCommonPartList(VocabulariesCommonList vocabularyList) {
         this.vocabularyList = vocabularyList;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public VocabulariesCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
             throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#fillCommonPart(java.lang.Object, org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void fillCommonPart(VocabulariesCommon vocabularyObject, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
-    public VocabulariesCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        DocumentModelList docList = wrapDoc.getWrappedObject();
-
-        VocabulariesCommonList coList = new VocabulariesCommonList();
+    public VocabulariesCommonList extractCommonPartList(
+    		DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
+        VocabulariesCommonList coList = extractPagingInfo(new VocabulariesCommonList(), wrapDoc);
         List<VocabulariesCommonList.VocabularyListItem> list = coList.getVocabularyListItem();
-
-        DocumentFilter filter = getDocumentFilter();
-        long pageNum, pageSize;
-        if(filter==null) {
-        	pageNum = 0;
-        	pageSize = 0;
-        } else {
-        	pageSize = filter.getPageSize();
-        	pageNum = filter.getOffset()/pageSize;
-        }
-        coList.setPageNum(pageNum);
-        coList.setPageSize(pageSize);
-    	coList.setTotalItems(docList.totalSize());
-        //FIXME: iterating over a long list of documents is not a long term
-        //strategy...need to change to more efficient iterating in future
-        Iterator<DocumentModel> iter = docList.iterator();
+        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
             VocabularyListItem ilistItem = new VocabularyListItem();

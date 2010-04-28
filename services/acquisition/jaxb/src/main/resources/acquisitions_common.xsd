@@ -13,11 +13,12 @@
 
 <xs:schema 
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
   xmlns:ns="http://collectionspace.org/services/acquisition"
   xmlns="http://collectionspace.org/services/acquisition"
   targetNamespace="http://collectionspace.org/services/acquisition"
-  version="0.1"
->
+  version="0.1">
 
 
 <!--
@@ -72,26 +73,39 @@
         </xs:sequence>
     </xs:complexType>
     
+    <!-- This is the base class for paginated lists -->
+    <xs:complexType name="abstractCommonList">
+        <xs:annotation>
+            <xs:appinfo>
+                <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
+            </xs:appinfo>
+        </xs:annotation>
+    </xs:complexType>
+
     <!-- acquisition records, as in nuxeo repository -->
     <xs:element name="acquisitions-common-list">
         <xs:complexType>
-            <xs:sequence>
-                <xs:element name="acquisition-list-item" maxOccurs="unbounded">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element name="acquisitionReferenceNumber" type="xs:string"
-                                minOccurs="1" />
-                            <xs:element name="acquisitionSources" type="acquisitionSourceList"
-                                minOccurs="1" />
-                            <!-- uri to retrive acquisition details -->
-                            <xs:element name="uri" type="xs:anyURI"
-                                minOccurs="1" />
-                            <xs:element name="csid" type="xs:string"
-                                minOccurs="1" />
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
-            </xs:sequence>
+            <xs:complexContent>
+                <xs:extension base="abstractCommonList">                    
+                    <xs:sequence>
+                        <xs:element name="acquisition-list-item" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="acquisitionReferenceNumber" type="xs:string"
+                                        minOccurs="1" />
+                                    <xs:element name="acquisitionSources" type="acquisitionSourceList"
+                                        minOccurs="1" />
+                                    <!-- uri to retrive acquisition details -->
+                                    <xs:element name="uri" type="xs:anyURI"
+                                        minOccurs="1" />
+                                    <xs:element name="csid" type="xs:string"
+                                        minOccurs="1" />
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:extension>
+            </xs:complexContent>                    
         </xs:complexType>
     </xs:element>
     

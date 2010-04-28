@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 public class LoaninDocumentModelHandler
         extends RemoteDocumentModelHandlerImpl<LoansinCommon, LoansinCommonList> {
 
+    /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(LoaninDocumentModelHandler.class);
     /**
      * loanin is used to stash JAXB object to use when handle is called
@@ -58,7 +59,6 @@ public class LoaninDocumentModelHandler
      * for ACTION.GET_ALL
      */
     private LoansinCommonList loaninList;
-
 
     /**
      * getCommonPart get associated loanin
@@ -84,35 +84,42 @@ public class LoaninDocumentModelHandler
      */
     @Override
     public LoansinCommonList getCommonPartList() {
-        return loaninList;
+        return this.loaninList;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#setCommonPartList(java.lang.Object)
+     */
     @Override
-    public void setCommonPartList(LoansinCommonList loaninList) {
-        this.loaninList = loaninList;
+    public void setCommonPartList(LoansinCommonList theLoaninList) {
+        this.loaninList = theLoaninList;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public LoansinCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
             throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#fillCommonPart(java.lang.Object, org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void fillCommonPart(LoansinCommon loaninObject, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public LoansinCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        DocumentModelList docList = wrapDoc.getWrappedObject();
-
-        LoansinCommonList coList = new LoansinCommonList();
+        LoansinCommonList coList = extractPagingInfo(new LoansinCommonList(), wrapDoc);
         List<LoansinCommonList.LoaninListItem> list = coList.getLoaninListItem();
-
-        //FIXME: iterating over a long list of documents is not a long term
-        //strategy...need to change to more efficient iterating in future
-        Iterator<DocumentModel> iter = docList.iterator();
+        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
             LoaninListItem ilistItem = new LoaninListItem();

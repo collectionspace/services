@@ -118,51 +118,30 @@ public class VocabularyItemDocumentModelHandler
     }
 
     @Override
-    public VocabularyitemsCommonList extractCommonPartList(DocumentWrapper wrapDoc) 
-    	throws Exception {
-        VocabularyitemsCommonList coList = new VocabularyitemsCommonList();
-        try{
-	        DocumentModelList docList = (DocumentModelList) wrapDoc.getWrappedObject();
-	
-	        List<VocabularyitemsCommonList.VocabularyitemListItem> list = 
-	        	coList.getVocabularyitemListItem();
-	
-	        DocumentFilter filter = getDocumentFilter();
-	        long pageNum, pageSize;
-	        if(filter==null) {
-	        	pageNum = 0;
-	        	pageSize = 0;
-	        } else {
-	        	pageSize = filter.getPageSize();
-	        	pageNum = filter.getOffset()/pageSize;
-	        }
-	        coList.setPageNum(pageNum);
-	        coList.setPageSize(pageSize);
-	    	coList.setTotalItems(docList.totalSize());
-	        //FIXME: iterating over a long list of documents is not a long term
-	        //strategy...need to change to more efficient iterating in future
-	        Iterator<DocumentModel> iter = docList.iterator();
-	        while(iter.hasNext()){
-	            DocumentModel docModel = iter.next();
-	            VocabularyitemListItem ilistItem = new VocabularyitemListItem();
-	            ilistItem.setDisplayName(
-									(String) docModel.getProperty(getServiceContext().getCommonPartLabel("vocabularyItems"),
-									VocabularyItemJAXBSchema.DISPLAY_NAME));
-	            ilistItem.setRefName(
-									(String) docModel.getProperty(getServiceContext().getCommonPartLabel("vocabularyItems"),
-									VocabularyItemJAXBSchema.REF_NAME));
-							String id = NuxeoUtils.extractId(docModel.getPathAsString());
-	            ilistItem.setUri("/vocabularies/"+inVocabulary+"/items/" + id);
-	            ilistItem.setCsid(id);
-	            list.add(ilistItem);
-	        }
-        }catch(Exception e){
-            if(logger.isDebugEnabled()){
-                logger.debug("Caught exception in extractCommonPartList", e);
-            }
-            throw e;
-        }
-        return coList;
+	public VocabularyitemsCommonList extractCommonPartList(
+			DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
+		VocabularyitemsCommonList coList = extractPagingInfo(new VocabularyitemsCommonList(), wrapDoc);
+		
+		// FIXME: iterating over a long list of documents is not a long term
+		// strategy...need to change to more efficient iterating in future
+		List<VocabularyitemsCommonList.VocabularyitemListItem> list = coList.getVocabularyitemListItem();
+		Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
+		while (iter.hasNext()) {
+			DocumentModel docModel = iter.next();
+			VocabularyitemListItem ilistItem = new VocabularyitemListItem();
+			ilistItem.setDisplayName((String) docModel.getProperty(
+					getServiceContext().getCommonPartLabel("vocabularyItems"),
+					VocabularyItemJAXBSchema.DISPLAY_NAME));
+			ilistItem.setRefName((String) docModel.getProperty(
+					getServiceContext().getCommonPartLabel("vocabularyItems"),
+					VocabularyItemJAXBSchema.REF_NAME));
+			String id = NuxeoUtils.extractId(docModel.getPathAsString());
+			ilistItem.setUri("/vocabularies/" + inVocabulary + "/items/" + id);
+			ilistItem.setCsid(id);
+			list.add(ilistItem);
+		}
+
+		return coList;
     }
 
     /**

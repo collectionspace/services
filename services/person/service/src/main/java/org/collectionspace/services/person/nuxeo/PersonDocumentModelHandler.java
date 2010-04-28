@@ -56,6 +56,7 @@ import org.slf4j.LoggerFactory;
 public class PersonDocumentModelHandler
         extends RemoteDocumentModelHandlerImpl<PersonsCommon, PersonsCommonList> {
 
+    /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(PersonDocumentModelHandler.class);
     /**
      * Common part schema label
@@ -78,15 +79,28 @@ public class PersonDocumentModelHandler
      */
     private String inAuthority;
 
+    /**
+     * Gets the in authority.
+     *
+     * @return the in authority
+     */
     public String getInAuthority() {
 		return inAuthority;
 	}
 
+	/**
+	 * Sets the in authority.
+	 *
+	 * @param inAuthority the new in authority
+	 */
 	public void setInAuthority(String inAuthority) {
 		this.inAuthority = inAuthority;
 	}
 
 	
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleCreate(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
     	// first fill all the parts of the document
@@ -94,12 +108,21 @@ public class PersonDocumentModelHandler
     	handleDisplayName(wrapDoc.getWrappedObject());
     }
     
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleUpdate(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
     	super.handleUpdate(wrapDoc);
     	handleDisplayName(wrapDoc.getWrappedObject());
     }
 
+    /**
+     * Handle display name.
+     *
+     * @param docModel the doc model
+     * @throws Exception the exception
+     */
     private void handleDisplayName(DocumentModel docModel) throws Exception {
     	String commonPartLabel = getServiceContext().getCommonPartLabel("persons");
     	Boolean displayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
@@ -197,11 +220,17 @@ public class PersonDocumentModelHandler
         return personList;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#setCommonPartList(java.lang.Object)
+     */
     @Override
     public void setCommonPartList(PersonsCommonList personList) {
         this.personList = personList;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#extractPart(org.nuxeo.ecm.core.api.DocumentModel, java.lang.String, org.collectionspace.services.common.service.ObjectPartType)
+     */
     @Override
     protected Map<String, Object> extractPart(DocumentModel docModel, String schema, ObjectPartType partMeta)
             throws Exception {
@@ -216,63 +245,50 @@ public class PersonDocumentModelHandler
     	return unQObjectProperties;
     }
     
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public PersonsCommon extractCommonPart(DocumentWrapper wrapDoc)
             throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#fillCommonPart(java.lang.Object, org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void fillCommonPart(PersonsCommon personObject, DocumentWrapper wrapDoc) throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
-    public PersonsCommonList extractCommonPartList(DocumentWrapper wrapDoc) 
-    	throws Exception {
-        PersonsCommonList coList = new PersonsCommonList();
-        try{
-	        DocumentModelList docList = (DocumentModelList) wrapDoc.getWrappedObject();
-	
-	        List<PersonsCommonList.PersonListItem> list = 
-	        	coList.getPersonListItem();
-	
-	        DocumentFilter filter = getDocumentFilter();
-	        long pageNum, pageSize;
-	        if(filter==null) {
-	        	pageNum = 0;
-	        	pageSize = 0;
-	        } else {
-	        	pageSize = filter.getPageSize();
-	        	pageNum = filter.getOffset()/pageSize;
-	        }
-	        coList.setPageNum(pageNum);
-	        coList.setPageSize(pageSize);
-	    	coList.setTotalItems(docList.totalSize());
-	        //FIXME: iterating over a long list of documents is not a long term
-	        //strategy...need to change to more efficient iterating in future
-	        Iterator<DocumentModel> iter = docList.iterator();
-	        String commonPartLabel = getServiceContext().getCommonPartLabel("persons");
-	        while(iter.hasNext()){
-	            DocumentModel docModel = iter.next();
-	            PersonListItem ilistItem = new PersonListItem();
-				ilistItem.setDisplayName((String) 
-	            		docModel.getProperty(commonPartLabel, PersonJAXBSchema.DISPLAY_NAME));
-	            ilistItem.setRefName((String) 
-            		docModel.getProperty(commonPartLabel, PersonJAXBSchema.REF_NAME));
-				String id = NuxeoUtils.extractId(docModel.getPathAsString());
-	            ilistItem.setUri("/personauthorities/"+inAuthority+"/items/" + id);
-	            ilistItem.setCsid(id);
-	            list.add(ilistItem);
-	        }
-        }catch(Exception e){
-            if(logger.isDebugEnabled()){
-                logger.debug("Caught exception in extractCommonPartList", e);
-            }
-            throw e;
-        }
-        return coList;
-    }
+	public PersonsCommonList extractCommonPartList(
+			DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
+		PersonsCommonList coList = extractPagingInfo(new PersonsCommonList(), wrapDoc);
+		List<PersonsCommonList.PersonListItem> list = coList.getPersonListItem();
+		Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
+		String commonPartLabel = getServiceContext().getCommonPartLabel(
+				"persons");
+		while (iter.hasNext()) {
+			DocumentModel docModel = iter.next();
+			PersonListItem ilistItem = new PersonListItem();
+			ilistItem.setDisplayName((String) docModel.getProperty(
+					commonPartLabel, PersonJAXBSchema.DISPLAY_NAME));
+			ilistItem.setRefName((String) docModel.getProperty(commonPartLabel,
+					PersonJAXBSchema.REF_NAME));
+			String id = NuxeoUtils.extractId(docModel.getPathAsString());
+			ilistItem.setUri("/personauthorities/" + inAuthority + "/items/"
+					+ id);
+			ilistItem.setCsid(id);
+			list.add(ilistItem);
+		}
+
+		return coList;
+	}
 
     /**
      * getQProperty converts the given property to qualified schema property

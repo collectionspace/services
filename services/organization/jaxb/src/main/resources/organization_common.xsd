@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema 
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    jaxb:version="1.0" elementFormDefault="unqualified"
     xmlns:ns="http://collectionspace.org/services/organization"
     xmlns="http://collectionspace.org/services/organization"
     targetNamespace="http://collectionspace.org/services/organization"
-    version="0.1"
-    >
-
+    version="0.1">
+    
     <!-- avoid XmlRootElement nightnmare, see http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html-->
-
+    
     <!-- See http://wiki.collectionspace.org/display/collectionspace/Name+Authority+Schema -->
     <!-- See http://wiki.collectionspace.org/display/collectionspace/Organization+Service+Home -->
-
+    
     <!-- Organization -->
     <xs:element name="organizations_common">
         <xs:complexType>
@@ -39,29 +40,39 @@
         </xs:complexType>
     </xs:element>
     
+    <!-- This is the base class for paginated lists -->
+    <xs:complexType name="abstractCommonListItem">
+        <xs:annotation>
+            <xs:appinfo>
+                <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
+            </xs:appinfo>
+        </xs:annotation>
+    </xs:complexType>
+    
     <!-- Organization instances, as in nuxeo repository -->
     <xs:element name="organizations-common-list">
         <xs:complexType>
-            <xs:sequence>
-                <xs:element name="pageNum" type="xs:unsignedInt" />
-                <xs:element name="pageSize" type="xs:unsignedInt" />
-                <xs:element name="totalItems" type="xs:unsignedInt" />
-                <xs:element name="organization_list_item" maxOccurs="unbounded">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element name="displayName" type="xs:string"
-                                minOccurs="1" />
-                            <!-- uri to retrieve organization details -->
-                            <xs:element name="uri" type="xs:anyURI"
-                                minOccurs="1" />
-                            <xs:element name="refName" type="xs:string"
-                                minOccurs="1" />
-                            <xs:element name="csid" type="xs:string"
-                                minOccurs="1" />
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
-            </xs:sequence>
+            <xs:complexContent>
+                <xs:extension base="abstractCommonListItem">                    
+                    <xs:sequence>
+                        <xs:element name="organization_list_item" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="displayName" type="xs:string"
+                                        minOccurs="1" />
+                                    <!-- uri to retrieve organization details -->
+                                    <xs:element name="uri" type="xs:anyURI"
+                                        minOccurs="1" />
+                                    <xs:element name="refName" type="xs:string"
+                                        minOccurs="1" />
+                                    <xs:element name="csid" type="xs:string"
+                                        minOccurs="1" />
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:extension>
+            </xs:complexContent>                    
         </xs:complexType>
     </xs:element>
     

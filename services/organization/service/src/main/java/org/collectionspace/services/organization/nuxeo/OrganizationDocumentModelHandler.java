@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 public class OrganizationDocumentModelHandler
         extends RemoteDocumentModelHandlerImpl<OrganizationsCommon, OrganizationsCommonList> {
 
+    /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(OrganizationDocumentModelHandler.class);
     /**
      * Common part schema label
@@ -72,15 +73,28 @@ public class OrganizationDocumentModelHandler
      */
     private String inAuthority;
 
+    /**
+     * Gets the in authority.
+     *
+     * @return the in authority
+     */
     public String getInAuthority() {
 		return inAuthority;
 	}
 
+	/**
+	 * Sets the in authority.
+	 *
+	 * @param inAuthority the new in authority
+	 */
 	public void setInAuthority(String inAuthority) {
 		this.inAuthority = inAuthority;
 	}
 
 	
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleCreate(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
     	// first fill all the parts of the document
@@ -88,6 +102,9 @@ public class OrganizationDocumentModelHandler
     	handleDisplayName(wrapDoc.getWrappedObject());
     }
     
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleUpdate(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
     	super.handleUpdate(wrapDoc);
@@ -170,11 +187,17 @@ public class OrganizationDocumentModelHandler
         return organizationList;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#setCommonPartList(java.lang.Object)
+     */
     @Override
     public void setCommonPartList(OrganizationsCommonList organizationList) {
         this.organizationList = organizationList;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#extractPart(org.nuxeo.ecm.core.api.DocumentModel, java.lang.String, org.collectionspace.services.common.service.ObjectPartType)
+     */
     @Override
     protected Map<String, Object> extractPart(DocumentModel docModel, String schema, ObjectPartType partMeta)
             throws Exception {
@@ -189,61 +212,46 @@ public class OrganizationDocumentModelHandler
     	return unQObjectProperties;
     }
     
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public OrganizationsCommon extractCommonPart(DocumentWrapper wrapDoc)
             throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#fillCommonPart(java.lang.Object, org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
-    public void fillCommonPart(OrganizationsCommon organizationObject, DocumentWrapper wrapDoc) throws Exception {
+    public void fillCommonPart(OrganizationsCommon organizationObject, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
-    public OrganizationsCommonList extractCommonPartList(DocumentWrapper wrapDoc) 
-    	throws Exception {
-        OrganizationsCommonList coList = new OrganizationsCommonList();
-        try{
-	        DocumentModelList docList = (DocumentModelList) wrapDoc.getWrappedObject();
-	
-	        List<OrganizationsCommonList.OrganizationListItem> list = 
-	        	coList.getOrganizationListItem();
-	
-	        DocumentFilter filter = getDocumentFilter();
-	        long pageNum, pageSize;
-	        if(filter==null) {
-	        	pageNum = 0;
-	        	pageSize = 0;
-	        } else {
-	        	pageSize = filter.getPageSize();
-	        	pageNum = filter.getOffset()/pageSize;
-	        }
-	        coList.setPageNum(pageNum);
-	        coList.setPageSize(pageSize);
-	    	coList.setTotalItems(docList.totalSize());
-	        //FIXME: iterating over a long list of documents is not a long term
-	        //strategy...need to change to more efficient iterating in future
-	        Iterator<DocumentModel> iter = docList.iterator();
-	        String commonPartLabel = getServiceContext().getCommonPartLabel("organizations");
-	        while(iter.hasNext()){
-	            DocumentModel docModel = iter.next();
-	            OrganizationListItem ilistItem = new OrganizationListItem();
-	            ilistItem.setDisplayName((String)
-	            		docModel.getProperty(commonPartLabel,OrganizationJAXBSchema.DISPLAY_NAME ));
-				ilistItem.setRefName((String) 
-						docModel.getProperty(commonPartLabel, OrganizationJAXBSchema.REF_NAME));
-				String id = NuxeoUtils.extractId(docModel.getPathAsString());
-	            ilistItem.setUri("/orgauthorities/"+inAuthority+"/items/" + id);
-	            ilistItem.setCsid(id);
-	            list.add(ilistItem);
-	        }
-        }catch(Exception e){
-            if(logger.isDebugEnabled()){
-                logger.debug("Caught exception in extractCommonPartList", e);
-            }
-            throw e;
+    public OrganizationsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) 
+    		throws Exception {
+        OrganizationsCommonList coList = this.extractPagingInfo(new OrganizationsCommonList(), wrapDoc);
+        List<OrganizationsCommonList.OrganizationListItem> list = coList.getOrganizationListItem();
+        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
+        String commonPartLabel = getServiceContext().getCommonPartLabel("organizations");
+        while(iter.hasNext()){
+            DocumentModel docModel = iter.next();
+            OrganizationListItem ilistItem = new OrganizationListItem();
+            ilistItem.setDisplayName((String)
+            		docModel.getProperty(commonPartLabel,OrganizationJAXBSchema.DISPLAY_NAME ));
+			ilistItem.setRefName((String) 
+					docModel.getProperty(commonPartLabel, OrganizationJAXBSchema.REF_NAME));
+			String id = NuxeoUtils.extractId(docModel.getPathAsString());
+            ilistItem.setUri("/orgauthorities/" + this.inAuthority + "/items/" + id);
+            ilistItem.setCsid(id);
+            list.add(ilistItem);
         }
+
         return coList;
     }
 

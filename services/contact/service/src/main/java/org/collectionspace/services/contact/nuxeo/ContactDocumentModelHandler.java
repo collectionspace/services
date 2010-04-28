@@ -41,99 +41,119 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * ContactDocumentModelHandler
- *
- * $LastChangedRevision: $
- * $LastChangedDate: $
+ * The Class ContactDocumentModelHandler.
  */
 public class ContactDocumentModelHandler
         extends RemoteDocumentModelHandlerImpl<ContactsCommon, ContactsCommonList> {
 
+    /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(ContactDocumentModelHandler.class);
-    /**
-     * contact is used to stash JAXB object to use when handle is called
-     * for Action.CREATE, Action.UPDATE or Action.GET
-     */
+    
+    /** The contact. */
     private ContactsCommon contact;
-    /**
-     * contactList is stashed when handle is called
-     * for ACTION.GET_ALL
-     */
+    
+    /** The contact list. */
     private ContactsCommonList contactList;
 
+    /** The in authority. */
     private String inAuthority;
 
+    /**
+     * Gets the in authority.
+     *
+     * @return the in authority
+     */
     public String getInAuthority() {
         return inAuthority;
     }
 
+    /**
+     * Sets the in authority.
+     *
+     * @param inAuthority the new in authority
+     */
     public void setInAuthority(String inAuthority) {
         this.inAuthority = inAuthority;
     }
 
+    /** The in item. */
     private String inItem;
 
+    /**
+     * Gets the in item.
+     *
+     * @return the in item
+     */
     public String getInItem() {
         return inItem;
     }
 
+    /**
+     * Sets the in item.
+     *
+     * @param inItem the new in item
+     */
     public void setInItem(String inItem) {
         this.inItem = inItem;
     }
 
-    /**
-     * getCommonPart get associated contact
-     * @return
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#getCommonPart()
      */
     @Override
     public ContactsCommon getCommonPart() {
         return contact;
     }
 
-    /**
-     * setCommonPart set associated contact
-     * @param contact
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#setCommonPart(java.lang.Object)
      */
     @Override
     public void setCommonPart(ContactsCommon contact) {
         this.contact = contact;
     }
 
-    /**
-     * getCommonPartList get associated contact (for index/GET_ALL)
-     * @return
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#getCommonPartList()
      */
     @Override
     public ContactsCommonList getCommonPartList() {
         return contactList;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#setCommonPartList(java.lang.Object)
+     */
     @Override
     public void setCommonPartList(ContactsCommonList contactList) {
         this.contactList = contactList;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public ContactsCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
             throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#fillCommonPart(java.lang.Object, org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void fillCommonPart(ContactsCommon contactObject, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public ContactsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        DocumentModelList docList = wrapDoc.getWrappedObject();
-
-        ContactsCommonList coList = new ContactsCommonList();
+        ContactsCommonList coList = extractPagingInfo(new ContactsCommonList(), wrapDoc);
         List<ContactsCommonList.ContactListItem> list = coList.getContactListItem();
-
-        //FIXME: iterating over a long list of documents is not a long term
-        //strategy...need to change to more efficient iterating in future
-        Iterator<DocumentModel> iter = docList.iterator();
+        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
             ContactListItem clistItem = new ContactListItem();
@@ -151,10 +171,8 @@ public class ContactDocumentModelHandler
         return coList;
     }
 
-    /**
-     * getQProperty converts the given property to qualified schema property
-     * @param prop
-     * @return
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.AbstractMultipartDocumentHandlerImpl#getQProperty(java.lang.String)
      */
     @Override
     public String getQProperty(String prop) {

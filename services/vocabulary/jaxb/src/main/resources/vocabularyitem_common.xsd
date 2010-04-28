@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema 
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"  
   xmlns:ns="http://collectionspace.org/services/vocabulary"
   xmlns="http://collectionspace.org/services/vocabulary"
   targetNamespace="http://collectionspace.org/services/vocabulary"
@@ -27,29 +29,39 @@
         </xs:complexType>
     </xs:element>
     
+    <!-- This is the base class for paginated lists -->
+    <xs:complexType name="abstractCommonListItem">
+        <xs:annotation>
+            <xs:appinfo>
+                <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
+            </xs:appinfo>
+        </xs:annotation>
+    </xs:complexType>
+
     <!-- Vocabularyitem instances, as in nuxeo repository -->
     <xs:element name="vocabularyitems-common-list">
         <xs:complexType>
-            <xs:sequence>
-								<xs:element name="pageNum" type="xs:unsignedInt" />
-								<xs:element name="pageSize" type="xs:unsignedInt" />
-								<xs:element name="totalItems" type="xs:unsignedInt" />
-                 <xs:element name="vocabularyitem_list_item" maxOccurs="unbounded">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element name="displayName" type="xs:string"
-                                minOccurs="1" />
-                            <!-- uri to retrieve vocabularyitem details -->
-                            <xs:element name="uri" type="xs:anyURI"
-                                minOccurs="1" />
-                            <xs:element name="refName" type="xs:string"
-                                minOccurs="1" />
-                            <xs:element name="csid" type="xs:string"
-                                minOccurs="1" />
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
-            </xs:sequence>
+            <xs:complexContent>
+                <xs:extension base="abstractCommonListItem">                                        
+                    <xs:sequence>
+                        <xs:element name="vocabularyitem_list_item" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="displayName" type="xs:string"
+                                        minOccurs="1" />
+                                    <!-- uri to retrieve vocabularyitem details -->
+                                    <xs:element name="uri" type="xs:anyURI"
+                                        minOccurs="1" />
+                                    <xs:element name="refName" type="xs:string"
+                                        minOccurs="1" />
+                                    <xs:element name="csid" type="xs:string"
+                                        minOccurs="1" />
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:extension>
+            </xs:complexContent>                    
         </xs:complexType>
     </xs:element>
     

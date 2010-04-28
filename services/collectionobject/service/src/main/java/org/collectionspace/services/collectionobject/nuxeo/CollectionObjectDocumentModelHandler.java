@@ -26,6 +26,8 @@ package org.collectionspace.services.collectionobject.nuxeo;
 import java.util.Iterator;
 import java.util.List;
 
+//import org.collectionspace.services.jaxb.AbstractCommonList;
+
 import org.collectionspace.services.CollectionObjectListItemJAXBSchema;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
@@ -47,6 +49,7 @@ import org.slf4j.LoggerFactory;
 public class CollectionObjectDocumentModelHandler
         extends RemoteDocumentModelHandlerImpl<CollectionobjectsCommon, CollectionobjectsCommonList> {
 
+    /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(CollectionObjectDocumentModelHandler.class);
     /**
      * collectionObject is used to stash JAXB object to use when handle is called
@@ -86,32 +89,40 @@ public class CollectionObjectDocumentModelHandler
         return collectionObjectList;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#setCommonPartList(java.lang.Object)
+     */
     @Override
     public void setCommonPartList(CollectionobjectsCommonList collectionObjectList) {
         this.collectionObjectList = collectionObjectList;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public CollectionobjectsCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
             throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#fillCommonPart(java.lang.Object, org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void fillCommonPart(CollectionobjectsCommon co, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public CollectionobjectsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        DocumentModelList docList = wrapDoc.getWrappedObject();
-
-        CollectionobjectsCommonList coList = new CollectionobjectsCommonList();
+        CollectionobjectsCommonList coList = this.extractPagingInfo(new CollectionobjectsCommonList(),
+        		wrapDoc);
         List<CollectionobjectsCommonList.CollectionObjectListItem> list = coList.getCollectionObjectListItem();
-
-        //FIXME: iterating over a long list of documents is not a long term
-        //strategy...need to change to more efficient iterating in future
-        Iterator<DocumentModel> iter = docList.iterator();
+        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
             CollectionObjectListItem coListItem = new CollectionObjectListItem();
@@ -128,6 +139,9 @@ public class CollectionObjectDocumentModelHandler
         return coList;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#fillAllParts(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
 
@@ -135,6 +149,12 @@ public class CollectionObjectDocumentModelHandler
         fillDublinCoreObject(wrapDoc); //dublincore might not be needed in future
     }
 
+    /**
+     * Fill dublin core object.
+     *
+     * @param wrapDoc the wrap doc
+     * @throws Exception the exception
+     */
     private void fillDublinCoreObject(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         DocumentModel docModel = wrapDoc.getWrappedObject();
         //FIXME property setter should be dynamically set using schema inspection
@@ -143,6 +163,9 @@ public class CollectionObjectDocumentModelHandler
         docModel.setPropertyValue("dublincore:title", CollectionObjectConstants.NUXEO_DC_TITLE);
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.AbstractMultipartDocumentHandlerImpl#getQProperty(java.lang.String)
+     */
     @Override
     public String getQProperty(String prop) {
         return CollectionObjectConstants.NUXEO_SCHEMA_NAME + ":" + prop;

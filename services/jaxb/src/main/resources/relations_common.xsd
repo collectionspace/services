@@ -13,10 +13,11 @@
 
 <xs:schema
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    jaxb:version="1.0" elementFormDefault="unqualified"
     xmlns="http://collectionspace.org/services/relation"
     xmlns:rel="http://collectionspace.org/services/relation"
-    targetNamespace="http://collectionspace.org/services/relation"
-    >
+    targetNamespace="http://collectionspace.org/services/relation">
 
     <!-- Relation -->
     <xs:element name="relations_common">
@@ -45,25 +46,38 @@
         </xs:restriction>
     </xs:simpleType>
 
+    <!-- This is the base class for paginated lists -->
+    <xs:complexType name="abstractCommonList">
+        <xs:annotation>
+            <xs:appinfo>
+                <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
+            </xs:appinfo>
+        </xs:annotation>
+    </xs:complexType>
+    
     <!-- collection objects as in nuxeo repository -->
     <xs:element name="relations-common-list">
         <xs:complexType>
-            <xs:sequence>
-                <xs:element name="relation-list-item" maxOccurs="unbounded">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <!-- uri to retrive collection object details -->
-                            <xs:element name="uri" type="xs:anyURI" minOccurs="1"/>
-                            <xs:element name="csid" type="xs:string" minOccurs="1"/>
-                            <xs:element name="subjectCsid" type="xs:string" minOccurs="1"/>
-                            <xs:element name="objectCsid" type="xs:string" minOccurs="1"/>
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
-            </xs:sequence>
+            <xs:complexContent>
+                <xs:extension base="abstractCommonList">                    
+                    <xs:sequence>
+                        <xs:element name="relation-list-item" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <!-- uri to retrive collection object details -->
+                                    <xs:element name="uri" type="xs:anyURI" minOccurs="1"/>
+                                    <xs:element name="csid" type="xs:string" minOccurs="1"/>
+                                    <xs:element name="subjectCsid" type="xs:string" minOccurs="1"/>
+                                    <xs:element name="objectCsid" type="xs:string" minOccurs="1"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:extension>
+            </xs:complexContent>                    
         </xs:complexType>
     </xs:element>
-
+    
 </xs:schema>
 
 

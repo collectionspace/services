@@ -108,26 +108,13 @@ public class PersonAuthorityDocumentModelHandler
 
     @Override
     public PersonauthoritiesCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        DocumentModelList docList = wrapDoc.getWrappedObject();
+        PersonauthoritiesCommonList coList = extractPagingInfo(new PersonauthoritiesCommonList(),
+        		wrapDoc);
 
-        PersonauthoritiesCommonList coList = new PersonauthoritiesCommonList();
-        List<PersonauthoritiesCommonList.PersonauthorityListItem> list = coList.getPersonauthorityListItem();
-
-        DocumentFilter filter = getDocumentFilter();
-        long pageNum, pageSize;
-        if(filter==null) {
-        	pageNum = 0;
-        	pageSize = 0;
-        } else {
-        	pageSize = filter.getPageSize();
-        	pageNum = filter.getOffset()/pageSize;
-        }
-        coList.setPageNum(pageNum);
-        coList.setPageSize(pageSize);
-    	coList.setTotalItems(docList.totalSize());
         //FIXME: iterating over a long list of documents is not a long term
         //strategy...need to change to more efficient iterating in future
-        Iterator<DocumentModel> iter = docList.iterator();
+        List<PersonauthoritiesCommonList.PersonauthorityListItem> list = coList.getPersonauthorityListItem();
+        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
             PersonauthorityListItem ilistItem = new PersonauthorityListItem();

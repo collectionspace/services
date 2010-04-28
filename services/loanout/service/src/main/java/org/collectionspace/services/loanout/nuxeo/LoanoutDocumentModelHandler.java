@@ -39,30 +39,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * LoanoutDocumentModelHandler
- *
- * $LastChangedRevision: $
- * $LastChangedDate: $
+ * The Class LoanoutDocumentModelHandler.
  */
 public class LoanoutDocumentModelHandler
         extends RemoteDocumentModelHandlerImpl<LoansoutCommon, LoansoutCommonList> {
 
+    /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(LoanoutDocumentModelHandler.class);
-    /**
-     * loanout is used to stash JAXB object to use when handle is called
-     * for Action.CREATE, Action.UPDATE or Action.GET
-     */
+    
+    /** The loanout. */
     private LoansoutCommon loanout;
-    /**
-     * loanoutList is stashed when handle is called
-     * for ACTION.GET_ALL
-     */
+    
+    /** The loanout list. */
     private LoansoutCommonList loanoutList;
 
 
     /**
-     * getCommonPart get associated loanout
-     * @return
+     * Gets the common part.
+     *
+     * @return the common part
      */
     @Override
     public LoansoutCommon getCommonPart() {
@@ -70,8 +65,9 @@ public class LoanoutDocumentModelHandler
     }
 
     /**
-     * setCommonPart set associated loanout
-     * @param loanout
+     * Sets the common part.
+     *
+     * @param loanout the new common part
      */
     @Override
     public void setCommonPart(LoansoutCommon loanout) {
@@ -79,40 +75,62 @@ public class LoanoutDocumentModelHandler
     }
 
     /**
-     * getCommonPartList get associated loanout (for index/GET_ALL)
-     * @return
+     * Gets the common part list.
+     *
+     * @return the common part list
      */
     @Override
     public LoansoutCommonList getCommonPartList() {
         return loanoutList;
     }
 
+    /**
+     * Sets the common part list.
+     *
+     * @param loanoutList the new common part list
+     */
     @Override
     public void setCommonPartList(LoansoutCommonList loanoutList) {
         this.loanoutList = loanoutList;
     }
 
+    /**
+     * Extract common part.
+     *
+     * @param wrapDoc the wrap doc
+     * @return the loansout common
+     * @throws Exception the exception
+     */
     @Override
     public LoansoutCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
             throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Fill common part.
+     *
+     * @param loanoutObject the loanout object
+     * @param wrapDoc the wrap doc
+     * @throws Exception the exception
+     */
     @Override
     public void fillCommonPart(LoansoutCommon loanoutObject, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Extract common part list.
+     *
+     * @param wrapDoc the wrap doc
+     * @return the loansout common list
+     * @throws Exception the exception
+     */
     @Override
     public LoansoutCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        DocumentModelList docList = wrapDoc.getWrappedObject();
-
-        LoansoutCommonList coList = new LoansoutCommonList();
+        LoansoutCommonList coList = extractPagingInfo(new LoansoutCommonList(), wrapDoc);
         List<LoansoutCommonList.LoanoutListItem> list = coList.getLoanoutListItem();
-
-        //FIXME: iterating over a long list of documents is not a long term
-        //strategy...need to change to more efficient iterating in future
-        Iterator<DocumentModel> iter = docList.iterator();
+        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
             LoanoutListItem ilistItem = new LoanoutListItem();
@@ -130,9 +148,10 @@ public class LoanoutDocumentModelHandler
     }
 
     /**
-     * getQProperty converts the given property to qualified schema property
-     * @param prop
-     * @return
+     * Gets the q property.
+     *
+     * @param prop the prop
+     * @return the q property
      */
     @Override
     public String getQProperty(String prop) {
