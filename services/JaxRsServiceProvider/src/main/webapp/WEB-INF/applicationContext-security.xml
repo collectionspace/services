@@ -5,6 +5,8 @@
     Copyright 2010 University of California at Berkeley
     Description:
         spring security namespace for CS service layer
+        ref: http://blog.springsource.com/2010/03/06/behind-the-spring-security-namespace/
+
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -14,27 +16,30 @@
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <!--sec:http use-expressions="true" realm="org.collectionspace.services">
-        <sec:http-basic />
-        <sec:logout />
-        <sec:anonymous enabled="false"/>
-    </sec:http-->
-
-    <sec:global-method-security >
-        <sec:expression-handler ref="expressionHandler"/>
-    </sec:global-method-security>
-
+    <!--
+        debugging tips : enable following categories in
+        $JBOSS_HOME/server/cspace/conf/jboss-log4j.xml to priority DEBUG
+        org.apache.catalina.core
+        org.springframework.security
+    -->
 
     <bean id="springSecurityFilterChain"
           class="org.springframework.security.web.FilterChainProxy">
         <sec:filter-chain-map path-type="ant">
             <sec:filter-chain pattern="/**"
-                              filters="securityPersistenceFilter,basicAuthenticationFilter,logoutFilter,exTranslationFilter,filterInvocationInterceptor"/>
+                              filters="securityContextPersistenceFilter,basicAuthenticationFilter,logoutFilter,exTranslationFilter,filterInvocationInterceptor"/>
         </sec:filter-chain-map>
     </bean>
 
-    <bean id="securityPersistenceFilter"
-          class="org.springframework.security.web.context.SecurityContextPersistenceFilter"/>
+    <bean id="securityContextPersistenceFilter"
+          class="org.springframework.security.web.context.SecurityContextPersistenceFilter">
+        <property name='securityContextRepository'>
+            <bean class='org.springframework.security.web.context.HttpSessionSecurityContextRepository'>
+                <property name='allowSessionCreation' value='true' />
+            </bean>
+        </property>
+    </bean>
+
 
     <bean id="basicAuthenticationFilter"
           class="org.springframework.security.web.authentication.www.BasicAuthenticationFilter">
@@ -59,12 +64,8 @@
 
     <bean id="exTranslationFilter"
           class="org.springframework.security.web.access.ExceptionTranslationFilter">
-        <property name="authenticationEntryPoint" ref="preAuthenticatedProcessingFilterEntryPoint"/>
+        <property name="authenticationEntryPoint" ref="basicAuthenticationEntryPoint"/>
     </bean>
-
-    <bean id="preAuthenticatedProcessingFilterEntryPoint"
-          class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint"/>
-
 
     <sec:authentication-manager alias="authenticationManager">
         <sec:authentication-provider ref="jaasAuthenticationProvider" user-service-ref="userDetailsService"/>
