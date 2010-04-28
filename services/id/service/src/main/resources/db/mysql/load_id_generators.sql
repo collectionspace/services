@@ -287,7 +287,7 @@ INSERT INTO `id_generators`
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES 
     ('ed87e7c6-0678-4f42-9d33-f671835586ef',
-     'Loans-in Number',
+     'Loan In Number',
      'Identifies activities in which collection objects are
 received on loan.',
      '9',
@@ -327,9 +327,8 @@ received on loan.',
 INSERT INTO `id_generators`
     (csid, displayname, description, priority, last_generated_id, id_generator_state)
   VALUES
--- Need to change this CSID
     ('4b984865-f93d-4481-b874-3dba863ec589',
-     'Loans Out Number',
+     'Loan Out Number',
      'Identifies activities in which collection objects are
 loaned out of the institution.',
      '9',
