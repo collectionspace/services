@@ -127,7 +127,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
@@ -241,7 +241,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+        @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
     public void createWithMostInvalid(String testName) throws Exception {
 

@@ -28,6 +28,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import org.collectionspace.services.account.AccountsCommon;
+import org.collectionspace.services.account.storage.csidp.UserStorageClient;
 import org.collectionspace.services.authentication.User;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
@@ -55,6 +56,7 @@ import org.slf4j.LoggerFactory;
 public class AccountStorageClient extends JpaStorageClientImpl {
 
     private final Logger logger = LoggerFactory.getLogger(AccountStorageClient.class);
+    private UserStorageClient userStorageClient = new UserStorageClient();
 
     public AccountStorageClient() {
     }
@@ -74,9 +76,9 @@ public class AccountStorageClient extends JpaStorageClientImpl {
         }
         EntityManagerFactory emf = null;
         EntityManager em = null;
+        AccountsCommon account = (AccountsCommon) handler.getCommonPart();
         try {
             handler.prepare(Action.CREATE);
-            AccountsCommon account = (AccountsCommon) handler.getCommonPart();
             DocumentWrapper<AccountsCommon> wrapDoc =
                     new DocumentWrapperImpl<AccountsCommon>(account);
             handler.handle(Action.CREATE, wrapDoc);
@@ -84,8 +86,9 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             em = emf.createEntityManager();
             em.getTransaction().begin();
             //if userid and password are given, add to default id provider
-            if (account.getUserId() != null && account.getPassword() != null) {
-                User user = createUser(account);
+            if (account.getUserId() != null && isForCSIdP(account.getPassword())) {
+                User user = userStorageClient.create(account.getUserId(),
+                        account.getPassword());
                 em.persist(user);
             }
 //            if (accountReceived.getTenant() != null) {
@@ -103,11 +106,21 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             }
             throw bre;
         } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            boolean uniqueConstraint = false;
+            if (userStorageClient.get(em, account.getUserId()) != null) {
+                //might be unique constraint violation
+                uniqueConstraint = true;
+            }
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception ", e);
+            if (uniqueConstraint) {
+                String msg = "UserId exists. Non unique userId=" + account.getUserId();
+                logger.error(msg);
+                throw new BadRequestException(msg);
             }
             throw new DocumentException(e);
         } finally {
@@ -141,8 +154,10 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             checkAllowedUpdates(accountReceived, accountFound);
             //if userid and password are given, add to default id provider
             if (accountReceived.getUserId() != null
-                    && hasPassword(accountReceived.getPassword())) {
-                updateUser(em, accountReceived);
+                    && isForCSIdP(accountReceived.getPassword())) {
+                userStorageClient.update(em,
+                        accountReceived.getUserId(),
+                        accountReceived.getPassword());
             }
             DocumentWrapper<AccountsCommon> wrapDoc =
                     new DocumentWrapperImpl<AccountsCommon>(accountFound);
@@ -188,37 +203,12 @@ public class AccountStorageClient extends JpaStorageClientImpl {
         try {
             emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
-            //TODO investigate if deep delete is possible
-            //query an delete is inefficient
+
             AccountsCommon accountFound = getAccount(em, id);
-
-            //TODO: add tenant id
-
-            //if userid gives any indication about the id provider, it should
-            //be used to avoid the following approach
-            Query usrDel = null;
-            User userLocal = getUser(em, accountFound);
-            if (userLocal != null) {
-                StringBuilder usrDelStr = new StringBuilder("DELETE FROM ");
-                usrDelStr.append(User.class.getCanonicalName());
-                usrDelStr.append(" WHERE username = :username");
-                //TODO: add tenant id
-                usrDel = em.createQuery(usrDelStr.toString());
-                usrDel.setParameter("username", accountFound.getUserId());
-            }
             em.getTransaction().begin();
-
-            if (userLocal != null) {
-                int usrDelCount = usrDel.executeUpdate();
-                if (usrDelCount != 1) {
-                    if (em != null && em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
-                    }
-                    String msg = "could not find user with username=" + accountFound.getUserId();
-                    logger.error(msg);
-                    throw new DocumentNotFoundException(msg);
-                }
-            }
+            //if userid gives any indication about the id provider, it should
+            //be used to avoid  delete
+            userStorageClient.delete(em, accountFound.getUserId());
             em.remove(accountFound);
             em.getTransaction().commit();
 
@@ -257,64 +247,24 @@ public class AccountStorageClient extends JpaStorageClientImpl {
 
     private boolean checkAllowedUpdates(AccountsCommon toAccount, AccountsCommon fromAccount) throws BadRequestException {
         if (!fromAccount.getUserId().equals(toAccount.getUserId())) {
-            String msg = "User id " + toAccount.getUserId() + " does not match "
-                    + "for given account with csid=" + fromAccount.getCsid();
+            String msg = "userId=" + toAccount.getUserId() + " of existing account does not match "
+                    + "the userId=" + fromAccount.getUserId()
+                    + " with csid=" + fromAccount.getCsid();
             logger.error(msg);
-            logger.debug(msg + " found userid=" + fromAccount.getUserId());
+            if (logger.isDebugEnabled()) {
+                logger.debug(msg + " found userid=" + fromAccount.getUserId());
+            }
             throw new BadRequestException(msg);
         }
         return true;
     }
 
-    private User createUser(AccountsCommon account) throws Exception {
-        User user = new User();
-        user.setUsername(account.getUserId());
-        if (hasPassword(account.getPassword())) {
-            user.setPasswd(getEncPassword(account));
-        }
-        user.setCreatedAtItem(new Date());
-        return user;
-    }
-
-    private User getUser(EntityManager em, AccountsCommon account) throws DocumentNotFoundException {
-        User userFound = em.find(User.class, account.getUserId());
-        if (userFound == null) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
-            String msg = "could not find user with id=" + account.getUserId();
-            logger.error(msg);
-            throw new DocumentNotFoundException(msg);
-        }
-        return userFound;
-    }
-
-    private void updateUser(EntityManager em, AccountsCommon account) throws Exception {
-        User userFound = getUser(em, account);
-        if (userFound != null) {
-            userFound.setPasswd(getEncPassword(account));
-            userFound.setUpdatedAtItem(new Date());
-            if (logger.isDebugEnabled()) {
-                logger.debug("updated user=" + JaxbUtils.toString(userFound, User.class));
-            }
-            em.persist(userFound);
-        }
-    }
-
-    private String getEncPassword(AccountsCommon account) throws BadRequestException {
-        //jaxb unmarshaller already unmarshal xs:base64Binary, no need to b64 decode
-        //byte[] bpass = Base64.decodeBase64(accountReceived.getPassword());
-        try {
-            SecurityUtils.validatePassword(new String(account.getPassword()));
-        } catch (Exception e) {
-            throw new BadRequestException(e.getMessage());
-        }
-        String secEncPasswd = SecurityUtils.createPasswordHash(
-                account.getUserId(), new String(account.getPassword()));
-        return secEncPasswd;
-    }
-
-    private boolean hasPassword(byte[] bpass) {
+    /**
+     * isForCSIdP deteremines if the create/update is also needed for CS IdP
+     * @param bpass
+     * @return
+     */
+    private boolean isForCSIdP(byte[] bpass) {
         return bpass != null && bpass.length > 0;
     }
 //    private UserTenant createTenantAssoc(AccountsCommon accountReceived) {
