@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.collectionspace.services.authorization.Permission;
+import org.collectionspace.services.authorization.PermissionAction;
 import org.collectionspace.services.authorization.PermissionsList;
 
 import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
@@ -88,8 +89,11 @@ public class PermissionDocumentHandler
         if (from.getEffect() != null) {
             to.setEffect(from.getEffect());
         }
-
-        //fixme update on actions
+        List<PermissionAction> fromActions = from.getActions();
+        if(!fromActions.isEmpty()) {
+            //override the whole list, no reconcilliation by design
+            to.setActions(fromActions);
+        }
 
         if (logger.isDebugEnabled()) {
             logger.debug("merged permission=" + JaxbUtils.toString(to, Permission.class));

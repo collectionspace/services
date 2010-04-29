@@ -375,9 +375,57 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
                 "Data in updated object did not match submitted data.");
     }
 
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"update"})
+    public void updateActions(String testName) throws Exception {
+
+        // Perform setup.
+        setupUpdate(testName);
+
+        Permission permToUpdate = new Permission();
+        permToUpdate.setCsid(knownResourceId);
+        // Update the content of this resource.
+        List<PermissionAction> actions = PermissionFactory.createDefaultActions();
+        int default_actions = actions.size();
+        actions.remove(0);
+        actions.remove(0);
+        int toUpdate_actions = actions.size();
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + " no. of actions default=" + default_actions
+                    + " to update =" + toUpdate_actions);
+        }
+        permToUpdate.setActions(actions);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + " updated object\n"
+                    + objectAsXmlString(permToUpdate, Permission.class));
+        }
+        PermissionClient client = new PermissionClient();
+        // Submit the request to the service and store the response.
+        ClientResponse<Permission> res = client.update(knownResourceId, permToUpdate);
+        int statusCode = res.getStatus();
+        // Check the status code of the response: does it match the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        Permission permUpdated = (Permission) res.getEntity();
+        Assert.assertNotNull(permUpdated);
+        int updated_actions = permToUpdate.getActions().size();
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + " no. of actions to update=" + toUpdate_actions
+                    + " updated =" + updated_actions);
+        }
+        Assert.assertEquals(toUpdate_actions,
+                updated_actions,
+                "Data in updated object did not match submitted data.");
+    }
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
+
     @Override
     public void updateWithEmptyEntityBody(String testName) throws Exception {
     }
@@ -431,7 +479,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     // Success outcomes
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"update"})
+    dependsOnMethods = {"updateActions"})
     public void delete(String testName) throws Exception {
 
         // Perform setup.
@@ -537,17 +585,16 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         return permission;
     }
 
-
     @AfterClass(alwaysRun = true)
     public void cleanUp() {
         setupDelete("delete");
         String noTest = System.getProperty("noTestCleanup");
-    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+        if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Skipping Cleanup phase ...");
             }
             return;
-    	}
+        }
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }

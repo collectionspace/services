@@ -57,13 +57,13 @@ public class PermissionValidatorHandler implements ValidatorHandler {
                 //create specific validation here
                 if (permission.getResourceName() == null || permission.getResourceName().isEmpty()) {
                     invalid = true;
-                    msgBldr.append("\npermissionName : missing");
+                    msgBldr.append("\nresourceName : missing or empty");
                 }
             } else if (action.equals(Action.UPDATE)) {
                 //update specific validation here
                 if (permission.getResourceName() != null && permission.getResourceName().isEmpty()) {
                     invalid = true;
-                    msgBldr.append("\npermissionName : cannot be changed!");
+                    msgBldr.append("\nresourceName : cannot be empty");
                 }
             }
             if (invalid) {

@@ -54,6 +54,8 @@ public class RoleDocumentHandler
         String id = UUID.randomUUID().toString();
         Role role = wrapDoc.getWrappedObject();
         role.setCsid(id);
+        //FIXME: if admin updating the role is a CS admin rather than
+        //the tenant admin, tenant id should be retrieved from the request
         role.setTenantId(getServiceContext().getTenantId());
     }
 
