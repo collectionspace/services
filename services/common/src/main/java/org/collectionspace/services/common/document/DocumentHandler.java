@@ -86,18 +86,24 @@ public interface DocumentHandler<T, TL, WT, WTL> {
     public void prepareUpdate() throws Exception;
 
     /**
-     * prepareGet processes query from repository before retrieving document from
+     * prepareGet processes query before retrieving document from
      * repository
      * @throws Exception
      */
     public void prepareGet() throws Exception;
 
     /**
-     * prepareGetAll processes query from repository before retrieving document(s) from
+     * prepareGetAll processes query before retrieving document(s) from
      * repository
      * @throws Exception
      */
     public void prepareGetAll() throws Exception;
+
+    /**
+     * prepareDelete processes delete before deleting document from repository
+     * @throws Exception
+     */
+    public void prepareDelete() throws Exception;
 
     /**
      * prepare is called by the client to hand over the document processing task
@@ -136,6 +142,13 @@ public interface DocumentHandler<T, TL, WT, WTL> {
     public void handleGetAll(DocumentWrapper<WTL> wrapDoc) throws Exception;
 
     /**
+     * handleDelete processes documents for the deletion of document in repository
+     * @param wrapDoc
+     * @throws Exception
+     */
+    public void handleDelete(DocumentWrapper<WT> wrapDoc) throws Exception;
+
+    /**
      * complete is called by the client to provide an opportunity to the handler
      * to take care of stuff before closing session with the repository. example
      * could be to reclaim resources or to populate response to the consumer
@@ -171,6 +184,13 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @throws Exception
      */
     public void completeGetAll(DocumentWrapper<WTL> wrapDoc) throws Exception;
+
+    /**
+     * completeDelete is called by the client to indicate completion of the delete call.
+     * @param wrapDoc
+     * @throws Exception
+     */
+    public void completeDelete(DocumentWrapper<WT> wrapDoc) throws Exception;
 
     /**
      * extractCommonPart extracts common part of a CS object from given document.
@@ -224,7 +244,7 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @param properties
      */
     public void setProperties(Map<String, Object> properties);
-    
+
     /**
      * createDocumentFilter is a factory method to create a document
      * filter that is relevant to be used with this document handler

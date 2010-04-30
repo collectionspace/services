@@ -80,7 +80,6 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
 //    	DocumentFilter docFilter = this.createDocumentFilter(ctx);
 //    	this.setDocumentFilter(docFilter);
 //    }
-    
     @Override
     public abstract DocumentFilter createDocumentFilter();
 
@@ -121,6 +120,10 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
                 prepareGetAll();
                 break;
 
+            case DELETE:
+                prepareDelete();
+                break;
+
         }
     }
 
@@ -138,6 +141,10 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
 
     @Override
     public void prepareGetAll() throws Exception {
+    }
+
+    @Override
+    public void prepareDelete() throws Exception {
     }
 
     @Override
@@ -159,6 +166,10 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
                 handleGetAll((DocumentWrapper<WTL>) wrapDoc);
                 break;
 
+            case DELETE:
+                handleDelete((DocumentWrapper<WT>) wrapDoc);
+                break;
+
         }
     }
 
@@ -173,6 +184,11 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
 
     @Override
     public abstract void handleGetAll(DocumentWrapper<WTL> wrapDoc) throws Exception;
+
+    @Override
+    public void handleDelete(DocumentWrapper<WT> wrapDoc) throws Exception {
+        
+    }
 
     @Override
     final public void complete(Action action, DocumentWrapper<?> wrapDoc) throws Exception {
@@ -192,14 +208,13 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
             case GET_ALL:
                 completeGetAll((DocumentWrapper<WTL>) wrapDoc);
                 break;
+
+            case DELETE:
+                completeDelete((DocumentWrapper<WT>) wrapDoc);
+                break;
         }
     }
 
-    /**
-     * completeCreate is called by the client to indicate completion of the create call.
-     * @param wrapDoc
-     * @throws Exception
-     */
     @Override
     public void completeCreate(DocumentWrapper<WT> wrapDoc) throws Exception {
     }
@@ -215,6 +230,10 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
 
     @Override
     public void completeGetAll(DocumentWrapper<WTL> wrapDoc) throws Exception {
+    }
+
+    @Override
+    public void completeDelete(DocumentWrapper<WT> wrapDoc) throws Exception {
     }
 
     @Override

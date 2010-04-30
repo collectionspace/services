@@ -50,6 +50,18 @@ public interface StorageClient {
      */
     void delete(ServiceContext ctx, String id) throws DocumentNotFoundException, DocumentException;
 
+
+    /**
+     * delete a entity from the persistence store
+     * @param ctx service context under which this method is invoked
+     * @param id of the entity
+     * @param handler to perform additional operations such as pre and post processing
+     * @throws DocumentNotFoundException if entity not found
+     * @throws DocumentException
+     */
+    void delete(ServiceContext ctx, String id, DocumentHandler handler) throws DocumentNotFoundException, DocumentException;
+
+
     /**
      * get entity from the persistence store
      * @param ctx service context under which this method is invoked

@@ -294,15 +294,7 @@ public class JpaStorageClientImpl implements StorageClient {
             emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
             em.getTransaction().begin();
-            Object entityFound = em.find(entityReceived.getClass(), id);
-            if (entityFound == null) {
-                if (em != null && em.getTransaction().isActive()) {
-                    em.getTransaction().rollback();
-                }
-                String msg = "could not find entity with id=" + id;
-                logger.error(msg);
-                throw new DocumentNotFoundException(msg);
-            }
+            Object entityFound = getEntity(em, id, entityReceived.getClass());
             DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entityFound);
             handler.handle(Action.UPDATE, wrapDoc);
             em.getTransaction().commit();
@@ -326,7 +318,9 @@ public class JpaStorageClientImpl implements StorageClient {
         }
     }
 
-    /* delete use delete to remove parent entityReceived along with child entities
+    /* 
+     * delete removes entity and its child entities
+     * cost: a get before delete
      * @see org.collectionspace.services.common.storage.StorageClient#delete(org.collectionspace.services.common.context.ServiceContext, java.lang.String)
      */
     @Override
@@ -334,13 +328,13 @@ public class JpaStorageClientImpl implements StorageClient {
             throws DocumentNotFoundException,
             DocumentException {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug("deleting entity with id=" + id);
+        }
+
         if (ctx == null) {
             throw new IllegalArgumentException(
                     "JpaStorageClient.delete: ctx is missing");
-        }
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("deleting entity with id=" + id);
         }
         EntityManagerFactory emf = null;
         EntityManager em = null;
@@ -383,7 +377,7 @@ public class JpaStorageClientImpl implements StorageClient {
      * deleteWhere uses the where clause to delete an entityReceived represented by the csidReceived
      * it does not delete any child entities.
      * @param ctx
-     * @param csidReceived
+     * @param id
      * @throws DocumentNotFoundException
      * @throws DocumentException
      */
@@ -442,6 +436,43 @@ public class JpaStorageClientImpl implements StorageClient {
         }
     }
 
+    @Override
+    public void delete(ServiceContext ctx, String id, DocumentHandler handler)
+            throws DocumentNotFoundException, DocumentException {
+        if (ctx == null) {
+            throw new IllegalArgumentException(
+                    "JpaStorageClient.delete: ctx is missing");
+        }
+        if (handler == null) {
+            throw new IllegalArgumentException(
+                    "JpaStorageClient.delete: handler is missing");
+        }
+        EntityManagerFactory emf = null;
+        EntityManager em = null;
+        try {
+            handler.prepare(Action.DELETE);
+            Object entity = handler.getCommonPart();
+            DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entity);
+
+            handler.handle(Action.DELETE, wrapDoc);
+            handler.complete(Action.DELETE, wrapDoc);
+        } catch (DocumentException de) {
+            throw de;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw new DocumentException(e);
+        } finally {
+            if (emf != null) {
+                JpaStorageUtils.releaseEntityManagerFactory(emf);
+            }
+        }
+    }
+
     /**
      * Gets the entityReceived name.
      * 
@@ -452,8 +483,8 @@ public class JpaStorageClientImpl implements StorageClient {
     protected String getEntityName(ServiceContext ctx) {
         Object o = ctx.getProperty(ServiceContextProperties.ENTITY_NAME);
         if (o == null) {
-            throw new IllegalArgumentException(ServiceContextProperties.ENTITY_NAME +
-                    "property is missing in context "
+            throw new IllegalArgumentException(ServiceContextProperties.ENTITY_NAME
+                    + "property is missing in context "
                     + ctx.toString());
         }
 
@@ -462,25 +493,35 @@ public class JpaStorageClientImpl implements StorageClient {
 
     /**
      * getEntity returns persistent entity for given id. it assumes that
-     * JpaStorageClientImpl is implemented using the JpaStorageClientImpl(entityClazz)
-     * constructor
+     * service context has property ServiceContextProperties.ENTITY_CLASS set
      * @param ctx service context
      * @param em entity manager
      * @param csid received
      * @return
-     * @throws DocumentNotFoundException
-     * @throws UnsupportedOperationException if JpaStorageClientImpl is not implemented
-     * using the JpaStorageClientImpl(entityClazz)
-     * constructor
+     * @throws DocumentNotFoundException and rollsback the transaction if active
      */
-    protected Object getEntity(ServiceContext ctx, EntityManager em, String id) throws DocumentNotFoundException {
+    protected Object getEntity(ServiceContext ctx, EntityManager em, String id)
+            throws DocumentNotFoundException {
         Class entityClazz = (Class) ctx.getProperty(ServiceContextProperties.ENTITY_CLASS);
         if (entityClazz == null) {
-            String msg = ServiceContextProperties.ENTITY_CLASS +
-                    " property is missing in the context";
+            String msg = ServiceContextProperties.ENTITY_CLASS
+                    + " property is missing in the context";
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }
+        return getEntity(em, id, entityClazz);
+    }
+
+    /**
+     * getEntity retrieves the persistent entity of given class for given id
+     * @param em
+     * @param id entity id
+     * @param entityClazz
+     * @return
+     * @throws DocumentNotFoundException and rollsback the transaction if active
+     */
+    protected Object getEntity(EntityManager em, String id, Class entityClazz)
+            throws DocumentNotFoundException {
         Object entityFound = JpaStorageUtils.getEntity(em, id, entityClazz);
         if (entityFound == null) {
             if (em != null && em.getTransaction().isActive()) {
