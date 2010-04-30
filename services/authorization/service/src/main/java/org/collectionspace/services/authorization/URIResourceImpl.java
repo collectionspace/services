@@ -20,28 +20,6 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *//**
- *  This document is a part of the source code and related artifacts
- *  for CollectionSpace, an open source collections management system
- *  for museums and related institutions:
-
- *  http://www.collectionspace.org
- *  http://wiki.collectionspace.org
-
- *  Copyright 2009 University of California at Berkeley
-
- *  Licensed under the Educational Community License (ECL), Version 2.0.
- *  You may not use this file except in compliance with this License.
-
- *  You may obtain a copy of the ECL 2.0 License at
-
- *  https://source.collectionspace.org/collection-space/LICENSE.txt
-
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
  */
 package org.collectionspace.services.authorization;
 
@@ -55,29 +33,54 @@ public class URIResourceImpl extends CSpaceResourceImpl {
 
     private String uri;
     private String method;
-    private CSpaceAction action;
 
     /**
      * constructor that is usually called from service runtime
+     * uses current tenant id from the context
      * @param uri
      * @param method an http method
      */
     public URIResourceImpl(String uri, String method) {
-        super(getParent(uri) + "#" + getAction(method).toString(), TYPE.URI);
-        action = getAction(method);
+        super(buildId(getParent(uri), getAction(method)),
+                getAction(method), TYPE.URI);
+        this.uri = uri;
+        this.method = method;
+    }
+
+    /**
+     * constructor that is usually called from service runtime
+     * @param tenantId id of the tenant to which this resource is associated
+     * @param uri
+     * @param method an http method
+     */
+    public URIResourceImpl(String tenantId, String uri, String method) {
+        super(tenantId, buildId(getParent(uri), getAction(method)),
+                getAction(method), TYPE.URI);
         this.uri = uri;
         this.method = method;
     }
 
     /**
      * constructor that is usually called from administrative interface
+     * uses current tenant id from the context
      * @param resourceName
      * @param actionType
      */
     public URIResourceImpl(String resourceName, ActionType actionType) {
         //FIXME more validation might be needed
-        super(resourceName + "#" + getAction(actionType).toString(), TYPE.URI);
-        action = getAction(actionType);
+        super(buildId(resourceName, getAction(actionType)),
+                getAction(actionType), TYPE.URI);
+    }
+
+    /**
+     * constructor that is usually called from administrative interface
+     * @param tenantId id of the tenant to which this resource is associated
+     * @param resourceName
+     * @param actionType
+     */
+    public URIResourceImpl(String tenantId, String resourceName, ActionType actionType) {
+        super(tenantId, buildId(resourceName, getAction(actionType)),
+                getAction(actionType), TYPE.URI);
     }
 
     /**
@@ -88,32 +91,14 @@ public class URIResourceImpl extends CSpaceResourceImpl {
     }
 
     /**
-     * @param uri the uri to set
-     */
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
-
-    /**
      * @return the method
      */
     public String getMethod() {
         return method;
     }
 
-    /**
-     * @param method the method to set
-     */
-    public void setMethod(String method) {
-        this.method = method;
-    }
-
-    /**
-     * getAction a convenience method to get action invoked on the resource
-     */
-    @Override
-    public CSpaceAction getAction() {
-        return action;
+    private static String buildId(String resourceName, CSpaceAction action) {
+        return resourceName + SEPARATOR_HASH + action.toString();
     }
 
     private static String getParent(String uri) {
@@ -173,8 +158,6 @@ public class URIResourceImpl extends CSpaceResourceImpl {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("URIResourceImpl [");
-        builder.append("action=");
-        builder.append(action);
         builder.append(", method=");
         builder.append(method);
         builder.append(", uri=");
@@ -182,6 +165,4 @@ public class URIResourceImpl extends CSpaceResourceImpl {
         builder.append("]");
         return builder.toString() + " " + super.toString();
     }
-
-
 }

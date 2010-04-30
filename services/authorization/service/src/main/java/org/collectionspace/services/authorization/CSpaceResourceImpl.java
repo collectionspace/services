@@ -23,29 +23,69 @@
  */
 package org.collectionspace.services.authorization;
 
+import org.collectionspace.authentication.AuthN;
+
 /**
  * CSpaceResourceImpl abstract resource implementation
  * @author 
  */
 public abstract class CSpaceResourceImpl implements CSpaceResource {
 
+    final protected static String SEPARATOR_HASH = "#";
+    final protected static String SEPARATOR_COLON = ":";
     private String id;
     private TYPE type;
+    private CSpaceAction action;
+    private String tenantId;
 
-    public CSpaceResourceImpl() {
+    private CSpaceResourceImpl() {
     }
 
-    public CSpaceResourceImpl(String id, TYPE type) {
-        if (id == null || id.isEmpty() || type == null) {
-            throw new IllegalArgumentException("id and/or type cannot be null or empty");
+    /**
+     * constructor that uses logged in user's tenant context to associate resource with
+     * @param id
+     * @param action
+     * @param type
+     */
+    public CSpaceResourceImpl(String id, CSpaceAction action, TYPE type) {
+        setup(id, action, type);
+        tenantId = AuthN.get().getCurrentTenantId();
+    }
+
+    /**
+     * constructor that uses given tenant id to associate the resource with
+     * @param tenantId
+     * @param id
+     * @param action
+     * @param type
+     */
+    public CSpaceResourceImpl(String tenantId, String id, CSpaceAction action, TYPE type) {
+        setup(id, action, type);
+        if (tenantId == null) {
+            throw new IllegalArgumentException("tenantId cannot be null");
+        }
+        this.tenantId = tenantId;
+    }
+
+    private void setup(String id, CSpaceAction action, TYPE type) {
+        if (id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("id cannot be null or empty");
         }
         this.id = id;
+        if (type == null) {
+            throw new IllegalArgumentException("type cannot be null");
+        }
+        this.action = action;
+        if (action == null) {
+            throw new IllegalArgumentException("action cannot be null");
+        }
         this.type = type;
     }
 
     @Override
     public String getId() {
-        return id;
+        //tenant-qualified id
+        return tenantId + SEPARATOR_COLON + id;
     }
 
     @Override
@@ -54,7 +94,17 @@ public abstract class CSpaceResourceImpl implements CSpaceResource {
     }
 
     @Override
-    public abstract CSpaceAction getAction();
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    /**
+     * getAction a convenience method to get action invoked on the resource
+     */
+    @Override
+    public CSpaceAction getAction() {
+        return action;
+    }
 
     @Override
     public String toString() {
@@ -64,9 +114,11 @@ public abstract class CSpaceResourceImpl implements CSpaceResource {
         builder.append(id);
         builder.append(", type=");
         builder.append(type);
+        builder.append(", tenantId=");
+        builder.append(tenantId);
+        builder.append(", action=");
+        builder.append(action.toString());
         builder.append("]");
         return builder.toString();
     }
-
-    
 }

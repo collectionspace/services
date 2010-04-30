@@ -82,10 +82,20 @@ final public class SpringAuthNContext extends AuthNContext {
 
         ArrayList<String> tenantList = new ArrayList<String>();
         CSpaceTenant[] tenants = getTenants();
-        for(CSpaceTenant tenant : tenants) {
+        for (CSpaceTenant tenant : tenants) {
             tenantList.add(tenant.getId());
         }
         return tenantList.toArray(new String[0]);
+    }
+
+    @Override
+    public String getCurrentTenantId() {
+        //FIXME assumption in 1.0: each user is associated with a single tenant
+        String[] tenantIds = getTenantIds();
+        if (tenantIds.length < 1) {
+            throw new IllegalStateException("No tenant associated with user=" + getUserId());
+        }
+        return getTenantIds()[0];
     }
 
     public CSpaceTenant[] getTenants() {
@@ -124,6 +134,16 @@ final public class SpringAuthNContext extends AuthNContext {
             }
         }
         return tenants.toArray(new CSpaceTenant[0]);
+    }
+
+    @Override
+    public String getCurrentTenantName() {
+        //FIXME assumption in 1.0: each user is associated with a single tenant
+        CSpaceTenant[] tenants = getTenants();
+        if (tenants.length < 1) {
+            throw new IllegalStateException("No tenant associated with user=" + getUserId());
+        }
+        return getTenants()[0].getName();
     }
 
     public Subject getSubject() {

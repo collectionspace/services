@@ -75,11 +75,12 @@ public class AuthZ {
     }
 
     /**
-     * addPermissions add permissions from given permission configuration
+     * addUriPermissions add permissions from given permission configuration
+     * with assumption that resource is of type URI
      * @param permission configuration
      */
     //FIXME this method should be in the restful web service resource of authz
-    public void addPermissions(Permission perm,
+    public void addUriPermissions(Permission perm,
             PermissionRole permRole) throws PermissionException {
         List<String> principals = new ArrayList<String>();
         if (!perm.getCsid().equals(permRole.getPermissions().get(0).getPermissionId())) {
@@ -93,7 +94,8 @@ public class AuthZ {
         }
         List<PermissionAction> permActions = perm.getActions();
         for (PermissionAction permAction : permActions) {
-            URIResourceImpl uriRes = new URIResourceImpl(perm.getResourceName(),
+            URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(),
+                    perm.getResourceName(),
                     permAction.getName());
             addPermission(uriRes, principals.toArray(new String[0]));
         }
@@ -158,17 +160,6 @@ public class AuthZ {
      */
     public boolean isAccessAllowed(CSpaceResource res) {
         CSpaceAction action = res.getAction();
-        return isAccessAllowed(res, action);
-    }
-
-    /**
-     * isAccessAllowed check if authenticated principal is allowed to access
-     * given resource per given permission
-     * @param res
-     * @param perm
-     * @return
-     */
-    public boolean isAccessAllowed(CSpaceResource res, CSpaceAction action) {
         return provider.getPermissionEvaluator().hasPermission(res, action);
     }
 }

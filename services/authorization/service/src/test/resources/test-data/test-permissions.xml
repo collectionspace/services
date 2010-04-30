@@ -15,6 +15,7 @@
             <name>DELETE</name>
         </action>
         <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
     </permission>
     <permission csid="2">
         <resourceName>collectionobjects</resourceName>
@@ -31,5 +32,6 @@
             <name>DELETE</name>
         </action>
         <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
     </permission>
 </ns2:permissions_list>

@@ -22,7 +22,6 @@
  *  limitations under the License.
 .
  */
-
 package org.collectionspace.authentication.spi;
 
 import javax.security.auth.Subject;
@@ -39,7 +38,7 @@ public abstract class AuthNContext {
      * @return
      */
     public abstract String getUserId();
-    
+
     /**
      * getTenantIds get tenant ids from the tenant context associated with the
      * security context
@@ -47,6 +46,17 @@ public abstract class AuthNContext {
      */
     public abstract String[] getTenantIds();
 
+    /**
+     * getCurrentTenantId get id of the tenant associated with the authenticated user
+     * @return
+     */
+    public abstract String getCurrentTenantId();
+
+    /**
+     * getCurrentTenantName get name of the tenant associated with the authenticated user
+     * @return
+     */
+    public abstract String getCurrentTenantName();
 
     /**
      * getTenants get tenant context associated with the security context
@@ -54,7 +64,6 @@ public abstract class AuthNContext {
      * @return
      */
     public abstract CSpaceTenant[] getTenants();
-
 
     /**
      * getSubject retrieves security context as Subject

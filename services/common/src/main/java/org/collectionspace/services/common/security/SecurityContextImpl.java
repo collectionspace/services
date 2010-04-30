@@ -40,13 +40,13 @@ public class SecurityContextImpl implements SecurityContext {
 
     final Logger logger = LoggerFactory.getLogger(SecurityContextImpl.class);
     private String userId;
-    private CSpaceTenant[] tenants = new CSpaceTenant[0];
-    private String[] tenantIds = new String[0];
+    private String currentTenantName;
+    private String currentTenantId;
 
     public SecurityContextImpl() {
         userId = AuthN.get().getUserId();
-        tenantIds = AuthN.get().getTenantIds();
-        tenants = AuthN.get().getTenants();
+        currentTenantId = AuthN.get().getCurrentTenantId();
+        currentTenantName = AuthN.get().getCurrentTenantName();
     }
 
     @Override
@@ -56,11 +56,11 @@ public class SecurityContextImpl implements SecurityContext {
 
     @Override
     public String getCurrentTenantId() {
-        return tenantIds[0];
+        return currentTenantId;
     }
 
     @Override
     public String getCurrentTenantName() {
-        return tenants[0].getName();
+        return currentTenantName;
     }
 }

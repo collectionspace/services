@@ -38,9 +38,23 @@ public interface CSpaceResource {
         OBJECT,
         ATTRIBUTE
     }
+
+    /**
+     * getId get tenant-qualified id of this resource
+     * @return
+     */
     public String getId();
 
+    /**
+     * getType get type of the resource
+     */
     public TYPE getType();
+
+    /**
+     * getTenantId get the id of the tenant to which this resource is associated
+     * @return
+     */
+    public String getTenantId();
 
     /**
      * getAction is a conveneniece method to get corresponding action to be invoked

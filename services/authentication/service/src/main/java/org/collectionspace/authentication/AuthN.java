@@ -99,6 +99,14 @@ public class AuthN {
         return authnContext.getTenantIds();
     }
 
+    public String getCurrentTenantId() {
+        return authnContext.getCurrentTenantId();
+    }
+
+    public String getCurrentTenantName() {
+        return authnContext.getCurrentTenantName();
+    }
+
     /**
      * getTenants returns tenants associated with user
      * @see CSpaceTenant

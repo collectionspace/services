@@ -89,7 +89,7 @@ public class AuthorizationGen {
         perm.setCsid(id);
         perm.setResourceName(resourceName);
         perm.setEffect(EffectType.PERMIT);
-
+        perm.setTenantId("1");
         ArrayList<PermissionAction> pas = new ArrayList<PermissionAction>();
         perm.setActions(pas);
 
@@ -142,7 +142,7 @@ public class AuthorizationGen {
         rv2.setRoleId("2");
         roleValues.add(rv2);
         pr.setRoles(roleValues);
-        
+
         return pr;
 
     }
