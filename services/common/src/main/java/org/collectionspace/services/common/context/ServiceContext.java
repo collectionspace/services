@@ -31,6 +31,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.ValidatorHandler;
+import org.collectionspace.services.common.security.SecurityContext;
+import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.service.ServiceBindingType;
 
@@ -46,19 +48,28 @@ public interface ServiceContext<IT, OT> {
      * The character used to separate the words in a part label
      */
     public static final String PART_LABEL_SEPERATOR = "_";
-    
     /** The Constant PART_COMMON_LABEL. */
     public static final String PART_COMMON_LABEL = "common";
-	
+
     /**
-     * getTenantId get id of tenant for which service is accessed
-     * @return tenant id
+     * getSecurityContext is contains security info. for the service layer
+     */
+    public SecurityContext getSecurityContext();
+
+    /**
+     * getUserId get authenticated user's userId
+     */
+    public String getUserId();
+
+    /**
+     * getTenantId get id of tenant to which authenticated user is associated with
+     * @return tenant id, null if tenant context not found
      */
     public String getTenantId();
 
     /**
-     * getTenantName get tenant name from the binding
-     * @return tenant name such as movingimage.us
+     * getTenantName get tenant name o which authenticated user is associated with
+     * @return tenant name such as movingimage.us, null if tenant context not found
      */
     public String getTenantName();
 
@@ -132,7 +143,6 @@ public interface ServiceContext<IT, OT> {
      */
     public String getRepositoryWorkspaceId();
 
-
     /**
      * Get input parts as received over the wire from service consumer
      * @return the input
@@ -176,20 +186,18 @@ public interface ServiceContext<IT, OT> {
      * @return label
      */
     public String getCommonPartLabel(String schemaName);
-    
+
     /**
      * getProperties retruns user-defined properties associated with this context
      * @return
      */
     public Map<String, Object> getProperties();
 
-
     /**
      * setProperties sets user-defined properties to this context
      * @param props
      */
     public void setProperties(Map<String, Object> props);
-
 
     /**
      * getProperty returns specified user-defined property
@@ -200,7 +208,7 @@ public interface ServiceContext<IT, OT> {
      * setProperty sets user-defined property with given name
      */
     public void setProperty(String name, Object o);
-    
+
     /**
      * getServiceBindingPropertyValue returns configured property
      */
@@ -212,7 +220,7 @@ public interface ServiceContext<IT, OT> {
      * @return document handler
      */
     public DocumentHandler getDocumentHandler() throws Exception;
-    
+
     /**
      * Gets the document hanlder.
      * 
@@ -222,7 +230,7 @@ public interface ServiceContext<IT, OT> {
      * 
      * @throws Exception the exception
      */
-    public DocumentHandler getDocumentHandler(MultivaluedMap<String, String> queryParams) throws Exception;   
+    public DocumentHandler getDocumentHandler(MultivaluedMap<String, String> queryParams) throws Exception;
 
     /**
      * getValidatorHandlers returns registered (from binding) validtor handlers
@@ -230,20 +238,20 @@ public interface ServiceContext<IT, OT> {
      * @return validation handlers
      */
     public List<ValidatorHandler> getValidatorHandlers() throws Exception;
-    
+
     /**
      * Gets the query params.
      * 
      * @return the query params
      */
     public MultivaluedMap<String, String> getQueryParams();
-    
+
     /**
      * Sets the query params.
      * 
      * @param queryParams the query params
      */
-    public void setQueryParams(MultivaluedMap<String, String> queryParams);    
+    public void setQueryParams(MultivaluedMap<String, String> queryParams);
 }
 
 
