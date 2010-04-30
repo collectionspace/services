@@ -47,10 +47,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.collectionspace.authentication;
 
-import org.collectionspace.authentication.spring.SpringSecurityContextUtils;
+import org.collectionspace.authentication.spi.AuthNContext;
+import org.collectionspace.authentication.spring.SpringAuthNContext;
 
 /**
  * AuthN is a singleton to access various authentication related utilities
@@ -58,16 +58,17 @@ import org.collectionspace.authentication.spring.SpringSecurityContextUtils;
  * @author 
  */
 public class AuthN {
+
     /**
      * volatile is used here to assume about ordering (post JDK 1.5)
      */
-    private static volatile AuthN  self = new AuthN();
-    private SecurityContextUtils securityContextUtils;
-    
+    private static volatile AuthN self = new AuthN();
+    private AuthNContext authnContext;
+
     private AuthN() {
         //hardcoded initialization of a provider
         //FIXME initialize with the help of configuration meta data
-        securityContextUtils = new SpringSecurityContextUtils();
+        authnContext = new SpringAuthNContext();
     }
 
     public final static AuthN get() {
@@ -78,8 +79,8 @@ public class AuthN {
      * getAuthn returns authentication utilities
      * @return
      */
-    public SecurityContextUtils getSecurityContextUtils() {
-        return securityContextUtils;
+    public AuthNContext getAuthNContext() {
+        return authnContext;
     }
 
     /**
@@ -87,14 +88,23 @@ public class AuthN {
      * @return
      */
     public String getUserId() {
-        return securityContextUtils.getUserId();
+        return authnContext.getUserId();
     }
+
     /**
      * getTenantIds returns a list of tenant ids the user is associated with
      * @return
      */
     public String[] getTenantIds() {
-        return securityContextUtils.getTenantIds();
+        return authnContext.getTenantIds();
     }
 
+    /**
+     * getTenants returns tenants associated with user
+     * @see CSpaceTenant
+     * @return
+     */
+    public CSpaceTenant[] getTenants() {
+        return authnContext.getTenants();
+    }
 }

@@ -32,7 +32,7 @@ import java.util.Map;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginException;
-import org.collectionspace.authentication.realm.CSpaceDbRealm;
+import org.collectionspace.authentication.realm.db.CSpaceDbRealm;
 import org.jboss.security.auth.spi.UsernamePasswordLoginModule;
 
 /**

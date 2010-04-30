@@ -52,19 +52,20 @@ package org.collectionspace.authentication.spring;
 import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Set;
 import javax.security.auth.Subject;
-import org.collectionspace.authentication.SecurityContextUtils;
 import org.collectionspace.authentication.CSpaceTenant;
+import org.collectionspace.authentication.spi.AuthNContext;
 import org.springframework.security.authentication.jaas.JaasAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
- * SpringSecurityContextUtils provides utilities to CSpace services runtime
+ * SpringAuthNContext provides utilities to CSpace services runtime
  * @author 
  */
-final public class SpringSecurityContextUtils extends SecurityContextUtils {
+final public class SpringAuthNContext extends AuthNContext {
     //private static final String SUBJECT_CONTEXT_KEY = "javax.security.auth.Subject.container";
 
     public String getUserId() {
@@ -79,22 +80,24 @@ final public class SpringSecurityContextUtils extends SecurityContextUtils {
     @Override
     public String[] getTenantIds() {
 
-        ArrayList<String> tenants = new ArrayList<String>();
-        Subject caller = null;
-        Authentication authToken = SecurityContextHolder.getContext().getAuthentication();
-        JaasAuthenticationToken jaasToken = null;
-        if (authToken instanceof JaasAuthenticationToken) {
-            jaasToken = (JaasAuthenticationToken) authToken;
-            caller = (Subject) jaasToken.getLoginContext().getSubject();
+        ArrayList<String> tenantList = new ArrayList<String>();
+        CSpaceTenant[] tenants = getTenants();
+        for(CSpaceTenant tenant : tenants) {
+            tenantList.add(tenant.getId());
         }
-        //caller = (Subject) PolicyContext.getContext(SUBJECT_CONTEXT_KEY);
+        return tenantList.toArray(new String[0]);
+    }
+
+    public CSpaceTenant[] getTenants() {
+        List<CSpaceTenant> tenants = new ArrayList<CSpaceTenant>();
+        Subject caller = getSubject();
         if (caller == null) {
-            String msg = "security not enabled!";
+            String msg = "Could not find Subject!";
             //TODO: find out why subject is not null
             //FIXME: if logger is loaded when authn comes up, use it
             //logger.warn(msg);
             System.err.println(msg);
-            return tenants.toArray(new String[0]);
+            return tenants.toArray(new CSpaceTenant[0]);
         }
         Set<Group> groups = null;
         groups = caller.getPrincipals(Group.class);
@@ -104,14 +107,14 @@ final public class SpringSecurityContextUtils extends SecurityContextUtils {
             //FIXME: if logger is loaded when authn comes up, use it
             //logger.warn(msg);
             System.err.println(msg);
-            return tenants.toArray(new String[0]);
+            return tenants.toArray(new CSpaceTenant[0]);
         }
         for (Group g : groups) {
             if ("Tenants".equals(g.getName())) {
                 Enumeration members = g.members();
                 while (members.hasMoreElements()) {
                     CSpaceTenant tenant = (CSpaceTenant) members.nextElement();
-                    tenants.add(tenant.getId());
+                    tenants.add(tenant);
                     //FIXME: if logger is loaded when authn comes up, use it
 //                    if (logger.isDebugEnabled()) {
 //                        logger.debug("found tenant id=" + tenant.getId()
@@ -120,6 +123,25 @@ final public class SpringSecurityContextUtils extends SecurityContextUtils {
                 }
             }
         }
-        return tenants.toArray(new String[0]);
+        return tenants.toArray(new CSpaceTenant[0]);
+    }
+
+    public Subject getSubject() {
+        Subject caller = null;
+        //if Spring was not used....
+        //caller = (Subject) PolicyContext.getContext(SUBJECT_CONTEXT_KEY);
+
+        //FIXME the follow call should be protected with a privileged action
+        //and must only be available to users with super privileges
+        //Spring does not offer any easy mechanism
+        //It is a bad idea to ship with a kernel user...kernel user should be
+        //created at startup time perhaps and used it here
+        Authentication authToken = SecurityContextHolder.getContext().getAuthentication();
+        JaasAuthenticationToken jaasToken = null;
+        if (authToken instanceof JaasAuthenticationToken) {
+            jaasToken = (JaasAuthenticationToken) authToken;
+            caller = (Subject) jaasToken.getLoginContext().getSubject();
+        }
+        return caller;
     }
 }

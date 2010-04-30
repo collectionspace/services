@@ -47,7 +47,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.collectionspace.authentication.realm;
+package org.collectionspace.authentication.realm.db;
 
 import java.lang.reflect.Constructor;
 import java.security.Principal;
@@ -68,6 +68,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.authentication.CSpaceTenant;
+import org.collectionspace.authentication.realm.CSpaceRealm;
 
 /**
  * CSpaceDbRealm provides access to user, password, role, tenant database
