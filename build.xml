@@ -3,7 +3,7 @@
     <description>
         collectionspace services
     </description>
-    <!-- enviornment should be declared before reading build.properties -->
+    <!-- environment should be declared before reading build.properties -->
     <property environment="env" />
     <!-- set global properties for this build -->
     <property file="build.properties" />
@@ -92,10 +92,10 @@
             </condition>
         </fail>
 
-        <fail message="Nuxeo is not deployed or ${jboss.deploy.nuxeo.systemy} not found">
+        <fail message="Nuxeo is not deployed or ${jboss.deploy.nuxeo.plugins} not found">
             <condition>
                 <not>
-                    <available file="${jboss.deploy.nuxeo.system}" type="dir"/>
+                    <available file="${jboss.deploy.nuxeo.plugins}" type="dir"/>
                 </not>
             </condition>
         </fail>

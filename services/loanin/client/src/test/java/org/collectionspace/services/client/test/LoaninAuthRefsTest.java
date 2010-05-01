@@ -313,13 +313,13 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
     		String returnDate,
                 String lendersAuthorizer,
                 String lendersContact,
-                String loanInContact) {
+                String loaninContact) {
         LoansinCommon loanin = new LoansinCommon();
         loanin.setLoanInNumber(loaninNumber);
         loanin.setLoanInNumber(returnDate);
         loanin.setLendersAuthorizer(lendersAuthorizer);
         loanin.setLendersContact(lendersContact);
-        loanin.setLoanInContact(loanInContact);
+        loanin.setLoanInContact(loaninContact);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(loanin, MediaType.APPLICATION_XML_TYPE);

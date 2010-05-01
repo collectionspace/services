@@ -615,14 +615,14 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
 
     private MultipartOutput createLoaninInstance(String identifier) {
         return createLoaninInstance(
-                "entryNumber-" + identifier,
-                "entryDate-" + identifier);
+                "loaninNumber-" + identifier,
+                "returnDate-" + identifier);
     }
 
-    private MultipartOutput createLoaninInstance(String loanInNumber,
+    private MultipartOutput createLoaninInstance(String loaninNumber,
     		String returnDate) {
         LoansinCommon loanin = new LoansinCommon();
-        loanin.setLoanInNumber(loanInNumber);
+        loanin.setLoanInNumber(loaninNumber);
         loanin.setLoanReturnDate(returnDate);
         LenderList lenderList = new LenderList();
         lenderList.getLender().add(

@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services</artifactId>
-    <version>0.6-SNAPSHOT</version>
+    <version>0.7-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>services</name>
 
@@ -16,8 +16,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <nuxeo.version.5.2>5.2.1-SNAPSHOT</nuxeo.version.5.2>
         <nuxeo.version.1.5>1.5.1-SNAPSHOT</nuxeo.version.1.5>
-        <cspace.services.version>0.6-SNAPSHOT</cspace.services.version>
-        <cspace.services.client.version>0.6.1-SNAPSHOT</cspace.services.client.version>
+        <cspace.services.version>0.7-SNAPSHOT</cspace.services.version>
+        <cspace.services.client.version>0.7-SNAPSHOT</cspace.services.client.version>
     </properties>
 
     <distributionManagement>

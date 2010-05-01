@@ -3,14 +3,17 @@
     <description>
         vocabulary nuxeo document type
     </description>
-  <!-- set global properties for this build -->
+    <!-- set global properties for this build -->
     <property name="services.trunk" value="../../../.."/>
-    <!-- enviornment should be declared before reading build.properties -->
+    <!-- environment should be declared before reading build.properties -->
     <property environment="env" />
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
-    <property name="nuxeo.vocabulary.jar" value="org.collectionspace.services.vocabulary.3rdparty.nuxeo-${cspace.release}.jar"/>
+    <property name="nuxeo.vocabulary.jar"
+        value="org.collectionspace.services.vocabulary.3rdparty.nuxeo-${cspace.release}.jar"/>
+    <property name="nuxeo.vocabulary.jars.all"
+        value="org.collectionspace.services.vocabulary.3rdparty.nuxeo-*.jar"/>
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -20,12 +23,12 @@
     </condition>
 
     <target name="init" >
-    <!-- Create the time stamp -->
+        <!-- Create the time stamp -->
         <tstamp/>
     </target>
 
     <target name="package" depends="package-unix,package-windows"
-  description="Package CollectionSpace Services" />
+        description="Package CollectionSpace Services" />
     <target name="package-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
             <arg value="package" />
@@ -50,7 +53,7 @@
     </target>
 
     <target name="install" depends="install-unix,install-windows"
-  description="Install" />
+        description="Install" />
     <target name="install-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
             <arg value="install" />
@@ -75,7 +78,7 @@
     </target>
 
     <target name="clean" depends="clean-unix,clean-windows"
-  description="Delete target directories" >
+        description="Delete target directories" >
         <delete dir="${build}"/>
     </target>
     <target name="clean-unix" if="osfamily-unix">
@@ -110,19 +113,27 @@
     </target>
 
     <target name="deploy" depends="install"
-    description="deploy vocabulary doctype in ${jboss.server.nuxeo}">
+        description="deploy vocabulary doctype in ${jboss.server.nuxeo}">
         <copy file="${basedir}/target/${nuxeo.vocabulary.jar}"
-        todir="${jboss.deploy.nuxeo.system}"/>
+        todir="${jboss.deploy.nuxeo.plugins}"/>
     </target>
 
     <target name="undeploy"
-    description="undeploy vocabulary doctype from ${jboss.server.nuxeo}">
-        <delete file="${jboss.deploy.nuxeo.system}/${nuxeo.vocabulary.jar}"/>
+        description="undeploy vocabulary doctype from ${jboss.server.nuxeo}">
+        <delete>
+            <fileset dir="${jboss.deploy.nuxeo.plugins}">
+                <include name="${nuxeo.vocabulary.jars.all}"/>
+            </fileset>
+            <!-- Legacy deployment location through release 0.6 -->
+            <fileset dir="${jboss.deploy.nuxeo.system}">
+                <include name="${nuxeo.vocabulary.jars.all}"/>
+            </fileset>
+        </delete>
     </target>
 
     <target name="dist"
-    description="generate distribution for vocabulary doctype" depends="package">
-        <copy todir="${services.trunk}/${dist.deploy.nuxeo.system}">
+        description="generate distribution for vocabulary doctype" depends="package">
+        <copy todir="${services.trunk}/${dist.deploy.nuxeo.plugins}">
             <fileset file="${basedir}/target/${nuxeo.vocabulary.jar}"/>
         </copy>
     </target>
