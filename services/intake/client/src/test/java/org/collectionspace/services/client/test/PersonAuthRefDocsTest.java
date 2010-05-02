@@ -31,12 +31,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IntakeClient;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.IntakesCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -79,6 +81,23 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
     private String fieldCollectorRefName = null;
     private String valuerRefName = null;
     private final int NUM_AUTH_REF_DOCS_EXPECTED = 1;
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
+     */
+    @Override
+    protected CollectionSpaceClient getClientInstance() {
+    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+    }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
+     */
+    @Override
+	protected AbstractCommonList getAbstractCommonList(
+			ClientResponse<AbstractCommonList> response) {
+    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+    }
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests

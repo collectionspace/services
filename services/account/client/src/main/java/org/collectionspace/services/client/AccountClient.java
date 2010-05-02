@@ -66,6 +66,11 @@ public class AccountClient extends AbstractServiceClientImpl {
         setProxy();
     }
 
+    @Override
+    public CollectionSpaceProxy getProxy() {
+    	return this.accountProxy;
+    }
+    
     /**
      * allow to reset proxy as per security needs
      */

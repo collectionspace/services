@@ -1,3 +1,29 @@
+/**	
+ * BaseServiceTest.java
+ *
+ * {Purpose of This Class}
+ *
+ * {Other Notes Relating to This Class (Optional)}
+ *
+ * $LastChangedBy: $
+ * $LastChangedRevision: $
+ * $LastChangedDate: $
+ *
+ * This document is a part of the source code and related artifacts
+ * for CollectionSpace, an open source collections management system
+ * for museums and related institutions:
+ *
+ * http://www.collectionspace.org
+ * http://wiki.collectionspace.org
+ *
+ * Copyright © 2009 {Contributing Institution}
+ *
+ * Licensed under the Educational Community License (ECL), Version 2.0.
+ * You may not use this file except in compliance with this License.
+ *
+ * You may obtain a copy of the ECL 2.0 License at
+ * https://source.collectionspace.org/collection-space/LICENSE.txt
+ */
 package org.collectionspace.services.client.test;
 
 import java.io.ByteArrayInputStream;
@@ -31,20 +57,60 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.DataProvider;
 import org.w3c.dom.Document;
 
+import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.jaxb.AbstractCommonList;
+
+/**
+ * FIXME: http://issues.collectionspace.org/browse/CSPACE-1685
+ * The Class BaseServiceTest.
+ */
 public abstract class BaseServiceTest {
 
+    /** The Constant logger. */
     static protected final Logger logger = LoggerFactory.getLogger(BaseServiceTest.class);
+    
+    /** The Constant serviceClient. */
     protected static final TestServiceClient serviceClient = new TestServiceClient();
+    
+    /** The NO n_ existen t_ id. */
     protected final String NON_EXISTENT_ID = createNonExistentIdentifier();
+    
+    /** The EXPECTE d_ statu s_ code. */
     protected int EXPECTED_STATUS_CODE = 0;
+    
+    /** The REQUES t_ type. */
     protected ServiceRequestType REQUEST_TYPE = ServiceRequestType.NON_EXISTENT;
+    
+    /** The Constant XML_DECLARATION. */
     protected static final String XML_DECLARATION = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
+    
+    /** The Constant MALFORMED_XML_DATA. */
     protected static final String MALFORMED_XML_DATA = XML_DECLARATION
             + "<malformed_xml>wrong schema contents</malformed_xml";
+    
+    /** The WRON g_ xm l_ schem a_ data. */
     protected final String WRONG_XML_SCHEMA_DATA = XML_DECLARATION
             + "<wrong_schema>wrong schema contents</wrong_schema>";
+    
+    /** The NUL l_ charset. */
     final String NULL_CHARSET = null;
 
+    /**
+     * Gets the client.
+     *
+     * @return the client
+     */
+    abstract protected CollectionSpaceClient getClientInstance();
+    
+	/**
+	 * Gets the abstract common list.
+	 *
+	 * @param response the response
+	 * @return the abstract common list
+	 */
+	abstract protected AbstractCommonList getAbstractCommonList(
+			ClientResponse<AbstractCommonList> response);    
+    
     /**
      * Returns the name of the currently running test.
      *
@@ -97,6 +163,9 @@ public abstract class BaseServiceTest {
         }
     }
 
+    /**
+     * Instantiates a new base service test.
+     */
     public BaseServiceTest() {
         super();
     }
@@ -218,6 +287,12 @@ public abstract class BaseServiceTest {
         return statusCode;
     }
 
+    /**
+     * Extract id.
+     *
+     * @param res the res
+     * @return the string
+     */
     static protected String extractId(ClientResponse<Response> res) {
         MultivaluedMap mvm = res.getMetadata();
         String uri = (String) ((ArrayList) mvm.get("Location")).get(0);
@@ -232,15 +307,34 @@ public abstract class BaseServiceTest {
         return id;
     }
 
+    /**
+     * Creates the identifier.
+     *
+     * @return the string
+     */
     static protected String createIdentifier() {
         long identifier = System.currentTimeMillis();
         return Long.toString(identifier);
     }
 
+    /**
+     * Creates the non existent identifier.
+     *
+     * @return the string
+     */
     protected String createNonExistentIdentifier() {
         return Long.toString(Long.MAX_VALUE);
     }
 
+    /**
+     * Extract part.
+     *
+     * @param input the input
+     * @param label the label
+     * @param clazz the clazz
+     * @return the object
+     * @throws Exception the exception
+     */
     static protected Object extractPart(MultipartInput input, String label, Class clazz)
             throws Exception {
         Object obj = null;
@@ -292,6 +386,14 @@ public abstract class BaseServiceTest {
         return obj;
     }
 
+    /**
+     * Gets the part object.
+     *
+     * @param partStr the part str
+     * @param clazz the clazz
+     * @return the part object
+     * @throws JAXBException the jAXB exception
+     */
     static protected Object getPartObject(String partStr, Class clazz)
             throws JAXBException {
         JAXBContext jc = JAXBContext.newInstance(clazz);
@@ -312,6 +414,13 @@ public abstract class BaseServiceTest {
         return obj;
     }
 
+    /**
+     * Object as xml string.
+     *
+     * @param o the o
+     * @param clazz the clazz
+     * @return the string
+     */
     static protected String objectAsXmlString(Object o, Class clazz) {
         StringWriter sw = new StringWriter();
         try {
@@ -345,6 +454,13 @@ public abstract class BaseServiceTest {
         return getObjectFromStream(jaxbClass, is);
     }
 
+    /**
+     * Gets the xml document.
+     *
+     * @param fileName the file name
+     * @return the xml document
+     * @throws Exception the exception
+     */
     static protected Document getXmlDocument(String fileName) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         File f = new File(fileName);
@@ -355,6 +471,13 @@ public abstract class BaseServiceTest {
         return factory.newDocumentBuilder().parse(f);
     }
 
+    /**
+     * Gets the xml document as string.
+     *
+     * @param fileName the file name
+     * @return the xml document as string
+     * @throws Exception the exception
+     */
     static protected String getXmlDocumentAsString(String fileName) throws Exception {
         byte[] b = FileUtils.readFileToByteArray(new File(fileName));
         return new String(b);
@@ -375,6 +498,12 @@ public abstract class BaseServiceTest {
         return jaxbClass.cast(unmarshaller.unmarshal(is));
     }
 
+    /**
+     * Map as string.
+     *
+     * @param map the map
+     * @return the string
+     */
     protected String mapAsString(MultivaluedMap map) {
         StringBuffer sb = new StringBuffer();
         for (Object entry : map.entrySet()) {
@@ -385,6 +514,11 @@ public abstract class BaseServiceTest {
         return sb.toString();
     }
 
+    /**
+     * Banner.
+     *
+     * @param label the label
+     */
     protected void banner(String label) {
         if (logger.isDebugEnabled()) {
             logger.debug("===================================================");

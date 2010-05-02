@@ -27,14 +27,14 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.LoaninClient;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanin.LoansinCommon;
 import org.collectionspace.services.loanin.LoansinCommonList;
 import org.collectionspace.services.loanin.LenderList;
 
-
 import org.jboss.resteasy.client.ClientResponse;
-
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
@@ -60,8 +60,25 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
     // Instance variables specific to this test.
     final String SERVICE_PATH_COMPONENT = "loansin";
     private String knownResourceId = null;
-    private List<String> allResourceIdsCreated = new ArrayList();
+    private List<String> allResourceIdsCreated = new ArrayList<String>();
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
+     */
+    @Override
+    protected CollectionSpaceClient getClientInstance() {
+    	return new LoaninClient();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
+     */
+    @Override
+	protected AbstractCommonList getAbstractCommonList(
+			ClientResponse<AbstractCommonList> response) {
+        return response.getEntity(LoansinCommonList.class);
+    }
+ 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------

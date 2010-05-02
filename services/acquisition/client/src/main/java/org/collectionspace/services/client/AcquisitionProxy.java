@@ -22,7 +22,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 @Path("/acquisitions/")
 @Produces({"multipart/mixed"})
 @Consumes({"multipart/mixed"})
-public interface AcquisitionProxy {
+public interface AcquisitionProxy extends CollectionSpaceProxy {
 
     @GET
     @Produces({"application/xml"})

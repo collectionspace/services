@@ -36,10 +36,12 @@ import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.client.AccountClient;
 import org.collectionspace.services.client.AccountFactory;
 import org.collectionspace.services.client.AccountRoleClient;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.RoleFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.ServiceRequestType;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
 
@@ -64,7 +66,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
             LoggerFactory.getLogger(AccountRoleServiceTest.class);
     // Instance variables specific to this test.
     private String knownResourceId = null;
-    private List<String> allResourceIdsCreated = new ArrayList();
+    private List<String> allResourceIdsCreated = new ArrayList<String>();
     private Hashtable<String, AccountValue> accValues = new Hashtable<String, AccountValue>();
     private Hashtable<String, RoleValue> roleValues = new Hashtable<String, RoleValue>();
     /*
@@ -117,6 +119,30 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
         roleValues.put(rv2.getRoleName(), rv2);
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
+     */
+    @Override
+    protected CollectionSpaceClient getClientInstance() {
+    	return new AccountRoleClient();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
+     */
+    @Override
+	protected AbstractCommonList getAbstractCommonList(
+			ClientResponse<AbstractCommonList> response) {
+    	//FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
+    	throw new UnsupportedOperationException();
+    }
+    
+	@Test(dataProvider = "testName")
+	@Override
+    public void readPaginatedList(String testName) throws Exception {
+		//FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
+	}    
+    
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
@@ -159,6 +185,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
     public void createList(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     // Failure outcomes
@@ -166,14 +193,17 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     // See Issue CSPACE-401.
     @Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     @Override
     public void createWithMalformedXml(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     @Override
     public void createWithWrongXmlSchema(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     // ---------------------------------------------------------------
@@ -217,7 +247,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         AccountRoleClient client = new AccountRoleClient();
-        ClientResponse<AccountRole> res = client.read(NON_EXISTENT_ID, "123");
+        ClientResponse<AccountRole> res = client.read(this.NON_EXISTENT_ID, "123");
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -238,6 +268,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"createList", "read"})
     public void readList(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     // Failure outcomes
@@ -250,6 +281,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read", "readList", "readNonExistent"})
     public void update(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     // Failure outcomes
@@ -257,20 +289,24 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     // See Issue CSPACE-401.
     @Override
     public void updateWithEmptyEntityBody(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     @Override
     public void updateWithMalformedXml(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     @Override
     public void updateWithWrongXmlSchema(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"readNonExistent", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     // ---------------------------------------------------------------
@@ -302,6 +338,9 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     }
 
     // Failure outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void deleteNonExistent(String testName) throws Exception {
@@ -341,12 +380,13 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     // Utility methods used by tests above
     // ---------------------------------------------------------------
     /**
-     * create accRolerole instance
-     * @param accId
-     * @param roleValues array of role ids
-     * @param userPermId
-     * @param useRoleId
-     * @return
+     * Creates the account role instance.
+     *
+     * @param pv the pv
+     * @param rvs the rvs
+     * @param usePermId the use perm id
+     * @param useRoleId the use role id
+     * @return the account role
      */
     static public AccountRole createAccountRoleInstance(AccountValue pv,
             Collection<RoleValue> rvs,

@@ -33,7 +33,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 //import org.collectionspace.services.common.context.ServiceContext;
@@ -47,6 +47,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
  * The Class CollectionObjectClient.
+ * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
 public class CollectionObjectClient extends AbstractServiceClientImpl {
 
@@ -56,7 +57,8 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
 	 */
-	public String getServicePathComponent() {
+	@Override
+    public String getServicePathComponent() {
 		return "collectionobjects";
 	}
 
@@ -67,6 +69,11 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         RegisterBuiltin.register(factory);
         setProxy();
+    }
+    
+    @Override
+    public CollectionSpaceProxy getProxy() {
+    	return this.collectionObjectProxy;
     }
 
     /**
@@ -90,6 +97,13 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
      */
     public ClientResponse<CollectionobjectsCommonList> readList() {
         return collectionObjectProxy.readList();
+
+    }
+
+    @Override
+    public ClientResponse<AbstractCommonList> readList(String pageSize,
+    		String pageNumber) {
+        return collectionObjectProxy.readList(pageSize, pageNumber);
 
     }
     

@@ -27,7 +27,9 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.RelationClient;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationshipType;
@@ -58,14 +60,31 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
 
     final String SERVICE_PATH_COMPONENT = "relations";
     private String knownResourceId = null;
-    private List<String> allResourceIdsCreated = new ArrayList();
+    private List<String> allResourceIdsCreated = new ArrayList<String>();
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
+     */
+    @Override
+    protected CollectionSpaceClient getClientInstance() {
+    	return new RelationClient();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
+     */
+    @Override
+	protected AbstractCommonList getAbstractCommonList(
+			ClientResponse<AbstractCommonList> response) {
+        return response.getEntity(RelationsCommonList.class);
+    }
+ 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
-    @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
+    @Override
     public void create(String testName) throws Exception {
 
         // Perform setup, such as initializing the type of service request

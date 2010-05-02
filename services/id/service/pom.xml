@@ -33,7 +33,15 @@
   <name>services.id.service</name>
 
   <dependencies>
-
+    <!-- keep slf4j dependencies on the top -->
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+    </dependency>
     <!-- Code common to all CollectionSpace services. -->
     <dependency>
       <groupId>org.collectionspace.services</groupId>
@@ -76,12 +84,10 @@
     </dependency>
 
     <!-- JBoss RESTEasy, a framework for providing and consuming RESTful services. -->
-    <!-- NOTE: Versions later than 1.0.2.GA - such as 1.1 GA - are available. -->
     <!-- JAX-RS support, a Java specification for RESTful services. -->
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
-      <version>1.0.2.GA</version>
       <exclusions>
         <exclusion>
           <groupId>tjws</groupId>
@@ -93,13 +99,11 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxb-provider</artifactId>
-      <version>1.0.2.GA</version>
     </dependency>
     <!-- MIME Multipart messaging support. -->
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-multipart-provider</artifactId>
-      <version>1.0.2.GA</version>
     </dependency>
 
     <!-- Cobertura, a tool for identifying the extent of code coverage in test classes -->

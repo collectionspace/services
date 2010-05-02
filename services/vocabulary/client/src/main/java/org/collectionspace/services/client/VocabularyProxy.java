@@ -22,7 +22,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 @Path("/vocabularies/")
 @Produces({"multipart/mixed"})
 @Consumes({"multipart/mixed"})
-public interface VocabularyProxy {
+public interface VocabularyProxy extends CollectionSpaceProxy {
 
     // List Vocabularies
     @GET

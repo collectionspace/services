@@ -29,59 +29,102 @@ import java.util.Properties;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
+//import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.jboss.resteasy.client.ClientResponse;
 //import org.collectionspace.services.common.context.ServiceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * BaseServiceClient is an abstract base client of all service clients
+ * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
 public abstract class AbstractServiceClientImpl implements CollectionSpaceClient {
 
+    /** The logger. */
     protected final Logger logger = LoggerFactory.getLogger(AbstractServiceClientImpl.class);
     
     /**
      * The character used to separate the words in a part label
      */
     public static final String PART_LABEL_SEPERATOR = "_";
+    
+    /** The Constant PART_COMMON_LABEL. */
     public static final String PART_COMMON_LABEL = "common";
     
+    /** The properties. */
     private Properties properties = new Properties();
+    
+    /** The url. */
     private URL url;
+    
+    /** The http client. */
     private HttpClient httpClient;
 
+	/**
+	 * Gets the common part name.
+	 *
+	 * @return the common part name
+	 */
 	public String getCommonPartName() {
 		return getCommonPartName(getServicePathComponent());
 	}
 
+	/**
+	 * Gets the common part name.
+	 *
+	 * @param servicePathComponent the service path component
+	 * @return the common part name
+	 */
 	public String getCommonPartName(String servicePathComponent) {
 		return servicePathComponent
 		+ PART_LABEL_SEPERATOR
 		+ PART_COMMON_LABEL;
 	}
 
+	/**
+	 * Gets the service path component.
+	 *
+	 * @return the service path component
+	 */
 	abstract public String getServicePathComponent();
     
+    /**
+     * Instantiates a new abstract service client impl.
+     */
     protected AbstractServiceClientImpl() {
         readProperties();
         setupHttpClient();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.CollectionSpaceClient#getProperty(java.lang.String)
+     */
     @Override
     public String getProperty(String propName) {
         return properties.getProperty(propName);
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.CollectionSpaceClient#setProperty(java.lang.String, java.lang.String)
+     */
     @Override
     public void setProperty(String propName, String value) {
         properties.setProperty(propName, value);
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.CollectionSpaceClient#removeProperty(java.lang.String)
+     */
     @Override
     public Object removeProperty(String propName) {
         return properties.remove(propName);
     }
 
+    /**
+     * Prints the properties.
+     */
     public void printProperties() {
         for(Object kobj : properties.keySet()){
             String key = (String) kobj;
@@ -89,22 +132,34 @@ public abstract class AbstractServiceClientImpl implements CollectionSpaceClient
         }
     }
     
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.CollectionSpaceClient#getBaseURL()
+     */
     @Override
     public String getBaseURL() {
         return properties.getProperty(URL_PROPERTY);
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.CollectionSpaceClient#getHttpClient()
+     */
     @Override
     public HttpClient getHttpClient() {
         return httpClient;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.CollectionSpaceClient#useAuth()
+     */
     @Override
     public boolean useAuth() {
         String auth = properties.getProperty(AUTH_PROPERTY);
         return Boolean.valueOf(auth);
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.CollectionSpaceClient#useSSL()
+     */
     @Override
     public boolean useSSL() {
         String ssl = properties.getProperty(SSL_PROPERTY);
@@ -204,8 +259,21 @@ public abstract class AbstractServiceClientImpl implements CollectionSpaceClient
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.CollectionSpaceClient#isServerSecure()
+     */
     @Override
     public boolean isServerSecure() {
         return Boolean.getBoolean("cspace.server.secure");
     }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.CollectionSpaceClient#readList(java.lang.String, java.lang.String)
+     */
+    @Override
+    public ClientResponse<AbstractCommonList> readList(String pageSize,
+    		String pageNumber) {
+    	return getProxy().readList(pageSize, pageNumber);
+    }
+    
 }

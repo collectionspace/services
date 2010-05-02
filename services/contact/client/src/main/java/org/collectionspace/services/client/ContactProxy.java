@@ -21,7 +21,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 @Path("/contacts/")
 @Produces({"multipart/mixed"})
 @Consumes({"multipart/mixed"})
-public interface ContactProxy {
+public interface ContactProxy extends CollectionSpaceProxy {
 
     @GET
     @Produces({"application/xml"})

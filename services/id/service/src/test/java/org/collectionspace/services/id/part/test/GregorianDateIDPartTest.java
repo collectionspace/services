@@ -4,7 +4,7 @@ import org.collectionspace.services.id.part.GregorianDateIDPart;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
+//import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
@@ -15,6 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GregorianDateIDPartTest {
+	
+	public GregorianDateIDPartTest(String inComingString) {
+		System.err.println("GregorianDateIDPartTest constructor invoked!");
+		//empty constructor
+	}
 
     final Logger logger =
         LoggerFactory.getLogger(GregorianDateIDPartTest.class);
@@ -48,6 +53,7 @@ public class GregorianDateIDPartTest {
 
     @Test
     public void format() {
+    	//empty?
     }
 
     @Test

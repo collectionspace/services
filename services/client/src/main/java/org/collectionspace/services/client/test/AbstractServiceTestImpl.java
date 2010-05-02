@@ -23,17 +23,21 @@
  */
 package org.collectionspace.services.client.test;
 
+import java.util.List;
+
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.AbstractServiceClientImpl;
+import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
-
-
-
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
+ * FIXME: http://issues.collectionspace.org/browse/CSPACE-1685
  * AbstractServiceTest, abstract base class for the client tests to be performed
  * to test an entity or relation service.
  *
@@ -41,34 +45,73 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractServiceTestImpl extends BaseServiceTest implements ServiceTest {
 
+	/** The logger. */
 	protected final Logger logger = LoggerFactory.getLogger(AbstractServiceTestImpl.class);
+	
+	/** The Constant DEFAULT_LIST_SIZE. */
+	static protected final int DEFAULT_LIST_SIZE = 10;
 
-    // Success outcomes
-    @Override
-    public void create(String testName) throws Exception {
+//    // Success outcomes
+//    /* (non-Javadoc)
+//     * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
+//     */
+//    @Override
+//    public void create(String testName) throws Exception {
+//    	//empty?
+//    }
+    
+    /**
+     * Gets the logger.
+     *
+     * @return the logger
+     */
+    private Logger getLogger() {
+    	return this.logger;
     }
 
+    /**
+     * Setup create.
+     */
     protected void setupCreate() {
         setupCreate("Create");
     }
 
+    /**
+     * Sets the up create.
+     *
+     * @param label the new up create
+     */
     protected void setupCreate(String label) {
     	testSetup(Response.Status.CREATED.getStatusCode(), ServiceRequestType.CREATE, label);
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.ServiceTest#createList(java.lang.String)
+     */
     @Override
     public abstract void createList(String testName) throws Exception;
 
     // No setup required for createList()
     // Failure outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.ServiceTest#createWithEmptyEntityBody(java.lang.String)
+     */
     @Override
     public abstract void createWithEmptyEntityBody(String testName)
             throws Exception;
 
+    /**
+     * Setup create with empty entity body.
+     */
     protected void setupCreateWithEmptyEntityBody() {
         setupCreateWithEmptyEntityBody("CreateWithEmptyEntityBody");
     }
 
+    /**
+     * Sets the up create with empty entity body.
+     *
+     * @param label the new up create with empty entity body
+     */
     protected void setupCreateWithEmptyEntityBody(String label) {
         clearSetup();
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
@@ -78,13 +121,24 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.ServiceTest#createWithMalformedXml(java.lang.String)
+     */
     @Override
     public abstract void createWithMalformedXml(String testName) throws Exception;
 
+    /**
+     * Setup create with malformed xml.
+     */
     protected void setupCreateWithMalformedXml() {
         setupCreateWithMalformedXml("CreateWithMalformedXml");
     }
 
+    /**
+     * Sets the up create with malformed xml.
+     *
+     * @param label the new up create with malformed xml
+     */
     protected void setupCreateWithMalformedXml(String label) {
         clearSetup();
         // Expected status code: 400 Bad Request
@@ -95,13 +149,24 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.ServiceTest#createWithWrongXmlSchema(java.lang.String)
+     */
     @Override
     public abstract void createWithWrongXmlSchema(String testName) throws Exception;
 
+    /**
+     * Setup create with wrong xml schema.
+     */
     protected void setupCreateWithWrongXmlSchema() {
         setupCreateWithWrongXmlSchema("CreateWithWrongXmlSchema");
     }
 
+    /**
+     * Sets the up create with wrong xml schema.
+     *
+     * @param label the new up create with wrong xml schema
+     */
     protected void setupCreateWithWrongXmlSchema(String label) {
         clearSetup();
         // Expected status code: 400 Bad Request
@@ -116,41 +181,141 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.ServiceTest#read(java.lang.String)
+     */
     @Override
     public abstract void read(String testName) throws Exception;
 
+    /**
+     * Setup read.
+     */
     protected void setupRead() {
         setupRead("Read");
     }
 
+    /**
+     * Sets the up read.
+     *
+     * @param label the new up read
+     */
     protected void setupRead(String label) {
     	testSetup(Response.Status.OK.getStatusCode(), ServiceRequestType.READ, label);
     }
 
     // Failure outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.ServiceTest#readNonExistent(java.lang.String)
+     */
     @Override
     public abstract void readNonExistent(String testName) throws Exception;
 
+    /**
+     * Setup read non existent.
+     */
     protected void setupReadNonExistent() {
         setupReadNonExistent("ReadNonExistent");
     }
 
+    /**
+     * Sets the up read non existent.
+     *
+     * @param label the new up read non existent
+     */
     protected void setupReadNonExistent(String label) {
         // Expected status code: 404 Not Found
     	testSetup(Response.Status.NOT_FOUND.getStatusCode(), ServiceRequestType.READ, label);
     }
 
-    // ---------------------------------------------------------------
+	/**
+	 * Read list.
+	 *
+	 * @param testName the test name
+	 * @param client the client
+	 * @param pageSize the page size
+	 * @param pageNumber the page number
+	 * @return the abstract common list
+	 * @throws Exception the exception
+	 */
+	private AbstractCommonList readList(String testName,
+			CollectionSpaceClient client,
+			long pageSize, long pageNumber) throws Exception {
+		ClientResponse<AbstractCommonList> response =
+			(ClientResponse<AbstractCommonList>)client.readList(Long.toString(pageSize),
+					Long.toString(pageNumber));
+		AbstractCommonList list = this.getAbstractCommonList(response);
+		int statusCode = response.getStatus();
+
+		// Check the status code of the response: does it match
+		// the expected response(s)?
+		if (getLogger().isDebugEnabled()) {
+			getLogger().debug(testName + ": status = " + statusCode);
+		}
+		Assert.assertTrue(this.REQUEST_TYPE.isValidStatusCode(statusCode),
+				invalidStatusCodeMessage(this.REQUEST_TYPE, statusCode));
+		Assert.assertEquals(statusCode, this.EXPECTED_STATUS_CODE);
+		
+		return list;
+	}
+
+	/**
+	 * Read paginated list.
+	 *
+	 * @param testName the test name
+	 * @throws Exception the exception
+	 */
+	@Test(dataProvider = "testName")
+    public void readPaginatedList(String testName) throws Exception {
+
+        // Perform setup.
+        setupReadList(testName);
+        
+        long pageSize = DEFAULT_LIST_SIZE / 3; //create 3 pages to iterate over
+        CollectionSpaceClient client = this.getClientInstance();
+        AbstractCommonList list = this.readList(testName, client, pageSize, 0);
+        long totalItems = list.getTotalItems();        
+        long pagesTotal = totalItems / pageSize;
+        for (int i = 0; i < pagesTotal; i++) {
+        	list = this.readList(testName, client, pageSize, i);
+        	if (getLogger().isDebugEnabled() == true) {
+        		getLogger().debug(testName + ":" + "page number is " + list.getPageNum());
+        		getLogger().debug(testName + ":" + "page size is " + list.getPageSize());
+        		getLogger().debug(testName + ":" + "total number of items is " + list.getTotalItems());
+        	}
+        }
+        
+        long mod = totalItems % pageSize;
+        if (mod != 0) {
+        	list = this.readList(testName, client, pageSize, pagesTotal);
+    		getLogger().debug(testName + ":" + "page number is " + list.getPageNum());
+    		getLogger().debug(testName + ":" + "page size is " + list.getPageSize());
+    		getLogger().debug(testName + ":" + "total number of items is " + list.getTotalItems());
+        }
+        
+    }
+
+	// ---------------------------------------------------------------
     // CRUD tests : READ (list, or multiple) tests
     // ---------------------------------------------------------------
     // Success outcomes
-    @Override
+    /* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.ServiceTest#readList(java.lang.String)
+	 */
+	@Override
     public abstract void readList(String testName) throws Exception;
 
+    /**
+     * Setup read list.
+     */
     protected void setupReadList() {
         setupReadList("ReadList");
     }
 
+    /**
+     * Sets the up read list.
+     *
+     * @param label the new up read list
+     */
     protected void setupReadList(String label) {
     	testSetup(Response.Status.OK.getStatusCode(), ServiceRequestType.READ_LIST, label);
     }
@@ -161,62 +326,117 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
     // CRUD tests : UPDATE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.ServiceTest#update(java.lang.String)
+     */
     @Override
     public abstract void update(String testName) throws Exception;
 
+    /**
+     * Setup update.
+     */
     protected void setupUpdate() {
         setupUpdate("Update");
     }
 
+    /**
+     * Sets the up update.
+     *
+     * @param label the new up update
+     */
     protected void setupUpdate(String label) {
         // Expected status code: 200 OK
     	testSetup(Response.Status.OK.getStatusCode(), ServiceRequestType.UPDATE, label);
     }
 
     // Failure outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.ServiceTest#updateWithEmptyEntityBody(java.lang.String)
+     */
     @Override
     public abstract void updateWithEmptyEntityBody(String testName) throws Exception;
 
+    /**
+     * Setup update with empty entity body.
+     */
     protected void setupUpdateWithEmptyEntityBody() {
         setupUpdateWithEmptyEntityBody("UpdateWithEmptyEntityBody");
     }
 
+    /**
+     * Sets the up update with empty entity body.
+     *
+     * @param label the new up update with empty entity body
+     */
     protected void setupUpdateWithEmptyEntityBody(String label) {
         // Expected status code: 400 Bad Request
     	testSetup(Response.Status.BAD_REQUEST.getStatusCode(), ServiceRequestType.UPDATE, label);
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.ServiceTest#updateWithMalformedXml(java.lang.String)
+     */
     @Override
     public abstract void updateWithMalformedXml(String testName) throws Exception;
 
+    /**
+     * Setup update with malformed xml.
+     */
     protected void setupUpdateWithMalformedXml() {
         setupUpdateWithMalformedXml("UpdateWithMalformedXml");
     }
 
+    /**
+     * Sets the up update with malformed xml.
+     *
+     * @param label the new up update with malformed xml
+     */
     protected void setupUpdateWithMalformedXml(String label) {
         // Expected status code: 400 Bad Request
     	testSetup(Response.Status.BAD_REQUEST.getStatusCode(), ServiceRequestType.UPDATE, label);
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.ServiceTest#updateWithWrongXmlSchema(java.lang.String)
+     */
     @Override
     public abstract void updateWithWrongXmlSchema(String testName) throws Exception;
 
+    /**
+     * Setup update with wrong xml schema.
+     */
     protected void setupUpdateWithWrongXmlSchema() {
         setupUpdateWithWrongXmlSchema("UpdateWithWrongXmlSchema");
     }
 
+    /**
+     * Sets the up update with wrong xml schema.
+     *
+     * @param label the new up update with wrong xml schema
+     */
     protected void setupUpdateWithWrongXmlSchema(String label) {
         // Expected status code: 400 Bad Request
     	testSetup(Response.Status.BAD_REQUEST.getStatusCode(), ServiceRequestType.UPDATE, label);
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.ServiceTest#updateNonExistent(java.lang.String)
+     */
     @Override
     public abstract void updateNonExistent(String testName) throws Exception;
 
+    /**
+     * Setup update non existent.
+     */
     protected void setupUpdateNonExistent() {
         setupUpdateNonExistent("UpdateNonExistent");
     }
 
+    /**
+     * Sets the up update non existent.
+     *
+     * @param label the new up update non existent
+     */
     protected void setupUpdateNonExistent(String label) {
         // Expected status code: 404 Not Found
     	testSetup(Response.Status.NOT_FOUND.getStatusCode(), ServiceRequestType.UPDATE, label);
@@ -226,25 +446,47 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
     // CRUD tests : DELETE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.ServiceTest#delete(java.lang.String)
+     */
     @Override
     public abstract void delete(String testName) throws Exception;
 
+    /**
+     * Setup delete.
+     */
     protected void setupDelete() {
         setupDelete("Delete");
     }
 
+    /**
+     * Sets the up delete.
+     *
+     * @param label the new up delete
+     */
     protected void setupDelete(String label) {
     	testSetup(Response.Status.OK.getStatusCode(), ServiceRequestType.DELETE, label);
     }
 
     // Failure outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.ServiceTest#deleteNonExistent(java.lang.String)
+     */
     @Override
     public abstract void deleteNonExistent(String testName) throws Exception;
 
+    /**
+     * Setup delete non existent.
+     */
     protected void setupDeleteNonExistent() {
         setupDeleteNonExistent("DeleteNonExistent");
     }
 
+    /**
+     * Sets the up delete non existent.
+     *
+     * @param label the new up delete non existent
+     */
     protected void setupDeleteNonExistent(String label) {
         clearSetup();
         // Expected status code: 404 Not Found

@@ -51,6 +51,11 @@ public class VocabularyClient extends AbstractServiceClientImpl {
         setProxy();
     }
 
+    @Override
+    public CollectionSpaceProxy getProxy() {
+    	return this.vocabularyProxy;
+    }    
+
     /**
      * allow to reset proxy as per security needs
      */

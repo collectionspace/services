@@ -24,7 +24,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 @Path("/personauthorities/")
 @Produces({"multipart/mixed"})
 @Consumes({"multipart/mixed"})
-public interface PersonAuthorityProxy {
+public interface PersonAuthorityProxy extends CollectionSpaceProxy {
 
     // List Personauthorities
     @GET

@@ -64,6 +64,11 @@ public class LoaninClient extends AbstractServiceClientImpl {
         RegisterBuiltin.register(factory);
         setProxy();
     }
+    
+    @Override
+    public CollectionSpaceProxy getProxy() {
+    	return this.loaninProxy;
+    }    
 
     /**
      * allow to reset proxy as per security needs

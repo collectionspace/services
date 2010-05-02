@@ -32,9 +32,11 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.AcquisitionClient;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
 import org.collectionspace.services.acquisition.AcquisitionsCommonList;
 
@@ -77,6 +79,23 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
     //private String acquisitionSourcesRefName = null;
     private String fieldCollectorRefName = null;
     private final int NUM_AUTH_REFS_EXPECTED = 3;
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
+     */
+    @Override
+    protected CollectionSpaceClient getClientInstance() {
+    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+    }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
+     */
+    @Override
+	protected AbstractCommonList getAbstractCommonList(
+			ClientResponse<AbstractCommonList> response) {
+    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+    }
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests

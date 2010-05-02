@@ -27,13 +27,16 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.client.AbstractServiceClientImpl;
 import org.collectionspace.services.client.CollectionObjectClient;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.domain.naturalhistory.CollectionobjectsNaturalhistory;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.collectionspace.services.collectionobject.ResponsibleDepartmentList;
-import org.jboss.resteasy.client.ClientResponse;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 
+import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
@@ -53,25 +56,60 @@ import org.slf4j.LoggerFactory;
  */
 public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
+    /** The logger. */
     private final Logger logger =
             LoggerFactory.getLogger(CollectionObjectServiceTest.class);
     // Instance variables specific to this test.
+    /** The known resource id. */
     private String knownResourceId = null;
+    
+    /** The all resource ids created. */
     private List<String> allResourceIdsCreated = new ArrayList();
+    
+    /** The multivalue. */
     private boolean multivalue; //toggle
 
-    /*
-     * This method is called only by the parent class, AbstractServiceTest
+    /**
+     * Gets the logger.
+     *
+     * @return the logger
+     */
+    private Logger getLogger() {
+    	return this.logger;
+    }
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
      */
     @Override
     protected String getServicePathComponent() {
         return new CollectionObjectClient().getServicePathComponent();
     }
-
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
+     */
+    @Override
+    protected CollectionSpaceClient getClientInstance() {
+    	return new CollectionObjectClient();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
+     */
+    @Override
+	protected AbstractCommonList getAbstractCommonList(
+			ClientResponse<AbstractCommonList> response) {
+        return response.getEntity(CollectionobjectsCommonList.class);
+    }
+ 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
@@ -121,6 +159,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      * Tests to diagnose and verify the fixed status of CSPACE-1026,
      * "Whitespace at certain points in payload cause failure"
      */
+    /**
+     * Creates the from xml cambridge.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "testSubmitRequest"})
     public void createFromXmlCambridge(String testName) throws Exception {
@@ -129,6 +173,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         testSubmitRequest(newId);
     }
 
+    /**
+     * Creates the from xml rfw s1.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "testSubmitRequest"})
     public void createFromXmlRFWS1(String testName) throws Exception {
@@ -139,6 +189,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         testSubmitRequest(newId);
     }
 
+    /**
+     * Creates the from xml rfw s2.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "testSubmitRequest"})
     public void createFromXmlRFWS2(String testName) throws Exception {
@@ -149,6 +205,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         testSubmitRequest(newId);
     }
 
+    /**
+     * Creates the from xml rfw s3.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "testSubmitRequest"})
     public void createFromXmlRFWS3(String testName) throws Exception {
@@ -159,6 +221,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         testSubmitRequest(newId);
     }
 
+    /**
+     * Creates the from xml rfw s4.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "testSubmitRequest"})
     public void createFromXmlRFWS4(String testName) throws Exception {
@@ -173,6 +241,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      * "Wedged records created!" (i.e. records with child repeatable
      * fields, which contain null values, can be successfully created
      * but an error occurs on trying to retrieve those records).
+     */
+    /**
+     * Creates the with null value repeatable field.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
      */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "testSubmitRequest"})
@@ -194,7 +268,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
     public void createList(String testName) throws Exception {
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < DEFAULT_LIST_SIZE; i++) {
             create(testName);
         }
     }
@@ -202,6 +276,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithEmptyEntityBody(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createWithEmptyEntityBody(String testName) throws Exception {
@@ -221,6 +298,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         setupCreate(testName);
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithWrongXmlSchema(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createWithWrongXmlSchema(String testName) throws Exception {
@@ -378,6 +458,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#read(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
@@ -420,6 +503,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     }
 
     // Failure outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readNonExistent(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read"})
@@ -443,10 +529,14 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    
     // ---------------------------------------------------------------
     // CRUD tests : READ_LIST tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readList(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"createList", "read"})
@@ -496,6 +586,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : UPDATE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#update(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read"})
@@ -547,6 +640,13 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
     }
 
+    /**
+     * Update retrieve.
+     *
+     * @param testName the test name
+     * @param id the id
+     * @return the client response
+     */
     private ClientResponse<MultipartInput> updateRetrieve(String testName, String id) {
         final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
         CollectionObjectClient client = new CollectionObjectClient();
@@ -561,6 +661,14 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         return res;
     }
 
+    /**
+     * Update send.
+     *
+     * @param testName the test name
+     * @param id the id
+     * @param collectionObject the collection object
+     * @return the client response
+     */
     private ClientResponse<MultipartInput> updateSend(String testName, String id,
             CollectionobjectsCommon collectionObject) {
         MultipartOutput output = new MultipartOutput();
@@ -574,6 +682,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithEmptyEntityBody(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read"})
@@ -594,6 +705,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     public void updateWithMalformedXml(String testName) throws Exception {
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithWrongXmlSchema(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read"})
@@ -680,7 +794,10 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     }
 */
 
-    @Override
+    /* (non-Javadoc)
+ * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateNonExistent(java.lang.String)
+ */
+@Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
@@ -768,6 +885,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : DELETE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#delete(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
@@ -792,6 +912,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     }
 
     // Failure outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"delete"})
@@ -828,6 +951,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         testSubmitRequest(knownResourceId);
     }
 
+    /**
+     * Test submit request.
+     *
+     * @param resourceId the resource id
+     * @throws Exception the exception
+     */
     private void testSubmitRequest(String resourceId) throws Exception {
 
         // Expected status code: 200 OK
@@ -881,6 +1010,13 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+    /**
+     * Creates the collection object instance.
+     *
+     * @param commonPartName the common part name
+     * @param identifier the identifier
+     * @return the multipart output
+     */
     private MultipartOutput createCollectionObjectInstance(String commonPartName,
             String identifier) {
         return createCollectionObjectInstance(commonPartName,
@@ -888,6 +1024,14 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
                 "objectName-" + identifier);
     }
 
+    /**
+     * Creates the collection object instance.
+     *
+     * @param commonPartName the common part name
+     * @param objectNumber the object number
+     * @param objectName the object name
+     * @return the multipart output
+     */
     private MultipartOutput createCollectionObjectInstance(String commonPartName,
             String objectNumber, String objectName) {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
@@ -921,6 +1065,14 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         return multipart;
     }
 
+    /**
+     * Creates the collection object instance.
+     *
+     * @param commonPartName the common part name
+     * @param collectionObject the collection object
+     * @param conh the conh
+     * @return the multipart output
+     */
     private MultipartOutput createCollectionObjectInstance(String commonPartName,
             CollectionobjectsCommon collectionObject, CollectionobjectsNaturalhistory conh) {
 
@@ -1001,10 +1153,24 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
     }
 
+    /**
+     * Gets the nH part name.
+     *
+     * @return the nH part name
+     */
     private String getNHPartName() {
         return "collectionobjects_naturalhistory";
     }
 
+    /**
+     * Creates the from xml file.
+     *
+     * @param testName the test name
+     * @param fileName the file name
+     * @param useJaxb the use jaxb
+     * @return the string
+     * @throws Exception the exception
+     */
     private String createFromXmlFile(String testName, String fileName, boolean useJaxb) throws Exception {
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and

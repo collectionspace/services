@@ -65,6 +65,11 @@ public class PermissionRoleClient extends AbstractServiceClientImpl {
         setProxy();
     }
 
+    @Override
+    public CollectionSpaceProxy getProxy() {
+    	return this.permissionRoleProxy;
+    }    
+
     /**
      * allow to reset proxy as per security needs
      */

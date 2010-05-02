@@ -46,6 +46,11 @@ public class AcquisitionClient extends AbstractServiceClientImpl {
         setProxy();
     }
 
+    @Override
+    public CollectionSpaceProxy getProxy() {
+    	return this.acquisitionProxy;
+    }
+
     /**
      * allow to reset proxy as per security needs
      */

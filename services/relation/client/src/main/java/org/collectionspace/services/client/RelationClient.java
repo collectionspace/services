@@ -1,3 +1,29 @@
+/**	
+ * RelationClient.java
+ *
+ * {Purpose of This Class}
+ *
+ * {Other Notes Relating to This Class (Optional)}
+ *
+ * $LastChangedBy: $
+ * $LastChangedRevision: $
+ * $LastChangedDate: $
+ *
+ * This document is a part of the source code and related artifacts
+ * for CollectionSpace, an open source collections management system
+ * for museums and related institutions:
+ *
+ * http://www.collectionspace.org
+ * http://wiki.collectionspace.org
+ *
+ * Copyright © 2009 {Contributing Institution}
+ *
+ * Licensed under the Educational Community License (ECL), Version 2.0.
+ * You may not use this file except in compliance with this License.
+ *
+ * You may obtain a copy of the ECL 2.0 License at
+ * https://source.collectionspace.org/collection-space/LICENSE.txt
+ */
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
@@ -13,96 +39,120 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
- * A RelationClient.
-
- * @version $Revision:$
+ * The Class RelationClient.
  */
-public class RelationClient extends AbstractServiceClientImpl implements RelationProxy {
+public class RelationClient extends AbstractServiceClientImpl {
 
-	/* (non-Javadoc)
-	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.collectionspace.services.client.BaseServiceClient#getServicePathComponent
+	 * ()
 	 */
+	@Override
 	public String getServicePathComponent() {
 		return "relations";
 	}
-	
-    /**
-     *
-     */
-    private RelationProxy relationProxy;
 
-    /**
-    *
-    * Default constructor for CollectionObjectClient class.
-    *
-    */
-   public RelationClient() {
-       ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-       RegisterBuiltin.register(factory);
-       setProxy();
-   }
-    
-   /**
-    * allow to reset proxy as per security needs
-    */
-   public void setProxy() {
-       if(useAuth()){
-           relationProxy = ProxyFactory.create(RelationProxy.class,
-                   getBaseURL(), getHttpClient());
-       }else{
-    	   relationProxy = ProxyFactory.create(RelationProxy.class,
-                   getBaseURL());
-       }
-   }
+	/** The relation proxy. */
+	private RelationProxy relationProxy;
 
-    /**
-     * @return
-     * @see org.collectionspace.hello.client.RelationProxy#getRelation()
-     */
-    public ClientResponse<RelationsCommonList> readList() {
-        return relationProxy.readList();
-    }
-    
-    public ClientResponse<RelationsCommonList> readList_SPO(String subjectCsid,
-			String predicate,
-			String objectCsid) {
-    	return relationProxy.readList_SPO(subjectCsid, predicate, objectCsid);
-    }
-    
-    /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.hello.client.RelationProxy#getRelation(java.lang.String)
-     */
-    public ClientResponse<MultipartInput> read(String csid) {
-        return relationProxy.read(csid);
+	/**
+	 * Instantiates a new relation client.
+	 */
+	public RelationClient() {
+		ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
+		RegisterBuiltin.register(factory);
+		setProxy();
+	}
+
+//	/* (non-Javadoc)
+//	 * @see org.collectionspace.services.client.CollectionSpaceClient#getProxy()
+//	 */
+//	@Override
+//	public CollectionSpaceProxy getProxy() {
+//		return this.relationProxy;
+//	}
+
+    public CollectionSpaceProxy getProxy() {
+    	return this.relationProxy;
     }
 
     /**
-     * @param relation
-     * @return
-     * @see org.collectionspace.hello.client.RelationProxy#createRelation(org.collectionspace.hello.Relation)
-     */
-    public ClientResponse<Response> create(MultipartOutput multipart) {
-        return relationProxy.create(multipart);
-    }
+	 * Sets the proxy.
+	 */
+	public void setProxy() {
+		if (useAuth()) {
+			relationProxy = ProxyFactory.create(RelationProxy.class,
+					getBaseURL(), getHttpClient());
+		} else {
+			relationProxy = ProxyFactory.create(RelationProxy.class,
+					getBaseURL());
+		}
+	}
 
-    /**
-     * @param csid
-     * @param relation
-     * @return
-     * @see org.collectionspace.hello.client.RelationProxy#updateRelation(java.lang.Long, org.collectionspace.hello.Relation)
-     */
-    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
-        return relationProxy.update(csid, multipart);
-    }
+	/**
+	 * Read list.
+	 *
+	 * @return the client response
+	 */
+	public ClientResponse<RelationsCommonList> readList() {
+		return relationProxy.readList();
+	}
 
-    /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.hello.client.RelationProxy#deleteRelation(java.lang.Long)
-     */
-    public ClientResponse<Response> delete(String csid) {
-        return relationProxy.delete(csid);
-    }
+	/**
+	 * Read list_ spo.
+	 *
+	 * @param subjectCsid the subject csid
+	 * @param predicate the predicate
+	 * @param objectCsid the object csid
+	 * @return the client response
+	 */
+	public ClientResponse<RelationsCommonList> readList_SPO(String subjectCsid,
+			String predicate, String objectCsid) {
+		return relationProxy.readList_SPO(subjectCsid, predicate, objectCsid);
+	}
+
+	/**
+	 * Read.
+	 *
+	 * @param csid the csid
+	 * @return the client response
+	 */
+	public ClientResponse<MultipartInput> read(String csid) {
+		return relationProxy.read(csid);
+	}
+
+	/**
+	 * Creates the.
+	 *
+	 * @param multipart the multipart
+	 * @return the client response
+	 */
+	public ClientResponse<Response> create(MultipartOutput multipart) {
+		return relationProxy.create(multipart);
+	}
+
+	/**
+	 * Update.
+	 *
+	 * @param csid the csid
+	 * @param multipart the multipart
+	 * @return the client response
+	 */
+	public ClientResponse<MultipartInput> update(String csid,
+			MultipartOutput multipart) {
+		return relationProxy.update(csid, multipart);
+	}
+
+	/**
+	 * Delete.
+	 *
+	 * @param csid the csid
+	 * @return the client response
+	 */
+	public ClientResponse<Response> delete(String csid) {
+		return relationProxy.delete(csid);
+	}
 }

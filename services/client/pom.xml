@@ -30,6 +30,12 @@
             <version>${project.version}</version>
             <optional>true</optional>
         </dependency> -->
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.jaxb</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
 <!-- External dependencies -->        
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
@@ -43,7 +49,6 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <version>1.0.2.GA</version>
             <exclusions>
                 <exclusion>
                     <groupId>tjws</groupId>
@@ -54,12 +59,10 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxb-provider</artifactId>
-            <version>1.0.2.GA</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-multipart-provider</artifactId>
-            <version>1.0.2.GA</version>
         </dependency>
         <!-- Set TestNG scope to default (compile), rather than test -->
         <!-- to allow import(s) in AbstractServiceTest class -->

@@ -27,9 +27,11 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.DimensionClient;
 import org.collectionspace.services.dimension.DimensionsCommon;
 import org.collectionspace.services.dimension.DimensionsCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -59,6 +61,23 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
     final String SERVICE_PATH_COMPONENT = "dimensions";
     private String knownResourceId = null;
     private List<String> allResourceIdsCreated = new ArrayList();
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
+     */
+    @Override
+    protected CollectionSpaceClient getClientInstance() {
+    	return new DimensionClient();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
+     */
+    @Override
+	protected AbstractCommonList getAbstractCommonList(
+			ClientResponse<AbstractCommonList> response) {
+        return response.getEntity(DimensionsCommonList.class);
+    }
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests

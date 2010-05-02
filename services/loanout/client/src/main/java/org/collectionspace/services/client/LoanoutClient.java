@@ -65,6 +65,11 @@ public class LoanoutClient extends AbstractServiceClientImpl {
         setProxy();
     }
 
+    @Override
+    public CollectionSpaceProxy getProxy() {
+    	return this.loanoutProxy;
+    }    
+
     /**
      * allow to reset proxy as per security needs
      */

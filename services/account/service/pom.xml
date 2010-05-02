@@ -26,7 +26,9 @@
             <artifactId>slf4j-log4j12</artifactId>
             <scope>provided</scope>
         </dependency>
+        
         <!-- CollectionSpace Dependencies -->
+        
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.common</artifactId>
@@ -47,7 +49,9 @@
             <artifactId>org.collectionspace.services.account.jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
+        
         <!-- External dependencies -->
+        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -71,8 +75,8 @@
             <artifactId>commons-logging</artifactId>
             <version>1.1</version>
         </dependency>
-        <!-- javax -->
 
+        <!-- javax -->
 
         <dependency>
             <groupId>javax.security</groupId>
@@ -81,13 +85,11 @@
             <scope>provided</scope>
         </dependency>
 
-
         <!-- jboss -->
 
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
-            <version>1.1.GA</version>
             <exclusions>
                 <exclusion>
                     <groupId>tjws</groupId>
@@ -98,15 +100,11 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxb-provider</artifactId>
-            <version>1.1.GA</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-multipart-provider</artifactId>
-            <version>1.1.GA</version>
         </dependency>
-
-
     </dependencies>
 
     <build>

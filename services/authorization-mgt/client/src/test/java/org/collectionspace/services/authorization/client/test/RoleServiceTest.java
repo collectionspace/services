@@ -26,12 +26,14 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RolesList;
 import org.collectionspace.services.client.RoleFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.ServiceRequestType;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
 import org.testng.Assert;
@@ -54,7 +56,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
             LoggerFactory.getLogger(RoleServiceTest.class);
     // Instance variables specific to this test.
     private String knownResourceId = null;
-    private List<String> allResourceIdsCreated = new ArrayList();
+    private List<String> allResourceIdsCreated = new ArrayList<String>();
     boolean addTenant = true;
     /*
      * This method is called only by the parent class, AbstractServiceTestImpl
@@ -65,6 +67,30 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         return new RoleClient().getServicePathComponent();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
+     */
+    @Override
+    protected CollectionSpaceClient getClientInstance() {
+    	return new RoleClient();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
+     */
+    @Override
+	protected AbstractCommonList getAbstractCommonList(
+			ClientResponse<AbstractCommonList> response) {
+    	//FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
+    	throw new UnsupportedOperationException();
+    }
+    
+	@Test(dataProvider = "testName")
+	@Override
+    public void readPaginatedList(String testName) throws Exception {
+			//FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
+	}    
+ 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
@@ -199,14 +225,17 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     // See Issue CSPACE-401.
     @Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     @Override
     public void createWithMalformedXml(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     @Override
     public void createWithWrongXmlSchema(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     // ---------------------------------------------------------------
@@ -380,14 +409,17 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     // See Issue CSPACE-401.
     @Override
     public void updateWithEmptyEntityBody(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     @Override
     public void updateWithMalformedXml(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     @Override
     public void updateWithWrongXmlSchema(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     @Override

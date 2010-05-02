@@ -21,7 +21,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 @Path("/dimensions/")
 @Produces({"multipart/mixed"})
 @Consumes({"multipart/mixed"})
-public interface DimensionProxy {
+public interface DimensionProxy extends CollectionSpaceProxy {
 
     @GET
     @Produces({"application/xml"})

@@ -50,7 +50,7 @@ import org.jboss.resteasy.client.ClientResponse;
 @Path("/accounts/")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface AccountProxy {
+public interface AccountProxy extends CollectionSpaceProxy {
 
     @GET
     @Produces({"application/xml"})

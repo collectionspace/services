@@ -31,13 +31,13 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.PersonJAXBSchema;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.client.OrgAuthorityClientUtils;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.common.authorityref.AuthorityRefList.AuthorityRefItem;
-import org.collectionspace.services.organization.OrgauthoritiesCommon;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.organization.OrganizationsCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -78,6 +78,23 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
     private String personAuthCSID = null;
     private String organizationContactPersonRefName = null;
     private final int NUM_AUTH_REFS_EXPECTED = 1;
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
+     */
+    @Override
+    protected CollectionSpaceClient getClientInstance() {
+    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+    }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
+     */
+    @Override
+	protected AbstractCommonList getAbstractCommonList(
+			ClientResponse<AbstractCommonList> response) {
+    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+    }
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests

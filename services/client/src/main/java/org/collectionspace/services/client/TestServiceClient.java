@@ -30,20 +30,18 @@ package org.collectionspace.services.client;
  */
 public class TestServiceClient extends AbstractServiceClientImpl {
     /**
-     *
-     * Default constructor for CollectionObjectClient class.
-     *
-     */
-    public TestServiceClient() {
-    }
-    
-    /**
     *
     * Returning NULL since this class is a base-level client, used (only) 
     * to obtain the base service URL.
     *
-    */    
+    */
+	@Override
 	public String getServicePathComponent() {
-		return null;
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public CollectionSpaceProxy getProxy() {
+		throw new UnsupportedOperationException();
 	}  
 }

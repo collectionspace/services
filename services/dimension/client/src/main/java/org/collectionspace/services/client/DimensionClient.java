@@ -73,6 +73,11 @@ public class DimensionClient extends AbstractServiceClientImpl {
         setProxy();
     }
 
+    @Override
+    public CollectionSpaceProxy getProxy() {
+    	return this.dimensionProxy;
+    }
+
     /**
      * allow to reset proxy as per security needs
      */

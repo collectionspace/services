@@ -30,12 +30,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.ContactClientUtils;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonauthoritiesCommonList;
 import org.collectionspace.services.person.PersonsCommon;
@@ -59,35 +61,88 @@ import org.testng.annotations.Test;
  */
 public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
+    /** The logger. */
     private final Logger logger =
         LoggerFactory.getLogger(PersonAuthorityServiceTest.class);
 
     // Instance variables specific to this test.
+    /** The SERVIC e_ pat h_ component. */
     final String SERVICE_PATH_COMPONENT = "personauthorities";
+    
+    /** The ITE m_ servic e_ pat h_ component. */
     final String ITEM_SERVICE_PATH_COMPONENT = "items";
+    
+    /** The CONTAC t_ servic e_ pat h_ component. */
     final String CONTACT_SERVICE_PATH_COMPONENT = "contacts";
+    
+    /** The TES t_ for e_ name. */
     final String TEST_FORE_NAME = "John";
+    
+    /** The TES t_ middl e_ name. */
     final String TEST_MIDDLE_NAME = null;
+    
+    /** The TES t_ su r_ name. */
     final String TEST_SUR_NAME = "Wayne";
+    
+    /** The TES t_ birt h_ date. */
     final String TEST_BIRTH_DATE = "May 26, 1907";
+    
+    /** The TES t_ deat h_ date. */
     final String TEST_DEATH_DATE = "June 11, 1979";
  
+    /** The known resource id. */
     private String knownResourceId = null;
+    
+    /** The known resource display name. */
     private String knownResourceDisplayName = null;
+    
+    /** The known resource ref name. */
     private String knownResourceRefName = null;
+    
+    /** The known item resource id. */
     private String knownItemResourceId = null;
+    
+    /** The known contact resource id. */
     private String knownContactResourceId = null;
+    
+    /** The n items to create in list. */
     private int nItemsToCreateInList = 3;
+    
+    /** The all resource ids created. */
     private List<String> allResourceIdsCreated = new ArrayList<String>();
+    
+    /** The all item resource ids created. */
     private Map<String, String> allItemResourceIdsCreated =
         new HashMap<String, String>();
+    
+    /** The all contact resource ids created. */
     private Map<String, String> allContactResourceIdsCreated =
         new HashMap<String, String>();
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
+     */
+    @Override
+    protected CollectionSpaceClient getClientInstance() {
+    	return new PersonAuthorityClient();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
+     */
+    @Override
+	protected AbstractCommonList getAbstractCommonList(
+			ClientResponse<AbstractCommonList> response) {
+        return response.getEntity(PersonsCommonList.class);
+    }
+ 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"create"})
@@ -119,9 +174,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": status = " + statusCode);
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertTrue(this.REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(this.REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, this.EXPECTED_STATUS_CODE);
 
         // Store the refname from the first resource created
         // for additional tests below.
@@ -142,6 +197,11 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         allResourceIdsCreated.add(newID);
     }
 
+    /**
+     * Creates the item.
+     *
+     * @param testName the test name
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"create"}, dependsOnMethods = {"create"})
     public void createItem(String testName) {
@@ -149,6 +209,13 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         String newID = createItemInAuthority(knownResourceId, knownResourceRefName);
     }
 
+    /**
+     * Creates the item in authority.
+     *
+     * @param vcsid the vcsid
+     * @param authRefName the auth ref name
+     * @return the string
+     */
     private String createItemInAuthority(String vcsid, String authRefName) {
 
         final String testName = "createItemInAuthority";
@@ -206,6 +273,11 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         return newID;
     }
 
+    /**
+     * Creates the contact.
+     *
+     * @param testName the test name
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"create"}, dependsOnMethods = {"createItem"})
     public void createContact(String testName) {
@@ -213,6 +285,13 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         String newID = createContactInItem(knownResourceId, knownItemResourceId);
     }
 
+   /**
+    * Creates the contact in item.
+    *
+    * @param parentcsid the parentcsid
+    * @param itemcsid the itemcsid
+    * @return the string
+    */
    private String createContactInItem(String parentcsid, String itemcsid) {
 
         final String testName = "createContactInItem";
@@ -262,14 +341,23 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithEmptyEntityBody(java.lang.String)
+     */
     @Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithMalformedXml(java.lang.String)
+     */
     @Override
     public void createWithMalformedXml(String testName) throws Exception {
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithWrongXmlSchema(java.lang.String)
+     */
     @Override
     public void createWithWrongXmlSchema(String testName) throws Exception {
     }
@@ -358,7 +446,10 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : CREATE LIST tests
     // ---------------------------------------------------------------
     // Success outcomes
-    @Override
+    /* (non-Javadoc)
+ * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
+ */
+@Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"createList"}, dependsOnGroups = {"create"})
     public void createList(String testName) throws Exception {
@@ -367,6 +458,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
     }
 
+    /**
+     * Creates the item list.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"createList"}, dependsOnMethods = {"createList"})
     public void createItemList(String testName) throws Exception {
@@ -376,6 +473,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
     }
 
+    /**
+     * Creates the contact list.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"createList"}, dependsOnMethods = {"createItemList"})
     public void createContactList(String testName) throws Exception {
@@ -389,6 +492,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#read(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"read"}, dependsOnGroups = {"create"})
@@ -421,6 +527,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
     }
 
+    /**
+     * Read by name.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
             groups = {"read"}, dependsOnGroups = {"create"})
         public void readByName(String testName) throws Exception {
@@ -484,7 +596,13 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     }
 */
 
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    /**
+ * Read item.
+ *
+ * @param testName the test name
+ * @throws Exception the exception
+ */
+@Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"read"}, dependsOnMethods = {"read"})
     public void readItem(String testName) throws Exception {
 
@@ -519,6 +637,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
     }
 
+    /**
+     * Verify item display name.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"readItem", "updateItem"})
     public void verifyItemDisplayName(String testName) throws Exception {
@@ -627,6 +751,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
                 "Updated DisplayName (not computed) in Person not stored.");
     }
 
+    /**
+     * Verify illegal item display name.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
             dependsOnMethods = {"verifyItemDisplayName"})
     public void verifyIllegalItemDisplayName(String testName) throws Exception {
@@ -673,6 +803,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
     
+    /**
+     * Read contact.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"read"}, dependsOnMethods = {"readItem"})
     public void readContact(String testName) throws Exception {
@@ -712,6 +848,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     }
 
     // Failure outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readNonExistent(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"read"}, dependsOnMethods = {"read"})
@@ -735,6 +874,11 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    /**
+     * Read item non existent.
+     *
+     * @param testName the test name
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"read"}, dependsOnMethods = {"readItem"})
     public void readItemNonExistent(String testName) {
@@ -757,6 +901,11 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    /**
+     * Read contact non existent.
+     *
+     * @param testName the test name
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"read"}, dependsOnMethods = {"readContact"})
     public void readContactNonExistent(String testName) {
@@ -785,6 +934,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Success outcomes
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readList(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"readList"}, dependsOnGroups = {"createList", "read"})
@@ -828,15 +980,28 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
     }
 
+    /**
+     * Read item list.
+     */
     @Test(groups = {"readList"}, dependsOnMethods = {"readList"})
     public void readItemList() {
         readItemList(knownResourceId, null);
     }
 
+    /**
+     * Read item list by authority name.
+     */
     @Test(groups = {"readList"}, dependsOnMethods = {"readItemList"})
     public void readItemListByAuthorityName() {
         readItemList(null, knownResourceDisplayName);
     }
+    
+    /**
+     * Read item list.
+     *
+     * @param vcsid the vcsid
+     * @param name the name
+     */
     private void readItemList(String vcsid, String name) {
 
         final String testName = "readItemList";
@@ -902,11 +1067,20 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
     }
 
+    /**
+     * Read contact list.
+     */
     @Test(groups = {"readList"}, dependsOnMethods = {"readItemList"})
     public void readContactList() {
         readContactList(knownResourceId, knownItemResourceId);
     }
 
+    /**
+     * Read contact list.
+     *
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     */
     private void readContactList(String parentcsid, String itemcsid) {
         final String testName = "readContactList";
 
@@ -968,6 +1142,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : UPDATE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#update(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"update"}, dependsOnGroups = {"read", "readList"})
@@ -1029,6 +1206,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
                 "Data in updated object did not match submitted data.");
     }
 
+    /**
+     * Update item.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"update"}, dependsOnMethods = {"update"})
     public void updateItem(String testName) throws Exception {
@@ -1092,6 +1275,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
                 "Data in updated Person did not match submitted data.");
     }
 
+    /**
+     * Update contact.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"update"}, dependsOnMethods = {"updateItem"})
     public void updateContact(String testName) throws Exception {
@@ -1158,14 +1347,23 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithEmptyEntityBody(java.lang.String)
+     */
     @Override
     public void updateWithEmptyEntityBody(String testName) throws Exception {
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithMalformedXml(java.lang.String)
+     */
     @Override
     public void updateWithMalformedXml(String testName) throws Exception {
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithWrongXmlSchema(java.lang.String)
+     */
     @Override
     public void updateWithWrongXmlSchema(String testName) throws Exception {
     }
@@ -1250,7 +1448,10 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     }
 */
 
-    @Override
+    /* (non-Javadoc)
+ * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateNonExistent(java.lang.String)
+ */
+@Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"update"}, dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
@@ -1280,6 +1481,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    /**
+     * Update non existent item.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"update"}, dependsOnMethods = {"updateItem", "testItemSubmitRequest"})
     public void updateNonExistentItem(String testName) throws Exception {
@@ -1313,6 +1520,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    /**
+     * Update non existent contact.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"update"}, dependsOnMethods = {"updateContact", "testContactSubmitRequest"})
     public void updateNonExistentContact(String testName) throws Exception {
@@ -1327,6 +1540,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     // Note: delete sub-resources in ascending hierarchical order,
     // before deleting their parents.
 
+    /**
+     * Delete contact.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class, 
         groups = {"delete"}, dependsOnGroups = {"create", "read", "readList", "update"})
     public void deleteContact(String testName) throws Exception {
@@ -1356,6 +1575,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+   /**
+    * Delete item.
+    *
+    * @param testName the test name
+    * @throws Exception the exception
+    */
    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"delete"}, dependsOnMethods = {"deleteContact"})
     public void deleteItem(String testName) throws Exception {
@@ -1383,6 +1608,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#delete(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"delete"}, dependsOnMethods = {"deleteItem"})
@@ -1411,6 +1639,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     }
 
     // Failure outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"delete"}, dependsOnMethods = {"delete"})
@@ -1434,6 +1665,11 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    /**
+     * Delete non existent item.
+     *
+     * @param testName the test name
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"delete"}, dependsOnMethods = {"deleteItem"})
     public void deleteNonExistentItem(String testName) {
@@ -1456,6 +1692,11 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    /**
+     * Delete non existent contact.
+     *
+     * @param testName the test name
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"delete"}, dependsOnMethods = {"deleteContact"})
     public void deleteNonExistentContact(String testName) {
@@ -1507,6 +1748,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
     }
 
+    /**
+     * Test item submit request.
+     */
     @Test(dependsOnMethods = {"createItem", "readItem", "testSubmitRequest"})
     public void testItemSubmitRequest() {
 
@@ -1528,6 +1772,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
     }
 
+    /**
+     * Test contact submit request.
+     */
     @Test(dependsOnMethods = {"createContact", "readContact", "testItemSubmitRequest"})
     public void testContactSubmitRequest() {
 
@@ -1610,15 +1857,28 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
+     */
     @Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
     }
 
+    /**
+     * Gets the item service path component.
+     *
+     * @return the item service path component
+     */
     public String getItemServicePathComponent() {
         return ITEM_SERVICE_PATH_COMPONENT;
     }
 
+    /**
+     * Gets the contact service path component.
+     *
+     * @return the contact service path component
+     */
     public String getContactServicePathComponent() {
         return CONTACT_SERVICE_PATH_COMPONENT;
     }

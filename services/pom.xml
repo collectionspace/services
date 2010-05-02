@@ -197,11 +197,6 @@
     </reporting>
     <dependencyManagement>
         <dependencies>
-<!--            <dependency>
-                <groupId>net.java.dev.jaxb2-commons</groupId>
-                <artifactId>jaxb-fluent-api</artifactId>
-                <version>2.0.1</version>
-            </dependency> -->
             <dependency>
                 <groupId>net.java.dev.jaxb2-commons</groupId>
                 <artifactId>jaxb-fluent-api</artifactId>
@@ -213,11 +208,6 @@
                 <version>5.6</version>
                 <scope>test</scope>
                 <classifier>jdk15</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>jaxrs-api</artifactId>
-                <version>1.1.GA</version>
             </dependency>
             <dependency>
                 <groupId>org.jvnet.jaxb2_commons</groupId>
@@ -236,9 +226,24 @@
             </dependency>
             <dependency>
                 <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-jaxrs</artifactId>
-                <version>1.1.GA</version>
+                <artifactId>jaxrs-api</artifactId>
+                <version>1.2.GA</version>
             </dependency>
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-jaxrs</artifactId>
+                <version>1.2.GA</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-jaxb-provider</artifactId>
+                <version>1.2.GA</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-multipart-provider</artifactId>
+                <version>1.2.GA</version>
+            </dependency>            
             <dependency>
                 <groupId>commons-httpclient</groupId>
                 <artifactId>commons-httpclient</artifactId>

@@ -9,6 +9,11 @@ public class NumericIDPartRegexValidatorTest {
 
     NumericIDPartRegexValidator validator = new NumericIDPartRegexValidator();
 
+	public NumericIDPartRegexValidatorTest(String inComingString) {
+		System.err.println("NumericIDPartRegexValidatorTest constructor invoked!");
+		//empty constructor
+	}
+    
     @Test
     public void isValid() {
         Assert.assertTrue(validator.isValid("0"));

@@ -25,9 +25,10 @@ package org.collectionspace.services.authorization.client.test;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.Response;
-import org.collectionspace.services.authorization.ActionType;
+//import org.collectionspace.services.authorization.ActionType;
 import org.collectionspace.services.authorization.EffectType;
 
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PermissionClient;
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.PermissionAction;
@@ -35,6 +36,7 @@ import org.collectionspace.services.authorization.PermissionsList;
 import org.collectionspace.services.client.PermissionFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.ServiceRequestType;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
 import org.testng.Assert;
@@ -57,7 +59,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
             LoggerFactory.getLogger(PermissionServiceTest.class);
     // Instance variables specific to this test.
     private String knownResourceId = null;
-    private List<String> allResourceIdsCreated = new ArrayList();
+    private List<String> allResourceIdsCreated = new ArrayList<String>();
     boolean addTenant = true;
     /*
      * This method is called only by the parent class, AbstractServiceTestImpl
@@ -68,7 +70,31 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         return new PermissionClient().getServicePathComponent();
     }
 
-    // ---------------------------------------------------------------
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
+     */
+    @Override
+    protected CollectionSpaceClient getClientInstance() {
+    	return new PermissionClient();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
+     */
+    @Override
+	protected AbstractCommonList getAbstractCommonList(
+			ClientResponse<AbstractCommonList> response) {
+    	//FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
+    	throw new UnsupportedOperationException();
+    }
+    
+	@Test(dataProvider = "testName")
+	@Override
+    public void readPaginatedList(String testName) throws Exception {
+		//FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
+	}    
+
+	// ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
@@ -200,14 +226,17 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     // See Issue CSPACE-401.
     @Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     @Override
     public void createWithMalformedXml(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     @Override
     public void createWithWrongXmlSchema(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     // ---------------------------------------------------------------
@@ -428,14 +457,17 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
 
     @Override
     public void updateWithEmptyEntityBody(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     @Override
     public void updateWithMalformedXml(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     @Override
     public void updateWithWrongXmlSchema(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     @Override

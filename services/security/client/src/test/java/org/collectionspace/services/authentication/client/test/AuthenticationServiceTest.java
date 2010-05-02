@@ -24,22 +24,28 @@ package org.collectionspace.services.authentication.client.test;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.apache.commons.codec.binary.Base64;
-import org.collectionspace.services.account.AccountTenant;
-import org.collectionspace.services.client.AccountClient;
-import org.collectionspace.services.account.AccountsCommon;
+
+//import org.apache.commons.codec.binary.Base64;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import org.collectionspace.services.account.AccountTenant;
+import org.collectionspace.services.client.AccountClient;
+import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+import org.collectionspace.services.client.test.BaseServiceTest;
+import org.collectionspace.services.jaxb.AbstractCommonList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +75,30 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         return null;
     }
 
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
+     */
+    @Override
+    protected CollectionSpaceClient getClientInstance() {
+    	return new AccountClient();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
+     */
+    @Override
+	protected AbstractCommonList getAbstractCommonList(
+			ClientResponse<AbstractCommonList> response) {
+    	throw new UnsupportedOperationException(); //Since this test does not support lists, this method is not needed.
+    }
+    
+	@Test(dataProvider = "testName")
+	@Override
+    public void readPaginatedList(String testName) throws Exception {
+		// Test not supported.
+	}    
+
+	@Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createAccounts(String testName) throws Exception {
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
@@ -126,7 +155,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     public void create(String testName) {
         setupCreate(testName);
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        String identifier = this.createIdentifier();
+        String identifier = BaseServiceTest.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
 
@@ -161,7 +190,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     public void createWithoutPassword() {
         banner("createWithoutPassword");
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        String identifier = this.createIdentifier();
+        String identifier = BaseServiceTest.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
 
@@ -191,7 +220,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     public void createWithUnknownUser() {
         banner("createWithUnknownUser");
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        String identifier = this.createIdentifier();
+        String identifier = BaseServiceTest.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
 
@@ -222,7 +251,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     public void createWithIncorrectPassword() {
         banner("createWithIncorrectPassword");
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        String identifier = this.createIdentifier();
+        String identifier = BaseServiceTest.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
 
@@ -253,7 +282,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     public void createWithIncorrectUserPassword() {
         banner("createWithIncorrectUserPassword");
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        String identifier = this.createIdentifier();
+        String identifier = BaseServiceTest.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
 
@@ -285,7 +314,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     public void createWithoutTenant() {
         banner("createWithoutTenant");
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        String identifier = this.createIdentifier();
+        String identifier = BaseServiceTest.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
 
@@ -449,6 +478,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createList(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -456,6 +486,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -463,6 +494,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithMalformedXml(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -470,6 +502,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithWrongXmlSchema(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -477,6 +510,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void read(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -484,6 +518,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void readNonExistent(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -491,6 +526,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void readList(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -498,6 +534,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void update(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -505,6 +542,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void updateWithEmptyEntityBody(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -512,6 +550,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void updateWithMalformedXml(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -519,6 +558,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void updateWithWrongXmlSchema(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -526,6 +566,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void updateNonExistent(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -533,5 +574,6 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void deleteNonExistent(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 }

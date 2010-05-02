@@ -22,7 +22,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 @Path("/loansout/")
 @Produces({"multipart/mixed"})
 @Consumes({"multipart/mixed"})
-public interface LoanoutProxy {
+public interface LoanoutProxy extends CollectionSpaceProxy {
 
     //(C)reate
     @POST

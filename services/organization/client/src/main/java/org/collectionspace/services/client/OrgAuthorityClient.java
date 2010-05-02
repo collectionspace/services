@@ -53,6 +53,11 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
         setProxy();
     }
 
+    @Override
+    public CollectionSpaceProxy getProxy() {
+    	return this.orgAuthorityProxy;
+    }    
+
     /**
      * allow to reset proxy as per security needs
      */

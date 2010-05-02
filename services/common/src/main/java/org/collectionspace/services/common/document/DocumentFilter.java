@@ -20,6 +20,7 @@ package org.collectionspace.services.common.document;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
+import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.context.ServiceContext;
 
@@ -34,11 +35,10 @@ import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
  */
 public class DocumentFilter {
 
-    public static final String PAGE_SIZE_DEFAULT_PROPERTY = "pageSizeDefault";
-    public static final String PAGE_SIZE_PARAM = "pgSz";
-    public static final String START_PAGE_PARAM = "pgNum";
     public static final int DEFAULT_PAGE_SIZE_INIT = 40;
+    public static final String PAGE_SIZE_DEFAULT_PROPERTY = "pageSizeDefault";
     public static int defaultPageSize = DEFAULT_PAGE_SIZE_INIT;
+
     protected String whereClause;	// Filtering clause. Omit the "WHERE".
     protected int startPage;		// Pagination offset for list results
     protected int pageSize;			// Pagination limit for list results
@@ -128,7 +128,7 @@ public class DocumentFilter {
         // Set the page size
         //
         String pageSizeStr = null;
-        List<String> list = queryParams.remove(PAGE_SIZE_PARAM);
+        List<String> list = queryParams.remove(IClientQueryParams.PAGE_SIZE_PARAM);
         if (list != null) {
             pageSizeStr = list.get(0);
         }
@@ -138,7 +138,7 @@ public class DocumentFilter {
         // Set the start page
         //
         String startPageStr = null;
-        list = queryParams.remove(START_PAGE_PARAM);
+        list = queryParams.remove(IClientQueryParams.START_PAGE_PARAM);
         if (list != null) {
             startPageStr = list.get(0);
         }
@@ -243,7 +243,8 @@ public class DocumentFilter {
             } catch (NumberFormatException e) {
                 //FIXME This should cause a warning in the log file and should result in the
                 //FIXME page size being set to the default.  We don't need to throw an exception here.
-                throw new NumberFormatException("Bad value for: " + PAGE_SIZE_PARAM);
+                throw new NumberFormatException("Bad value for: " +
+                		IClientQueryParams.PAGE_SIZE_PARAM);
             }
         }
 
@@ -260,7 +261,8 @@ public class DocumentFilter {
             try {
                 startPage = Integer.valueOf(startPageStr);
             } catch (NumberFormatException e) {
-                throw new NumberFormatException("Bad value for: " + START_PAGE_PARAM);
+                throw new NumberFormatException("Bad value for: " +
+                		IClientQueryParams.START_PAGE_PARAM);
             }
         }
     }

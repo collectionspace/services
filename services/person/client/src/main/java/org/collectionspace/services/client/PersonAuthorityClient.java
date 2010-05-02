@@ -56,6 +56,11 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
         setProxy();
     }
 
+    @Override
+    public CollectionSpaceProxy getProxy() {
+    	return this.personAuthorityProxy;
+    }    
+
     /**
      * allow to reset proxy as per security needs
      */

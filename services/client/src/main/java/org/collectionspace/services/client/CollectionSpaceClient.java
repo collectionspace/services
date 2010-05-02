@@ -23,25 +23,72 @@
  */
 package org.collectionspace.services.client;
 import org.apache.commons.httpclient.HttpClient;
+import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.jboss.resteasy.client.ClientResponse;
 
 /**
  *
  */
 public interface CollectionSpaceClient {
+    
+    /** The AUT h_ property. */
     String AUTH_PROPERTY = "cspace.auth";
+    
+    /** The PASSWOR d_ property. */
     String PASSWORD_PROPERTY = "cspace.password";
+    
+    /** The SS l_ property. */
     String SSL_PROPERTY = "cspace.ssl";
+    
+    /** The UR l_ property. */
     String URL_PROPERTY = "cspace.url";
+    
+    /** The USE r_ property. */
     String USER_PROPERTY = "cspace.user";
 
+    /**
+     * Gets the proxy.
+     *
+     * @return the proxy
+     */
+    CollectionSpaceProxy getProxy();
+    
+    /**
+     * Gets the base url.
+     *
+     * @return the base url
+     */
     String getBaseURL();
 
+    /**
+     * Gets the http client.
+     *
+     * @return the http client
+     */
     HttpClient getHttpClient();
 
+    /**
+     * Gets the property.
+     *
+     * @param propName the prop name
+     * @return the property
+     */
     String getProperty(String propName);
 
+    /**
+     * Removes the property.
+     *
+     * @param propName the prop name
+     * @return the object
+     */
     Object removeProperty(String propName);
 
+    /**
+     * Sets the property.
+     *
+     * @param propName the prop name
+     * @param value the value
+     */
     void setProperty(String propName, String value);
 
     /**
@@ -55,8 +102,18 @@ public interface CollectionSpaceClient {
      */
     void setupHttpClient();
 
+    /**
+     * Use auth.
+     *
+     * @return true, if successful
+     */
     boolean useAuth();
 
+    /**
+     * Use ssl.
+     *
+     * @return true, if successful
+     */
     boolean useSSL();
 
     /**
@@ -64,5 +121,15 @@ public interface CollectionSpaceClient {
      * @return
      */
     boolean isServerSecure();
+    
+    /**
+     * Read list.
+     *
+     * @param pageSize the page size
+     * @param pageNumber the page number
+     * @return the client response
+     */
+    public ClientResponse<AbstractCommonList> readList(String pageSize,
+    		String pageNumber);    
 
 }

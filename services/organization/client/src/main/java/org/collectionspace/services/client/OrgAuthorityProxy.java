@@ -24,7 +24,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 @Path("/orgauthorities/")
 @Produces({"multipart/mixed"})
 @Consumes({"multipart/mixed"})
-public interface OrgAuthorityProxy {
+public interface OrgAuthorityProxy extends CollectionSpaceProxy {
 
     // List OrgAuthorities
     @GET

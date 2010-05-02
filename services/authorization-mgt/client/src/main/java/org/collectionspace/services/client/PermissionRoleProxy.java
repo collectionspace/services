@@ -45,7 +45,7 @@ import org.jboss.resteasy.client.ClientResponse;
 @Path("/authorization/permissions")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface PermissionRoleProxy {
+public interface PermissionRoleProxy extends CollectionSpaceProxy {
 
     //(C)reate
     @POST

@@ -64,6 +64,11 @@ public class ContactClient extends AbstractServiceClientImpl {
         setProxy();
     }
 
+    @Override
+    public CollectionSpaceProxy getProxy() {
+    	return this.contactProxy;
+    }
+    
     /**
      * allow to reset proxy as per security needs
      */

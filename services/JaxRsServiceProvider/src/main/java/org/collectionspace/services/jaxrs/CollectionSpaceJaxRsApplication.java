@@ -60,7 +60,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
     private Set<Class<?>> empty = new HashSet<Class<?>>();
 
     public CollectionSpaceJaxRsApplication() {
-        singletons.add(new SecurityInterceptor());
+//        singletons.add(new SecurityInterceptor());
         singletons.add(new AccountResource());
         singletons.add(new RoleResource());
         singletons.add(new PermissionResource());

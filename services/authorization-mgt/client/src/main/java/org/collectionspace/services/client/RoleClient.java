@@ -66,6 +66,11 @@ public class RoleClient extends AbstractServiceClientImpl {
         setProxy();
     }
 
+    @Override
+    public CollectionSpaceProxy getProxy() {
+    	return this.roleProxy;
+    }    
+
     /**
      * allow to reset proxy as per security needs
      */

@@ -44,6 +44,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * A IntakeClient.
 
  * @version $Revision:$
+ * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
 public class IntakeClient extends AbstractServiceClientImpl {
 
@@ -73,6 +74,11 @@ public class IntakeClient extends AbstractServiceClientImpl {
         setProxy();
     }
 
+    @Override
+    public CollectionSpaceProxy getProxy() {
+    	return this.intakeProxy;
+    }
+    
     /**
      * allow to reset proxy as per security needs
      */
