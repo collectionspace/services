@@ -1,1 +1,2 @@
-This change should was modified on the v0.5 branch. Revision was r1594.
+Release branch of the CollectionSpace Services Layer.
+http://wiki.collectionspace.org

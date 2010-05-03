@@ -9,7 +9,7 @@
     <name>services</name>
     
     <properties>
-        <cspace.services.client.version>0.5-SNAPSHOT</cspace.services.client.version>
+        <cspace.services.client.version>0.6</cspace.services.client.version>
         <jboss.version>4.2.3.GA</jboss.version>
         <jboss.ejb.version>3.0</jboss.ejb.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
