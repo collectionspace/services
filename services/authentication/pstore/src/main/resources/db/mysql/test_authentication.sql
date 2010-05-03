@@ -13,3 +13,6 @@ insert into `roles` (`rolename`, `rolegroup`, `created_at`) values ('collections
 
 insert into `users_roles`(`username`, `rolename`, `created_at`) values ('test', 'collections_manager', '2010-02-17 16:31:48');
 insert into `users_roles`(`username`, `rolename`, `created_at`) values('admin', 'collections_registrar', '2010-02-17 16:31:48');
+
+-- Added default login / end user account for release 0.6
+insert into `users` (`username`,`passwd`, `created_at`) VALUES ('test@collectionspace.org','NyaDNd1pMQRb3N+SYj/4GaZCRLU9DnRtQ4eXNJ1NpXg=', '2010-05-03 12:35:00');
