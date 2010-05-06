@@ -29,7 +29,7 @@ public class AcquisitionClient extends AbstractServiceClientImpl {
     /**
      *
      */
-    private static final AcquisitionClient instance = new AcquisitionClient();
+//    private static final AcquisitionClient instance = new AcquisitionClient();
     /**
      *
      */
@@ -69,9 +69,9 @@ public class AcquisitionClient extends AbstractServiceClientImpl {
      *
      * @return
      */
-    public static AcquisitionClient getInstance() {
-        return instance;
-    }
+//    public static AcquisitionClient getInstance() {
+//        return instance;
+//    }
 
     /**
      * @return

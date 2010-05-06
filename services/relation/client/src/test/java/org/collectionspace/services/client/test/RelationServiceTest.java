@@ -55,11 +55,17 @@ import org.slf4j.LoggerFactory;
  */
 public class RelationServiceTest extends AbstractServiceTestImpl {
 
+   /** The logger. */
    private final Logger logger =
         LoggerFactory.getLogger(RelationServiceTest.class);
 
+    /** The SERVIC e_ pat h_ component. */
     final String SERVICE_PATH_COMPONENT = "relations";
+    
+    /** The known resource id. */
     private String knownResourceId = null;
+    
+    /** The all resource ids created. */
     private List<String> allResourceIdsCreated = new ArrayList<String>();
 
     /* (non-Javadoc)
@@ -83,6 +89,9 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     @Override
     public void create(String testName) throws Exception {
@@ -125,6 +134,9 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         allResourceIdsCreated.add(extractId(res));
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"create"})
@@ -137,13 +149,28 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithEmptyEntityBody(java.lang.String)
+     */
+    @Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
+    	//Should this test really be empty?
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithMalformedXml(java.lang.String)
+     */
+    @Override
     public void createWithMalformedXml(String testName) throws Exception {
+    	//Should this test really be empty?
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithWrongXmlSchema(java.lang.String)
+     */
+    @Override
     public void createWithWrongXmlSchema(String testName) throws Exception {
+    	//Should this test really be empty?
     }
 
     /*
@@ -230,6 +257,9 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#read(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"create"})
@@ -261,6 +291,9 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
     }
 
     // Failure outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readNonExistent(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"read"})
@@ -284,10 +317,26 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
+	 */
+	@Test(dataProvider = "testName")
+	/*
+	 * FIXME: Until the Relation service uses NXQL queries to get results,
+	 * we need to skip the pagination tests
+	 */
+	@Override
+	public void readPaginatedList(String testName) throws Exception {
+		//Override and skip the pagination tests
+	}
+   
     // ---------------------------------------------------------------
     // CRUD tests : READ_LIST tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readList(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"createList", "read"})
@@ -336,6 +385,9 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
 
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#update(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"read"})
@@ -407,13 +459,28 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithEmptyEntityBody(java.lang.String)
+     */
+    @Override
     public void updateWithEmptyEntityBody(String testName) throws Exception {
+    	//Should this test really be empty?
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithMalformedXml(java.lang.String)
+     */
+    @Override
     public void updateWithMalformedXml(String testName) throws Exception {
+    	//Should this test really be empty?
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithWrongXmlSchema(java.lang.String)
+     */
+    @Override
     public void updateWithWrongXmlSchema(String testName) throws Exception {
+    	//Should this test really be empty?
     }
 
     /*
@@ -496,6 +563,9 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
     }
      */
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateNonExistent(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"update", "testSubmitRequest"})
@@ -527,6 +597,9 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : DELETE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#delete(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
@@ -551,6 +624,9 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
     }
 
     // Failure outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"delete"})
@@ -577,8 +653,12 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // RELATE_OBJECT tests
     // ---------------------------------------------------------------
+    /**
+     * Relate objects.
+     */
     @Test(dependsOnMethods = {"create"})
     public void relateObjects() {
+    	//Should this test really be empty?
     }
 
     // ---------------------------------------------------------------
@@ -643,11 +723,20 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
+     */
     @Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
     }
 
+    /**
+     * Creates the relation instance.
+     *
+     * @param identifier the identifier
+     * @return the multipart output
+     */
     private MultipartOutput createRelationInstance(String identifier) {
         RelationsCommon relation = new RelationsCommon();
         fillRelation(relation, identifier);
@@ -665,10 +754,9 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
 
     /**
      * Fills the relation.
-     * 
+     *
+     * @param relation the relation
      * @param identifier the identifier
-     * 
-     * @return the relation
      */
     private void fillRelation(RelationsCommon relation, String identifier) {
         fillRelation(relation, "Subject-" + identifier,
@@ -680,14 +768,13 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
 
     /**
      * Fills the relation.
-     * 
+     *
+     * @param relation the relation
      * @param documentId1 the document id1
      * @param documentType1 the document type1
      * @param documentId2 the document id2
      * @param documentType2 the document type2
      * @param rt the rt
-     * 
-     * @return the relation
      */
     private void fillRelation(RelationsCommon relation,
             String documentId1, String documentType1,

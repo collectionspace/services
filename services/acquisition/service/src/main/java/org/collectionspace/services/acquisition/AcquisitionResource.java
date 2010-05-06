@@ -36,6 +36,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -52,8 +53,7 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.security.UnauthorizedException;
-import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
+import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
@@ -223,10 +223,11 @@ public class AcquisitionResource
     public AcquisitionsCommonList getAcquisitionList(@Context UriInfo ui,
     		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
     	AcquisitionsCommonList result = null;
+    	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
     	if (keywords != null) {
-    		result = searchAcquisitions(keywords);
+    		result = searchAcquisitions(queryParams, keywords);
     	} else {
-    		result = getAcquisitionsList();
+    		result = getAcquisitionsList(queryParams);
     	}
     	
     	return result;
@@ -237,12 +238,12 @@ public class AcquisitionResource
      * 
      * @return the acquisitions list
      */
-    private AcquisitionsCommonList getAcquisitionsList() {
+    private AcquisitionsCommonList getAcquisitionsList(MultivaluedMap<String, String> queryParams) {
         AcquisitionsCommonList acquisitionObjectList;
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
-            getRepositoryClient(ctx).getAll(ctx, handler);
+            getRepositoryClient(ctx).getFiltered(ctx, handler);
             acquisitionObjectList = (AcquisitionsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
@@ -366,9 +367,11 @@ public class AcquisitionResource
     @GET
     @Path("/search")    
     @Produces("application/xml")
+    @Deprecated    
     public AcquisitionsCommonList keywordsSearchAcquisitions(@Context UriInfo ui,
     		@QueryParam (IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
-    	return searchAcquisitions(keywords);
+    	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+    	return searchAcquisitions(queryParams, keywords);
     }
     
     /**
@@ -378,10 +381,12 @@ public class AcquisitionResource
      * 
      * @return the acquisitions common list
      */
-    private AcquisitionsCommonList searchAcquisitions(String keywords) {
+    private AcquisitionsCommonList searchAcquisitions(
+    		MultivaluedMap<String, String> queryParams,
+    		String keywords) {
     	AcquisitionsCommonList acquisitionObjectList;    	
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
 
             // perform a keyword search
@@ -392,12 +397,9 @@ public class AcquisitionResource
 	            if (logger.isDebugEnabled()) {
 	            	logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
 	            }
-	            getRepositoryClient(ctx).getFiltered(ctx, handler);
-            } else {
-            	getRepositoryClient(ctx).getAll(ctx, handler);
-            }            
-            acquisitionObjectList = (AcquisitionsCommonList) handler.getCommonPartList();
-            
+            }
+            getRepositoryClient(ctx).getFiltered(ctx, handler);
+            acquisitionObjectList = (AcquisitionsCommonList) handler.getCommonPartList();            
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -432,8 +434,8 @@ public class AcquisitionResource
             ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             DocumentWrapper<DocumentModel> docWrapper = 
             	getRepositoryClient(ctx).getDoc(ctx, csid);
-            RemoteDocumentModelHandlerImpl handler 
-            	= (RemoteDocumentModelHandlerImpl)createDocumentHandler(ctx);
+            DocumentModelHandler<MultipartInput, MultipartOutput> handler 
+            	= (DocumentModelHandler<MultipartInput, MultipartOutput>)createDocumentHandler(ctx);
             List<String> authRefFields = 
             	((MultipartServiceContextImpl)ctx).getCommonPartPropertyValues(
             			ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);

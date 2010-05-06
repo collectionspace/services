@@ -23,10 +23,11 @@
  */
 package org.collectionspace.services.authorization.test;
 
-import java.util.ArrayList;
-import java.util.List;
+//import java.util.ArrayList;
+//import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+//import org.collectionspace.services.client.test.BaseServiceTest;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.PermissionRole;
@@ -62,20 +63,20 @@ public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
     }
 
     public void seedRoles() throws Exception {
+    	//Should this test really be empty?
     }
 
-    public void seedPermissions() throws Exception {
-
+    public void seedPermissions() throws Exception {    	
         PermissionsList pcList =
-                (PermissionsList) fromFile(PermissionsList.class,
+                (PermissionsList) fromFile(PermissionsList.class, baseDir +
                 AbstractAuthorizationTestImpl.testDataDir + "test-permissions.xml");
         logger.info("read permissions from "
-                + AbstractAuthorizationTestImpl.testDataDir + "test-permissions.xml");
+                + baseDir + AbstractAuthorizationTestImpl.testDataDir + "test-permissions.xml");
         PermissionsRolesList pcrList =
-                (PermissionsRolesList) fromFile(PermissionsRolesList.class,
+                (PermissionsRolesList) fromFile(PermissionsRolesList.class, baseDir +
                 AbstractAuthorizationTestImpl.testDataDir + "test-permissions-roles.xml");
         logger.info("read permissions-roles from "
-                + AbstractAuthorizationTestImpl.testDataDir + "test-permissions.xml");
+                + baseDir + AbstractAuthorizationTestImpl.testDataDir + "test-permissions.xml");
         AuthZ authZ = AuthZ.get();
         for (Permission p : pcList.getPermissions()) {
             if (logger.isDebugEnabled()) {

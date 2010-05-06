@@ -59,6 +59,7 @@ import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
+import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -255,7 +256,7 @@ public class IntakeResource extends
         try {
         	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
-            getRepositoryClient(ctx).getAll(ctx, handler);
+            getRepositoryClient(ctx).getFiltered(ctx, handler);
             intakeObjectList = (IntakesCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
@@ -292,8 +293,8 @@ public class IntakeResource extends
         	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentWrapper<DocumentModel> docWrapper = 
             	getRepositoryClient(ctx).getDoc(ctx, csid);
-            RemoteDocumentModelHandlerImpl handler 
-            	= (RemoteDocumentModelHandlerImpl)createDocumentHandler(ctx);
+            DocumentModelHandler<MultipartInput, MultipartOutput> handler 
+            	= (DocumentModelHandler<MultipartInput, MultipartOutput>)createDocumentHandler(ctx);
             List<String> authRefFields = 
             	((MultipartServiceContextImpl)ctx).getCommonPartPropertyValues(
             			ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
@@ -474,13 +475,10 @@ public class IntakeResource extends
 	            documentFilter.setWhereClause(whereClause);
 	            if (logger.isDebugEnabled()) {
 	            	logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
-	            }
-	            getRepositoryClient(ctx).getFiltered(ctx, handler);
-            } else {
-            	getRepositoryClient(ctx).getAll(ctx, handler);
-            }            
-            intakesObjectList = (IntakesCommonList) handler.getCommonPartList();
-            
+	            }	            
+            }
+            getRepositoryClient(ctx).getFiltered(ctx, handler);
+            intakesObjectList = (IntakesCommonList) handler.getCommonPartList();            
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();

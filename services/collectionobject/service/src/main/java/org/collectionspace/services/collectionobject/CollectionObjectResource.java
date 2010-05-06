@@ -238,7 +238,7 @@ public class CollectionObjectResource
     public CollectionobjectsCommonList getCollectionObjectList(@Context UriInfo ui,
     		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
     	CollectionobjectsCommonList result = null;
-    	MultivaluedMap queryParams = ui.getQueryParameters();
+    	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
     	if (keywords != null) {
     		result = searchCollectionObjects(queryParams, keywords);
     	} else {
@@ -251,7 +251,7 @@ public class CollectionObjectResource
     /**
      * Gets the collection object list.
      */
-    private CollectionobjectsCommonList getCollectionObjectList(MultivaluedMap queryParams) {
+    private CollectionobjectsCommonList getCollectionObjectList(MultivaluedMap<String, String> queryParams) {
         CollectionobjectsCommonList collectionObjectList;
         try {
             ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
@@ -385,6 +385,7 @@ public class CollectionObjectResource
     public IntakesCommonList getIntakesCommonList(@Context UriInfo ui,
     		@PathParam("csid") String csid) {
         IntakesCommonList result = null;  	
+    	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
         
         try {
         	//
@@ -393,8 +394,9 @@ public class CollectionObjectResource
         	String subjectCsid = csid;
         	String predicate = RelationshipType.COLLECTIONOBJECT_INTAKE.value();
         	String objectCsid = null;
-        	NewRelationResource relationResource = new NewRelationResource();        	
-        	RelationsCommonList relationsCommonList = relationResource.getRelationList(subjectCsid, predicate, objectCsid);
+        	NewRelationResource relationResource = new NewRelationResource();
+        	RelationsCommonList relationsCommonList = relationResource.getRelationList(queryParams,
+        			subjectCsid, predicate, objectCsid);
         	
         	//
         	// Create an array of Intake csid's
@@ -438,7 +440,8 @@ public class CollectionObjectResource
     		@Context UriInfo ui) {
     	AuthorityRefList authRefList = null;
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+        	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentWrapper<DocumentModel> docWrapper = 
             	getRepositoryClient(ctx).getDoc(ctx, csid);
             DocumentModelHandler<MultipartInput, MultipartOutput> docHandler = 
@@ -501,7 +504,7 @@ public class CollectionObjectResource
     @Produces("application/xml")
     public CollectionobjectsCommonList keywordsSearchCollectionObjects(@Context UriInfo ui,
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
-    	MultivaluedMap queryParams = ui.getQueryParameters();
+    	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
     	return searchCollectionObjects(queryParams, keywords);
     }    
     

@@ -46,7 +46,7 @@ public class ContactClient extends AbstractServiceClientImpl {
 	/**
      *
      */
-    private static final ContactClient instance = new ContactClient();
+//    private static final ContactClient instance = new ContactClient();
     
     /**
      *
@@ -87,9 +87,9 @@ public class ContactClient extends AbstractServiceClientImpl {
      *
      * @return
      */
-    public static ContactClient getInstance() {
-        return instance;
-    }
+//    public static ContactClient getInstance() {
+//        return instance;
+//    }
 
     /**
      * @return

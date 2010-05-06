@@ -212,7 +212,7 @@ public class DimensionResource extends
         try {
         	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
-            getRepositoryClient(ctx).getAll(ctx, handler);
+            getRepositoryClient(ctx).getFiltered(ctx, handler);
             dimensionObjectList = (DimensionsCommonList) handler.getCommonPartList();
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {

@@ -288,16 +288,18 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
         IntakeClient intakeClient = new IntakeClient();
-        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Note: Any non-success responses are ignored and not reported.
         for (String resourceId : intakeIdsCreated) {
             ClientResponse<Response> res = intakeClient.delete(resourceId);
         }
         // Delete persons before PersonAuth
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         for (String resourceId : personIdsCreated) {
             ClientResponse<Response> res = personAuthClient.deleteItem(personAuthCSID, resourceId);
         }
-        ClientResponse<Response> res = personAuthClient.delete(personAuthCSID);
+        if (personAuthCSID != null) {
+        	personAuthClient.delete(personAuthCSID);
+        }
     }
 
     // ---------------------------------------------------------------

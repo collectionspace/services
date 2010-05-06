@@ -1,9 +1,35 @@
+/**	
+ * PersonAuthorityClient.java
+ *
+ * {Purpose of This Class}
+ *
+ * {Other Notes Relating to This Class (Optional)}
+ *
+ * $LastChangedBy: $
+ * $LastChangedRevision: $
+ * $LastChangedDate: $
+ *
+ * This document is a part of the source code and related artifacts
+ * for CollectionSpace, an open source collections management system
+ * for museums and related institutions:
+ *
+ * http://www.collectionspace.org
+ * http://wiki.collectionspace.org
+ *
+ * Copyright © 2009 {Contributing Institution}
+ *
+ * Licensed under the Educational Community License (ECL), Version 2.0.
+ * You may not use this file except in compliance with this License.
+ *
+ * You may obtain a copy of the ECL 2.0 License at
+ * https://source.collectionspace.org/collection-space/LICENSE.txt
+ */
 package org.collectionspace.services.client;
 
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
+//import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.person.PersonauthoritiesCommonList;
@@ -18,9 +44,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
- * A PersonAuthorityClient.
-
- * @version $Revision:$
+ * The Class PersonAuthorityClient.
  */
 public class PersonAuthorityClient extends AbstractServiceClientImpl {
 
@@ -32,23 +56,25 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
         return "personauthorities";
     }
 
+    /**
+     * Gets the item common part name.
+     *
+     * @return the item common part name
+     */
     public String getItemCommonPartName() {
         return getCommonPartName("persons");
     }
 
-    /**
-     *
-     */
-    private static final PersonAuthorityClient instance = new PersonAuthorityClient();
+    /** The person authority proxy. */
+//    private static final PersonAuthorityClient instance = new PersonAuthorityClient();
+    
     /**
      *
      */
     private PersonAuthorityProxy personAuthorityProxy;
 
     /**
-     *
-     * Default constructor for PersonAuthorityClient class.
-     *
+     * Instantiates a new person authority client.
      */
     public PersonAuthorityClient() {
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
@@ -56,13 +82,16 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
         setProxy();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.CollectionSpaceClient#getProxy()
+     */
     @Override
     public CollectionSpaceProxy getProxy() {
     	return this.personAuthorityProxy;
     }    
 
     /**
-     * allow to reset proxy as per security needs
+     * Sets the proxy.
      */
     public void setProxy() {
         if (useAuth()) {
@@ -75,16 +104,16 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
     }
 
     /**
-     * FIXME Comment this
+     * Read list.
      *
-     * @return
+     * @return the client response
      */
-    public static PersonAuthorityClient getInstance() {
-        return instance;
-    }
+//    public static PersonAuthorityClient getInstance() {
+//        return instance;
+//    }
 
     /**
-     * @return
+     * @return list
      * @see org.collectionspace.services.client.PersonAuthorityProxy#readList()
      */
     public ClientResponse<PersonauthoritiesCommonList> readList() {
@@ -92,37 +121,41 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
     }
 
     /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.services.client.PersonAuthorityProxy#read(java.lang.String)
+     * Read.
+     *
+     * @param csid the csid
+     * @return the client response
      */
     public ClientResponse<MultipartInput> read(String csid) {
         return personAuthorityProxy.read(csid);
     }
 
     /**
-     * @param name
-     * @return
-     * @see org.collectionspace.services.client.PersonAuthorityProxy#readByName(java.lang.String)
+     * Read by name.
+     *
+     * @param name the name
+     * @return the client response
      */
     public ClientResponse<MultipartInput> readByName(String name) {
         return personAuthorityProxy.readByName(name);
     }
 
     /**
-     * @param personAuthority
-     * @return
-     * @see org.collectionspace.services.client.PersonAuthorityProxy#createPersonAuthority(org.collectionspace.hello.PersonAuthority)
+     * Creates the.
+     *
+     * @param multipart the multipart
+     * @return the client response
      */
     public ClientResponse<Response> create(MultipartOutput multipart) {
         return personAuthorityProxy.create(multipart);
     }
 
     /**
-     * @param csid
-     * @param personAuthority
-     * @return
-     * @see org.collectionspace.services.client.PersonAuthorityProxy#updatePersonAuthority(java.lang.Long, org.collectionspace.hello.PersonAuthority)
+     * Update.
+     *
+     * @param csid the csid
+     * @param multipart the multipart
+     * @return the client response
      */
     public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
         return personAuthorityProxy.update(csid, multipart);
@@ -130,62 +163,75 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
     }
 
     /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.services.client.PersonAuthorityProxy#deletePersonAuthority(java.lang.Long)
+     * Delete.
+     *
+     * @param csid the csid
+     * @return the client response
      */
     public ClientResponse<Response> delete(String csid) {
         return personAuthorityProxy.delete(csid);
     }
 
     /**
-     * @return
-     * @see org.collectionspace.services.client.PersonAuthorityProxy#readItemList()
+     * Read item list.
+     *
+     * @param vcsid the vcsid
+     * @return the client response
      */
     public ClientResponse<PersonsCommonList> readItemList(String vcsid) {
         return personAuthorityProxy.readItemList(vcsid);
     }
 
     /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.services.client.IntakeProxy#getAuthorityRefs(java.lang.String)
+     * Gets the referencing objects.
+     *
+     * @param parentcsid the parentcsid
+     * @param csid the csid
+     * @return the referencing objects
      */
     public ClientResponse<AuthorityRefDocList> getReferencingObjects(String parentcsid, String csid) {
         return personAuthorityProxy.getReferencingObjects(parentcsid, csid);
     }
 
     /**
-     * @return
-     * @see org.collectionspace.services.client.PersonAuthorityProxy#readItemListForNamedAuthority()
+     * Read item list for named authority.
+     *
+     * @param specifier the specifier
+     * @return the client response
      */
     public ClientResponse<PersonsCommonList> readItemListForNamedAuthority(String specifier) {
         return personAuthorityProxy.readItemListForNamedAuthority(specifier);
     }
 
     /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.services.client.PersonAuthorityProxy#read(java.lang.String)
+     * Read item.
+     *
+     * @param vcsid the vcsid
+     * @param csid the csid
+     * @return the client response
      */
     public ClientResponse<MultipartInput> readItem(String vcsid, String csid) {
         return personAuthorityProxy.readItem(vcsid, csid);
     }
 
     /**
-     * @param personAuthority
-     * @return
-     * @see org.collectionspace.services.client.PersonAuthorityProxy#createPersonAuthority(org.collectionspace.hello.PersonAuthority)
+     * Creates the item.
+     *
+     * @param vcsid the vcsid
+     * @param multipart the multipart
+     * @return the client response
      */
     public ClientResponse<Response> createItem(String vcsid, MultipartOutput multipart) {
         return personAuthorityProxy.createItem(vcsid, multipart);
     }
 
     /**
-     * @param csid
-     * @param personAuthority
-     * @return
-     * @see org.collectionspace.services.client.PersonAuthorityProxy#updatePersonAuthority(java.lang.Long, org.collectionspace.hello.PersonAuthority)
+     * Update item.
+     *
+     * @param vcsid the vcsid
+     * @param csid the csid
+     * @param multipart the multipart
+     * @return the client response
      */
     public ClientResponse<MultipartInput> updateItem(String vcsid, String csid, MultipartOutput multipart) {
         return personAuthorityProxy.updateItem(vcsid, csid, multipart);
@@ -193,34 +239,76 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
     }
 
     /**
-     * @param csid
-     * @return
-     * @see org.collectionspace.services.client.PersonAuthorityProxy#deletePersonAuthority(java.lang.Long)
+     * Delete item.
+     *
+     * @param vcsid the vcsid
+     * @param csid the csid
+     * @return the client response
      */
     public ClientResponse<Response> deleteItem(String vcsid, String csid) {
         return personAuthorityProxy.deleteItem(vcsid, csid);
     }
 
+    /**
+     * Creates the contact.
+     *
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * @param multipart the multipart
+     * @return the client response
+     */
     public ClientResponse<Response> createContact(String parentcsid,
             String itemcsid, MultipartOutput multipart) {
         return personAuthorityProxy.createContact(parentcsid, itemcsid, multipart);
     }
 
+    /**
+     * Read contact.
+     *
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * @param csid the csid
+     * @return the client response
+     */
     public ClientResponse<MultipartInput> readContact(String parentcsid,
             String itemcsid, String csid) {
         return personAuthorityProxy.readContact(parentcsid, itemcsid, csid);
     }
 
+    /**
+     * Read contact list.
+     *
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * @return the client response
+     */
     public ClientResponse<ContactsCommonList> readContactList(String parentcsid,
             String itemcsid) {
         return personAuthorityProxy.readContactList(parentcsid, itemcsid);
     }
 
+    /**
+     * Update contact.
+     *
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * @param csid the csid
+     * @param multipart the multipart
+     * @return the client response
+     */
     public ClientResponse<MultipartInput> updateContact(String parentcsid,
             String itemcsid, String csid, MultipartOutput multipart) {
         return personAuthorityProxy.updateContact(parentcsid, itemcsid, csid, multipart);
     }
 
+    /**
+     * Delete contact.
+     *
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * @param csid the csid
+     * @return the client response
+     */
     public ClientResponse<Response> deleteContact(String parentcsid,
         String itemcsid, String csid) {
         return personAuthorityProxy.deleteContact(parentcsid,

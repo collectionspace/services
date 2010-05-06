@@ -78,9 +78,18 @@ import org.testng.annotations.Test;
  */
 public abstract class AbstractAuthorizationTestImpl {
 
-    final Logger logger = LoggerFactory.getLogger(AbstractAuthorizationTestImpl.class);
+	static protected final String MAVEN_BASEDIR_PROPERTY = "maven.basedir";
+	final Logger logger = LoggerFactory.getLogger(AbstractAuthorizationTestImpl.class);
     private org.springframework.jdbc.datasource.DataSourceTransactionManager txManager;
     final static String testDataDir = "src/test/resources/test-data/";
+    static String baseDir;
+    static {
+    	baseDir = System.getProperty(AbstractAuthorizationTestImpl.MAVEN_BASEDIR_PROPERTY);
+    	if (baseDir == null || baseDir.isEmpty()) {
+    		baseDir = System.getProperty("user.dir");
+    	}
+    	baseDir = baseDir + System.getProperty("file.separator");    	
+    }
 
     /**
      * Returns the name of the currently running test.

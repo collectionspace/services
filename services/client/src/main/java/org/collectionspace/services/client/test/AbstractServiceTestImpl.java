@@ -23,13 +23,13 @@
  */
 package org.collectionspace.services.client.test;
 
-import java.util.List;
+//import java.util.List;
 
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.AbstractServiceClientImpl;
+//import org.collectionspace.services.client.AbstractServiceClientImpl;
 import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +50,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 	
 	/** The Constant DEFAULT_LIST_SIZE. */
 	static protected final int DEFAULT_LIST_SIZE = 10;
+	static protected final int DEFAULT_PAGINATEDLIST_SIZE = 10;
 
 //    // Success outcomes
 //    /* (non-Javadoc)
@@ -243,7 +244,6 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 		ClientResponse<AbstractCommonList> response =
 			(ClientResponse<AbstractCommonList>)client.readList(Long.toString(pageSize),
 					Long.toString(pageNumber));
-		AbstractCommonList list = this.getAbstractCommonList(response);
 		int statusCode = response.getStatus();
 
 		// Check the status code of the response: does it match
@@ -254,44 +254,115 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 		Assert.assertTrue(this.REQUEST_TYPE.isValidStatusCode(statusCode),
 				invalidStatusCodeMessage(this.REQUEST_TYPE, statusCode));
 		Assert.assertEquals(statusCode, this.EXPECTED_STATUS_CODE);
-		
+
+		AbstractCommonList list = this.getAbstractCommonList(response);		
 		return list;
 	}
 
+    /**
+     * Creates the list.
+     *
+     * @param testName the test name
+     * @param listSize the list size
+     * @throws Exception the exception
+     */
+    protected void createPaginatedList(String testName, int listSize) throws Exception {
+        for (int i = 0; i < listSize; i++) {
+            create(testName);
+        }
+    }
+	
+    /*@Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    public void leafCeate(String testName) throws Exception {
+    	this.create(testName);
+    }*/
+    
+    private void assertPaginationInfo(String testName,
+    		AbstractCommonList list,
+    		long expectedPageNum,
+    		long expectedPageSize,
+    		long expectedListSize,
+    		long expectedTotalItems) {
+    	Assert.assertNotNull(list);
+    	
+    	long pageNum = list.getPageNum();
+    	Assert.assertEquals(pageNum, expectedPageNum);
+    	if (getLogger().isDebugEnabled() == true) {
+    		getLogger().debug(testName + ":" + "page number is " + pageNum);
+    	}
+    	
+    	long pageSizeReturned = list.getPageSize();
+    	Assert.assertEquals(pageSizeReturned, expectedPageSize);
+    	if (getLogger().isDebugEnabled() == true) {
+    		getLogger().debug(testName + ":" + "page size is " + list.getPageSize());
+    	}
+    	
+    	long itemsInPage = list.getItemsInPage();
+    	Assert.assertEquals(itemsInPage, expectedListSize);
+    	if (getLogger().isDebugEnabled() == true) {
+    		getLogger().debug(testName + ":" + "actual items in page was/were " + itemsInPage);
+    	}        	
+    	
+    	long totalItemsReturned = list.getTotalItems();
+    	Assert.assertEquals(totalItemsReturned, expectedTotalItems);
+    	if (getLogger().isDebugEnabled() == true) {
+    		getLogger().debug(testName + ":" + "total number of items is " + list.getTotalItems());
+    	}    	 
+    }
+    
 	/**
 	 * Read paginated list.
 	 *
 	 * @param testName the test name
 	 * @throws Exception the exception
 	 */
-	@Test(dataProvider = "testName")
+    @Test(dataProvider = "testName") /*, dataProviderClass = AbstractServiceTestImpl.class,
+    	    dependsOnMethods = {"leafCeate"}) */
     public void readPaginatedList(String testName) throws Exception {
-
         // Perform setup.
         setupReadList(testName);
-        
-        long pageSize = DEFAULT_LIST_SIZE / 3; //create 3 pages to iterate over
         CollectionSpaceClient client = this.getClientInstance();
-        AbstractCommonList list = this.readList(testName, client, pageSize, 0);
-        long totalItems = list.getTotalItems();        
-        long pagesTotal = totalItems / pageSize;
-        for (int i = 0; i < pagesTotal; i++) {
-        	list = this.readList(testName, client, pageSize, i);
-        	if (getLogger().isDebugEnabled() == true) {
-        		getLogger().debug(testName + ":" + "page number is " + list.getPageNum());
-        		getLogger().debug(testName + ":" + "page size is " + list.getPageSize());
-        		getLogger().debug(testName + ":" + "total number of items is " + list.getTotalItems());
-        	}
+        
+        // Get the current total number of items.
+        // If there are no items then create some
+        AbstractCommonList list = this.readList(testName, client, 1 /*pgSz*/, 0 /*pgNum*/);
+        if (list == null || list.getTotalItems() == 0) {
+        	this.createPaginatedList(testName, DEFAULT_PAGINATEDLIST_SIZE);
+        	list = this.readList(testName, client, 1 /*pgSz*/, 0 /*pgNum*/);
+        }
+
+        // Print out the current list size to be paginated
+        Assert.assertNotNull(list);
+        long totalItems = list.getTotalItems();
+        Assert.assertFalse(totalItems == 0);
+        if (getLogger().isDebugEnabled() == true) {
+        	getLogger().debug(testName + ":" + "created list of " + 
+        			totalItems + " to be paginated.");
         }
         
+        long pageSize = totalItems / 3; //create up to 3 pages to iterate over
+        long pagesTotal = pageSize > 0 ? (totalItems / pageSize) : 0;
+        for (int i = 0; i < pagesTotal; i++) {
+        	list = this.readList(testName, client, pageSize, i);
+        	assertPaginationInfo(testName,
+        			list,
+        			i,			//expected page number
+        			pageSize,	//expected page size
+        			pageSize,	//expected num of items in page
+        			totalItems);//expected total num of items
+        }
+        
+        // if there are any remainders be sure to paginate them as well
         long mod = totalItems % pageSize;
         if (mod != 0) {
         	list = this.readList(testName, client, pageSize, pagesTotal);
-    		getLogger().debug(testName + ":" + "page number is " + list.getPageNum());
-    		getLogger().debug(testName + ":" + "page size is " + list.getPageSize());
-    		getLogger().debug(testName + ":" + "total number of items is " + list.getTotalItems());
+        	assertPaginationInfo(testName,
+        			list, 
+        			pagesTotal, //expected page number
+        			pageSize, 	//expected page size
+        			mod, 		//expected num of items in page
+        			totalItems);//expected total num of items
         }
-        
     }
 
 	// ---------------------------------------------------------------

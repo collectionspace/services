@@ -48,7 +48,7 @@ public class LoanoutClient extends AbstractServiceClientImpl {
     /**
      *
      */
-    private static final LoanoutClient instance = new LoanoutClient();
+//    private static final LoanoutClient instance = new LoanoutClient();
     /**
      *
      */
@@ -88,9 +88,9 @@ public class LoanoutClient extends AbstractServiceClientImpl {
      *
      * @return
      */
-    public static LoanoutClient getInstance() {
-        return instance;
-    }
+//    public static LoanoutClient getInstance() {
+//        return instance;
+//    }
 
     /**
      * @return

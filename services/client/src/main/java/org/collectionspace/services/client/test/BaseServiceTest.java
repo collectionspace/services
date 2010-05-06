@@ -66,6 +66,9 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
  */
 public abstract class BaseServiceTest {
 
+	//Maven's base directory -i.e., the one containing the current pom.xml
+	static protected final String MAVEN_BASEDIR_PROPERTY = "maven.basedir";
+	
     /** The Constant logger. */
     static protected final Logger logger = LoggerFactory.getLogger(BaseServiceTest.class);
     

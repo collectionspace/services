@@ -172,6 +172,10 @@
                 <configuration>
                     <systemProperties>
                         <property>
+                            <name>maven.basedir</name>
+                            <value>${basedir}</value>
+                        </property>           
+                        <property>
                             <name>log4j.configuration</name>
                             <value>file:${project.build.directory}/test-classes/log4j.properties</value>
                         </property>

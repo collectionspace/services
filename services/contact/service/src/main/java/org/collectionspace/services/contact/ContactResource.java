@@ -33,6 +33,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -40,8 +41,6 @@ import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
@@ -206,11 +205,12 @@ public class ContactResource extends
     @GET
     @Produces("application/xml")
     public ContactsCommonList getContactList(@Context UriInfo ui) {
+    	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
         ContactsCommonList contactObjectList = new ContactsCommonList();
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
-            getRepositoryClient(ctx).getAll(ctx, handler);
+            getRepositoryClient(ctx).getFiltered(ctx, handler);
             contactObjectList = (ContactsCommonList) handler.getCommonPartList();
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {

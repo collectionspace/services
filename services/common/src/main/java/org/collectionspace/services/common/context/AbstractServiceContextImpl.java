@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.collectionspace.authentication.AuthN;
-
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.config.PropertyItemUtils;
@@ -89,9 +87,15 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     /** security context */
     private SecurityContext securityContext;
 
+    /**
+     * Instantiates a new abstract service context impl.
+     */
     private AbstractServiceContextImpl() {
-    } // private constructor for singleton pattern
+    	// private constructor for singleton pattern
+    } 
+
     // request query params
+    /** The query params. */
     private MultivaluedMap<String, String> queryParams;
 
     /**
@@ -133,18 +137,16 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         }
     }
 
-    /**
-     * getCommonPartLabel get common part label
-     * @return
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getCommonPartLabel()
      */
     @Override
     public String getCommonPartLabel() {
         return getCommonPartLabel(getServiceName());
     }
 
-    /**
-     * getCommonPartLabel get common part label
-     * @return
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getCommonPartLabel(java.lang.String)
      */
     public String getCommonPartLabel(String schemaName) {
         return schemaName.toLowerCase() + PART_LABEL_SEPERATOR + PART_COMMON_LABEL;
@@ -316,11 +318,17 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         overrideDocumentType = docType;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getSecurityContext()
+     */
     @Override
     public SecurityContext getSecurityContext() {
         return securityContext;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getUserId()
+     */
     @Override
     public String getUserId() {
         return securityContext.getUserId();
@@ -422,7 +430,7 @@ public abstract class AbstractServiceContextImpl<IT, OT>
      */
     private DocumentHandler createDocumentHandlerInstance() throws Exception {
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        Class c = tccl.loadClass(getDocumentHandlerClass());
+        Class<?> c = tccl.loadClass(getDocumentHandlerClass());
         if (DocumentHandler.class.isAssignableFrom(c)) {
             docHandler = (DocumentHandler) c.newInstance();
         } else {
@@ -495,7 +503,7 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         for (String clazz : handlerClazzes) {
             clazz = clazz.trim();
-            Class c = tccl.loadClass(clazz);
+            Class<?> c = tccl.loadClass(clazz);
             if (ValidatorHandler.class.isAssignableFrom(c)) {
                 handlers.add((ValidatorHandler) c.newInstance());
             }
@@ -524,13 +532,19 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         return msg.toString();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#getQueryParams()
+     */
     @Override
     public MultivaluedMap<String, String> getQueryParams() {
         return this.queryParams;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.ServiceContext#setQueryParams(javax.ws.rs.core.MultivaluedMap)
+     */
     @Override
-    public void setQueryParams(MultivaluedMap<String, String> queryParams) {
-        this.queryParams = queryParams;
+    public void setQueryParams(MultivaluedMap<String, String> theQueryParams) {
+        this.queryParams = theQueryParams;
     }
 }

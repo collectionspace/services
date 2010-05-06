@@ -60,7 +60,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
     // Instance variables specific to this test.
     final String SERVICE_PATH_COMPONENT = "dimensions";
     private String knownResourceId = null;
-    private List<String> allResourceIdsCreated = new ArrayList();
+    private List<String> allResourceIdsCreated = new ArrayList<String>();
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()

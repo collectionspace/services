@@ -55,7 +55,7 @@ public class DimensionClient extends AbstractServiceClientImpl {
 	/**
      *
      */
-    private static final DimensionClient instance = new DimensionClient();
+//    private static final DimensionClient instance = new DimensionClient();
     
     /**
      *
@@ -96,9 +96,9 @@ public class DimensionClient extends AbstractServiceClientImpl {
      *
      * @return
      */
-    public static DimensionClient getInstance() {
-        return instance;
-    }
+//    public static DimensionClient getInstance() {
+//        return instance;
+//    }
 
     /**
      * @return

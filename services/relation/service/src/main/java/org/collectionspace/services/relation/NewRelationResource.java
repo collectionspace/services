@@ -38,6 +38,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -151,14 +152,16 @@ public class NewRelationResource extends
 	
 	/**
 	 * Gets the relation.
-	 * 
+	 *
+	 * @param ui the ui
 	 * @param csid the csid
-	 * 
 	 * @return the relation
 	 */
 	@GET
 	@Path("{csid}")
-	public MultipartOutput getRelation(@PathParam("csid") String csid) {
+	public MultipartOutput getRelation(@Context UriInfo ui,
+			@PathParam("csid") String csid) {
+		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
 		if (logger.isDebugEnabled()) {
 			logger.debug("getRelation with csid=" + csid);
 		}
@@ -171,7 +174,7 @@ public class NewRelationResource extends
 		}
 		MultipartOutput result = null;
 		try {
-			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
 			DocumentHandler handler = createDocumentHandler(ctx);
 			getRepositoryClient(ctx).get(ctx, csid, handler);
 			result = (MultipartOutput) ctx.getOutput();
@@ -222,7 +225,8 @@ public class NewRelationResource extends
 	@GET
 	@Produces("application/xml")
 	public RelationsCommonList getRelationList(@Context UriInfo ui) {
-		return this.getRelationList(null, null, null);
+		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+		return this.getRelationList(queryParams, null, null, null);
 	}
 
 	/**
@@ -238,7 +242,8 @@ public class NewRelationResource extends
 	@Produces("application/xml")
 	public RelationsCommonList getRelationList_S(@Context UriInfo ui,
 			@PathParam("subjectCsid") String subjectCsid) {
-		return this.getRelationList(subjectCsid, null, null);
+		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+		return this.getRelationList(queryParams, subjectCsid, null, null);
 	}
 
 	/**
@@ -254,7 +259,8 @@ public class NewRelationResource extends
 	@Produces("application/xml")
 	public RelationsCommonList getRelationList_P(@Context UriInfo ui,
 			@PathParam("predicate") String predicate) {
-		return this.getRelationList(null, predicate, null);
+		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+		return this.getRelationList(queryParams, null, predicate, null);
 	}
 
 	/**
@@ -270,7 +276,8 @@ public class NewRelationResource extends
 	@Produces("application/xml")
 	public RelationsCommonList getRelationList_O(@Context UriInfo ui,
 			@PathParam("objectCsid") String objectCsid) {
-		return this.getRelationList(null, null, objectCsid);
+		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+		return this.getRelationList(queryParams, null, null, objectCsid);
 	}
 
 	/**
@@ -288,7 +295,8 @@ public class NewRelationResource extends
 	public RelationsCommonList getRelationList_PS(@Context UriInfo ui,
 			@PathParam("predicate") String predicate,
 			@PathParam("subjectCsid") String subjectCsid) {
-		return this.getRelationList(subjectCsid, predicate, null);
+		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+		return this.getRelationList(queryParams, subjectCsid, predicate, null);
 	}
 
 	/**
@@ -306,7 +314,8 @@ public class NewRelationResource extends
 	public RelationsCommonList getRelationList_SP(@Context UriInfo ui,
 			@PathParam("subjectCsid") String subjectCsid,
 			@PathParam("predicate") String predicate) {
-		return this.getRelationList(subjectCsid, predicate, null);
+		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+		return this.getRelationList(queryParams, subjectCsid, predicate, null);
 	}
 
 	/**
@@ -324,7 +333,8 @@ public class NewRelationResource extends
 	public RelationsCommonList getRelationList_PO(@Context UriInfo ui,
 			@PathParam("predicate") String predicate,
 			@PathParam("objectCsid") String objectCsid) {
-		return this.getRelationList(null, predicate, objectCsid);
+		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+		return this.getRelationList(queryParams, null, predicate, objectCsid);
 	}
 
 	/**
@@ -342,7 +352,8 @@ public class NewRelationResource extends
 	public RelationsCommonList getRelationList_OP(@Context UriInfo ui,
 			@PathParam("objectCsid") String objectCsid,
 			@PathParam("predicate") String predicate) {
-		return this.getRelationList(null, predicate, objectCsid);
+		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+		return this.getRelationList(queryParams, null, predicate, objectCsid);
 	}
 
 	/**
@@ -362,7 +373,8 @@ public class NewRelationResource extends
 			@PathParam("predicate") String predicate,
 			@PathParam("subjectCsid") String subjectCsid,
 			@PathParam("objectCsid") String objectCsid) {
-		return this.getRelationList(subjectCsid, predicate, objectCsid);
+		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+		return this.getRelationList(queryParams, subjectCsid, predicate, objectCsid);
 	}
 
 	/**
@@ -382,7 +394,8 @@ public class NewRelationResource extends
 			@PathParam("subjectCsid") String subjectCsid,
 			@PathParam("predicate") String predicate,
 			@PathParam("objectCsid") String objectCsid) {
-		return this.getRelationList(subjectCsid, predicate, objectCsid);
+		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+		return this.getRelationList(queryParams, subjectCsid, predicate, objectCsid);
 	}
 
 	/*
@@ -487,23 +500,29 @@ public class NewRelationResource extends
 	}
 
 	/**
-	 * Gets the relation list request.
-	 * 
-	 * @return the relation list request
-	 * 
-	 * @throws WebApplicationException
-	 *             the web application exception
+	 * Gets the relation list.
+	 *
+	 * @param queryParams the query params
+	 * @param subjectCsid the subject csid
+	 * @param predicate the predicate
+	 * @param objectCsid the object csid
+	 * @return the relation list
+	 * @throws WebApplicationException the web application exception
 	 */
-	public RelationsCommonList getRelationList(String subjectCsid,
-			String predicate, String objectCsid) throws WebApplicationException {
+	public RelationsCommonList getRelationList(
+			MultivaluedMap<String, String> queryParams,
+			String subjectCsid,
+			String predicate, 
+			String objectCsid) throws WebApplicationException {
 		RelationsCommonList relationList = new RelationsCommonList();
 		try {
-			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
 			DocumentHandler handler = createDocumentHandler(ctx);
 			Map<String, Object> propsFromPath = handler.getProperties();
 			propsFromPath.put(IRelationsManager.SUBJECT, subjectCsid);
 			propsFromPath.put(IRelationsManager.PREDICATE, predicate);
 			propsFromPath.put(IRelationsManager.OBJECT, objectCsid);
+			// Until we replace this with a search, "getAll()" is better then "getFiltered"
 			getRepositoryClient(ctx).getAll(ctx, handler);
 			relationList = (RelationsCommonList) handler.getCommonPartList();
 		} catch (UnauthorizedException ue) {

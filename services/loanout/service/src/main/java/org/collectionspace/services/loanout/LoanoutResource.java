@@ -45,8 +45,6 @@ import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResou
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -57,7 +55,7 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.security.UnauthorizedException;
-import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
+import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -253,7 +251,7 @@ public class LoanoutResource extends
         try {
         	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
-            getRepositoryClient(ctx).getAll(ctx, handler);
+            getRepositoryClient(ctx).getFiltered(ctx, handler);
             loanoutObjectList = (LoansoutCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
@@ -290,8 +288,8 @@ public class LoanoutResource extends
         	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentWrapper<DocumentModel> docWrapper = 
             	getRepositoryClient(ctx).getDoc(ctx, csid);
-            RemoteDocumentModelHandlerImpl handler 
-            	= (RemoteDocumentModelHandlerImpl)createDocumentHandler(ctx);
+            DocumentModelHandler<MultipartInput, MultipartOutput> handler 
+            	= (DocumentModelHandler<MultipartInput, MultipartOutput>)createDocumentHandler(ctx);
             List<String> authRefFields = 
             	((MultipartServiceContextImpl)ctx).getCommonPartPropertyValues(
         			ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
@@ -456,12 +454,9 @@ public class LoanoutResource extends
 	            if (logger.isDebugEnabled()) {
 	            	logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
 	            }
-	            getRepositoryClient(ctx).getFiltered(ctx, handler);
-            } else {
-            	getRepositoryClient(ctx).getAll(ctx, handler);
-            }            
+            }
+            getRepositoryClient(ctx).getFiltered(ctx, handler);
             loansoutObjectList = (LoansoutCommonList) handler.getCommonPartList();
-            
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();

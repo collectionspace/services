@@ -27,7 +27,7 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.client.AbstractServiceClientImpl;
+//import org.collectionspace.services.client.AbstractServiceClientImpl;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
@@ -64,7 +64,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     private String knownResourceId = null;
     
     /** The all resource ids created. */
-    private List<String> allResourceIdsCreated = new ArrayList();
+    private List<String> allResourceIdsCreated = new ArrayList<String>();
     
     /** The multivalue. */
     private boolean multivalue; //toggle
@@ -260,7 +260,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         }
         testSubmitRequest(newId);
     }
-
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.ServiceTest#createList()
      */
@@ -268,9 +268,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
     public void createList(String testName) throws Exception {
-        for (int i = 0; i < DEFAULT_LIST_SIZE; i++) {
-            create(testName);
-        }
+    	this.createPaginatedList(testName, DEFAULT_LIST_SIZE);
     }
 
     // Failure outcomes
@@ -282,6 +280,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createWithEmptyEntityBody(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?
     }
 
    /**
@@ -304,6 +303,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createWithWrongXmlSchema(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?
     }
 
 
@@ -399,6 +399,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     * @param testName  The name of this test method.  This name is supplied
     *     automatically, via reflection, by a TestNG 'data provider' in
     *     a base class.
+    * @throws Exception 
     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createWithRequiredValuesNullOrEmpty(String testName) throws Exception {
@@ -689,6 +690,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read"})
     public void updateWithEmptyEntityBody(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?
     }
 
    /**
@@ -703,6 +705,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read"})
     public void updateWithMalformedXml(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?
     }
 
     /* (non-Javadoc)
@@ -712,6 +715,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read"})
     public void updateWithWrongXmlSchema(String testName) throws Exception {
+    	//FIXME: Should this test really be empty?
     }
 
 /*
@@ -839,6 +843,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     * @param testName  The name of this test method.  This name is supplied
     *     automatically, via reflection, by a TestNG 'data provider' in
     *     a base class.
+ * @throws Exception 
     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read"})
@@ -944,6 +949,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     /**
      * Tests the code for manually submitting data that is used by several
      * of the methods above.
+     * @throws Exception 
      */
 
     @Test(dependsOnMethods = {"create", "read"})

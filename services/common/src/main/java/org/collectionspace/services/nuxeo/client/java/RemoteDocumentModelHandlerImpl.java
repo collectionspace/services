@@ -120,8 +120,10 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
     	// set the page size and page numer
     	commonList.setPageNum(pageNum);
     	commonList.setPageSize(pageSize);
-    	// set the total result size
     	DocumentModelList docList = wrapDoc.getWrappedObject();
+    	// Set num of items in list. this is useful to our testing framework.
+    	commonList.setItemsInPage(docList.size());
+    	// set the total result size
     	commonList.setTotalItems(docList.totalSize());
     	
     	return (TL)commonList;

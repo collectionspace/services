@@ -17,10 +17,11 @@
             <xs:sequence>
                 <xs:element name="pageNum" type="xs:unsignedInt" />
                 <xs:element name="pageSize" type="xs:unsignedInt" />
+                <!-- "itemsInPage" is useful to our testing framework's unit tests -->
+                <xs:element name="itemsInPage" type="xs:unsignedInt" />
                 <xs:element name="totalItems" type="xs:unsignedInt" />
             </xs:sequence>
         </xs:complexType>
     </xs:element>
     
 </xs:schema>
-

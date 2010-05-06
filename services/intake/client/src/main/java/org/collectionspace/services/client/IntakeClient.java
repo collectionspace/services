@@ -57,7 +57,7 @@ public class IntakeClient extends AbstractServiceClientImpl {
     /**
      *
      */
-    private static final IntakeClient instance = new IntakeClient();
+//    private static final IntakeClient instance = new IntakeClient();
     /**
      *
      */
@@ -97,9 +97,9 @@ public class IntakeClient extends AbstractServiceClientImpl {
      *
      * @return
      */
-    public static IntakeClient getInstance() {
-        return instance;
-    }
+//    public static IntakeClient getInstance() {
+//        return instance;
+//    }
 
     /**
      * @return
