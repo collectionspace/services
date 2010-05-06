@@ -26,7 +26,6 @@ package org.collectionspace.services.account.storage;
 import java.util.Date;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.storage.csidp.UserStorageClient;
 import org.collectionspace.services.authentication.User;
@@ -39,7 +38,6 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.document.JaxbUtils;
-import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 
@@ -86,7 +84,8 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             em = emf.createEntityManager();
             em.getTransaction().begin();
             //if userid and password are given, add to default id provider
-            if (account.getUserId() != null && isForCSIdP(account.getPassword())) {
+            if (account.getUserId() != null &&
+                    isForCSIdP(account.getPassword())) {
                 User user = userStorageClient.create(account.getUserId(),
                         account.getPassword());
                 em.persist(user);

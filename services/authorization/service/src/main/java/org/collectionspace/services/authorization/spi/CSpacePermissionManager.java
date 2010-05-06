@@ -34,9 +34,50 @@ import org.collectionspace.services.authorization.PermissionNotFoundException;
  */
 public interface CSpacePermissionManager {
 
-    public void addPermission(CSpaceResource res, String[] principals, CSpaceAction perm)
+    /**
+     * addPermisison adds permission for given action on given resource for given principals
+     * @param res resource
+     * @param principals an array of principal names
+     * @action action on the resource
+     * @throws PermissionException
+     * @see CSpaceResource
+     * @see CSpaceAction
+     */
+    public void addPermissions(CSpaceResource res, CSpaceAction action, String[] principals)
             throws PermissionException;
 
-    public void deletePermission(CSpaceResource res, String[] principals, CSpaceAction perm)
+    /**
+     * removePermission removes permission(s) for given action on given resource involving given principals
+     * @param res
+     * @param action
+     * @param principals
+     * @throws PermissionNotFoundException
+     * @throws PermissionException
+     * @see CSpaceResource
+     * @see CSpaceAction
+     */
+    public void deletePermissions(CSpaceResource res, CSpaceAction action, String[] principals)
+            throws PermissionNotFoundException, PermissionException;
+
+    /**
+     * deletePermissions delete all permissions for given action on given resource
+     * @param res
+     * @param action
+     * @throws PermissionNotFoundException
+     * @throws PermissionException
+     * @see CSpaceResource
+     * @see CSpaceAction
+     */
+    public void deletePermissions(CSpaceResource res, CSpaceAction action)
+            throws PermissionNotFoundException, PermissionException;
+
+    /**
+     * deletePermissions delete all permissions for given resource
+     * @param res
+     * @throws PermissionNotFoundException
+     * @throws PermissionException
+     * @see CSpaceResource
+     */
+    public void deletePermissions(CSpaceResource res)
             throws PermissionNotFoundException, PermissionException;
 }

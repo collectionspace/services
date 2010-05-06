@@ -52,6 +52,9 @@ public class SpringPermissionEvaluator implements CSpacePermissionEvaluator {
         PermissionEvaluator eval = provider.getProviderPermissionEvaluator();
         Permission p = SpringAuthorizationProvider.mapPermssion(perm);
         Authentication authToken = SecurityContextHolder.getContext().getAuthentication();
-        return eval.hasPermission(authToken, Long.valueOf(res.getId().hashCode()), res.getType().toString(), p);
+        return eval.hasPermission(authToken,
+                Long.valueOf(res.getId().hashCode()),
+                res.getType().toString(),
+                p);
     }
 }

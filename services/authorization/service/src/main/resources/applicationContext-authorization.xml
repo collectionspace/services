@@ -84,5 +84,6 @@
     <bean id="cspaceAuthorizationProvider" class="org.collectionspace.services.authorization.spring.SpringAuthorizationProvider">
         <property name="providerAclService" ref="aclService"/>
         <property name="providerPermissionEvaluator" ref="permissionEvaluator"/>
+        <property name="txManager" ref="transactionManager"/>
     </bean>
 </beans>

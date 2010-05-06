@@ -56,6 +56,12 @@ public class PermissionRoleDocumentHandler
     }
 
     @Override
+    public void completeCreate(DocumentWrapper<List<PermissionRoleRel>> wrapDoc) throws Exception {
+        PermissionRole pr = getCommonPart();
+        AuthorizationDelegate.addPermissions(getServiceContext(), pr);
+    }
+
+    @Override
     public void handleUpdate(DocumentWrapper<List<PermissionRoleRel>> wrapDoc) throws Exception {
         throw new UnsupportedOperationException("operation not relevant for PermissionRoleDocumentHandler");
     }
@@ -76,13 +82,20 @@ public class PermissionRoleDocumentHandler
         throw new UnsupportedOperationException("operation not relevant for PermissionRoleDocumentHandler");
     }
 
+
+    @Override
+    public void completeDelete(DocumentWrapper<List<PermissionRoleRel>> wrapDoc) throws Exception {
+        PermissionRole pr = getCommonPart();
+        AuthorizationDelegate.deletePermissions(getServiceContext(), pr);
+    }
+
     @Override
     public PermissionRole extractCommonPart(
             DocumentWrapper<List<PermissionRoleRel>> wrapDoc)
             throws Exception {
         List<PermissionRoleRel> prrl = wrapDoc.getWrappedObject();
         PermissionRole pr = new PermissionRole();
-        SubjectType subject = PermissionRoleUtil.getSubject(getServiceContext());
+        SubjectType subject = PermissionRoleUtil.getRelationSubject(getServiceContext());
         PermissionRoleRel prr0 = prrl.get(0);
         if (SubjectType.ROLE.equals(subject)) {
 
@@ -123,7 +136,7 @@ public class PermissionRoleDocumentHandler
         SubjectType subject = pr.getSubject();
         if (subject == null) {
             //it is not required to give subject as URI determines the subject
-            subject = PermissionRoleUtil.getSubject(getServiceContext());
+            subject = PermissionRoleUtil.getRelationSubject(getServiceContext());
         } else {
             //subject mismatch should have been checked during validation
         }

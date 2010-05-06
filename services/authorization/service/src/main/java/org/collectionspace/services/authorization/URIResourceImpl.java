@@ -66,10 +66,10 @@ public class URIResourceImpl extends CSpaceResourceImpl {
      * @param resourceName
      * @param actionType
      */
-    public URIResourceImpl(String resourceName, ActionType actionType) {
+    public URIResourceImpl(String resourceName, CSpaceAction action) {
         //FIXME more validation might be needed
-        super(buildId(resourceName, getAction(actionType)),
-                getAction(actionType), TYPE.URI);
+        super(buildId(resourceName, action),
+                action, TYPE.URI);
     }
 
     /**
@@ -78,9 +78,9 @@ public class URIResourceImpl extends CSpaceResourceImpl {
      * @param resourceName
      * @param actionType
      */
-    public URIResourceImpl(String tenantId, String resourceName, ActionType actionType) {
-        super(tenantId, buildId(resourceName, getAction(actionType)),
-                getAction(actionType), TYPE.URI);
+    public URIResourceImpl(String tenantId, String resourceName, CSpaceAction action) {
+        super(tenantId, buildId(resourceName, action),
+                action, TYPE.URI);
     }
 
     /**
@@ -125,33 +125,6 @@ public class URIResourceImpl extends CSpaceResourceImpl {
             return CSpaceAction.DELETE;
         }
         throw new IllegalStateException("no method found!");
-    }
-
-    /**
-     * getAction is a convenience method to get corresponding action for
-     * given ActionType
-     * @param action
-     * @return
-     */
-    public static CSpaceAction getAction(ActionType action) {
-        if (ActionType.CREATE.equals(action)) {
-            return CSpaceAction.CREATE;
-        } else if (ActionType.READ.equals(action)) {
-            return CSpaceAction.READ;
-        } else if (ActionType.UPDATE.equals(action)) {
-            return CSpaceAction.UPDATE;
-        } else if (ActionType.DELETE.equals(action)) {
-            return CSpaceAction.DELETE;
-        } else if (ActionType.SEARCH.equals(action)) {
-            return CSpaceAction.SEARCH;
-        } else if (ActionType.ADMIN.equals(action)) {
-            return CSpaceAction.ADMIN;
-        } else if (ActionType.START.equals(action)) {
-            return CSpaceAction.START;
-        } else if (ActionType.STOP.equals(action)) {
-            return CSpaceAction.STOP;
-        }
-        throw new IllegalArgumentException("action = " + action.toString());
     }
 
     @Override

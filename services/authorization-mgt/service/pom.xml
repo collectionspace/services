@@ -164,6 +164,7 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authorization.jaxb</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>

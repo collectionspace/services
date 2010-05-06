@@ -61,6 +61,10 @@ public class PermissionDocumentHandler
     }
 
     @Override
+    public void completeCreate(DocumentWrapper<Permission> wrapDoc) throws Exception {
+    }
+
+    @Override
     public void handleUpdate(DocumentWrapper<Permission> wrapDoc) throws Exception {
         Permission permissionFound = wrapDoc.getWrappedObject();
         Permission permissionReceived = getCommonPart();
@@ -90,7 +94,7 @@ public class PermissionDocumentHandler
             to.setEffect(from.getEffect());
         }
         List<PermissionAction> fromActions = from.getActions();
-        if(!fromActions.isEmpty()) {
+        if (!fromActions.isEmpty()) {
             //override the whole list, no reconcilliation by design
             to.setActions(fromActions);
         }
@@ -121,6 +125,10 @@ public class PermissionDocumentHandler
         PermissionsList permissionsList = extractCommonPartList(wrapDoc);
         setCommonPartList(permissionsList);
         getServiceContext().setOutput(getCommonPartList());
+    }
+
+    @Override
+    public void completeDelete(DocumentWrapper<Permission> wrapDoc) throws Exception {
     }
 
     @Override

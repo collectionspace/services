@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.authorization.storage;
 
+import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextProperties;
@@ -33,7 +34,7 @@ import org.collectionspace.services.common.context.ServiceContextProperties;
  */
 public class PermissionRoleUtil {
 
-    static SubjectType getSubject(ServiceContext ctx) {
+    static SubjectType getRelationSubject(ServiceContext ctx) {
         Object o = ctx.getProperty(ServiceContextProperties.SUBJECT);
         if (o == null) {
             throw new IllegalArgumentException(ServiceContextProperties.SUBJECT +
@@ -41,5 +42,15 @@ public class PermissionRoleUtil {
                     + ctx.toString());
         }
         return (SubjectType) o;
+    }
+
+
+    static SubjectType getRelationSubject(ServiceContext ctx, PermissionRole pr) {
+        SubjectType subject = pr.getSubject();
+        if (subject == null) {
+            //it is not required to give subject as URI determines the subject
+            subject = getRelationSubject(ctx);
+        }
+        return subject;
     }
 }

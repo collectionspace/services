@@ -75,11 +75,11 @@ public abstract class CSpaceResourceImpl implements CSpaceResource {
         if (type == null) {
             throw new IllegalArgumentException("type cannot be null");
         }
-        this.action = action;
+        this.type = type;
         if (action == null) {
             throw new IllegalArgumentException("action cannot be null");
         }
-        this.type = type;
+        this.action = action;
     }
 
     @Override

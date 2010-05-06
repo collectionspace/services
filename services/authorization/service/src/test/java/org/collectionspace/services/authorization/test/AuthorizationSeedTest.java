@@ -83,7 +83,7 @@ public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
             }
             for (PermissionRole pr : pcrList.getPermissionRoles()) {
                 if (pr.getPermissions().get(0).getPermissionId().equals(p.getCsid())) {
-                    authZ.addUriPermissions(p, pr);
+//                    authZ.addPermissionsForUri(p, pr);
                 }
             }
         }

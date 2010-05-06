@@ -32,6 +32,7 @@ import org.collectionspace.services.authorization.spi.CSpaceAuthorizationProvide
 import org.collectionspace.services.authorization.spi.CSpacePermissionEvaluator;
 import org.collectionspace.services.authorization.spi.CSpacePermissionManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.acls.domain.BasePermission;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
@@ -40,6 +41,9 @@ import org.springframework.security.acls.model.MutableAclService;
 import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 /**
  * SpringAuthorizationProvider Spring Security provider
@@ -52,6 +56,8 @@ public class SpringAuthorizationProvider implements CSpaceAuthorizationProvider 
     private MutableAclService providerAclService;
     @Autowired
     private PermissionEvaluator providerPermissionEvaluator;
+    @Autowired
+    private DataSourceTransactionManager txManager;
     private SpringPermissionEvaluator permissionEvaluator;
     private SpringPermissionManager permissionManager;
     private String version = "1.0";
@@ -66,7 +72,7 @@ public class SpringAuthorizationProvider implements CSpaceAuthorizationProvider 
     }
 
     public void setProviderAclService(MutableAclService mutableAclService) {
-         this.providerAclService = mutableAclService;
+        this.providerAclService = mutableAclService;
         if (log.isDebugEnabled()) {
             log.debug("mutableAclService set");
         }
@@ -123,6 +129,7 @@ public class SpringAuthorizationProvider implements CSpaceAuthorizationProvider 
             case CREATE:
                 return BasePermission.CREATE;
             case READ:
+            case SEARCH:
                 return BasePermission.READ;
             case UPDATE:
                 return BasePermission.WRITE;
@@ -130,5 +137,35 @@ public class SpringAuthorizationProvider implements CSpaceAuthorizationProvider 
                 return BasePermission.DELETE;
         }
         return null;
+    }
+
+    /**
+     * @return the txManager
+     */
+    DataSourceTransactionManager getTxManager() {
+        return txManager;
+    }
+
+    /**
+     * @param txManager the txManager to set
+     */
+    public void setTxManager(DataSourceTransactionManager txManager) {
+        this.txManager = txManager;
+    }
+
+    TransactionStatus beginTransaction(String name) {
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        // explicitly setting the transaction name is something that can only be done programmatically
+        def.setName(name);
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        return getTxManager().getTransaction(def);
+    }
+
+    void rollbackTransaction(TransactionStatus status) {
+        getTxManager().rollback(status);
+    }
+
+    void commitTransaction(TransactionStatus status) {
+        getTxManager().commit(status);
     }
 }

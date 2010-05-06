@@ -75,91 +75,102 @@ public class AuthZ {
     }
 
     /**
-     * addUriPermissions add permissions from given permission configuration
-     * with assumption that resource is of type URI
-     * @param permission configuration
-     */
-    //FIXME this method should be in the restful web service resource of authz
-    public void addUriPermissions(Permission perm,
-            PermissionRole permRole) throws PermissionException {
-        List<String> principals = new ArrayList<String>();
-        if (!perm.getCsid().equals(permRole.getPermissions().get(0).getPermissionId())) {
-            throw new IllegalArgumentException("permission ids do not"
-                    + " match for role=" + permRole.getRoles().get(0).getRoleName()
-                    + " with permissionId=" + permRole.getPermissions().get(0).getPermissionId()
-                    + " for permission with csid=" + perm.getCsid());
-        }
-        for (RoleValue roleValue : permRole.getRoles()) {
-            principals.add(roleValue.getRoleName());
-        }
-        List<PermissionAction> permActions = perm.getActions();
-        for (PermissionAction permAction : permActions) {
-            URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(),
-                    perm.getResourceName(),
-                    permAction.getName());
-            addPermission(uriRes, principals.toArray(new String[0]));
-        }
-    }
-
-    /**
-     * addPermission for given principals to access given resource
-     * -permission is retrieved from the resource
+     * addPermissions add permission for given principals to access given resource
+     * -action info is retrieved from the resource
      * @param res
      * @param principals
      */
-    public void addPermission(CSpaceResource res, String[] principals) throws PermissionException {
+    public void addPermissions(CSpaceResource res, String[] principals) throws PermissionException {
         CSpaceAction action = res.getAction();
-        addPermission(res, principals, action);
+        addPermissions(res, action, principals);
     }
 
     /**
-     * addPermission add given permission for given principals to access given resource
+     * addPermissions add permission for given principals to invoke given action on given resource
      * @param res
+     * @parm action
      * @param principals
-     * @param perm
      */
-    public void addPermission(CSpaceResource res, String[] principals, CSpaceAction action)
+    public void addPermissions(CSpaceResource res, CSpaceAction action, String[] principals)
             throws PermissionException {
-        provider.getPermissionManager().addPermission(res, principals, action);
-        if (log.isDebugEnabled()) {
-            log.debug("added permission resource=" + res.getId() + " action=" + action.name());
-        }
+        provider.getPermissionManager().addPermissions(res, action, principals);
     }
 
     /**
-     * deletePermission for given principals for given resource
-     * permission is retrieve from the resource
+     * deletePermissions delete permission(s) for given resource involving given
+     * principals
+     * - action is retrieved from the resource
      * @param res
      * @param principals
      */
-    public void deletePermission(CSpaceResource res, String[] principals)
+    public void deletePermissions(CSpaceResource res, String[] principals)
             throws PermissionNotFoundException, PermissionException {
         CSpaceAction action = res.getAction();
-        deletePermission(res, principals, action);
+        deletePermissions(res, action, principals);
     }
 
     /**
-     * deletePermission given permission for given principals for given resource
+     * deletePermissions delete permission(s) for given action on given resource
+     * involving given principals
+     * @param res
+     * @param action
+     * @param principals
+     */
+    public void deletePermissions(CSpaceResource res, CSpaceAction action, String[] principals)
+            throws PermissionNotFoundException, PermissionException {
+        provider.getPermissionManager().deletePermissions(res, action, principals);
+    }
+
+    /**
+     * deletePermissions delete permission(s) for given resource involving any
+     * principal
+     * - action is retrieved from the resource if available else applicable to
+     * all actions associated with the resource
      * @param res
      * @param principals
-     * @param perm
      */
-    public void deletePermission(CSpaceResource res, String[] principals, CSpaceAction action)
+    public void deletePermissions(CSpaceResource res)
             throws PermissionNotFoundException, PermissionException {
-        provider.getPermissionManager().deletePermission(res, principals, action);
-        if (log.isDebugEnabled()) {
-            log.debug("removed permission resource=" + res.getId() + " action=" + action.name());
+        CSpaceAction action = res.getAction();
+        if (action != null) {
+            deletePermissions(res, action);
+        } else {
+            provider.getPermissionManager().deletePermissions(res);
         }
+    }
+
+    /**
+     * deletePermissions delete permission(s) for given action on given resource
+     * involving given principals
+     * @param res
+     * @param action
+     * @param principals
+     */
+    public void deletePermissions(CSpaceResource res, CSpaceAction action)
+            throws PermissionNotFoundException, PermissionException {
+        provider.getPermissionManager().deletePermissions(res, action);
     }
 
     /**
      * isAccessAllowed check if authenticated principal is allowed to access
-     * given resource, permission is retrieved from the resource
+     * given resource
+     *  action is retrieved from the resource if available
      * @param res
      * @return
      */
     public boolean isAccessAllowed(CSpaceResource res) {
         CSpaceAction action = res.getAction();
+        return isAccessAllowed(res, action);
+    }
+
+
+    /**
+     * isAccessAllowed check if authenticated principal is allowed to invoke
+     * given action on given resource
+     * @param res
+     * @return
+     */
+    public boolean isAccessAllowed(CSpaceResource res, CSpaceAction action) {
         return provider.getPermissionEvaluator().hasPermission(res, action);
     }
 }
