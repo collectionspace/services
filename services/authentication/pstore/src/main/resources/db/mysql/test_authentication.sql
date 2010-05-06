@@ -6,3 +6,5 @@
 use cspace;
 
 insert into `users` (`username`,`passwd`, `created_at`) VALUES ('test','n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg=', '2010-02-17 16:31:48');
+-- Additional account introduced during integration on release 0.6, and currently relied upon by the Application Layer.
+insert into `users` (`username`,`passwd`, `created_at`) VALUES ('test@collectionspace.org','NyaDNd1pMQRb3N+SYj/4GaZCRLU9DnRtQ4eXNJ1NpXg=', '2010-05-03 12:35:00');
