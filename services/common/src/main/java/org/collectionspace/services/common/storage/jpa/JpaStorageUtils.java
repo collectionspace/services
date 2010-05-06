@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.common.storage.jpa;
 
+import java.util.HashMap;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -83,7 +84,7 @@ public class JpaStorageUtils {
     }
 
     /**
-     * getEntity using where clause from given docFilter
+     * getEntity using whereClause clause from given docFilter
      * @param entityName fully qualified entity name
      * @param id
      * @param docFilter
@@ -123,6 +124,48 @@ public class JpaStorageUtils {
             }
             if (logger.isDebugEnabled()) {
                 logger.debug("could not find entity with id=" + id);
+            }
+            //returns null
+        } finally {
+            if (em != null) {
+                releaseEntityManagerFactory(emf);
+            }
+        }
+        return o;
+    }
+
+    /**
+     * getEntity using given where clause with given param bindings
+     * @param entityName
+     * @param whereClause
+     * @param paramBindings
+     * @return
+     */
+    public static Object getEntity(String entityName,
+            String whereClause, HashMap<String, Object> paramBindings) {
+        EntityManagerFactory emf = null;
+        EntityManager em = null;
+        Object o = null;
+        try {
+            StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
+            queryStrBldr.append(entityName);
+            queryStrBldr.append(" a");
+            queryStrBldr.append(" " + whereClause);
+
+            emf = getEntityManagerFactory();
+            em = emf.createEntityManager();
+            String queryStr = queryStrBldr.toString(); //for debugging
+            Query q = em.createQuery(queryStr);
+            for (String paramName : paramBindings.keySet()) {
+                q.setParameter(paramName, paramBindings.get(paramName));
+            }
+            o = q.getSingleResult();
+        } catch (NoResultException nre) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("could not find entity with where=" + whereClause);
             }
             //returns null
         } finally {

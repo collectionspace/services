@@ -150,7 +150,6 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         AccountClient client = new AccountClient();
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
-
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
