@@ -23,6 +23,8 @@
  */
 package org.collectionspace.services.authorization.spring;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,16 +33,15 @@ import org.collectionspace.services.authorization.spi.CSpacePermissionManager;
 import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.PermissionException;
 import org.collectionspace.services.authorization.PermissionNotFoundException;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.security.acls.model.AccessControlEntry;
+import org.springframework.security.acls.model.AclDataAccessException;
+import org.springframework.security.acls.model.AlreadyExistsException;
 import org.springframework.security.acls.model.MutableAcl;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.acls.model.Sid;
-import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 /**
  * Manages permissions in Spring Security
@@ -60,29 +61,59 @@ public class SpringPermissionManager implements CSpacePermissionManager {
             throws PermissionException {
         ObjectIdentity oid = SpringAuthorizationProvider.mapResource(res);
         Sid[] sids = SpringAuthorizationProvider.mapPrincipal(principals);
-        Permission p = SpringAuthorizationProvider.mapPermssion(action);
+        Permission p = SpringAuthorizationProvider.mapPermission(action);
         TransactionStatus status = provider.beginTransaction("addPermssions");
-        try {
-            for (Sid sid : sids) {
+
+        //add permission for each sid
+        for (Sid sid : sids) {
+            try {
                 addPermission(oid, p, sid);
                 if (log.isDebugEnabled()) {
-                    log.debug("added permission "
+                    log.debug("addpermissions(res,action,prin[]), success for "
                             + " res=" + res.toString()
                             + " action=" + action.toString()
                             + " oid=" + oid.toString()
                             + " perm=" + p.toString()
-                            + " sid=" + sids.toString());
+                            + " sid=" + sid.toString());
                 }
-            }
-        } catch (Exception ex) {
-            provider.rollbackTransaction(status);
-            if (log.isDebugEnabled()) {
-                ex.printStackTrace();
-            }
-            throw new PermissionException(ex);
-        }
-        provider.commitTransaction(status);
 
+            } catch (AlreadyExistsException aex) {
+                if (log.isWarnEnabled()) {
+                    log.warn("addpermissions(res,action,prin[]) failed,"
+                            + " oid=" + oid.toString()
+                            + " res=" + res.toString()
+                            + " action=" + action.toString()
+                            + " oid=" + oid.toString()
+                            + " perm=" + p.toString(), aex);
+                }
+                //keep going
+            } catch (Exception ex) {
+                String msg = "addpermissions(res,action,prin[]) failed,"
+                        + " oid=" + oid.toString()
+                        + " res=" + res.toString()
+                        + " action=" + action.toString()
+                        + " oid=" + oid.toString()
+                        + " perm=" + p.toString();
+                if (log.isDebugEnabled()) {
+                    log.debug(msg, ex);
+                }
+                //don't know what might be wrong...stop
+                provider.rollbackTransaction(status);
+                if (ex instanceof PermissionException) {
+                    throw (PermissionException) ex;
+                }
+                throw new PermissionException(msg, ex);
+            }
+        }//rof
+        provider.commitTransaction(status);
+        if (log.isDebugEnabled()) {
+            log.debug("addpermissions(res,action,prin[]), success for "
+                    + " res=" + res.toString()
+                    + " action=" + action.toString()
+                    + " oid=" + oid.toString()
+                    + " perm=" + p.toString()
+                    + " sids=" + sids.toString());
+        }
     }
 
     @Override
@@ -90,55 +121,100 @@ public class SpringPermissionManager implements CSpacePermissionManager {
             throws PermissionNotFoundException, PermissionException {
         ObjectIdentity oid = SpringAuthorizationProvider.mapResource(res);
         Sid[] sids = SpringAuthorizationProvider.mapPrincipal(principals);
-        Permission p = SpringAuthorizationProvider.mapPermssion(action);
+        Permission p = SpringAuthorizationProvider.mapPermission(action);
         TransactionStatus status = provider.beginTransaction("deletePermssions");
-        try {
-            for (Sid sid : sids) {
+        //delete permission for each sid
+        for (Sid sid : sids) {
+            try {
                 deletePermissions(oid, p, sid);
                 if (log.isDebugEnabled()) {
-                    log.debug("deleted permission "
+                    log.debug("deletedpermissions(res,action,prin[]), success for "
                             + " res=" + res.toString()
                             + " action=" + action.toString()
                             + " oid=" + oid.toString()
                             + " perm=" + p.toString()
-                            + " sid=" + sids.toString());
+                            + " sid=" + sid.toString());
                 }
+            } catch (AclDataAccessException aex) {
+                if (log.isWarnEnabled()) {
+                    log.debug("deletepermissions(res,action,prin[]) failed, "
+                            + " oid=" + oid.toString()
+                            + " res=" + res.toString()
+                            + " action=" + action.toString()
+                            + " oid=" + oid.toString()
+                            + " perm=" + p.toString(), aex);
+                }
+                //keep going
+            } catch (Exception ex) {
+                String msg = "deletepermissions(res,action,prin[]) failed,"
+                        + " oid=" + oid.toString()
+                        + " res=" + res.toString()
+                        + " action=" + action.toString()
+                        + " oid=" + oid.toString()
+                        + " perm=" + p.toString();
+                if (log.isDebugEnabled()) {
+                    log.debug(msg, ex);
+                }
+                //don't know what might be wrong...stop
+                provider.rollbackTransaction(status);
+                if (ex instanceof PermissionException) {
+                    throw (PermissionException) ex;
+                }
+                throw new PermissionException(msg, ex);
             }
-        } catch (Exception ex) {
-            provider.rollbackTransaction(status);
-            if (log.isDebugEnabled()) {
-                ex.printStackTrace();
-            }
-            throw new PermissionException(ex);
         }
         provider.commitTransaction(status);
-
+        if (log.isDebugEnabled()) {
+            log.debug("deletedpermissions(res,action,prin[]), success for "
+                    + " res=" + res.toString()
+                    + " action=" + action.toString()
+                    + " oid=" + oid.toString()
+                    + " perm=" + p.toString()
+                    + " sids=" + sids.toString());
+        }
     }
 
     @Override
     public void deletePermissions(CSpaceResource res, CSpaceAction action)
             throws PermissionNotFoundException, PermissionException {
         ObjectIdentity oid = SpringAuthorizationProvider.mapResource(res);
-        Permission p = SpringAuthorizationProvider.mapPermssion(action);
+        Permission p = SpringAuthorizationProvider.mapPermission(action);
         TransactionStatus status = provider.beginTransaction("deletePermssions");
         try {
             deletePermissions(oid, p, null);
-            if (log.isDebugEnabled()) {
-                log.debug("deleted permissions "
-                        + " res=" + res.toString()
-                        + " action=" + action.toString()
-                        + " oid=" + oid.toString()
-                        + " perm=" + p.toString());
-            }
+        } catch (AclDataAccessException aex) {
+            provider.rollbackTransaction(status);
+            log.debug("deletepermissions(res,action) failed,"
+                    + " oid=" + oid.toString()
+                    + " res=" + res.toString()
+                    + " action=" + action.toString()
+                    + " oid=" + oid.toString()
+                    + " perm=" + p.toString(), aex);
+            throw new PermissionException(aex);
         } catch (Exception ex) {
             provider.rollbackTransaction(status);
+            String msg = "deletepermissions(res,action,prin[]) failed,"
+                    + " oid=" + oid.toString()
+                    + " res=" + res.toString()
+                    + " action=" + action.toString()
+                    + " oid=" + oid.toString()
+                    + " perm=" + p.toString();
             if (log.isDebugEnabled()) {
-                ex.printStackTrace();
+                log.debug(msg, ex);
             }
-            throw new PermissionException(ex);
+            if (ex instanceof PermissionException) {
+                throw (PermissionException) ex;
+            }
+            throw new PermissionException(msg, ex);
         }
         provider.commitTransaction(status);
-
+        if (log.isDebugEnabled()) {
+            log.debug("deletepermissions(res,action) success, "
+                    + " res=" + res.toString()
+                    + " action=" + action.toString()
+                    + " oid=" + oid.toString()
+                    + " perm=" + p.toString());
+        }
 
     }
 
@@ -149,86 +225,106 @@ public class SpringPermissionManager implements CSpacePermissionManager {
         TransactionStatus status = provider.beginTransaction("addPermssion");
         try {
             provider.getProviderAclService().deleteAcl(oid, true);
+        } catch (AclDataAccessException aex) {
+            provider.rollbackTransaction(status);
+            log.debug("deletepermissions(res) failed,"
+                    + " oid=" + oid.toString()
+                    + " res=" + res.toString()
+                    + " oid=" + oid.toString(), aex);
+            throw new PermissionException(aex);
         } catch (Exception ex) {
             provider.rollbackTransaction(status);
+            String msg = "deletepermissions(res) failed,"
+                    + " oid=" + oid.toString()
+                    + " res=" + res.toString()
+                    + " oid=" + oid.toString();
             if (log.isDebugEnabled()) {
-                ex.printStackTrace();
+                log.debug(msg, ex);
             }
-            throw new PermissionException(ex);
+            if (ex instanceof PermissionException) {
+                throw (PermissionException) ex;
+            }
+            throw new PermissionException(msg, ex);
         }
         provider.commitTransaction(status);
 
         if (log.isDebugEnabled()) {
-            log.debug("deleted permissions "
+            log.debug("deletepermissions(res) success, "
                     + " res=" + res.toString()
                     + " oid=" + oid.toString());
         }
     }
 
     private void addPermission(ObjectIdentity oid, Permission permission,
-            Sid recipient) throws PermissionException {
+            Sid sid) throws PermissionException {
         MutableAcl acl;
 
         try {
             acl = getAcl(oid);
-        } catch (PermissionException pnfe) {
+        } catch (NotFoundException nfe) {
+            if (log.isDebugEnabled()) {
+                log.debug("addPermission: acl not found for oid=" + oid.toString()
+                        + " perm=" + permission.toString()
+                        + " sid=" + sid.toString()
+                        + " adding...");
+            }
             acl = provider.getProviderAclService().createAcl(oid);
         }
-        acl.insertAce(acl.getEntries().size(), permission, recipient, true);
+        acl.insertAce(acl.getEntries().size(), permission, sid, true);
         provider.getProviderAclService().updateAcl(acl);
 
         if (log.isDebugEnabled()) {
             log.debug("addPermission: added acl for oid=" + oid.toString()
                     + " perm=" + permission.toString()
-                    + " sid=" + recipient.toString());
+                    + " sid=" + sid.toString());
         }
     }
 
-    private void deletePermissions(ObjectIdentity oid, Permission permission, Sid recipient)
-            throws PermissionException {
-
-        int j = 0;
+    private void deletePermissions(ObjectIdentity oid, Permission permission, Sid sid) /** throws AclDataAccessException */
+    {
+        int i = 0;
         MutableAcl acl = getAcl(oid);
-        List<AccessControlEntry> entries = acl.getEntries();
+        List<AccessControlEntry> acel = acl.getEntries();
+        int aces = acel.size();
         if (log.isDebugEnabled()) {
             log.debug("deletePermissions: for acl oid=" + oid.toString()
-                    + " found " + entries.size() + " aces");
+                    + " found " + aces + " aces");
         }
-
-        for (int i = 0; i < entries.size(); i++) {
-            AccessControlEntry ace = entries.get(i);
-            if (recipient != null) {
-                if (ace.getSid().equals(recipient)
+        ArrayList<Integer> foundAces = new ArrayList<Integer>();
+        Iterator iter = acel.listIterator();
+        //not possible to delete while iterating
+        while(iter.hasNext()) {
+            AccessControlEntry ace = (AccessControlEntry)iter.next();
+            if (sid != null) {
+                if (ace.getSid().equals(sid)
                         && ace.getPermission().equals(permission)) {
-                    acl.deleteAce(i);
-                    j++;
+                    foundAces.add(i);
+                    i++;
                 }
             } else {
                 if (ace.getPermission().equals(permission)) {
-                    acl.deleteAce(i);
-                    j++;
+                    foundAces.add(i);
+                    i++;
                 }
             }
+        }
+        for (int j = foundAces.size() - 1; j >= 0; j--) {
+            //the following operation does not work while iterating in the while loop
+            acl.deleteAce(foundAces.get(j)); //autobox
         }
         provider.getProviderAclService().updateAcl(acl);
 
         if (log.isDebugEnabled()) {
             log.debug("deletePermissions: for acl oid=" + oid.toString()
-                    + " deleted " + j + " aces");
+                    + " deleted " + i + " aces");
         }
     }
 
-    private MutableAcl getAcl(ObjectIdentity oid) throws PermissionNotFoundException {
+    private MutableAcl getAcl(ObjectIdentity oid) throws NotFoundException {
         MutableAcl acl = null;
-        try {
-            acl = (MutableAcl) provider.getProviderAclService().readAclById(oid);
-            if (log.isDebugEnabled()) {
-                log.debug("found acl for oid=" + oid.toString());
-            }
-        } catch (NotFoundException nfe) {
-            String msg = "Cound not find acl for oid=" + oid.toString();
-            log.error(msg);
-            throw new PermissionNotFoundException(msg);
+        acl = (MutableAcl) provider.getProviderAclService().readAclById(oid);
+        if (log.isDebugEnabled()) {
+            log.debug("found acl for oid=" + oid.toString());
         }
         return acl;
     }

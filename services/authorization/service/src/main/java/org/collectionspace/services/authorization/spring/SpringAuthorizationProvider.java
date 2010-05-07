@@ -122,7 +122,7 @@ public class SpringAuthorizationProvider implements CSpaceAuthorizationProvider 
         return sids.toArray(new Sid[0]);
     }
 
-    static Permission mapPermssion(CSpaceAction perm) {
+    static Permission mapPermission(CSpaceAction perm) {
         switch (perm) {
             case ADMIN:
                 return BasePermission.ADMINISTRATION;

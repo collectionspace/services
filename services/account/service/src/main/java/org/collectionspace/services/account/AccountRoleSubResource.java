@@ -176,6 +176,7 @@ public class AccountRoleSubResource
             logger.debug("deleteAccountRole with csid=" + csid);
         }
         ServiceContext<AccountRole, AccountRole> ctx = createServiceContext((AccountRole) null, subject);
-        getStorageClient(ctx).delete(ctx, csid);
+        DocumentHandler handler = createDocumentHandler(ctx);
+        getStorageClient(ctx).delete(ctx, csid, handler);
     }
 }

@@ -177,6 +177,7 @@ public class PermissionRoleSubResource
             logger.debug("deletePermissionRole with csid=" + csid);
         }
         ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext((PermissionRole) null, subject);
-        getStorageClient(ctx).delete(ctx, csid);
+        DocumentHandler handler = createDocumentHandler(ctx);
+        getStorageClient(ctx).delete(ctx, csid, handler);
     }
 }

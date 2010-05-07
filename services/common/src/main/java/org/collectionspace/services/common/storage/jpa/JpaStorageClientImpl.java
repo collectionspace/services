@@ -63,11 +63,11 @@ import org.slf4j.LoggerFactory;
 </xs:annotation>
 </xs:element>
 </xs:sequence>
-<xs:attribute name="csidFound" type="xs:string">
+<xs:attribute name="csid" type="xs:string">
 <xs:annotation>
 <xs:appinfo>
 <hj:csidReceived>
-<orm:column name="csidFound" length="128" nullable="false"/>
+<orm:column name="csid" length="128" nullable="false"/>
 </hj:csidReceived>
 </xs:appinfo>
 </xs:annotation>
@@ -123,6 +123,9 @@ public class JpaStorageClientImpl implements StorageClient {
             }
             throw bre;
         } catch (DocumentException de) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             throw de;
         } catch (Exception e) {
             if (em != null && em.getTransaction().isActive()) {
@@ -297,6 +300,7 @@ public class JpaStorageClientImpl implements StorageClient {
             Object entityFound = getEntity(em, id, entityReceived.getClass());
             DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entityFound);
             handler.handle(Action.UPDATE, wrapDoc);
+            JaxbUtils.setValue(entityFound, "setUpdatedAtItem", Date.class, new Date());
             em.getTransaction().commit();
             handler.complete(Action.UPDATE, wrapDoc);
         } catch (BadRequestException bre) {
@@ -305,6 +309,9 @@ public class JpaStorageClientImpl implements StorageClient {
             }
             throw bre;
         } catch (DocumentException de) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -357,6 +364,9 @@ public class JpaStorageClientImpl implements StorageClient {
             em.getTransaction().commit();
 
         } catch (DocumentException de) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -420,6 +430,9 @@ public class JpaStorageClientImpl implements StorageClient {
             em.getTransaction().commit();
 
         } catch (DocumentException de) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -457,6 +470,9 @@ public class JpaStorageClientImpl implements StorageClient {
             handler.handle(Action.DELETE, wrapDoc);
             handler.complete(Action.DELETE, wrapDoc);
         } catch (DocumentException de) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
             throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -494,6 +510,7 @@ public class JpaStorageClientImpl implements StorageClient {
     /**
      * getEntity returns persistent entity for given id. it assumes that
      * service context has property ServiceContextProperties.ENTITY_CLASS set
+     * rolls back the transaction if not found
      * @param ctx service context
      * @param em entity manager
      * @param csid received
@@ -514,6 +531,7 @@ public class JpaStorageClientImpl implements StorageClient {
 
     /**
      * getEntity retrieves the persistent entity of given class for given id
+     * rolls back the transaction if not found
      * @param em
      * @param id entity id
      * @param entityClazz

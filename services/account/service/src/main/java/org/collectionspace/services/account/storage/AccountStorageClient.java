@@ -45,7 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * AccountStorageClient deals with both Account and CSIP's
+ * AccountStorageClient deals with both Account and CSIdP's
  * state in persistent storage. The rationale behind creating this class is that
  * this class manages pesistence for both account and CSIP's user. Transactions
  * are used where possible to permorme the persistence operations atomically.

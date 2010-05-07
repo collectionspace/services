@@ -74,8 +74,6 @@ public class RoleDocumentHandler
      * @return merged role
      */
     private Role merge(Role from, Role to) {
-        Date now = new Date();
-        to.setUpdatedAtItem(now);
         if (from.getRoleName() != null) {
             to.setRoleName(from.getRoleName());
         }

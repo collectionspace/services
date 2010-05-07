@@ -88,19 +88,19 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         pva.setPermissionId(accPermId);
         permValues.put(pva.getResourceName(), pva);
 
-        String rc = "collectionobjects";
-        String coPermId = createPermission(rc, EffectType.DENY);
-        PermissionValue pvc = new PermissionValue();
-        pvc.setResourceName(rc);
-        pvc.setPermissionId(coPermId);
-        permValues.put(pvc.getResourceName(), pvc);
-
-        String ri = "intakes";
-        String iPermId = createPermission(ri, EffectType.DENY);
-        PermissionValue pvi = new PermissionValue();
-        pvi.setResourceName(ri);
-        pvi.setPermissionId(iPermId);
-        permValues.put(pvi.getResourceName(), pvi);
+//        String rc = "collectionobjects";
+//        String coPermId = createPermission(rc, EffectType.DENY);
+//        PermissionValue pvc = new PermissionValue();
+//        pvc.setResourceName(rc);
+//        pvc.setPermissionId(coPermId);
+//        permValues.put(pvc.getResourceName(), pvc);
+//
+//        String ri = "intakes";
+//        String iPermId = createPermission(ri, EffectType.DENY);
+//        PermissionValue pvi = new PermissionValue();
+//        pvi.setResourceName(ri);
+//        pvi.setPermissionId(iPermId);
+//        permValues.put(pvi.getResourceName(), pvi);
 
         String rn1 = "ROLE_CO1";
         String r1RoleId = createRole(rn1);
@@ -122,28 +122,29 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     protected CollectionSpaceClient getClientInstance() {
-    	return new PermissionRoleClient();
+        return new PermissionRoleClient();
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getAbstractCommonList(
-			ClientResponse<AbstractCommonList> response) {
-    	//FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
-    	throw new UnsupportedOperationException();
+    protected AbstractCommonList getAbstractCommonList(
+            ClientResponse<AbstractCommonList> response) {
+        //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
+        throw new UnsupportedOperationException();
     }
-    
-	@Test(dataProvider = "testName")
-	@Override
+
+    @Test(dataProvider = "testName")
+    @Override
     public void readPaginatedList(String testName) throws Exception {
-		//FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
-	}    
+        //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
+    }
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
+
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
@@ -403,35 +404,20 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
 
     @AfterClass(alwaysRun = true)
     public void cleanUp() {
-        setupDelete("delete");
+        setupDelete("cleanup");
         String noTest = System.getProperty("noTestCleanup");
-    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+        if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Skipping Cleanup phase ...");
             }
             return;
-    	}
+        }
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
-        PermissionRoleClient client = new PermissionRoleClient();
-        for (String resourceId : allResourceIdsCreated) {
-
-            ClientResponse<Response> res = client.delete(resourceId, "123");
-            int statusCode = res.getStatus();
-            if (logger.isDebugEnabled()) {
-                logger.debug("cleanup: delete relationships for permission id="
-                        + resourceId + " status=" + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        }
-
         for (PermissionValue pv : permValues.values()) {
             deletePermission(pv.getPermissionId());
         }
-
         for (RoleValue rv : roleValues.values()) {
             deleteRole(rv.getRoleId());
         }

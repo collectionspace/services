@@ -37,6 +37,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import org.collectionspace.services.authorization.storage.AuthorizationDelegate;
 
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 //import org.collectionspace.services.common.context.RemoteServiceContextImpl;
@@ -51,7 +52,6 @@ import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
-import org.collectionspace.services.common.context.ServiceContextProperties;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -351,6 +351,11 @@ public class PermissionResource
             //delete all relationships for this permission
             PermissionRoleSubResource subResource = new PermissionRoleSubResource();
             subResource.deletePermissionRole(csid, SubjectType.ROLE);
+            //delete permissions at the provider too
+            //at the PermissionRoleSubResource/DocHandler levels, there is no visibility
+            //if permission is deleted
+            AuthorizationDelegate.deletePermissions(csid);
+            
             ServiceContext<Permission, Permission> ctx = createServiceContext((Permission)null, Permission.class);
             getStorageClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();

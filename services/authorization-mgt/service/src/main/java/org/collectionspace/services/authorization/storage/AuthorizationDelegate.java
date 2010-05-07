@@ -32,6 +32,7 @@ import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.PermissionAction;
 import org.collectionspace.services.authorization.PermissionException;
+import org.collectionspace.services.authorization.PermissionNotFoundException;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.RoleValue;
@@ -43,20 +44,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * AuthorizationDelegate delegates permissions management to the authorization
- * service from the RESTful service
+ * AuthorizationDelegate delegates permissions management to the underlying authorization
+ * service from the RESTful service layer. The authorization service for example
+ * might manage permissions with the help of a provider (e.g. Spring Security ACL)
  * @author
  */
 public class AuthorizationDelegate {
 
-    private final Logger logger = LoggerFactory.getLogger(AuthorizationDelegate.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthorizationDelegate.class);
 
+    /**
+     * addPermissions add permissions represented given PermissionRole
+     * @param ctx
+     * @param pr permission role
+     * @throws Exception
+     * @see PermissionRole
+     */
     static void addPermissions(ServiceContext ctx, PermissionRole pr) throws Exception {
         SubjectType subject = PermissionRoleUtil.getRelationSubject(ctx, pr);
         AuthZ authz = AuthZ.get();
         if (subject.equals(SubjectType.ROLE)) {
             PermissionValue pv = pr.getPermissions().get(0);
-            CSpaceResource[] resources = getResources(pv);
+            CSpaceResource[] resources = getResources(pv.getPermissionId());
             String[] roles = getRoles(pr.getRoles());
             for (CSpaceResource res : resources) {
                 authz.addPermissions(res, roles);
@@ -65,7 +74,7 @@ public class AuthorizationDelegate {
             RoleValue rv = pr.getRoles().get(0);
             String[] roles = {rv.getRoleName()};
             for (PermissionValue pv : pr.getPermissions()) {
-                CSpaceResource[] resources = getResources(pv);
+                CSpaceResource[] resources = getResources(pv.getPermissionId());
                 for (CSpaceResource res : resources) {
                     authz.addPermissions(res, roles);
                 }
@@ -73,21 +82,48 @@ public class AuthorizationDelegate {
         }
     }
 
+    /**
+     * deletePermissions delete all permissions associated with given permission role
+     * @param ctx
+     * @param pr permissionrole
+     * @throws Exception
+     */
     static void deletePermissions(ServiceContext ctx, PermissionRole pr)
             throws Exception {
         PermissionValue pv = pr.getPermissions().get(0);
         deletePermissions(pv);
     }
 
+    /**
+     * deletePermissions delete permissions associated with given PermissionValue
+     * @param pv permission value
+     * @throws Exception
+     * @see PermissionValue
+     */
     static void deletePermissions(PermissionValue pv)
             throws Exception {
-        CSpaceResource[] resources = getResources(pv);
-        AuthZ authz = AuthZ.get();
-        for (CSpaceResource res : resources) {
-            authz.deletePermissions(res);
-        }
+        deletePermissions(pv.getPermissionId());
     }
 
+    /**
+     * deletePermissions delete permissions associated with given permission id
+     * @param permCsid
+     * @throws Exception
+     */
+    static public void deletePermissions(String permCsid) throws Exception {
+        CSpaceResource[] resources = getResources(permCsid);
+        AuthZ authz = AuthZ.get();
+
+        for (CSpaceResource res : resources) {
+            try {
+                authz.deletePermissions(res);
+            } catch (PermissionException pe) {
+                //perms are created downthere only if roles are related to the permissions
+                logger.info("no permissions found in authz service provider for " +
+                        "permCsid=" + permCsid + " res=" + res.getId());
+            }
+        }
+    }
 
     /**
      * addPermissionsForUri add permissions from given permission configuration
@@ -135,26 +171,25 @@ public class AuthorizationDelegate {
 
     /**
      * getResources from given PermissionValue
-     * @param pv permission value
+     * @param permisison csid
      * @return array of CSpaceResource
      * @see PermissionValue
      * @see CSpaceResource
      */
-    private static CSpaceResource[] getResources(PermissionValue pv) {
+    private static CSpaceResource[] getResources(String permCsid) {
         List<CSpaceResource> rl = new ArrayList<CSpaceResource>();
-        Permission p = (Permission) JpaStorageUtils.getEntity(pv.getPermissionId(),
+        Permission p = (Permission) JpaStorageUtils.getEntity(permCsid,
                 Permission.class);
         if (p != null) {
             for (PermissionAction pa : p.getActions()) {
 
-                CSpaceResource res = new URIResourceImpl(pv.getResourceName(),
+                CSpaceResource res = new URIResourceImpl(p.getResourceName(),
                         getAction(pa.getName()));
                 rl.add(res);
             }
         }
         return rl.toArray(new CSpaceResource[0]);
     }
-
 
     /**
      * getAction is a convenience method to get corresponding action for
@@ -182,5 +217,4 @@ public class AuthorizationDelegate {
         }
         throw new IllegalArgumentException("action = " + action.toString());
     }
-
 }

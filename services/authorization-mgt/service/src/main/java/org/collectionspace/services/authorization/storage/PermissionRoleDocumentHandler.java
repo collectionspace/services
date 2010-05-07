@@ -85,8 +85,7 @@ public class PermissionRoleDocumentHandler
 
     @Override
     public void completeDelete(DocumentWrapper<List<PermissionRoleRel>> wrapDoc) throws Exception {
-        PermissionRole pr = getCommonPart();
-        AuthorizationDelegate.deletePermissions(getServiceContext(), pr);
+//
     }
 
     @Override
