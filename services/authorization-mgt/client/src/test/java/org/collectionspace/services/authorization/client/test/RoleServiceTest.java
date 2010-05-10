@@ -548,7 +548,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         Role role = RoleFactory.createRoleInstance(roleName, description,
                 useRoleName);
         if (logger.isDebugEnabled()) {
-            logger.debug("to be created, role common");
+            logger.debug("to be created, role");
             logger.debug(objectAsXmlString(role, Role.class));
         }
         return role;

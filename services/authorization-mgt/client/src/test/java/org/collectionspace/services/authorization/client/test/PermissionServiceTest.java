@@ -611,7 +611,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
                 useResourceName, useAction, useEffect);
 
         if (logger.isDebugEnabled()) {
-            logger.debug("to be created, permission common");
+            logger.debug("to be created, permission");
             logger.debug(objectAsXmlString(permission, Permission.class));
         }
         return permission;

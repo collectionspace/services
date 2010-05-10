@@ -20,17 +20,15 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.collectionspace.services.authentication.client.test;
+package org.collectionspace.services.security.client.test;
 
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 //import org.apache.commons.codec.binary.Base64;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -42,6 +40,7 @@ import org.collectionspace.services.account.Status;
 import org.collectionspace.services.client.AccountFactory;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.client.CollectionObjectClient;
+import org.collectionspace.services.client.CollectionObjectFactory;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.BaseServiceTest;
@@ -132,6 +131,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": barneyAccountId=" + barneyAccountId);
         }
+        res.releaseConnection();
 
     }
 
@@ -168,7 +168,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": georgeAccountId=" + georgeAccountId);
         }
-
+        res.releaseConnection();
         //deactivate
         setupUpdate(testName);
         account.setStatus(Status.INACTIVE);
@@ -188,6 +188,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        res1.releaseConnection();
     }
 
 
@@ -228,6 +229,8 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         // Store the ID returned from this create operation for additional tests
         // below.
         knownResourceId = extractId(res);
+        res.releaseConnection();
+
     }
 
     @Test(dataProvider = "testName", dependsOnMethods = {"createInactiveAccount"})
@@ -258,6 +261,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(res.getStatus(),
                 Response.Status.FORBIDDEN.getStatusCode(), "expected "
                 + Response.Status.FORBIDDEN.getStatusCode());
+        res.releaseConnection();
     }
 
     /**
@@ -288,6 +292,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
             logger.debug(testName + ": status = " + res.getStatus());
         }
         Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
+        res.releaseConnection();
     }
 
     /**
@@ -319,6 +324,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
             logger.debug(testName + ": status = " + res.getStatus());
         }
         Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
+        res.releaseConnection();
     }
 
     /**
@@ -350,6 +356,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
             logger.debug(testName + ": status = " + res.getStatus());
         }
         Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
+        res.releaseConnection();
     }
 
     /**
@@ -382,6 +389,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
                     + res.getStatus());
         }
         Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
+        res.releaseConnection();
     }
 
     /**
@@ -414,6 +422,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
                     + res.getStatus());
         }
         Assert.assertEquals(res.getStatus(), Response.Status.UNAUTHORIZED.getStatusCode(), "expected " + Response.Status.UNAUTHORIZED.getStatusCode());
+        res.releaseConnection();
     }
 
     /* (non-Javadoc)
@@ -449,6 +458,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         }
         Assert.assertEquals(res.getStatus(),
                 Response.Status.OK.getStatusCode(), "expected " + Response.Status.OK.getStatusCode());
+        res.releaseConnection();
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
@@ -481,6 +491,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        res.releaseConnection();
     }
 
     // ---------------------------------------------------------------
@@ -514,10 +525,9 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
 
         collectionObject.setObjectNumber(objectNumber);
         collectionObject.setObjectName(objectName);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(collectionObject,
-                MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", commonPartName);
+        MultipartOutput multipart =
+                CollectionObjectFactory.createCollectionObjectInstance(
+                commonPartName, collectionObject, null, null);
 
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, collectionobject common ",

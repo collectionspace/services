@@ -39,6 +39,7 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PermissionClient;
 import org.collectionspace.services.client.PermissionFactory;
 import org.collectionspace.services.client.PermissionRoleClient;
+import org.collectionspace.services.client.PermissionRoleFactory;
 import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.RoleFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
@@ -168,7 +169,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+        res.releaseConnection();
         // Store the ID returned from this create operation
         // for additional tests below.
         //this is is not important in case of this relationship
@@ -229,6 +230,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
 
         PermissionRole output = (PermissionRole) res.getEntity();
         Assert.assertNotNull(output);
+        res.releaseConnection();
     }
 
     // Failure outcomes
@@ -252,6 +254,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        res.releaseConnection();
     }
 
     // ---------------------------------------------------------------
@@ -323,6 +326,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        res.releaseConnection();
     }
 
     // Failure outcomes
@@ -359,6 +363,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         }
         Assert.assertEquals(statusCode, EXPECTED_STATUS);
 
+
     }
 
     // ---------------------------------------------------------------
@@ -377,26 +382,10 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
             boolean usePermId,
             boolean useRoleId) {
 
-        PermissionRole permRole = new PermissionRole();
-        //service consume is not required to provide subject as it is determined
-        //from URI used
-//        permRole.setSubject(SubjectType.ROLE);
-        if (usePermId) {
-            ArrayList<PermissionValue> pvs = new ArrayList<PermissionValue>();
-            pvs.add(pv);
-            permRole.setPermissions(pvs);
-        }
-        if (useRoleId) {
-            //FIXME is there a better way?
-            ArrayList<RoleValue> rvas = new ArrayList<RoleValue>();
-            for (RoleValue rv : rvs) {
-                rvas.add(rv);
-            }
-            permRole.setRoles(rvas);
-        }
-
+        PermissionRole permRole = PermissionRoleFactory.createPermissionRoleInstance(
+                pv, rvs, usePermId, useRoleId);
         if (logger.isDebugEnabled()) {
-            logger.debug("to be created, permRole common");
+            logger.debug("to be created, permRole");
             logger.debug(objectAsXmlString(permRole, PermissionRole.class));
         }
         return permRole;
@@ -427,7 +416,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         setupCreate();
         PermissionClient permClient = new PermissionClient();
         List<PermissionAction> actions = PermissionFactory.createDefaultActions();
-        Permission permission = PermissionServiceTest.createPermissionInstance(resName,
+        Permission permission = PermissionFactory.createPermissionInstance(resName,
                 "default permissions for " + resName,
                 actions, effect, true, true, true);
         ClientResponse<Response> res = permClient.create(permission);
@@ -439,6 +428,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        res.releaseConnection();
         return extractId(res);
     }
 
@@ -454,6 +444,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        res.releaseConnection();
     }
 
     private String createRole(String roleName) {
@@ -471,6 +462,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        res.releaseConnection();
         return extractId(res);
     }
 
@@ -486,5 +478,6 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        res.releaseConnection();
     }
 }

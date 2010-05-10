@@ -12,7 +12,7 @@
     <groupId>org.collectionspace.services</groupId>
     <artifactId>org.collectionspace.services.security.client</artifactId>
     <name>services.security.client</name>
-    
+
     <dependencies>
         <!-- keep slf4j dependencies on the top -->
         <dependency>
@@ -34,12 +34,12 @@
         <!-- authentication tests use CollectionObject service and Account service -->
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.authentication.client</artifactId>
+            <artifactId>org.collectionspace.services.account.client</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.account.client</artifactId>
+            <artifactId>org.collectionspace.services.authorization-mgt.client</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

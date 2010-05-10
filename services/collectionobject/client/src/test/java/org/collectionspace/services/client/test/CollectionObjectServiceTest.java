@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 
 //import org.collectionspace.services.client.AbstractServiceClientImpl;
 import org.collectionspace.services.client.CollectionObjectClient;
+import org.collectionspace.services.client.CollectionObjectFactory;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.domain.naturalhistory.CollectionobjectsNaturalhistory;
@@ -1082,11 +1083,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     private MultipartOutput createCollectionObjectInstance(String commonPartName,
             CollectionobjectsCommon collectionObject, CollectionobjectsNaturalhistory conh) {
 
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(collectionObject,
-                MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", commonPartName);
-
+        MultipartOutput multipart = CollectionObjectFactory.createCollectionObjectInstance(
+                commonPartName, collectionObject, getNHPartName(), conh);
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, collectionobject common");
             logger.debug(objectAsXmlString(collectionObject,
@@ -1094,9 +1092,6 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         }
 
         if (conh != null) {
-            OutputPart nhPart = multipart.addPart(conh, MediaType.APPLICATION_XML_TYPE);
-            nhPart.getHeaders().add("label", getNHPartName());
-
             if (logger.isDebugEnabled()) {
                 logger.debug("to be created, collectionobject nhistory");
                 logger.debug(objectAsXmlString(conh,
