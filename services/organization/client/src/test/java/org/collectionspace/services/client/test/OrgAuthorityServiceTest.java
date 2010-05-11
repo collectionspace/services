@@ -22,7 +22,6 @@
  */
 package org.collectionspace.services.client.test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,24 +61,49 @@ import org.testng.annotations.Test;
  */
 public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
+    /** The logger. */
     private final Logger logger =
         LoggerFactory.getLogger(OrgAuthorityServiceTest.class);
 
     // Instance variables specific to this test.
+    /** The SERVIC e_ pat h_ component. */
     final String SERVICE_PATH_COMPONENT = "orgauthorities";
+    
+    /** The ITE m_ servic e_ pat h_ component. */
     final String ITEM_SERVICE_PATH_COMPONENT = "items";
+    
+    /** The CONTAC t_ servic e_ pat h_ component. */
     final String CONTACT_SERVICE_PATH_COMPONENT = "contacts";
+    
+    /** The TES t_ or g_ shortname. */
     private final String TEST_ORG_SHORTNAME = "Test Org";
+    
+    /** The TES t_ or g_ foundin g_ place. */
     private final String TEST_ORG_FOUNDING_PLACE = "Anytown, USA";
+    
+    /** The known resource id. */
     private String knownResourceId = null;
+    
+    /** The known resource display name. */
     private String knownResourceDisplayName = null;
+    
+    /** The known resource ref name. */
     private String knownResourceRefName = null;
+    
+    /** The known item resource id. */
     private String knownItemResourceId = null;
+    
+    /** The known contact resource id. */
     private String knownContactResourceId = null;
+    
+    /** The n items to create in list. */
     private int nItemsToCreateInList = 3;
-    private List<String> allResourceIdsCreated = new ArrayList<String>();
+    
+    /** The all item resource ids created. */
     private Map<String, String> allItemResourceIdsCreated =
         new HashMap<String, String>();
+    
+    /** The all contact resource ids created. */
     private Map<String, String> allContactResourceIdsCreated =
         new HashMap<String, String>();
     
@@ -104,6 +128,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"create"})
@@ -122,27 +149,34 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     	MultipartOutput multipart = 
     	    OrgAuthorityClientUtils.createOrgAuthorityInstance(
 	        displayName, refName, client.getCommonPartName());
-        ClientResponse<Response> res = client.create(multipart);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        
+    	String newID = null;
+    	ClientResponse<Response> res = client.create(multipart);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        //
+	        // Specifically:
+	        // Does it fall within the set of valid status codes?
+	        // Does it exactly match the expected status code?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Store the refname from the first resource created
+	        // for additional tests below.
+	        knownResourceRefName = refName;
+	
+	        newID = OrgAuthorityClientUtils.extractId(res);
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Store the refname from the first resource created
-        // for additional tests below.
-        knownResourceRefName = refName;
-
-        String newID = OrgAuthorityClientUtils.extractId(res);
+        
         // Store the ID returned from the first resource created
         // for additional tests below.
         if (knownResourceId == null){
@@ -157,6 +191,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         allResourceIdsCreated.add(newID);
     }
 
+    /**
+     * Creates the item.
+     *
+     * @param testName the test name
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"create"}, dependsOnMethods = {"create"})
     public void createItem(String testName) {
@@ -164,6 +203,13 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         String newID = createItemInAuthority(knownResourceId, knownResourceRefName);
     }
 
+    /**
+     * Creates the item in authority.
+     *
+     * @param vcsid the vcsid
+     * @param authRefName the auth ref name
+     * @return the string
+     */
     private String createItemInAuthority(String vcsid, String authRefName) {
 
         final String testName = "createItemInAuthority";
@@ -201,6 +247,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         return newID;
     }
 
+    /**
+     * Creates the contact.
+     *
+     * @param testName the test name
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"create"}, dependsOnMethods = {"createItem"})
     public void createContact(String testName) {
@@ -208,6 +259,13 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         String newID = createContactInItem(knownResourceId, knownItemResourceId);
     }
 
+   /**
+    * Creates the contact in item.
+    *
+    * @param parentcsid the parentcsid
+    * @param itemcsid the itemcsid
+    * @return the string
+    */
    private String createContactInItem(String parentcsid, String itemcsid) {
 
         final String testName = "createContactInItem";
@@ -222,19 +280,25 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         MultipartOutput multipart =
             ContactClientUtils.createContactInstance(parentcsid,
             itemcsid, identifier, new ContactClient().getCommonPartName());
+        
+        String newID = null;
         ClientResponse<Response> res =
              client.createContact(parentcsid, itemcsid, multipart);
-        int statusCode = res.getStatus();
-        String newID = OrgAuthorityClientUtils.extractId(res);
+        try {
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+	        newID = OrgAuthorityClientUtils.extractId(res);
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Store the ID returned from the first contact resource created
         // for additional tests below.
@@ -257,16 +321,28 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithEmptyEntityBody(java.lang.String)
+     */
     @Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithMalformedXml(java.lang.String)
+     */
     @Override
     public void createWithMalformedXml(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithWrongXmlSchema(java.lang.String)
+     */
     @Override
     public void createWithWrongXmlSchema(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
 /*
@@ -353,7 +429,10 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : CREATE LIST tests
     // ---------------------------------------------------------------
     // Success outcomes
-    @Override
+    /* (non-Javadoc)
+ * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
+ */
+@Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"createList"}, dependsOnGroups = {"create"})
     public void createList(String testName) throws Exception {
@@ -362,6 +441,12 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         }
     }
 
+    /**
+     * Creates the item list.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"createList"}, dependsOnMethods = {"createList"})
     public void createItemList(String testName) throws Exception {
@@ -371,6 +456,12 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         }
     }
 
+    /**
+     * Creates the contact list.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"createList"}, dependsOnMethods = {"createItemList"})
     public void createContactList(String testName) throws Exception {
@@ -384,6 +475,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#read(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"read"}, dependsOnGroups = {"create"})
@@ -395,27 +489,37 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<MultipartInput> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        //FIXME: remove the following try catch once Aron fixes signatures
         try {
-            MultipartInput input = (MultipartInput) res.getEntity();
-            OrgauthoritiesCommon orgAuthority = (OrgauthoritiesCommon) extractPart(input,
-                    client.getCommonPartName(), OrgauthoritiesCommon.class);
-            Assert.assertNotNull(orgAuthority);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	        //FIXME: remove the following try catch once Aron fixes signatures
+	        try {
+	            MultipartInput input = (MultipartInput) res.getEntity();
+	            OrgauthoritiesCommon orgAuthority = (OrgauthoritiesCommon) extractPart(input,
+	                    client.getCommonPartName(), OrgauthoritiesCommon.class);
+	            Assert.assertNotNull(orgAuthority);
+	        } catch (Exception e) {
+	            throw new RuntimeException(e);
+	        }
+        } finally {
+        	res.releaseConnection();
         }
     }
 
+    /**
+     * Read by name.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
             groups = {"read"}, dependsOnGroups = {"create"})
         public void readByName(String testName) throws Exception {
@@ -426,24 +530,28 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<MultipartInput> res = client.readByName(knownResourceDisplayName);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        //FIXME: remove the following try catch once Aron fixes signatures
         try {
-            MultipartInput input = (MultipartInput) res.getEntity();
-            OrgauthoritiesCommon orgAuthority = (OrgauthoritiesCommon) extractPart(input,
-                    new OrgAuthorityClient().getCommonPartName(), OrgauthoritiesCommon.class);
-            Assert.assertNotNull(orgAuthority);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	        //FIXME: remove the following try catch once Aron fixes signatures
+	        try {
+	            MultipartInput input = (MultipartInput) res.getEntity();
+	            OrgauthoritiesCommon orgAuthority = (OrgauthoritiesCommon) extractPart(input,
+	                    new OrgAuthorityClient().getCommonPartName(), OrgauthoritiesCommon.class);
+	            Assert.assertNotNull(orgAuthority);
+	        } catch (Exception e) {
+	            throw new RuntimeException(e);
+	        }
+        } finally {
+        	res.releaseConnection();
         }
     }
 
@@ -479,7 +587,13 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     }
 */
 
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    /**
+ * Read item.
+ *
+ * @param testName the test name
+ * @throws Exception the exception
+ */
+@Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"read"}, dependsOnMethods = {"read"})
     public void readItem(String testName) throws Exception {
 
@@ -489,31 +603,41 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Check whether we've received a organization.
+	        MultipartInput input = (MultipartInput) res.getEntity();
+	        OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
+	                client.getItemCommonPartName(), OrganizationsCommon.class);
+	        Assert.assertNotNull(organization);
+	        boolean showFull = true;
+	        if(showFull && logger.isDebugEnabled()){
+	            logger.debug(testName + ": returned payload:");
+	            logger.debug(objectAsXmlString(organization,
+	                    OrganizationsCommon.class));
+	        }
+	        Assert.assertEquals(organization.getInAuthority(), knownResourceId);
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Check whether we've received a organization.
-        MultipartInput input = (MultipartInput) res.getEntity();
-        OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
-                client.getItemCommonPartName(), OrganizationsCommon.class);
-        Assert.assertNotNull(organization);
-        boolean showFull = true;
-        if(showFull && logger.isDebugEnabled()){
-            logger.debug(testName + ": returned payload:");
-            logger.debug(objectAsXmlString(organization,
-                    OrganizationsCommon.class));
-        }
-        Assert.assertEquals(organization.getInAuthority(), knownResourceId);
     }
 
+    /**
+     * Verify item display name.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
             dependsOnMethods = {"readItem", "updateItem"})
     public void verifyItemDisplayName(String testName) throws Exception {
@@ -523,20 +647,26 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
+        MultipartInput input = null;
         ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Check whether organization has expected displayName.
+	        input = res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Check whether organization has expected displayName.
-        MultipartInput input = (MultipartInput) res.getEntity();
+        
         OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
                 client.getItemCommonPartName(), OrganizationsCommon.class);
         Assert.assertNotNull(organization);
@@ -560,18 +690,23 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         OutputPart commonPart = output.addPart(organization, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug("updateItem: status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug("updateItem: status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Retrieve the updated resource and verify that its contents exist.
+	        input = (MultipartInput) res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Retrieve the updated resource and verify that its contents exist.
-        input = (MultipartInput) res.getEntity();
+        
         OrganizationsCommon updatedOrganization =
                 (OrganizationsCommon) extractPart(input,
                         client.getItemCommonPartName(), OrganizationsCommon.class);
@@ -594,18 +729,23 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         commonPart = output.addPart(organization, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug("updateItem: status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug("updateItem: status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Retrieve the updated resource and verify that its contents exist.
+	        input = (MultipartInput) res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Retrieve the updated resource and verify that its contents exist.
-        input = (MultipartInput) res.getEntity();
+        
         updatedOrganization =
                 (OrganizationsCommon) extractPart(input,
                         client.getItemCommonPartName(), OrganizationsCommon.class);
@@ -620,6 +760,12 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
                 "Updated DisplayName (not computed) in Organization not stored.");
     }
 
+    /**
+     * Verify illegal item display name.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
             dependsOnMethods = {"verifyItemDisplayName"})
     public void verifyIllegalItemDisplayName(String testName) throws Exception {
@@ -666,6 +812,12 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    /**
+     * Read contact.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"read"}, dependsOnMethods = {"readItem"})
     public void readContact(String testName) throws Exception {
@@ -705,6 +857,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     }
 
     // Failure outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readNonExistent(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"read"}, dependsOnMethods = {"read"})
@@ -728,6 +883,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    /**
+     * Read item non existent.
+     *
+     * @param testName the test name
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"read"}, dependsOnMethods = {"readItem"})
     public void readItemNonExistent(String testName) {
@@ -750,6 +910,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    /**
+     * Read contact non existent.
+     *
+     * @param testName the test name
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"read"}, dependsOnMethods = {"readContact"})
     public void readContactNonExistent(String testName) {
@@ -778,6 +943,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Success outcomes
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readList(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"readList"}, dependsOnGroups = {"createList", "read"})
@@ -821,16 +989,28 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         }
     }
 
+    /**
+     * Read item list.
+     */
     @Test(groups = {"readList"}, dependsOnMethods = {"readList"})
     public void readItemList() {
         readItemList(knownResourceId, null);
     }
 
+    /**
+     * Read item list by authority name.
+     */
     @Test(groups = {"readList"}, dependsOnMethods = {"readItemList"})
     public void readItemListByAuthorityName() {
         readItemList(null, knownResourceDisplayName);
     }
 
+    /**
+     * Read item list.
+     *
+     * @param vcsid the vcsid
+     * @param name the name
+     */
     private void readItemList(String vcsid, String name) {
 
         final String testName = "readItemList";
@@ -896,11 +1076,20 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         }
     }
 
+    /**
+     * Read contact list.
+     */
     @Test(groups = {"readList"}, dependsOnMethods = {"readItemList"})
     public void readContactList() {
         readContactList(knownResourceId, knownItemResourceId);
     }
 
+    /**
+     * Read contact list.
+     *
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     */
     private void readContactList(String parentcsid, String itemcsid) {
         final String testName = "readContactList";
 
@@ -962,6 +1151,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : UPDATE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#update(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"update"}, dependsOnGroups = {"read", "readList"})
@@ -1023,6 +1215,12 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
                 "Data in updated object did not match submitted data.");
     }
 
+    /**
+     * Update item.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"update"}, dependsOnMethods = {"update"})
     public void updateItem(String testName) throws Exception {
@@ -1086,6 +1284,12 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
                 "Data in updated Organization did not match submitted data.");
     }
 
+    /**
+     * Update contact.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"update"}, dependsOnMethods = {"updateItem"})
     public void updateContact(String testName) throws Exception {
@@ -1152,16 +1356,28 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithEmptyEntityBody(java.lang.String)
+     */
     @Override
     public void updateWithEmptyEntityBody(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithMalformedXml(java.lang.String)
+     */
     @Override
     public void updateWithMalformedXml(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithWrongXmlSchema(java.lang.String)
+     */
     @Override
     public void updateWithWrongXmlSchema(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
 /*
@@ -1244,7 +1460,10 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     }
 */
 
-    @Override
+    /* (non-Javadoc)
+ * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateNonExistent(java.lang.String)
+ */
+@Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"update"}, dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
@@ -1271,6 +1490,12 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    /**
+     * Update non existent item.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"update"}, dependsOnMethods = {"updateItem", "testItemSubmitRequest"})
     public void updateNonExistentItem(String testName) throws Exception {
@@ -1303,6 +1528,12 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    /**
+     * Update non existent contact.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"update"}, dependsOnMethods = {"updateContact", "testContactSubmitRequest"})
     public void updateNonExistentContact(String testName) throws Exception {
@@ -1317,6 +1548,12 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     // Note: delete sub-resources in ascending hierarchical order,
     // before deleting their parents.
 
+    /**
+     * Delete contact.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"delete"}, dependsOnGroups = {"create", "read", "readList", "update"})
     public void deleteContact(String testName) throws Exception {
@@ -1346,6 +1583,12 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+   /**
+    * Delete item.
+    *
+    * @param testName the test name
+    * @throws Exception the exception
+    */
    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"delete"}, dependsOnMethods = {"deleteContact"})
     public void deleteItem(String testName) throws Exception {
@@ -1373,6 +1616,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#delete(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"delete"}, dependsOnMethods = {"deleteItem"})
@@ -1401,6 +1647,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     }
 
     // Failure outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"delete"}, dependsOnMethods = {"delete"})
@@ -1424,6 +1673,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    /**
+     * Delete non existent item.
+     *
+     * @param testName the test name
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"delete"}, dependsOnMethods = {"deleteItem"})
     public void deleteNonExistentItem(String testName) {
@@ -1446,6 +1700,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    /**
+     * Delete non existent contact.
+     *
+     * @param testName the test name
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"delete"}, dependsOnMethods = {"deleteContact"})
     public void deleteNonExistentContact(String testName) {
@@ -1497,6 +1756,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
     }
 
+    /**
+     * Test item submit request.
+     */
     @Test(dependsOnMethods = {"createItem", "readItem", "testSubmitRequest"})
     public void testItemSubmitRequest() {
 
@@ -1518,6 +1780,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
     }
 
+    /**
+     * Test contact submit request.
+     */
     @Test(dependsOnMethods = {"createContact", "readContact", "testItemSubmitRequest"})
     public void testContactSubmitRequest() {
 
@@ -1555,6 +1820,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
      */
 
     @AfterClass(alwaysRun=true)
+    @Override
     public void cleanUp() {
         String noTest = System.getProperty("noTestCleanup");
     	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
@@ -1566,6 +1832,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
+        
         String parentResourceId;
         String itemResourceId;
         String contactResourceId;
@@ -1579,6 +1846,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
             // below are ignored and not reported.
             ClientResponse<Response> res =
                 client.deleteContact(parentResourceId, itemResourceId, contactResourceId);
+            res.releaseConnection();
         }
         // Clean up item resources.
         for (Map.Entry<String, String> entry : allItemResourceIdsCreated.entrySet()) {
@@ -1588,27 +1856,38 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
             // below are ignored and not reported.
             ClientResponse<Response> res =
                 client.deleteItem(parentResourceId, itemResourceId);
+            res.releaseConnection();
         }
         // Clean up parent resources.
-        for (String resourceId : allResourceIdsCreated) {
-            // Note: Any non-success responses from the delete operation
-            // below are ignored and not reported.
-            ClientResponse<Response> res = client.delete(resourceId);
-        }
+        super.cleanUp();
+        
     }
 
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
+     */
     @Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
     }
 
+    /**
+     * Gets the item service path component.
+     *
+     * @return the item service path component
+     */
     public String getItemServicePathComponent() {
         return ITEM_SERVICE_PATH_COMPONENT;
     }
 
+    /**
+     * Gets the contact service path component.
+     *
+     * @return the contact service path component
+     */
     public String getContactServicePathComponent() {
         return CONTACT_SERVICE_PATH_COMPONENT;
     }
@@ -1686,6 +1965,12 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
             itemResourceIdentifier) + "/" + contactResourceIdentifier;
     }
 
+    /**
+     * Creates the org authority instance.
+     *
+     * @param identifier the identifier
+     * @return the multipart output
+     */
     private MultipartOutput createOrgAuthorityInstance(String identifier) {
     	String displayName = "displayName-" + identifier;
     	String refName = OrgAuthorityClientUtils.createOrgAuthRefName(displayName, true);

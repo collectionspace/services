@@ -73,6 +73,9 @@ public class DimensionClient extends AbstractServiceClientImpl {
         setProxy();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.CollectionSpaceClient#getProxy()
+     */
     @Override
     public CollectionSpaceProxy getProxy() {
     	return this.dimensionProxy;
@@ -140,9 +143,10 @@ public class DimensionClient extends AbstractServiceClientImpl {
 
     /**
      * @param csid
-     * @return
+     * @return response
      * @see org.collectionspace.services.client.DimensionProxy#deleteDimension(java.lang.Long)
      */
+    @Override
     public ClientResponse<Response> delete(String csid) {
         return dimensionProxy.delete(csid);
     }

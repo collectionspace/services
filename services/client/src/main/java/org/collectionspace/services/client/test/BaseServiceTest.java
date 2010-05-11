@@ -31,7 +31,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -42,6 +42,8 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -63,6 +65,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 /**
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1685
  * The Class BaseServiceTest.
+ * @param <CommonListType> 
  */
 public abstract class BaseServiceTest {
 
@@ -228,21 +231,23 @@ public abstract class BaseServiceTest {
      */
     protected int submitRequest(String method, String url) {
         int statusCode = 0;
+        HttpMethodBase httpMethod = null;
         try {
             TestServiceClient client = new TestServiceClient();
             if (method.equals(javax.ws.rs.HttpMethod.DELETE)) {
-                DeleteMethod deleteMethod = new DeleteMethod(url);
-                statusCode = client.getHttpClient().executeMethod(deleteMethod);
+            	httpMethod = new DeleteMethod(url);
             } else if (method.equals(javax.ws.rs.HttpMethod.GET)) {
-                GetMethod getMethod = new GetMethod(url);
-                statusCode = client.getHttpClient().executeMethod(getMethod);
-            } else {
-                // Do nothing - leave status code at default value.
+            	httpMethod = new GetMethod(url);
+            }
+            if (httpMethod != null) {
+                statusCode = client.getHttpClient().executeMethod(httpMethod);
             }
         } catch (Exception e) {
             logger.error(
                     "Exception during HTTP " + method + " request to "
                     + url + ":", e);
+        } finally {
+        	httpMethod.releaseConnection();
         }
         return statusCode;
     }
@@ -265,27 +270,26 @@ public abstract class BaseServiceTest {
     protected int submitRequest(String method, String url, String mediaType,
             String entityStr) {
         int statusCode = 0;
+        EntityEnclosingMethod httpMethod = null;
         try {
             TestServiceClient client = new TestServiceClient();
             if (method.equals(javax.ws.rs.HttpMethod.POST)) {
-                StringRequestEntity entityBody =
-                        new StringRequestEntity(mediaType, entityStr, NULL_CHARSET);
-                PostMethod postMethod = new PostMethod(url);
-                postMethod.setRequestEntity(entityBody);
-                statusCode = client.getHttpClient().executeMethod(postMethod);
+                httpMethod = new PostMethod(url);
             } else if (method.equals(javax.ws.rs.HttpMethod.PUT)) {
+                httpMethod = new PutMethod(url);
+            }
+            if (httpMethod != null) {
                 StringRequestEntity entityBody =
-                        new StringRequestEntity(mediaType, entityStr, NULL_CHARSET);
-                PutMethod putMethod = new PutMethod(url);
-                putMethod.setRequestEntity(entityBody);
-                statusCode = client.getHttpClient().executeMethod(putMethod);
-            } else {
-                // Do nothing - leave status code at default value.
+                    new StringRequestEntity(mediaType, entityStr, NULL_CHARSET);
+            	httpMethod.setRequestEntity(entityBody);
+            	statusCode = client.getHttpClient().executeMethod(httpMethod);
             }
         } catch (Exception e) {
             logger.error(
                     "Exception during HTTP " + method + " request to "
                     + url + ":", e);
+        } finally {
+        	httpMethod.releaseConnection();
         }
         return statusCode;
     }
@@ -297,8 +301,8 @@ public abstract class BaseServiceTest {
      * @return the string
      */
     static protected String extractId(ClientResponse<Response> res) {
-        MultivaluedMap mvm = res.getMetadata();
-        String uri = (String) ((ArrayList) mvm.get("Location")).get(0);
+        MultivaluedMap<String, Object> mvm = res.getMetadata();
+        String uri = (String) ((List<Object>) mvm.get("Location")).get(0);
         if (logger.isDebugEnabled()) {
             logger.debug("extractId:uri=" + uri);
         }
@@ -338,7 +342,7 @@ public abstract class BaseServiceTest {
      * @return the object
      * @throws Exception the exception
      */
-    static protected Object extractPart(MultipartInput input, String label, Class clazz)
+    static protected Object extractPart(MultipartInput input, String label, Class<?> clazz)
             throws Exception {
         Object obj = null;
         String partLabel = "";
@@ -397,7 +401,7 @@ public abstract class BaseServiceTest {
      * @return the part object
      * @throws JAXBException the jAXB exception
      */
-    static protected Object getPartObject(String partStr, Class clazz)
+    static protected Object getPartObject(String partStr, Class<?> clazz)
             throws JAXBException {
         JAXBContext jc = JAXBContext.newInstance(clazz);
         ByteArrayInputStream bais = null;
@@ -411,6 +415,9 @@ public abstract class BaseServiceTest {
                 try {
                     bais.close();
                 } catch (Exception e) {
+                	if (logger.isDebugEnabled() == true) {
+                		e.printStackTrace();
+                	}
                 }
             }
         }
@@ -424,7 +431,7 @@ public abstract class BaseServiceTest {
      * @param clazz the clazz
      * @return the string
      */
-    static protected String objectAsXmlString(Object o, Class clazz) {
+    static protected String objectAsXmlString(Object o, Class<?> clazz) {
         StringWriter sw = new StringWriter();
         try {
             JAXBContext jc = JAXBContext.newInstance(clazz);
@@ -445,7 +452,7 @@ public abstract class BaseServiceTest {
      * @return
      * @throws Exception
      */
-    static protected Object getObjectFromFile(Class jaxbClass, String fileName)
+    static protected Object getObjectFromFile(Class<?> jaxbClass, String fileName)
             throws Exception {
 
         JAXBContext context = JAXBContext.newInstance(jaxbClass);
@@ -493,7 +500,7 @@ public abstract class BaseServiceTest {
      * @return
      * @throws Exception
      */
-    static protected Object getObjectFromStream(Class jaxbClass, InputStream is) throws Exception {
+    static protected Object getObjectFromStream(Class<?> jaxbClass, InputStream is) throws Exception {
         JAXBContext context = JAXBContext.newInstance(jaxbClass);
         Unmarshaller unmarshaller = context.createUnmarshaller();
         //note: setting schema to null will turn validator off
@@ -507,10 +514,10 @@ public abstract class BaseServiceTest {
      * @param map the map
      * @return the string
      */
-    protected String mapAsString(MultivaluedMap map) {
+    protected String mapAsString(MultivaluedMap<String, Object> map) {
         StringBuffer sb = new StringBuffer();
         for (Object entry : map.entrySet()) {
-            MultivaluedMap.Entry mentry = (MultivaluedMap.Entry) entry;
+            MultivaluedMap.Entry<String, Object> mentry = (MultivaluedMap.Entry<String, Object>) entry;
             sb.append("    name=" + mentry.getKey());
             sb.append(" value=" + mentry.getValue() + "\n");
         }

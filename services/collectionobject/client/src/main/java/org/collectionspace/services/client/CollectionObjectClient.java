@@ -26,14 +26,8 @@
  */
 package org.collectionspace.services.client;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 //import org.collectionspace.services.common.context.ServiceContext;
@@ -100,12 +94,11 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
 
     }
 
-    @Override
-    public ClientResponse<AbstractCommonList> readList(String pageSize,
-    		String pageNumber) {
-        return collectionObjectProxy.readList(pageSize, pageNumber);
-
-    }
+//    @Override
+//    public ClientResponse<CollectionobjectsCommonList> readList(String pageSize,
+//    		String pageNumber) {
+//        return collectionObjectProxy.readList(pageSize, pageNumber);
+//    }
     
     /**
      * Roundtrip.
@@ -147,7 +140,7 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
 
     /**
      * @param csid
-     * @return
+     * @return response
      * @see org.collectionspace.services.client.CollectionObjectProxy#getAuthorityRefs(java.lang.String)
      */
     public ClientResponse<AuthorityRefList> getAuthorityRefs(String csid) {
@@ -188,6 +181,7 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.services.client.CollectionObjectProxy#delete()
      * @return the client response< response>
      */
+    @Override
     public ClientResponse<Response> delete(String csid) {
         return collectionObjectProxy.delete(csid);
     }

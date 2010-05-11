@@ -47,14 +47,14 @@ import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResou
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.common.context.MultipartServiceContext;
+//import org.collectionspace.services.common.authorityref.AuthorityRefList;
+//import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
-import org.collectionspace.services.common.context.MultipartServiceContextImpl;
+//import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
-import org.collectionspace.services.common.document.DocumentException;
+//import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
@@ -62,14 +62,14 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
-import org.collectionspace.services.common.vocabulary.RefNameUtils;
+//import org.collectionspace.services.common.vocabulary.RefNameUtils;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.contact.ContactJAXBSchema;
 import org.collectionspace.services.contact.nuxeo.ContactDocumentModelHandler;
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
+//import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.person.nuxeo.PersonDocumentModelHandler;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -265,7 +265,7 @@ public class PersonAuthorityResource extends
     @GET
     @Path("urn:cspace:name({specifier})")
     public MultipartOutput getPersonAuthorityByName(@PathParam("specifier") String specifier) {
-        String idValue = null;
+//REM:        String idValue = null;
         if (specifier == null) {
             logger.error("getPersonAuthority: missing name!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
@@ -325,6 +325,7 @@ public class PersonAuthorityResource extends
      * can be passed as a query param "type", and must match a configured type
      * for the service bindings. If not set, the type defaults to
      * ServiceBindingUtils.SERVICE_TYPE_PROCEDURE.
+     * @param parentcsid 
      * 
      * @param csid the parent csid
      * @param itemcsid the person csid
@@ -334,7 +335,7 @@ public class PersonAuthorityResource extends
      */
     @GET
     @Path("{csid}/items/{itemcsid}/refObjs")
-    @Produces("application/xml")
+    @Produces("application/xml") //FIXME: REM do this for CSPACE-1079 in Org authority.
     public AuthorityRefDocList getReferencingObjects(
             @PathParam("csid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
@@ -355,7 +356,7 @@ public class PersonAuthorityResource extends
         }
     try {
         // Note that we have to create the service context for the Items, not the main service
-        ServiceContext ctx = MultipartServiceContextFactory.get().createServiceContext(getItemServiceName());
+        ServiceContext<MultipartInput, MultipartOutput> ctx = MultipartServiceContextFactory.get().createServiceContext(getItemServiceName());
         DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
         RepositoryClient repoClient = getRepositoryClient(ctx); 
         DocumentFilter myFilter = handler.createDocumentFilter();
@@ -463,16 +464,16 @@ public class PersonAuthorityResource extends
     public PersonauthoritiesCommonList getPersonAuthorityList(@Context UriInfo ui) {
         PersonauthoritiesCommonList personAuthorityObjectList = new PersonauthoritiesCommonList();
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
-            DocumentFilter myFilter = handler.createDocumentFilter(); //new DocumentFilter();
-            myFilter.setPagination(queryParams); //FIXME
+//REM:            DocumentFilter myFilter = handler.createDocumentFilter(); //new DocumentFilter();
+//REM:            myFilter.setPagination(queryParams); //FIXME
             String nameQ = queryParams.getFirst("refName");
             if (nameQ != null) {
-                myFilter.setWhereClause("personauthorities_common:refName='" + nameQ + "'");
+                handler.getDocumentFilter().setWhereClause("personauthorities_common:refName='" + nameQ + "'");
             }
-            handler.setDocumentFilter(myFilter);
+//REM:            handler.setDocumentFilter(myFilter);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             personAuthorityObjectList = (PersonauthoritiesCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
@@ -588,9 +589,15 @@ public class PersonAuthorityResource extends
 
     }
 
-    /*************************************************************************
+    /**
+     * ***********************************************************************
      * Person parts - this is a sub-resource of PersonAuthority
-     *************************************************************************/
+     * ***********************************************************************.
+     *
+     * @param parentcsid the parentcsid
+     * @param input the input
+     * @return the response
+     */    
     @POST
     @Path("{csid}/items")
     public Response createPerson(@PathParam("csid") String parentcsid, MultipartInput input) {
@@ -705,11 +712,11 @@ public class PersonAuthorityResource extends
         	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getItemServiceName(),
         			queryParams);
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
-            DocumentFilter myFilter = handler.createDocumentFilter(); //new DocumentFilter();
-            myFilter.setPagination(queryParams); //FIXME (this is unnecessary since it is already set by "createContactDocumentHandler" method
+//REM:            DocumentFilter myFilter = handler.createDocumentFilter(); //new DocumentFilter();
+//REM:            myFilter.setPagination(queryParams); //FIXME (this is unnecessary since it is already set by "createContactDocumentHandler" method
 
             // Add the where clause "persons_common:inAuthority='" + parentcsid + "'"
-            myFilter.setWhereClause(PersonJAXBSchema.PERSONS_COMMON + ":" +
+            handler.getDocumentFilter().setWhereClause(PersonJAXBSchema.PERSONS_COMMON + ":" +
             		PersonJAXBSchema.IN_AUTHORITY + "='" + parentcsid + "'");
             
             // AND persons_common:displayName LIKE '%partialTerm%'
@@ -719,10 +726,9 @@ public class PersonAuthorityResource extends
             		PersonJAXBSchema.DISPLAY_NAME +
             		" LIKE " +
             		"'%" + partialTerm + "%'";
-            	myFilter.appendWhereClause(ptClause);
-            }
-            
-            handler.setDocumentFilter(myFilter);
+            	handler.getDocumentFilter().appendWhereClause(ptClause);
+            }            
+//REM:            handler.setDocumentFilter(myFilter);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             personObjectList = (PersonsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
@@ -771,11 +777,11 @@ public class PersonAuthorityResource extends
 
             ctx = createServiceContext(getItemServiceName(), queryParams);
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
-            DocumentFilter myFilter = handler.createDocumentFilter(); //new DocumentFilter();
-            myFilter.setPagination(queryParams); //FIXME
+//REM:            DocumentFilter myFilter = handler.createDocumentFilter(); //new DocumentFilter();
+//REM:            myFilter.setPagination(queryParams); //FIXME
 
             // Add the where clause "persons_common:inAuthority='" + parentcsid + "'"
-            myFilter.setWhereClause(PersonJAXBSchema.PERSONS_COMMON + ":" +
+            handler.createDocumentFilter().setWhereClause(PersonJAXBSchema.PERSONS_COMMON + ":" +
             		PersonJAXBSchema.IN_AUTHORITY + "='" + parentcsid + "'");
             
             // AND persons_common:displayName LIKE '%partialTerm%'
@@ -785,10 +791,10 @@ public class PersonAuthorityResource extends
             		PersonJAXBSchema.DISPLAY_NAME +
             		" LIKE " +
             		"'%" + partialTerm + "%'";
-            	myFilter.appendWhereClause(ptClause);
+            	handler.createDocumentFilter().appendWhereClause(ptClause);
             }
             
-            handler.setDocumentFilter(myFilter);
+//REM:            handler.setDocumentFilter(myFilter);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             personObjectList = (PersonsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
@@ -925,9 +931,16 @@ public class PersonAuthorityResource extends
 
     }
 
-    /*************************************************************************
+    /**
+     * ***********************************************************************
      * Contact parts - this is a sub-resource of Person (or "item")
-     *************************************************************************/
+     * ***********************************************************************.
+     *
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * @param input the input
+     * @return the response
+     */
     @POST
     @Path("{parentcsid}/items/{itemcsid}/contacts")
     public Response createContact(
@@ -987,9 +1000,9 @@ public class PersonAuthorityResource extends
         	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getContactServiceName(),
         			queryParams);
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
-            DocumentFilter myFilter = handler.createDocumentFilter(); //new DocumentFilter();
-            myFilter.setPagination(queryParams); //FIXME (this is unnecessary since it is already set by "createContactDocumentHandler" method
-            myFilter.setWhereClause(ContactJAXBSchema.CONTACTS_COMMON + ":" +
+//REM:            DocumentFilter myFilter = handler.createDocumentFilter(); //new DocumentFilter();
+//REM:            myFilter.setPagination(queryParams); //FIXME (this is unnecessary since it is already set by "createContactDocumentHandler" method
+            handler.createDocumentFilter().setWhereClause(ContactJAXBSchema.CONTACTS_COMMON + ":" +
                 ContactJAXBSchema.IN_AUTHORITY +
                 "='" + parentcsid + "'" +
                 " AND " +
@@ -997,7 +1010,7 @@ public class PersonAuthorityResource extends
                 ContactJAXBSchema.IN_ITEM +
                 "='" + itemcsid + "'" +
                 " AND ecm:isProxy = 0");
-            handler.setDocumentFilter(myFilter);
+//REM:            handler.setDocumentFilter(myFilter);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             contactObjectList = (ContactsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {

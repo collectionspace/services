@@ -22,32 +22,14 @@
  */
 package org.collectionspace.services.ItegrationTests.test;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.HeadMethod;
-import org.apache.commons.httpclient.methods.OptionsMethod;
-import org.apache.commons.httpclient.methods.TraceMethod;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,19 +38,12 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 
-import org.collectionspace.services.client.TestServiceClient;
-
-import org.collectionspace.services.CollectionObjectJAXBSchema;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
-import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 
-import org.collectionspace.services.IntakeJAXBSchema;
 import org.collectionspace.services.client.IntakeClient;
 import org.collectionspace.services.intake.IntakesCommon;
-import org.collectionspace.services.intake.IntakesCommonList;
 
-import org.collectionspace.services.common.relation.RelationJAXBSchema;
 import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
@@ -103,11 +78,17 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		MultipartOutput multipart = new MultipartOutput();
 		OutputPart commonPart = multipart.addPart(co, MediaType.APPLICATION_XML_TYPE);
 		commonPart.getHeaders().add("label", collectionObjectClient.getCommonPartName());
+		
 		// Make the create call and check the response
 		ClientResponse<Response> response = collectionObjectClient.create(multipart);
-		Assert.assertEquals(response.getStatus(), Response.Status.CREATED
-				.getStatusCode());
-		String collectionObjectCsid = extractId(response);
+		String collectionObjectCsid = null;
+		try {
+			Assert.assertEquals(response.getStatus(), Response.Status.CREATED
+					.getStatusCode());
+			collectionObjectCsid = extractId(response);
+		} finally {
+			response.releaseConnection();
+		}
 	    
 	    
 	    // Next, create an Intake object
@@ -117,10 +98,16 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    multipart = new MultipartOutput();
 	    commonPart = multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
 	    commonPart.getHeaders().add("label", intakeClient.getCommonPartName());
+
 	    // Make the call to create and check the response
 	    response = intakeClient.create(multipart);
-	    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
-	    String intakeCsid = extractId(response);
+	    String intakeCsid = null;
+	    try {
+		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
+		    intakeCsid = extractId(response);
+	    } finally {
+	    	response.releaseConnection();
+	    }
 	    
 	    // Lastly, relate the two entities, by creating a new relation object
 	    RelationsCommon relation = new RelationsCommon();
@@ -131,10 +118,16 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    multipart = new MultipartOutput();
 	    commonPart = multipart.addPart(relation, MediaType.APPLICATION_XML_TYPE);
 	    commonPart.getHeaders().add("label", relationClient.getCommonPartName());
+
 	    // Make the call to crate
-	    response = relationClient.create(multipart); 
-	    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
-	    String relationCsid = extractId(response);
+	    response = relationClient.create(multipart);
+	    String relationCsid = null;
+	    try {
+		    Assert.assertEquals(response.getStatus(), Response.Status.CREATED.getStatusCode());
+		    relationCsid = extractId(response);
+	    } finally {
+	    	response.releaseConnection();
+	    }
 	    
 	    //
 	    // Now try to retrieve the Intake record of the CollectionObject.
@@ -143,24 +136,29 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    ClientResponse<RelationsCommonList> resultResponse = relationClient.readList_SPO(collectionObjectCsid,
 	    		predicate,
 	    		intakeCsid);
-	    Assert.assertEquals(resultResponse.getStatus(), Response.Status.OK.getStatusCode());
+        RelationsCommonList relationList = null;
+	    try {
+	    	Assert.assertEquals(resultResponse.getStatus(), Response.Status.OK.getStatusCode());
+	        relationList = resultResponse.getEntity();
+	    } finally {
+	    	resultResponse.releaseConnection();
+	    }
 	    
 	    //
 	    // Each relation returned in the list needs to match what we
 	    // requested.
 	    //
-        RelationsCommonList relationList = resultResponse.getEntity();        
         List<RelationsCommonList.RelationListItem> relationListItems = relationList.getRelationListItem();
         Assert.assertFalse(relationListItems.isEmpty());
         
-        ClientResponse<RelationsCommon> resultRelationResponse;
-        RelationsCommon resultRelation = null;
         int i = 0;
+        RelationsCommon resultRelation = null;
         for(RelationsCommonList.RelationListItem listItem : relationListItems){
         	
         	String foundCsid = listItem.getCsid();
+        	ClientResponse<MultipartInput> multiPartResponse = null;
         	try {
-        		ClientResponse<MultipartInput> multiPartResponse = relationClient.read(foundCsid);
+        		multiPartResponse = relationClient.read(foundCsid);
         		int responseStatus = multiPartResponse.getStatus();
         		Assert.assertEquals(responseStatus, Response.Status.OK.getStatusCode());
 	        	MultipartInput input = (MultipartInput) multiPartResponse.getEntity();
@@ -169,7 +167,10 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	        			RelationsCommon.class);
         	} catch (Exception e) {
         		e.printStackTrace();
+        	} finally {
+        		multiPartResponse.releaseConnection();
         	}
+        	
         	Assert.assertEquals(resultRelation.getDocumentId1(), collectionObjectCsid);
         	Assert.assertEquals(resultRelation.getRelationshipType(), RelationshipType.COLLECTIONOBJECT_INTAKE);
         	Assert.assertEquals(resultRelation.getDocumentId2(), intakeCsid);

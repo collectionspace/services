@@ -60,23 +60,49 @@ import org.slf4j.LoggerFactory;
  */
 public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
 
+   /** The logger. */
    private final Logger logger =
        LoggerFactory.getLogger(OrgAuthorityAuthRefsTest.class);
 
     // Instance variables specific to this test.
+    /** The SERVIC e_ pat h_ component. */
     final String SERVICE_PATH_COMPONENT = "orgauthorities";
+    
+    /** The PERSO n_ authorit y_ name. */
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
+    
+    /** The known resource ref name. */
     private String knownResourceRefName = null;
+    
+    /** The known auth resource id. */
     private String knownAuthResourceId = null;
+    
+    /** The known item id. */
     private String knownItemId = null;
+    
+    /** The all resource ids created. */
     private List<String> allResourceIdsCreated = new ArrayList<String>();
+    
+    /** The all item resource ids created. */
     private Map<String, String> allItemResourceIdsCreated =
         new HashMap<String, String>();
-    private List<String> personIdsCreated = new ArrayList();
+    
+    /** The person ids created. */
+    private List<String> personIdsCreated = new ArrayList<String>();
+    
+    /** The CREATE d_ status. */
     private int CREATED_STATUS = Response.Status.CREATED.getStatusCode();
+    
+    /** The O k_ status. */
     private int OK_STATUS = Response.Status.OK.getStatusCode();
+    
+    /** The person auth csid. */
     private String personAuthCSID = null;
+    
+    /** The organization contact person ref name. */
     private String organizationContactPersonRefName = null;
+    
+    /** The NU m_ aut h_ ref s_ expected. */
     private final int NUM_AUTH_REFS_EXPECTED = 1;
 
     /* (non-Javadoc)
@@ -100,6 +126,12 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /**
+     * Creates the with auth refs.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void createWithAuthRefs(String testName) throws Exception {
 
@@ -114,28 +146,31 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
             OrgAuthorityClientUtils.createOrgAuthRefName(displayName, createWithDisplayName);
         MultipartOutput multipart =
             OrgAuthorityClientUtils.createOrgAuthorityInstance(
-		displayName, knownResourceRefName, new OrgAuthorityClient().getCommonPartName());
+		displayName, knownResourceRefName, orgAuthClient.getCommonPartName());
 
         // Submit the request to the service and store the response.
         ClientResponse<Response> res = orgAuthClient.create(multipart);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Store the IDs from every resource created by tests,
-        // so they can be deleted after tests have been run.
-        knownAuthResourceId = extractId(res);
+        try {
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        //
+	        // Specifically:
+	        // Does it fall within the set of valid status codes?
+	        // Does it exactly match the expected status code?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Store the IDs from every resource created by tests,
+	        // so they can be deleted after tests have been run.
+	        knownAuthResourceId = extractId(res);
+        } finally {
+        	res.releaseConnection();
+        }        
         allResourceIdsCreated.add(knownAuthResourceId);
 
         // Create all the person refs and entities
@@ -159,23 +194,15 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         knownItemId = OrgAuthorityClientUtils.createItemInAuthority(
             knownAuthResourceId, knownResourceRefName, testOrgMap, orgAuthClient);
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
         // Store the IDs from every item created by tests,
         // so they can be deleted after tests have been run.
         allItemResourceIdsCreated.put(knownItemId, knownAuthResourceId);
-
     }
     
-    protected void createPersonRefs(){
-
+    /**
+     * Creates the person refs.
+     */
+    protected void createPersonRefs() {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding
         // refName by which it can be identified.
@@ -183,13 +210,17 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
     	    PersonAuthorityClientUtils.createPersonAuthRefName(PERSON_AUTHORITY_NAME, false);
     	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    PERSON_AUTHORITY_NAME, authRefName, personAuthClient.getCommonPartName());
-        ClientResponse<Response> res = personAuthClient.create(multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, CREATED_STATUS);
-        personAuthCSID = extractId(res);
+        
+    	ClientResponse<Response> res = personAuthClient.create(multipart);
+        try {
+	        int statusCode = res.getStatus();	
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, CREATED_STATUS);
+	        personAuthCSID = extractId(res);
+        } finally {
+        	res.releaseConnection();
+        }
 
         // Create a temporary Person resource, and its corresponding refName
         // by which it can be identified.
@@ -199,6 +230,14 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
 
     }
     
+    /**
+     * Creates the person.
+     *
+     * @param firstName the first name
+     * @param surName the sur name
+     * @param refName the ref name
+     * @return the string
+     */
     protected String createPerson(String firstName, String surName, String refName ) {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String,String>();
@@ -207,16 +246,30 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
     	MultipartOutput multipart = 
     	    PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
     		refName, personInfo, personAuthClient.getItemCommonPartName());
-        ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
-        int statusCode = res.getStatus();
-
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, CREATED_STATUS);
-    	return extractId(res);
+        
+    	String result = null;
+    	ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
+    	try {
+	        int statusCode = res.getStatus();
+	
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, CREATED_STATUS);
+	    	result = extractId(res);
+    	} finally {
+    		res.releaseConnection();
+    	}
+    	
+    	return result;
     }
 
     // Success outcomes
+    /**
+     * Read and check auth refs.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"createWithAuthRefs"})
     public void readAndCheckAuthRefs(String testName) throws Exception {
@@ -310,14 +363,14 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         }
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Delete Person resource(s) (before PersonAuthority resources).
-        ClientResponse<Response> res;
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            res = personAuthClient.deleteItem(personAuthCSID, resourceId);
+            personAuthClient.deleteItem(personAuthCSID, resourceId).releaseConnection();
         }
         // Delete PersonAuthority resource(s).
         // Note: Any non-success response is ignored and not reported.
-        res = personAuthClient.delete(personAuthCSID);
+        personAuthClient.delete(personAuthCSID).releaseConnection();
+        
         String parentResourceId;
         String itemResourceId;
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -327,24 +380,34 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
             parentResourceId = entry.getValue();
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            res = client.deleteItem(parentResourceId, itemResourceId);
+            client.deleteItem(parentResourceId, itemResourceId).releaseConnection();
         }
+        
         // Clean up parent resources.
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
-            res = client.delete(resourceId);
+            client.delete(resourceId).releaseConnection();
         }
     }
 
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
+     */
     @Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
     }
 
+    /**
+     * Creates the org authority instance.
+     *
+     * @param identifier the identifier
+     * @return the multipart output
+     */
     private MultipartOutput createOrgAuthorityInstance(String identifier) {
     	String displayName = "displayName-" + identifier;
     	String refName = OrgAuthorityClientUtils.createOrgAuthRefName(displayName, true);

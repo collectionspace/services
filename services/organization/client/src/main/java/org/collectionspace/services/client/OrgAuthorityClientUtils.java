@@ -1,3 +1,29 @@
+/**	
+ * OrgAuthorityClientUtils.java
+ *
+ * {Purpose of This Class}
+ *
+ * {Other Notes Relating to This Class (Optional)}
+ *
+ * $LastChangedBy: $
+ * $LastChangedRevision: $
+ * $LastChangedDate: $
+ *
+ * This document is a part of the source code and related artifacts
+ * for CollectionSpace, an open source collections management system
+ * for museums and related institutions:
+ *
+ * http://www.collectionspace.org
+ * http://wiki.collectionspace.org
+ *
+ * Copyright © 2009 {Contributing Institution}
+ *
+ * Licensed under the Educational Community License (ECL), Version 2.0.
+ * You may not use this file except in compliance with this License.
+ *
+ * You may obtain a copy of the ECL 2.0 License at
+ * https://source.collectionspace.org/collection-space/LICENSE.txt
+ */
 package org.collectionspace.services.client;
 
 import java.util.ArrayList;
@@ -17,10 +43,23 @@ import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The Class OrgAuthorityClientUtils.
+ */
 public class OrgAuthorityClientUtils {
+    
+    /** The Constant logger. */
     private static final Logger logger =
         LoggerFactory.getLogger(OrgAuthorityClientUtils.class);
 
+    /**
+     * Creates the org authority instance.
+     *
+     * @param displayName the display name
+     * @param refName the ref name
+     * @param headerLabel the header label
+     * @return the multipart output
+     */
     public static MultipartOutput createOrgAuthorityInstance(
     		String displayName, String refName, String headerLabel ) {
         OrgauthoritiesCommon orgAuthority = new OrgauthoritiesCommon();
@@ -39,6 +78,15 @@ public class OrgAuthorityClientUtils {
         return multipart;
     }
 
+    /**
+     * Creates the item in authority.
+     *
+     * @param vcsid the vcsid
+     * @param orgAuthorityRefName the org authority ref name
+     * @param orgInfo the org info
+     * @param client the client
+     * @return the string
+     */
     public static String createItemInAuthority(String vcsid, 
     		String orgAuthorityRefName, Map<String, String> orgInfo,
     		OrgAuthorityClient client) {
@@ -58,31 +106,46 @@ public class OrgAuthorityClientUtils {
         			orgInfo.get(OrganizationJAXBSchema.SHORT_NAME ),    			
         			orgInfo.get(OrganizationJAXBSchema.FOUNDING_PLACE ));
     	}
-    	String refName = createOrganizationRefName( orgAuthorityRefName, displayName, true);
+    	String refName = createOrganizationRefName(orgAuthorityRefName, displayName, true);
 
     	if(logger.isDebugEnabled()){
     		logger.debug("Import: Create Item: \""+displayName
     				+"\" in orgAuthority: \"" + orgAuthorityRefName +"\"");
     	}
     	MultipartOutput multipart =
-    		createOrganizationInstance( vcsid, refName, orgInfo, client.getItemCommonPartName() );
+    		createOrganizationInstance(vcsid, refName, orgInfo, client.getItemCommonPartName());
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
-
-    	int statusCode = res.getStatus();
-
-    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-    		throw new RuntimeException("Could not create Item: \""+displayName
-    				+"\" in orgAuthority: \"" + orgAuthorityRefName
-    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    	String result;
+    	try {	
+	    	int statusCode = res.getStatus();
+	
+	    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
+	    		throw new RuntimeException("Could not create Item: \""+displayName
+	    				+"\" in orgAuthority: \"" + orgAuthorityRefName
+	    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	    	}
+	    	if(statusCode != EXPECTED_STATUS_CODE) {
+	    		throw new RuntimeException("Unexpected Status when creating Item: \""+ displayName
+	    				+"\" in orgAuthority: \"" + orgAuthorityRefName +"\", Status:"+ statusCode);
+	    	}
+	
+	    	result = extractId(res);
+    	} finally {
+    		res.releaseConnection();
     	}
-    	if(statusCode != EXPECTED_STATUS_CODE) {
-    		throw new RuntimeException("Unexpected Status when creating Item: \""+displayName
-    				+"\" in orgAuthority: \"" + orgAuthorityRefName +"\", Status:"+ statusCode);
-    	}
-
-    	return extractId(res);
+    	
+    	return result;
     }
 
+    /**
+     * Creates the organization instance.
+     *
+     * @param inAuthority the in authority
+     * @param orgRefName the org ref name
+     * @param orgInfo the org info
+     * @param headerLabel the header label
+     * @return the multipart output
+     */
     public static MultipartOutput createOrganizationInstance(String inAuthority, 
     		String orgRefName, Map<String, String> orgInfo, String headerLabel){
         OrganizationsCommon organization = new OrganizationsCommon();
@@ -147,6 +210,12 @@ public class OrgAuthorityClientUtils {
                 requestType.validStatusCodesAsString();
     }
 
+    /**
+     * Extract id.
+     *
+     * @param res the res
+     * @return the string
+     */
     public static String extractId(ClientResponse<Response> res) {
         MultivaluedMap<String, Object> mvm = res.getMetadata();
         String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
@@ -161,6 +230,13 @@ public class OrgAuthorityClientUtils {
         return id;
     }
     
+    /**
+     * Creates the org auth ref name.
+     *
+     * @param orgAuthorityName the org authority name
+     * @param withDisplaySuffix the with display suffix
+     * @return the string
+     */
     public static String createOrgAuthRefName(String orgAuthorityName, boolean withDisplaySuffix) {
     	String refName = "urn:cspace:org.collectionspace.demo:orgauthority:name("
     			+orgAuthorityName+")";
@@ -169,6 +245,14 @@ public class OrgAuthorityClientUtils {
     	return refName;
     }
 
+    /**
+     * Creates the organization ref name.
+     *
+     * @param orgAuthRefName the org auth ref name
+     * @param orgName the org name
+     * @param withDisplaySuffix the with display suffix
+     * @return the string
+     */
     public static String createOrganizationRefName(
     						String orgAuthRefName, String orgName, boolean withDisplaySuffix) {
     	String refName = orgAuthRefName+":organization:name("+orgName+")";

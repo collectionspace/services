@@ -1,3 +1,29 @@
+/**	
+ * PersonAuthorityClientUtils.java
+ *
+ * {Purpose of This Class}
+ *
+ * {Other Notes Relating to This Class (Optional)}
+ *
+ * $LastChangedBy: $
+ * $LastChangedRevision: $
+ * $LastChangedDate: $
+ *
+ * This document is a part of the source code and related artifacts
+ * for CollectionSpace, an open source collections management system
+ * for museums and related institutions:
+ *
+ * http://www.collectionspace.org
+ * http://wiki.collectionspace.org
+ *
+ * Copyright © 2009 {Contributing Institution}
+ *
+ * Licensed under the Educational Community License (ECL), Version 2.0.
+ * You may not use this file except in compliance with this License.
+ *
+ * You may obtain a copy of the ECL 2.0 License at
+ * https://source.collectionspace.org/collection-space/LICENSE.txt
+ */
 package org.collectionspace.services.client;
 
 import java.util.ArrayList;
@@ -19,10 +45,23 @@ import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The Class PersonAuthorityClientUtils.
+ */
 public class PersonAuthorityClientUtils {
+    
+    /** The Constant logger. */
     private static final Logger logger =
         LoggerFactory.getLogger(PersonAuthorityClientUtils.class);
 
+    /**
+     * Creates the person authority instance.
+     *
+     * @param displayName the display name
+     * @param refName the ref name
+     * @param headerLabel the header label
+     * @return the multipart output
+     */
     public static MultipartOutput createPersonAuthorityInstance(
     		String displayName, String refName, String headerLabel ) {
         PersonauthoritiesCommon personAuthority = new PersonauthoritiesCommon();
@@ -41,6 +80,15 @@ public class PersonAuthorityClientUtils {
         return multipart;
     }
 
+    /**
+     * Creates the person instance.
+     *
+     * @param inAuthority the in authority
+     * @param personRefName the person ref name
+     * @param personInfo the person info
+     * @param headerLabel the header label
+     * @return the multipart output
+     */
     public static MultipartOutput createPersonInstance(String inAuthority, 
     		String personRefName, Map<String, String> personInfo, String headerLabel){
         PersonsCommon person = new PersonsCommon();
@@ -98,6 +146,15 @@ public class PersonAuthorityClientUtils {
         return multipart;
     }
     
+    /**
+     * Creates the item in authority.
+     *
+     * @param vcsid the vcsid
+     * @param personAuthorityRefName the person authority ref name
+     * @param personMap the person map
+     * @param client the client
+     * @return the string
+     */
     public static String createItemInAuthority(String vcsid, 
     		String personAuthorityRefName, Map<String,String> personMap,
     		PersonAuthorityClient client ) {
@@ -132,23 +189,37 @@ public class PersonAuthorityClientUtils {
     	MultipartOutput multipart = 
     		createPersonInstance( vcsid, refName,
     			personMap, client.getItemCommonPartName() );
+    	
+    	String result = null;
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
-
-    	int statusCode = res.getStatus();
-
-    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-    		throw new RuntimeException("Could not create Item: \""+refName
-    				+"\" in personAuthority: \"" + personAuthorityRefName
-    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    	try {
+	    	int statusCode = res.getStatus();
+	
+	    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
+	    		throw new RuntimeException("Could not create Item: \""+refName
+	    				+"\" in personAuthority: \"" + personAuthorityRefName
+	    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	    	}
+	    	if(statusCode != EXPECTED_STATUS_CODE) {
+	    		throw new RuntimeException("Unexpected Status when creating Item: \""+refName
+	    				+"\" in personAuthority: \"" + personAuthorityRefName +"\", Status:"+ statusCode);
+	    	}
+	
+	    	result = extractId(res);
+    	} finally {
+    		res.releaseConnection();
     	}
-    	if(statusCode != EXPECTED_STATUS_CODE) {
-    		throw new RuntimeException("Unexpected Status when creating Item: \""+refName
-    				+"\" in personAuthority: \"" + personAuthorityRefName +"\", Status:"+ statusCode);
-    	}
-
-    	return extractId(res);
+    	
+    	return result;
     }
 
+    /**
+     * Creates the person auth ref name.
+     *
+     * @param personAuthorityName the person authority name
+     * @param withDisplaySuffix the with display suffix
+     * @return the string
+     */
     public static String createPersonAuthRefName(String personAuthorityName, boolean withDisplaySuffix) {
     	String refName = "urn:cspace:org.collectionspace.demo:personauthority:name("
     			+personAuthorityName+")";
@@ -157,6 +228,14 @@ public class PersonAuthorityClientUtils {
     	return refName;
     }
 
+    /**
+     * Creates the person ref name.
+     *
+     * @param personAuthRefName the person auth ref name
+     * @param personName the person name
+     * @param withDisplaySuffix the with display suffix
+     * @return the string
+     */
     public static String createPersonRefName(
     						String personAuthRefName, String personName, boolean withDisplaySuffix) {
     	String refName = personAuthRefName+":person:name("+personName+")";
@@ -165,6 +244,12 @@ public class PersonAuthorityClientUtils {
     	return refName;
     }
 
+    /**
+     * Extract id.
+     *
+     * @param res the res
+     * @return the string
+     */
     public static String extractId(ClientResponse<Response> res) {
         MultivaluedMap<String, Object> mvm = res.getMetadata();
         String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
@@ -208,7 +293,7 @@ public class PersonAuthorityClientUtils {
      * @param surName
      * @param birthDate
      * @param deathDate
-     * @return
+     * @return display name
      */
     public static String prepareDefaultDisplayName(
     		String foreName, String middleName, String surName,

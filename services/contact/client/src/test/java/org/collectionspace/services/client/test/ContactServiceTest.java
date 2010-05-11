@@ -61,7 +61,6 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
     // Instance variables specific to this test.
     final String SERVICE_PATH_COMPONENT = "contacts";
     private String knownResourceId = null;
-    private List<String> allResourceIdsCreated = new ArrayList();
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -143,14 +142,17 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
     // See Issue CSPACE-401.
     @Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
     @Override
     public void createWithMalformedXml(String testName) throws Exception {
+    	//Should this really be empty??
     }
 
     @Override
     public void createWithWrongXmlSchema(String testName) throws Exception {
+    	//Should this really be empty??
     }
 
     /*
@@ -406,13 +408,21 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
     @Override
-    public void updateWithEmptyEntityBody(String testName) throws Exception{
+    public void updateWithEmptyEntityBody(String testName) throws Exception {
+    	//Should this really be empty??
     }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithMalformedXml(java.lang.String)
+     */
     @Override
     public void updateWithMalformedXml(String testName) throws Exception {
+    	//Should this really be empty??
     }
+
     @Override
     public void updateWithWrongXmlSchema(String testName) throws Exception {
+    	//Should this really be empty??
     }
 
     /*
@@ -603,35 +613,10 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
     }
 
     // ---------------------------------------------------------------
-    // Cleanup of resources created during testing
-    // ---------------------------------------------------------------
-
-    /**
-     * Deletes all resources created by tests, after all tests have been run.
-     *
-     * This cleanup method will always be run, even if one or more tests fail.
-     * For this reason, it attempts to remove all resources created
-     * at any point during testing, even if some of those resources
-     * may be expected to be deleted by certain tests.
-     */
-    @AfterClass(alwaysRun=true)
-    public void cleanUp() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Cleaning up temporary resources created for testing ...");
-        }
-        ContactClient client = new ContactClient();
-        for (String resourceId : allResourceIdsCreated) {
-            // Note: Any non-success responses are ignored and not reported.
-            ClientResponse<Response> res = client.delete(resourceId);
-        }
-    }
-
-    // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
     @Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
     }
-
 }

@@ -61,22 +61,48 @@ import org.slf4j.LoggerFactory;
  */
 public class CollectionObjectAuthRefsTest extends BaseServiceTest {
 
+   /** The logger. */
    private final Logger logger =
        LoggerFactory.getLogger(CollectionObjectAuthRefsTest.class);
 
     // Instance variables specific to this test.
+    /** The SERVIC e_ pat h_ component. */
     final String SERVICE_PATH_COMPONENT = "collectionobjects";
+    
+    /** The PERSO n_ authorit y_ name. */
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
+    
+    /** The known resource id. */
     private String knownResourceId = null;
-    private List<String> collectionObjectIdsCreated = new ArrayList();
-    private List<String> personIdsCreated = new ArrayList();
+    
+    /** The collection object ids created. */
+    private List<String> collectionObjectIdsCreated = new ArrayList<String>();
+    
+    /** The person ids created. */
+    private List<String> personIdsCreated = new ArrayList<String>();
+    
+    /** The CREATE d_ status. */
     private int CREATED_STATUS = Response.Status.CREATED.getStatusCode();
+    
+    /** The O k_ status. */
     private int OK_STATUS = Response.Status.OK.getStatusCode();
+    
+    /** The person auth csid. */
     private String personAuthCSID = null; 
+    
+    /** The content organization ref name. */
     private String contentOrganizationRefName = null;
+    
+    /** The content people ref name. */
     private String contentPeopleRefName = null;
+    
+    /** The content person ref name. */
     private String contentPersonRefName = null;
+    
+    /** The inscriber ref name. */
     private String inscriberRefName = null;
+    
+    /** The NU m_ aut h_ ref s_ expected. */
     private final int NUM_AUTH_REFS_EXPECTED = 4;
 
     /* (non-Javadoc)
@@ -100,6 +126,12 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /**
+     * Creates the with auth refs.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void createWithAuthRefs(String testName) throws Exception {
 
@@ -151,6 +183,9 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         collectionObjectIdsCreated.add(extractId(res));
     }
     
+    /**
+     * Creates the person refs.
+     */
     protected void createPersonRefs(){
     	String authRefName = 
     		PersonAuthorityClientUtils.createPersonAuthRefName(PERSON_AUTHORITY_NAME, false);
@@ -182,6 +217,14 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         personIdsCreated.add(createPerson("Ingrid", "Inscriber", inscriberRefName));
     }
     
+    /**
+     * Creates the person.
+     *
+     * @param firstName the first name
+     * @param surName the sur name
+     * @param refName the ref name
+     * @return the string
+     */
     protected String createPerson(String firstName, String surName, String refName ) {
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
@@ -200,6 +243,12 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     }
 
     // Success outcomes
+    /**
+     * Read and check auth refs.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"createWithAuthRefs"})
     public void readAndCheckAuthRefs(String testName) throws Exception {
@@ -290,26 +339,40 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         for (String resourceId : collectionObjectIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            ClientResponse<Response> res = collectionObjectClient.delete(resourceId);
+            collectionObjectClient.delete(resourceId).releaseConnection();
         }
         // Note: Any non-success response is ignored and not reported.
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Delete persons before PersonAuth
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            ClientResponse<Response> res = personAuthClient.deleteItem(personAuthCSID, resourceId);
+            personAuthClient.deleteItem(personAuthCSID, resourceId).releaseConnection();
         }
-        ClientResponse<Response> res = personAuthClient.delete(personAuthCSID);
+        personAuthClient.delete(personAuthCSID).releaseConnection();
     }
 
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
+     */
     @Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
     }
 
+   /**
+    * Creates the collection object instance.
+    *
+    * @param title the title
+    * @param objNum the obj num
+    * @param contentOrganization the content organization
+    * @param contentPeople the content people
+    * @param contentPerson the content person
+    * @param inscriber the inscriber
+    * @return the multipart output
+    */
    private MultipartOutput createCollectionObjectInstance(
 		   		String title,
 		   		String objNum,

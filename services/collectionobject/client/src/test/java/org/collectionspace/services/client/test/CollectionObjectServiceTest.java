@@ -22,7 +22,6 @@
  */
 package org.collectionspace.services.client.test;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -42,7 +41,6 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import org.slf4j.Logger;
@@ -64,20 +62,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     /** The known resource id. */
     private String knownResourceId = null;
     
-    /** The all resource ids created. */
-    private List<String> allResourceIdsCreated = new ArrayList<String>();
-    
     /** The multivalue. */
     private boolean multivalue; //toggle
-
-    /**
-     * Gets the logger.
-     *
-     * @return the logger
-     */
-    private Logger getLogger() {
-    	return this.logger;
-    }
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
@@ -982,36 +968,6 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         }
         Assert.assertEquals(statusCode, EXPECTED_STATUS);
 
-    }
-
-    // ---------------------------------------------------------------
-    // Cleanup of resources created during testing
-    // ---------------------------------------------------------------
-    /**
-     * Deletes all resources created by tests, after all tests have been run.
-     *
-     * This cleanup method will always be run, even if one or more tests fail.
-     * For this reason, it attempts to remove all resources created
-     * at any point during testing, even if some of those resources
-     * may be expected to be deleted by certain tests.
-     */
-    @AfterClass(alwaysRun = true)
-    public void cleanUp() {
-        String noTest = System.getProperty("noTestCleanup");
-    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Skipping Cleanup phase ...");
-            }
-            return;
-    	}
-        if (logger.isDebugEnabled()) {
-            logger.debug("Cleaning up temporary resources created for testing ...");
-        }
-       CollectionObjectClient client = new CollectionObjectClient();
-       for (String resourceId : allResourceIdsCreated) {
-            // Note: Any non-success responses are ignored and not reported.
-            ClientResponse<Response> res = client.delete(resourceId);
-        }
     }
 
     // ---------------------------------------------------------------

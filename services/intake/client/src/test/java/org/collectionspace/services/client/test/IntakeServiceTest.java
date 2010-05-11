@@ -22,7 +22,6 @@
  */
 package org.collectionspace.services.client.test;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -38,7 +37,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
+//import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import org.slf4j.Logger;
@@ -65,9 +64,6 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
     /** The known resource id. */
     private String knownResourceId = null;
     
-    /** The all resource ids created. */
-    private List<String> allResourceIdsCreated = new ArrayList<String>();
-
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -156,6 +152,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
     /* (non-Javadoc)
@@ -163,6 +160,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithMalformedXml(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
     /* (non-Javadoc)
@@ -170,6 +168,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithWrongXmlSchema(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
     /*
@@ -440,7 +439,8 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithEmptyEntityBody(java.lang.String)
      */
     @Override
-    public void updateWithEmptyEntityBody(String testName) throws Exception{
+    public void updateWithEmptyEntityBody(String testName) throws Exception {
+    	//Should this really be empty?
     }
     
     /* (non-Javadoc)
@@ -448,6 +448,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void updateWithMalformedXml(String testName) throws Exception {
+    	//Should this really be empty?
     }
     
     /* (non-Javadoc)
@@ -455,6 +456,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void updateWithWrongXmlSchema(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
     /*
@@ -650,37 +652,6 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         }
         Assert.assertEquals(statusCode, EXPECTED_STATUS);
 
-    }
-
-    // ---------------------------------------------------------------
-    // Cleanup of resources created during testing
-    // ---------------------------------------------------------------
-
-    /**
-     * Deletes all resources created by tests, after all tests have been run.
-     *
-     * This cleanup method will always be run, even if one or more tests fail.
-     * For this reason, it attempts to remove all resources created
-     * at any point during testing, even if some of those resources
-     * may be expected to be deleted by certain tests.
-     */
-    @AfterClass(alwaysRun=true)
-    public void cleanUp() {
-        String noTest = System.getProperty("noTestCleanup");
-    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Skipping Cleanup phase ...");
-            }
-            return;
-    	}
-        if (logger.isDebugEnabled()) {
-            logger.debug("Cleaning up temporary resources created for testing ...");
-        }
-        IntakeClient client = new IntakeClient();
-        for (String resourceId : allResourceIdsCreated) {
-            // Note: Any non-success responses are ignored and not reported.
-            ClientResponse<Response> res = client.delete(resourceId);
-        }
     }
 
     // ---------------------------------------------------------------

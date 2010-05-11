@@ -22,7 +22,6 @@
  */
 package org.collectionspace.services.client.test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,9 +107,6 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     /** The n items to create in list. */
     private int nItemsToCreateInList = 3;
     
-    /** The all resource ids created. */
-    private List<String> allResourceIdsCreated = new ArrayList<String>();
-    
     /** The all item resource ids created. */
     private Map<String, String> allItemResourceIdsCreated =
         new HashMap<String, String>();
@@ -162,27 +158,32 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     	MultipartOutput multipart = 
             PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    displayName, fullRefName, client.getCommonPartName());
-        ClientResponse<Response> res = client.create(multipart);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(this.REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(this.REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, this.EXPECTED_STATUS_CODE);
-
+        
+    	String newID = null;
+    	ClientResponse<Response> res = client.create(multipart);
+    	try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        //
+	        // Specifically:
+	        // Does it fall within the set of valid status codes?
+	        // Does it exactly match the expected status code?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(this.REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(this.REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, this.EXPECTED_STATUS_CODE);
+	
+	        newID = PersonAuthorityClientUtils.extractId(res);
+    	} finally {
+    		res.releaseConnection();
+    	}
         // Store the refname from the first resource created
         // for additional tests below.
         knownResourceRefName = baseRefName;
-
-        String newID = PersonAuthorityClientUtils.extractId(res);
         // Store the ID returned from the first resource created
         // for additional tests below.
         if (knownResourceId == null){
@@ -243,18 +244,24 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         MultipartOutput multipart = 
             PersonAuthorityClientUtils.createPersonInstance(vcsid, refName, johnWayneMap,
                 client.getItemCommonPartName() );
-        ClientResponse<Response> res = client.createItem(vcsid, multipart);
-        int statusCode = res.getStatus();
-        String newID = PersonAuthorityClientUtils.extractId(res);
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        String newID = null;
+        ClientResponse<Response> res = client.createItem(vcsid, multipart);
+        try {
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+	        newID = PersonAuthorityClientUtils.extractId(res);
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
@@ -306,19 +313,25 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         MultipartOutput multipart =
             ContactClientUtils.createContactInstance(parentcsid,
             itemcsid, identifier, new ContactClient().getCommonPartName());
+        
+        String newID = null;
         ClientResponse<Response> res =
              client.createContact(parentcsid, itemcsid, multipart);
-        int statusCode = res.getStatus();
-        String newID = PersonAuthorityClientUtils.extractId(res);
+        try {
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+	        newID = PersonAuthorityClientUtils.extractId(res);
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Store the ID returned from the first contact resource created
         // for additional tests below.
@@ -346,6 +359,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
     /* (non-Javadoc)
@@ -353,6 +367,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithMalformedXml(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
     /* (non-Javadoc)
@@ -360,6 +375,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithWrongXmlSchema(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
 /*
@@ -449,7 +465,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     /* (non-Javadoc)
  * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
  */
-@Override
+    @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"createList"}, dependsOnGroups = {"create"})
     public void createList(String testName) throws Exception {
@@ -506,24 +522,27 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<MultipartInput> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        //FIXME: remove the following try catch once Aron fixes signatures
         try {
-            MultipartInput input = (MultipartInput) res.getEntity();
-            PersonauthoritiesCommon personAuthority = (PersonauthoritiesCommon) extractPart(input,
-                    client.getCommonPartName(), PersonauthoritiesCommon.class);
-            Assert.assertNotNull(personAuthority);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	        //FIXME: remove the following try catch once Aron fixes signatures
+	        try {
+	            MultipartInput input = (MultipartInput) res.getEntity();
+	            PersonauthoritiesCommon personAuthority = (PersonauthoritiesCommon) extractPart(input,
+	                    client.getCommonPartName(), PersonauthoritiesCommon.class);
+	            Assert.assertNotNull(personAuthority);
+	        } catch (Exception e) {
+	            throw new RuntimeException(e);
+	        }
+        } finally {
+        	res.releaseConnection();
         }
     }
 
@@ -537,30 +556,33 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
             groups = {"read"}, dependsOnGroups = {"create"})
         public void readByName(String testName) throws Exception {
 
-            // Perform setup.
+        // Perform setup.
         setupRead();
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<MultipartInput> res = client.readByName(knownResourceDisplayName);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        //FIXME: remove the following try catch once Aron fixes signatures
         try {
-            MultipartInput input = (MultipartInput) res.getEntity();
-            PersonauthoritiesCommon personAuthority = (PersonauthoritiesCommon) extractPart(input,
-                    client.getCommonPartName(), PersonauthoritiesCommon.class);
-            Assert.assertNotNull(personAuthority);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	        //FIXME: remove the following try catch once Aron fixes signatures
+	        try {
+	            MultipartInput input = (MultipartInput) res.getEntity();
+	            PersonauthoritiesCommon personAuthority = (PersonauthoritiesCommon) extractPart(input,
+	                    client.getCommonPartName(), PersonauthoritiesCommon.class);
+	            Assert.assertNotNull(personAuthority);
+	        } catch (Exception e) {
+	            throw new RuntimeException(e);
+	        }
+        } finally {
+        	res.releaseConnection();
         }
     }
 
@@ -605,36 +627,38 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"read"}, dependsOnMethods = {"read"})
     public void readItem(String testName) throws Exception {
-
         // Perform setup.
         setupRead(testName);
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Check whether we've received a person.
+	        MultipartInput input = (MultipartInput) res.getEntity();
+	        PersonsCommon person = (PersonsCommon) extractPart(input,
+	                client.getItemCommonPartName(), PersonsCommon.class);
+	        Assert.assertNotNull(person);
+	        boolean showFull = true;
+	        if(showFull && logger.isDebugEnabled()){
+	            logger.debug(testName + ": returned payload:");
+	            logger.debug(objectAsXmlString(person, PersonsCommon.class));
+	        }
+	        Assert.assertEquals(person.getInAuthority(), knownResourceId);
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Check whether we've received a person.
-        MultipartInput input = (MultipartInput) res.getEntity();
-        PersonsCommon person = (PersonsCommon) extractPart(input,
-                client.getItemCommonPartName(), PersonsCommon.class);
-        Assert.assertNotNull(person);
-        boolean showFull = true;
-        if(showFull && logger.isDebugEnabled()){
-            logger.debug(testName + ": returned payload:");
-            logger.debug(objectAsXmlString(person, PersonsCommon.class));
-        }
-        Assert.assertEquals(person.getInAuthority(), knownResourceId);
-
     }
 
     /**
@@ -646,26 +670,31 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"readItem", "updateItem"})
     public void verifyItemDisplayName(String testName) throws Exception {
-
         // Perform setup.
         setupUpdate(testName);
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
+        MultipartInput input =null;
         ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Check whether person has expected displayName.
+	        input = (MultipartInput) res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Check whether person has expected displayName.
-        MultipartInput input = (MultipartInput) res.getEntity();
+	        
         PersonsCommon person = (PersonsCommon) extractPart(input,
                 client.getItemCommonPartName(), PersonsCommon.class);
         Assert.assertNotNull(person);
@@ -676,7 +705,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        TEST_FORE_NAME, null, TEST_SUR_NAME,
 	        TEST_BIRTH_DATE, TEST_DEATH_DATE);
         Assert.assertNotNull(displayName, expectedDisplayName);
-        
+    
         // Update the shortName and verify the computed name is updated.
         person.setCsid(null);
         person.setDisplayNameComputed(true);
@@ -691,18 +720,23 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         OutputPart commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug("updateItem: status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug("updateItem: status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Retrieve the updated resource and verify that its contents exist.
+	        input = (MultipartInput) res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Retrieve the updated resource and verify that its contents exist.
-        input = (MultipartInput) res.getEntity();
+        
         PersonsCommon updatedPerson =
                 (PersonsCommon) extractPart(input,
                         client.getItemCommonPartName(), PersonsCommon.class);
@@ -725,18 +759,23 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug("updateItem: status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug("updateItem: status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Retrieve the updated resource and verify that its contents exist.
+	        input = (MultipartInput) res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Retrieve the updated resource and verify that its contents exist.
-        input = (MultipartInput) res.getEntity();
+        
         updatedPerson =
                 (PersonsCommon) extractPart(input,
                         client.getItemCommonPartName(), PersonsCommon.class);
@@ -766,20 +805,26 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
+        MultipartInput input = null;
         ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
+	
+	        // Check whether Person has expected displayName.
+	        input = (MultipartInput) res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
-
-        // Check whether Person has expected displayName.
-        MultipartInput input = (MultipartInput) res.getEntity();
+        
         PersonsCommon person = (PersonsCommon) extractPart(input,
                 client.getItemCommonPartName(), PersonsCommon.class);
         Assert.assertNotNull(person);
@@ -792,15 +837,19 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         OutputPart commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug("updateItem: status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug("updateItem: status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
     
     /**
@@ -812,28 +861,33 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"read"}, dependsOnMethods = {"readItem"})
     public void readContact(String testName) throws Exception {
-
         // Perform setup.
         setupRead(testName);
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
+        MultipartInput input = null;
         ClientResponse<MultipartInput> res =
             client.readContact(knownResourceId, knownItemResourceId,
             knownContactResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Check whether we've received a contact.
+	        input = (MultipartInput) res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Check whether we've received a contact.
-        MultipartInput input = (MultipartInput) res.getEntity();
+        
         ContactsCommon contact = (ContactsCommon) extractPart(input,
                 new ContactClient().getCommonPartName(), ContactsCommon.class);
         Assert.assertNotNull(contact);
@@ -862,16 +916,19 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+        	int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     /**
@@ -889,16 +946,20 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<MultipartInput> res = client.readItem(knownResourceId, NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     /**
@@ -917,16 +978,20 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<MultipartInput> res =
             client.readContact(knownResourceId, knownItemResourceId, NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     // ---------------------------------------------------------------
@@ -947,18 +1012,24 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
+        PersonauthoritiesCommonList list = null;
         ClientResponse<PersonauthoritiesCommonList> res = client.readList();
-        PersonauthoritiesCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        list = res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = false;
@@ -1012,24 +1083,30 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	// Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<PersonsCommonList> res = null;
-        if(vcsid!= null) {
+        if (vcsid!= null) {
 	        res = client.readItemList(vcsid);
-        } else if(name!= null) {
+        } else if (name!= null) {
    	        res = client.readItemListForNamedAuthority(name);
         } else {
         	Assert.fail("readItemList passed null csid and name!");
         }
-        PersonsCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
+        PersonsCommonList list = null;
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+	        list = res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         List<PersonsCommonList.PersonListItem> items =
             list.getPersonListItem();
@@ -1089,20 +1166,26 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
+        ContactsCommonList list = null;
         ClientResponse<ContactsCommonList> res =
                 client.readContactList(parentcsid, itemcsid);
-        ContactsCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        list = res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
+        
         List<ContactsCommonList.ContactListItem> listitems =
             list.getContactListItem();
         int nItemsReturned = listitems.size();
@@ -1155,17 +1238,22 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<MultipartInput> res =
-                client.read(knownResourceId);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": read status = " + res.getStatus());
+        MultipartInput input = null;
+        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        try {
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": read status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+	
+	        if(logger.isDebugEnabled()){
+	            logger.debug("got PersonAuthority to update with ID: " + knownResourceId);
+	        }
+	        input = res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
-        if(logger.isDebugEnabled()){
-            logger.debug("got PersonAuthority to update with ID: " + knownResourceId);
-        }
-        MultipartInput input = (MultipartInput) res.getEntity();
+        
         PersonauthoritiesCommon personAuthority = (PersonauthoritiesCommon) extractPart(input,
                 client.getCommonPartName(), PersonauthoritiesCommon.class);
         Assert.assertNotNull(personAuthority);
@@ -1183,18 +1271,23 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         OutputPart commonPart = output.addPart(personAuthority, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getCommonPartName());
         res = client.update(knownResourceId, output);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Retrieve the updated resource and verify that its contents exist.
+	        input = (MultipartInput) res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Retrieve the updated resource and verify that its contents exist.
-        input = (MultipartInput) res.getEntity();
+        
         PersonauthoritiesCommon updatedPersonAuthority =
                 (PersonauthoritiesCommon) extractPart(input,
                         client.getCommonPartName(), PersonauthoritiesCommon.class);
@@ -1221,19 +1314,25 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         PersonAuthorityClient client = new PersonAuthorityClient();
+        MultipartInput input = null;
         ClientResponse<MultipartInput> res =
                 client.readItem(knownResourceId, knownItemResourceId);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": read status = " + res.getStatus());
+        try {
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": read status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+	
+	        if(logger.isDebugEnabled()){
+	            logger.debug("got Person to update with ID: " +
+	                knownItemResourceId +
+	                " in PersonAuthority: " + knownResourceId );
+	        }
+	        input = res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
-        if(logger.isDebugEnabled()){
-            logger.debug("got Person to update with ID: " +
-                knownItemResourceId +
-                " in PersonAuthority: " + knownResourceId );
-        }
-        MultipartInput input = (MultipartInput) res.getEntity();
+        
         PersonsCommon person = (PersonsCommon) extractPart(input,
                 client.getItemCommonPartName(), PersonsCommon.class);
         Assert.assertNotNull(person);
@@ -1252,18 +1351,23 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         OutputPart commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Retrieve the updated resource and verify that its contents exist.
+	        input = (MultipartInput) res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Retrieve the updated resource and verify that its contents exist.
-        input = (MultipartInput) res.getEntity();
+        
         PersonsCommon updatedPerson =
                 (PersonsCommon) extractPart(input,
                         client.getItemCommonPartName(), PersonsCommon.class);
@@ -1284,26 +1388,31 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"update"}, dependsOnMethods = {"updateItem"})
     public void updateContact(String testName) throws Exception {
-
         // Perform setup.
         setupUpdate(testName);
 
         // Retrieve the contents of a resource to update.
         PersonAuthorityClient client = new PersonAuthorityClient();
+        MultipartInput input = null;
         ClientResponse<MultipartInput> res =
                 client.readContact(knownResourceId, knownItemResourceId, knownContactResourceId);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": read status = " + res.getStatus());
+        try {
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": read status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+	
+	        if(logger.isDebugEnabled()){
+	            logger.debug("got Contact to update with ID: " +
+	                knownContactResourceId +
+	                " in item: " + knownItemResourceId +
+	                " in parent: " + knownResourceId );
+	        }
+	        input = res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
-        if(logger.isDebugEnabled()){
-            logger.debug("got Contact to update with ID: " +
-                knownContactResourceId +
-                " in item: " + knownItemResourceId +
-                " in parent: " + knownResourceId );
-        }
-        MultipartInput input = (MultipartInput) res.getEntity();
+        
         ContactsCommon contact = (ContactsCommon) extractPart(input,
                 new ContactClient().getCommonPartName(), ContactsCommon.class);
         Assert.assertNotNull(contact);
@@ -1321,18 +1430,22 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         OutputPart commonPart = output.addPart(contact, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", new ContactClient().getCommonPartName());
         res = client.updateContact(knownResourceId, knownItemResourceId, knownContactResourceId, output);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Retrieve the updated resource and verify that its contents exist.
+	        input = (MultipartInput) res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Retrieve the updated resource and verify that its contents exist.
-        input = (MultipartInput) res.getEntity();
         ContactsCommon updatedContact =
                 (ContactsCommon) extractPart(input,
                         new ContactClient().getCommonPartName(), ContactsCommon.class);
@@ -1352,6 +1465,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void updateWithEmptyEntityBody(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
     /* (non-Javadoc)
@@ -1359,6 +1473,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void updateWithMalformedXml(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
     /* (non-Javadoc)
@@ -1366,6 +1481,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void updateWithWrongXmlSchema(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
 /*
@@ -1469,16 +1585,20 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     				displayName, fullRefName, client.getCommonPartName());
         ClientResponse<MultipartInput> res =
                 client.update(NON_EXISTENT_ID, multipart);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     /**
@@ -1508,16 +1628,20 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     			client.getItemCommonPartName() );
         ClientResponse<MultipartInput> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     /**
@@ -1564,6 +1688,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         ClientResponse<Response> res =
             client.deleteContact(knownResourceId, knownItemResourceId, knownContactResourceId);
         int statusCode = res.getStatus();
+        res.releaseConnection();
 
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -1597,6 +1722,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<Response> res = client.deleteItem(knownResourceId, knownItemResourceId);
         int statusCode = res.getStatus();
+        res.releaseConnection();
 
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -1627,6 +1753,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<Response> res = client.delete(knownResourceId);
         int statusCode = res.getStatus();
+        res.releaseConnection();
 
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -1654,6 +1781,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
+        res.releaseConnection();
 
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -1681,6 +1809,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<Response> res = client.deleteItem(knownResourceId, NON_EXISTENT_ID);
         int statusCode = res.getStatus();
+        res.releaseConnection();
 
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -1709,6 +1838,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         ClientResponse<Response> res =
             client.deleteContact(knownResourceId, knownItemResourceId, NON_EXISTENT_ID);
         int statusCode = res.getStatus();
+        res.releaseConnection();
 
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -1812,6 +1942,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      */
 
     @AfterClass(alwaysRun=true)
+    @Override
     public void cleanUp() {
         String noTest = System.getProperty("noTestCleanup");
     	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
@@ -1836,6 +1967,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
             // below are ignored and not reported.
             ClientResponse<Response> res =
                 client.deleteContact(parentResourceId, itemResourceId, contactResourceId);
+            res.releaseConnection();
         }
         // Clean up item resources.
         for (Map.Entry<String, String> entry : allItemResourceIdsCreated.entrySet()) {
@@ -1845,13 +1977,10 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
             // below are ignored and not reported.
             ClientResponse<Response> res =
                 client.deleteItem(parentResourceId, itemResourceId);
+            res.releaseConnection();
         }
         // Clean up parent resources.
-        for (String resourceId : allResourceIdsCreated) {
-            // Note: Any non-success responses from the delete operation
-            // below are ignored and not reported.
-            ClientResponse<Response> res = client.delete(resourceId);
-        }
+        super.cleanUp();
     }
 
     // ---------------------------------------------------------------

@@ -25,6 +25,9 @@ package org.collectionspace.services.client.test;
 
 //import java.util.List;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -34,6 +37,7 @@ import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 /**
@@ -51,6 +55,9 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 	/** The Constant DEFAULT_LIST_SIZE. */
 	static protected final int DEFAULT_LIST_SIZE = 10;
 	static protected final int DEFAULT_PAGINATEDLIST_SIZE = 10;
+	
+	/* Use this to keep track of resources to delete */
+	protected List<String> allResourceIdsCreated = new ArrayList<String>();	
 
 //    // Success outcomes
 //    /* (non-Javadoc)
@@ -242,21 +249,26 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 			CollectionSpaceClient client,
 			long pageSize, long pageNumber) throws Exception {
 		ClientResponse<AbstractCommonList> response =
-			(ClientResponse<AbstractCommonList>)client.readList(Long.toString(pageSize),
-					Long.toString(pageNumber));
-		int statusCode = response.getStatus();
-
-		// Check the status code of the response: does it match
-		// the expected response(s)?
-		if (getLogger().isDebugEnabled()) {
-			getLogger().debug(testName + ": status = " + statusCode);
+			client.readList(Long.toString(pageSize), Long.toString(pageNumber));
+		AbstractCommonList result = null;
+		try {
+			int statusCode = response.getStatus();
+	
+			// Check the status code of the response: does it match
+			// the expected response(s)?
+			if (getLogger().isDebugEnabled()) {
+				getLogger().debug(testName + ": status = " + statusCode);
+			}
+			Assert.assertTrue(this.REQUEST_TYPE.isValidStatusCode(statusCode),
+					invalidStatusCodeMessage(this.REQUEST_TYPE, statusCode));
+			Assert.assertEquals(statusCode, this.EXPECTED_STATUS_CODE);
+	
+			result = this.getAbstractCommonList(response);
+		} finally {
+			response.releaseConnection();
 		}
-		Assert.assertTrue(this.REQUEST_TYPE.isValidStatusCode(statusCode),
-				invalidStatusCodeMessage(this.REQUEST_TYPE, statusCode));
-		Assert.assertEquals(statusCode, this.EXPECTED_STATUS_CODE);
-
-		AbstractCommonList list = this.getAbstractCommonList(response);		
-		return list;
+		
+		return result;
 	}
 
     /**
@@ -325,10 +337,10 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         
         // Get the current total number of items.
         // If there are no items then create some
-        AbstractCommonList list = this.readList(testName, client, 1 /*pgSz*/, 0 /*pgNum*/);
+        AbstractCommonList list = (AbstractCommonList) this.readList(testName, client, 1 /*pgSz*/, 0 /*pgNum*/);
         if (list == null || list.getTotalItems() == 0) {
         	this.createPaginatedList(testName, DEFAULT_PAGINATEDLIST_SIZE);
-        	list = this.readList(testName, client, 1 /*pgSz*/, 0 /*pgNum*/);
+        	list = (AbstractCommonList) this.readList(testName, client, 1 /*pgSz*/, 0 /*pgNum*/);
         }
 
         // Print out the current list size to be paginated
@@ -343,7 +355,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         long pageSize = totalItems / 3; //create up to 3 pages to iterate over
         long pagesTotal = pageSize > 0 ? (totalItems / pageSize) : 0;
         for (int i = 0; i < pagesTotal; i++) {
-        	list = this.readList(testName, client, pageSize, i);
+        	list = (AbstractCommonList) this.readList(testName, client, pageSize, i);
         	assertPaginationInfo(testName,
         			list,
         			i,			//expected page number
@@ -355,7 +367,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         // if there are any remainders be sure to paginate them as well
         long mod = totalItems % pageSize;
         if (mod != 0) {
-        	list = this.readList(testName, client, pageSize, pagesTotal);
+        	list = (AbstractCommonList) this.readList(testName, client, pageSize, pagesTotal);
         	assertPaginationInfo(testName,
         			list, 
         			pagesTotal, //expected page number
@@ -489,6 +501,33 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         // Expected status code: 400 Bad Request
     	testSetup(Response.Status.BAD_REQUEST.getStatusCode(), ServiceRequestType.UPDATE, label);
     }
+    
+    /**
+     * Deletes all resources created by tests, after all tests have been run.
+     *
+     * This cleanup method will always be run, even if one or more tests fail.
+     * For this reason, it attempts to remove all resources created
+     * at any point during testing, even if some of those resources
+     * may be expected to be deleted by certain tests.
+     */
+    @AfterClass(alwaysRun=true)
+    public void cleanUp() {
+        String noTest = System.getProperty("noTestCleanup");
+    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Skipping Cleanup phase ...");
+            }
+            return;
+    	}
+        if (logger.isDebugEnabled()) {
+            logger.debug("Cleaning up temporary resources created for testing ...");
+        }
+        CollectionSpaceClient client = this.getClientInstance();
+        for (String resourceId : allResourceIdsCreated) {
+            // Note: Any non-success responses are ignored and not reported.
+            client.delete(resourceId).releaseConnection();
+        }
+    }    
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.ServiceTest#updateNonExistent(java.lang.String)

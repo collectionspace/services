@@ -17,7 +17,7 @@ import javax.persistence.Persistence;
 import javax.persistence.Query;
 import org.collectionspace.services.account.AccountTenant;
 import org.collectionspace.services.account.AccountsCommon;
-import org.collectionspace.services.account.Tenant;
+//import org.collectionspace.services.account.Tenant;
 import org.collectionspace.services.account.Status;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;

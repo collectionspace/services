@@ -22,6 +22,8 @@
  *  limitations under the License.
  */
 package org.collectionspace.services.client;
+import javax.ws.rs.core.Response;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
@@ -118,7 +120,7 @@ public interface CollectionSpaceClient {
 
     /**
      * checks System property cspace.server.secure
-     * @return
+     * @return boolean
      */
     boolean isServerSecure();
     
@@ -130,6 +132,14 @@ public interface CollectionSpaceClient {
      * @return the client response
      */
     public ClientResponse<AbstractCommonList> readList(String pageSize,
-    		String pageNumber);    
+    		String pageNumber);
+    
+    /**
+     * Delete.
+     *
+     * @param csid the csid
+     * @return the client response
+     */
+    public ClientResponse<Response> delete(String csid);
 
 }

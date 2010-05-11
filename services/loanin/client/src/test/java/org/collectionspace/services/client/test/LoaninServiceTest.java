@@ -22,7 +22,7 @@
  */
 package org.collectionspace.services.client.test;
 
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -39,7 +39,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
+//import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 import org.slf4j.Logger;
@@ -54,13 +54,16 @@ import org.slf4j.LoggerFactory;
  */
 public class LoaninServiceTest extends AbstractServiceTestImpl {
 
+   /** The logger. */
    private final Logger logger =
        LoggerFactory.getLogger(LoaninServiceTest.class);
 
     // Instance variables specific to this test.
+    /** The SERVIC e_ pat h_ component. */
     final String SERVICE_PATH_COMPONENT = "loansin";
+    
+    /** The known resource id. */
     private String knownResourceId = null;
-    private List<String> allResourceIdsCreated = new ArrayList<String>();
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -83,6 +86,9 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
@@ -96,27 +102,33 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         LoaninClient client = new LoaninClient();
         String identifier = createIdentifier();
         MultipartOutput multipart = createLoaninInstance(identifier);
+        String newID = null;
         ClientResponse<Response> res = client.create(multipart);
-
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        //
+	        // Specifically:
+	        // Does it fall within the set of valid status codes?
+	        // Does it exactly match the expected status code?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        newID = extractId(res);
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Store the ID returned from the first resource created
         // for additional tests below.
         if (knownResourceId == null){
-            knownResourceId = extractId(res);
+            knownResourceId = newID;
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
@@ -124,9 +136,12 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         
         // Store the IDs from every resource created by tests,
         // so they can be deleted after tests have been run.
-        allResourceIdsCreated.add(extractId(res));
+        allResourceIdsCreated.add(newID);
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"create"})
@@ -139,16 +154,28 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithEmptyEntityBody(java.lang.String)
+     */
     @Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithMalformedXml(java.lang.String)
+     */
     @Override
     public void createWithMalformedXml(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithWrongXmlSchema(java.lang.String)
+     */
     @Override
     public void createWithWrongXmlSchema(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
     /*
@@ -235,35 +262,46 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#read(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
-
         // Perform setup.
         setupRead(testName);
 
         // Submit the request to the service and store the response.
+        MultipartInput input = null;
         LoaninClient client = new LoaninClient();
         ClientResponse<MultipartInput> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
+        try {
+        	int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        input = res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        MultipartInput input = (MultipartInput) res.getEntity();
+        
         LoansinCommon loanin = (LoansinCommon) extractPart(input,
                 client.getCommonPartName(), LoansinCommon.class);
         Assert.assertNotNull(loanin);
     }
 
     // Failure outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readNonExistent(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"read"})
@@ -275,48 +313,60 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         LoaninClient client = new LoaninClient();
         ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     // ---------------------------------------------------------------
     // CRUD tests : READ_LIST tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readList(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"createList", "read"})
     public void readList(String testName) throws Exception {
-
         // Perform setup.
         setupReadList(testName);
 
         // Submit the request to the service and store the response.
+        LoansinCommonList list = null;
         LoaninClient client = new LoaninClient();
         ClientResponse<LoansinCommonList> res = client.readList();
-        LoansinCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	        
+	        list = res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = false;
-        if(iterateThroughList && logger.isDebugEnabled()){
+        if (iterateThroughList && logger.isDebugEnabled()){
             List<LoansinCommonList.LoaninListItem> items =
                     list.getLoaninListItem();
             int i = 0;
@@ -330,7 +380,6 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
                 i++;
             }
         }
-
     }
 
     // Failure outcomes
@@ -339,6 +388,9 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : UPDATE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#update(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"read"})
@@ -348,18 +400,24 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         setupUpdate(testName);
 
         // Retrieve the contents of a resource to update.
+        MultipartInput input = null;
         LoaninClient client = new LoaninClient();
         ClientResponse<MultipartInput> res =
-                client.read(knownResourceId);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": read status = " + res.getStatus());
+            client.read(knownResourceId);
+        try {
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": read status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+	
+	        if(logger.isDebugEnabled()){
+	            logger.debug("got object to update with ID: " + knownResourceId);
+	        }
+	        input = res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
-        if(logger.isDebugEnabled()){
-            logger.debug("got object to update with ID: " + knownResourceId);
-        }
-        MultipartInput input = (MultipartInput) res.getEntity();
+        
         LoansinCommon loanin = (LoansinCommon) extractPart(input,
                 client.getCommonPartName(), LoansinCommon.class);
         Assert.assertNotNull(loanin);
@@ -377,17 +435,22 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         commonPart.getHeaders().add("label", client.getCommonPartName());
 
         res = client.update(knownResourceId, output);
-        int statusCode = res.getStatus();
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	
+	        input = (MultipartInput) res.getEntity();
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-
-        input = (MultipartInput) res.getEntity();
+        
         LoansinCommon updatedLoanin =
                 (LoansinCommon) extractPart(input,
                         client.getCommonPartName(), LoansinCommon.class);
@@ -396,20 +459,33 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(updatedLoanin.getLoanReturnDate(),
                 loanin.getLoanReturnDate(),
                 "Data in updated object did not match submitted data.");
-
     }
 
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithEmptyEntityBody(java.lang.String)
+     */
     @Override
-    public void updateWithEmptyEntityBody(String testName) throws Exception{
+    public void updateWithEmptyEntityBody(String testName) throws Exception {
+    	//Should this really be empty?
     }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithMalformedXml(java.lang.String)
+     */
     @Override
     public void updateWithMalformedXml(String testName) throws Exception {
+    	//Should this really be empty?
     }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithWrongXmlSchema(java.lang.String)
+     */
     @Override
     public void updateWithWrongXmlSchema(String testName) throws Exception {
+    	//Should this really be empty?
     }
 
     /*
@@ -492,6 +568,9 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
     }
      */
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateNonExistent(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"update", "testSubmitRequest"})
@@ -507,22 +586,29 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         MultipartOutput multipart = createLoaninInstance(NON_EXISTENT_ID);
         ClientResponse<MultipartInput> res =
                 client.update(NON_EXISTENT_ID, multipart);
-        int statusCode = res.getStatus();
+        try {
+        	int statusCode = res.getStatus();
 
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     // ---------------------------------------------------------------
     // CRUD tests : DELETE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#delete(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
@@ -534,40 +620,50 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         LoaninClient client = new LoaninClient();
         ClientResponse<Response> res = client.delete(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     // Failure outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
+     */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"delete"})
     public void deleteNonExistent(String testName) throws Exception {
-
         // Perform setup.
         setupDeleteNonExistent(testName);
 
         // Submit the request to the service and store the response.
         LoaninClient client = new LoaninClient();
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     // ---------------------------------------------------------------
@@ -599,43 +695,35 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
     }
 
     // ---------------------------------------------------------------
-    // Cleanup of resources created during testing
-    // ---------------------------------------------------------------
-
-    /**
-     * Deletes all resources created by tests, after all tests have been run.
-     *
-     * This cleanup method will always be run, even if one or more tests fail.
-     * For this reason, it attempts to remove all resources created
-     * at any point during testing, even if some of those resources
-     * may be expected to be deleted by certain tests.
-     */
-    @AfterClass(alwaysRun=true)
-    public void cleanUp() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Cleaning up temporary resources created for testing ...");
-        }
-       LoaninClient client = new LoaninClient();
-       for (String resourceId : allResourceIdsCreated) {
-            // Note: Any non-success responses are ignored and not reported.
-            ClientResponse<Response> res = client.delete(resourceId);
-        }
-    }
-
-    // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
+     */
     @Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
     }
 
+    /**
+     * Creates the loanin instance.
+     *
+     * @param identifier the identifier
+     * @return the multipart output
+     */
     private MultipartOutput createLoaninInstance(String identifier) {
         return createLoaninInstance(
                 "loaninNumber-" + identifier,
                 "returnDate-" + identifier);
     }
 
+    /**
+     * Creates the loanin instance.
+     *
+     * @param loaninNumber the loanin number
+     * @param returnDate the return date
+     * @return the multipart output
+     */
     private MultipartOutput createLoaninInstance(String loaninNumber,
     		String returnDate) {
         LoansinCommon loanin = new LoansinCommon();

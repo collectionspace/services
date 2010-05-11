@@ -36,8 +36,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
+//import javax.xml.bind.JAXBContext;
+//import javax.xml.bind.Marshaller;
 
 import org.collectionspace.services.common.query.QueryManager;
 //import org.collectionspace.services.common.NuxeoClientType;

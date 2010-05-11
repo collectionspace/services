@@ -38,7 +38,7 @@ import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
-import org.collectionspace.services.acquisition.AcquisitionsCommonList;
+//import org.collectionspace.services.acquisition.AcquisitionsCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -68,8 +68,8 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
     final String SERVICE_PATH_COMPONENT = "acquisitions";
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     private String knownResourceId = null;
-    private List<String> acquisitionIdsCreated = new ArrayList();
-    private List<String> personIdsCreated = new ArrayList();
+    private List<String> acquisitionIdsCreated = new ArrayList<String>();
+    private List<String> personIdsCreated = new ArrayList<String>();
     private int CREATED_STATUS = Response.Status.CREATED.getStatusCode();
     private int OK_STATUS = Response.Status.OK.getStatusCode();
     private String personAuthCSID = null; 
@@ -288,15 +288,18 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         for (String resourceId : acquisitionIdsCreated) {
            // Note: Any non-success responses are ignored and not reported.
            ClientResponse<Response> res = acquisitionClient.delete(resourceId);
+           res.releaseConnection();
         }
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Delete persons before PersonAuth
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
             ClientResponse<Response> res = personAuthClient.deleteItem(personAuthCSID, resourceId);
+            res.releaseConnection();
         }
         // Note: Any non-success response is ignored and not reported.
         ClientResponse<Response> res = personAuthClient.delete(personAuthCSID);
+        res.releaseConnection();
     }
 
     // ---------------------------------------------------------------

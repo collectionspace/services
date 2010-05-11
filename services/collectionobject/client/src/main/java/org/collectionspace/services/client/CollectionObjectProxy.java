@@ -35,15 +35,15 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
+//import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+//import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.client.IClientQueryParams;
+//import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.CollectionSpaceProxy;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.jaxb.AbstractCommonList;
+//import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -68,6 +68,21 @@ public interface CollectionObjectProxy extends CollectionSpaceProxy {
     @GET
     @Produces({"application/xml"})
     ClientResponse<CollectionobjectsCommonList> readList();
+    
+//    /**
+//     * Read list.
+//     *
+//     * @param pageSize the page size
+//     * @param pageNumber the page number
+//     * @return the client response
+//     */
+//    @GET
+//    @Produces({"application/xml"})
+//    @Override
+//    ClientResponse<CollectionobjectsCommonList> readList(
+//    		@QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) String pageSize,
+//    		@QueryParam(IClientQueryParams.START_PAGE_PARAM) String pageNumber);
+    
 
     /**
      * Roundtrip.

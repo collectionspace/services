@@ -42,9 +42,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  */
 public class PermissionRoleClient extends AbstractServiceClientImpl {
 
-    /**
-     *
-     */
+    /** The permission role proxy. */
     private PermissionRoleProxy permissionRoleProxy;
 
     /* (non-Javadoc)
@@ -65,13 +63,16 @@ public class PermissionRoleClient extends AbstractServiceClientImpl {
         setProxy();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.CollectionSpaceClient#getProxy()
+     */
     @Override
     public CollectionSpaceProxy getProxy() {
     	return this.permissionRoleProxy;
     }    
 
     /**
-     * allow to reset proxy as per security needs
+     * allow to reset proxy as per security needs.
      */
     public void setProxy() {
         if (useAuth()) {
@@ -85,32 +86,39 @@ public class PermissionRoleClient extends AbstractServiceClientImpl {
 
 
     /**
-     * @param csid
+     * Read.
+     *
+     * @param csid the csid
      * @param prcsid relationship does not have an id, junk is fine
-     * @return
-     * @see 
+     * @return the client response
+     * @see
      */
     public ClientResponse<PermissionRole> read(String csid, String prcsid) {
         return permissionRoleProxy.read(csid, prcsid);
     }
 
     /**
-     * @param permRole
-     * @return
-     * @see 
+     * Creates the.
+     *
+     * @param csid the csid
+     * @param permRole the perm role
+     * @return the client response
+     * @see
      */
     public ClientResponse<Response> create(String csid, PermissionRole permRole) {
         return permissionRoleProxy.create(csid, permRole);
     }
 
-
     /**
-     * @param csid
+     * Delete.
+     *
+     * @param csid the csid
      * @param prcsid relationship does not have an id, junk is fine
-     * @return
-     * @see 
+     * @return response
+     * @see
      */
     public ClientResponse<Response> delete(String csid, String prcsid) {
         return permissionRoleProxy.delete(csid, prcsid);
     }
+        
 }

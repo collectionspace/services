@@ -124,34 +124,37 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
                 lendersAuthorizerRefName,
                 lendersContactRefName,
                 loanInContactRefName);
-        ClientResponse<Response> res = loaninClient.create(multipart);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        ClientResponse<Response> response = loaninClient.create(multipart);
+        int statusCode = response.getStatus();
+        try {
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        //
+	        // Specifically:
+	        // Does it fall within the set of valid status codes?
+	        // Does it exactly match the expected status code?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Store the ID returned from the first resource created
+	        // for additional tests below.
+	        if (knownResourceId == null){
+	            knownResourceId = extractId(response);
+	            if (logger.isDebugEnabled()) {
+	                logger.debug(testName + ": knownResourceId=" + knownResourceId);
+	            }
+	        }
+	        
+	        // Store the IDs from every resource created by tests,
+	        // so they can be deleted after tests have been run.
+	        loaninIdsCreated.add(extractId(response));
+        } finally {
+        	response.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Store the ID returned from the first resource created
-        // for additional tests below.
-        if (knownResourceId == null){
-            knownResourceId = extractId(res);
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": knownResourceId=" + knownResourceId);
-            }
-        }
-        
-        // Store the IDs from every resource created by tests,
-        // so they can be deleted after tests have been run.
-        loaninIdsCreated.add(extractId(res));
     }
     
     protected void createPersonRefs(){
@@ -307,7 +310,9 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-        	personAuthClient.deleteItem(personAuthCSID, resourceId);
+        	ClientResponse<Response> response = 
+        		personAuthClient.deleteItem(personAuthCSID, resourceId); // alternative to personAuthClient.deleteItem().releaseConnection();
+        	response.releaseConnection();
         }
         
         // Delete PersonAuthority resource(s).
@@ -315,10 +320,12 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         if (personAuthCSID != null) {
         	personAuthClient.delete(personAuthCSID);
 	        // Delete Loans In resource(s).
-	        LoaninClient loaninClient = new LoaninClient();
+        	LoaninClient loaninClient = new LoaninClient();
+        	ClientResponse<Response> response = null;
 	        for (String resourceId : loaninIdsCreated) {
 	            // Note: Any non-success responses are ignored and not reported.
-	            loaninClient.delete(resourceId);
+	            response = loaninClient.delete(resourceId); // alternative to loaninClient.delete(resourceId).releaseConnection();
+	            response.releaseConnection();
 	        }
         }
     }

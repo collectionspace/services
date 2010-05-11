@@ -45,6 +45,8 @@ public interface ServiceTest {
      * Tests creation of a new resource.
      *
      * Relied upon by 'read', 'update' and 'delete' tests, below.
+     * @param testName 
+     * @throws Exception 
      */
     public void create(String testName) throws Exception;
 
@@ -53,6 +55,8 @@ public interface ServiceTest {
      * calling create(), and relies on the latter's test assertion(s).
      *
      * Relied upon by 'read list' tests, below.
+     * @param testName 
+     * @throws Exception 
      */
     public void createList(String testName) throws Exception;
 
@@ -61,12 +65,16 @@ public interface ServiceTest {
     /**
      * Tests creation of a resource by submitting
      * an empty entity body (aka empty payload).
+     * @param testName 
+     * @throws Exception 
      */
     public void createWithEmptyEntityBody(String testName) throws Exception;
 
     /**
      * Tests creation of a resource by submitting
      * a representation with malformed XML data.
+     * @param testName 
+     * @throws Exception 
      */
     public void createWithMalformedXml(String testName) throws Exception;
 
@@ -74,6 +82,8 @@ public interface ServiceTest {
      * Tests creation of a resource by submitting
      * a representation in the wrong XML schema
      * (e.g. not matching the object's schema).
+     * @param testName 
+     * @throws Exception 
      */
     public void createWithWrongXmlSchema(String testName) throws Exception;
 
@@ -89,6 +99,8 @@ public interface ServiceTest {
 
     /**
      * Tests reading (i.e. retrieval) of a resource.
+     * @param testName 
+     * @throws Exception 
      */
     public void read(String testName) throws Exception;
 
@@ -98,6 +110,8 @@ public interface ServiceTest {
      * Tests reading (i.e. retrieval) of a non-existent
      * resource, whose resource identifier does not exist
      * at the specified URL.
+     * @param testName 
+     * @throws Exception 
      */
     public void readNonExistent(String testName) throws Exception;
 
@@ -111,6 +125,8 @@ public interface ServiceTest {
     /**
      * Tests reading (i.e. retrieval) of a list of
      * multiple resources.
+     * @param testName 
+     * @throws Exception 
      */
     public void readList(String testName) throws Exception;
 
@@ -133,6 +149,8 @@ public interface ServiceTest {
 
     /**
      * Tests updating the content of a resource.
+     * @param testName 
+     * @throws Exception 
      */
     public void update(String testName) throws Exception;
 
@@ -141,6 +159,8 @@ public interface ServiceTest {
     /**
      * Tests updating the content of a resource
      * by submitting an empty entity body (aka empty payload).
+     * @param testName 
+     * @throws Exception 
      */
     public void updateWithEmptyEntityBody(String testName) throws Exception;
 
@@ -148,6 +168,8 @@ public interface ServiceTest {
      * Tests updating the content of a resource
      * by submitting a representation with malformed
      * XML data.
+     * @param testName 
+     * @throws Exception 
      */
     public void updateWithMalformedXml(String testName) throws Exception;
 
@@ -155,12 +177,16 @@ public interface ServiceTest {
      * Tests updating the content of a resource
      * by submitting a representation in the wrong
      * XML schema (e.g. not matching the object's schema).
+     * @param testName 
+     * @throws Exception 
      */
     public void updateWithWrongXmlSchema(String testName) throws Exception;
 
     /**
      * Tests updating the content of a non-existent
      * resource, whose resource identifier does not exist.
+     * @param testName 
+     * @throws Exception 
      */
     public void updateNonExistent(String testName) throws Exception;
 
@@ -173,6 +199,8 @@ public interface ServiceTest {
 
     /**
      * Tests deleting a resource.
+     * @param testName 
+     * @throws Exception 
      */
     public void delete(String testName) throws Exception;
 
@@ -181,6 +209,8 @@ public interface ServiceTest {
     /**
      * Tests deleting a non-existent resource, whose resource
      * identifier does not exist at the specified URL.
+     * @param testName 
+     * @throws Exception 
      */
     public void deleteNonExistent(String testName) throws Exception;
 

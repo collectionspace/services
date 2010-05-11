@@ -23,6 +23,10 @@
 
 package org.collectionspace.services.client;
 
+import javax.ws.rs.core.Response;
+
+import org.jboss.resteasy.client.ClientResponse;
+
 /**
  * A CollectionObjectClient.
 
@@ -43,5 +47,9 @@ public class TestServiceClient extends AbstractServiceClientImpl {
 	@Override
 	public CollectionSpaceProxy getProxy() {
 		throw new UnsupportedOperationException();
-	}  
+	}
+	
+	public ClientResponse<Response> delete(String csid) {
+		throw new UnsupportedOperationException();
+	}
 }

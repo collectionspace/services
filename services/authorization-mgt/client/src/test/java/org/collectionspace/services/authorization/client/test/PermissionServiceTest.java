@@ -22,7 +22,7 @@
  */
 package org.collectionspace.services.authorization.client.test;
 
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.Response;
 //import org.collectionspace.services.authorization.ActionType;
@@ -44,7 +44,6 @@ import org.testng.annotations.Test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.AfterClass;
 
 /**
  * PermissionServiceTest, carries out tests against a
@@ -55,16 +54,22 @@ import org.testng.annotations.AfterClass;
  */
 public class PermissionServiceTest extends AbstractServiceTestImpl {
 
+    /** The Constant logger. */
     static private final Logger logger =
             LoggerFactory.getLogger(PermissionServiceTest.class);
     // Instance variables specific to this test.
+    /** The known resource id. */
     private String knownResourceId = null;
-    private List<String> allResourceIdsCreated = new ArrayList<String>();
+    
+    /** The add tenant. */
     boolean addTenant = true;
     /*
      * This method is called only by the parent class, AbstractServiceTestImpl
      */
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
+     */
     @Override
     protected String getServicePathComponent() {
         return new PermissionClient().getServicePathComponent();
@@ -88,6 +93,9 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     	throw new UnsupportedOperationException();
     }
     
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
+	 */
 	@Test(dataProvider = "testName")
 	@Override
     public void readPaginatedList(String testName) throws Exception {
@@ -98,7 +106,10 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
-    @Override
+    /* (non-Javadoc)
+	 * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
+	 */
+	@Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
 
@@ -141,6 +152,12 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         }
     }
 
+    /**
+     * Creates the without resource name.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
     public void createWithoutResourceName(String testName) throws Exception {
@@ -169,6 +186,9 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     }
 
     //to not cause uniqueness violation for permission, createList is removed
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
@@ -224,16 +244,25 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithEmptyEntityBody(java.lang.String)
+     */
     @Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
     	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithMalformedXml(java.lang.String)
+     */
     @Override
     public void createWithMalformedXml(String testName) throws Exception {
     	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithWrongXmlSchema(java.lang.String)
+     */
     @Override
     public void createWithWrongXmlSchema(String testName) throws Exception {
     	//FIXME: Should this test really be empty?  If so, please comment accordingly.
@@ -243,6 +272,9 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#read(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
@@ -270,6 +302,9 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     }
 
     // Failure outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readNonExistent(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read"})
@@ -297,6 +332,9 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : READ_LIST tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readList(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"createList", "read"})
@@ -327,6 +365,12 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         }
     }
 
+    /**
+     * Search resource name.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"createList", "read"})
     public void searchResourceName(String testName) throws Exception {
@@ -366,6 +410,9 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : UPDATE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#update(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read", "readList", "readNonExistent"})
@@ -404,6 +451,12 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
                 "Data in updated object did not match submitted data.");
     }
 
+    /**
+     * Update actions.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"update"})
     public void updateActions(String testName) throws Exception {
@@ -455,21 +508,33 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithEmptyEntityBody(java.lang.String)
+     */
     @Override
     public void updateWithEmptyEntityBody(String testName) throws Exception {
     	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithMalformedXml(java.lang.String)
+     */
     @Override
     public void updateWithMalformedXml(String testName) throws Exception {
     	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithWrongXmlSchema(java.lang.String)
+     */
     @Override
     public void updateWithWrongXmlSchema(String testName) throws Exception {
     	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateNonExistent(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"readNonExistent", "testSubmitRequest"})
@@ -509,6 +574,9 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : DELETE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#delete(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"updateActions"})
@@ -533,6 +601,9 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     }
 
     // Failure outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"delete"})
@@ -562,6 +633,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     /**
      * Tests the code for manually submitting data that is used by several
      * of the methods above.
+     * @throws Exception 
      */
     @Test(dependsOnMethods = {"create", "read"})
     public void testSubmitRequest() throws Exception {
@@ -596,7 +668,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
      * @param useResourceName
      * @param useAction
      * @param useEffect
-     * @return
+     * @return permission
      */
     public static Permission createPermissionInstance(String resourceName,
             String description,
@@ -617,29 +689,13 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         return permission;
     }
 
-    @AfterClass(alwaysRun = true)
-    public void cleanUp() {
-        setupDelete("delete");
-        String noTest = System.getProperty("noTestCleanup");
-        if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Skipping Cleanup phase ...");
-            }
-            return;
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Cleaning up temporary resources created for testing ...");
-        }
-        PermissionClient client = new PermissionClient();
-        for (String resourceId : allResourceIdsCreated) {
-            ClientResponse<Response> res = client.delete(resourceId);
-            int statusCode = res.getStatus();
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        }
-    }
-
+    /**
+     * Prints the list.
+     *
+     * @param testName the test name
+     * @param list the list
+     * @return the int
+     */
     private int printList(String testName, PermissionsList list) {
 
         int i = 0;

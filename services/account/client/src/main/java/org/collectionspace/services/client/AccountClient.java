@@ -51,6 +51,7 @@ public class AccountClient extends AbstractServiceClientImpl {
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */
+    @Override
     public String getServicePathComponent() {
         return "accounts";
     }
@@ -85,7 +86,7 @@ public class AccountClient extends AbstractServiceClientImpl {
     }
 
     /**
-     * @return
+     * @return response
      * @see org.collectionspace.hello.client.AccountProxy#readList()
      */
     public ClientResponse<AccountsCommonList> readList() {
@@ -100,7 +101,7 @@ public class AccountClient extends AbstractServiceClientImpl {
 
     /**
      * @param csid
-     * @return
+     * @return response
      * @see org.collectionspace.hello.client.AccountProxy#getAccount(java.lang.String)
      */
     public ClientResponse<AccountsCommon> read(String csid) {
@@ -108,8 +109,9 @@ public class AccountClient extends AbstractServiceClientImpl {
     }
 
     /**
+     * @param multipart 
      * @param account
-     * @return
+     * @return response
      * @see org.collectionspace.hello.client.AccountProxy#create(org.collectionspace.services.account.AccountsCommon)
      */
     public ClientResponse<Response> create(AccountsCommon multipart) {
@@ -118,8 +120,9 @@ public class AccountClient extends AbstractServiceClientImpl {
 
     /**
      * @param csid
+     * @param multipart 
      * @param account
-     * @return
+     * @return response
      * @see org.collectionspace.hello.client.AccountProxy#updateAccount(java.lang.Long, org.collectionspace.services.account.AccountsCommon)
      */
     public ClientResponse<AccountsCommon> update(String csid, AccountsCommon multipart) {
@@ -128,10 +131,11 @@ public class AccountClient extends AbstractServiceClientImpl {
 
     /**
      * @param csid
-     * @return
+     * @return response
      * @see org.collectionspace.hello.client.AccountProxy#deleteAccount(java.lang.Long)
      */
-    public ClientResponse<Response> delete(String csid) {
+    @Override
+	public ClientResponse<Response> delete(String csid) {
         return accountProxy.delete(csid);
     }
 }

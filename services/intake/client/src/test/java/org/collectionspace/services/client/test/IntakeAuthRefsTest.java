@@ -67,8 +67,8 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
     final String SERVICE_PATH_COMPONENT = "intakes";
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     private String knownResourceId = null;
-    private List<String> intakeIdsCreated = new ArrayList();
-    private List<String> personIdsCreated = new ArrayList();
+    private List<String> intakeIdsCreated = new ArrayList<String>();
+    private List<String> personIdsCreated = new ArrayList<String>();
     private int CREATED_STATUS = Response.Status.CREATED.getStatusCode();
     private int OK_STATUS = Response.Status.OK.getStatusCode();
     private String personAuthCSID = null; 
@@ -303,14 +303,14 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
         IntakeClient intakeClient = new IntakeClient();
         // Note: Any non-success responses are ignored and not reported.
         for (String resourceId : intakeIdsCreated) {
-            ClientResponse<Response> res = intakeClient.delete(resourceId);
+            intakeClient.delete(resourceId).releaseConnection();
         }
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Delete persons before PersonAuth
         for (String resourceId : personIdsCreated) {
-            ClientResponse<Response> res = personAuthClient.deleteItem(personAuthCSID, resourceId);
+            personAuthClient.deleteItem(personAuthCSID, resourceId).releaseConnection();
         }
-        ClientResponse<Response> res = personAuthClient.delete(personAuthCSID);
+        personAuthClient.delete(personAuthCSID).releaseConnection();
     }
 
     // ---------------------------------------------------------------

@@ -53,15 +53,21 @@ import org.testng.annotations.AfterClass;
  */
 public class AccountServiceTest extends AbstractServiceTestImpl {
 
+    /** The Constant logger. */
     static private final Logger logger =
             LoggerFactory.getLogger(AccountServiceTest.class);
     // Instance variables specific to this test.
+    /** The known resource id. */
     private String knownResourceId = null;
-    private List<String> allResourceIdsCreated = new ArrayList();
+    
+    /** The add tenant. */
     static boolean addTenant = true;
 
     /*
      * This method is called only by the parent class, AbstractServiceTestImpl
+     */
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
      */
     @Override
     protected String getServicePathComponent() {
@@ -99,6 +105,9 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
@@ -137,6 +146,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         }
     }
 
+    /**
+     * Creates the for unique user.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
     public void createForUniqueUser(String testName) throws Exception {
@@ -158,6 +173,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
+    /**
+     * Creates the with invalid tenant.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
     public void createWithInvalidTenant(String testName) throws Exception {
@@ -181,6 +202,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
 
     }
 
+    /**
+     * Creates the without user.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
     public void createWithoutUser(String testName) throws Exception {
@@ -203,6 +230,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
+    /**
+     * Creates the with invalid email.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
     public void createWithInvalidEmail(String testName) throws Exception {
@@ -225,6 +258,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
+    /**
+     * Creates the without screen name.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
     public void createWithoutScreenName(String testName) throws Exception {
@@ -247,6 +286,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
+    /**
+     * Creates the with invalid password.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
     public void createWithInvalidPassword(String testName) throws Exception {
@@ -269,6 +314,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
+        /**
+         * Creates the with most invalid.
+         *
+         * @param testName the test name
+         * @throws Exception the exception
+         */
         @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
     public void createWithMostInvalid(String testName) throws Exception {
@@ -292,6 +343,9 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     }
 
     //to not cause uniqueness violation for account, createList is removed
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
@@ -336,16 +390,25 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithEmptyEntityBody(java.lang.String)
+     */
     @Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
     	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithMalformedXml(java.lang.String)
+     */
     @Override
     public void createWithMalformedXml(String testName) throws Exception {
     	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createWithWrongXmlSchema(java.lang.String)
+     */
     @Override
     public void createWithWrongXmlSchema(String testName) throws Exception {
     	//FIXME: Should this test really be empty?  If so, please comment accordingly.
@@ -355,6 +418,9 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#read(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
@@ -382,6 +448,9 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     }
 
     // Failure outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readNonExistent(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read"})
@@ -409,6 +478,9 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : READ_LIST tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readList(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"createList", "read"})
@@ -439,6 +511,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         }
     }
 
+    /**
+     * Search screen name.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"createList", "read"})
     public void searchScreenName(String testName) throws Exception {
@@ -469,6 +547,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         }
     }
 
+    /**
+     * Search user id.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"createList", "read"})
     public void searchUserId(String testName) throws Exception {
@@ -499,6 +583,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         }
     }
 
+    /**
+     * Search email.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"createList", "read"})
     public void searchEmail(String testName) throws Exception {
@@ -529,6 +619,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         }
     }
 
+    /**
+     * Search screen name email.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"createList", "read"})
     public void searchScreenNameEmail(String testName) throws Exception {
@@ -565,6 +661,9 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : UPDATE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#update(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read", "readList", "readNonExistent"})
@@ -618,6 +717,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
                 "Data in updated object did not match submitted data.");
     }
 
+    /**
+     * Update password.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"update"})
     public void updatePassword(String testName) throws Exception {
@@ -671,6 +776,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
 //                "Data in updated object did not match submitted data.");
     }
 
+    /**
+     * Update password without user.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"update"})
     public void updatePasswordWithoutUser(String testName) throws Exception {
@@ -703,6 +814,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
 
     }
 
+    /**
+     * Update invalid password.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"update"})
     public void updateInvalidPassword(String testName) throws Exception {
@@ -747,6 +864,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
 
     }
 
+    /**
+     * Deactivate.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"updatePasswordWithoutUser"})
     public void deactivate(String testName) throws Exception {
@@ -802,21 +925,33 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithEmptyEntityBody(java.lang.String)
+     */
     @Override
     public void updateWithEmptyEntityBody(String testName) throws Exception {
     	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithMalformedXml(java.lang.String)
+     */
     @Override
     public void updateWithMalformedXml(String testName) throws Exception {
     	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithWrongXmlSchema(java.lang.String)
+     */
     @Override
     public void updateWithWrongXmlSchema(String testName) throws Exception {
     	//FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateNonExistent(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"deactivate", "readNonExistent", "testSubmitRequest"})
@@ -847,6 +982,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    /**
+     * Update wrong user.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"deactivate", "readNonExistent", "testSubmitRequest"})
     public void updateWrongUser(String testName) throws Exception {
@@ -895,6 +1036,9 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : DELETE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#delete(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"testSubmitRequest", "updateWrongUser"})
@@ -919,6 +1063,9 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     }
 
     // Failure outcomes
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
+     */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"delete"})
@@ -948,6 +1095,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     /**
      * Tests the code for manually submitting data that is used by several
      * of the methods above.
+     * @throws Exception 
      */
     @Test(dependsOnMethods = {"create", "read"})
     public void testSubmitRequest() throws Exception {
@@ -1002,30 +1150,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
 
     }
 
-    @AfterClass(alwaysRun = true)
-    public void cleanUp() {
-        setupDelete("delete");
-        String noTest = System.getProperty("noTestCleanup");
-        if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Skipping Cleanup phase ...");
-            }
-            return;
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Cleaning up temporary resources created for testing ...");
-        }
-        AccountClient client = new AccountClient();
-        for (String resourceId : allResourceIdsCreated) {
-            // Note: Any non-success responses are ignored and not reported.
-            ClientResponse<Response> res = client.delete(resourceId);
-            int statusCode = res.getStatus();
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        }
-    }
-
+    /**
+     * Prints the list.
+     *
+     * @param testName the test name
+     * @param list the list
+     */
     private void printList(String testName, AccountsCommonList list) {
         List<AccountsCommonList.AccountListItem> items =
                 list.getAccountListItem();
