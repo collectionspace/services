@@ -62,6 +62,8 @@ public interface PersonAuthorityProxy extends CollectionSpaceProxy {
     ClientResponse<PersonsCommonList> readItemList(@PathParam("vcsid") String vcsid);
 
     /**
+     * @param parentcsid 
+     * @param itemcsid 
      * @param csid
      * @return
      * @see org.collectionspace.services.client.IntakeProxy#getAuthorityRefs(java.lang.String)
