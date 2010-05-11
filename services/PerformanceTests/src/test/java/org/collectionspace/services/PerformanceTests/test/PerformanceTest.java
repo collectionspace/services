@@ -65,7 +65,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 	// Get clients for the CollectionSpace services
 	//
 	/** The MA x_ records. */
-	private static int MAX_RECORDS = 100;
+	private static int MAX_RECORDS = 1000;
 
 	/**
 	 * Performance test.

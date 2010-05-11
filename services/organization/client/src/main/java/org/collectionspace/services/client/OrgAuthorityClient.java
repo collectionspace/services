@@ -29,6 +29,7 @@ package org.collectionspace.services.client;
 //import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.organization.OrgauthoritiesCommonList;
@@ -165,6 +166,7 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
      * @param csid the csid
      * @return the client response
      */
+    @Override
     public ClientResponse<Response> delete(String csid) {
         return orgAuthorityProxy.delete(csid);
     }
@@ -178,6 +180,18 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
     public ClientResponse<OrganizationsCommonList> readItemList(String vcsid) {
         return orgAuthorityProxy.readItemList(vcsid);
     }
+    
+    /**
+     * Gets the referencing objects.
+     *
+     * @param parentcsid the parentcsid
+     * @param csid the csid
+     * @return the referencing objects
+     */
+    public ClientResponse<AuthorityRefDocList> getReferencingObjects(String parentcsid, String csid) {
+        return orgAuthorityProxy.getReferencingObjects(parentcsid, csid);
+    }
+    
 
     /**
      * Read item list for named authority.

@@ -26,7 +26,7 @@
  */
 package org.collectionspace.services.client;
 
-import javax.ws.rs.PathParam;
+//import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 //import org.collectionspace.services.common.authorityref.AuthorityRefList;

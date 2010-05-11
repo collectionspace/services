@@ -37,12 +37,12 @@ import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.intake.IntakesCommon;
-import org.collectionspace.services.intake.IntakesCommonList;
+//import org.collectionspace.services.intake.IntakesCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
@@ -68,8 +68,8 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
     final String SERVICE_PATH_COMPONENT = "intakes";
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     private String knownIntakeId = null;
-    private List<String> intakeIdsCreated = new ArrayList();
-    private List<String> personIdsCreated = new ArrayList();
+    private List<String> intakeIdsCreated = new ArrayList<String>();
+    private List<String> personIdsCreated = new ArrayList<String>();
     private int CREATED_STATUS = Response.Status.CREATED.getStatusCode();
     private int OK_STATUS = Response.Status.OK.getStatusCode();
     private String personAuthCSID = null; 
@@ -126,21 +126,24 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
 								valuerRefName );
 
         ClientResponse<Response> res = intakeClient.create(multipart);
-
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        //
+	        // Specifically:
+	        // Does it fall within the set of valid status codes?
+	        // Does it exactly match the expected status code?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Store the ID returned from the first resource created
         // for additional tests below.
@@ -156,6 +159,9 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         intakeIdsCreated.add(extractId(res));
     }
     
+    /**
+     * Creates the person refs.
+     */
     protected void createPersonRefs(){
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     	String authRefName = 
@@ -291,14 +297,16 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         // Note: Any non-success responses are ignored and not reported.
         for (String resourceId : intakeIdsCreated) {
             ClientResponse<Response> res = intakeClient.delete(resourceId);
+            res.releaseConnection();
         }
         // Delete persons before PersonAuth
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         for (String resourceId : personIdsCreated) {
             ClientResponse<Response> res = personAuthClient.deleteItem(personAuthCSID, resourceId);
+            res.releaseConnection();
         }
         if (personAuthCSID != null) {
-        	personAuthClient.delete(personAuthCSID);
+        	personAuthClient.delete(personAuthCSID).releaseConnection();
         }
     }
 
