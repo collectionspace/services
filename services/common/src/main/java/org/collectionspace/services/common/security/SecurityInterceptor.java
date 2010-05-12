@@ -41,6 +41,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.authorization.AuthZ;
+import org.collectionspace.services.authorization.CSpaceResource;
+import org.collectionspace.services.authorization.URIResourceImpl;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.slf4j.Logger;
@@ -66,19 +68,21 @@ public class SecurityInterceptor implements PreProcessInterceptor {
             logger.debug("received " + httpMethod + " on " + uriPath);
         }
         checkActive();
-        AuthZ authZ = AuthZ.get();
-//        CSpaceResource res = new URIResourceImpl(uriPath, httpMethod);
-//        if (!authZ.isAccessAllowed(res)) {
-//            logger.error("Access to " + res.getId() + " is NOT allowed to " +
-//                    " user=" + AuthN.get().getUserId());
-//            Response response = Response.status(
-//                    Response.Status.FORBIDDEN).entity(uriPath + " " + httpMethod).type("text/plain").build();
-//            throw new WebApplicationException(response);
-//        }
-//        if(logger.isDebugEnabled()) {
-//            logger.debug("Access to " + res.getId() + " is allowed to " +
-//                    " user=" + AuthN.get().getUserId());
-//        }
+        if (uriPath.startsWith("dimensions")) {
+             AuthZ authZ = AuthZ.get();
+            CSpaceResource res = new URIResourceImpl(uriPath, httpMethod);
+            if (!authZ.isAccessAllowed(res)) {
+                logger.error("Access to " + res.getId() + " is NOT allowed to "
+                        + " user=" + AuthN.get().getUserId());
+                Response response = Response.status(
+                        Response.Status.FORBIDDEN).entity(uriPath + " " + httpMethod).type("text/plain").build();
+                throw new WebApplicationException(response);
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Access to " + res.getId() + " is allowed to "
+                        + " user=" + AuthN.get().getUserId());
+            }
+        }
         return null;
     }
 
@@ -106,7 +110,7 @@ public class SecurityInterceptor implements PreProcessInterceptor {
             }
             Object status = JaxbUtils.getValue(account, "getStatus");
             if (status != null) {
-                String value = (String)JaxbUtils.getValue(status, "value");
+                String value = (String) JaxbUtils.getValue(status, "value");
                 if ("INACTIVE".equalsIgnoreCase(value)) {
                     String msg = "User's account is inactive, userId=" + userId;
                     Response response = Response.status(

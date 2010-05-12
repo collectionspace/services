@@ -19,7 +19,7 @@
         <subject>ROLE</subject>
         <permission>
             <permissionId>2</permissionId>
-            <resourceName>collectionobjects</resourceName>
+            <resourceName>dimensions</resourceName>
         </permission>
         <role>
             <roleId>1</roleId>

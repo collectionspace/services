@@ -75,8 +75,8 @@ public class AuthorizationGen {
 
         Permission accPerm = buildCommonPermission("1", "accounts");
         apcList.add(accPerm);
-        Permission coPerm = buildCommonPermission("2", "collectionobjects");
-        apcList.add(coPerm);
+        Permission dimPerm = buildCommonPermission("2", "dimensions");
+        apcList.add(dimPerm);
         AbstractAuthorizationTestImpl.toFile(pcList, PermissionsList.class,
                 AbstractAuthorizationTestImpl.testDataDir + "test-permissions.xml");
         logger.info("generated permissions to "
@@ -112,7 +112,7 @@ public class AuthorizationGen {
         PermissionsRolesList psrsl = new PermissionsRolesList();
         ArrayList<PermissionRole> prl = new ArrayList<PermissionRole>();
         prl.add(buildCommonPermissionRoles("1", "accounts"));
-        prl.add(buildCommonPermissionRoles("2", "collectionobjects"));
+        prl.add(buildCommonPermissionRoles("2", "dimensions"));
         psrsl.setPermissionRoles(prl);
         AbstractAuthorizationTestImpl.toFile(psrsl, PermissionsRolesList.class,
                 AbstractAuthorizationTestImpl.testDataDir + "test-permissions-roles.xml");

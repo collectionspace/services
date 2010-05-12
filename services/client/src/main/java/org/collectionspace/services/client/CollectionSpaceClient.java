@@ -22,8 +22,8 @@
  *  limitations under the License.
  */
 package org.collectionspace.services.client;
-import javax.ws.rs.core.Response;
 
+import javax.ws.rs.core.Response;
 import org.apache.commons.httpclient.HttpClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
@@ -32,19 +32,15 @@ import org.jboss.resteasy.client.ClientResponse;
  *
  */
 public interface CollectionSpaceClient {
-    
+
     /** The AUT h_ property. */
     String AUTH_PROPERTY = "cspace.auth";
-    
     /** The PASSWOR d_ property. */
     String PASSWORD_PROPERTY = "cspace.password";
-    
     /** The SS l_ property. */
     String SSL_PROPERTY = "cspace.ssl";
-    
     /** The UR l_ property. */
     String URL_PROPERTY = "cspace.url";
-    
     /** The USE r_ property. */
     String USER_PROPERTY = "cspace.user";
 
@@ -54,7 +50,7 @@ public interface CollectionSpaceClient {
      * @return the proxy
      */
     CollectionSpaceProxy getProxy();
-    
+
     /**
      * Gets the base url.
      *
@@ -105,6 +101,25 @@ public interface CollectionSpaceClient {
     void setupHttpClient();
 
     /**
+     * setProxy for the client
+     * might be useful to reset proxy (based on auth requirements) that is usually created at the time of
+     * constructing a client
+     */
+    void setProxy();
+
+    /**
+     * setAuth sets up authentication properties based on given parameters
+     * @param useAuth
+     * @param user user name
+     * @param useUser indicates using user name
+     * @param password
+     * @param usePassword indicates using password
+     */
+    void setAuth(boolean useAuth,
+            String user, boolean useUser,
+            String password, boolean usePassword);
+
+    /**
      * Use auth.
      *
      * @return true, if successful
@@ -123,7 +138,7 @@ public interface CollectionSpaceClient {
      * @return boolean
      */
     boolean isServerSecure();
-    
+
     /**
      * Read list.
      *

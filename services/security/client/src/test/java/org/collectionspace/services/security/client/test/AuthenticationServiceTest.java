@@ -105,12 +105,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         // its associated HTTP method name (e.g. POST, DELETE).
         setupCreate(testName);
         AccountClient accountClient = new AccountClient();
-        accountClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
-                "true");
-        accountClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
-                "test");
-        accountClient.setProperty(
-                CollectionSpaceClient.PASSWORD_PROPERTY, "test");
+        accountClient.setAuth(true, "test", true, "test", true);
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
@@ -142,12 +137,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         // its associated HTTP method name (e.g. POST, DELETE).
         setupCreate(testName);
         AccountClient accountClient = new AccountClient();
-        accountClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
-                "true");
-        accountClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
-                "test");
-        accountClient.setProperty(
-                CollectionSpaceClient.PASSWORD_PROPERTY, "test");
+        accountClient.setAuth(true, "test", true, "test", true);
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
@@ -201,23 +191,10 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     public void create(String testName) {
         setupCreate(testName);
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+        collectionObjectClient.setAuth(true, "barney", true, "barney08", true);
         String identifier = BaseServiceTest.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-
-        collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
-                "true");
-        collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
-                "barney");
-        collectionObjectClient.setProperty(
-                CollectionSpaceClient.PASSWORD_PROPERTY, "barney08");
-        try {
-            collectionObjectClient.setupHttpClient();
-            collectionObjectClient.setProxy();
-        } catch (Exception e) {
-            logger.error("create: caught " + e.getMessage());
-            return;
-        }
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
         if (logger.isDebugEnabled()) {
             logger.debug("create: status = " + res.getStatus());
@@ -233,27 +210,35 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
 
     }
 
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"createActiveAccount"})
+    public void createWithoutAuthn(String testName) {
+        setupCreate(testName);
+        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+        collectionObjectClient.setAuth(false, "test", true, "test", true);
+        String identifier = BaseServiceTest.createIdentifier();
+        MultipartOutput multipart = createCollectionObjectInstance(
+                collectionObjectClient.getCommonPartName(), identifier);
+        ClientResponse<Response> res = collectionObjectClient.create(multipart);
+        if (logger.isDebugEnabled()) {
+            logger.debug("create: status = " + res.getStatus());
+        }
+        Assert.assertEquals(res.getStatus(),
+                Response.Status.UNAUTHORIZED.getStatusCode(), "expected "
+                + Response.Status.UNAUTHORIZED.getStatusCode());
+        res.releaseConnection();
+
+    }
+
     @Test(dataProvider = "testName", dependsOnMethods = {"createInactiveAccount"})
     public void createWithInactiveAccount(String testName) {
         banner(testName);
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+        collectionObjectClient.setAuth(true, "george", true, "george08", true);
         String identifier = BaseServiceTest.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
 
-        collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
-                "true");
-        collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
-                "george");
-        collectionObjectClient.setProperty(CollectionSpaceClient.PASSWORD_PROPERTY,
-                "george08");
-        try {
-            collectionObjectClient.setupHttpClient();
-            collectionObjectClient.setProxy();
-        } catch (Exception e) {
-            logger.error(testName + ": caught " + e.getMessage());
-            return;
-        }
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + res.getStatus());
@@ -271,22 +256,10 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     public void createWithoutPassword(String testName) {
         banner(testName);
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+        collectionObjectClient.setAuth(true, "test", true, "", false);
         String identifier = BaseServiceTest.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-
-        collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
-                "true");
-        collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
-                "test");
-        collectionObjectClient.removeProperty(CollectionSpaceClient.PASSWORD_PROPERTY);
-        try {
-            collectionObjectClient.setupHttpClient();
-            collectionObjectClient.setProxy();
-        } catch (Exception e) {
-            logger.error(testName + ": caught " + e.getMessage());
-            return;
-        }
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + res.getStatus());
@@ -302,23 +275,10 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     public void createWithUnknownUser(String testName) {
         banner(testName);
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+        collectionObjectClient.setAuth(true, "foo", true, "bar", true);
         String identifier = BaseServiceTest.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-
-        collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
-                "true");
-        collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
-                "foo");
-        collectionObjectClient.setProperty(CollectionSpaceClient.PASSWORD_PROPERTY,
-                "bar");
-        try {
-            collectionObjectClient.setupHttpClient();
-            collectionObjectClient.setProxy();
-        } catch (Exception e) {
-            logger.error(testName + ": caught " + e.getMessage());
-            return;
-        }
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + res.getStatus());
@@ -334,23 +294,10 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     public void createWithIncorrectPassword(String testName) {
         banner(testName);
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+        collectionObjectClient.setAuth(true, "test", true, "bar", true);
         String identifier = BaseServiceTest.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-
-        collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
-                "true");
-        collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
-                "test");
-        collectionObjectClient.setProperty(
-                CollectionSpaceClient.PASSWORD_PROPERTY, "bar");
-        try {
-            collectionObjectClient.setupHttpClient();
-            collectionObjectClient.setProxy();
-        } catch (Exception e) {
-            logger.error(testName + ": caught " + e.getMessage());
-            return;
-        }
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + res.getStatus());
@@ -366,23 +313,10 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     public void createWithIncorrectUserPassword(String testName) {
         banner(testName);
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+        collectionObjectClient.setAuth(true, "foo", true, "bar", true);
         String identifier = BaseServiceTest.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-
-        collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
-                "true");
-        collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
-                "foo");
-        collectionObjectClient.setProperty(
-                CollectionSpaceClient.PASSWORD_PROPERTY, "bar");
-        try {
-            collectionObjectClient.setupHttpClient();
-            collectionObjectClient.setProxy();
-        } catch (Exception e) {
-            logger.error(testName + ": caught " + e.getMessage());
-            return;
-        }
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = "
@@ -399,23 +333,10 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     public void createWithoutTenant(String testName) {
         banner(testName);
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+        collectionObjectClient.setAuth(true, "babybop", true, "babybop09", true);
         String identifier = BaseServiceTest.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
-
-        collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
-                "true");
-        collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
-                "babybop");
-        collectionObjectClient.setProperty(
-                CollectionSpaceClient.PASSWORD_PROPERTY, "babybop09");
-        try {
-            collectionObjectClient.setupHttpClient();
-            collectionObjectClient.setProxy();
-        } catch (Exception e) {
-            logger.error(testName + ": caught " + e.getMessage());
-            return;
-        }
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = "
@@ -435,20 +356,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         setupDelete(testName);
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient = new CollectionObjectClient();
-
-        collectionObjectClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
-                "true");
-        collectionObjectClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
-                "test");
-        collectionObjectClient.setProperty(
-                CollectionSpaceClient.PASSWORD_PROPERTY, "test");
-        try {
-            collectionObjectClient.setupHttpClient();
-            collectionObjectClient.setProxy();
-        } catch (Exception e) {
-            logger.error("deleteCollectionObject: caught " + e.getMessage());
-            return;
-        }
+        collectionObjectClient.setAuth(true, "test", true, "test", true);
         if (logger.isDebugEnabled()) {
             logger.debug("Calling deleteCollectionObject:" + knownResourceId);
         }
@@ -468,13 +376,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupDelete(testName);
         AccountClient accountClient = new AccountClient();
-
-        accountClient.setProperty(CollectionSpaceClient.AUTH_PROPERTY,
-                "true");
-        accountClient.setProperty(CollectionSpaceClient.USER_PROPERTY,
-                "test");
-        accountClient.setProperty(
-                CollectionSpaceClient.PASSWORD_PROPERTY, "test");
+        accountClient.setAuth(true, "test", true, "test", true);
         // Submit the request to the service and store the response.
         ClientResponse<Response> res = accountClient.delete(barneyAccountId);
         int statusCode = res.getStatus();
@@ -507,7 +409,8 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     private MultipartOutput createCollectionObjectInstance(
             String commonPartName, String identifier) {
-        return createCollectionObjectInstance(commonPartName, "objectNumber-" + identifier, "objectName-" + identifier);
+        return createCollectionObjectInstance(commonPartName, "objectNumber-"
+                + identifier, "objectName-" + identifier);
     }
 
     /**

@@ -69,35 +69,26 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
  */
 public abstract class BaseServiceTest {
 
-	//Maven's base directory -i.e., the one containing the current pom.xml
-	static protected final String MAVEN_BASEDIR_PROPERTY = "maven.basedir";
-	
+    //Maven's base directory -i.e., the one containing the current pom.xml
+    static protected final String MAVEN_BASEDIR_PROPERTY = "maven.basedir";
     /** The Constant logger. */
     static protected final Logger logger = LoggerFactory.getLogger(BaseServiceTest.class);
-    
     /** The Constant serviceClient. */
     protected static final TestServiceClient serviceClient = new TestServiceClient();
-    
     /** The NO n_ existen t_ id. */
     protected final String NON_EXISTENT_ID = createNonExistentIdentifier();
-    
     /** The EXPECTE d_ statu s_ code. */
     protected int EXPECTED_STATUS_CODE = 0;
-    
     /** The REQUES t_ type. */
     protected ServiceRequestType REQUEST_TYPE = ServiceRequestType.NON_EXISTENT;
-    
     /** The Constant XML_DECLARATION. */
     protected static final String XML_DECLARATION = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-    
     /** The Constant MALFORMED_XML_DATA. */
     protected static final String MALFORMED_XML_DATA = XML_DECLARATION
             + "<malformed_xml>wrong schema contents</malformed_xml";
-    
     /** The WRON g_ xm l_ schem a_ data. */
     protected final String WRONG_XML_SCHEMA_DATA = XML_DECLARATION
             + "<wrong_schema>wrong schema contents</wrong_schema>";
-    
     /** The NUL l_ charset. */
     final String NULL_CHARSET = null;
 
@@ -107,16 +98,16 @@ public abstract class BaseServiceTest {
      * @return the client
      */
     abstract protected CollectionSpaceClient getClientInstance();
-    
-	/**
-	 * Gets the abstract common list.
-	 *
-	 * @param response the response
-	 * @return the abstract common list
-	 */
-	abstract protected AbstractCommonList getAbstractCommonList(
-			ClientResponse<AbstractCommonList> response);    
-    
+
+    /**
+     * Gets the abstract common list.
+     *
+     * @param response the response
+     * @return the abstract common list
+     */
+    abstract protected AbstractCommonList getAbstractCommonList(
+            ClientResponse<AbstractCommonList> response);
+
     /**
      * Returns the name of the currently running test.
      *

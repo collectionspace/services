@@ -125,32 +125,7 @@ public class AuthorizationDelegate {
         }
     }
 
-    /**
-     * addPermissionsForUri add permissions from given permission configuration
-     * with assumption that resource is of type URI
-     * @param permission configuration
-     */
-    //FIXME this method should be in the restful web service resource of authz
-    public void addPermissionsForUri(Permission perm,
-            PermissionRole permRole) throws PermissionException {
-        List<String> principals = new ArrayList<String>();
-        if (!perm.getCsid().equals(permRole.getPermissions().get(0).getPermissionId())) {
-            throw new IllegalArgumentException("permission ids do not"
-                    + " match for role=" + permRole.getRoles().get(0).getRoleName()
-                    + " with permissionId=" + permRole.getPermissions().get(0).getPermissionId()
-                    + " for permission with csid=" + perm.getCsid());
-        }
-        for (RoleValue roleValue : permRole.getRoles()) {
-            principals.add(roleValue.getRoleName());
-        }
-        List<PermissionAction> permActions = perm.getActions();
-        for (PermissionAction permAction : permActions) {
-            CSpaceAction action = getAction(permAction.getName());
-            URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(),
-                    perm.getResourceName(), action);
-            AuthZ.get().addPermissions(uriRes, principals.toArray(new String[0]));
-        }
-    }
+
 
     /**
      * getRoles get roles (string) array from given RoleValue list

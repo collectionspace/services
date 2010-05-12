@@ -18,7 +18,7 @@
         <tenant_id>1</tenant_id>
     </permission>
     <permission csid="2">
-        <resourceName>collectionobjects</resourceName>
+        <resourceName>dimensions</resourceName>
         <action>
             <name>CREATE</name>
         </action>

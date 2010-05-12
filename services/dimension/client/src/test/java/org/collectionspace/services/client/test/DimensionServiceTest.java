@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.DimensionClient;
+import org.collectionspace.services.client.DimensionFactory;
 import org.collectionspace.services.dimension.DimensionsCommon;
 import org.collectionspace.services.dimension.DimensionsCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -54,14 +55,12 @@ import org.slf4j.LoggerFactory;
  */
 public class DimensionServiceTest extends AbstractServiceTestImpl {
 
-   /** The logger. */
-   private final Logger logger =
-       LoggerFactory.getLogger(DimensionServiceTest.class);
-
+    /** The logger. */
+    private final Logger logger =
+            LoggerFactory.getLogger(DimensionServiceTest.class);
     // Instance variables specific to this test.
     /** The SERVIC e_ pat h_ component. */
     final String SERVICE_PATH_COMPONENT = "dimensions";
-    
     /** The known resource id. */
     private String knownResourceId = null;
 
@@ -70,15 +69,15 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     protected CollectionSpaceClient getClientInstance() {
-    	return new DimensionClient();
+        return new DimensionClient();
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getAbstractCommonList(
-			ClientResponse<AbstractCommonList> response) {
+    protected AbstractCommonList getAbstractCommonList(
+            ClientResponse<AbstractCommonList> response) {
         return response.getEntity(DimensionsCommonList.class);
     }
 
@@ -90,7 +89,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
 
         // Perform setup, such as initializing the type of service request
@@ -101,7 +100,8 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         DimensionClient client = new DimensionClient();
         String identifier = createIdentifier();
-        MultipartOutput multipart = createDimensionInstance(identifier);
+        MultipartOutput multipart = createDimensionInstance(client.getCommonPartName(),
+                identifier);
         ClientResponse<Response> res = client.create(multipart);
 
         int statusCode = res.getStatus();
@@ -112,7 +112,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         // Specifically:
         // Does it fall within the set of valid status codes?
         // Does it exactly match the expected status code?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -121,7 +121,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
 
         // Store the ID returned from the first resource created
         // for additional tests below.
-        if (knownResourceId == null){
+        if (knownResourceId == null) {
             knownResourceId = extractId(res);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
@@ -137,10 +137,10 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#createList(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"create"})
     public void createList(String testName) throws Exception {
-        for(int i = 0; i < 3; i++){
+        for (int i = 0; i < 3; i++) {
             create(testName);
         }
     }
@@ -153,7 +153,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
-    	//Should this really be empty?
+        //Should this really be empty?
     }
 
     /* (non-Javadoc)
@@ -161,7 +161,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithMalformedXml(String testName) throws Exception {
-    	//Should this really be empty?
+        //Should this really be empty?
     }
 
     /* (non-Javadoc)
@@ -169,13 +169,13 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithWrongXmlSchema(String testName) throws Exception {
-    	//Should this really be empty?
+        //Should this really be empty?
     }
 
     /*
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "testSubmitRequest"})
+    dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithEmptyEntityBody(String testName) throws Exception {
 
     // Perform setup.
@@ -191,9 +191,9 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
     // Check the status code of the response: does it match
     // the expected response(s)?
     if(logger.isDebugEnabled()){
-        logger.debug("createWithEmptyEntityBody url=" + url +
-            " status=" + statusCode);
-     }
+    logger.debug("createWithEmptyEntityBody url=" + url +
+    " status=" + statusCode);
+    }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -201,7 +201,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "testSubmitRequest"})
+    dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithMalformedXml(String testName) throws Exception {
 
     // Perform setup.
@@ -217,9 +217,9 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
     // Check the status code of the response: does it match
     // the expected response(s)?
     if(logger.isDebugEnabled()){
-        logger.debug(testName + ": url=" + url +
-            " status=" + statusCode);
-     }
+    logger.debug(testName + ": url=" + url +
+    " status=" + statusCode);
+    }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -227,7 +227,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "testSubmitRequest"})
+    dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithWrongXmlSchema(String testName) throws Exception {
 
     // Perform setup.
@@ -243,15 +243,14 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
     // Check the status code of the response: does it match
     // the expected response(s)?
     if(logger.isDebugEnabled()){
-        logger.debug(testName + ": url=" + url +
-            " status=" + statusCode);
-     }
+    logger.debug(testName + ": url=" + url +
+    " status=" + statusCode);
+    }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
      */
-
     // ---------------------------------------------------------------
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
@@ -260,8 +259,8 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#read(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
 
         // Perform setup.
@@ -274,7 +273,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -292,8 +291,8 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readNonExistent(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"read"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"read"})
     public void readNonExistent(String testName) throws Exception {
 
         // Perform setup.
@@ -306,7 +305,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -322,8 +321,8 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readList(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"read"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"read"})
     public void readList(String testName) throws Exception {
 
         // Perform setup.
@@ -337,7 +336,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -346,17 +345,17 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = false;
-        if(iterateThroughList && logger.isDebugEnabled()){
+        if (iterateThroughList && logger.isDebugEnabled()) {
             List<DimensionsCommonList.DimensionListItem> items =
                     list.getDimensionListItem();
             int i = 0;
-            for(DimensionsCommonList.DimensionListItem item : items){
-                logger.debug(testName + ": list-item[" + i + "] csid=" +
-                        item.getCsid());
-                logger.debug(testName + ": list-item[" + i + "] objectNumber=" +
-                        item.getDimension());
-                logger.debug(testName + ": list-item[" + i + "] URI=" +
-                        item.getUri());
+            for (DimensionsCommonList.DimensionListItem item : items) {
+                logger.debug(testName + ": list-item[" + i + "] csid="
+                        + item.getCsid());
+                logger.debug(testName + ": list-item[" + i + "] objectNumber="
+                        + item.getDimension());
+                logger.debug(testName + ": list-item[" + i + "] URI="
+                        + item.getUri());
                 i++;
             }
         }
@@ -373,8 +372,8 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#update(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"read"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"read"})
     public void update(String testName) throws Exception {
 
         // Perform setup.
@@ -384,12 +383,12 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         DimensionClient client = new DimensionClient();
         ClientResponse<MultipartInput> res =
                 client.read(knownResourceId);
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": read status = " + res.getStatus());
         }
         Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
 
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("got object to update with ID: " + knownResourceId);
         }
         MultipartInput input = (MultipartInput) res.getEntity();
@@ -400,7 +399,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         // Update the content of this resource.
         dimension.setValue("updated-" + dimension.getValue());
         dimension.setValueDate("updated-" + dimension.getValueDate());
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("to be updated object");
             logger.debug(objectAsXmlString(dimension, DimensionsCommon.class));
         }
@@ -412,7 +411,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         res = client.update(knownResourceId, output);
         int statusCode = res.getStatus();
         // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -423,7 +422,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         input = (MultipartInput) res.getEntity();
         DimensionsCommon updatedDimension =
                 (DimensionsCommon) extractPart(input,
-                        client.getCommonPartName(), DimensionsCommon.class);
+                client.getCommonPartName(), DimensionsCommon.class);
         Assert.assertNotNull(updatedDimension);
 
         Assert.assertEquals(updatedDimension.getValueDate(),
@@ -439,30 +438,30 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithEmptyEntityBody(java.lang.String)
      */
     @Override
-    public void updateWithEmptyEntityBody(String testName) throws Exception{
-    	//Should this really be empty?
+    public void updateWithEmptyEntityBody(String testName) throws Exception {
+        //Should this really be empty?
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithMalformedXml(java.lang.String)
      */
     @Override
     public void updateWithMalformedXml(String testName) throws Exception {
-    	//Should this really be empty?
+        //Should this really be empty?
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateWithWrongXmlSchema(java.lang.String)
      */
     @Override
     public void updateWithWrongXmlSchema(String testName) throws Exception {
-    	//Should this really be empty?
+        //Should this really be empty?
     }
 
     /*
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "update", "testSubmitRequest"})
+    dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithEmptyEntityBody(String testName) throws Exception {
 
     // Perform setup.
@@ -478,9 +477,9 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
     // Check the status code of the response: does it match
     // the expected response(s)?
     if(logger.isDebugEnabled()){
-        logger.debug(testName + ": url=" + url +
-            " status=" + statusCode);
-     }
+    logger.debug(testName + ": url=" + url +
+    " status=" + statusCode);
+    }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -488,7 +487,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "update", "testSubmitRequest"})
+    dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithMalformedXml(String testName) throws Exception {
 
     // Perform setup.
@@ -504,9 +503,9 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
     // Check the status code of the response: does it match
     // the expected response(s)?
     if(logger.isDebugEnabled()){
-        logger.debug(testName + ": url=" + url +
-         " status=" + statusCode);
-     }
+    logger.debug(testName + ": url=" + url +
+    " status=" + statusCode);
+    }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -514,7 +513,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        dependsOnMethods = {"create", "update", "testSubmitRequest"})
+    dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithWrongXmlSchema(String testName) throws Exception {
 
     // Perform setup.
@@ -530,9 +529,9 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
     // Check the status code of the response: does it match
     // the expected response(s)?
     if(logger.isDebugEnabled()){
-        logger.debug(testName + ": url=" + url +
-        " status=" + statusCode);
-     }
+    logger.debug(testName + ": url=" + url +
+    " status=" + statusCode);
+    }
     Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -543,8 +542,8 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#updateNonExistent(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"update", "testSubmitRequest"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
 
         // Perform setup.
@@ -554,14 +553,15 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
         DimensionClient client = new DimensionClient();
-        MultipartOutput multipart = createDimensionInstance(NON_EXISTENT_ID);
+        MultipartOutput multipart = createDimensionInstance(client.getCommonPartName(),
+                NON_EXISTENT_ID);
         ClientResponse<MultipartInput> res =
                 client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -577,8 +577,8 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#delete(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
     public void delete(String testName) throws Exception {
 
         // Perform setup.
@@ -591,7 +591,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -604,8 +604,8 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#deleteNonExistent(java.lang.String)
      */
     @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"delete"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"delete"})
     public void deleteNonExistent(String testName) throws Exception {
 
         // Perform setup.
@@ -618,7 +618,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ": status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -646,9 +646,9 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug("testSubmitRequest: url=" + url +
-                " status=" + statusCode);
+        if (logger.isDebugEnabled()) {
+            logger.debug("testSubmitRequest: url=" + url
+                    + " status=" + statusCode);
         }
         Assert.assertEquals(statusCode, EXPECTED_STATUS);
 
@@ -671,9 +671,9 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      * @param identifier the identifier
      * @return the multipart output
      */
-    private MultipartOutput createDimensionInstance(String identifier) {
-        return createDimensionInstance(
-        		"dimensionType-" + identifier,
+    private MultipartOutput createDimensionInstance(String commonPartName, String identifier) {
+        return createDimensionInstance(commonPartName, 
+                "dimensionType-" + identifier,
                 "entryNumber-" + identifier,
                 "entryDate-" + identifier);
     }
@@ -686,19 +686,18 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      * @param entryDate the entry date
      * @return the multipart output
      */
-    private MultipartOutput createDimensionInstance(String dimensionType, String entryNumber, String entryDate) {
+    private MultipartOutput createDimensionInstance(String commonPartName, String dimensionType, String entryNumber, String entryDate) {
         DimensionsCommon dimension = new DimensionsCommon();
         dimension.setDimension(dimensionType);
         dimension.setValue(entryNumber);
         dimension.setValueDate(entryDate);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart =
-            multipart.addPart(dimension, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new DimensionClient().getCommonPartName());
+        MultipartOutput multipart = DimensionFactory.createDimensionInstance(
+                commonPartName, dimension);
 
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("to be created, dimension common");
-            logger.debug(objectAsXmlString(dimension, DimensionsCommon.class));
+            logger.debug(objectAsXmlString(dimension,
+                    DimensionsCommon.class));
         }
 
         return multipart;

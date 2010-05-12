@@ -20,7 +20,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
@@ -33,23 +32,30 @@ import org.jboss.resteasy.client.ClientResponse;
  * @version $Revision:$
  */
 public class TestServiceClient extends AbstractServiceClientImpl {
-    /**
-    *
-    * Returning NULL since this class is a base-level client, used (only) 
-    * to obtain the base service URL.
-    *
-    */
-	@Override
-	public String getServicePathComponent() {
-		throw new UnsupportedOperationException();
-	}
 
-	@Override
-	public CollectionSpaceProxy getProxy() {
-		throw new UnsupportedOperationException();
-	}
-	
-	public ClientResponse<Response> delete(String csid) {
-		throw new UnsupportedOperationException();
-	}
+    /**
+     *
+     * Returning NULL since this class is a base-level client, used (only)
+     * to obtain the base service URL.
+     *
+     */
+    @Override
+    public String getServicePathComponent() {
+        throw new UnsupportedOperationException();
+    }
+
+
+    @Override
+    public CollectionSpaceProxy getProxy() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setProxy() {
+        throw new UnsupportedOperationException();
+    }
+
+    public ClientResponse<Response> delete(String csid) {
+	throw new UnsupportedOperationException();
+    } 
 }

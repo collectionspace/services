@@ -25,14 +25,22 @@ package org.collectionspace.services.authorization.test;
 
 //import java.util.ArrayList;
 //import java.util.List;
+import java.util.ArrayList;
+import java.util.List;
+import org.collectionspace.services.authorization.ActionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 //import org.collectionspace.services.client.test.BaseServiceTest;
 import org.collectionspace.services.authorization.AuthZ;
+import org.collectionspace.services.authorization.CSpaceAction;
 import org.collectionspace.services.authorization.Permission;
+import org.collectionspace.services.authorization.PermissionAction;
+import org.collectionspace.services.authorization.PermissionException;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionsList;
 import org.collectionspace.services.authorization.PermissionsRolesList;
+import org.collectionspace.services.authorization.RoleValue;
+import org.collectionspace.services.authorization.URIResourceImpl;
 import org.springframework.transaction.TransactionStatus;
 import org.testng.annotations.BeforeClass;
 
@@ -84,9 +92,64 @@ public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
             }
             for (PermissionRole pr : pcrList.getPermissionRoles()) {
                 if (pr.getPermissions().get(0).getPermissionId().equals(p.getCsid())) {
-//                    authZ.addPermissionsForUri(p, pr);
+                    addPermissionsForUri(p, pr);
                 }
             }
         }
+    }
+
+        /**
+     * addPermissionsForUri add permissions from given permission configuration
+     * with assumption that resource is of type URI
+     * @param permission configuration
+     */
+    //FIXME this method should be in the restful web service resource of authz
+    private void addPermissionsForUri(Permission perm,
+            PermissionRole permRole) throws PermissionException {
+        List<String> principals = new ArrayList<String>();
+        if (!perm.getCsid().equals(permRole.getPermissions().get(0).getPermissionId())) {
+            throw new IllegalArgumentException("permission ids do not"
+                    + " match for role=" + permRole.getRoles().get(0).getRoleName()
+                    + " with permissionId=" + permRole.getPermissions().get(0).getPermissionId()
+                    + " for permission with csid=" + perm.getCsid());
+        }
+        for (RoleValue roleValue : permRole.getRoles()) {
+            principals.add(roleValue.getRoleName());
+        }
+        List<PermissionAction> permActions = perm.getActions();
+        for (PermissionAction permAction : permActions) {
+            CSpaceAction action = getAction(permAction.getName());
+            URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(),
+                    perm.getResourceName(), action);
+            AuthZ.get().addPermissions(uriRes, principals.toArray(new String[0]));
+        }
+    }
+
+
+    /**
+     * getAction is a convenience method to get corresponding action for
+     * given ActionType
+     * @param action
+     * @return
+     */
+    private CSpaceAction getAction(ActionType action) {
+        if (ActionType.CREATE.equals(action)) {
+            return CSpaceAction.CREATE;
+        } else if (ActionType.READ.equals(action)) {
+            return CSpaceAction.READ;
+        } else if (ActionType.UPDATE.equals(action)) {
+            return CSpaceAction.UPDATE;
+        } else if (ActionType.DELETE.equals(action)) {
+            return CSpaceAction.DELETE;
+        } else if (ActionType.SEARCH.equals(action)) {
+            return CSpaceAction.SEARCH;
+        } else if (ActionType.ADMIN.equals(action)) {
+            return CSpaceAction.ADMIN;
+        } else if (ActionType.START.equals(action)) {
+            return CSpaceAction.START;
+        } else if (ActionType.STOP.equals(action)) {
+            return CSpaceAction.STOP;
+        }
+        throw new IllegalArgumentException("action = " + action.toString());
     }
 }

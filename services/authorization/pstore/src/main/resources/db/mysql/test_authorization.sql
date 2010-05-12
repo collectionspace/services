@@ -15,9 +15,9 @@ insert into `accounts_roles`(`account_id`, `user_id`, `role_id`, `role_name`, `c
 insert into `accounts_roles`(`account_id`, `user_id`, `role_id`, `role_name`, `created_at`) values ('eeca40d7-dc77-4cc5-b489-16a53c75525a', 'test', '3', 'ROLE_COLLECTIONS_MANAGER', '2010-02-17 16:31:48');
 
 -- Additional account introduced during integration on release 0.6, and currently relied upon by the Application Layer.
-insert into `accounts_roles`(`account_id`, `user_id`, `role_id`, `role_name`, `created_at`) values ('251f98f3-0292-4f3e-aa95-455314050e1b', 'test', '1', 'ROLE_ADMINISTRATOR', '2010-05-03 12:35:00');
-insert into `accounts_roles`(`account_id`, `user_id`, `role_id`, `role_name`, `created_at`) values ('251f98f3-0292-4f3e-aa95-455314050e1b', 'test', '2', 'ROLE_USERS', '2010-05-03 12:35:00');
-insert into `accounts_roles`(`account_id`, `user_id`, `role_id`, `role_name`, `created_at`) values ('251f98f3-0292-4f3e-aa95-455314050e1b', 'test', '3', 'ROLE_COLLECTIONS_MANAGER', '2010-05-03 12:35:00');
+insert into `accounts_roles`(`account_id`, `user_id`, `role_id`, `role_name`, `created_at`) values ('251f98f3-0292-4f3e-aa95-455314050e1b', 'test@collectionspace.org', '1', 'ROLE_ADMINISTRATOR', '2010-05-03 12:35:00');
+insert into `accounts_roles`(`account_id`, `user_id`, `role_id`, `role_name`, `created_at`) values ('251f98f3-0292-4f3e-aa95-455314050e1b', 'test@collectionspace.org', '2', 'ROLE_USERS', '2010-05-03 12:35:00');
+insert into `accounts_roles`(`account_id`, `user_id`, `role_id`, `role_name`, `created_at`) values ('251f98f3-0292-4f3e-aa95-455314050e1b', 'test@collectionspace.org', '3', 'ROLE_COLLECTIONS_MANAGER', '2010-05-03 12:35:00');
 
 -- todo: barney is created in security test but accountrole is not yet created there, so add fake account id
 insert into `accounts_roles`(`account_id`, `user_id`, `role_id`, `role_name`, `created_at`) values ('1', 'barney', '2', 'ROLE_USERS', '2010-02-17 16:31:48');
