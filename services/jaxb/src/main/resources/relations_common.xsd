@@ -37,6 +37,9 @@
     <!-- enumeration defining the type of relationship between two entities -->
     <xs:simpleType name="RelationshipType">
         <xs:restriction base="xs:string">
+            <!-- Added for compatibility with current default value -->
+            <!-- in the Application Layer; see CSPACE-1815 -->
+            <xs:enumeration value="affects"/>
             <!-- document with id as document-id-1 is associated with document with id as document-id-2 -->
             <xs:enumeration value="association"/>
             <!-- document with id as document-id-1 contains one or more document with id as document-id-2 -->
