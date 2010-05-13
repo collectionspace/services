@@ -128,7 +128,7 @@ public class DocumentFilter {
         // Set the page size
         //
         String pageSizeStr = null;
-        List<String> list = queryParams.remove(IClientQueryParams.PAGE_SIZE_PARAM);  //REM: Should we really be removing this param?
+        List<String> list = queryParams.get(IClientQueryParams.PAGE_SIZE_PARAM);
         if (list != null) {
             pageSizeStr = list.get(0);
         }
@@ -138,7 +138,7 @@ public class DocumentFilter {
         // Set the start page
         //
         String startPageStr = null;
-        list = queryParams.remove(IClientQueryParams.START_PAGE_PARAM);	//REM: Should we really be removing this param?
+        list = queryParams.get(IClientQueryParams.START_PAGE_PARAM);
         if (list != null) {
             startPageStr = list.get(0);
         }
