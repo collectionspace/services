@@ -32,10 +32,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.AccountValue;
+import org.collectionspace.services.authorization.ActionType;
 import org.collectionspace.services.authorization.EffectType;
 
 import org.collectionspace.services.authorization.Permission;
@@ -61,7 +63,9 @@ import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.dimension.DimensionsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -75,6 +79,9 @@ import org.testng.annotations.BeforeClass;
  * AuthorizationServiceTest, carries out tests against a
  * deployed and running Permission, Role, AccountRole, PermissionRole and
  * CollectionObject Services.
+ *
+ * Pre-requisite : authorization-mgt/client tests seed some permissions used
+ * by this test
  *
  * $LastChangedRevision: 917 $
  * $LastChangedDate: 2009-11-06 12:20:28 -0800 (Fri, 06 Nov 2009) $
@@ -113,17 +120,34 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     }
 
     private void seedPermissions() {
-        String rc1 = "collectionobjects";
-        bigbirdPermId = createPermission(rc1, EffectType.PERMIT);
+        String res = "dimensions";
+
+        PermissionAction pac = new PermissionAction();
+        pac.setName(ActionType.CREATE);
+        PermissionAction par = new PermissionAction();
+        par.setName(ActionType.READ);
+        PermissionAction pau = new PermissionAction();
+        pau.setName(ActionType.UPDATE);
+        PermissionAction pad = new PermissionAction();
+        pad.setName(ActionType.DELETE);
+
+        //bigbird can create, read and update but not delete
+        List<PermissionAction> bbactions = new ArrayList<PermissionAction>();
+        bbactions.add(pac);
+        bbactions.add(par);
+        bbactions.add(pau);
+        bigbirdPermId = createPermission(res, bbactions, EffectType.PERMIT);
         PermissionValue bbpv = new PermissionValue();
-        bbpv.setResourceName(rc1);
+        bbpv.setResourceName(res);
         bbpv.setPermissionId(bigbirdPermId);
         permValues.put(bbpv.getPermissionId(), bbpv);
 
-        String rc2 = "collectionobjects";
-        elmoPermId = createPermission(rc2, EffectType.DENY);
+        //elmo can only read
+        List<PermissionAction> eactions = new ArrayList<PermissionAction>();
+        eactions.add(par);
+        elmoPermId = createPermission(res, eactions, EffectType.PERMIT);
         PermissionValue epv = new PermissionValue();
-        epv.setResourceName(rc2);
+        epv.setResourceName(res);
         epv.setPermissionId(elmoPermId);
         permValues.put(epv.getPermissionId(), epv);
     }
@@ -221,6 +245,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         DimensionClient client = new DimensionClient();
+        //bigbird allowed to create
         client.setAuth(true, "bigbird2010", true, "bigbird2010", true);
         String identifier = createIdentifier();
         DimensionsCommon dimension = new DimensionsCommon();
@@ -238,7 +263,11 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
+        Assert.assertEquals(statusCode, Response.Status.CREATED.getStatusCode());
+        knownResourceId = extractId(res);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": knownResourceId=" + knownResourceId);
+        }
     }
 
     //to not cause uniqueness violation for permRole, createList is removed
@@ -275,6 +304,27 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupRead(testName);
 
+        // Submit the request to the service and store the response.
+        DimensionClient client = new DimensionClient();
+        //elmo allowed to read
+        client.setAuth(true, "elmo2010", true, "elmo2010", true);
+        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        MultipartInput input = (MultipartInput) res.getEntity();
+        DimensionsCommon dimension = (DimensionsCommon) extractPart(input,
+                client.getCommonPartName(), DimensionsCommon.class);
+        Assert.assertNotNull(dimension);
+
     }
 
     // Failure outcomes
@@ -308,6 +358,38 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"read", "readList", "readNonExistent"})
     public void update(String testName) throws Exception {
         setupUpdate(testName);
+
+    }
+
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"read", "readList", "readNonExistent"})
+    public void updateNotAllowed(String testName) throws Exception {
+        setupUpdate(testName);
+
+        DimensionClient client = new DimensionClient();
+
+        //elmo not allowed to update
+        client.setAuth(true, "elmo2010", true, "elmo2010", true);
+
+        DimensionsCommon dimension = new DimensionsCommon();
+        dimension.setDimension("dimensionType");
+        // Update the content of this resource.
+        dimension.setValue("updated-" + dimension.getValue());
+        dimension.setValueDate("updated-" + dimension.getValueDate());
+        // Submit the request to the service and store the response.
+        MultipartOutput output = new MultipartOutput();
+        OutputPart commonPart = output.addPart(dimension, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", client.getCommonPartName());
+
+        ClientResponse<MultipartInput> res = client.update(knownResourceId, output);
+        int statusCode = res.getStatus();
+        // Check the status code of the response: does it match the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
     }
 
     // Failure outcomes
@@ -335,12 +417,52 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     // CRUD tests : DELETE tests
     // ---------------------------------------------------------------
     // Success outcomes
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"updateNotAllowed"})
+    public void deleteNotAllowed(String testName) throws Exception {
+        // Perform setup.
+        setupDelete(testName);
+
+        // Submit the request to the service and store the response.
+        DimensionClient client = new DimensionClient();
+        //bigbird can not delete
+        client.setAuth(true, "bigbird2010", true, "bigbird2010", true);
+        ClientResponse<Response> res = client.delete(knownResourceId);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
+
+    }
+
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"read"})
+    dependsOnMethods = {"deleteNotAllowed"})
     public void delete(String testName) throws Exception {
         // Perform setup.
         setupDelete(testName);
+
+        // Submit the request to the service and store the response.
+        DimensionClient client = new DimensionClient();
+        //default user test/test has delete permission
+        client.setAuth(true, "test", true, "test", true);
+        ClientResponse<Response> res = client.delete(knownResourceId);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
     }
 
@@ -388,9 +510,14 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     }
 
     private String createPermission(String resName, EffectType effect) {
+        List<PermissionAction> actions = PermissionFactory.createDefaultActions();
+        return createPermission(resName, actions, effect);
+    }
+
+    private String createPermission(String resName,
+            List<PermissionAction> actions, EffectType effect) {
         setupCreate("createPermission");
         PermissionClient permClient = new PermissionClient();
-        List<PermissionAction> actions = PermissionFactory.createDefaultActions();
         Permission permission = PermissionFactory.createPermissionInstance(resName,
                 "default permissions for " + resName,
                 actions, effect, true, true, true);
