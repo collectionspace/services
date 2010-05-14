@@ -61,7 +61,7 @@ public class SpringPermissionManager implements CSpacePermissionManager {
             throws PermissionException {
         ObjectIdentity oid = SpringAuthorizationProvider.mapResource(res);
         Sid[] sids = SpringAuthorizationProvider.mapPrincipal(principals);
-        Permission p = SpringAuthorizationProvider.mapPermission(action);
+        Permission p = SpringAuthorizationProvider.mapAction(action);
         TransactionStatus status = provider.beginTransaction("addPermssions");
 
         //add permission for each sid
@@ -121,7 +121,7 @@ public class SpringPermissionManager implements CSpacePermissionManager {
             throws PermissionNotFoundException, PermissionException {
         ObjectIdentity oid = SpringAuthorizationProvider.mapResource(res);
         Sid[] sids = SpringAuthorizationProvider.mapPrincipal(principals);
-        Permission p = SpringAuthorizationProvider.mapPermission(action);
+        Permission p = SpringAuthorizationProvider.mapAction(action);
         TransactionStatus status = provider.beginTransaction("deletePermssions");
         //delete permission for each sid
         for (Sid sid : sids) {
@@ -178,10 +178,18 @@ public class SpringPermissionManager implements CSpacePermissionManager {
     public void deletePermissions(CSpaceResource res, CSpaceAction action)
             throws PermissionNotFoundException, PermissionException {
         ObjectIdentity oid = SpringAuthorizationProvider.mapResource(res);
-        Permission p = SpringAuthorizationProvider.mapPermission(action);
+        Permission p = SpringAuthorizationProvider.mapAction(action);
         TransactionStatus status = provider.beginTransaction("deletePermssions");
         try {
             deletePermissions(oid, p, null);
+            provider.commitTransaction(status);
+            if (log.isDebugEnabled()) {
+                log.debug("deletepermissions(res,action) success, "
+                        + " res=" + res.toString()
+                        + " action=" + action.toString()
+                        + " oid=" + oid.toString()
+                        + " perm=" + p.toString());
+            }
         } catch (AclDataAccessException aex) {
             provider.rollbackTransaction(status);
             log.debug("deletepermissions(res,action) failed,"
@@ -207,14 +215,6 @@ public class SpringPermissionManager implements CSpacePermissionManager {
             }
             throw new PermissionException(msg, ex);
         }
-        provider.commitTransaction(status);
-        if (log.isDebugEnabled()) {
-            log.debug("deletepermissions(res,action) success, "
-                    + " res=" + res.toString()
-                    + " action=" + action.toString()
-                    + " oid=" + oid.toString()
-                    + " perm=" + p.toString());
-        }
 
     }
 
@@ -222,9 +222,15 @@ public class SpringPermissionManager implements CSpacePermissionManager {
     public void deletePermissions(CSpaceResource res)
             throws PermissionNotFoundException, PermissionException {
         ObjectIdentity oid = SpringAuthorizationProvider.mapResource(res);
-        TransactionStatus status = provider.beginTransaction("addPermssion");
+        TransactionStatus status = provider.beginTransaction("deletePermssion");
         try {
             provider.getProviderAclService().deleteAcl(oid, true);
+            provider.commitTransaction(status);
+            if (log.isDebugEnabled()) {
+                log.debug("deletepermissions(res) success, "
+                        + " res=" + res.toString()
+                        + " oid=" + oid.toString());
+            }
         } catch (AclDataAccessException aex) {
             provider.rollbackTransaction(status);
             log.debug("deletepermissions(res) failed,"
@@ -245,13 +251,6 @@ public class SpringPermissionManager implements CSpacePermissionManager {
                 throw (PermissionException) ex;
             }
             throw new PermissionException(msg, ex);
-        }
-        provider.commitTransaction(status);
-
-        if (log.isDebugEnabled()) {
-            log.debug("deletepermissions(res) success, "
-                    + " res=" + res.toString()
-                    + " oid=" + oid.toString());
         }
     }
 
@@ -293,8 +292,8 @@ public class SpringPermissionManager implements CSpacePermissionManager {
         ArrayList<Integer> foundAces = new ArrayList<Integer>();
         Iterator iter = acel.listIterator();
         //not possible to delete while iterating
-        while(iter.hasNext()) {
-            AccessControlEntry ace = (AccessControlEntry)iter.next();
+        while (iter.hasNext()) {
+            AccessControlEntry ace = (AccessControlEntry) iter.next();
             if (sid != null) {
                 if (ace.getSid().equals(sid)
                         && ace.getPermission().equals(permission)) {

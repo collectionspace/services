@@ -8,10 +8,6 @@
         </permission>
         <role>
             <roleId>1</roleId>
-            <roleName>ROLE_USERS</roleName>
-        </role>
-        <role>
-            <roleId>2</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
@@ -23,10 +19,6 @@
         </permission>
         <role>
             <roleId>1</roleId>
-            <roleName>ROLE_USERS</roleName>
-        </role>
-        <role>
-            <roleId>2</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>

@@ -20,28 +20,6 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *//**
- *  This document is a part of the source code and related artifacts
- *  for CollectionSpace, an open source collections management system
- *  for museums and related institutions:
-
- *  http://www.collectionspace.org
- *  http://wiki.collectionspace.org
-
- *  Copyright 2009 University of California at Berkeley
-
- *  Licensed under the Educational Community License (ECL), Version 2.0.
- *  You may not use this file except in compliance with this License.
-
- *  You may obtain a copy of the ECL 2.0 License at
-
- *  https://source.collectionspace.org/collection-space/LICENSE.txt
-
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
  */
 package org.collectionspace.services.authorization.test;
 
@@ -49,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.collectionspace.services.authorization.ActionType;
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.EffectType;
@@ -67,29 +46,35 @@ import org.collectionspace.services.authorization.SubjectType;
 public class AuthorizationGen {
 
     final Logger logger = LoggerFactory.getLogger(AuthorizationGen.class);
+    private PermissionsList pcList = new PermissionsList();
+    PermissionsRolesList psrsl = new PermissionsRolesList();
 
-    public void genPermissions() {
-        PermissionsList pcList = new PermissionsList();
+    public PermissionsList genPermissions() {
         ArrayList<Permission> apcList = new ArrayList<Permission>();
         pcList.setPermissions(apcList);
 
-        Permission accPerm = buildCommonPermission("1", "accounts");
+        Permission accPerm = buildCommonPermission("1", "1", "accounts");
         apcList.add(accPerm);
-        Permission dimPerm = buildCommonPermission("2", "dimensions");
+        Permission dimPerm = buildCommonPermission("1", "2", "dimensions");
         apcList.add(dimPerm);
-        AbstractAuthorizationTestImpl.toFile(pcList, PermissionsList.class,
-                AbstractAuthorizationTestImpl.testDataDir + "test-permissions.xml");
-        logger.info("generated permissions to "
-                + AbstractAuthorizationTestImpl.testDataDir + "test-permissions.xml");
+        return pcList;
 
     }
 
-    private Permission buildCommonPermission(String id, String resourceName) {
+    public void writePermissions(PermissionsList pcList, String fileName) {
+        AbstractAuthorizationTestImpl.toFile(pcList, PermissionsList.class,
+                AbstractAuthorizationTestImpl.testDataDir + fileName);
+        logger.info("generated permissions to "
+                + AbstractAuthorizationTestImpl.testDataDir + fileName);
+    }
+
+    private Permission buildCommonPermission(String tenantId, String permId, String resourceName) {
+        //String id = UUID.randomUUID().toString();
         Permission perm = new Permission();
-        perm.setCsid(id);
+        perm.setCsid(permId);
         perm.setResourceName(resourceName);
         perm.setEffect(EffectType.PERMIT);
-        perm.setTenantId("1");
+        perm.setTenantId(tenantId);
         ArrayList<PermissionAction> pas = new ArrayList<PermissionAction>();
         perm.setActions(pas);
 
@@ -108,39 +93,38 @@ public class AuthorizationGen {
         return perm;
     }
 
-    public void genPermissionsRoles() {
-        PermissionsRolesList psrsl = new PermissionsRolesList();
+    public PermissionsRolesList genPermissionsRoles(PermissionsList pcList) {
         ArrayList<PermissionRole> prl = new ArrayList<PermissionRole>();
-        prl.add(buildCommonPermissionRoles("1", "accounts"));
-        prl.add(buildCommonPermissionRoles("2", "dimensions"));
+        prl.add(buildCommonPermissionRoles("1", "1", "accounts"));
+        prl.add(buildCommonPermissionRoles("1", "2", "dimensions"));
         psrsl.setPermissionRoles(prl);
-        AbstractAuthorizationTestImpl.toFile(psrsl, PermissionsRolesList.class,
-                AbstractAuthorizationTestImpl.testDataDir + "test-permissions-roles.xml");
-        logger.info("generated permissions-roles to "
-                + AbstractAuthorizationTestImpl.testDataDir + "test-permissions-roles.xml");
+        return psrsl;
     }
 
-    private PermissionRole buildCommonPermissionRoles(String id, String resName) {
+    public void writePermissionRoles(PermissionsRolesList psrsl, String fileName) {
+        AbstractAuthorizationTestImpl.toFile(psrsl, PermissionsRolesList.class,
+                AbstractAuthorizationTestImpl.testDataDir + fileName);
+        logger.info("generated permissions-roles to "
+                + AbstractAuthorizationTestImpl.testDataDir + fileName);
+    }
+
+    private PermissionRole buildCommonPermissionRoles(String tenantId, String permissionId,
+            String resName) {
 
         PermissionRole pr = new PermissionRole();
         pr.setSubject(SubjectType.ROLE);
-
         List<PermissionValue> permValues = new ArrayList<PermissionValue>();
         pr.setPermissions(permValues);
         PermissionValue permValue = new PermissionValue();
-        permValue.setPermissionId(id);
+        permValue.setPermissionId(permissionId);
         permValue.setResourceName(resName);
         permValues.add(permValue);
 
         List<RoleValue> roleValues = new ArrayList<RoleValue>();
-        RoleValue rv1 = new RoleValue();
-        rv1.setRoleName("ROLE_USERS");
-        rv1.setRoleId("1");
-        roleValues.add(rv1);
-        RoleValue rv2 = new RoleValue();
-        rv2.setRoleName("ROLE_ADMINISTRATOR");
-        rv2.setRoleId("2");
-        roleValues.add(rv2);
+        RoleValue radmin = new RoleValue();
+        radmin.setRoleName("ROLE_ADMINISTRATOR");
+        radmin.setRoleId(tenantId);
+        roleValues.add(radmin);
         pr.setRoles(roleValues);
 
         return pr;

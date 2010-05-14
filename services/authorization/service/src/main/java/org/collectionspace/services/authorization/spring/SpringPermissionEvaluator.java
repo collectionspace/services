@@ -50,7 +50,7 @@ public class SpringPermissionEvaluator implements CSpacePermissionEvaluator {
     @Override
     public boolean hasPermission(CSpaceResource res, CSpaceAction perm) {
         PermissionEvaluator eval = provider.getProviderPermissionEvaluator();
-        Permission p = SpringAuthorizationProvider.mapPermission(perm);
+        Permission p = SpringAuthorizationProvider.mapAction(perm);
         Authentication authToken = SecurityContextHolder.getContext().getAuthentication();
         return eval.hasPermission(authToken,
                 Long.valueOf(res.getId().hashCode()),

@@ -51,6 +51,8 @@ import org.testng.annotations.BeforeClass;
 public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
 
     final Logger logger = LoggerFactory.getLogger(AuthorizationSeedTest.class);
+    final static String PERMISSION_FILE = "test-permissions.xml";
+    final static String PERMISSION_ROLE_FILE = "test-permissions-roles.xml";
 
     @BeforeClass(alwaysRun = true)
     public void seedData() {
@@ -58,8 +60,10 @@ public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
         TransactionStatus status = beginTransaction("seedData");
         try {
             AuthorizationGen authzGen = new AuthorizationGen();
-            authzGen.genPermissions();
-            authzGen.genPermissionsRoles();
+            PermissionsList pl = authzGen.genPermissions();
+            authzGen.writePermissions(pl, PERMISSION_FILE);
+            PermissionsRolesList prl = authzGen.genPermissionsRoles(pl);
+            authzGen.writePermissionRoles(prl, PERMISSION_ROLE_FILE);
             seedRoles();
             seedPermissions();
         } catch (Exception ex) {
@@ -71,20 +75,20 @@ public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
     }
 
     public void seedRoles() throws Exception {
-    	//Should this test really be empty?
+        //Should this test really be empty?
     }
 
-    public void seedPermissions() throws Exception {    	
+    public void seedPermissions() throws Exception {
         PermissionsList pcList =
-                (PermissionsList) fromFile(PermissionsList.class, baseDir +
-                AbstractAuthorizationTestImpl.testDataDir + "test-permissions.xml");
+                (PermissionsList) fromFile(PermissionsList.class, baseDir
+                + AbstractAuthorizationTestImpl.testDataDir + PERMISSION_FILE);
         logger.info("read permissions from "
-                + baseDir + AbstractAuthorizationTestImpl.testDataDir + "test-permissions.xml");
+                + baseDir + AbstractAuthorizationTestImpl.testDataDir +  PERMISSION_FILE);
         PermissionsRolesList pcrList =
-                (PermissionsRolesList) fromFile(PermissionsRolesList.class, baseDir +
-                AbstractAuthorizationTestImpl.testDataDir + "test-permissions-roles.xml");
+                (PermissionsRolesList) fromFile(PermissionsRolesList.class, baseDir
+                + AbstractAuthorizationTestImpl.testDataDir + PERMISSION_ROLE_FILE);
         logger.info("read permissions-roles from "
-                + baseDir + AbstractAuthorizationTestImpl.testDataDir + "test-permissions.xml");
+                + baseDir + AbstractAuthorizationTestImpl.testDataDir +  PERMISSION_ROLE_FILE);
         AuthZ authZ = AuthZ.get();
         for (Permission p : pcList.getPermissions()) {
             if (logger.isDebugEnabled()) {
@@ -98,7 +102,7 @@ public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
         }
     }
 
-        /**
+    /**
      * addPermissionsForUri add permissions from given permission configuration
      * with assumption that resource is of type URI
      * @param permission configuration
@@ -124,7 +128,6 @@ public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
             AuthZ.get().addPermissions(uriRes, principals.toArray(new String[0]));
         }
     }
-
 
     /**
      * getAction is a convenience method to get corresponding action for
