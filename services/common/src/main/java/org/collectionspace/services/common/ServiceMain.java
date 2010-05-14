@@ -12,6 +12,7 @@ import org.collectionspace.services.common.tenant.TenantBindingType;
 import org.collectionspace.services.common.types.PropertyItemType;
 import org.collectionspace.services.common.types.PropertyType;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
+import org.collectionspace.services.nuxeo.client.java.TenantRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,17 +42,17 @@ public class ServiceMain {
      * @return
      */
     public static ServiceMain getInstance() {
-        if(instance == null){
-            synchronized(ServiceMain.class){
-                if(instance == null){
+        if (instance == null) {
+            synchronized (ServiceMain.class) {
+                if (instance == null) {
                     ServiceMain temp = new ServiceMain();
-                    try{
+                    try {
                         temp.initialize();
-                    }catch(Exception e){
+                    } catch (Exception e) {
                         instance = null;
-                        if(e instanceof RuntimeException){
+                        if (e instanceof RuntimeException) {
                             throw (RuntimeException) e;
-                        }else{
+                        } else {
                             throw new RuntimeException(e);
                         }
                     }
@@ -66,7 +67,7 @@ public class ServiceMain {
         setServerRootDir();
         readConfig();
         propagateConfiguredProperties();
-        if(getClientType().equals(ClientType.JAVA)){
+        if (getClientType().equals(ClientType.JAVA)) {
             nuxeoConnector = NuxeoConnector.getInstance();
             nuxeoConnector.initialize(
                     getServicesConfigReader().getConfiguration().getRepositoryClient());
@@ -78,12 +79,12 @@ public class ServiceMain {
      * but not necessarily those occupied by individual services
      */
     public void release() {
-        try{
-            if(nuxeoConnector != null){
+        try {
+            if (nuxeoConnector != null) {
                 nuxeoConnector.release();
             }
             instance = null;
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             //gobble it
         }
@@ -97,21 +98,33 @@ public class ServiceMain {
         tenantBindingConfigReader = new TenantBindingConfigReaderImpl(getServerRootDir());
         getTenantBindingConfigReader().read();
     }
-    
+
     private void propagateConfiguredProperties() {
-    	List<PropertyType> repoPropListHolder = 
-    		servicesConfigReader.getConfiguration().getRepositoryClient().getProperties();
-    	if(repoPropListHolder != null && !repoPropListHolder.isEmpty()) {
-        	List<PropertyItemType> propList = repoPropListHolder.get(0).getItem();
-        	if(propList != null && !propList.isEmpty()) {
-       			tenantBindingConfigReader.setDefaultPropertiesOnTenants(propList, true);
-        	}
-    	}
+        List<PropertyType> repoPropListHolder =
+                servicesConfigReader.getConfiguration().getRepositoryClient().getProperties();
+        if (repoPropListHolder != null && !repoPropListHolder.isEmpty()) {
+            List<PropertyItemType> propList = repoPropListHolder.get(0).getItem();
+            if (propList != null && !propList.isEmpty()) {
+                tenantBindingConfigReader.setDefaultPropertiesOnTenants(propList, true);
+            }
+        }
     }
 
     void retrieveAllWorkspaceIds() throws Exception {
         //all configs are read, connector is initialized, retrieve workspaceids
-        getTenantBindingConfigReader().retrieveAllWorkspaceIds();
+        Hashtable<String, TenantBindingType> tenantBindings =
+                getTenantBindingConfigReader().getTenantBindings();
+        TenantRepository.get().retrieveAllWorkspaceIds(tenantBindings);
+    }
+
+    /**
+     * getWorkspaceId returns workspace id for given tenant and service name
+     * @param tenantId
+     * @param serviceName
+     * @return
+     */
+    public String getWorkspaceId(String tenantId, String serviceName) {
+        return TenantRepository.get().getWorkspaceId(tenantId, serviceName);
     }
 
     /**
@@ -120,20 +133,21 @@ public class ServiceMain {
     public NuxeoConnector getNuxeoConnector() {
         return nuxeoConnector;
     }
-
-    private void setServerRootDir() {
-        serverRootDir = System.getProperty("jboss.server.home.dir");
-        if(serverRootDir == null){
-            serverRootDir = "."; //assume server is started from server root, e.g. server/cspace
-        }
-    }
-
+    
     /**
      * @return the serverRootDir
      */
     public String getServerRootDir() {
         return serverRootDir;
     }
+
+    private void setServerRootDir() {
+        serverRootDir = System.getProperty("jboss.server.home.dir");
+        if (serverRootDir == null) {
+            serverRootDir = "."; //assume server is started from server root, e.g. server/cspace
+        }
+    }
+
 
     /**
      * @return the serviceConfig

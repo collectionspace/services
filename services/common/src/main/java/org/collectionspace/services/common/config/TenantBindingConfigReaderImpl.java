@@ -28,11 +28,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.collectionspace.services.common.ClientType;
-import org.collectionspace.services.common.RepositoryClientConfigType;
-import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.tenant.TenantBindingType;
 import org.collectionspace.services.common.tenant.TenantBindingConfig;
@@ -58,8 +53,6 @@ public class TenantBindingConfigReaderImpl
     //tenant-qualified servicename, service binding
     private Hashtable<String, ServiceBindingType> serviceBindings =
             new Hashtable<String, ServiceBindingType>();
-    //tenant-qualified service, workspace
-    private Hashtable<String, String> serviceWorkspaces = new Hashtable<String, String>();
 
     public TenantBindingConfigReaderImpl(String serverRootDir) {
         super(serverRootDir);
@@ -103,110 +96,19 @@ public class TenantBindingConfigReaderImpl
         }
     }
 
-    /**
-     * retrieveWorkspaceIds is called at initialization time to retrieve
-     * workspace ids of all the tenants
-     * @throws Exception
-     */
-    public void retrieveAllWorkspaceIds() throws Exception {
-        for (TenantBindingType tenantBinding : tenantBindings.values()) {
-            retrieveWorkspaceIds(tenantBinding);
-        }
-    }
-
-    /**
-     * retrieveWorkspaceIds retrieves workspace ids for services used by
-     * the given tenant
-     * @param tenantBinding
-     * @throws Exception
-     */
-    public void retrieveWorkspaceIds(TenantBindingType tenantBinding) throws Exception {
-        Hashtable<String, String> workspaceIds = new Hashtable<String, String>();
-        ServiceMain svcMain = ServiceMain.getInstance();
-        RepositoryClientConfigType rclientConfig = svcMain.getServicesConfigReader().getConfiguration().getRepositoryClient();
-        ClientType clientType = svcMain.getClientType();
-        if (clientType.equals(ClientType.JAVA)
-                && rclientConfig.getName().equalsIgnoreCase("nuxeo-java")) {
-            //FIXME only one repository client is recognized
-            workspaceIds = svcMain.getNuxeoConnector().retrieveWorkspaceIds(
-                    tenantBinding.getRepositoryDomain());
-        }
-        //verify if workspace exists for each service in the tenant binding
-        for (ServiceBindingType serviceBinding : tenantBinding.getServiceBindings()) {
-            String serviceName = serviceBinding.getName();
-            String repositoryClientName = serviceBinding.getRepositoryClient();
-            if (repositoryClientName == null) {
-                //no repository needed for this service...skip
-                if (logger.isInfoEnabled()) {
-                    logger.info("The service " + serviceName
-                            + " does not seem to require a document repository.");
-                }
-                continue;
-            }
-
-            if (repositoryClientName.isEmpty()) {
-                String msg = "Invalid repositoryClient " + serviceName;
-                logger.error(msg);
-                continue;
-            }
-            repositoryClientName = repositoryClientName.trim();
-            RepositoryClient repositoryClient = getRepositoryClient(
-                    repositoryClientName);
-            if (repositoryClient == null) {
-                String msg = "Could not find repositoryClient " + repositoryClientName
-                        + " for service=" + serviceName;
-                logger.error(msg);
-                continue;
-            }
-            String workspaceId = null;
-            //workspace name is service name by convention
-            String workspace = serviceName.toLowerCase();
-            if (clientType.equals(ClientType.JAVA)) {
-                workspaceId = workspaceIds.get(workspace);
-                if (workspaceId == null) {
-                    if (logger.isWarnEnabled()) {
-                        logger.warn("Failed to retrieve workspace ID for " + workspace
-                                + " from repository, trying to create a new workspace ...");
-                    }
-                    workspaceId = repositoryClient.createWorkspace(
-                            tenantBinding.getRepositoryDomain(),
-                            serviceBinding.getName());
-                    if (workspaceId == null) {
-                        if (logger.isWarnEnabled()) {
-                            logger.warn("Failed to create workspace in repository"
-                                    + " for service=" + workspace);
-                        }
-                        continue;
-                    }
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Successfully created workspace in repository" +
-                                " id=" + workspaceId + " for service=" + workspace);
-                    }
-                }
-            } else {
-                workspaceId = serviceBinding.getRepositoryWorkspaceId();
-                if (workspaceId == null || "".equals(workspaceId)) {
-                    logger.error("Could not find workspace in repository for" +
-                            " service=" + workspace);
-                    //FIXME: should we throw an exception here?
-                    continue;
-                }
-            }
-            String tenantService = getTenantQualifiedServiceName(tenantBinding.getId(), serviceName);
-            serviceWorkspaces.put(tenantService, workspaceId);
-            if (logger.isInfoEnabled()) {
-                logger.info("Created/retrieved repository workspace=" +
-                        workspace + " id=" + workspaceId
-                        + " for service=" + serviceName);
-            }
-        }
-    }
-
     @Override
     public TenantBindingConfig getConfiguration() {
         return tenantBindingConfig;
     }
 
+    /**
+     * getTenantBindings returns all the tenant bindings read from configuration
+     * @return
+     */
+    public Hashtable<String, TenantBindingType> getTenantBindings() {
+        return tenantBindings;
+    }
+    
     /**
      * getTenantBinding gets tenant binding for given tenant
      * @param tenantId
@@ -252,16 +154,6 @@ public class TenantBindingConfigReaderImpl
         return list;
     }
 
-    /**
-     * getWorkspaceId retrieves workspace id for given tenant for given service
-     * @param tenantId
-     * @param serviceName
-     * @return
-     */
-    public String getWorkspaceId(String tenantId, String serviceName) {
-        String tenantService = getTenantQualifiedServiceName(tenantId, serviceName);
-        return serviceWorkspaces.get(tenantService);
-    }
 
     /**
      * @param tenantId
@@ -271,10 +163,6 @@ public class TenantBindingConfigReaderImpl
     public static String getTenantQualifiedServiceName(
             String tenantId, String serviceName) {
         return tenantId + "." + serviceName.toLowerCase();
-    }
-
-    private RepositoryClient getRepositoryClient(String clientName) {
-        return RepositoryClientFactory.getInstance().getClient(clientName);
     }
 
     /**

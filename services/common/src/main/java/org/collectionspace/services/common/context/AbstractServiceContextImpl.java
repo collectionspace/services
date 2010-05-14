@@ -271,8 +271,7 @@ public abstract class AbstractServiceContextImpl<IT, OT>
      */
     @Override
     public String getRepositoryWorkspaceId() {
-        TenantBindingConfigReaderImpl tbConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
-        return tbConfigReader.getWorkspaceId(getTenantId(), getServiceName());
+        return ServiceMain.getInstance().getWorkspaceId(getTenantId(), getServiceName());
     }
 
     /* (non-Javadoc)
