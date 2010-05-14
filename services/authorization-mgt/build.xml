@@ -109,29 +109,24 @@
 
     <target name="gen_ddl"
             description="generate service-specific tables(s), indices, etc.">
-        <ant antfile="pstore/build.xml" target="gen_ddl" inheritAll="false"/>
     </target>
 
     <target name="create_db"
             description="create tables(s), indices for authorization service">
-        <ant antfile="pstore/build.xml" target="create_db" inheritAll="false"/>
     </target>
 
     <target name="deploy" depends="install"
             description="deploy authorization service">
-        <ant antfile="pstore/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="service/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
             description="undeploy authorization service">
-        <ant antfile="pstore/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="service/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist" depends="package"
             description="distribute authorization service}">
-        <!--ant antfile="pstore/build.xml" target="dist" inheritall="false"/-->
         <ant antfile="service/build.xml" target="dist" inheritall="false"/>
     </target>
 

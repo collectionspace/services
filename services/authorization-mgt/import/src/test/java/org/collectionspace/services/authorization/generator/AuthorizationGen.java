@@ -21,13 +21,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.collectionspace.services.authorization.test;
+package org.collectionspace.services.authorization.generator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import org.collectionspace.services.authorization.ActionType;
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.EffectType;
@@ -61,12 +60,6 @@ public class AuthorizationGen {
 
     }
 
-    public void writePermissions(PermissionsList pcList, String fileName) {
-        AbstractAuthorizationTestImpl.toFile(pcList, PermissionsList.class,
-                AbstractAuthorizationTestImpl.testDataDir + fileName);
-        logger.info("generated permissions to "
-                + AbstractAuthorizationTestImpl.testDataDir + fileName);
-    }
 
     private Permission buildCommonPermission(String tenantId, String permId, String resourceName) {
         //String id = UUID.randomUUID().toString();
@@ -99,13 +92,6 @@ public class AuthorizationGen {
         prl.add(buildCommonPermissionRoles("1", "2", "dimensions"));
         psrsl.setPermissionRoles(prl);
         return psrsl;
-    }
-
-    public void writePermissionRoles(PermissionsRolesList psrsl, String fileName) {
-        AbstractAuthorizationTestImpl.toFile(psrsl, PermissionsRolesList.class,
-                AbstractAuthorizationTestImpl.testDataDir + fileName);
-        logger.info("generated permissions-roles to "
-                + AbstractAuthorizationTestImpl.testDataDir + fileName);
     }
 
     private PermissionRole buildCommonPermissionRoles(String tenantId, String permissionId,

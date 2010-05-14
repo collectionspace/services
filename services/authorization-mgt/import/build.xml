@@ -1,7 +1,7 @@
 
-<project name="authorization-mgt.client" default="package" basedir=".">
+<project name="authorization-mgt.import" default="package" basedir=".">
     <description>
-        collectionspace authorization-mgt client
+        collectionspace authorization-mgt import
     </description>
     <!-- set global properties for this build -->
     <property name="services.trunk" value="../../.."/>
@@ -112,15 +112,15 @@
 
 
     <target name="deploy" depends="install"
-            description="deploy authorization-mgt service in ${jboss.server.cspace}">
+            description="deploy authorization-mgt import in ${jboss.server.cspace}">
     </target>
 
     <target name="undeploy"
-            description="undeploy authorization-mgt service from ${jboss.server.cspace}">
+            description="undeploy authorization-mgt import from ${jboss.server.cspace}">
     </target>
 
     <target name="dist"
-            description="generate distribution for authorization-mgt service" depends="package">
+            description="generate distribution for authorization-mgt import" depends="package">
     </target>
 
 </project>

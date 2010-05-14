@@ -47,7 +47,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.collectionspace.services.authorization.test;
+package org.collectionspace.services.authorization.importer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,6 +60,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.collectionspace.services.authorization.AuthZ;
+import org.collectionspace.services.authorization.PermissionsList;
+import org.collectionspace.services.authorization.PermissionsRolesList;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -78,17 +80,18 @@ import org.testng.annotations.Test;
  */
 public abstract class AbstractAuthorizationTestImpl {
 
-	static protected final String MAVEN_BASEDIR_PROPERTY = "maven.basedir";
-	final Logger logger = LoggerFactory.getLogger(AbstractAuthorizationTestImpl.class);
+    static protected final String MAVEN_BASEDIR_PROPERTY = "maven.basedir";
+    final Logger logger = LoggerFactory.getLogger(AbstractAuthorizationTestImpl.class);
     private org.springframework.jdbc.datasource.DataSourceTransactionManager txManager;
-    final static String testDataDir = "src/test/resources/test-data/";
+    final static String importDataDir = "src/main/resources/import-data/";
     static String baseDir;
+
     static {
-    	baseDir = System.getProperty(AbstractAuthorizationTestImpl.MAVEN_BASEDIR_PROPERTY);
-    	if (baseDir == null || baseDir.isEmpty()) {
-    		baseDir = System.getProperty("user.dir");
-    	}
-    	baseDir = baseDir + System.getProperty("file.separator");    	
+        baseDir = System.getProperty(AbstractAuthorizationTestImpl.MAVEN_BASEDIR_PROPERTY);
+        if (baseDir == null || baseDir.isEmpty()) {
+            baseDir = System.getProperty("user.dir");
+        }
+        baseDir = baseDir + System.getProperty("file.separator");
     }
 
     /**
@@ -173,6 +176,22 @@ public abstract class AbstractAuthorizationTestImpl {
                 }
             }
         }
+    }
+
+
+    public void writePermissions(PermissionsList pcList, String fileName) {
+        AbstractAuthorizationTestImpl.toFile(pcList, PermissionsList.class,
+                AbstractAuthorizationTestImpl.importDataDir + fileName);
+        logger.info("generated permissions to "
+                + AbstractAuthorizationTestImpl.importDataDir + fileName);
+    }
+
+    
+    public void writePermissionRoles(PermissionsRolesList psrsl, String fileName) {
+        AbstractAuthorizationTestImpl.toFile(psrsl, PermissionsRolesList.class,
+                AbstractAuthorizationTestImpl.importDataDir + fileName);
+        logger.info("generated permissions-roles to "
+                + AbstractAuthorizationTestImpl.importDataDir + fileName);
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractAuthorizationTestImpl.class)

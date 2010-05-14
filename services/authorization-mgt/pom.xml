@@ -15,6 +15,7 @@
     
     <modules>
         <module>service</module>
+        <module>import</module>
         <module>client</module>
     </modules>
 </project>

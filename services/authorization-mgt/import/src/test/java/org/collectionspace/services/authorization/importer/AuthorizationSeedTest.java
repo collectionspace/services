@@ -21,10 +21,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.collectionspace.services.authorization.test;
+package org.collectionspace.services.authorization.importer;
 
 //import java.util.ArrayList;
 //import java.util.List;
+import org.collectionspace.services.authorization.generator.AuthorizationGen;
+import org.collectionspace.services.authorization.importer.AbstractAuthorizationTestImpl;
 import java.util.ArrayList;
 import java.util.List;
 import org.collectionspace.services.authorization.ActionType;
@@ -51,8 +53,8 @@ import org.testng.annotations.BeforeClass;
 public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
 
     final Logger logger = LoggerFactory.getLogger(AuthorizationSeedTest.class);
-    final static String PERMISSION_FILE = "test-permissions.xml";
-    final static String PERMISSION_ROLE_FILE = "test-permissions-roles.xml";
+    final static String PERMISSION_FILE = "import-permissions.xml";
+    final static String PERMISSION_ROLE_FILE = "import-permissions-roles.xml";
 
     @BeforeClass(alwaysRun = true)
     public void seedData() {
@@ -61,9 +63,9 @@ public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
         try {
             AuthorizationGen authzGen = new AuthorizationGen();
             PermissionsList pl = authzGen.genPermissions();
-            authzGen.writePermissions(pl, PERMISSION_FILE);
+            writePermissions(pl, PERMISSION_FILE);
             PermissionsRolesList prl = authzGen.genPermissionsRoles(pl);
-            authzGen.writePermissionRoles(prl, PERMISSION_ROLE_FILE);
+            writePermissionRoles(prl, PERMISSION_ROLE_FILE);
             seedRoles();
             seedPermissions();
         } catch (Exception ex) {
@@ -81,14 +83,14 @@ public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
     public void seedPermissions() throws Exception {
         PermissionsList pcList =
                 (PermissionsList) fromFile(PermissionsList.class, baseDir
-                + AbstractAuthorizationTestImpl.testDataDir + PERMISSION_FILE);
+                + AbstractAuthorizationTestImpl.importDataDir + PERMISSION_FILE);
         logger.info("read permissions from "
-                + baseDir + AbstractAuthorizationTestImpl.testDataDir +  PERMISSION_FILE);
+                + baseDir + AbstractAuthorizationTestImpl.importDataDir +  PERMISSION_FILE);
         PermissionsRolesList pcrList =
                 (PermissionsRolesList) fromFile(PermissionsRolesList.class, baseDir
-                + AbstractAuthorizationTestImpl.testDataDir + PERMISSION_ROLE_FILE);
+                + AbstractAuthorizationTestImpl.importDataDir + PERMISSION_ROLE_FILE);
         logger.info("read permissions-roles from "
-                + baseDir + AbstractAuthorizationTestImpl.testDataDir +  PERMISSION_ROLE_FILE);
+                + baseDir + AbstractAuthorizationTestImpl.importDataDir +  PERMISSION_ROLE_FILE);
         AuthZ authZ = AuthZ.get();
         for (Permission p : pcList.getPermissions()) {
             if (logger.isDebugEnabled()) {

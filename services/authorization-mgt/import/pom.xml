@@ -10,8 +10,8 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.collectionspace.services</groupId>
-    <artifactId>org.collectionspace.services.authorization-mgt.client</artifactId>
-    <name>services.authorization-mgt.client</name>
+    <artifactId>org.collectionspace.services.authorization-mgt.import</artifactId>
+    <name>services.authorization-mgt.import</name>
     <properties>
         <spring.version>3.0.0.RELEASE</spring.version>
         <spring.security.version>3.0.2.RELEASE</spring.security.version>
@@ -156,7 +156,7 @@
     </dependencies>
 
     <build>
-        <finalName>cspace-services-authorization-mgt-client</finalName>
+        <finalName>cspace-services-authorization-mgt-import</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -170,6 +170,10 @@
                         <property>
                             <name>log4j.configuration</name>
                             <value>file:${project.build.directory}/test-classes/log4j.properties</value>
+                        </property>
+                        <property>
+                            <name>spring-beans-config</name>
+                            <value>applicationContext-authorization-test.xml</value>
                         </property>
                     </systemProperties>
                 </configuration>
