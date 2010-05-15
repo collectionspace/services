@@ -8,6 +8,7 @@
 
       <layouts mode="any">
         <layout>heading</layout>
+        <layout>collectionspace_core</layout>
         <layout>acquisition</layout>
       </layouts>        
     </type>

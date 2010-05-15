@@ -23,6 +23,7 @@
 
       <layouts mode="any">
         <layout>heading</layout>
+        <layout>collectionspace_core</layout>
         <layout>relation</layout>
       </layouts>
     </type>

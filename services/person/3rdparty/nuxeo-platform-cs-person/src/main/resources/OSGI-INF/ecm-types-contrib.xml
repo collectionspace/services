@@ -8,6 +8,7 @@
 
       <layouts mode="any">
         <layout>heading</layout>
+        <layout>collectionspace_core</layout>
         <layout>cspersonauthority</layout>
       </layouts>        
     </type>
@@ -33,6 +34,7 @@
 
       <layouts mode="any">
         <layout>heading</layout>
+        <layout>collectionspace_core</layout>
         <layout>person</layout>
       </layouts>        
     </type>

@@ -8,8 +8,9 @@
 
       <layouts mode="any">
         <layout>heading</layout>
+        <layout>collectionspace_core</layout>
         <layout>dimension</layout>
-      </layouts>        
+      </layouts>
     </type>
 
     <type id="Folder" coretype="Folder">
@@ -23,6 +24,5 @@
         <type>Dimension</type>
       </subtypes>
     </type>
-
   </extension>
 </component>

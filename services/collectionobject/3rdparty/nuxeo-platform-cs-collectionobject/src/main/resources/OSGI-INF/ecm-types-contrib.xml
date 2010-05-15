@@ -8,6 +8,7 @@
 
       <layouts mode="any">
         <layout>heading</layout>
+        <layout>collectionspace_core</layout>
         <layout>collectionobject</layout>
       </layouts>        
     </type>
@@ -23,6 +24,5 @@
         <type>CollectionObject</type>
       </subtypes>
     </type>
-
   </extension>
 </component>

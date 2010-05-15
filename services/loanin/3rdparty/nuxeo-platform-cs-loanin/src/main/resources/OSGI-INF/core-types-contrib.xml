@@ -7,6 +7,7 @@
     <doctype name="Loanin" extends="Document">
       <schema name="common"/>
       <schema name="dublincore"/>
+      <schema name="collectionspace_core"/>
       <schema name="loansin_common"/>
     </doctype>
   </extension>

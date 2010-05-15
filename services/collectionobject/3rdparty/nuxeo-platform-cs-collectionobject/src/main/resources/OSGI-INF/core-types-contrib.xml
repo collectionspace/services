@@ -8,6 +8,7 @@
         <doctype name="CollectionObject" extends="Document">
             <schema name="common"/>
             <schema name="dublincore"/>
+            <schema name="collectionspace_core"/>
             <schema name="collectionobjects_common"/>
             <schema name="collectionobjects_naturalhistory"/>
         </doctype>

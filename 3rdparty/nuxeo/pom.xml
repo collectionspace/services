@@ -30,53 +30,6 @@
             <version>2.2.2.SP8</version>
             <scope>provided</scope>
         </dependency>
-        <!-- Nuxeo -->
-        <!-- Nuxeo Dependencies with versions
-        <dependency>
-            <groupId>org.nuxeo.common</groupId>
-            <artifactId>nuxeo-common</artifactId>
-            <version>1.5.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.nuxeo.runtime</groupId>
-            <artifactId>nuxeo-runtime</artifactId>
-            <version>1.5.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.nuxeo.runtime</groupId>
-            <artifactId>nuxeo-runtime-osgi</artifactId>
-            <version>1.5.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.nuxeo.ecm.core</groupId>
-            <artifactId>nuxeo-core-api</artifactId>
-            <version>1.5.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.nuxeo.ecm.core</groupId>
-            <artifactId>nuxeo-core-client</artifactId>
-            <version>1.5.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.nuxeo.ecm.core</groupId>
-            <artifactId>nuxeo-core-query</artifactId>
-            <version>1.5.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.nuxeo.ecm.core</groupId>
-            <artifactId>nuxeo-core-schema</artifactId>
-            <version>1.5.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.nuxeo.ecm.core</groupId>
-            <artifactId>nuxeo-core-io</artifactId>
-            <version>1.5.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.nuxeo.ecm.core</groupId>
-            <artifactId>nuxeo-core-facade</artifactId>
-            <version>1.5.1-SNAPSHOT</version>
-        </dependency> -->
     </dependencies>
 
 </project>

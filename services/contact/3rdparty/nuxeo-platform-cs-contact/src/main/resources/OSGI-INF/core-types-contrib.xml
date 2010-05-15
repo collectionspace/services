@@ -7,6 +7,7 @@
     <doctype name="Contact" extends="Document">
       <schema name="common"/>
       <schema name="dublincore"/>
+      <schema name="collectionspace_core"/>
       <schema name="contacts_common"/>
     </doctype>
   </extension>

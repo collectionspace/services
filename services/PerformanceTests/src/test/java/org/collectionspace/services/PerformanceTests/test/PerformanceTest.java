@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+import org.jboss.resteasy.util.HttpResponseCodes;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.client.CollectionObjectClient;
@@ -65,19 +66,19 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 	// Get clients for the CollectionSpace services
 	//
 	/** The MA x_ records. */
-	private static int MAX_RECORDS = 1000;
+	private static int MAX_RECORDS = 1;
 
 	/**
 	 * Performance test.
 	 */
 	@Test
 	public void performanceTest() {
-		roundTripOverhead(10);
-		deleteCollectionObjects();
+//		roundTripOverhead(MAX_RECORDS);
+//		deleteCollectionObjects();
 		String[] coList = this.createCollectionObjects(MAX_RECORDS);
-		this.searchCollectionObjects(MAX_RECORDS);
-		this.deleteCollectionObjects(coList);
-		roundTripOverhead(10);
+//		this.searchCollectionObjects(MAX_RECORDS);
+//		this.deleteCollectionObjects(coList);
+//		roundTripOverhead(10);
 	}
 	
 	/**
@@ -91,9 +92,15 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 		CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
 		
 		long totalTime = 0;
+		ClientResponse<Response> response;
 		for (int i = 0; i < numOfCalls; i++) {
-			Date startTime = new Date();
-			collectionObjectClient.roundtrip().releaseConnection();
+			Date startTime = new Date();			
+			response = collectionObjectClient.roundtrip();
+			try {
+				Assert.assertEquals(response.getStatus(), HttpResponseCodes.SC_OK);
+			} finally {
+				response.releaseConnection();
+			}
 			Date stopTime = new Date();
 			totalTime = totalTime + (stopTime.getTime() - startTime.getTime());
 			System.out.println("Overhead roundtrip time is: " + (stopTime.getTime() - startTime.getTime()));

@@ -123,11 +123,13 @@
                 <include name="*.jar"/>
             </fileset>
         </copy>
+        <ant antfile="nuxeo-platform-collectionspace/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
     description="undeploy nuxeo client libs from ${jboss.server.cspace}">
         <delete dir="${jboss.server.cspace}/nuxeo-client"/>
+        <ant antfile="nuxeo-platform-collectionspace/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"

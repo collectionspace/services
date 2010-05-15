@@ -8,6 +8,7 @@
 
       <layouts mode="any">
         <layout>heading</layout>
+        <layout>collectionspace_core</layout>
         <layout>csvocabulary</layout>
       </layouts>        
     </type>
@@ -33,6 +34,7 @@
 
       <layouts mode="any">
         <layout>heading</layout>
+        <layout>collectionspace_core</layout>
         <layout>vocabularyitem</layout>
       </layouts>        
     </type>
