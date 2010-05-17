@@ -98,13 +98,21 @@ public interface RepositoryClient extends StorageClient {
 
     /**
      * Find a list of documentModels from the Nuxeo repository
+     * @param ctx 
      * @param docTypes a list of DocType names to match
      * @param where the clause to qualify on
+     * @param pageSize 
+     * @param pageNum 
+     * @param computeTotal 
      * @param domain the domain for the associated services
-     * @return
+     * @return document wrapper
+     * @throws DocumentNotFoundException 
+     * @throws DocumentException 
      */
     public DocumentWrapper<DocumentModelList> findDocs(
-    		List<String> docTypes, String where, String domain,
+    		ServiceContext ctx,
+    		List<String> docTypes,
+    		String where,
     		int pageSize, int pageNum, boolean computeTotal )
             throws DocumentNotFoundException, DocumentException;
 }

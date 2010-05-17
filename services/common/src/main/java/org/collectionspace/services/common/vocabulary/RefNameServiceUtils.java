@@ -33,7 +33,9 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
@@ -55,22 +57,24 @@ public class RefNameServiceUtils {
 
     private final Logger logger = LoggerFactory.getLogger(RefNameServiceUtils.class);
     
-    public static AuthorityRefDocList getAuthorityRefDocs(RepositoryClient repoClient, 
-    		String tenantId, String serviceType, String refName,
-    		int pageSize, int pageNum, boolean computeTotal )
-    		throws DocumentException, DocumentNotFoundException {
+    public static AuthorityRefDocList getAuthorityRefDocs(ServiceContext ctx,
+    		RepositoryClient repoClient, 
+    		String serviceType,
+    		String refName,
+    		int pageSize, int pageNum, boolean computeTotal ) throws DocumentException, DocumentNotFoundException {
     	AuthorityRefDocList wrapperList = new AuthorityRefDocList();
         List<AuthorityRefDocList.AuthorityRefDocItem> list = 
         	wrapperList.getAuthorityRefDocItem();
     	TenantBindingConfigReaderImpl tReader =
             ServiceMain.getInstance().getTenantBindingConfigReader();
-    	List<ServiceBindingType> servicebindings = tReader.getServiceBindingsByType(tenantId, serviceType);
-    	if(servicebindings==null || servicebindings.isEmpty())
+    	List<ServiceBindingType> servicebindings = tReader.getServiceBindingsByType(ctx.getTenantId(), serviceType);
+    	if (servicebindings == null || servicebindings.isEmpty())
     		return null;
     	// Need to escape the quotes in the refName
     	// TODO What if they are already escaped?
     	String escapedRefName = refName.replaceAll("'", "\\\\'");
-    	String domain = tReader.getTenantBinding(tenantId).getRepositoryDomain();
+//    	String domain = 
+//    		tReader.getTenantBinding(ctx.getTenantId()).getRepositoryDomain();
     	ArrayList<String> docTypes = new ArrayList<String>(); 
     	HashMap<String, ServiceBindingType> queriedServiceBindings = new HashMap<String, ServiceBindingType>(); 
     	HashMap<String, List<String>> authRefFieldsByService = new HashMap<String, List<String>>(); 
@@ -114,8 +118,8 @@ public class RefNameServiceUtils {
     		return wrapperList;
     	String fullQuery = whereClause.toString(); // for debug
 		// Now we have to issue the search
-		DocumentWrapper<DocumentModelList> docListWrapper = repoClient.findDocs(
-	    		docTypes, whereClause.toString(), domain, pageSize, pageNum, computeTotal );
+		DocumentWrapper<DocumentModelList> docListWrapper = repoClient.findDocs(ctx,
+	    		docTypes, whereClause.toString(), pageSize, pageNum, computeTotal );
 		// Now we gather the info for each document into the list and return
         DocumentModelList docList = docListWrapper.getWrappedObject();
         Iterator<DocumentModel> iter = docList.iterator();

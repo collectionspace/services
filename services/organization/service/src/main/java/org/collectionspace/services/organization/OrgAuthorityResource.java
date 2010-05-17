@@ -396,8 +396,10 @@ public class OrgAuthorityResource extends
     		DocumentModel docModel = docWrapper.getWrappedObject();
     		String refName = (String)docModel.getPropertyValue(OrganizationJAXBSchema.REF_NAME);
 
-    		authRefDocList = RefNameServiceUtils.getAuthorityRefDocs(repoClient, 
-    				ctx.getTenantId(), serviceType, refName,
+    		authRefDocList = RefNameServiceUtils.getAuthorityRefDocs(ctx,
+    				repoClient, 
+    				serviceType,
+    				refName,
     				myFilter.getPageSize(), myFilter.getStartPage(), true );
     	} catch (UnauthorizedException ue) {
     		Response response = Response.status(

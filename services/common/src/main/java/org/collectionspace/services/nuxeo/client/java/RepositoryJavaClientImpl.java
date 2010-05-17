@@ -20,6 +20,8 @@ package org.collectionspace.services.nuxeo.client.java;
 import java.util.UUID;
 import java.util.List;
 
+import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
@@ -52,10 +54,109 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision: $ $LastChangedDate: $
  */
 public class RepositoryJavaClientImpl implements RepositoryClient {
+	
+	/**
+	 * The Class QueryContext.
+	 */
+	private class QueryContext {
+		
+		/** The doc type. */
+		String docType;
+		
+		/** The doc filter. */
+		DocumentFilter docFilter;
+		
+		/** The where clause. */
+		String whereClause;
+		
+		/** The domain. */
+		String domain;
+		
+		/** The tenant id. */
+		String tenantId;
+		
+		/**
+		 * Instantiates a new query context.
+		 *
+		 * @param ctx the ctx
+		 * @throws DocumentNotFoundException the document not found exception
+		 * @throws DocumentException the document exception
+		 */
+		QueryContext(ServiceContext ctx) throws DocumentNotFoundException, DocumentException {
+	        docType = ctx.getDocumentType();
+	        if (docType == null) {
+	            throw new DocumentNotFoundException(
+	                    "Unable to find DocumentType for service " + ctx.getServiceName());
+	        }
+	        domain = ctx.getRepositoryDomainName();
+	        if (domain == null) {
+	            throw new DocumentNotFoundException(
+	                    "Unable to find Domain for service " + ctx.getServiceName());
+	        }
+	        tenantId = ctx.getTenantId();
+	        if (tenantId == null) {
+	            throw new IllegalArgumentException(
+	            	"Service context has no Tenant ID specified.");
+	        }			
+		}
+		
+//		/**
+//		 * Instantiates a new query context.
+//		 *
+//		 * @param whereClause the where clause
+//		 * @param theDomain the the domain
+//		 * @param theTenantId the the tenant id
+//		 */
+//		QueryContext(String theWhereClause, String theDomain, String theTenantId) {
+//			whereClause = theWhereClause;
+//			domain = theDomain;
+//			tenantId = theTenantId;
+//		}
+		
+		/**
+		 * Instantiates a new query context.
+		 *
+		 * @param ctx the ctx
+		 * @param theWhereClause the the where clause
+		 * @throws DocumentNotFoundException the document not found exception
+		 * @throws DocumentException the document exception
+		 */
+		QueryContext(ServiceContext ctx, String theWhereClause) throws DocumentNotFoundException, DocumentException {
+			this(ctx);
+			whereClause = theWhereClause;
+		}		
+		
+		/**
+		 * Instantiates a new query context.
+		 *
+		 * @param ctx the ctx
+		 * @param handler the handler
+		 * @throws DocumentNotFoundException the document not found exception
+		 * @throws DocumentException the document exception
+		 */
+		QueryContext(ServiceContext ctx, DocumentHandler handler) throws DocumentNotFoundException, DocumentException {
+			this(ctx);
+	        if (handler == null) {
+	            throw new IllegalArgumentException(
+	                    "Document handler is missing.");
+	        }
+	        docFilter = handler.getDocumentFilter();
+	        if (docFilter == null) {
+	            throw new IllegalArgumentException(
+	                    "Document handler has no Filter specified.");
+	        }
+	        whereClause = docFilter.getWhereClause();	        
+		}
+	}
 
+    /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(RepositoryJavaClientImpl.class);
 
+    /**
+     * Instantiates a new repository java client impl.
+     */
     public RepositoryJavaClientImpl() {
+    	//Empty constructor
     }
 
     /**
@@ -188,29 +289,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
     @Override
     public void get(ServiceContext ctx, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
-
-        if (handler == null) {
-            throw new IllegalArgumentException(
-                    "RepositoryJavaClient.get: handler is missing");
-        }
-        DocumentFilter docFilter = handler.getDocumentFilter();
-        if (docFilter == null) {
-            throw new IllegalArgumentException(
-                    "RepositoryJavaClient.get: handler has no Filter specified");
-        }
-        if (docFilter.getPageSize() != 1) {
-            logger.warn("RepositoryJavaClient.get: forcing docFilter pagesize to 1.");
-        }
-        String docType = ctx.getDocumentType();
-        if (docType == null) {
-            throw new DocumentNotFoundException(
-                    "Unable to find DocumentType for service " + ctx.getServiceName());
-        }
-        String domain = ctx.getRepositoryDomainName();
-        if (domain == null) {
-            throw new DocumentNotFoundException(
-                    "Unable to find Domain for service " + ctx.getServiceName());
-        }
+    	QueryContext queryContext = new QueryContext(ctx, handler);
         RepositoryInstance repoSession = null;
 
         try {
@@ -219,7 +298,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
 
             DocumentModelList docList = null;
             // force limit to 1, and ignore totalSize
-            String query = buildNXQLQuery(docType, docFilter.getWhereClause(), domain);
+            String query = buildNXQLQuery(queryContext);
             docList = repoSession.query(query, null, 1, 0, false);
             if (docList.size() != 1) {
                 throw new DocumentNotFoundException("No document found matching filter params.");
@@ -295,6 +374,21 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
     }
 
     /**
+     * Gets the domain.
+     *
+     * @param ctx the ctx
+     * @return the domain
+     */
+    String getDomain(ServiceContext ctx) {
+    	String result = null;
+    	TenantBindingConfigReaderImpl tReader =
+            ServiceMain.getInstance().getTenantBindingConfigReader();
+    	result = 
+    		tReader.getTenantBinding(ctx.getTenantId()).getRepositoryDomain();
+    	return result;
+    }
+    
+    /**
      * find wrapped documentModel from the Nuxeo repository
      * @param ctx service context under which this method is invoked
      * @param where NXQL where clause to get the document
@@ -302,27 +396,22 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
      */
     @Override
     public DocumentWrapper<DocumentModel> findDoc(
-            ServiceContext ctx, String where)
+            ServiceContext ctx, String whereClause)
             throws DocumentNotFoundException, DocumentException {
         RepositoryInstance repoSession = null;
         DocumentWrapper<DocumentModel> wrapDoc = null;
 
         try {
-            String docType = ctx.getDocumentType();
-            if (docType == null) {
-                throw new DocumentNotFoundException(
-                        "Unable to find DocumentType for service " + ctx.getServiceName());
-            }
-            String domain = ctx.getRepositoryDomainName();
-            if (domain == null) {
-                throw new DocumentNotFoundException(
-                        "Unable to find Domain for service " + ctx.getServiceName());
-            }
+        	QueryContext queryContext = new QueryContext(ctx, whereClause);
             repoSession = getRepositorySession();
             DocumentModelList docList = null;
             // force limit to 1, and ignore totalSize
-            String query = buildNXQLQuery(docType, where, domain);
-            docList = repoSession.query(query, null, 1, 0, false);
+            String query = buildNXQLQuery(queryContext);
+            docList = repoSession.query(query,
+            		null, //Filter
+            		1, //limit
+            		0, //offset
+            		false); //countTotal
             if (docList.size() != 1) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("findDoc: Query found: " + docList.size() + " items.");
@@ -356,11 +445,11 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
      * @throws DocumentException
      */
     public String findDocCSID(
-            ServiceContext ctx, String where)
+            ServiceContext ctx, String whereClause)
             throws DocumentNotFoundException, DocumentException {
         String csid = null;
         try {
-            DocumentWrapper<DocumentModel> wrapDoc = findDoc(ctx, where);
+            DocumentWrapper<DocumentModel> wrapDoc = findDoc(ctx, whereClause);
             DocumentModel docModel = wrapDoc.getWrappedObject();
             csid = NuxeoUtils.extractId(docModel.getPathAsString());
         } catch (DocumentNotFoundException dnfe) {
@@ -387,7 +476,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
      */
     @Override
     public DocumentWrapper<DocumentModelList> findDocs(
-            List<String> docTypes, String where, String domain,
+    		ServiceContext ctx,
+            List<String> docTypes,
+            String whereClause,
             int pageSize, int pageNum, boolean computeTotal)
             throws DocumentNotFoundException, DocumentException {
         RepositoryInstance repoSession = null;
@@ -398,13 +489,12 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
                 throw new DocumentNotFoundException(
                         "findDocs must specify at least one DocumentType.");
             }
-            if (domain == null) {
-                throw new DocumentNotFoundException("findDocs must specify Domain.");
-            }
             repoSession = getRepositorySession();
             DocumentModelList docList = null;
             // force limit to 1, and ignore totalSize
-            String query = buildNXQLQuery(docTypes, where, domain);
+            QueryContext queryContext = new QueryContext(ctx, whereClause);
+//            QueryContext queryContext = new QueryContext(where, this.getDomain(ctx), ctx.getTenantId());            
+            String query = buildNXQLQuery(docTypes, queryContext);
             docList = repoSession.query(query, null, pageSize, pageNum, computeTotal);
             wrapDoc = new DocumentWrapperImpl<DocumentModelList>(docList);
         } catch (IllegalArgumentException iae) {
@@ -422,6 +512,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         return wrapDoc;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.storage.StorageClient#get(org.collectionspace.services.common.context.ServiceContext, java.util.List, org.collectionspace.services.common.document.DocumentHandler)
+     */
     @Override
     public void get(ServiceContext ctx, List<String> csidList, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
@@ -511,7 +604,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
             }
         }
     }
-
+    
     /**
      * getFiltered get all documents for an entity service from the Document repository,
      * given filter parameters specified by the handler. 
@@ -522,37 +615,20 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
      */
     public void getFiltered(ServiceContext ctx, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
-        if (handler == null) {
-            throw new IllegalArgumentException(
-                    "RepositoryJavaClient.getFiltered: handler is missing");
-        }
-        DocumentFilter docFilter = handler.getDocumentFilter();
-        if (docFilter == null) {
-            throw new IllegalArgumentException(
-                    "RepositoryJavaClient.getFiltered: handler has no Filter specified");
-        }
-        String docType = ctx.getDocumentType();
-        if (docType == null) {
-            throw new DocumentNotFoundException(
-                    "Unable to find DocumentType for service " + ctx.getServiceName());
-        }
-        String domain = ctx.getRepositoryDomainName();
-        if (domain == null) {
-            throw new DocumentNotFoundException(
-                    "Unable to find Domain for service " + ctx.getServiceName());
-        }
+    	QueryContext queryContext = new QueryContext(ctx, handler);
+    	        
         RepositoryInstance repoSession = null;
         try {
             handler.prepare(Action.GET_ALL);
             repoSession = getRepositorySession();
             DocumentModelList docList = null;
-            String query = buildNXQLQuery(docType, docFilter.getWhereClause(), domain);
+            String query = buildNXQLQuery(queryContext);
 
             // If we have limit and/or offset, then pass true to get totalSize
             // in returned DocumentModelList.
-            if ((docFilter.getOffset() > 0) || (docFilter.getPageSize() > 0)) {
+            if ((queryContext.docFilter.getOffset() > 0) || (queryContext.docFilter.getPageSize() > 0)) {
                 docList = repoSession.query(query, null,
-                        docFilter.getPageSize(), docFilter.getOffset(), true);
+                		queryContext.docFilter.getPageSize(), queryContext.docFilter.getOffset(), true);
             } else {
                 docList = repoSession.query(query);
             }
@@ -675,12 +751,18 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.storage.StorageClient#delete(org.collectionspace.services.common.context.ServiceContext, java.lang.String, org.collectionspace.services.common.document.DocumentHandler)
+     */
     @Override
     public void delete(ServiceContext ctx, String id, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.repository.RepositoryClient#createWorkspace(java.lang.String, java.lang.String)
+     */
     @Override
     public String createWorkspace(String tenantDomain, String workspaceName) throws Exception {
         RepositoryInstance repoSession = null;
@@ -716,6 +798,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         return workspaceId;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.repository.RepositoryClient#getWorkspaceId(java.lang.String, java.lang.String)
+     */
     @Override
     public String getWorkspaceId(String tenantDomain, String workspaceName) throws Exception {
         String workspaceId = null;
@@ -743,26 +828,52 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         return workspaceId;
     }
 
-    private final void appendNXQLWhere(StringBuilder query, String where, String domain) {
+    /**
+     * Append nxql where.
+     *
+     * @param query the query
+     * @param where the where
+     * @param domain the domain
+     */
+    private final void appendNXQLWhere(StringBuilder query, QueryContext queryContext) {
         // TODO This is a slow method for tenant-filter
         // We should make this a property that is indexed.
-        query.append(" WHERE ecm:path STARTSWITH '/" + domain + "'");
-        if ((null != where) && (where.length() > 0)) {
+        query.append(" WHERE ecm:path STARTSWITH '/" + queryContext.domain + "'");
+//        query.append(" AND collectionspace_core:tenantId = " + tenantId);//FIXME: REM - Uncomment this and add a constant for the collectionspace_core schema and tenantId element
+        String whereClause = queryContext.whereClause;
+        if (whereClause != null && whereClause.length() > 0) {
             // Due to an apparent bug/issue in how Nuxeo translates the NXQL query string
             // into SQL, we need to parenthesize our 'where' clause
-            query.append(" AND " + "(" + where + ")");
+            query.append(" AND " + "(" + whereClause + ")");
         }
         query.append(" AND ecm:isProxy = 0");
     }
 
-    private final String buildNXQLQuery(String docType, String where, String domain) {
+    /**
+     * Builds the nxql query.
+     *
+     * @param docType the doc type
+     * @param where the where
+     * @param domain the domain
+     * @param tenantId the tenant id
+     * @return the string
+     */
+    private final String buildNXQLQuery(QueryContext queryContext) {
         StringBuilder query = new StringBuilder("SELECT * FROM ");
-        query.append(docType);
-        appendNXQLWhere(query, where, domain);
+        query.append(queryContext.docType);
+        appendNXQLWhere(query, queryContext);
         return query.toString();
     }
 
-    private final String buildNXQLQuery(List<String> docTypes, String where, String domain) {
+    /**
+     * Builds the nxql query.
+     *
+     * @param docTypes the doc types
+     * @param where the where
+     * @param domain the domain
+     * @return the string
+     */
+    private final String buildNXQLQuery(List<String> docTypes, QueryContext queryContext) {
         StringBuilder query = new StringBuilder("SELECT * FROM ");
         boolean fFirst = true;
         for (String docType : docTypes) {
@@ -773,10 +884,16 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
             }
             query.append(docType);
         }
-        appendNXQLWhere(query, where, domain);
+        appendNXQLWhere(query, queryContext);
         return query.toString();
     }
 
+    /**
+     * Gets the repository session.
+     *
+     * @return the repository session
+     * @throws Exception the exception
+     */
     private RepositoryInstance getRepositorySession() throws Exception {
         // FIXME: is it possible to reuse repository session?
         // Authentication failures happen while trying to reuse the session
@@ -788,6 +905,11 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         return repoSession;
     }
 
+    /**
+     * Release repository session.
+     *
+     * @param repoSession the repo session
+     */
     private void releaseRepositorySession(RepositoryInstance repoSession) {
         try {
             NuxeoClient client = NuxeoConnector.getInstance().getClient();

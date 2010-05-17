@@ -371,9 +371,11 @@ public class PersonAuthorityResource extends
         DocumentModel docModel = docWrapper.getWrappedObject();
         String refName = (String)docModel.getPropertyValue(PersonJAXBSchema.REF_NAME);
 
-        authRefDocList = RefNameServiceUtils.getAuthorityRefDocs(repoClient, 
-        		ctx.getTenantId(), serviceType, refName,
-        		myFilter.getPageSize(), myFilter.getStartPage(), true );
+        authRefDocList = RefNameServiceUtils.getAuthorityRefDocs(ctx,
+        		repoClient, 
+        		serviceType,
+        		refName,
+        		myFilter.getPageSize(), myFilter.getStartPage(), true /*computeTotal*/ );
     } catch (UnauthorizedException ue) {
         Response response = Response.status(
                 Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
