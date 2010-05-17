@@ -52,6 +52,9 @@ public abstract class DocumentModelHandler<T, TL>
     private RepositoryInstance repositorySession;
     //key=schema, value=documentpart
 
+    public final static String COLLECTIONSPACE_CORE_SCHEMA = "collectionspace_core";
+    public final static String COLLECTIONSPACE_CORE_TENANTID = "tenantId";
+    
     /**
      * getRepositorySession returns Nuxeo Repository Session
      * @return

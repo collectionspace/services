@@ -21,18 +21,23 @@ import java.util.UUID;
 import java.util.List;
 
 import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceContext;
+
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
-import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
+
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.collectionspace.services.common.repository.RepositoryClient;
+import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
+
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.nuxeo.common.utils.IdUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -43,6 +48,7 @@ import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.client.NuxeoClient;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +88,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
 		 * @throws DocumentNotFoundException the document not found exception
 		 * @throws DocumentException the document exception
 		 */
-		QueryContext(ServiceContext ctx) throws DocumentNotFoundException, DocumentException {
+		QueryContext(ServiceContext<MultipartInput, MultipartOutput> ctx) throws DocumentNotFoundException, DocumentException {
 	        docType = ctx.getDocumentType();
 	        if (docType == null) {
 	            throw new DocumentNotFoundException(
@@ -99,20 +105,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
 	            	"Service context has no Tenant ID specified.");
 	        }			
 		}
-		
-//		/**
-//		 * Instantiates a new query context.
-//		 *
-//		 * @param whereClause the where clause
-//		 * @param theDomain the the domain
-//		 * @param theTenantId the the tenant id
-//		 */
-//		QueryContext(String theWhereClause, String theDomain, String theTenantId) {
-//			whereClause = theWhereClause;
-//			domain = theDomain;
-//			tenantId = theTenantId;
-//		}
-		
+
 		/**
 		 * Instantiates a new query context.
 		 *
@@ -121,7 +114,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
 		 * @throws DocumentNotFoundException the document not found exception
 		 * @throws DocumentException the document exception
 		 */
-		QueryContext(ServiceContext ctx, String theWhereClause) throws DocumentNotFoundException, DocumentException {
+		QueryContext(ServiceContext<MultipartInput, MultipartOutput> ctx,
+				String theWhereClause) throws DocumentNotFoundException, DocumentException {
 			this(ctx);
 			whereClause = theWhereClause;
 		}		
@@ -134,7 +128,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
 		 * @throws DocumentNotFoundException the document not found exception
 		 * @throws DocumentException the document exception
 		 */
-		QueryContext(ServiceContext ctx, DocumentHandler handler) throws DocumentNotFoundException, DocumentException {
+		QueryContext(ServiceContext<MultipartInput, MultipartOutput> ctx,
+				DocumentHandler handler) throws DocumentNotFoundException, DocumentException {
 			this(ctx);
 	        if (handler == null) {
 	            throw new IllegalArgumentException(
@@ -159,6 +154,33 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
     	//Empty constructor
     }
 
+    /**
+     * Sets the collection space core values.
+     *
+     * @param ctx the ctx
+     * @param documentModel the document model
+     * @throws ClientException the client exception
+     */
+    private void setCollectionSpaceCoreValues(ServiceContext<MultipartInput, MultipartOutput> ctx,
+    		DocumentModel documentModel,
+    		Action action) throws ClientException {
+    	//
+    	// Add the tenant ID value to the new entity
+    	//
+    	documentModel.setProperty(DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA,
+        		DocumentModelHandler.COLLECTIONSPACE_CORE_TENANTID,
+        		ctx.getTenantId());
+    	switch (action) {
+    		case CREATE:
+    			//add creation date value
+    			break;
+    		case UPDATE:
+    			//add update value
+    			break;
+    		default:
+    	}
+    }
+    
     /**
      * create document in the Nuxeo repository
      *
@@ -206,6 +228,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
             DocumentWrapper<DocumentModel> wrapDoc = new DocumentWrapperImpl<DocumentModel>(doc);
             handler.handle(Action.CREATE, wrapDoc);
             // create document with documentmodel
+            setCollectionSpaceCoreValues(ctx, doc, Action.CREATE);
             doc = repoSession.createDocument(doc);
             repoSession.save();
             handler.complete(Action.CREATE, wrapDoc);
@@ -372,21 +395,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         }
         return wrapDoc;
     }
-
-    /**
-     * Gets the domain.
-     *
-     * @param ctx the ctx
-     * @return the domain
-     */
-    String getDomain(ServiceContext ctx) {
-    	String result = null;
-    	TenantBindingConfigReaderImpl tReader =
-            ServiceMain.getInstance().getTenantBindingConfigReader();
-    	result = 
-    		tReader.getTenantBinding(ctx.getTenantId()).getRepositoryDomain();
-    	return result;
-    }
     
     /**
      * find wrapped documentModel from the Nuxeo repository
@@ -444,6 +452,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
      * @param where NXQL where clause to get the document
      * @throws DocumentException
      */
+    @Override
     public String findDocCSID(
             ServiceContext ctx, String whereClause)
             throws DocumentNotFoundException, DocumentException {
@@ -493,7 +502,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
             DocumentModelList docList = null;
             // force limit to 1, and ignore totalSize
             QueryContext queryContext = new QueryContext(ctx, whereClause);
-//            QueryContext queryContext = new QueryContext(where, this.getDomain(ctx), ctx.getTenantId());            
             String query = buildNXQLQuery(docTypes, queryContext);
             docList = repoSession.query(query, null, pageSize, pageNum, computeTotal);
             wrapDoc = new DocumentWrapperImpl<DocumentModelList>(docList);
@@ -613,6 +621,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
      * @throws DocumentNotFoundException if workspace not found
      * @throws DocumentException
      */
+    @Override
     public void getFiltered(ServiceContext ctx, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
     	QueryContext queryContext = new QueryContext(ctx, handler);
@@ -692,6 +701,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
             DocumentWrapper<DocumentModel> wrapDoc = new DocumentWrapperImpl<DocumentModel>(doc);
             handler.handle(Action.UPDATE, wrapDoc);
+            setCollectionSpaceCoreValues(ctx, doc, Action.CREATE);
             repoSession.saveDocument(doc);
             repoSession.save();
             handler.complete(Action.UPDATE, wrapDoc);
@@ -835,17 +845,32 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
      * @param where the where
      * @param domain the domain
      */
-    private final void appendNXQLWhere(StringBuilder query, QueryContext queryContext) {
+    private final void appendNXQLWhere(StringBuilder query, QueryContext queryContext) {    	
+    	//
+    	// Restrict search to a specific Nuxeo domain
         // TODO This is a slow method for tenant-filter
         // We should make this a property that is indexed.
+    	//
         query.append(" WHERE ecm:path STARTSWITH '/" + queryContext.domain + "'");
-//        query.append(" AND collectionspace_core:tenantId = " + tenantId);//FIXME: REM - Uncomment this and add a constant for the collectionspace_core schema and tenantId element
+        
+        //
+        // Restrict search to the current tenant ID.  Is the domain path filter (above) still needed?
+        //
+        query.append("AND " + DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA + ":" +
+        		DocumentModelHandler.COLLECTIONSPACE_CORE_TENANTID +
+        		" = " + queryContext.tenantId);
+        //
+        // Finally, append the incoming where clause
+        //
         String whereClause = queryContext.whereClause;
         if (whereClause != null && whereClause.length() > 0) {
             // Due to an apparent bug/issue in how Nuxeo translates the NXQL query string
             // into SQL, we need to parenthesize our 'where' clause
             query.append(" AND " + "(" + whereClause + ")");
         }
+        //
+        // Please lookup this use in Nuxeo support and document here
+        //
         query.append(" AND ecm:isProxy = 0");
     }
 
