@@ -207,6 +207,48 @@
             </service:object>
         </tenant:serviceBindings>
         <!-- end loanout service meta-data -->
+        <!-- begin movement service meta-data -->
+        <tenant:serviceBindings name="Movements" type="procedure" version="0.1">
+            <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
+                nuxeo-java
+            </service:repositoryClient>
+            <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.movement.nuxeo.MovementDocumentModelHandler
+            </service:documentHandler>
+            <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.movement.nuxeo.MovementValidatorHandler
+            </service:validatorHandler>
+            <service:object name="Movement" version="0.1"
+                            xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:part id="0" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="movements-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/common/system"
+                            schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="movements_common" updated="" order="1">
+                    <service:properties>
+                        <!-- Uncomment the following two entries when the Storage Location Authority is introduced: -->
+                        <!-- <types:item><types:key>authRef</types:key><types:value>currentLocation</types:value></types:item> -->
+                        <!-- <types:item><types:key>authRef</types:key><types:value>normalLocation</types:value></types:item> -->
+                        <types:item><types:key>authRef</types:key><types:value>movementContact</types:value></types:item>
+		    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/movement"
+                            schemaLocation="http://collectionspace.org/services/movement http://services.collectionspace.org/movement/movements_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end movement service meta-data -->
         <!-- begin vocabulary service meta-data -->
         <tenant:serviceBindings name="Vocabularies" version="0.1">
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>

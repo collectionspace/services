@@ -31,6 +31,7 @@
         <module>intake</module>
         <module>loanin</module>
         <module>loanout</module>
+        <module>movement</module>
         <module>dimension</module>
         <module>contact</module>
         <module>JaxRsServiceProvider</module>
