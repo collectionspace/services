@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Movement schema (XSD)
+    
+    Entity  : Movement
+    Part    : Common
+    Used for: Nuxeo EP core document type
+
+    $LastChangedRevision: 1442 $
+    $LastChangedDate: 2010-02-25 14:22:30 -0800 (Thu, 25 Feb 2010) $
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/movement/"
+    xmlns="http://collectionspace.org/movement/"
+    targetNamespace="http://collectionspace.org/movement/"
+    version="0.1">
+    
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Location+and+Movement+Control+Schema -->
+    
+    <!--  Object Location Information Group -->
+    <xs:element name="currentLocation" type="xs:string"/>
+    <xs:element name="currentLocationFitness" type="xs:string"/>
+    <xs:element name="currentLocationNote" type="xs:string"/>
+    <xs:element name="locationDate" type="xs:string"/>
+    <xs:element name="normalLocation" type="xs:string"/>
+    
+    <!--  Movement Information Group -->
+    <xs:element name="movementContact" type="xs:string"/>
+    <xs:element name="movementMethods">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="movementMethod" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="movementNote" type="xs:string"/>
+    <xs:element name="movementReferenceNumber" type="xs:string"/>
+    <xs:element name="plannedRemovalDate" type="xs:string"/>
+    <xs:element name="removalDate" type="xs:string"/>
+    <xs:element name="reasonForMove" type="xs:string"/>
+    
+</xs:schema>
