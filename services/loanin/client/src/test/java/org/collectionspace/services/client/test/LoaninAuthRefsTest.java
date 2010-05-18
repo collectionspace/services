@@ -57,8 +57,8 @@ import org.slf4j.LoggerFactory;
  * LoaninAuthRefsTest, carries out Authority References tests against a
  * deployed and running Loanin (aka Loans In) Service.
  *
- * $LastChangedRevision: 1327 $
- * $LastChangedDate: 2010-02-12 10:35:11 -0800 (Fri, 12 Feb 2010) $
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
 public class LoaninAuthRefsTest extends BaseServiceTest {
 

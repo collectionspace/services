@@ -6,7 +6,7 @@ package org.collectionspace.services.test;
 /**
  * Placeholder for server-side testing of Loan In service code.
  * 
- * @version $Revision:$
+ * @version $Revision$
  */
 public class LoaninServiceTest {
 	//empty

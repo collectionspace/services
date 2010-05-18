@@ -41,8 +41,8 @@ import org.slf4j.LoggerFactory;
 /**
  * LoaninDocumentModelHandler
  *
- * $LastChangedRevision: $
- * $LastChangedDate: $
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
 public class LoaninDocumentModelHandler
         extends RemoteDocumentModelHandlerImpl<LoansinCommon, LoansinCommonList> {
