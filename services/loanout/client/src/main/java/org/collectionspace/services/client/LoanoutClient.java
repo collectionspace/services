@@ -33,8 +33,8 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 /**
  * LoanoutClient.java
  *
- * $LastChangedRevision: $
- * $LastChangedDate: $
+ * $LastChangedRevision$
+ * $LastChangedDate$
  *
  */
 public class LoanoutClient extends AbstractServiceClientImpl {

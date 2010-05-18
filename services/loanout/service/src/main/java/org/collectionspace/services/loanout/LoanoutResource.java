@@ -95,7 +95,7 @@ public class LoanoutResource extends
     @Override
     protected String getVersionString() {
     	/** The last change revision. */
-    	final String lastChangeRevision = "$LastChangedRevision: 1627 $";
+    	final String lastChangeRevision = "$LastChangedRevision$";
     	return lastChangeRevision;
     }
     

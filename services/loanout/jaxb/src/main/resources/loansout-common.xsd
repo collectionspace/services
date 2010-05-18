@@ -7,8 +7,8 @@
     Part    : Common
     Used for: JAXB binding between XML and Java objects
 
-    $LastChangedRevision: 1692 $
-    $LastChangedDate: 2010-03-24 20:20:55 -0800 (Wed, 24 Mar 2010) $
+    $LastChangedRevision$
+    $LastChangedDate$
 -->
 
 <xs:schema 
