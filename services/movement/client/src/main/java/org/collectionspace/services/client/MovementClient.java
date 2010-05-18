@@ -33,8 +33,8 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 /**
  * MovementClient.java
  *
- * $LastChangedRevision: $
- * $LastChangedDate: $
+ * $LastChangedRevision$
+ * $LastChangedDate$
  *
  */
 public class MovementClient extends AbstractServiceClientImpl {

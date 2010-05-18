@@ -48,8 +48,8 @@ import org.slf4j.LoggerFactory;
  * MovementServiceTest, carries out tests against a
  * deployed and running Movement Service.
  *
- * $LastChangedRevision: 1327 $
- * $LastChangedDate: 2010-02-12 10:35:11 -0800 (Fri, 12 Feb 2010) $
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
 public class MovementServiceTest extends AbstractServiceTestImpl {
 
