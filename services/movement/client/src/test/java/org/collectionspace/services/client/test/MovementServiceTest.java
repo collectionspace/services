@@ -31,6 +31,7 @@ import org.collectionspace.services.client.MovementClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.movement.MovementsCommon;
 import org.collectionspace.services.movement.MovementsCommonList;
+import org.collectionspace.services.movement.MovementMethodsList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -676,17 +677,26 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
     }
 
     /**
-     * Creates the movement instance.
+     * Creates an instance of a Movement record for testing.
      *
-     * @param movementReferenceNumber the movement reference number
-     * @param locationDate the location date
-     * @return the multipart output
+     * @param movementReferenceNumber A movement reference number.
+     * @param locationDate A location date.
+     * @return Multipart output suitable for use as a payload
+     *     in a create or update request.
      */
     private MultipartOutput createMovementInstance(String movementReferenceNumber,
     		String locationDate) {
         MovementsCommon movement = new MovementsCommon();
         movement.setMovementReferenceNumber(movementReferenceNumber);
         movement.setLocationDate(locationDate);
+        MovementMethodsList movementMethodsList = new MovementMethodsList();
+        List<String> methods = movementMethodsList.getMovementMethod();
+        // @TODO Use properly formatted refNames for representative movement
+        // methods in this example record. The values below are placeholders.
+        String identifier = createIdentifier();
+        methods.add("First Movement Method-" + identifier);
+        methods.add("Second Movement Method-" + identifier);
+        movement.setMovementMethods(movementMethodsList);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(movement, MediaType.APPLICATION_XML_TYPE);
