@@ -137,24 +137,6 @@ public abstract class AbstractAuthorizationTestImpl {
     }
 
 
-    static Object fromFile(Class jaxbClass, String fileName) throws Exception {
-        InputStream is = new FileInputStream(fileName);
-        try {
-            JAXBContext context = JAXBContext.newInstance(jaxbClass);
-            Unmarshaller unmarshaller = context.createUnmarshaller();
-            //note: setting schema to null will turn validator off
-            unmarshaller.setSchema(null);
-            return jaxbClass.cast(unmarshaller.unmarshal(is));
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (Exception e) {
-                }
-            }
-        }
-    }
-
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractAuthorizationTestImpl.class)
     public void test(String testName) {

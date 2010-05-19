@@ -21,7 +21,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.collectionspace.services.authorization.generator;
+package org.collectionspace.services.authorization.importer;
 
 import java.io.File;
 import org.slf4j.Logger;
@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
+import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.ActionType;
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.EffectType;
@@ -40,6 +41,7 @@ import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.PermissionsList;
 import org.collectionspace.services.authorization.PermissionsRolesList;
+import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
@@ -47,7 +49,8 @@ import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.tenant.TenantBindingType;
 
 /**
- *
+ * AuthorizationGen generates authorizations (permissions and roles)
+ * for tenant services
  * @author 
  */
 public class AuthorizationGen {
@@ -58,12 +61,16 @@ public class AuthorizationGen {
     private Hashtable<String, TenantBindingType> tenantBindings =
             new Hashtable<String, TenantBindingType>();
 
-    public void initialize(String tenantBindingFile) throws Exception {
+    public void initialize(String tenantBindingFileName) throws Exception {
         TenantBindingConfigReaderImpl tenantBindingConfigReader =
                 new TenantBindingConfigReaderImpl(null);
-        tenantBindingConfigReader.read(tenantBindingFile);
+        tenantBindingConfigReader.read(tenantBindingFileName);
         tenantBindings = tenantBindingConfigReader.getTenantBindings();
+        if (logger.isDebugEnabled()) {
+            logger.debug("initialized with tenant bindings from " + tenantBindingFileName);
+        }
     }
+
 
     public void createDefaultServicePermissions() {
         for (String tenantId : tenantBindings.keySet()) {
@@ -83,6 +90,7 @@ public class AuthorizationGen {
         return apcList;
 
     }
+
 
     private Permission buildCommonPermission(String tenantId, String resourceName) {
         String id = UUID.randomUUID().toString();
@@ -165,7 +173,9 @@ public class AuthorizationGen {
         pcList.setPermissions(permList);
         toFile(pcList, PermissionsList.class,
                 fileName);
-        logger.info("exported permissions to " + fileName);
+        if (logger.isDebugEnabled()) {
+            logger.debug("exported permissions to " + fileName);
+        }
     }
 
     public void exportPermissionRoles(String fileName) {
@@ -173,7 +183,9 @@ public class AuthorizationGen {
         psrsl.setPermissionRoles(permRoleList);
         toFile(psrsl, PermissionsRolesList.class,
                 fileName);
-        logger.info("exported permissions-roles to " + fileName);
+        if (logger.isDebugEnabled()) {
+            logger.debug("exported permissions-roles to " + fileName);
+        }
     }
 
     private void toFile(Object o, Class jaxbClass, String fileName) {
