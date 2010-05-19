@@ -21,48 +21,62 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 import org.collectionspace.services.client.IClientQueryParams;
-import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.context.ServiceContext;
 
-//TODO: would be great to not rely on resteasy directly
-import org.jboss.resteasy.specimpl.MultivaluedMapImpl;
-
 /**
- * DocumentFilter bundles simple query filtering parameters. 
- * It is designed to be used with filtered get and search calls to RepositoryClient.
- * The values are set up and stored on a DocumentHandler, and
- * fetched by a RepositoryClient when calling filtered get methods.
+ * The Class DocumentFilter.
  */
 public class DocumentFilter {
 
+    /** The Constant DEFAULT_PAGE_SIZE_INIT. */
     public static final int DEFAULT_PAGE_SIZE_INIT = 40;
+    
+    /** The Constant PAGE_SIZE_DEFAULT_PROPERTY. */
     public static final String PAGE_SIZE_DEFAULT_PROPERTY = "pageSizeDefault";
+    
+    /** The default page size. */
     public static int defaultPageSize = DEFAULT_PAGE_SIZE_INIT;
 
+    /** The where clause. */
     protected String whereClause;	// Filtering clause. Omit the "WHERE".
+    
+    /** The start page. */
     protected int startPage;		// Pagination offset for list results
+    
+    /** The page size. */
     protected int pageSize;			// Pagination limit for list results
-    private boolean pageSizeDirty = false; // True if default page size explicitly set/overridden
-
+    
     //queryParams is not initialized as it would require a multi-valued map implementation
     //unless it is used from opensource lib...this variable holds ref to
     //implementation available in JBoss RESTeasy
+    /** The query params. */
     private MultivaluedMap<String, String> queryParams = null;
 
     /**
-     * ParamBinding encapsulates parameter binding for query
+     * The Class ParamBinding.
      */
     public static class ParamBinding {
 
+        /** The name. */
         private String name;
+        
+        /** The value. */
         private Object value;
 
-        public ParamBinding(String name, Object value) {
-            this.name = name;
-            this.value = value;
+        /**
+         * Instantiates a new param binding.
+         *
+         * @param theName the name
+         * @param theValue the value
+         */
+        public ParamBinding(String theName, Object theValue) {
+            this.name = theName;
+            this.value = theValue;
         }
 
         /**
+         * Gets the name.
+         *
          * @return the name
          */
         public String getName() {
@@ -70,13 +84,17 @@ public class DocumentFilter {
         }
 
         /**
-         * @param name the name to set
+         * Sets the name.
+         *
+         * @param theName the new name
          */
-        public void setName(String name) {
-            this.name = name;
+        public void setName(String theName) {
+            this.name = theName;
         }
 
         /**
+         * Gets the value.
+         *
          * @return the value
          */
         public Object getValue() {
@@ -84,16 +102,18 @@ public class DocumentFilter {
         }
 
         /**
-         * @param value the value to set
+         * Sets the value.
+         *
+         * @param theValue the new value
          */
-        public void setValue(Object value) {
-            this.value = value;
+        public void setValue(Object theValue) {
+            this.value = theValue;
         }
     }
 
     /**
      * Instantiates a new document filter.
-     * 
+     *
      * @param ctx the ctx
      */
     public DocumentFilter(ServiceContext ctx) {
@@ -101,44 +121,52 @@ public class DocumentFilter {
                 DocumentFilter.PAGE_SIZE_DEFAULT_PROPERTY));
     }
 
+    /**
+     * Instantiates a new document filter.
+     */
     public DocumentFilter() {
         this("", 0, defaultPageSize);			// Use empty string for easy concatenation
     }
 
-    public DocumentFilter(String whereClause, int startPage, int pageSize) {
-        this.whereClause = whereClause;
-        this.startPage = (startPage > 0) ? startPage : 0;
-        this.pageSize = (pageSize > 0) ? pageSize : defaultPageSize;
+    /**
+     * Instantiates a new document filter.
+     *
+     * @param theWhereClause the the where clause
+     * @param theStartPage the the start page
+     * @param thePageSize the the page size
+     */
+    public DocumentFilter(String theWhereClause, int theStartPage, int thePageSize) {
+        this.whereClause = theWhereClause;
+        this.startPage = (theStartPage > 0) ? theStartPage : 0;
+        this.pageSize = (thePageSize > 0) ? thePageSize : defaultPageSize;
     }
 
     /**
      * Sets the pagination.
-     * 
-     * @param queryParams the query params
+     *
+     * @param theQueryParams the the query params
      */
-    public void setPagination(MultivaluedMap<String, String> queryParams) {
+    public void setPagination(MultivaluedMap<String, String> theQueryParams) {
         //
         // Bail if there are no params
         //
-        if (queryParams == null) {
+        if (theQueryParams == null) {
             return;
         }
-
         //
         // Set the page size
         //
         String pageSizeStr = null;
-        List<String> list = queryParams.get(IClientQueryParams.PAGE_SIZE_PARAM);
+        List<String> list = theQueryParams.get(IClientQueryParams.PAGE_SIZE_PARAM);
         if (list != null) {
             pageSizeStr = list.get(0);
         }
         setPageSize(pageSizeStr);
-
         //
         // Set the start page
         //
         String startPageStr = null;
-        list = queryParams.get(IClientQueryParams.START_PAGE_PARAM);
+        list = theQueryParams.get(IClientQueryParams.START_PAGE_PARAM);
         if (list != null) {
             startPageStr = list.get(0);
         }
@@ -146,100 +174,134 @@ public class DocumentFilter {
     }
 
     /**
-     * @return the current default page size for new DocumentFilter instances
+     * Gets the default page size.
+     *
+     * @return the default page size
      */
     public static int getDefaultPageSize() {
         return defaultPageSize;
     }
 
     /**
-     * @param defaultPageSize the working default page size for new DocumentFilter instances
+     * Sets the default page size.
+     *
+     * @param theDefaultPageSize the new default page size
      */
-    public static void setDefaultPageSize(int defaultPageSize) {
-        DocumentFilter.defaultPageSize = defaultPageSize;
+    public static void setDefaultPageSize(int theDefaultPageSize) {
+        DocumentFilter.defaultPageSize = theDefaultPageSize;
     }
 
     /**
-     * @return the WHERE filtering clause
+     * Gets the where clause.
+     *
+     * @return the where clause
      */
     public String getWhereClause() {
         return whereClause;
     }
 
     /**
-     * @param whereClause the filtering clause (do not include "WHERE")
+     * Sets the where clause.
+     *
+     * @param theWhereClause the new where clause
      */
-    public void setWhereClause(String whereClause) {
-        this.whereClause = whereClause;
-    }
-
-    public void appendWhereClause(String whereClause) {
-        String currentClause = getWhereClause();
-        if (currentClause != null) {
-            String newClause = currentClause.concat(IQueryManager.SEARCH_TERM_SEPARATOR + whereClause);
-            this.setWhereClause(newClause);
-        }
+    public void setWhereClause(String theWhereClause) {
+        this.whereClause = theWhereClause;
     }
 
     /**
-     * buildWhereClause builds where clause for search query
-     * @param queryStrBldr query string to append with where clause
-     * @return parameter binding
+     * Append where clause.
+     *
+     * @param theWhereClause the the where clause
+     * @param conjunction the conjunction
+     */
+    public void appendWhereClause(String theWhereClause, String conjunction) {
+    	if (theWhereClause != null && theWhereClause.length() > 0) {
+	        String currentClause = getWhereClause();
+	        if (currentClause != null) {
+	            String newClause = currentClause.concat(conjunction + theWhereClause);
+	            this.setWhereClause(newClause);
+	        } else {
+	        	this.setWhereClause(theWhereClause);
+	        }
+    	}
+    }
+
+    /**
+     * Builds the where for search.
+     *
+     * @param queryStrBldr the query str bldr
+     * @return the list
      */
     public List<ParamBinding> buildWhereForSearch(StringBuilder queryStrBldr) {
         return new ArrayList<ParamBinding>();
     }
 
     /**
-     * buildWhereClause builds where clause for get, update or delete
-     * @param queryStrBldr query string to append with where clause
-     * @return parameter binding
+     * Builds the where.
+     *
+     * @param queryStrBldr the query str bldr
+     * @return the list
      */
     public List<ParamBinding> buildWhere(StringBuilder queryStrBldr) {
         return new ArrayList<ParamBinding>();
     }
 
     /**
-     * @return the specified (0-based) page offset
+     * Gets the start page.
+     *
+     * @return the start page
      */
     public int getStartPage() {
         return startPage;
     }
 
     /**
-     * @param startPage the (0-based) page offset to use
+     * Sets the start page.
+     *
+     * @param theStartPage the new start page
      */
-    public void setStartPage(int startPage) {
-        this.startPage = startPage;
+    public void setStartPage(int theStartPage) {
+        this.startPage = theStartPage;
     }
 
     /**
-     * @return the max number of items to return for list requests
+     * Gets the page size.
+     *
+     * @return the page size
      */
     public int getPageSize() {
         return pageSize;
     }
 
+    /**
+     * Gets the page size dirty.
+     *
+     * @return the page size dirty
+     */
     public boolean getPageSizeDirty() {
         return this.getPageSizeDirty();
     }
 
     /**
-     * @param pageSize the max number of items to return for list requests
+     * Sets the page size.
+     *
+     * @param thePageSize the new page size
      */
-    public void setPageSize(int pageSize) {
-        this.pageSize = pageSize;
-        this.pageSizeDirty = true; // page size explicity set/overriden
+    public void setPageSize(int thePageSize) {
+        this.pageSize = thePageSize;
     }
 
     /**
-     * @param pageSize the max number of items to return for list requests
+     * Sets the page size.
+     *
+     * @param thePageSizeStr the new page size
      */
-    public void setPageSize(String pageSizeStr) {
-        int pageSize = this.defaultPageSize;
-        if (pageSizeStr != null) {
+    public void setPageSize(String thePageSizeStr) {
+        int newPageSize = DocumentFilter.defaultPageSize;
+        if (thePageSizeStr != null) {
             try {
-                pageSize = Integer.valueOf(pageSizeStr);
+            	newPageSize = Integer.valueOf(thePageSizeStr);
             } catch (NumberFormatException e) {
                 //FIXME This should cause a warning in the log file and should result in the
                 //FIXME page size being set to the default.  We don't need to throw an exception here.
@@ -248,12 +310,12 @@ public class DocumentFilter {
             }
         }
 
-        setPageSize(pageSize);
+        setPageSize(newPageSize);
     }
 
     /**
      * Sets the start page.
-     * 
+     *
      * @param startPageStr the new start page
      */
     protected void setStartPage(String startPageStr) {
@@ -268,18 +330,32 @@ public class DocumentFilter {
     }
 
     /**
-     * @return the offset computed from the startPage and the pageSize
+     * Gets the offset.
+     *
+     * @return the offset
      */
     public int getOffset() {
         return pageSize * startPage;
     }
 
+    /**
+     * Adds the query param.
+     *
+     * @param key the key
+     * @param value the value
+     */
     public void addQueryParam(String key, String value) {
         if (queryParams != null) {
             queryParams.add(key, value);
         }
     }
 
+    /**
+     * Gets the query param.
+     *
+     * @param key the key
+     * @return the query param
+     */
     public List<String> getQueryParam(String key) {
         if (queryParams != null) {
             return queryParams.get(key);
@@ -288,11 +364,21 @@ public class DocumentFilter {
         }
     }
 
+    /**
+     * Gets the query params.
+     *
+     * @return the query params
+     */
     public MultivaluedMap<String, String> getQueryParams() {
         return queryParams;
     }
 
-    public void setQueryParams(MultivaluedMap<String, String> queryParams) {
-        this.queryParams = queryParams;
+    /**
+     * Sets the query params.
+     *
+     * @param theQueryParams the the query params
+     */
+    public void setQueryParams(MultivaluedMap<String, String> theQueryParams) {
+        this.queryParams = theQueryParams;
     }
 }

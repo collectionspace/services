@@ -26,8 +26,6 @@
  */
 package org.collectionspace.services.relation;
 
-import java.util.Map;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -43,10 +41,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.common.query.IQueryManager;
+import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
-//import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.relation.IRelationsManager;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.security.UnauthorizedException;
@@ -98,23 +96,6 @@ public class NewRelationResource extends
     public Class<RelationsCommon> getCommonPartClass() {
     	return RelationsCommon.class;
     }
-	
-	/* (non-Javadoc)
-	 * @see org.collectionspace.services.common.AbstractCollectionSpaceResource#createDocumentHandler(org.collectionspace.services.common.context.ServiceContext)
-	 */
-//	@Override
-//	public DocumentHandler createDocumentHandler(ServiceContext<MultipartInput, MultipartOutput> ctx)
-//			throws Exception {
-//		DocumentHandler docHandler = ctx.getDocumentHandler();
-//		if (ctx.getInput() != null) {
-//			Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx
-//					.getCommonPartLabel(), RelationsCommon.class);
-//			if (obj != null) {
-//				docHandler.setCommonPart((RelationsCommon) obj);
-//			}
-//		}
-//		return docHandler;
-//	}
 
 	/**
 	 * Creates the relation.
@@ -517,20 +498,15 @@ public class NewRelationResource extends
 		RelationsCommonList relationList = new RelationsCommonList();
 		try {
 			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
-			DocumentHandler handler = createDocumentHandler(ctx);
-			Map<String, Object> propsFromPath = handler.getProperties();
-			propsFromPath.put(IRelationsManager.SUBJECT, subjectCsid);
-			propsFromPath.put(IRelationsManager.PREDICATE, predicate);
-			propsFromPath.put(IRelationsManager.OBJECT, objectCsid);
-			// Until we replace this with a search, "getAll()" is better then "getFiltered"
-			getRepositoryClient(ctx).getAll(ctx, handler);
-			relationList = (RelationsCommonList) handler.getCommonPartList();
+			DocumentHandler handler = createDocumentHandler(ctx);			
+			String relationClause = RelationsUtils.buildWhereClause(subjectCsid, predicate, objectCsid);
+			handler.getDocumentFilter().appendWhereClause(relationClause, IQueryManager.SEARCH_QUALIFIER_AND);			
+			getRepositoryClient(ctx).getFiltered(ctx, handler);
+			relationList = (RelationsCommonList)handler.getCommonPartList();
 		} catch (UnauthorizedException ue) {
-			Response response = Response.status(Response.Status.UNAUTHORIZED)
-					.entity(
-							"Get relations failed reason "
-									+ ue.getErrorReason()).type("text/plain")
-					.build();
+			Response response = Response.status(Response.Status.UNAUTHORIZED).entity(
+					"Get relations failed reason " +
+					ue.getErrorReason()).type("text/plain").build();
 			throw new WebApplicationException(response);
 		} catch (Exception e) {
 			if (logger.isDebugEnabled()) {
@@ -541,6 +517,7 @@ public class NewRelationResource extends
 					"Index failed").type("text/plain").build();
 			throw new WebApplicationException(response);
 		}
+		
 		return relationList;
 	}
 }

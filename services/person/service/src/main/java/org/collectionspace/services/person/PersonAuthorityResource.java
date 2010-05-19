@@ -47,14 +47,9 @@ import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResou
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
-//import org.collectionspace.services.common.authorityref.AuthorityRefList;
-//import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.context.MultipartServiceContextFactory;
-//import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
-//import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
@@ -62,19 +57,20 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
-//import org.collectionspace.services.common.vocabulary.RefNameUtils;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.contact.ContactJAXBSchema;
 import org.collectionspace.services.contact.nuxeo.ContactDocumentModelHandler;
-//import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.person.nuxeo.PersonDocumentModelHandler;
+
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
+
 import org.nuxeo.ecm.core.api.DocumentModel;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,18 +146,6 @@ public class PersonAuthorityResource extends
         return contactResource.getServiceName();
     }
 
-//    @Override
-//    public DocumentHandler createDocumentHandler(ServiceContext<MultipartInput, MultipartOutput> ctx) throws Exception {
-//        DocumentHandler docHandler = ctx.getDocumentHandler();
-//        if (ctx.getInput() != null) {
-//            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), PersonauthoritiesCommon.class);
-//            if (obj != null) {
-//                docHandler.setCommonPart((PersonauthoritiesCommon) obj);
-//            }
-//        }
-//        return docHandler;
-//    }
-
     /**
  * Creates the item document handler.
  * 
@@ -202,20 +186,6 @@ public class PersonAuthorityResource extends
         docHandler.setInAuthority(inAuthority);
         docHandler.setInItem(inItem);
     	
-//        DocumentHandler docHandler = ctx.getDocumentHandler();
-//        // Set the inAuthority and inItem values, which specify the
-//        // parent authority (e.g. PersonAuthority, OrgAuthority) and the item
-//        // (e.g. Person, Organization) with which the Contact is associated.
-//        ((ContactDocumentModelHandler) docHandler).setInAuthority(inAuthority);
-//        ((ContactDocumentModelHandler) docHandler).setInItem(inItem);
-//        if (ctx.getInput() != null) {
-//            Object obj = ((MultipartServiceContext) ctx)
-//                .getInputPart(ctx.getCommonPartLabel(getContactServiceName()),
-//                ContactsCommon.class);
-//            if (obj != null) {
-//                docHandler.setCommonPart((ContactsCommon) obj);
-//            }
-//        }
         return docHandler;
     }
 
@@ -265,7 +235,6 @@ public class PersonAuthorityResource extends
     @GET
     @Path("urn:cspace:name({specifier})")
     public MultipartOutput getPersonAuthorityByName(@PathParam("specifier") String specifier) {
-//REM:        String idValue = null;
         if (specifier == null) {
             logger.error("getPersonAuthority: missing name!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
@@ -337,73 +306,73 @@ public class PersonAuthorityResource extends
     @Path("{csid}/items/{itemcsid}/refObjs")
     @Produces("application/xml") //FIXME: REM do this for CSPACE-1079 in Org authority.
     public AuthorityRefDocList getReferencingObjects(
-            @PathParam("csid") String parentcsid,
-            @PathParam("itemcsid") String itemcsid,
+    		@PathParam("csid") String parentcsid,
+    		@PathParam("itemcsid") String itemcsid,
     		@Context UriInfo ui) {
     	AuthorityRefDocList authRefDocList = null;
-        if (logger.isDebugEnabled()) {
-            logger.debug("getReferencingObjects with parentcsid=" 
-            		+ parentcsid + " and itemcsid=" + itemcsid);
-        }
-        if (parentcsid == null || "".equals(parentcsid)
-                || itemcsid == null || "".equals(itemcsid)) {
-            logger.error("getPerson: missing parentcsid or itemcsid!");
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "get failed on Person with parentcsid=" 
-            		+ parentcsid + " and itemcsid=" + itemcsid).type(
-                    "text/plain").build();
-            throw new WebApplicationException(response);
-        }
-    try {
-        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-        // Note that we have to create the service context for the Items, not the main service
-        ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getItemServiceName(),
-        		queryParams);
-        DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
-        RepositoryClient repoClient = getRepositoryClient(ctx); 
-        DocumentFilter myFilter = handler.getDocumentFilter();
-    	String serviceType = ServiceBindingUtils.SERVICE_TYPE_PROCEDURE;
-        List<String> list = queryParams.remove(ServiceBindingUtils.SERVICE_TYPE_PROP);
-        if (list != null) {
-        	serviceType = list.get(0);
-        }
-        DocumentWrapper<DocumentModel> docWrapper = repoClient.getDoc(ctx, itemcsid);
-        DocumentModel docModel = docWrapper.getWrappedObject();
-        String refName = (String)docModel.getPropertyValue(PersonJAXBSchema.REF_NAME);
+    	if (logger.isDebugEnabled()) {
+    		logger.debug("getReferencingObjects with parentcsid=" 
+    				+ parentcsid + " and itemcsid=" + itemcsid);
+    	}
+    	if (parentcsid == null || "".equals(parentcsid)
+    			|| itemcsid == null || "".equals(itemcsid)) {
+    		logger.error("getPerson: missing parentcsid or itemcsid!");
+    		Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+    				"get failed on Person with parentcsid=" 
+    				+ parentcsid + " and itemcsid=" + itemcsid).type(
+    				"text/plain").build();
+    		throw new WebApplicationException(response);
+    	}
+    	try {
+    		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+    		// Note that we have to create the service context for the Items, not the main service
+    		ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getItemServiceName(),
+    				queryParams);
+    		DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
+    		RepositoryClient repoClient = getRepositoryClient(ctx); 
+    		DocumentFilter myFilter = handler.getDocumentFilter();
+    		String serviceType = ServiceBindingUtils.SERVICE_TYPE_PROCEDURE;
+    		List<String> list = queryParams.remove(ServiceBindingUtils.SERVICE_TYPE_PROP);
+    		if (list != null) {
+    			serviceType = list.get(0);
+    		}
+    		DocumentWrapper<DocumentModel> docWrapper = repoClient.getDoc(ctx, itemcsid);
+    		DocumentModel docModel = docWrapper.getWrappedObject();
+    		String refName = (String)docModel.getPropertyValue(PersonJAXBSchema.REF_NAME);
 
-        authRefDocList = RefNameServiceUtils.getAuthorityRefDocs(ctx,
-        		repoClient, 
-        		serviceType,
-        		refName,
-        		myFilter.getPageSize(), myFilter.getStartPage(), true /*computeTotal*/ );
-    } catch (UnauthorizedException ue) {
-        Response response = Response.status(
-                Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
-        throw new WebApplicationException(response);
-    } catch (DocumentNotFoundException dnfe) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("getReferencingObjects", dnfe);
-        }
-        Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                "GetReferencingObjects failed with parentcsid=" 
-            		+ parentcsid + " and itemcsid=" + itemcsid).type(
-                "text/plain").build();
-        throw new WebApplicationException(response);
-    } catch (Exception e) {	// Includes DocumentException
-        if (logger.isDebugEnabled()) {
-            logger.debug("GetReferencingObjects", e);
-        }
-        Response response = Response.status(
-                Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed").type("text/plain").build();
-        throw new WebApplicationException(response);
-    }
-    if (authRefDocList == null) {
-        Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                "Get failed, the requested Person CSID:" + itemcsid + ": was not found.").type(
-                "text/plain").build();
-        throw new WebApplicationException(response);
-    }
-    return authRefDocList;
+    		authRefDocList = RefNameServiceUtils.getAuthorityRefDocs(ctx,
+    				repoClient, 
+    				serviceType,
+    				refName,
+    				myFilter.getPageSize(), myFilter.getStartPage(), true /*computeTotal*/ );
+    	} catch (UnauthorizedException ue) {
+    		Response response = Response.status(
+    				Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
+    		throw new WebApplicationException(response);
+    	} catch (DocumentNotFoundException dnfe) {
+    		if (logger.isDebugEnabled()) {
+    			logger.debug("getReferencingObjects", dnfe);
+    		}
+    		Response response = Response.status(Response.Status.NOT_FOUND).entity(
+    				"GetReferencingObjects failed with parentcsid=" 
+    				+ parentcsid + " and itemcsid=" + itemcsid).type(
+    				"text/plain").build();
+    		throw new WebApplicationException(response);
+    	} catch (Exception e) {	// Includes DocumentException
+    		if (logger.isDebugEnabled()) {
+    			logger.debug("GetReferencingObjects", e);
+    		}
+    		Response response = Response.status(
+    				Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed").type("text/plain").build();
+    		throw new WebApplicationException(response);
+    	}
+    	if (authRefDocList == null) {
+    		Response response = Response.status(Response.Status.NOT_FOUND).entity(
+    				"Get failed, the requested Person CSID:" + itemcsid + ": was not found.").type(
+    				"text/plain").build();
+    		throw new WebApplicationException(response);
+    	}
+    	return authRefDocList;
     }
 
     @GET
@@ -722,7 +691,7 @@ public class PersonAuthorityResource extends
             		PersonJAXBSchema.DISPLAY_NAME +
             		" LIKE " +
             		"'%" + partialTerm + "%'";
-            	handler.getDocumentFilter().appendWhereClause(ptClause);
+            	handler.getDocumentFilter().appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }            
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             personObjectList = (PersonsCommonList) handler.getCommonPartList();
@@ -783,7 +752,7 @@ public class PersonAuthorityResource extends
             		PersonJAXBSchema.DISPLAY_NAME +
             		" LIKE " +
             		"'%" + partialTerm + "%'";
-            	handler.getDocumentFilter().appendWhereClause(ptClause);
+            	handler.getDocumentFilter().appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }            
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             personObjectList = (PersonsCommonList) handler.getCommonPartList();
@@ -1069,8 +1038,8 @@ public class PersonAuthorityResource extends
                 .type("text/plain").build();
             throw new WebApplicationException(response);
         }
+        
         return result;
-
     }
 
     /**

@@ -152,28 +152,6 @@ public class OrgAuthorityResource extends
         return contactResource.getServiceName();
     }
 
-    /*
-    public RemoteServiceContext createItemServiceContext(MultipartInput input) throws Exception {
-    RemoteServiceContext ctx = new RemoteServiceContextImpl(getItemServiceName());
-    ctx.setInput(input);
-    return ctx;
-    }
-     */
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#createDocumentHandler(org.collectionspace.services.common.context.ServiceContext)
-     */
-//    @Override
-//    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-//        DocumentHandler docHandler =ctx.getDocumentHandler();
-//        if (ctx.getInput() != null) {
-//            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), OrgauthoritiesCommon.class);
-//            if (obj != null) {
-//                docHandler.setCommonPart((OrgauthoritiesCommon) obj);
-//            }
-//        }
-//        return docHandler;
-//    }
-
     /**
      * Creates the item document handler.
      * 
@@ -192,17 +170,7 @@ public class OrgAuthorityResource extends
     			ctx.getCommonPartLabel(getItemServiceName()),
     			OrganizationsCommon.class);        	
         docHandler.setInAuthority(inAuthority);
-        
-        
-//        ((OrganizationDocumentModelHandler) docHandler).setInAuthority(inAuthority);
-//        if (ctx.getInput() != null) {
-//            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(getItemServiceName()),
-//                    OrganizationsCommon.class);
-//            if (obj != null) {
-//                docHandler.setCommonPart((OrganizationsCommon) obj);
-//            }
-//        }
-
+                
         return docHandler;
     }
 
@@ -228,20 +196,6 @@ public class OrgAuthorityResource extends
         docHandler.setInAuthority(inAuthority);
         docHandler.setInItem(inItem);
     	
-//        DocumentHandler docHandler = ctx.getDocumentHandler();
-//        // Set the inAuthority and inItem values, which specify the
-//        // parent authority (e.g. PersonAuthority, OrgAuthority) and the item
-//        // (e.g. Person, Organization) with which the Contact is associated.
-//        ((ContactDocumentModelHandler) docHandler).setInAuthority(inAuthority);
-//        ((ContactDocumentModelHandler) docHandler).setInItem(inItem);
-//        if (ctx.getInput() != null) {
-//            Object obj = ((MultipartServiceContext) ctx)
-//                .getInputPart(ctx.getCommonPartLabel(getContactServiceName()),
-//                ContactsCommon.class);
-//            if (obj != null) {
-//                docHandler.setCommonPart((ContactsCommon) obj);
-//            }
-//        }
         return docHandler;
     }
 
@@ -258,7 +212,6 @@ public class OrgAuthorityResource extends
         	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
-            //orgAuthorityObject.setCsid(csid);
             UriBuilder path = UriBuilder.fromResource(OrgAuthorityResource.class);
             path.path("" + csid);
             Response response = Response.created(path.build()).build();
@@ -291,7 +244,6 @@ public class OrgAuthorityResource extends
     @GET
     @Path("urn:cspace:name({specifier})")
     public MultipartOutput getOrgAuthorityByName(@PathParam("specifier") String specifier) {
-        String idValue = null;
         if (specifier == null) {
             logger.error("getOrgAuthority: missing name!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
@@ -442,7 +394,6 @@ public class OrgAuthorityResource extends
     @GET
     @Path("{csid}")
     public MultipartOutput getOrgAuthority(@PathParam("csid") String csid) {
-        String idValue = null;
         if (csid == null) {
             logger.error("getOrgAuthority: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
@@ -620,11 +571,13 @@ public class OrgAuthorityResource extends
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Delete failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-
     }
 
     /*************************************************************************
      * Organization parts - this is a sub-resource of OrgAuthority
+     * @param parentcsid 
+     * @param input 
+     * @return org response
      *************************************************************************/
     @POST
     @Path("{csid}/items")
@@ -658,6 +611,7 @@ public class OrgAuthorityResource extends
 
     /**
      * Gets the organization.
+     * @param parentcsid 
      * 
      * @param csid The organization authority (parent) CSID.
      * @param itemcsid The organization item CSID.
@@ -725,9 +679,11 @@ public class OrgAuthorityResource extends
 
     /**
      * Gets the authority refs for an Organization item.
+     * @param parentcsid 
      *
      * @param csid The organization authority (parent) CSID.
      * @param itemcsid The organization item CSID.
+     * @param ui 
      *
      * @return the authority refs for the Organization item.
      */
@@ -799,7 +755,7 @@ public class OrgAuthorityResource extends
             	String ptClause = "AND " + OrganizationJAXBSchema.ORGANIZATIONS_COMMON +
             		":" + OrganizationJAXBSchema.DISPLAY_NAME +
             		" LIKE " + "'%" + partialTerm + "%'";
-            	myFilter.appendWhereClause(ptClause);
+            	myFilter.appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }            
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             organizationObjectList = (OrganizationsCommonList) handler.getCommonPartList();
@@ -860,7 +816,7 @@ public class OrgAuthorityResource extends
             	OrganizationJAXBSchema.DISPLAY_NAME +
             		" LIKE " +
             		"'%" + partialTerm + "%'";
-            	myFilter.appendWhereClause(ptClause);
+            	myFilter.appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }            
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             personObjectList = (OrganizationsCommonList) handler.getCommonPartList();
@@ -1000,6 +956,10 @@ public class OrgAuthorityResource extends
 
     /*************************************************************************
      * Contact parts - this is a sub-resource of Organization (or "item")
+     * @param parentcsid 
+     * @param itemcsid 
+     * @param input 
+     * @return contact
      *************************************************************************/
     @POST
     @Path("{parentcsid}/items/{itemcsid}/contacts")
@@ -1064,11 +1024,12 @@ public class OrgAuthorityResource extends
             myFilter.setWhereClause(ContactJAXBSchema.CONTACTS_COMMON + ":" +
                 ContactJAXBSchema.IN_AUTHORITY +
                 "='" + parentcsid + "'" +
-                " AND " +
+                IQueryManager.SEARCH_QUALIFIER_AND +
                 ContactJAXBSchema.CONTACTS_COMMON + ":" +
                 ContactJAXBSchema.IN_ITEM +
                 "='" + itemcsid + "'" +
-                " AND ecm:isProxy = 0");
+                IQueryManager.SEARCH_QUALIFIER_AND +
+                "ecm:isProxy = 0");
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             contactObjectList = (ContactsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {

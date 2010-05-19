@@ -33,6 +33,7 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
 
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 
@@ -633,6 +634,10 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
             DocumentModelList docList = null;
             String query = buildNXQLQuery(queryContext);
 
+            if (logger.isDebugEnabled()) {
+                logger.debug("Executing NXQL query: " + query.toString());
+            }
+
             // If we have limit and/or offset, then pass true to get totalSize
             // in returned DocumentModelList.
             if ((queryContext.docFilter.getOffset() > 0) || (queryContext.docFilter.getPageSize() > 0)) {
@@ -640,10 +645,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
                 		queryContext.docFilter.getPageSize(), queryContext.docFilter.getOffset(), true);
             } else {
                 docList = repoSession.query(query);
-            }
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("Executed NXQL query: " + query.toString());
             }
 
             //set repoSession to handle the document
@@ -856,7 +857,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         //
         // Restrict search to the current tenant ID.  Is the domain path filter (above) still needed?
         //
-        query.append("AND " + DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA + ":" +
+        query.append(IQueryManager.SEARCH_QUALIFIER_AND + DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA + ":" +
         		DocumentModelHandler.COLLECTIONSPACE_CORE_TENANTID +
         		" = " + queryContext.tenantId);
         //
@@ -866,12 +867,12 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         if (whereClause != null && whereClause.length() > 0) {
             // Due to an apparent bug/issue in how Nuxeo translates the NXQL query string
             // into SQL, we need to parenthesize our 'where' clause
-            query.append(" AND " + "(" + whereClause + ")");
+            query.append(IQueryManager.SEARCH_QUALIFIER_AND + "(" + whereClause + ")");
         }
         //
         // Please lookup this use in Nuxeo support and document here
         //
-        query.append(" AND ecm:isProxy = 0");
+        query.append(IQueryManager.SEARCH_QUALIFIER_AND + "ecm:isProxy = 0");
     }
 
     /**

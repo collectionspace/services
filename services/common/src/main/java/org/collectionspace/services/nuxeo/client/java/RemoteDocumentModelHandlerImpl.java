@@ -44,9 +44,10 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.vocabulary.RefNameUtils;
-//import org.collectionspace.services.vocabulary.VocabulariesCommonList;
+
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
@@ -59,6 +60,8 @@ import org.w3c.dom.Document;
  *
  * $LastChangedRevision: $
  * $LastChangedDate: $
+ * @param <T> 
+ * @param <TL> 
  */
 public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         extends DocumentModelHandler<T, TL> {

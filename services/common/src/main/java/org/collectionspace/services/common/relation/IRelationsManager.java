@@ -40,11 +40,15 @@ public interface IRelationsManager {
 
     /** The Constant SUBJECT. */
     static public final String SUBJECT = "subjectCsid";
+    static public final String SUBJECT_QP = "sbj";
+    
     /** The Constant PREDICATE. */
     static public final String PREDICATE = "predicate";
+    static public final String PREDICATE_QP = "prd";
+    
     /** The Constant OBJECT. */
     static public final String OBJECT = "objectCsid";
-
+    static public final String OBJECT_QP = "obj";
 
     /**
      * Gets the relationships for the entity corresponding to the CSID=csid.

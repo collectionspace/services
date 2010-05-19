@@ -25,19 +25,19 @@ package org.collectionspace.services.relation.nuxeo;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
-
-import org.collectionspace.services.common.relation.IRelationsManager;
+import org.collectionspace.services.common.relation.RelationJAXBSchema;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
-import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
 
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
@@ -68,7 +68,7 @@ public class RelationDocumentModelHandler
 
     /**
      * getCommonObject get associated Relation
-     * @return
+     * @return relation
      */
     @Override
     public RelationsCommon getCommonPart() {
@@ -80,13 +80,13 @@ public class RelationDocumentModelHandler
      * @param relation
      */
     @Override
-    public void setCommonPart(RelationsCommon relation) {
-        this.relation = relation;
+    public void setCommonPart(RelationsCommon theRelation) {
+        this.relation = theRelation;
     }
 
     /**
      * getRelationList get associated Relation (for index/GET_ALL)
-     * @return
+     * @return relationCommonList
      */
     @Override
     public RelationsCommonList getCommonPartList() {
@@ -97,8 +97,8 @@ public class RelationDocumentModelHandler
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#setCommonPartList(java.lang.Object)
      */
     @Override
-    public void setCommonPartList(RelationsCommonList relationList) {
-        this.relationList = relationList;
+    public void setCommonPartList(RelationsCommonList theRelationList) {
+        this.relationList = theRelationList;
     }
 
     /* (non-Javadoc)
@@ -114,7 +114,7 @@ public class RelationDocumentModelHandler
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#fillCommonPart(java.lang.Object, org.collectionspace.services.common.document.DocumentWrapper)
      */
     @Override
-    public void fillCommonPart(RelationsCommon relation, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    public void fillCommonPart(RelationsCommon theRelation, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         throw new UnsupportedOperationException();
     }
 
@@ -123,24 +123,14 @@ public class RelationDocumentModelHandler
      */
     @Override
     public RelationsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        Map propsFromResource = this.getProperties();
-        String subjectCsid = (String) propsFromResource.get(IRelationsManager.SUBJECT);
-        String predicate = (String) propsFromResource.get(IRelationsManager.PREDICATE);
-        String objectCsid = (String) propsFromResource.get(IRelationsManager.OBJECT);
-
-        //FIXME - Need to change this into a NXQL on subject, predicate, object terms.  Currently,
-        //FIXME - we're performing a post query filter which is far from ideal and not scalable.
         RelationsCommonList relList = this.extractPagingInfo(new RelationsCommonList(), wrapDoc) ;
         List<RelationsCommonList.RelationListItem> itemList = relList.getRelationListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
-            if (RelationsUtils.isQueryMatch(docModel, subjectCsid,
-                    predicate, objectCsid) == true){
-                RelationListItem relListItem = RelationsUtils.getRelationListItem(getServiceContext(),
-                        docModel, getServiceContextPath());
-                itemList.add(relListItem);
-            }
+            RelationListItem relListItem = getRelationListItem(getServiceContext(),
+                    docModel, getServiceContextPath());
+            itemList.add(relListItem);
         }
         return relList;
     }
@@ -153,23 +143,42 @@ public class RelationDocumentModelHandler
     @Override
     public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         super.fillAllParts(wrapDoc);
-        fillDublinCoreObject(wrapDoc); //dublincore might not be needed in future
     }
 
     /**
-     * Fill dublin core object.
+     * Gets the relation list item.
      *
-     * @param wrapDoc the wrap doc
+     * @param ctx the ctx
+     * @param docModel the doc model
+     * @param serviceContextPath the service context path
+     * @return the relation list item
      * @throws Exception the exception
      */
-    private void fillDublinCoreObject(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-        DocumentModel docModel = wrapDoc.getWrappedObject();
-        //FIXME property setter should be dynamically set using schema inspection
-        //so it does not require hard coding
-        // a default title for the Dublin Core schema
-        docModel.setPropertyValue("dublincore:title", RelationConstants.NUXEO_DC_TITLE);
+    private RelationListItem getRelationListItem(ServiceContext<MultipartInput, MultipartOutput> ctx,
+    		DocumentModel docModel,
+            String serviceContextPath) throws Exception {
+        RelationListItem relationListItem = new RelationListItem();
+        String id = NuxeoUtils.extractId(docModel.getPathAsString());
+        relationListItem.setCsid(id);
+        //
+        // Subject
+        //
+        relationListItem.setSubjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(),
+        		RelationJAXBSchema.DOCUMENT_ID_1));
+        //
+        // Predicate
+        //
+        relationListItem.setRelationshipType((String) docModel.getProperty(ctx.getCommonPartLabel(),
+        		RelationJAXBSchema.RELATIONSHIP_TYPE));
+        //
+        // Object
+        //
+        relationListItem.setObjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(),
+        		RelationJAXBSchema.DOCUMENT_ID_2));
+        
+        relationListItem.setUri(serviceContextPath + id);
+        return relationListItem;
     }
-
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.AbstractMultipartDocumentHandlerImpl#getQProperty(java.lang.String)

@@ -43,8 +43,6 @@ import org.collectionspace.services.VocabularyItemJAXBSchema;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -121,32 +119,6 @@ public class VocabularyResource extends
     public String getItemServiceName() {
         return vocabularyItemServiceName;
     }
-
-    /*
-    public RemoteServiceContext createItemServiceContext(MultipartInput input) throws Exception {
-    RemoteServiceContext ctx = new RemoteServiceContextImpl(getItemServiceName());
-    ctx.setInput(input);
-    return ctx;
-    }
-     */
-//    @Override
-//    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
-//        DocumentHandler docHandler = ctx.getDocumentHandler();
-//        if (ctx.getInput() != null) {
-//            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), VocabulariesCommon.class);
-//            if (obj != null) {
-//                docHandler.setCommonPart((VocabulariesCommon) obj);
-//            }
-//        }
-//        return docHandler;
-//    }
-    
-//    @Override
-//    public DocumentHandler createDocumentHandler(ServiceContext ctx)
-//    		throws Exception {
-//        DocumentHandler docHandler = createDocumentHandler(ctx, VocabulariesCommon.class);
-//        return docHandler;
-//    }
     
     /**
      * Creates the item document handler.
@@ -214,7 +186,7 @@ public class VocabularyResource extends
     @GET
     @Path("{csid}")
     public MultipartOutput getVocabulary(@PathParam("csid") String csid) {
-        String idValue = null;
+//        String idValue = null;
         if (csid == null) {
             logger.error("getVocabulary: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
@@ -398,6 +370,9 @@ public class VocabularyResource extends
 
     /*************************************************************************
      * VocabularyItem parts - this is a sub-resource of Vocabulary
+     * @param parentcsid 
+     * @param input 
+     * @return vocab item response
      *************************************************************************/
     @POST
     @Path("{csid}/items")
@@ -530,12 +505,11 @@ public class VocabularyResource extends
 
             // AND vocabularyitems_common:displayName LIKE '%partialTerm%'
             if (partialTerm != null && !partialTerm.isEmpty()) {
-                String ptClause = "AND "
-                        + VocabularyItemJAXBSchema.VOCABULARYITEMS_COMMON + ":"
+                String ptClause = VocabularyItemJAXBSchema.VOCABULARYITEMS_COMMON + ":"
                         + VocabularyItemJAXBSchema.DISPLAY_NAME
-                        + " LIKE "
+                        + IQueryManager.SEARCH_LIKE
                         + "'%" + partialTerm + "%'";
-                myFilter.appendWhereClause(ptClause);
+                myFilter.appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }
 
             if (logger.isDebugEnabled()) {
