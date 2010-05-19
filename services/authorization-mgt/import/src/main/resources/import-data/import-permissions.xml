@@ -1,6 +1,266 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:permissions_list xmlns:ns2="http://collectionspace.org/services/authorization">
-    <permission csid="1">
+    <permission csid="d517250a-91a8-4b19-b1a4-75ad56d3012a">
+        <resourceName>collectionobjects</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="eb155cad-cfac-4bcd-bdb3-34c8406bb6c7">
+        <resourceName>intakes</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="04383c28-f9d0-4628-bd8d-90c07963630d">
+        <resourceName>loansin</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="1280b13b-0e02-4c11-955d-5151ac15cb16">
+        <resourceName>loansout</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="86ed3672-c338-4537-893d-69bbef22ea7e">
+        <resourceName>movements</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="293a5a00-e2ca-49f9-9f52-6cefbceae1a7">
+        <resourceName>vocabularies</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="1c1152e4-2e7b-4744-bf86-8c47f62f6b2a">
+        <resourceName>vocabularyitems</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="29e217f7-d1a0-463b-9f3e-1804be23f127">
+        <resourceName>orgauthorities</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="34197256-031f-4218-bb8d-c02a9d202986">
+        <resourceName>organizations</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="d327da0e-da21-4716-a01c-47ad828ec2b4">
+        <resourceName>personauthorities</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="d2746267-4ade-4e12-8dc4-11ee151c7f2e">
+        <resourceName>persons</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="5dcbce71-bc19-4da0-8072-d994c8854007">
+        <resourceName>acquisitions</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="a2cd134f-c418-4c9c-8a85-bb530a97cea8">
+        <resourceName>relations</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="bfd8768d-64bc-47b7-9193-edfb5fc17884">
         <resourceName>accounts</resourceName>
         <action>
             <name>CREATE</name>
@@ -14,10 +274,13 @@
         <action>
             <name>DELETE</name>
         </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>
     </permission>
-    <permission csid="2">
+    <permission csid="eb77d422-5019-470f-9670-b62bcd8eb9be">
         <resourceName>dimensions</resourceName>
         <action>
             <name>CREATE</name>
@@ -30,6 +293,109 @@
         </action>
         <action>
             <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="c66becf5-0670-4e6f-83be-283ca28b9220">
+        <resourceName>contacts</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="9ce72e7a-dded-4b92-b0c1-3333e117a152">
+        <resourceName>authorization/roles</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="407df950-207a-4490-a122-61ab43984956">
+        <resourceName>authorization/permissions</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="5e16a57f-8c6d-4c93-b167-85c2c7881f02">
+        <resourceName>authorization/permroles</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="d1a3663a-645b-4ac4-86b8-c6ecd05e1e12">
+        <resourceName>accounts/accountroles</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
         </action>
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>

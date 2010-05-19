@@ -21,7 +21,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.collectionspace.services.common.config;
 
 import java.io.File;
@@ -41,10 +40,17 @@ public interface ConfigReader<T> {
     public String getFileName();
 
     /**
-     * read parse and read the configruation file.
+     * read parse and read the default configruation file from default location
      * @throws Exception
      */
     public void read() throws Exception;
+
+    /**
+     * read parse and read the given configruation file.
+     * @param configFile fully qualified file name
+     * @throws Exception
+     */
+    public void read(String configFile) throws Exception;
 
     /**
      * getConfig get configuration binding

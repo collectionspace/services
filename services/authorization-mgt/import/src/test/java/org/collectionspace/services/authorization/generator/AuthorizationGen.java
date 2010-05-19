@@ -23,10 +23,15 @@
  */
 package org.collectionspace.services.authorization.generator;
 
+import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.UUID;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import org.collectionspace.services.authorization.ActionType;
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.EffectType;
@@ -37,6 +42,9 @@ import org.collectionspace.services.authorization.PermissionsList;
 import org.collectionspace.services.authorization.PermissionsRolesList;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.service.ServiceBindingType;
+import org.collectionspace.services.common.tenant.TenantBindingType;
 
 /**
  *
@@ -45,27 +53,42 @@ import org.collectionspace.services.authorization.SubjectType;
 public class AuthorizationGen {
 
     final Logger logger = LoggerFactory.getLogger(AuthorizationGen.class);
-    private PermissionsList pcList = new PermissionsList();
-    PermissionsRolesList psrsl = new PermissionsRolesList();
+    private List<Permission> permList = new ArrayList<Permission>();
+    private List<PermissionRole> permRoleList = new ArrayList<PermissionRole>();
+    private Hashtable<String, TenantBindingType> tenantBindings =
+            new Hashtable<String, TenantBindingType>();
 
-    public PermissionsList genPermissions() {
+    public void initialize(String tenantBindingFile) throws Exception {
+        TenantBindingConfigReaderImpl tenantBindingConfigReader =
+                new TenantBindingConfigReaderImpl(null);
+        tenantBindingConfigReader.read(tenantBindingFile);
+        tenantBindings = tenantBindingConfigReader.getTenantBindings();
+    }
+
+    public void createDefaultServicePermissions() {
+        for (String tenantId : tenantBindings.keySet()) {
+            List<Permission> perms = createDefaultServicePermissions(tenantId);
+            permList.addAll(perms);
+        }
+    }
+
+    public List<Permission> createDefaultServicePermissions(String tenantId) {
         ArrayList<Permission> apcList = new ArrayList<Permission>();
-        pcList.setPermissions(apcList);
-
-        Permission accPerm = buildCommonPermission("1", "1", "accounts");
-        apcList.add(accPerm);
-        Permission dimPerm = buildCommonPermission("1", "2", "dimensions");
-        apcList.add(dimPerm);
-        return pcList;
+        TenantBindingType tbinding = tenantBindings.get(tenantId);
+        for (ServiceBindingType sbinding : tbinding.getServiceBindings()) {
+            Permission accPerm = buildCommonPermission(tbinding.getId(),
+                    sbinding.getName());
+            apcList.add(accPerm);
+        }
+        return apcList;
 
     }
 
-
-    private Permission buildCommonPermission(String tenantId, String permId, String resourceName) {
-        //String id = UUID.randomUUID().toString();
+    private Permission buildCommonPermission(String tenantId, String resourceName) {
+        String id = UUID.randomUUID().toString();
         Permission perm = new Permission();
-        perm.setCsid(permId);
-        perm.setResourceName(resourceName);
+        perm.setCsid(id);
+        perm.setResourceName(resourceName.toLowerCase());
         perm.setEffect(EffectType.PERMIT);
         perm.setTenantId(tenantId);
         ArrayList<PermissionAction> pas = new ArrayList<PermissionAction>();
@@ -83,37 +106,86 @@ public class AuthorizationGen {
         PermissionAction pa3 = new PermissionAction();
         pa3.setName(ActionType.DELETE);
         pas.add(pa3);
+        PermissionAction pa4 = new PermissionAction();
+        pa4.setName(ActionType.SEARCH);
+        pas.add(pa4);
         return perm;
     }
 
-    public PermissionsRolesList genPermissionsRoles(PermissionsList pcList) {
-        ArrayList<PermissionRole> prl = new ArrayList<PermissionRole>();
-        prl.add(buildCommonPermissionRoles("1", "1", "accounts"));
-        prl.add(buildCommonPermissionRoles("1", "2", "dimensions"));
-        psrsl.setPermissionRoles(prl);
-        return psrsl;
+    public List<Permission> getDefaultServicePermissions() {
+        return permList;
     }
 
-    private PermissionRole buildCommonPermissionRoles(String tenantId, String permissionId,
-            String resName) {
+    public void createDefaultPermissionsRoles(String roleName) {
+        for (Permission p : permList) {
+            PermissionRole permRole = buildCommonPermissionRoles(p.getTenantId(), p.getCsid(),
+                    p.getResourceName(), roleName);
+            permRoleList.add(permRole);
+        }
+    }
+
+    public List<PermissionRole> createPermissionsRoles(List<Permission> perms, String roleName) {
+        List<PermissionRole> permRoles = new ArrayList<PermissionRole>();
+        for (Permission p : perms) {
+            PermissionRole permRole = buildCommonPermissionRoles(p.getTenantId(), p.getCsid(),
+                    p.getResourceName(), roleName);
+            permRoles.add(permRole);
+        }
+        return permRoles;
+    }
+
+    private PermissionRole buildCommonPermissionRoles(String tenantId, String permId,
+            String resName, String roleName) {
 
         PermissionRole pr = new PermissionRole();
         pr.setSubject(SubjectType.ROLE);
         List<PermissionValue> permValues = new ArrayList<PermissionValue>();
         pr.setPermissions(permValues);
         PermissionValue permValue = new PermissionValue();
-        permValue.setPermissionId(permissionId);
-        permValue.setResourceName(resName);
+        permValue.setPermissionId(permId);
+        permValue.setResourceName(resName.toLowerCase());
         permValues.add(permValue);
 
         List<RoleValue> roleValues = new ArrayList<RoleValue>();
         RoleValue radmin = new RoleValue();
-        radmin.setRoleName("ROLE_ADMINISTRATOR");
+        radmin.setRoleName(roleName.toUpperCase());
         radmin.setRoleId(tenantId);
         roleValues.add(radmin);
         pr.setRoles(roleValues);
 
         return pr;
+    }
 
+    public List<PermissionRole> getDefaultServicePermissionRoles() {
+        return permRoleList;
+    }
+
+    public void exportPermissions(String fileName) {
+        PermissionsList pcList = new PermissionsList();
+        pcList.setPermissions(permList);
+        toFile(pcList, PermissionsList.class,
+                fileName);
+        logger.info("exported permissions to " + fileName);
+    }
+
+    public void exportPermissionRoles(String fileName) {
+        PermissionsRolesList psrsl = new PermissionsRolesList();
+        psrsl.setPermissionRoles(permRoleList);
+        toFile(psrsl, PermissionsRolesList.class,
+                fileName);
+        logger.info("exported permissions-roles to " + fileName);
+    }
+
+    private void toFile(Object o, Class jaxbClass, String fileName) {
+        File f = new File(fileName);
+        try {
+            JAXBContext jc = JAXBContext.newInstance(jaxbClass);
+            Marshaller m = jc.createMarshaller();
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
+                    Boolean.TRUE);
+            m.marshal(o, f);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

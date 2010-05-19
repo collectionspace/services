@@ -52,8 +52,10 @@ public abstract class AbstractConfigReaderImpl<T>
     abstract public void read() throws Exception;
 
     @Override
-    abstract public T getConfiguration();
+    abstract public void read(String configFile) throws Exception;
 
+    @Override
+    abstract public T getConfiguration();
 
     /**
      * parse parses given configuration file from the disk based on given class
@@ -67,17 +69,17 @@ public abstract class AbstractConfigReaderImpl<T>
         JAXBContext jc = JAXBContext.newInstance(clazz);
         Unmarshaller um = jc.createUnmarshaller();
         Object readObject = um.unmarshal(configFile);
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("read() read file " + configFile.getAbsolutePath());
         }
         return readObject;
     }
 
     protected String getAbsoluteFileName(String configFileName) {
-        return serverRootDir +
-                File.separator + CSPACE_DIR_NAME +
-                File.separator + CONFIG_DIR_NAME +
-                File.separator + configFileName;
+        return serverRootDir
+                + File.separator + CSPACE_DIR_NAME
+                + File.separator + CONFIG_DIR_NAME
+                + File.separator + configFileName;
     }
 
     protected String getServerRootDir() {

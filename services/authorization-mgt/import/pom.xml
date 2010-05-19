@@ -28,12 +28,6 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.authentication.service</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authorization.service</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -50,49 +44,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.client</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <!-- Needed if/when client test framework files are moved into -->
-        <!-- /services/client/src/test from /services/client/src/main -->
-
-        <!-- <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.client</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-            <type>test-jar</type>
-        </dependency> -->
-        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>5.6</version>
         </dependency>
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxrs</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>tjws</groupId>
-                    <artifactId>webserver</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxb-provider</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-multipart-provider</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
-        </dependency>
+
 
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -170,12 +126,20 @@
                 <configuration>
                     <systemProperties>
                         <property>
-                            <name>maven.basedir</name>
-                            <value>${basedir}</value>
-                        </property>
-                        <property>
                             <name>log4j.configuration</name>
                             <value>file:${project.build.directory}/test-classes/log4j.properties</value>
+                        </property>
+                        <property>
+                            <name>importdir</name>
+                            <value>${basedir}/src/main/resources/import-data/</value>
+                        </property>
+                        <property>
+                            <name>exportdir</name>
+                            <value>${basedir}/src/main/resources/import-data/</value>
+                        </property>
+                        <property>
+                            <name>tenantbindings</name>
+                            <value>${basedir}/../../common/src/main/config/services/tenant-bindings.xml</value>
                         </property>
                         <property>
                             <name>spring-beans-config</name>

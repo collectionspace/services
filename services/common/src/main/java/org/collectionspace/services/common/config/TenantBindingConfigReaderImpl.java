@@ -47,7 +47,7 @@ public class TenantBindingConfigReaderImpl
     final private static String CONFIG_FILE_NAME = "tenant-bindings.xml";
     final Logger logger = LoggerFactory.getLogger(TenantBindingConfigReaderImpl.class);
     private TenantBindingConfig tenantBindingConfig;
-    //tenant name, tenant binding
+    //tenant id, tenant binding
     private Hashtable<String, TenantBindingType> tenantBindings =
             new Hashtable<String, TenantBindingType>();
     //tenant-qualified servicename, service binding
@@ -66,6 +66,14 @@ public class TenantBindingConfigReaderImpl
     @Override
     public void read() throws Exception {
         String configFileName = getAbsoluteFileName(CONFIG_FILE_NAME);
+        read(configFileName);
+    }
+
+    @Override
+    public void read(String configFileName) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug("read() config file=" + configFileName);
+        }
         File configFile = new File(configFileName);
         if (!configFile.exists()) {
             String msg = "Could not find configuration file " + configFileName;
@@ -108,7 +116,7 @@ public class TenantBindingConfigReaderImpl
     public Hashtable<String, TenantBindingType> getTenantBindings() {
         return tenantBindings;
     }
-    
+
     /**
      * getTenantBinding gets tenant binding for given tenant
      * @param tenantId
@@ -153,7 +161,6 @@ public class TenantBindingConfigReaderImpl
         }
         return list;
     }
-
 
     /**
      * @param tenantId

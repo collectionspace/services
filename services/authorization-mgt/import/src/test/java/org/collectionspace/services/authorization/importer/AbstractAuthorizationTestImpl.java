@@ -80,19 +80,8 @@ import org.testng.annotations.Test;
  */
 public abstract class AbstractAuthorizationTestImpl {
 
-    static protected final String MAVEN_BASEDIR_PROPERTY = "maven.basedir";
     final Logger logger = LoggerFactory.getLogger(AbstractAuthorizationTestImpl.class);
     private org.springframework.jdbc.datasource.DataSourceTransactionManager txManager;
-    final static String importDataDir = "src/main/resources/import-data/";
-    static String baseDir;
-
-    static {
-        baseDir = System.getProperty(AbstractAuthorizationTestImpl.MAVEN_BASEDIR_PROPERTY);
-        if (baseDir == null || baseDir.isEmpty()) {
-            baseDir = System.getProperty("user.dir");
-        }
-        baseDir = baseDir + System.getProperty("file.separator");
-    }
 
     /**
      * Returns the name of the currently running test.
@@ -147,18 +136,6 @@ public abstract class AbstractAuthorizationTestImpl {
         txManager.commit(status);
     }
 
-    static void toFile(Object o, Class jaxbClass, String fileName) {
-        File f = new File(fileName);
-        try {
-            JAXBContext jc = JAXBContext.newInstance(jaxbClass);
-            Marshaller m = jc.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-                    Boolean.TRUE);
-            m.marshal(o, f);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     static Object fromFile(Class jaxbClass, String fileName) throws Exception {
         InputStream is = new FileInputStream(fileName);
@@ -178,21 +155,6 @@ public abstract class AbstractAuthorizationTestImpl {
         }
     }
 
-
-    public void writePermissions(PermissionsList pcList, String fileName) {
-        AbstractAuthorizationTestImpl.toFile(pcList, PermissionsList.class,
-                AbstractAuthorizationTestImpl.importDataDir + fileName);
-        logger.info("generated permissions to "
-                + AbstractAuthorizationTestImpl.importDataDir + fileName);
-    }
-
-    
-    public void writePermissionRoles(PermissionsRolesList psrsl, String fileName) {
-        AbstractAuthorizationTestImpl.toFile(psrsl, PermissionsRolesList.class,
-                AbstractAuthorizationTestImpl.importDataDir + fileName);
-        logger.info("generated permissions-roles to "
-                + AbstractAuthorizationTestImpl.importDataDir + fileName);
-    }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractAuthorizationTestImpl.class)
     public void test(String testName) {

@@ -55,26 +55,34 @@ public class ServicesConfigReaderImpl
     @Override
     public void read() throws Exception {
         String configFileName = getAbsoluteFileName(CONFIG_FILE_NAME);
+        read(configFileName);
+    }
+
+    @Override
+    public void read(String configFileName) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug("read() config file=" + configFileName);
+        }
         File configFile = new File(configFileName);
-        if(!configFile.exists()){
+        if (!configFile.exists()) {
             String msg = "Could not find configuration file " + configFileName;
             logger.error(msg);
             throw new RuntimeException(msg);
         }
         serviceConfig = (ServiceConfig) parse(configFile, ServiceConfig.class);
         clientType = serviceConfig.getRepositoryClient().getClientType();
-        if(clientType == null){
+        if (clientType == null) {
             String msg = "Missing <client-type> in <repository-client>";
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }
         clientClassName = serviceConfig.getRepositoryClient().getClientClass();
-        if(clientClassName == null){
+        if (clientClassName == null) {
             String msg = "Missing <client-class> in <repository-client>";
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("using client=" + clientType.toString() + " class=" + clientClassName);
         }
     }

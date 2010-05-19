@@ -25,8 +25,8 @@ package org.collectionspace.services.authorization.importer;
 
 //import java.util.ArrayList;
 //import java.util.List;
+import java.io.File;
 import org.collectionspace.services.authorization.generator.AuthorizationGen;
-import org.collectionspace.services.authorization.importer.AbstractAuthorizationTestImpl;
 import java.util.ArrayList;
 import java.util.List;
 import org.collectionspace.services.authorization.ActionType;
@@ -62,10 +62,13 @@ public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
         TransactionStatus status = beginTransaction("seedData");
         try {
             AuthorizationGen authzGen = new AuthorizationGen();
-            PermissionsList pl = authzGen.genPermissions();
-            writePermissions(pl, PERMISSION_FILE);
-            PermissionsRolesList prl = authzGen.genPermissionsRoles(pl);
-            writePermissionRoles(prl, PERMISSION_ROLE_FILE);
+            String tenantBindingFile = getTenantBindingFile();
+            authzGen.initialize(tenantBindingFile);
+            authzGen.createDefaultServicePermissions();
+            authzGen.createDefaultPermissionsRoles("ROLE_ADMINISTRATOR");
+            String exportDir = getExportDir();
+            authzGen.exportPermissions(exportDir + PERMISSION_FILE);
+            authzGen.exportPermissionRoles(exportDir + PERMISSION_ROLE_FILE);
             seedRoles();
             seedPermissions();
         } catch (Exception ex) {
@@ -81,16 +84,17 @@ public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
     }
 
     public void seedPermissions() throws Exception {
+        String importDir = getImportDir();
         PermissionsList pcList =
-                (PermissionsList) fromFile(PermissionsList.class, baseDir
-                + AbstractAuthorizationTestImpl.importDataDir + PERMISSION_FILE);
+                (PermissionsList) fromFile(PermissionsList.class,
+                importDir + PERMISSION_FILE);
         logger.info("read permissions from "
-                + baseDir + AbstractAuthorizationTestImpl.importDataDir +  PERMISSION_FILE);
+                + importDir + PERMISSION_FILE);
         PermissionsRolesList pcrList =
-                (PermissionsRolesList) fromFile(PermissionsRolesList.class, baseDir
-                + AbstractAuthorizationTestImpl.importDataDir + PERMISSION_ROLE_FILE);
+                (PermissionsRolesList) fromFile(PermissionsRolesList.class,
+                importDir + PERMISSION_ROLE_FILE);
         logger.info("read permissions-roles from "
-                + baseDir + AbstractAuthorizationTestImpl.importDataDir +  PERMISSION_ROLE_FILE);
+                + importDir + PERMISSION_ROLE_FILE);
         AuthZ authZ = AuthZ.get();
         for (Permission p : pcList.getPermissions()) {
             if (logger.isDebugEnabled()) {
@@ -156,5 +160,32 @@ public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
             return CSpaceAction.STOP;
         }
         throw new IllegalArgumentException("action = " + action.toString());
+    }
+
+    private String getTenantBindingFile() {
+        String tenantBindingFile = System.getProperty("tenantbindings");
+        if (tenantBindingFile == null || tenantBindingFile.isEmpty()) {
+            throw new IllegalStateException("tenantbindings are required."
+                    + " System property tenantbindings is missing or empty");
+        }
+        return tenantBindingFile;
+    }
+
+    private String getImportDir() {
+        String importDir = System.getProperty("importdir");
+        if (importDir == null || importDir.isEmpty()) {
+            throw new IllegalStateException("importdir required."
+                    + " System property importdir is missing or empty");
+        }
+        return importDir + File.separator;
+    }
+
+    private String getExportDir() {
+        String exportDir = System.getProperty("exportdir");
+        if (exportDir == null || exportDir.isEmpty()) {
+            throw new IllegalStateException("exportdir required."
+                    + " System property exportdir is missing or empty");
+        }
+        return exportDir + File.separator;
     }
 }
