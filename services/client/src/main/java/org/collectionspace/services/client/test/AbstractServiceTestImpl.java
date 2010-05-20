@@ -365,7 +365,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         }
         
         // if there are any remainders be sure to paginate them as well
-        long mod = totalItems % pageSize;
+        long mod = pageSize != 0 ? totalItems % pageSize : totalItems;
         if (mod != 0) {
         	list = (AbstractCommonList) this.readList(testName, client, pageSize, pagesTotal);
         	assertPaginationInfo(testName,

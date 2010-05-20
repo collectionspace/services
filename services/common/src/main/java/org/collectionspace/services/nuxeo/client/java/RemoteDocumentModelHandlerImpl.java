@@ -119,8 +119,8 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
     	
     	DocumentFilter docFilter = this.getDocumentFilter();
     	long pageSize = docFilter.getPageSize();
-    	long pageNum = docFilter.getOffset() / pageSize;
-    	// set the page size and page numer
+    	long pageNum = pageSize != 0 ? docFilter.getOffset() / pageSize : pageSize;
+    	// set the page size and page number
     	commonList.setPageNum(pageNum);
     	commonList.setPageSize(pageSize);
     	DocumentModelList docList = wrapDoc.getWrappedObject();

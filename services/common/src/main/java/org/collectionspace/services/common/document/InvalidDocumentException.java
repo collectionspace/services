@@ -35,9 +35,15 @@ package org.collectionspace.services.common.document;
 public class InvalidDocumentException extends BadRequestException {
 
     /**
+	 * Default UID for serialization
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
      * Creates a new instance of <code>InvalidDocumentException</code> without detail message.
      */
     public InvalidDocumentException() {
+    	//empty constructor
     }
 
     /**

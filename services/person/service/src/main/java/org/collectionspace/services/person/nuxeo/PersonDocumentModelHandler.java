@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.collectionspace.services.PersonJAXBSchema;
+import org.collectionspace.services.common.document.InvalidDocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.service.ObjectPartType;
@@ -38,8 +39,10 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonsCommonList;
 import org.collectionspace.services.person.PersonsCommonList.PersonListItem;
+
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,16 +130,15 @@ public class PersonDocumentModelHandler
     	String commonPartLabel = getServiceContext().getCommonPartLabel("persons");
     	Boolean displayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
     			PersonJAXBSchema.DISPLAY_NAME_COMPUTED);
-    	if (displayNameComputed) {
+    	if (displayNameComputed == true) {
     		String displayName = prepareDefaultDisplayName(
-			(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.FORE_NAME ),    			
-			(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.MIDDLE_NAME ),    			
-			(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.SUR_NAME ),    			
-			(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.BIRTH_DATE ),    			
-			(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.DEATH_DATE )  			
-			);
-			docModel.setProperty(commonPartLabel, PersonJAXBSchema.DISPLAY_NAME,
-					displayName);
+				(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.FORE_NAME),    			
+				(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.MIDDLE_NAME),    			
+				(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.SUR_NAME),    			
+				(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.BIRTH_DATE),    			
+				(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.DEATH_DATE));
+    		docModel.setProperty(commonPartLabel, PersonJAXBSchema.DISPLAY_NAME,
+    				displayName);
     	}
     }
 	
@@ -156,16 +158,17 @@ public class PersonDocumentModelHandler
     private static String prepareDefaultDisplayName(
     		String foreName, String middleName, String surName,
     		String birthDate, String deathDate ) throws Exception {
-    	StringBuilder newStr = new StringBuilder();
-		final String sep = " ";
-		final String dateSep = "-";
+		final String SEP = " ";
+		final String DATE_SEP = "-";
+
+		StringBuilder newStr = new StringBuilder();
 		List<String> nameStrings = 
 			Arrays.asList(foreName, middleName, surName);
 		boolean firstAdded = false;
-    	for(String partStr : nameStrings ){
-			if(null != partStr ) {
-				if(firstAdded) {
-					newStr.append(sep);
+    	for (String partStr : nameStrings ){
+			if (partStr != null) {
+				if (firstAdded == true) {
+					newStr.append(SEP);
 				}
 				newStr.append(partStr);
 				firstAdded = true;
@@ -173,23 +176,24 @@ public class PersonDocumentModelHandler
     	}
     	// Now we add the dates. In theory could have dates with no name, but that is their problem.
     	boolean foundBirth = false;
-		if(null != birthDate) {
-			if(firstAdded) {
-				newStr.append(sep);
+		if (birthDate != null) {
+			if (firstAdded) {
+				newStr.append(SEP);
 			}
 			newStr.append(birthDate);
-	    	newStr.append(dateSep);		// Put this in whether there is a death date or not
+	    	newStr.append(DATE_SEP);		// Put this in whether there is a death date or not
 			foundBirth = true;
 		}
-		if(null != deathDate) {
-			if(!foundBirth) {
-				if(firstAdded) {
-					newStr.append(sep);
+		if (deathDate != null) {
+			if (!foundBirth) {
+				if (firstAdded == true) {
+					newStr.append(SEP);
 				}
-		    	newStr.append(dateSep);
+		    	newStr.append(DATE_SEP);
 			}
 			newStr.append(deathDate);
 		}
+		
 		return newStr.toString();
     }
     

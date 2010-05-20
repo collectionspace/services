@@ -229,6 +229,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         String identifier = createIdentifier();
         String refName = PersonAuthorityClientUtils.createPersonRefName(authRefName, "John Wayne", true);
         Map<String, String> johnWayneMap = new HashMap<String,String>();
+        //
+        // Fill the property map
+        //
+        johnWayneMap.put(PersonJAXBSchema.DISPLAY_NAME_COMPUTED, "false");
+        johnWayneMap.put(PersonJAXBSchema.DISPLAY_NAME, "John Wayne");
+        
         johnWayneMap.put(PersonJAXBSchema.FORE_NAME, TEST_FORE_NAME);
         johnWayneMap.put(PersonJAXBSchema.SUR_NAME, TEST_SUR_NAME);
         johnWayneMap.put(PersonJAXBSchema.GENDER, "male");

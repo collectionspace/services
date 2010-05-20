@@ -94,10 +94,26 @@ public class PersonAuthorityClientUtils {
         PersonsCommon person = new PersonsCommon();
         person.setInAuthority(inAuthority);
        	person.setRefName(personRefName);
-       	String value = null;
-    	value = personInfo.get(PersonJAXBSchema.DISPLAY_NAME_COMPUTED);
-    	boolean displayNameComputed = (value==null) || value.equalsIgnoreCase("true"); 
+       	
+       	//
+       	// If the 'DISPLAY_NAME_COMPUTED' property is null or empty then
+       	// we'll assume that the service consumer wants us to compute the
+       	// display name.  Otherwise, we'll parse the value with the Boolean class.
+       	//
+    	String booleanStr = personInfo.get(PersonJAXBSchema.DISPLAY_NAME_COMPUTED);
+    	boolean displayNameComputed = true;
+    	if (booleanStr != null && booleanStr.length() > 0) {
+    		displayNameComputed = Boolean.parseBoolean(booleanStr);
+    	}
     	person.setDisplayNameComputed(displayNameComputed);
+
+       	String displayName = personInfo.get(PersonJAXBSchema.DISPLAY_NAME);
+       	person.setDisplayName(displayName);
+    	if (displayNameComputed == false && displayName == null) {
+    		throw new IllegalArgumentException("displayName cannot be null when displayComputed is 'false'");
+    	}      	
+    	
+    	String value;
         if((value = (String)personInfo.get(PersonJAXBSchema.FORE_NAME))!=null)
         	person.setForeName(value);
         if((value = (String)personInfo.get(PersonJAXBSchema.MIDDLE_NAME))!=null)
