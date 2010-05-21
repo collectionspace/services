@@ -26,20 +26,33 @@ package org.collectionspace.services.common.document;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.StringWriter;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.Result;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.TransformerConfigurationException; 
+import javax.xml.transform.TransformerException; 
+
 import org.collectionspace.services.common.service.ObjectPartContentType;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.service.XmlContentType;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -54,16 +67,63 @@ import org.w3c.dom.Text;
  */
 public class DocumentUtils {
 
+    /** The Constant logger. */
+    private static final Logger logger =
+        LoggerFactory.getLogger(DocumentUtils.class);
+
+    /** The NAM e_ valu e_ separator. */
     private static String NAME_VALUE_SEPARATOR = "|";
 
+    /**
+     * The Class NameValue.
+     */
     private static class NameValue {
-    	NameValue() {
+    	
+	    /**
+	     * Instantiates a new name value.
+	     */
+	    NameValue() {
     		// default scoped constructor to removed "synthetic accessor" warning
     	}
+        
+        /** The name. */
         String name;
+        
+        /** The value. */
         String value;
     };
-
+    
+    /**
+     * Log byte array input stream.  After logging this method resets the stream and returns it in its original state.
+     *
+     * @param inputStream the input stream
+     * @return the byte array input stream
+     */
+    private static ByteArrayInputStream logByteArrayInputStream(ByteArrayInputStream inputStream) {
+    	ByteArrayInputStream result = null;
+    	
+    	if (logger.isDebugEnabled() == true) {
+	    	ByteArrayInputStream bais = (ByteArrayInputStream)inputStream;
+	
+			int length = bais.available();
+			byte [] buff = new byte[length];
+			try {
+				bais.read(buff);
+			} catch (Exception e) {
+				logger.debug("Could not read input stream", e);
+			}
+	    		
+	    	String s = new String(buff);
+	    	logger.debug(s);
+	    	//
+	    	// Essentially, reset the stream and return it in its original state
+	    	//
+	    	result = new ByteArrayInputStream(buff);
+    	}
+    	
+    	return result;
+    }
+    
     /**
      * parseProperties given payload to create XML document. this
      * method also closes given stream after parsing.
@@ -73,20 +133,34 @@ public class DocumentUtils {
      */
     public static Document parseDocument(InputStream payload)
             throws Exception {
+    	Document result = null;
+    	
+    	if (logger.isDebugEnabled() == true) {
+    		if (payload instanceof ByteArrayInputStream) {
+    			payload = logByteArrayInputStream((ByteArrayInputStream)payload);
+    		}
+    	}
+    	
         try {
             // Create a builder factory
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setValidating(false);//TODO take validating value from meta
 
             // Create the builder and parse the file
-            return factory.newDocumentBuilder().parse(payload);
+            result = factory.newDocumentBuilder().parse(payload);
+            
+            // Write it to the log so we can see what we've created.
+            if (logger.isDebugEnabled() == true) {
+            	System.out.println(xmlToString(result));
+            }
 
         } finally {
             if (payload != null) {
                 payload.close();
             }
-
         }
+        
+        return result;
     }
 
     /**
@@ -117,9 +191,13 @@ public class DocumentUtils {
                         value = getTextNodeValue(node);
                     } else {
                         value = getMultiValues(node);
-                    }
-                    objectProps.put(name, value);
+                    }                    
                 }
+                //
+                // Set the value even if it's null.
+                // A null value implies a clear/delete of the property
+                //
+                objectProps.put(name, value);
             }
         }
         return objectProps;
@@ -206,7 +284,7 @@ public class DocumentUtils {
      * @param partMeta
      * @param rootElementName
      * @param objectProps
-     * @return
+     * @return Document
      * @throws Exception
      */
     public static Document buildDocument(ObjectPartType partMeta, String rootElementName,
@@ -242,9 +320,9 @@ public class DocumentUtils {
                 //no need to qualify each element name as namespace is already added
                 Element e = document.createElement(prop);
                 root.appendChild(e);
-                if (value instanceof ArrayList) {
+                if (value instanceof ArrayList<?>) {
                     //multi-value element
-                    insertMultiValues(document, e, (ArrayList) value);
+                    insertMultiValues(document, e, (ArrayList<String>) value);
                 } else {
                     String strValue = objectProps.get(prop).toString();
                     insertTextNode(document, e, strValue);
@@ -254,8 +332,16 @@ public class DocumentUtils {
         return document;
     }
 
-    private static void insertMultiValues(Document document, Element e, ArrayList vals) {
+    /**
+     * Insert multi values.
+     *
+     * @param document the document
+     * @param e the e
+     * @param vals the vals
+     */
+    private static void insertMultiValues(Document document, Element e, ArrayList<String> vals) {
         String parentName = e.getNodeName();
+        
         for (Object o : vals) {
             String val = (String) o; //force cast
             NameValue nv = unqualify(val);
@@ -265,6 +351,13 @@ public class DocumentUtils {
         }
     }
 
+    /**
+     * Insert text node.
+     *
+     * @param document the document
+     * @param e the e
+     * @param strValue the str value
+     */
     private static void insertTextNode(Document document, Element e, String strValue) {
         Text tNode = document.createTextNode(strValue);
         e.appendChild(tNode);
@@ -310,6 +403,32 @@ public class DocumentUtils {
         StreamResult result = new StreamResult(os);
         transformer.transform(source, result);
     }
+
+    /**
+     * Xml to string.
+     *
+     * @param node the node
+     * @return the string
+     */
+    public static String xmlToString(Node node) {
+    	String result = null;
+    	
+        try {
+            Source source = new DOMSource(node);
+            StringWriter stringWriter = new StringWriter();
+            Result streamResult = new StreamResult(stringWriter);
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Transformer transformer = factory.newTransformer();
+            transformer.transform(source, streamResult);
+            result = stringWriter.getBuffer().toString();
+        } catch (TransformerConfigurationException e) {
+            e.printStackTrace();
+        } catch (TransformerException e) {
+            e.printStackTrace();
+        }
+        
+        return result;
+    }    
 
     /**
      * getXmlDocoument retrieve w3c.Document from given file
