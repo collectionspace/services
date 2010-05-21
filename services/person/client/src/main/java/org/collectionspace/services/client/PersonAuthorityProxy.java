@@ -8,9 +8,11 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
+import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.person.PersonauthoritiesCommonList;
 import org.collectionspace.services.person.PersonsCommonList;
@@ -60,6 +62,14 @@ public interface PersonAuthorityProxy extends CollectionSpaceProxy {
     @Produces({"application/xml"})
     @Path("/{vcsid}/items/")
     ClientResponse<PersonsCommonList> readItemList(@PathParam("vcsid") String vcsid);
+
+    // List Items matching a partial term.
+    @GET
+    @Produces("application/xml")
+    @Path("/{csid}/items/")
+    ClientResponse<PersonsCommonList>readItemList(
+            @PathParam("csid") String parentcsid,
+            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm);
 
     /**
      * @param parentcsid 

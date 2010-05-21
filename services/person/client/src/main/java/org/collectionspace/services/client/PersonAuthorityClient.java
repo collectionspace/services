@@ -183,6 +183,18 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
     }
 
     /**
+     * Read item list, filtering by partial term match.
+     *
+     * @param vcsid the vcsid
+     * @param partialTerm A partial term on which to match,
+     *     which will filter list results to return only matched resources.
+     * @return the client response
+     */
+    public ClientResponse<PersonsCommonList> readItemList(String vcsid, String partialTerm) {
+        return personAuthorityProxy.readItemList(vcsid, partialTerm);
+    }
+
+    /**
      * Gets the referencing objects.
      *
      * @param parentcsid the parentcsid

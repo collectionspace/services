@@ -691,7 +691,9 @@ public class PersonAuthorityResource extends
             		PersonJAXBSchema.DISPLAY_NAME +
             		" LIKE " +
             		"'%" + partialTerm + "%'";
-            	handler.getDocumentFilter().appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
+            	// handler.getDocumentFilter().appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
+                handler.getDocumentFilter().appendWhereClause(ptClause, "");
+
             }            
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             personObjectList = (PersonsCommonList) handler.getCommonPartList();
@@ -752,7 +754,9 @@ public class PersonAuthorityResource extends
             		PersonJAXBSchema.DISPLAY_NAME +
             		" LIKE " +
             		"'%" + partialTerm + "%'";
-            	handler.getDocumentFilter().appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
+            	// handler.getDocumentFilter().appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
+                handler.getDocumentFilter().appendWhereClause(ptClause, "");
+
             }            
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             personObjectList = (PersonsCommonList) handler.getCommonPartList();
