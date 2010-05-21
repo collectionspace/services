@@ -23,8 +23,6 @@
  */
 package org.collectionspace.services.client.test;
 
-//import java.util.List;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,12 +38,19 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 /**
- * FIXME: http://issues.collectionspace.org/browse/CSPACE-1685
- * AbstractServiceTest, abstract base class for the client tests to be performed
- * to test an entity or relation service.
+ * AbstractServiceTest.
+ *
+ * Abstract base class for client tests of entity and relation services.
+ * Abstract methods are provided for a set of CRUD + List tests to be invoked.
  *
  * For Javadoc descriptions of this class's methods, see the ServiceTest interface.
+ *
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
+
+// FIXME: http://issues.collectionspace.org/browse/CSPACE-1685
+
 public abstract class AbstractServiceTestImpl extends BaseServiceTest implements ServiceTest {
 
     /** The logger. */

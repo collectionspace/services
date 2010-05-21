@@ -1,14 +1,4 @@
-/**	
- * BaseServiceTest.java
- *
- * {Purpose of This Class}
- *
- * {Other Notes Relating to This Class (Optional)}
- *
- * $LastChangedBy: $
- * $LastChangedRevision: $
- * $LastChangedDate: $
- *
+/**
  * This document is a part of the source code and related artifacts
  * for CollectionSpace, an open source collections management system
  * for museums and related institutions:
@@ -16,13 +6,20 @@
  * http://www.collectionspace.org
  * http://wiki.collectionspace.org
  *
- * Copyright © 2009 {Contributing Institution}
+ * Copyright (c) 2009 Regents of the University of California
  *
  * Licensed under the Educational Community License (ECL), Version 2.0.
  * You may not use this file except in compliance with this License.
  *
  * You may obtain a copy of the ECL 2.0 License at
+ *
  * https://source.collectionspace.org/collection-space/LICENSE.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.collectionspace.services.client.test;
 
@@ -31,7 +28,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
-//import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -63,10 +59,16 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /**
- * FIXME: http://issues.collectionspace.org/browse/CSPACE-1685
- * The Class BaseServiceTest.
- * @param <CommonListType> 
+ * BaseServiceTest.
+ *
+ * Base abstract class on which client tests of services are based.
+ *
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
+
+// FIXME: http://issues.collectionspace.org/browse/CSPACE-1685
+
 public abstract class BaseServiceTest {
 
     //Maven's base directory -i.e., the one containing the current pom.xml
