@@ -75,22 +75,30 @@ public abstract class BaseServiceTest {
     static protected final Logger logger = LoggerFactory.getLogger(BaseServiceTest.class);
     /** The Constant serviceClient. */
     protected static final TestServiceClient serviceClient = new TestServiceClient();
-    /** The NO n_ existen t_ id. */
+    /** The non-existent id. */
     protected final String NON_EXISTENT_ID = createNonExistentIdentifier();
-    /** The EXPECTE d_ statu s_ code. */
+    /** The expected status code. */
     protected int EXPECTED_STATUS_CODE = 0;
-    /** The REQUES t_ type. */
+    /** The request type type. */
     protected ServiceRequestType REQUEST_TYPE = ServiceRequestType.NON_EXISTENT;
     /** The Constant XML_DECLARATION. */
     protected static final String XML_DECLARATION = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
     /** The Constant MALFORMED_XML_DATA. */
     protected static final String MALFORMED_XML_DATA = XML_DECLARATION
             + "<malformed_xml>wrong schema contents</malformed_xml";
-    /** The WRON g_ xm l_ schem a_ data. */
+    /** The wrong XML schema data. */
     protected final String WRONG_XML_SCHEMA_DATA = XML_DECLARATION
             + "<wrong_schema>wrong schema contents</wrong_schema>";
-    /** The NUL l_ charset. */
+    /** The null charset. */
     final String NULL_CHARSET = null;
+
+
+    /**
+     * Instantiates a new base service test.
+     */
+    public BaseServiceTest() {
+        super();
+    }
 
     /**
      * Gets the client.
@@ -121,8 +129,8 @@ public abstract class BaseServiceTest {
     @DataProvider(name = "testName")
     public static Object[][] testName(Method m) {
         return new Object[][]{
-                    new Object[]{m.getName()}
-                };
+            new Object[]{m.getName()}
+        };
     }
 
     /**
@@ -145,26 +153,27 @@ public abstract class BaseServiceTest {
     }
 
     /**
-     * Initializes setup valuesfor a given test.
+     * Initializes setup values for a given test.
+     *
+     * @param expectedStatusCode  A status code expected to be returned in the response.
+     *
+     * @param serviceRequestType  A type of service request (e.g. CREATE, DELETE).
+     *
+     * @param testName The name of the test being run.
      */
     protected void testSetup(
             int expectedStatusCode,
             ServiceRequestType reqType,
-            String bannerLabel) {
+            String testName) {
+
         clearSetup();
         EXPECTED_STATUS_CODE = expectedStatusCode;
         REQUEST_TYPE = reqType;
-        // Print a banner identifying the test that will be run.
+        
+        // Print a banner identifying the test being run.
         if (logger.isDebugEnabled()) {
-            banner(bannerLabel);
+            testBanner(testName);
         }
-    }
-
-    /**
-     * Instantiates a new base service test.
-     */
-    public BaseServiceTest() {
-        super();
     }
 
     /**
@@ -285,6 +294,9 @@ public abstract class BaseServiceTest {
         return statusCode;
     }
 
+    // FIXME: Move some or all of the methods below to a common client and
+    // server utilities package, when this package becomes available.
+
     /**
      * Extract id.
      *
@@ -304,7 +316,7 @@ public abstract class BaseServiceTest {
         }
         return id;
     }
-
+ 
     /**
      * Creates the identifier.
      *
@@ -516,14 +528,24 @@ public abstract class BaseServiceTest {
     }
 
     /**
-     * Banner.
+     * Print label text inside a test-specific banner.
      *
-     * @param label the label
+     * @param testName The name of a test method.
      */
-    protected void banner(String label) {
+    protected static void testBanner(String testName) {
+        testName = (testName == null) ? "Test = no test name specified" : " Test = " + testName;
+        banner(testName);
+    }
+
+    /**
+     * Print label text inside a banner.
+     *
+     * @param label The label to be printed inside a banner.
+     */
+    protected static void banner(String label) {
         if (logger.isDebugEnabled()) {
             logger.debug("===================================================");
-            logger.debug(" Test = " + label);
+            logger.debug(" " + label);
             logger.debug("===================================================");
         }
     }
