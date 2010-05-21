@@ -752,7 +752,7 @@ public class OrgAuthorityResource extends
             
             // AND organizations_common:displayName LIKE '%partialTerm%'
             if (partialTerm != null && !partialTerm.isEmpty()) {
-            	String ptClause = "AND " + OrganizationJAXBSchema.ORGANIZATIONS_COMMON +
+            	String ptClause = OrganizationJAXBSchema.ORGANIZATIONS_COMMON +
             		":" + OrganizationJAXBSchema.DISPLAY_NAME +
             		" LIKE " + "'%" + partialTerm + "%'";
             	myFilter.appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
@@ -811,9 +811,8 @@ public class OrgAuthorityResource extends
             
             // AND organizations_common:displayName LIKE '%partialTerm%'
             if (partialTerm != null && !partialTerm.isEmpty()) {
-            	String ptClause = "AND " +
-            	OrganizationJAXBSchema.ORGANIZATIONS_COMMON + ":" +
-            	OrganizationJAXBSchema.DISPLAY_NAME +
+            	String ptClause = OrganizationJAXBSchema.ORGANIZATIONS_COMMON + ":" +
+            		OrganizationJAXBSchema.DISPLAY_NAME +
             		" LIKE " +
             		"'%" + partialTerm + "%'";
             	myFilter.appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);

@@ -283,7 +283,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         if (knownItemResourceId == null){
             knownItemResourceId = newID;
             if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
+                logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);                
             }
         }
 
@@ -1557,6 +1557,11 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         PersonsCommon person = (PersonsCommon) extractPart(input,
                 client.getItemCommonPartName(), PersonsCommon.class);
         Assert.assertNotNull(person);
+        
+        if (logger.isDebugEnabled() == true) {
+        	logger.debug("About to update the following person...");
+        	logger.debug(objectAsXmlString(person, PersonsCommon.class));
+        }
 
         // Update the contents of this resource.
         person.setCsid(null);
@@ -1565,8 +1570,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
             logger.debug("to be updated Person");
             logger.debug(objectAsXmlString(person,
                 PersonsCommon.class));
-        }        
-
+        }    
+        
         // Submit the updated resource to the service and store the response.
         MultipartOutput output = new MultipartOutput();
         OutputPart commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
@@ -1593,6 +1598,11 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
                 (PersonsCommon) extractPart(input,
                         client.getItemCommonPartName(), PersonsCommon.class);
         Assert.assertNotNull(updatedPerson);
+        
+        if (logger.isDebugEnabled() == true) {
+        	logger.debug("Updated to following person to:");
+        	logger.debug(objectAsXmlString(updatedPerson, PersonsCommon.class));
+        }        
 
         // Verify that the updated resource received the correct data.
         Assert.assertEquals(updatedPerson.getForeName(),

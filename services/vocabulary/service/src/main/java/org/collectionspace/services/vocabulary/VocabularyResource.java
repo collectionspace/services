@@ -494,10 +494,7 @@ public class VocabularyResource extends
             ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getItemServiceName(),
             		queryParams);
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
-//            DocumentFilter myFilter = handler.createDocumentFilter(); //new DocumentFilter();
-            DocumentFilter myFilter = handler.getDocumentFilter(); //new DocumentFilter();
-//            myFilter.setPagination(queryParams);
-            // "vocabularyitems_common:inVocabulary='" + parentcsid + "'");
+            DocumentFilter myFilter = handler.getDocumentFilter();
             myFilter.setWhereClause(
                     VocabularyItemJAXBSchema.VOCABULARYITEMS_COMMON + ":"
                     + VocabularyItemJAXBSchema.IN_VOCABULARY + "="
@@ -511,15 +508,11 @@ public class VocabularyResource extends
                         + "'%" + partialTerm + "%'";
                 myFilter.appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }
-
             if (logger.isDebugEnabled()) {
                 logger.debug("getVocabularyItemList filtered WHERE clause: "
                         + myFilter.getWhereClause());
             }
-
-            handler.setDocumentFilter(myFilter);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
-
             vocabularyItemObjectList = (VocabularyitemsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
@@ -652,6 +645,5 @@ public class VocabularyResource extends
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Delete failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-
     }
 }

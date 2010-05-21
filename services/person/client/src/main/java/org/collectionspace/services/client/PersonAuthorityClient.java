@@ -95,7 +95,7 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      */
     public void setProxy() {
         if (useAuth()) {
-            personAuthorityProxy = ProxyFactory.create(PersonAuthorityProxy.class,
+            personAuthorityProxy = ProxyFactory.create(PersonAuthorityProxy.class, //FIXME: This method is deprecated.  We need to use the new "executor" model -see related JavaDocs.
                     getBaseURL(), getHttpClient());
         } else {
             personAuthorityProxy = ProxyFactory.create(PersonAuthorityProxy.class,

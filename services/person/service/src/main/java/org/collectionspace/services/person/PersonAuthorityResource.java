@@ -304,7 +304,7 @@ public class PersonAuthorityResource extends
      */
     @GET
     @Path("{csid}/items/{itemcsid}/refObjs")
-    @Produces("application/xml") //FIXME: REM do this for CSPACE-1079 in Org authority.
+    @Produces("application/xml")
     public AuthorityRefDocList getReferencingObjects(
     		@PathParam("csid") String parentcsid,
     		@PathParam("itemcsid") String itemcsid,
@@ -554,7 +554,6 @@ public class PersonAuthorityResource extends
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Delete failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-
     }
 
     /**
@@ -686,14 +685,11 @@ public class PersonAuthorityResource extends
             
             // AND persons_common:displayName LIKE '%partialTerm%'
             if (partialTerm != null && !partialTerm.isEmpty()) {
-            	String ptClause = 
-            	PersonJAXBSchema.PERSONS_COMMON + ":" +
+            	String ptClause = PersonJAXBSchema.PERSONS_COMMON + ":" +
             		PersonJAXBSchema.DISPLAY_NAME +
             		" LIKE " +
             		"'%" + partialTerm + "%'";
-            	// handler.getDocumentFilter().appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
-                handler.getDocumentFilter().appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
-
+           	 	handler.getDocumentFilter().appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }            
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             personObjectList = (PersonsCommonList) handler.getCommonPartList();
@@ -731,9 +727,8 @@ public class PersonAuthorityResource extends
             @Context UriInfo ui) {
         PersonsCommonList personObjectList = new PersonsCommonList();
         try {
-            String whereClause =
-            	PersonAuthorityJAXBSchema.PERSONAUTHORITIES_COMMON+
-            	":" + PersonAuthorityJAXBSchema.DISPLAY_NAME+
+            String whereClause = PersonAuthorityJAXBSchema.PERSONAUTHORITIES_COMMON +
+            	":" + PersonAuthorityJAXBSchema.DISPLAY_NAME +
             	"='" + parentSpecifier+"'";
             // Need to get an Authority by name
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
@@ -749,14 +744,11 @@ public class PersonAuthorityResource extends
             
             // AND persons_common:displayName LIKE '%partialTerm%'
             if (partialTerm != null && !partialTerm.isEmpty()) {
-            	String ptClause = "AND " +
-            	PersonJAXBSchema.PERSONS_COMMON + ":" +
+            	String ptClause = PersonJAXBSchema.PERSONS_COMMON + ":" +
             		PersonJAXBSchema.DISPLAY_NAME +
             		" LIKE " +
             		"'%" + partialTerm + "%'";
-            	// handler.getDocumentFilter().appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
-                handler.getDocumentFilter().appendWhereClause(ptClause, "");
-
+            	handler.getDocumentFilter().appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }            
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             personObjectList = (PersonsCommonList) handler.getCommonPartList();
@@ -891,7 +883,6 @@ public class PersonAuthorityResource extends
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Delete failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-
     }
 
     /**
@@ -938,7 +929,6 @@ public class PersonAuthorityResource extends
                 .type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        
     }
         
     /**
@@ -1185,5 +1175,4 @@ public class PersonAuthorityResource extends
             throw new WebApplicationException(response);
         }
     }
-
 }

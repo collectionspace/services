@@ -114,7 +114,7 @@ public class PersonAuthorityClientUtils {
     	}      	
     	
     	String value;
-        if((value = (String)personInfo.get(PersonJAXBSchema.FORE_NAME))!=null)
+        if((value = (String)personInfo.get(PersonJAXBSchema.FORE_NAME))!=null) //FIXME: REM - I don't think we need to check for null -null is a valid value and won't cause any problems. 
         	person.setForeName(value);
         if((value = (String)personInfo.get(PersonJAXBSchema.MIDDLE_NAME))!=null)
         	person.setMiddleName(value);
@@ -150,6 +150,7 @@ public class PersonAuthorityClientUtils {
         	person.setBioNote(value);
         if((value = (String)personInfo.get(PersonJAXBSchema.NAME_NOTE))!=null)
         	person.setNameNote(value);
+        
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(person,
             MediaType.APPLICATION_XML_TYPE);
@@ -199,12 +200,12 @@ public class PersonAuthorityClientUtils {
     	String refName = createPersonRefName(personAuthorityRefName, displayName, true);
 
     	if(logger.isDebugEnabled()){
-    		logger.debug("Import: Create Item: \""+displayName
+    		logger.debug("Import: Create Item: \"" + displayName
     				+"\" in personAuthorityulary: \"" + personAuthorityRefName +"\"");
     	}
     	MultipartOutput multipart = 
-    		createPersonInstance( vcsid, refName,
-    			personMap, client.getItemCommonPartName() );
+    		createPersonInstance(vcsid, refName,
+    			personMap, client.getItemCommonPartName());
     	
     	String result = null;
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);

@@ -1053,13 +1053,12 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
             vocabularyItemResourceId = entry.getKey();
             vocabularyResourceId = entry.getValue();
             // Note: Any non-success responses are ignored and not reported.
-            ClientResponse<Response> res =
-                client.deleteItem(vocabularyResourceId, vocabularyItemResourceId);
+            client.deleteItem(vocabularyResourceId, vocabularyItemResourceId).releaseConnection();
         }
         // Clean up vocabulary resources.
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            ClientResponse<Response> res = client.delete(resourceId);
+            client.delete(resourceId).releaseConnection();
         }
 
     }
