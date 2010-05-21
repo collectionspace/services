@@ -89,7 +89,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     /** The test death date. */
     final String TEST_DEATH_DATE = "June 11, 1979";
 
-    // Test name for partial term matching: Lech Walensa
+    // Test name for partial term matching: Lech Walesa
     final String TEST_PARTIAL_TERM_FORE_NAME = "Lech";
     // Contains two non-USASCII range Unicode UTF-8 characters
     final String TEST_PARTIAL_TERM_SUR_NAME = "Wa" + "\u0142" + "\u0119" + "sa";
