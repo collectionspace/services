@@ -28,6 +28,7 @@ import org.collectionspace.services.id.IDResource;
 import org.collectionspace.services.intake.IntakeResource;
 import org.collectionspace.services.loanin.LoaninResource;
 import org.collectionspace.services.loanout.LoanoutResource;
+import org.collectionspace.services.location.LocationAuthorityResource;
 import org.collectionspace.services.movement.MovementResource;
 import org.collectionspace.services.relation.NewRelationResource;
 import org.collectionspace.services.acquisition.AcquisitionResource;
@@ -70,6 +71,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new IntakeResource());
         singletons.add(new LoaninResource());
         singletons.add(new LoanoutResource());
+        singletons.add(new LocationAuthorityResource());
         singletons.add(new MovementResource());
         singletons.add(new AcquisitionResource());
         singletons.add(new NewRelationResource());

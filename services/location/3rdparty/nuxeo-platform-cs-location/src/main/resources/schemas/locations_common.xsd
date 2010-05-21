@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Location schema (XSD)
+    
+    Entity  : Location
+    Part    : Common
+    Used for: Nuxeo EP core document type
+    
+    $LastChangedRevision: 860 $
+    $LastChangedDate: 2009-10-14 14:48:05 -0700 (Wed, 14 Oct 2009) $
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/location"
+  xmlns="http://collectionspace.org/services/location"
+  targetNamespace="http://collectionspace.org/services/location"
+  version="0.1"
+>
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Location+Service+Home -->    
+
+    <!--  Location Information Group -->
+    <!--  inAuthority is the csid of the owning LocationAuthority -->
+    <xs:element name="inAuthority" type="xs:string" />
+    <xs:element name="refName" type="xs:string"/>
+    <xs:element name="displayName" type="xs:string"/>
+    <xs:element name="displayNameComputed" type="xs:boolean"/>
+    <xs:element name="name" type="xs:string"/>
+    <xs:element name="conditionNote" type="xs:string"/>
+    <xs:element name="conditionNoteDate" type="xs:string"/>
+    <xs:element name="securityNote" type="xs:string"/>
+    <xs:element name="locationType" type="xs:string"/>
+    <xs:element name="status" type="xs:string"/>
+
+</xs:schema>
+

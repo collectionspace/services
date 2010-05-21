@@ -470,6 +470,78 @@
             </service:object>
         </tenant:serviceBindings>
         <!-- end person service meta-data -->
+        <!-- begin locationauthority service meta-data -->
+        <tenant:serviceBindings name="Locationauthorities" version="0.1">
+            <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
+                nuxeo-java
+            </service:repositoryClient>
+            <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.location.nuxeo.LocationAuthorityDocumentModelHandler
+            </service:documentHandler>
+            <service:object id="1" name="Locationauthority" version="0.1"
+                            xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:part id="0" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="locationauthorities-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/common/system"
+                            schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="locationauthorities_common" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/location"
+                            schemaLocation="http://collectionspace.org/services/location http://services.collectionspace.org/location/locationauthorities_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end locationauthority service meta-data -->
+                        <!-- begin location service meta-data.
+                        Note there is no Location service, but there is a
+                        Repository workspace so we have to configure that.
+        -->
+        <tenant:serviceBindings name="Locations" version="0.1">
+            <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
+                nuxeo-java
+            </service:repositoryClient>
+            <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.location.nuxeo.LocationDocumentModelHandler
+            </service:documentHandler>
+            <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.location.nuxeo.LocationValidatorHandler
+            </service:validatorHandler>
+            <service:object id="1" name="Locationitem" version="0.1"
+                            xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:part id="0" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="locations-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/common/system"
+                            schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="locations_common" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/location"
+                            schemaLocation="http://collectionspace.org/services/location http://services.collectionspace.org/location/locations_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end location service meta-data -->
         <!-- begin acquisition service meta-data -->
         <tenant:serviceBindings name="Acquisitions" type="procedure" version="0.1">
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>

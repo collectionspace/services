@@ -1,0 +1,318 @@
+/**	
+ * LocationAuthorityClient.java
+ *
+ * {Purpose of This Class}
+ *
+ * {Other Notes Relating to This Class (Optional)}
+ *
+ * $LastChangedBy: $
+ * $LastChangedRevision: $
+ * $LastChangedDate: $
+ *
+ * This document is a part of the source code and related artifacts
+ * for CollectionSpace, an open source collections management system
+ * for museums and related institutions:
+ *
+ * http://www.collectionspace.org
+ * http://wiki.collectionspace.org
+ *
+ * Copyright © 2009 {Contributing Institution}
+ *
+ * Licensed under the Educational Community License (ECL), Version 2.0.
+ * You may not use this file except in compliance with this License.
+ *
+ * You may obtain a copy of the ECL 2.0 License at
+ * https://source.collectionspace.org/collection-space/LICENSE.txt
+ */
+package org.collectionspace.services.client;
+
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
+
+//import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
+import org.collectionspace.services.contact.ContactsCommonList;
+import org.collectionspace.services.location.LocationauthoritiesCommonList;
+import org.collectionspace.services.location.LocationsCommonList;
+import org.collectionspace.services.client.LocationAuthorityProxy;
+
+import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.client.ProxyFactory;
+import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
+
+/**
+ * The Class LocationAuthorityClient.
+ */
+public class LocationAuthorityClient extends AbstractServiceClientImpl {
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
+     */
+    @Override
+    public String getServicePathComponent() {
+        return "locationauthorities";
+    }
+
+    /**
+     * Gets the item common part name.
+     *
+     * @return the item common part name
+     */
+    public String getItemCommonPartName() {
+        return getCommonPartName("locations");
+    }
+
+    /** The location authority proxy. */
+//    private static final LocationAuthorityClient instance = new LocationAuthorityClient();
+    
+    /**
+     *
+     */
+    private LocationAuthorityProxy locationAuthorityProxy;
+
+    /**
+     * Instantiates a new location authority client.
+     */
+    public LocationAuthorityClient() {
+        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
+        RegisterBuiltin.register(factory);
+        setProxy();
+    }
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.CollectionSpaceClient#getProxy()
+     */
+    @Override
+    public CollectionSpaceProxy getProxy() {
+    	return this.locationAuthorityProxy;
+    }    
+
+    /**
+     * Sets the proxy.
+     */
+    public void setProxy() {
+        if (useAuth()) {
+            locationAuthorityProxy = ProxyFactory.create(LocationAuthorityProxy.class,
+                    getBaseURL(), getHttpClient());
+        } else {
+            locationAuthorityProxy = ProxyFactory.create(LocationAuthorityProxy.class,
+                    getBaseURL());
+        }
+    }
+
+    /**
+     * Read list.
+     *
+     * @return the client response
+     */
+//    public static LocationAuthorityClient getInstance() {
+//        return instance;
+//    }
+
+    /**
+     * @return list
+     * @see org.collectionspace.services.client.LocationAuthorityProxy#readList()
+     */
+    public ClientResponse<LocationauthoritiesCommonList> readList() {
+        return locationAuthorityProxy.readList();
+    }
+
+    /**
+     * Read.
+     *
+     * @param csid the csid
+     * @return the client response
+     */
+    public ClientResponse<MultipartInput> read(String csid) {
+        return locationAuthorityProxy.read(csid);
+    }
+
+    /**
+     * Read by name.
+     *
+     * @param name the name
+     * @return the client response
+     */
+    public ClientResponse<MultipartInput> readByName(String name) {
+        return locationAuthorityProxy.readByName(name);
+    }
+
+    /**
+     * Creates the.
+     *
+     * @param multipart the multipart
+     * @return the client response
+     */
+    public ClientResponse<Response> create(MultipartOutput multipart) {
+        return locationAuthorityProxy.create(multipart);
+    }
+
+    /**
+     * Update.
+     *
+     * @param csid the csid
+     * @param multipart the multipart
+     * @return the client response
+     */
+    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
+        return locationAuthorityProxy.update(csid, multipart);
+
+    }
+
+    /**
+     * Delete.
+     *
+     * @param csid the csid
+     * @return the client response
+     */
+    public ClientResponse<Response> delete(String csid) {
+        return locationAuthorityProxy.delete(csid);
+    }
+
+    /**
+     * Read item list.
+     *
+     * @param vcsid the vcsid
+     * @return the client response
+     */
+    public ClientResponse<LocationsCommonList> readItemList(String vcsid) {
+        return locationAuthorityProxy.readItemList(vcsid);
+    }
+
+    /**
+     * Gets the referencing objects.
+     *
+     * @param parentcsid the parentcsid
+     * @param csid the csid
+     * @return the referencing objects
+     */
+    public ClientResponse<AuthorityRefDocList> getReferencingObjects(String parentcsid, String csid) {
+        return locationAuthorityProxy.getReferencingObjects(parentcsid, csid);
+    }
+
+    /**
+     * Read item list for named authority.
+     *
+     * @param specifier the specifier
+     * @return the client response
+     */
+    public ClientResponse<LocationsCommonList> readItemListForNamedAuthority(String specifier) {
+        return locationAuthorityProxy.readItemListForNamedAuthority(specifier);
+    }
+
+    /**
+     * Read item.
+     *
+     * @param vcsid the vcsid
+     * @param csid the csid
+     * @return the client response
+     */
+    public ClientResponse<MultipartInput> readItem(String vcsid, String csid) {
+        return locationAuthorityProxy.readItem(vcsid, csid);
+    }
+
+    /**
+     * Creates the item.
+     *
+     * @param vcsid the vcsid
+     * @param multipart the multipart
+     * @return the client response
+     */
+    public ClientResponse<Response> createItem(String vcsid, MultipartOutput multipart) {
+        return locationAuthorityProxy.createItem(vcsid, multipart);
+    }
+
+    /**
+     * Update item.
+     *
+     * @param vcsid the vcsid
+     * @param csid the csid
+     * @param multipart the multipart
+     * @return the client response
+     */
+    public ClientResponse<MultipartInput> updateItem(String vcsid, String csid, MultipartOutput multipart) {
+        return locationAuthorityProxy.updateItem(vcsid, csid, multipart);
+
+    }
+
+    /**
+     * Delete item.
+     *
+     * @param vcsid the vcsid
+     * @param csid the csid
+     * @return the client response
+     */
+    public ClientResponse<Response> deleteItem(String vcsid, String csid) {
+        return locationAuthorityProxy.deleteItem(vcsid, csid);
+    }
+
+    /**
+     * Creates the contact.
+     *
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * @param multipart the multipart
+     * @return the client response
+     */
+    public ClientResponse<Response> createContact(String parentcsid,
+            String itemcsid, MultipartOutput multipart) {
+        return locationAuthorityProxy.createContact(parentcsid, itemcsid, multipart);
+    }
+
+    /**
+     * Read contact.
+     *
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * @param csid the csid
+     * @return the client response
+     */
+    public ClientResponse<MultipartInput> readContact(String parentcsid,
+            String itemcsid, String csid) {
+        return locationAuthorityProxy.readContact(parentcsid, itemcsid, csid);
+    }
+
+    /**
+     * Read contact list.
+     *
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * @return the client response
+     */
+    public ClientResponse<ContactsCommonList> readContactList(String parentcsid,
+            String itemcsid) {
+        return locationAuthorityProxy.readContactList(parentcsid, itemcsid);
+    }
+
+    /**
+     * Update contact.
+     *
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * @param csid the csid
+     * @param multipart the multipart
+     * @return the client response
+     */
+    public ClientResponse<MultipartInput> updateContact(String parentcsid,
+            String itemcsid, String csid, MultipartOutput multipart) {
+        return locationAuthorityProxy.updateContact(parentcsid, itemcsid, csid, multipart);
+    }
+
+    /**
+     * Delete contact.
+     *
+     * @param parentcsid the parentcsid
+     * @param itemcsid the itemcsid
+     * @param csid the csid
+     * @return the client response
+     */
+    public ClientResponse<Response> deleteContact(String parentcsid,
+        String itemcsid, String csid) {
+        return locationAuthorityProxy.deleteContact(parentcsid,
+            itemcsid, csid);
+    }
+
+}

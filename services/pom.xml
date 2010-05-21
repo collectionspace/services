@@ -32,6 +32,7 @@
         <module>intake</module>
         <module>loanin</module>
         <module>loanout</module>
+        <module>location</module>
         <module>movement</module>
         <module>dimension</module>
         <module>contact</module>

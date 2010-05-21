@@ -686,13 +686,13 @@ public class PersonAuthorityResource extends
             
             // AND persons_common:displayName LIKE '%partialTerm%'
             if (partialTerm != null && !partialTerm.isEmpty()) {
-            	String ptClause = "AND " +
+            	String ptClause = 
             	PersonJAXBSchema.PERSONS_COMMON + ":" +
             		PersonJAXBSchema.DISPLAY_NAME +
             		" LIKE " +
             		"'%" + partialTerm + "%'";
             	// handler.getDocumentFilter().appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
-                handler.getDocumentFilter().appendWhereClause(ptClause, "");
+                handler.getDocumentFilter().appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
 
             }            
             getRepositoryClient(ctx).getFiltered(ctx, handler);
