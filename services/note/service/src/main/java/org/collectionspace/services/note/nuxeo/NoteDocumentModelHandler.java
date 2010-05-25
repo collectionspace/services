@@ -58,6 +58,13 @@ public class NoteDocumentModelHandler
 
     /** The owner. */
     private String owner;
+    
+    private final String commonSchemaName = "notes_common";
+    
+	public boolean schemaHasSubItem(String schema) {
+		return commonSchemaName.equals(schema);
+	}
+
 
     /**
      * Gets the owner.

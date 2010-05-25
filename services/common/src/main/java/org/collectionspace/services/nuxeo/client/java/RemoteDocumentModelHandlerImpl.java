@@ -94,7 +94,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         }
     }
 
-    private void addOutputPart(Map<String, Object> unQObjectProperties, String schema, ObjectPartType partMeta)
+    protected void addOutputPart(Map<String, Object> unQObjectProperties, String schema, ObjectPartType partMeta)
     		throws Exception {
 		Document doc = DocumentUtils.buildDocument(partMeta, schema,
 				unQObjectProperties);
@@ -220,6 +220,20 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
      */
     protected Map<String, Object> extractPart(DocumentModel docModel, String schema, ObjectPartType partMeta)
             throws Exception {
+    	return extractPart( docModel, schema, partMeta, null );
+    }
+    
+    /**
+     * extractPart extracts an XML object from given DocumentModel
+     * @param docModel
+     * @param schema of the object to extract
+     * @param partMeta metadata for the object to extract
+     * @throws Exception
+     */
+    protected Map<String, Object> extractPart(
+    		DocumentModel docModel, String schema, ObjectPartType partMeta,
+    		Map<String, Object> addToMap)
+            throws Exception {
     	Map<String, Object> result = null;
     	
         MediaType mt = MediaType.valueOf(partMeta.getContent().getContentType());
@@ -227,7 +241,8 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
             Map<String, Object> objectProps = docModel.getProperties(schema);
             //unqualify properties before sending the doc over the wire (to save bandwidh)
             //FIXME: is there a better way to avoid duplication of a collection?
-            Map<String, Object> unQObjectProperties = new HashMap<String, Object>();
+            Map<String, Object> unQObjectProperties = 
+            	(addToMap!=null)? addToMap:(new HashMap<String, Object>());
             Set<Entry<String, Object>> qualifiedEntries = objectProps.entrySet();
             for(Entry<String, Object> entry : qualifiedEntries){
                 String unqProp = getUnQProperty(entry.getKey());

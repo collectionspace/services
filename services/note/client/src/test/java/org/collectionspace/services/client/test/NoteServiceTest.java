@@ -290,9 +290,9 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
                 client.getCommonPartName(), NotesCommon.class);
         Assert.assertNotNull(note);
 
-        // Update the content of this resource.
+        // Update the content of this resource, both the subitem, and the content
         note.setContent("updated-" + note.getContent());
-        note.setAuthor("updated-" + note.getAuthor());
+        note.setOrder(note.getOrder()+10);
         if(logger.isDebugEnabled()){
             logger.debug("to be updated object");
             logger.debug(objectAsXmlString(note, NotesCommon.class));
@@ -319,10 +319,10 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
                         client.getCommonPartName(), NotesCommon.class);
         Assert.assertNotNull(updatedNote);
 
-        Assert.assertEquals(updatedNote.getContent(),
-                note.getContent(),
+        Assert.assertEquals(updatedNote.getContent(), note.getContent(),
                 "Data in updated object did not match submitted data.");
-
+        Assert.assertEquals(updatedNote.getOrder(), note.getOrder(),
+                "Data in updated object (subitem) did not match submitted data.");
     }
 
     // Failure outcomes

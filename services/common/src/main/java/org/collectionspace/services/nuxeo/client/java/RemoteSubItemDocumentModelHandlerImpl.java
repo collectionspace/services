@@ -70,6 +70,7 @@ public abstract class RemoteSubItemDocumentModelHandlerImpl<T, TL> extends
      * @param partMeta metadata for the object to fill
      * @throws Exception
      */
+	@Override
     protected void fillPart(InputPart part, DocumentModel docModel, ObjectPartType partMeta)
             throws Exception {
         InputStream payload = part.getBody(InputStream.class, null);
@@ -104,5 +105,26 @@ public abstract class RemoteSubItemDocumentModelHandlerImpl<T, TL> extends
         }
     }
     
+    /**
+     * extractPart extracts an XML object from given DocumentModel
+     * This overridden form checks for schemas that extend subitem, and merges
+     * in the subitem properties for that part.
+     * @param docModel
+     * @param schema of the object to extract
+     * @param partMeta metadata for the object to extract
+     * @throws Exception
+     */
+	@Override
+    protected Map<String, Object> extractPart(DocumentModel docModel, String schema, ObjectPartType partMeta)
+            throws Exception {
+    	Map<String, Object> map = extractPart( docModel, schema, partMeta, null ); 
+		if(schemaHasSubItem(schema)) {
+			extractPart(docModel, SI_LABEL, partMeta, map);
+		}
+    	return map;
+    }
+	
+	// TODO HACK - should make this info be configured in the part metadata.
+	public abstract boolean schemaHasSubItem(String schema);
 
 }
