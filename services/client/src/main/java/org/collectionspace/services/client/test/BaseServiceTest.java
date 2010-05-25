@@ -94,6 +94,9 @@ public abstract class BaseServiceTest {
     /** The null charset. */
     final String NULL_CHARSET = null;
 
+    protected final static String BANNER_SEPARATOR_LINE =
+        "===================================================";
+
 
     /**
      * Instantiates a new base service test.
@@ -154,6 +157,21 @@ public abstract class BaseServiceTest {
         REQUEST_TYPE = ServiceRequestType.NON_EXISTENT;
     }
 
+
+        /**
+     * Initializes setup values for a given test.
+     *
+     * @param expectedStatusCode  A status code expected to be returned in the response.
+     *
+     * @param serviceRequestType  A type of service request (e.g. CREATE, DELETE).
+     */
+    protected void testSetup(
+            int expectedStatusCode,
+            ServiceRequestType reqType) {
+        String testName = null;
+        testSetup(expectedStatusCode, reqType, testName);
+    }
+
     /**
      * Initializes setup values for a given test.
      *
@@ -173,8 +191,10 @@ public abstract class BaseServiceTest {
         REQUEST_TYPE = reqType;
         
         // Print a banner identifying the test being run.
-        if (logger.isDebugEnabled()) {
-            testBanner(testName);
+        if ((testName != null) && (! testName.trim().isEmpty())) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(testBanner(testName));
+            }
         }
     }
 
@@ -530,25 +550,33 @@ public abstract class BaseServiceTest {
     }
 
     /**
-     * Print label text inside a test-specific banner.
+     * Returns label text inside a test-specific banner.
      *
      * @param testName The name of a test method.
+     *
+     * @return A test-specific banner.
      */
-    protected static void testBanner(String testName) {
-        testName = (testName == null) ? "Test = no test name specified" : " Test = " + testName;
-        banner(testName);
+    protected static String testBanner(String testName) {
+        testName = (testName == null || testName.trim().isEmpty()) ?
+            "Test = no test name specified" : " Test = " + testName;
+        return banner(testName);
     }
 
     /**
-     * Print label text inside a banner.
+     * Returns text inside a banner.
      *
-     * @param label The label to be printed inside a banner.
+     * @param label The label to be output inside a banner.
+     *
+     * @return A banner.
      */
-    protected static void banner(String label) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("===================================================");
-            logger.debug(" " + label);
-            logger.debug("===================================================");
-        }
+    protected static String banner(String label) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("\n");
+        sb.append(BANNER_SEPARATOR_LINE);
+        sb.append("\n");
+        sb.append(" " + label);
+        sb.append("\n");
+        sb.append(BANNER_SEPARATOR_LINE);
+        return sb.toString();
     }
 }

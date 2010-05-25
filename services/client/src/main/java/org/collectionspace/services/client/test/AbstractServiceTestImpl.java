@@ -38,7 +38,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 /**
- * AbstractServiceTest.
+ * AbstractServiceTestImpl
  *
  * Abstract base class for client tests of entity and relation services.
  * Abstract methods are provided for a set of CRUD + List tests to be invoked.
