@@ -24,4 +24,28 @@
       </subtypes>
     </type>
   </extension>
+  <extension target="org.nuxeo.ecm.platform.types.TypeService" point="types">
+    <type id="Subitem" coretype="Subitem">
+      <label>org.collectionspace.subitem</label>
+      <!--icon>/icons/file.gif</icon-->
+      <default-view>view_documents</default-view>
+
+      <layouts mode="any">
+        <layout>heading</layout>
+        <layout>subitem</layout>
+      </layouts>        
+    </type>
+
+    <type id="Folder" coretype="Folder">
+      <subtypes>
+        <type>Subitem</type>
+      </subtypes>
+    </type>
+    
+    <type id="Workspace" coretype="Workspace">
+      <subtypes>
+        <type>Subitem</type>
+      </subtypes>
+    </type>
+  </extension>
 </component>

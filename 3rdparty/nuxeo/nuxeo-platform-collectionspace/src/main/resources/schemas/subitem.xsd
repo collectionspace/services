@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Older (?) CollectionObject Core Schema for Nuxeo EP
+
+    $LastChangedRevision: 2099 $
+    $LastChangedDate: 2010-05-14 17:24:06 -0700 (Fri, 14 May 2010) $
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/subitem/"
+    xmlns="http://collectionspace.org/subitem/"
+    targetNamespace="http://collectionspace.org/subitem/"
+    version="0.1">
+
+    <!--  SubItem Common Information Group -->
+    <!--  owner is the csid of the owning LocationAuthority -->
+    <xs:element name="owner" type="xs:string" />
+    <xs:element name="isPrimary" type="xs:boolean"/>
+    <xs:element name="order" type="xs:unsignedInt"/>
+</xs:schema>

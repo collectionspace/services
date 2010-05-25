@@ -149,6 +149,7 @@
         <ant antfile="account/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="relation/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="id/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="note/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="loanin/build.xml" target="deploy" inheritAll="false"/>
@@ -180,6 +181,7 @@
         <ant antfile="loanin/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="note/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="id/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="relation/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="account/build.xml" target="undeploy" inheritAll="false"/>

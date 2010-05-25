@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:permissions_list xmlns:ns2="http://collectionspace.org/services/authorization">
-    <permission csid="a4017e3d-1eef-42b1-bdb7-8443d681707c">
+    <permission csid="c254348f-e5d0-4db9-8634-ed0b47887826">
         <resourceName>collectionobjects</resourceName>
         <action>
             <name>CREATE</name>
@@ -20,7 +20,7 @@
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>
     </permission>
-    <permission csid="66d54998-a1a1-4c64-9728-2b6d8b9b61df">
+    <permission csid="964b5187-fda0-4e2d-8873-0c235acf1796">
         <resourceName>intakes</resourceName>
         <action>
             <name>CREATE</name>
@@ -40,7 +40,7 @@
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>
     </permission>
-    <permission csid="07e47d8a-1aa6-440b-b30b-a2d42d8023a1">
+    <permission csid="e1eff972-65f0-4213-9d91-e5eaad58fd5d">
         <resourceName>loansin</resourceName>
         <action>
             <name>CREATE</name>
@@ -60,7 +60,7 @@
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>
     </permission>
-    <permission csid="476a773b-83ad-4383-8761-c92930bf527c">
+    <permission csid="ded1f92e-6b57-43ee-bc94-19e32bae9822">
         <resourceName>loansout</resourceName>
         <action>
             <name>CREATE</name>
@@ -80,7 +80,7 @@
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>
     </permission>
-    <permission csid="b0144782-e289-4847-bb67-e9b5c0412887">
+    <permission csid="428a7c8c-a3cf-4616-a439-65ce41566fba">
         <resourceName>movements</resourceName>
         <action>
             <name>CREATE</name>
@@ -100,7 +100,7 @@
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>
     </permission>
-    <permission csid="8cc25692-4d52-40e2-afbc-b95a79db3b0a">
+    <permission csid="e2189ea7-1710-443a-a2a9-0c3d8ee256b1">
         <resourceName>vocabularies</resourceName>
         <action>
             <name>CREATE</name>
@@ -120,7 +120,7 @@
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>
     </permission>
-    <permission csid="d2f87bd9-9ea6-4b39-aebe-6a0fc6d96594">
+    <permission csid="9d132fbd-0f5a-42cb-bae3-117b2f71dff8">
         <resourceName>vocabularyitems</resourceName>
         <action>
             <name>CREATE</name>
@@ -140,7 +140,7 @@
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>
     </permission>
-    <permission csid="80e32ee8-4740-4b48-a3ba-aec706172146">
+    <permission csid="293a5a44-4e91-4bee-b85e-ceacd6e213bb">
         <resourceName>orgauthorities</resourceName>
         <action>
             <name>CREATE</name>
@@ -160,7 +160,7 @@
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>
     </permission>
-    <permission csid="49167e68-8001-45b4-abef-c042032e488e">
+    <permission csid="c1a81f3f-e95d-4e04-bbdd-54b9f5c8ff86">
         <resourceName>organizations</resourceName>
         <action>
             <name>CREATE</name>
@@ -180,7 +180,7 @@
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>
     </permission>
-    <permission csid="3c69a90d-35b9-4bc0-9360-46977368f86f">
+    <permission csid="986a2192-13cf-4985-a1ce-bf38337a1d2c">
         <resourceName>personauthorities</resourceName>
         <action>
             <name>CREATE</name>
@@ -200,7 +200,7 @@
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>
     </permission>
-    <permission csid="3cd1d1b5-1d7b-4795-9e74-26511325720f">
+    <permission csid="a82b6feb-6dce-4029-9046-f2830f8b64fc">
         <resourceName>persons</resourceName>
         <action>
             <name>CREATE</name>
@@ -220,7 +220,47 @@
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>
     </permission>
-    <permission csid="0ec19a72-a210-44b9-a10e-817fea57276f">
+    <permission csid="314b45b4-b3d0-4b0c-bd9b-c9d4f41bf963">
+        <resourceName>locationauthorities</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="fd66abf5-6022-4e21-8f83-750ba5dc79be">
+        <resourceName>locations</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="10b20df4-d9bc-4b51-88bb-9051342c05c9">
         <resourceName>acquisitions</resourceName>
         <action>
             <name>CREATE</name>
@@ -240,7 +280,7 @@
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>
     </permission>
-    <permission csid="808c7f90-16a1-42a6-a24b-06327728b2e4">
+    <permission csid="0f606175-cf1f-4c8b-9216-8fac556db213">
         <resourceName>relations</resourceName>
         <action>
             <name>CREATE</name>
@@ -260,7 +300,7 @@
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>
     </permission>
-    <permission csid="5840f553-3fa1-4254-8442-7f4e76dfbd08">
+    <permission csid="2537caa4-4859-43f4-a92b-630b38336f62">
         <resourceName>accounts</resourceName>
         <action>
             <name>CREATE</name>
@@ -280,7 +320,7 @@
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>
     </permission>
-    <permission csid="fc89633a-56c6-4d20-9022-dbf7919afe0c">
+    <permission csid="a1c13748-f404-4a72-a7b2-e0599316828c">
         <resourceName>dimensions</resourceName>
         <action>
             <name>CREATE</name>
@@ -300,7 +340,7 @@
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>
     </permission>
-    <permission csid="f0806b7f-5dca-4aed-bae9-b25fba378f95">
+    <permission csid="ab6d047b-a685-4f7d-b708-846a155f1fea">
         <resourceName>contacts</resourceName>
         <action>
             <name>CREATE</name>
@@ -320,7 +360,27 @@
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>
     </permission>
-    <permission csid="173a185c-b2d6-4fae-8c33-89b2e34dbeea">
+    <permission csid="d5f1cb1e-1aa7-48a2-a32b-4b9cca3b3169">
+        <resourceName>notes</resourceName>
+        <action>
+            <name>CREATE</name>
+        </action>
+        <action>
+            <name>READ</name>
+        </action>
+        <action>
+            <name>UPDATE</name>
+        </action>
+        <action>
+            <name>DELETE</name>
+        </action>
+        <action>
+            <name>SEARCH</name>
+        </action>
+        <effect>PERMIT</effect>
+        <tenant_id>1</tenant_id>
+    </permission>
+    <permission csid="eea3a150-0eb7-4061-937d-d35fbe11f55a">
         <resourceName>authorization/roles</resourceName>
         <action>
             <name>CREATE</name>
@@ -340,7 +400,7 @@
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>
     </permission>
-    <permission csid="d82cdea5-6643-4aac-a94b-5b5808a6d0e8">
+    <permission csid="d694674b-fe0c-4769-8615-9e7f482bbbdc">
         <resourceName>authorization/permissions</resourceName>
         <action>
             <name>CREATE</name>
@@ -360,7 +420,7 @@
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>
     </permission>
-    <permission csid="9955709b-267a-4da1-a569-76a2520af6e7">
+    <permission csid="d712beb5-bd4c-435f-a631-ab5eccae0462">
         <resourceName>authorization/permroles</resourceName>
         <action>
             <name>CREATE</name>
@@ -380,7 +440,7 @@
         <effect>PERMIT</effect>
         <tenant_id>1</tenant_id>
     </permission>
-    <permission csid="8c816fa9-d1df-4c8c-95a0-7972d214ae09">
+    <permission csid="85a25c1b-0cb7-4df1-a447-eee665e693f9">
         <resourceName>accounts/accountroles</resourceName>
         <action>
             <name>CREATE</name>

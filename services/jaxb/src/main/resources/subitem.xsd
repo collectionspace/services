@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Copyright 2009 University of California at Berkeley
+	Licensed under the Educational Community License (ECL), Version 2.0.
+	You may not use this file except in compliance with this License.
+
+	You may obtain a copy of the ECL 2.0 License at
+	https://source.collectionspace.org/collection-space/LICENSE.txt
+
+	Document   : subitem.xsd
+	Revision   : $LastChangedRevision: 1292 $
+	Created on : $LastChangedDate: 2010-01-29 14:55:28 -0800 (Fri, 29 Jan 2010) $
+	Author     : $LastChangedBy: $
+	Description: Subitem has the basic information that all sub-resource items
+							 have, including links to the parent, order, and primary markers.
+-->
+<xs:schema
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://collectionspace.org/services/common/subitem"
+	targetNamespace="http://collectionspace.org/services/common/subitem"
+	version="0.1"
+	>
+
+	 <xs:element name="subitem" >
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="owner"     	type="xs:string" />
+				<xs:element name="isPrimary"  type="xs:boolean" />
+				<xs:element name="order" 			type="xs:unsignedInt" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

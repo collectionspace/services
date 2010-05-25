@@ -724,6 +724,39 @@
             </service:object>
         </tenant:serviceBindings>
         <!-- end contact service meta-data -->
+        <!-- begin note service meta-data -->
+        <tenant:serviceBindings name="Notes" version="0.1">
+            <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
+                nuxeo-java
+            </service:repositoryClient>
+            <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.note.nuxeo.NoteDocumentModelHandler
+            </service:documentHandler>
+            <service:object name="CSNote" version="0.1"
+                            xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:part id="0" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="notes-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/common/system"
+                            schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="notes_common" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/note"
+                            schemaLocation="http://collectionspace.org/services/note http://services.collectionspace.org/note/notes_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end note service meta-data -->
         <!-- begin role service meta-data -->
         <tenant:serviceBindings name="authorization/roles" version="0.1">
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>

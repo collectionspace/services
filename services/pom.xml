@@ -18,6 +18,7 @@
         <module>client</module>
         <module>jaxb</module>
         <module>common</module>
+        <module>note</module>
         <module>authorization-mgt</module> <!-- relies on authorization -->
         <module>common-test</module>
         <module>account</module> <!-- relies on authorization-mgt.client -->

@@ -25,6 +25,7 @@ package org.collectionspace.services.jaxrs;
 import org.collectionspace.services.account.AccountResource;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.id.IDResource;
+import org.collectionspace.services.note.NoteResource;
 import org.collectionspace.services.intake.IntakeResource;
 import org.collectionspace.services.loanin.LoaninResource;
 import org.collectionspace.services.loanout.LoanoutResource;
@@ -68,6 +69,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new PermissionResource());
         singletons.add(new CollectionObjectResource());
         singletons.add(new IDResource());
+        singletons.add(new NoteResource());
         singletons.add(new IntakeResource());
         singletons.add(new LoaninResource());
         singletons.add(new LoanoutResource());
