@@ -39,11 +39,12 @@ public interface CSpacePermissionManager {
      * @param res resource
      * @param principals an array of principal names
      * @action action on the resource
+     * @grant true to grant, false to deny
      * @throws PermissionException
      * @see CSpaceResource
      * @see CSpaceAction
      */
-    public void addPermissions(CSpaceResource res, CSpaceAction action, String[] principals)
+    public void addPermissions(CSpaceResource res, CSpaceAction action, String[] principals, boolean grant)
             throws PermissionException;
 
     /**

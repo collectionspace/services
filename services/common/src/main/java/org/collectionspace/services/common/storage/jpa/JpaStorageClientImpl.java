@@ -96,11 +96,11 @@ public class JpaStorageClientImpl implements StorageClient {
 
         if (ctx == null) {
             throw new IllegalArgumentException(
-                    "JpaStorageClient.create: ctx is missing");
+                    "create: ctx is missing");
         }
         if (handler == null) {
             throw new IllegalArgumentException(
-                    "JpaStorageClient.create: handler is missing");
+                    "create: handler is missing");
         }
         EntityManagerFactory emf = null;
         EntityManager em = null;
@@ -160,11 +160,11 @@ public class JpaStorageClientImpl implements StorageClient {
             throws DocumentNotFoundException, DocumentException {
         if (ctx == null) {
             throw new IllegalArgumentException(
-                    "JpaStorageClient.get: ctx is missing");
+                    "get: ctx is missing");
         }
         if (handler == null) {
             throw new IllegalArgumentException(
-                    "JpaStorageClient.get: handler is missing");
+                    "get: handler is missing");
         }
         DocumentFilter docFilter = handler.getDocumentFilter();
         if (docFilter == null) {
@@ -217,11 +217,11 @@ public class JpaStorageClientImpl implements StorageClient {
             throws DocumentNotFoundException, DocumentException {
         if (ctx == null) {
             throw new IllegalArgumentException(
-                    "JpaStorageClient.getFiltered: ctx is missing");
+                    "getFiltered: ctx is missing");
         }
         if (handler == null) {
             throw new IllegalArgumentException(
-                    "JpaStorageClient.getFiltered: handler is missing");
+                    "getFiltered: handler is missing");
         }
 
         DocumentFilter docFilter = handler.getDocumentFilter();
@@ -283,11 +283,11 @@ public class JpaStorageClientImpl implements StorageClient {
             DocumentException {
         if (ctx == null) {
             throw new IllegalArgumentException(
-                    "JpaStorageClient.update: ctx is missing");
+                    "update: ctx is missing");
         }
         if (handler == null) {
             throw new IllegalArgumentException(
-                    "JpaStorageClient.update: handler is missing");
+                    "update: handler is missing");
         }
         EntityManagerFactory emf = null;
         EntityManager em = null;
@@ -336,12 +336,12 @@ public class JpaStorageClientImpl implements StorageClient {
             DocumentException {
 
         if (logger.isDebugEnabled()) {
-            logger.debug("deleting entity with id=" + id);
+            logger.debug("delete(ctx, id): deleting entity with id=" + id);
         }
 
         if (ctx == null) {
             throw new IllegalArgumentException(
-                    "JpaStorageClient.delete: ctx is missing");
+                    "delete(ctx, id): ctx is missing");
         }
         EntityManagerFactory emf = null;
         EntityManager em = null;
@@ -356,7 +356,7 @@ public class JpaStorageClientImpl implements StorageClient {
                 if (em != null && em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
                 }
-                String msg = "could not find entity with id=" + id;
+                String msg = "delete(ctx, id): could not find entity with id=" + id;
                 logger.error(msg);
                 throw new DocumentNotFoundException(msg);
             }
@@ -370,7 +370,7 @@ public class JpaStorageClientImpl implements StorageClient {
             throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception ", e);
+                logger.debug("delete(ctx, id): Caught exception ", e);
             }
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -397,11 +397,11 @@ public class JpaStorageClientImpl implements StorageClient {
 
         if (ctx == null) {
             throw new IllegalArgumentException(
-                    "JpaStorageClient.deleteWhere: ctx is missing");
+                    "deleteWhere(ctx, id) : ctx is missing");
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("deleting entity with id=" + id);
+            logger.debug("deleteWhere(ctx, id): deleting entity with id=" + id);
         }
         EntityManagerFactory emf = null;
         EntityManager em = null;
@@ -423,7 +423,7 @@ public class JpaStorageClientImpl implements StorageClient {
                 if (em != null && em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
                 }
-                String msg = "could not find entity with id=" + id;
+                String msg = "deleteWhere(ctx, id) could not find entity with id=" + id;
                 logger.error(msg);
                 throw new DocumentNotFoundException(msg);
             }
@@ -436,7 +436,7 @@ public class JpaStorageClientImpl implements StorageClient {
             throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception ", e);
+                logger.debug("deleteWhere(ctx, id) Caught exception ", e);
             }
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -449,25 +449,45 @@ public class JpaStorageClientImpl implements StorageClient {
         }
     }
 
+    /*
+     * delete removes entity and its child entities but calls back to given handler
+     * cost: a get before delete
+     * @see org.collectionspace.services.common.storage.StorageClient#delete(org.collectionspace.services.common.context.ServiceContext, java.lang.String)
+     */
     @Override
     public void delete(ServiceContext ctx, String id, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
         if (ctx == null) {
             throw new IllegalArgumentException(
-                    "JpaStorageClient.delete: ctx is missing");
+                    "delete(ctx, ix, handler): ctx is missing");
         }
         if (handler == null) {
             throw new IllegalArgumentException(
-                    "JpaStorageClient.delete: handler is missing");
+                    "delete(ctx, ix, handler): handler is missing");
         }
         EntityManagerFactory emf = null;
         EntityManager em = null;
         try {
             handler.prepare(Action.DELETE);
-            Object entity = handler.getCommonPart();
-            DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entity);
 
+            emf = JpaStorageUtils.getEntityManagerFactory();
+            em = emf.createEntityManager();
+
+            em.getTransaction().begin();
+            Object entityFound = getEntity(ctx, em, id);
+            if (entityFound == null) {
+                if (em != null && em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                String msg = "delete(ctx, ix, handler) could not find entity with id=" + id;
+                logger.error(msg);
+                throw new DocumentNotFoundException(msg);
+            }
+            DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entityFound);
             handler.handle(Action.DELETE, wrapDoc);
+            em.remove(entityFound);
+            em.getTransaction().commit();
+
             handler.complete(Action.DELETE, wrapDoc);
         } catch (DocumentException de) {
             if (em != null && em.getTransaction().isActive()) {
@@ -476,7 +496,7 @@ public class JpaStorageClientImpl implements StorageClient {
             throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception ", e);
+                logger.debug("delete(ctx, ix, handler): Caught exception ", e);
             }
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();

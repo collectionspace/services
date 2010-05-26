@@ -79,10 +79,11 @@ public class AuthZ {
      * -action info is retrieved from the resource
      * @param res
      * @param principals
+     *      * @param grant true to grant false to deny
      */
-    public void addPermissions(CSpaceResource res, String[] principals) throws PermissionException {
+    public void addPermissions(CSpaceResource res, String[] principals, boolean grant) throws PermissionException {
         CSpaceAction action = res.getAction();
-        addPermissions(res, action, principals);
+        addPermissions(res, action, principals, grant);
     }
 
     /**
@@ -90,10 +91,11 @@ public class AuthZ {
      * @param res
      * @parm action
      * @param principals
+     * @param grant true to grant false to deny
      */
-    public void addPermissions(CSpaceResource res, CSpaceAction action, String[] principals)
+    public void addPermissions(CSpaceResource res, CSpaceAction action, String[] principals, boolean grant)
             throws PermissionException {
-        provider.getPermissionManager().addPermissions(res, action, principals);
+        provider.getPermissionManager().addPermissions(res, action, principals, grant);
     }
 
     /**
@@ -162,7 +164,6 @@ public class AuthZ {
         CSpaceAction action = res.getAction();
         return isAccessAllowed(res, action);
     }
-
 
     /**
      * isAccessAllowed check if authenticated principal is allowed to invoke

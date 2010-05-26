@@ -199,13 +199,14 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("create: status = " + res.getStatus());
         }
+        //so it does not have any permissions out-of-the-box to create a
+        //collection object
         Assert.assertEquals(res.getStatus(),
-                Response.Status.CREATED.getStatusCode(), "expected "
-                + Response.Status.CREATED.getStatusCode());
+                Response.Status.FORBIDDEN.getStatusCode(), "expected "
+                + Response.Status.FORBIDDEN.getStatusCode());
 
         // Store the ID returned from this create operation for additional tests
         // below.
-        knownResourceId = extractId(res);
         res.releaseConnection();
 
     }
@@ -354,19 +355,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     public void delete(String testName) {
         setupDelete(testName);
-        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        collectionObjectClient = new CollectionObjectClient();
-        collectionObjectClient.setAuth(true, "test", true, "test", true);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Calling deleteCollectionObject:" + knownResourceId);
-        }
-        ClientResponse<Response> res = collectionObjectClient.delete(knownResourceId);
-        if (logger.isDebugEnabled()) {
-            logger.debug("deleteCollectionObject: status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(),
-                Response.Status.OK.getStatusCode(), "expected " + Response.Status.OK.getStatusCode());
-        res.releaseConnection();
+
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,

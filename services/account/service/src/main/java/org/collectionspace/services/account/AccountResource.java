@@ -145,13 +145,13 @@ public class AccountResource
             return response;
         } catch (BadRequestException bre) {
             Response response = Response.status(
-                    Response.Status.BAD_REQUEST).entity(ServiceMessages.POST_FAILED +
-                    bre.getErrorReason()).type("text/plain").build();
+                    Response.Status.BAD_REQUEST).entity(ServiceMessages.POST_FAILED
+                    + bre.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.POST_FAILED +
-                    ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.POST_FAILED
+                    + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -194,8 +194,8 @@ public class AccountResource
             result = (AccountsCommon) ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.GET_FAILED +
-                    ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.GET_FAILED
+                    + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
@@ -211,8 +211,8 @@ public class AccountResource
             }
             logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.GET_FAILED +
-                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.GET_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
 
@@ -249,8 +249,8 @@ public class AccountResource
             accountList = (AccountsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.LIST_FAILED +
-                    ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.LIST_FAILED
+                    + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
 
         } catch (Exception e) {
@@ -259,8 +259,8 @@ public class AccountResource
             }
             logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.LIST_FAILED +
-                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.LIST_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return accountList;
@@ -297,13 +297,13 @@ public class AccountResource
             result = (AccountsCommon) ctx.getOutput();
         } catch (BadRequestException bre) {
             Response response = Response.status(
-                    Response.Status.BAD_REQUEST).entity(ServiceMessages.PUT_FAILED +
-                    bre.getErrorReason()).type("text/plain").build();
+                    Response.Status.BAD_REQUEST).entity(ServiceMessages.PUT_FAILED
+                    + bre.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.PUT_FAILED +
-                    ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.PUT_FAILED
+                    + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
@@ -316,8 +316,8 @@ public class AccountResource
         } catch (Exception e) {
             logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.PUT_FAILED +
-                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.PUT_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return result;
@@ -347,7 +347,7 @@ public class AccountResource
         try {
             //FIXME ideally the following two ops shoudl be in the same tx CSPACE-658
             //delete all relationships
-            AccountRoleSubResource subResource = new AccountRoleSubResource();
+            AccountRoleSubResource subResource = new AccountRoleSubResource("accounts/accountroles");
             subResource.deleteAccountRole(csid, SubjectType.ROLE);
             ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext((AccountsCommon) null,
                     AccountsCommon.class);
@@ -355,8 +355,8 @@ public class AccountResource
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.DELETE_FAILED +
-                    ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.DELETE_FAILED
+                    + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
 
         } catch (DocumentNotFoundException dnfe) {
@@ -370,8 +370,8 @@ public class AccountResource
         } catch (Exception e) {
             logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.DELETE_FAILED +
-                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.DELETE_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
 
@@ -387,13 +387,14 @@ public class AccountResource
         if (accCsid == null || "".equals(accCsid)) {
             logger.error("createAccountRole: missing accCsid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    ServiceMessages.POST_FAILED + "accountroles account " + 
-                    ServiceMessages.MISSING_INVALID_CSID + accCsid).type(
+                    ServiceMessages.POST_FAILED + "accountroles account "
+                    + ServiceMessages.MISSING_INVALID_CSID + accCsid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
         try {
-            AccountRoleSubResource subResource = new AccountRoleSubResource();
+            AccountRoleSubResource subResource =
+                    new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
             String accrolecsid = subResource.createAccountRole(input, SubjectType.ROLE);
             UriBuilder path = UriBuilder.fromResource(AccountResource.class);
             path.path(accCsid + "/accountroles/" + accrolecsid);
@@ -416,8 +417,8 @@ public class AccountResource
             logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    ServiceMessages.POST_FAILED +
-                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+                    ServiceMessages.POST_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
     }
@@ -433,14 +434,15 @@ public class AccountResource
         if (accCsid == null || "".equals(accCsid)) {
             logger.error("getAccountRole: missing accCsid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    ServiceMessages.GET_FAILED + "accountroles account " +
-                    ServiceMessages.MISSING_INVALID_CSID + accCsid).type(
+                    ServiceMessages.GET_FAILED + "accountroles account "
+                    + ServiceMessages.MISSING_INVALID_CSID + accCsid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
         AccountRole result = null;
         try {
-            AccountRoleSubResource subResource = new AccountRoleSubResource();
+            AccountRoleSubResource subResource =
+                    new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
             //get relationships for an account
             result = subResource.getAccountRole(accCsid, SubjectType.ROLE);
         } catch (UnauthorizedException ue) {
@@ -486,13 +488,14 @@ public class AccountResource
         if (accCsid == null || "".equals(accCsid)) {
             logger.error("deleteAccountRole: missing accCsid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    ServiceMessages.DELETE_FAILED + "accountroles account " +
-                    ServiceMessages.MISSING_INVALID_CSID + accCsid).type(
+                    ServiceMessages.DELETE_FAILED + "accountroles account "
+                    + ServiceMessages.MISSING_INVALID_CSID + accCsid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
         try {
-            AccountRoleSubResource subResource = new AccountRoleSubResource();
+            AccountRoleSubResource subResource =
+                    new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
             //delete all relationships for an account
             subResource.deleteAccountRole(accCsid, SubjectType.ROLE);
             return Response.status(HttpResponseCodes.SC_OK).build();

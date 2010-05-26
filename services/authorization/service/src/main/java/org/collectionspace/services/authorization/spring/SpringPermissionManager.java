@@ -49,7 +49,7 @@ import org.springframework.transaction.TransactionStatus;
  */
 public class SpringPermissionManager implements CSpacePermissionManager {
 
-    final Log log = LogFactory.getLog(SpringPermissionEvaluator.class);
+    final Log log = LogFactory.getLog(SpringPermissionManager.class);
     private SpringAuthorizationProvider provider;
 
     SpringPermissionManager(SpringAuthorizationProvider provider) {
@@ -57,21 +57,22 @@ public class SpringPermissionManager implements CSpacePermissionManager {
     }
 
     @Override
-    public void addPermissions(CSpaceResource res, CSpaceAction action, String[] principals)
+    public void addPermissions(CSpaceResource res, CSpaceAction action, String[] principals, boolean grant)
             throws PermissionException {
-        ObjectIdentity oid = SpringAuthorizationProvider.mapResource(res);
-        Sid[] sids = SpringAuthorizationProvider.mapPrincipal(principals);
-        Permission p = SpringAuthorizationProvider.mapAction(action);
+        ObjectIdentity oid = SpringAuthorizationProvider.getObjectIdentity(res);
+        Sid[] sids = SpringAuthorizationProvider.getSids(principals);
+        Permission p = SpringAuthorizationProvider.getPermission(action);
         TransactionStatus status = provider.beginTransaction("addPermssions");
 
         //add permission for each sid
         for (Sid sid : sids) {
             try {
-                addPermission(oid, p, sid);
+                addPermission(oid, p, sid, grant);
                 if (log.isDebugEnabled()) {
-                    log.debug("addpermissions(res,action,prin[]), success for "
+                    log.debug("addpermissions(res,action,prin[], grant), success for "
                             + " res=" + res.toString()
                             + " action=" + action.toString()
+                            + " grant=" + grant
                             + " oid=" + oid.toString()
                             + " perm=" + p.toString()
                             + " sid=" + sid.toString());
@@ -79,21 +80,23 @@ public class SpringPermissionManager implements CSpacePermissionManager {
 
             } catch (AlreadyExistsException aex) {
                 if (log.isWarnEnabled()) {
-                    log.warn("addpermissions(res,action,prin[]) failed,"
+                    log.warn("addpermissions(res,action,prin[], grant) failed,"
                             + " oid=" + oid.toString()
                             + " res=" + res.toString()
+                            + " grant=" + grant
                             + " action=" + action.toString()
                             + " oid=" + oid.toString()
                             + " perm=" + p.toString(), aex);
                 }
                 //keep going
             } catch (Exception ex) {
-                String msg = "addpermissions(res,action,prin[]) failed,"
+                String msg = "addpermissions(res,action,prin[], grant) failed,"
                         + " oid=" + oid.toString()
                         + " res=" + res.toString()
                         + " action=" + action.toString()
                         + " oid=" + oid.toString()
-                        + " perm=" + p.toString();
+                        + " perm=" + p.toString()
+                        + " grant=" + grant;
                 if (log.isDebugEnabled()) {
                     log.debug(msg, ex);
                 }
@@ -107,9 +110,10 @@ public class SpringPermissionManager implements CSpacePermissionManager {
         }//rof
         provider.commitTransaction(status);
         if (log.isDebugEnabled()) {
-            log.debug("addpermissions(res,action,prin[]), success for "
+            log.debug("addpermissions(res,action,prin[], grant), success for "
                     + " res=" + res.toString()
                     + " action=" + action.toString()
+                    + " grant=" + grant
                     + " oid=" + oid.toString()
                     + " perm=" + p.toString()
                     + " sids=" + sids.toString());
@@ -119,9 +123,9 @@ public class SpringPermissionManager implements CSpacePermissionManager {
     @Override
     public void deletePermissions(CSpaceResource res, CSpaceAction action, String[] principals)
             throws PermissionNotFoundException, PermissionException {
-        ObjectIdentity oid = SpringAuthorizationProvider.mapResource(res);
-        Sid[] sids = SpringAuthorizationProvider.mapPrincipal(principals);
-        Permission p = SpringAuthorizationProvider.mapAction(action);
+        ObjectIdentity oid = SpringAuthorizationProvider.getObjectIdentity(res);
+        Sid[] sids = SpringAuthorizationProvider.getSids(principals);
+        Permission p = SpringAuthorizationProvider.getPermission(action);
         TransactionStatus status = provider.beginTransaction("deletePermssions");
         //delete permission for each sid
         for (Sid sid : sids) {
@@ -177,8 +181,8 @@ public class SpringPermissionManager implements CSpacePermissionManager {
     @Override
     public void deletePermissions(CSpaceResource res, CSpaceAction action)
             throws PermissionNotFoundException, PermissionException {
-        ObjectIdentity oid = SpringAuthorizationProvider.mapResource(res);
-        Permission p = SpringAuthorizationProvider.mapAction(action);
+        ObjectIdentity oid = SpringAuthorizationProvider.getObjectIdentity(res);
+        Permission p = SpringAuthorizationProvider.getPermission(action);
         TransactionStatus status = provider.beginTransaction("deletePermssions");
         try {
             deletePermissions(oid, p, null);
@@ -221,7 +225,7 @@ public class SpringPermissionManager implements CSpacePermissionManager {
     @Override
     public void deletePermissions(CSpaceResource res)
             throws PermissionNotFoundException, PermissionException {
-        ObjectIdentity oid = SpringAuthorizationProvider.mapResource(res);
+        ObjectIdentity oid = SpringAuthorizationProvider.getObjectIdentity(res);
         TransactionStatus status = provider.beginTransaction("deletePermssion");
         try {
             provider.getProviderAclService().deleteAcl(oid, true);
@@ -255,7 +259,7 @@ public class SpringPermissionManager implements CSpacePermissionManager {
     }
 
     private void addPermission(ObjectIdentity oid, Permission permission,
-            Sid sid) throws PermissionException {
+            Sid sid, boolean grant) throws PermissionException {
         MutableAcl acl;
 
         try {
@@ -265,17 +269,19 @@ public class SpringPermissionManager implements CSpacePermissionManager {
                 log.debug("addPermission: acl not found for oid=" + oid.toString()
                         + " perm=" + permission.toString()
                         + " sid=" + sid.toString()
+                        + " grant=" + grant
                         + " adding...");
             }
             acl = provider.getProviderAclService().createAcl(oid);
         }
-        acl.insertAce(acl.getEntries().size(), permission, sid, true);
+        acl.insertAce(acl.getEntries().size(), permission, sid, grant);
         provider.getProviderAclService().updateAcl(acl);
 
         if (log.isDebugEnabled()) {
             log.debug("addPermission: added acl for oid=" + oid.toString()
                     + " perm=" + permission.toString()
-                    + " sid=" + sid.toString());
+                    + " sid=" + sid.toString()
+                    + " grant=" + grant);
         }
     }
 

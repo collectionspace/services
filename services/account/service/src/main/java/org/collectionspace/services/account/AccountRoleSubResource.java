@@ -46,18 +46,30 @@ import org.slf4j.LoggerFactory;
 public class AccountRoleSubResource
         extends AbstractCollectionSpaceResourceImpl<AccountRole, AccountRole> {
 
+    final public static String ACCOUNT_ACCOUNTROLE_SERVICE = "accounts/accountroles";
+    final public static String ROLE_ACCOUNTROLE_SERVICE = "roles/accountroles";
+    
     //this service is never exposed as standalone RESTful service...just use unique
     //service name to identify binding
     /** The service name. */
-    final private String serviceName = "accounts/accountroles";
+    private String serviceName =  ACCOUNT_ACCOUNTROLE_SERVICE;
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(AccountRoleSubResource.class);
     /** The storage client. */
     final StorageClient storageClient = new JpaRelationshipStorageClient<AccountRole>();
 
+    /**
+     *
+     * @param serviceName qualified service path
+     */
+    AccountRoleSubResource(String serviceName) {
+        this.serviceName = serviceName;
+    }
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
      */
+
     @Override
     protected String getVersionString() {
         /** The last change revision. */
@@ -176,7 +188,6 @@ public class AccountRoleSubResource
             logger.debug("deleteAccountRole with csid=" + csid);
         }
         ServiceContext<AccountRole, AccountRole> ctx = createServiceContext((AccountRole) null, subject);
-        DocumentHandler handler = createDocumentHandler(ctx);
-        getStorageClient(ctx).delete(ctx, csid, handler);
+        getStorageClient(ctx).delete(ctx, csid);
     }
 }

@@ -12,6 +12,13 @@
     <name>services.main</name>
     <packaging>pom</packaging>
 
+    <!--
+    !!!!!PLEASE READ!!!!!
+    Make sure you add modules below in the order of dependency. Security and
+    infrastructure modules should be built first. For example the authorization-mgt
+    module would also import default permissions. Domain specific services should only
+    be built after the security module and common modules are built
+    -->
     <modules>
         <module>authentication</module>
         <module>authorization</module>
@@ -20,7 +27,7 @@
         <module>common</module>
         <module>authorization-mgt</module> <!-- relies on authorization -->
         <module>common-test</module>
-        <module>account</module> <!-- relies on authorization-mgt.client -->
+        <module>account</module> <!-- relies on authorization-mgt.import -->
         <module>note</module>
         <module>relation</module>
         <!--        <module>query</module> -->

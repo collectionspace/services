@@ -109,12 +109,20 @@ public class SpringAuthorizationProvider implements CSpaceAuthorizationProvider 
         return permissionManager;
     }
 
-    static ObjectIdentity mapResource(CSpaceResource res) {
-        return new ObjectIdentityImpl(res.getType().toString(),
-                Long.valueOf(res.getId().hashCode()));
+    static Long getObjectIdentityIdentifier(CSpaceResource res) {
+        return Long.valueOf(res.getId().hashCode());
     }
 
-    static Sid[] mapPrincipal(String[] principals) {
+    static String getObjectIdentityType(CSpaceResource res) {
+        return res.getType().toString();
+    }
+
+    static ObjectIdentity getObjectIdentity(CSpaceResource res) {
+        return new ObjectIdentityImpl(getObjectIdentityType(res),
+                getObjectIdentityIdentifier(res));
+    }
+
+    static Sid[] getSids(String[] principals) {
         ArrayList<Sid> sids = new ArrayList<Sid>();
         for (String principal : principals) {
             sids.add(new GrantedAuthoritySid(principal));
@@ -122,7 +130,7 @@ public class SpringAuthorizationProvider implements CSpaceAuthorizationProvider 
         return sids.toArray(new Sid[0]);
     }
 
-    static Permission mapAction(CSpaceAction perm) {
+    static Permission getPermission(CSpaceAction perm) {
         switch (perm) {
             case ADMIN:
                 return BasePermission.ADMINISTRATION;

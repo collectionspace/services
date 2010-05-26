@@ -12,9 +12,26 @@
     >
     <!-- begin movingimages.us tenant meta-data -->
     <tenant:tenantBinding
-        id="1" name="movingimages.us" displayName="Museum of Moving Images" version="0.1" repositoryDomain="default-domain">
+        id="1" name="movingimage.us" displayName="Museum of Moving Images" version="0.1" repositoryDomain="default-domain">
+        <!-- begin idgenerators service meta-data -->
+        <tenant:serviceBindings name="idgenerators" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+
+        </tenant:serviceBindings>
+        <!-- end idgenerator service meta-data -->
+            <!-- begin id service meta-data -->
+        <tenant:serviceBindings name="id" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /idgenerators/*/ids
+            </service:uriPath>
+        </tenant:serviceBindings>
         <tenant:serviceBindings name="CollectionObjects" type="object" version="0.1">
             <!-- begin collectionobject service meta-data -->
+            <!-- other URI paths using which this service could be accessed -->
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /collectionobjects/*/authorityrefs/
+            </service:uriPath>
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
                 nuxeo-java
             </service:repositoryClient>
@@ -24,11 +41,12 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.collectionobject.nuxeo.CollectionObjectValidatorHandler
             </service:validatorHandler>
-						<service:properties xmlns:service='http://collectionspace.org/services/common/service'>
-							<types:item><types:key>objectNameProperty</types:key><types:value>objectName</types:value></types:item>
-							<types:item><types:key>objectNumberProperty</types:key><types:value>objectNumber</types:value></types:item>
-						</service:properties>															
-		<service:object name="CollectionObject" version="0.1"
+            <service:properties xmlns:service='http://collectionspace.org/services/common/service'>
+                <types:item><types:key>objectNameProperty</types:key><types:value>objectName</types:value></types:item>
+                <types:item><types:key>objectNumberProperty</types:key><types:value>objectNumber</types:value></types:item>
+            </service:properties>
+            <!-- end id service meta-data -->
+            <service:object name="CollectionObject" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
                               versionable="true" auditable="false"
@@ -71,6 +89,10 @@
         <!--end collectionobject service meta-data -->
         <!-- begin intake service meta-data -->
         <tenant:serviceBindings name="Intakes" type="procedure" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /intakes/*/authorityrefs/
+            </service:uriPath>
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
                 nuxeo-java
             </service:repositoryClient>
@@ -80,11 +102,11 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.intake.nuxeo.IntakeValidatorHandler
             </service:validatorHandler>
-						<service:properties xmlns:service='http://collectionspace.org/services/common/service'>
-							<!-- What to use for name??? 
-							<types:item><types:key>objectNameProperty</types:key><types:value>objectName</types:value></types:item> -->
-							<types:item><types:key>objectNumberProperty</types:key><types:value>entryNumber</types:value></types:item>
-						</service:properties>															
+            <service:properties xmlns:service='http://collectionspace.org/services/common/service'>
+                <!-- What to use for name???
+                                                        <types:item><types:key>objectNameProperty</types:key><types:value>objectName</types:value></types:item> -->
+                <types:item><types:key>objectNumberProperty</types:key><types:value>entryNumber</types:value></types:item>
+            </service:properties>
             <service:object name="Intake" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -120,6 +142,10 @@
         <!-- end intake service meta-data -->
         <!-- begin loanin service meta-data -->
         <tenant:serviceBindings name="Loansin" type="procedure" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /loansin/*/authorityrefs/
+            </service:uriPath>
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
                 nuxeo-java
             </service:repositoryClient>
@@ -129,11 +155,11 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.loanin.nuxeo.LoaninValidatorHandler
             </service:validatorHandler>
-						<service:properties xmlns:service='http://collectionspace.org/services/common/service'>
-							<!-- What to use for name??? 
-							<types:item><types:key>objectNameProperty</types:key><types:value>objectName</types:value></types:item> -->
-							<types:item><types:key>objectNumberProperty</types:key><types:value>loanInNumber</types:value></types:item>
-						</service:properties>															
+            <service:properties xmlns:service='http://collectionspace.org/services/common/service'>
+                <!-- What to use for name???
+                                                        <types:item><types:key>objectNameProperty</types:key><types:value>objectName</types:value></types:item> -->
+                <types:item><types:key>objectNumberProperty</types:key><types:value>loanInNumber</types:value></types:item>
+            </service:properties>
             <service:object name="Loanin" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -167,6 +193,10 @@
         <!-- end loanin service meta-data -->
         <!-- begin loanout service meta-data -->
         <tenant:serviceBindings name="Loansout" type="procedure" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /loansout/*/authorityrefs/
+            </service:uriPath>
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
                 nuxeo-java
             </service:repositoryClient>
@@ -196,7 +226,7 @@
                         <types:item><types:key>authRef</types:key><types:value>borrowersContact</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>lendersAuthorizer</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>lendersContact</types:value></types:item>
-											</service:properties>
+                    </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/loanout"
@@ -209,6 +239,10 @@
         <!-- end loanout service meta-data -->
         <!-- begin movement service meta-data -->
         <tenant:serviceBindings name="Movements" type="procedure" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /movements/*/authorityrefs/
+            </service:uriPath>
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
                 nuxeo-java
             </service:repositoryClient>
@@ -238,7 +272,7 @@
                         <!-- <types:item><types:key>authRef</types:key><types:value>currentLocation</types:value></types:item> -->
                         <!-- <types:item><types:key>authRef</types:key><types:value>normalLocation</types:value></types:item> -->
                         <types:item><types:key>authRef</types:key><types:value>movementContact</types:value></types:item>
-		    </service:properties>
+                    </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/movement"
@@ -251,6 +285,8 @@
         <!-- end movement service meta-data -->
         <!-- begin vocabulary service meta-data -->
         <tenant:serviceBindings name="Vocabularies" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
                 nuxeo-java
             </service:repositoryClient>
@@ -288,6 +324,10 @@
                         Repository workspace so we have to configure that.
         -->
         <tenant:serviceBindings name="Vocabularyitems" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /vocabularies/*/items/
+            </service:uriPath>
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
                 nuxeo-java
             </service:repositoryClient>
@@ -324,6 +364,10 @@
         <!-- end vocabulary service meta-data -->
         <!-- begin orgauthority service meta-data -->
         <tenant:serviceBindings name="Orgauthorities" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /orgauthorities/*/items/*/authorityrefs/
+            </service:uriPath>
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
                 nuxeo-java
             </service:repositoryClient>
@@ -360,6 +404,13 @@
                         Repository workspace so we have to configure that.
         -->
         <tenant:serviceBindings name="Organizations" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /orgauthorities/*/items/
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /orgauthorities/*/items/*/refObjs
+            </service:uriPath>
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
                 nuxeo-java
             </service:repositoryClient>
@@ -384,9 +435,9 @@
                 <service:part id="1" control_group="Managed"
                               versionable="true" auditable="false"
                               label="organizations_common" updated="" order="1">
-										<service:properties>
-											<types:item><types:key>authRef</types:key><types:value>contactName</types:value></types:item>
-										</service:properties>
+                    <service:properties>
+                        <types:item><types:key>authRef</types:key><types:value>contactName</types:value></types:item>
+                    </service:properties>
 
                     <service:content contentType="application/xml">
                         <service:xmlContent
@@ -400,6 +451,13 @@
         <!-- end organization service meta-data -->
         <!-- begin personauthority service meta-data -->
         <tenant:serviceBindings name="Personauthorities" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /personauthorities/*/items/
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /personauthorities/*/items/*/refObjs
+            </service:uriPath>
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
                 nuxeo-java
             </service:repositoryClient>
@@ -436,6 +494,10 @@
                         Repository workspace so we have to configure that.
         -->
         <tenant:serviceBindings name="Persons" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /personauthorities/*/items/
+            </service:uriPath>
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
                 nuxeo-java
             </service:repositoryClient>
@@ -472,6 +534,10 @@
         <!-- end person service meta-data -->
         <!-- begin locationauthority service meta-data -->
         <tenant:serviceBindings name="Locationauthorities" version="0.1">
+                        <!-- other URI paths using which this service could be accessed -->
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /locationauthorities/*/items/
+            </service:uriPath>
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
                 nuxeo-java
             </service:repositoryClient>
@@ -544,6 +610,10 @@
         <!-- end location service meta-data -->
         <!-- begin acquisition service meta-data -->
         <tenant:serviceBindings name="Acquisitions" type="procedure" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /acquisitions/*/authorityrefs/
+            </service:uriPath>
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
                 nuxeo-java
             </service:repositoryClient>
@@ -553,11 +623,11 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.acquisition.nuxeo.AcquisitionValidatorHandler
             </service:validatorHandler>
-						<service:properties xmlns:service='http://collectionspace.org/services/common/service'>
-							<!-- What to use for name??? 
-							<types:item><types:key>objectNameProperty</types:key><types:value>objectName</types:value></types:item> -->
-							<types:item><types:key>objectNumberProperty</types:key><types:value>acquisitionReferenceNumber</types:value></types:item>
-						</service:properties>															
+            <service:properties xmlns:service='http://collectionspace.org/services/common/service'>
+                <!-- What to use for name???
+                                                        <types:item><types:key>objectNameProperty</types:key><types:value>objectName</types:value></types:item> -->
+                <types:item><types:key>objectNumberProperty</types:key><types:value>acquisitionReferenceNumber</types:value></types:item>
+            </service:properties>
             <service:object name="Acquisition" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -591,6 +661,10 @@
         <!-- end acquisition service meta-data -->
         <!-- begin relation service meta-data -->
         <tenant:serviceBindings name="Relations" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->'
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                relations/subject/*/type/*/object/*
+            </service:uriPath>
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
                 nuxeo-java
             </service:repositoryClient>
@@ -627,6 +701,8 @@
         <!-- end relation service meta-data -->
         <!-- begin account service meta-data -->
         <tenant:serviceBindings name="Accounts" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.account.storage.AccountDocumentHandler
             </service:documentHandler>
@@ -660,6 +736,8 @@
         <!-- end account service meta-data -->
         <!-- begin dimension service meta-data -->
         <tenant:serviceBindings name="Dimensions" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
                 nuxeo-java
             </service:repositoryClient>
@@ -693,6 +771,13 @@
         <!-- end dimension service meta-data -->
         <!-- begin contact service meta-data -->
         <tenant:serviceBindings name="Contacts" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /personauthorities/*/items/*/contacts
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /orgauthorities/*/items/*/contacts
+            </service:uriPath>
             <service:repositoryClient xmlns:service='http://collectionspace.org/services/common/service'>
                 nuxeo-java
             </service:repositoryClient>
@@ -759,6 +844,8 @@
         <!-- end note service meta-data -->
         <!-- begin role service meta-data -->
         <tenant:serviceBindings name="authorization/roles" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.authorization.storage.RoleDocumentHandler
             </service:documentHandler>
@@ -792,6 +879,8 @@
         <!-- end role service meta-data -->
         <!-- begin permission service meta-data -->
         <tenant:serviceBindings name="authorization/permissions" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.authorization.storage.PermissionDocumentHandler
             </service:documentHandler>
@@ -824,7 +913,11 @@
         </tenant:serviceBindings>
         <!-- end permission service meta-data -->
         <!-- begin permission-role service meta-data -->
-        <tenant:serviceBindings name="authorization/permroles" version="0.1">
+        <tenant:serviceBindings name="authorization/permissions/permroles" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /authorization/permissions/*/permroles/
+            </service:uriPath>
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.authorization.storage.PermissionRoleDocumentHandler
             </service:documentHandler>
@@ -858,13 +951,17 @@
         <!-- end permission-role service meta-data -->
         <!-- begin account-role service meta-data -->
         <tenant:serviceBindings name="accounts/accountroles" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /accounts/*/accountroles/
+            </service:uriPath>
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.account.storage.AccountRoleDocumentHandler
             </service:documentHandler>
             <!--service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.account.storage.AccountRoleDocumentHandler
             </service:validatorHandler-->
-            <service:object name="PermissionRole" version="0.1"
+            <service:object name="AccountRole" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
                               versionable="true" auditable="false"

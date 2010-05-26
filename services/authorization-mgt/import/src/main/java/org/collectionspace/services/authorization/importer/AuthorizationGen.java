@@ -60,6 +60,7 @@ public class AuthorizationGen {
     private List<PermissionRole> permRoleList = new ArrayList<PermissionRole>();
     private Hashtable<String, TenantBindingType> tenantBindings =
             new Hashtable<String, TenantBindingType>();
+    final public static String ROLE_ADMINISTRATOR = "ROLE_ADMINISTRATOR";
 
     public void initialize(String tenantBindingFileName) throws Exception {
         TenantBindingConfigReaderImpl tenantBindingConfigReader =
@@ -70,7 +71,6 @@ public class AuthorizationGen {
             logger.debug("initialized with tenant bindings from " + tenantBindingFileName);
         }
     }
-
 
     public void createDefaultServicePermissions() {
         for (String tenantId : tenantBindings.keySet()) {
@@ -83,14 +83,24 @@ public class AuthorizationGen {
         ArrayList<Permission> apcList = new ArrayList<Permission>();
         TenantBindingType tbinding = tenantBindings.get(tenantId);
         for (ServiceBindingType sbinding : tbinding.getServiceBindings()) {
-            Permission accPerm = buildCommonPermission(tbinding.getId(),
-                    sbinding.getName());
-            apcList.add(accPerm);
+
+            //add permissions for the main path
+            Permission perm = buildCommonPermission(tbinding.getId(),
+                    sbinding.getName().toLowerCase());
+            apcList.add(perm);
+
+            //add permissions for alternate paths
+            List<String> uriPaths = sbinding.getUriPath();
+            for (String uriPath : uriPaths) {
+                perm = buildCommonPermission(tbinding.getId(),
+                        uriPath.toLowerCase());
+                apcList.add(perm);
+            }
+
         }
         return apcList;
 
     }
-
 
     private Permission buildCommonPermission(String tenantId, String resourceName) {
         String id = UUID.randomUUID().toString();
@@ -124,26 +134,33 @@ public class AuthorizationGen {
         return permList;
     }
 
-    public void createDefaultPermissionsRoles(String roleName) {
+    public void createDefaultPermissionsRoles() {
         for (Permission p : permList) {
-            PermissionRole permRole = buildCommonPermissionRoles(p.getTenantId(), p.getCsid(),
-                    p.getResourceName(), roleName);
-            permRoleList.add(permRole);
+            TenantBindingType tbinding = tenantBindings.get(p.getTenantId());
+//            String tenantAdminRole = getTenantAdminRole(tbinding.getName());
+//            PermissionRole permRole = buildCommonPermissionRoles(p.getTenantId(), p.getCsid(),
+//                    p.getResourceName(), tenantAdminRole, "999");
+//            permRoleList.add(permRole);
+
+            //CSpace Administrator has all access
+            PermissionRole permAdmRole = buildCommonPermissionRoles(p.getTenantId(), p.getCsid(),
+                    p.getResourceName(), ROLE_ADMINISTRATOR, "1");
+            permRoleList.add(permAdmRole);
         }
     }
 
-    public List<PermissionRole> createPermissionsRoles(List<Permission> perms, String roleName) {
+    public List<PermissionRole> createPermissionsRoles(List<Permission> perms, String roleName, String roleId) {
         List<PermissionRole> permRoles = new ArrayList<PermissionRole>();
         for (Permission p : perms) {
             PermissionRole permRole = buildCommonPermissionRoles(p.getTenantId(), p.getCsid(),
-                    p.getResourceName(), roleName);
+                    p.getResourceName(), roleName, roleId);
             permRoles.add(permRole);
         }
         return permRoles;
     }
 
     private PermissionRole buildCommonPermissionRoles(String tenantId, String permId,
-            String resName, String roleName) {
+            String resName, String roleName, String roleId) {
 
         PermissionRole pr = new PermissionRole();
         pr.setSubject(SubjectType.ROLE);
@@ -157,11 +174,22 @@ public class AuthorizationGen {
         List<RoleValue> roleValues = new ArrayList<RoleValue>();
         RoleValue radmin = new RoleValue();
         radmin.setRoleName(roleName.toUpperCase());
-        radmin.setRoleId(tenantId);
+        radmin.setRoleId(roleId);
         roleValues.add(radmin);
         pr.setRoles(roleValues);
 
         return pr;
+    }
+
+    /**
+     * getTenantAdminRole generates role for tenant administrator
+     * @param tenantName
+     * @return
+     */
+    private String getTenantAdminRole(String tenantName) {
+        tenantName = tenantName.toUpperCase();
+        tenantName = tenantName.replace(' ', '_');
+        return ROLE_ADMINISTRATOR + "_" + tenantName;
     }
 
     public List<PermissionRole> getDefaultServicePermissionRoles() {

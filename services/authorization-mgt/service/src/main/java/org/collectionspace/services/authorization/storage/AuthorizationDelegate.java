@@ -29,16 +29,17 @@ import org.collectionspace.services.authorization.ActionType;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceAction;
 import org.collectionspace.services.authorization.CSpaceResource;
+import org.collectionspace.services.authorization.EffectType;
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.PermissionAction;
 import org.collectionspace.services.authorization.PermissionException;
-import org.collectionspace.services.authorization.PermissionNotFoundException;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.authorization.URIResourceImpl;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,18 +66,32 @@ public class AuthorizationDelegate {
         AuthZ authz = AuthZ.get();
         if (subject.equals(SubjectType.ROLE)) {
             PermissionValue pv = pr.getPermissions().get(0);
-            CSpaceResource[] resources = getResources(pv.getPermissionId());
+            Permission p = getPermission(pv.getPermissionId());
+            if (p == null) {
+                String msg = "addPermissions: No permission found for id=" + pv.getPermissionId();
+                logger.error(msg);
+                throw new DocumentNotFoundException(msg);
+            }
+            CSpaceResource[] resources = getResources(p);
             String[] roles = getRoles(pr.getRoles());
             for (CSpaceResource res : resources) {
-                authz.addPermissions(res, roles);
+                boolean grant = p.getEffect().equals(EffectType.PERMIT) ? true : false;
+                authz.addPermissions(res, roles, grant);
             }
         } else if (SubjectType.PERMISSION.equals(subject)) {
             RoleValue rv = pr.getRoles().get(0);
             String[] roles = {rv.getRoleName()};
             for (PermissionValue pv : pr.getPermissions()) {
-                CSpaceResource[] resources = getResources(pv.getPermissionId());
+                Permission p = getPermission(pv.getPermissionId());
+                if (p == null) {
+                    String msg = "addPermissions: No permission found for id=" + pv.getPermissionId();
+                    logger.error(msg);
+                    continue;
+                }
+                CSpaceResource[] resources = getResources(p);
                 for (CSpaceResource res : resources) {
-                    authz.addPermissions(res, roles);
+                    boolean grant = p.getEffect().equals(EffectType.PERMIT) ? true : false;
+                    authz.addPermissions(res, roles, grant);
                 }
             }
         }
@@ -111,7 +126,13 @@ public class AuthorizationDelegate {
      * @throws Exception
      */
     static public void deletePermissions(String permCsid) throws Exception {
-        CSpaceResource[] resources = getResources(permCsid);
+        Permission p = getPermission(permCsid);
+        if (p == null) {
+            String msg = "deletePermissions: No permission found for id=" + permCsid;
+            logger.error(msg);
+            throw new DocumentNotFoundException(msg);
+        }
+        CSpaceResource[] resources = getResources(p);
         AuthZ authz = AuthZ.get();
 
         for (CSpaceResource res : resources) {
@@ -119,13 +140,11 @@ public class AuthorizationDelegate {
                 authz.deletePermissions(res);
             } catch (PermissionException pe) {
                 //perms are created downthere only if roles are related to the permissions
-                logger.info("no permissions found in authz service provider for " +
-                        "permCsid=" + permCsid + " res=" + res.getId());
+                logger.info("no permissions found in authz service provider for "
+                        + "permCsid=" + permCsid + " res=" + res.getId());
             }
         }
     }
-
-
 
     /**
      * getRoles get roles (string) array from given RoleValue list
@@ -151,19 +170,22 @@ public class AuthorizationDelegate {
      * @see PermissionValue
      * @see CSpaceResource
      */
-    private static CSpaceResource[] getResources(String permCsid) {
+    private static CSpaceResource[] getResources(Permission p) {
         List<CSpaceResource> rl = new ArrayList<CSpaceResource>();
-        Permission p = (Permission) JpaStorageUtils.getEntity(permCsid,
-                Permission.class);
-        if (p != null) {
-            for (PermissionAction pa : p.getActions()) {
 
-                CSpaceResource res = new URIResourceImpl(p.getResourceName(),
-                        getAction(pa.getName()));
-                rl.add(res);
-            }
+        for (PermissionAction pa : p.getActions()) {
+
+            CSpaceResource res = new URIResourceImpl(p.getResourceName(),
+                    getAction(pa.getName()));
+            rl.add(res);
         }
         return rl.toArray(new CSpaceResource[0]);
+    }
+
+    private static Permission getPermission(String permCsid) {
+        Permission p = (Permission) JpaStorageUtils.getEntity(permCsid,
+                Permission.class);
+        return p;
     }
 
     /**

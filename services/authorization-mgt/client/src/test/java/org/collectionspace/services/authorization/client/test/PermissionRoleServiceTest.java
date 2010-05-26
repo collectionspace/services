@@ -73,7 +73,8 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
     
     /** The all resource ids created. */
     private List<String> allResourceIdsCreated = new ArrayList<String>();
-    
+
+    final private static String TEST_SERVICE_NAME = "fakeservice";
     /** The perm values. */
     private Hashtable<String, PermissionValue> permValues = new Hashtable<String, PermissionValue>();
     
@@ -96,7 +97,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      */
     @BeforeClass(alwaysRun = true)
     public void seedData() {
-        String ra = "accounts";
+        String ra = TEST_SERVICE_NAME;
         String accPermId = createPermission(ra, EffectType.PERMIT);
         PermissionValue pva = new PermissionValue();
         pva.setResourceName(ra);
@@ -175,7 +176,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         setupCreate(testName);
 
         // Submit the request to the service and store the response.
-        PermissionValue pv = permValues.get("accounts");
+        PermissionValue pv = permValues.get(TEST_SERVICE_NAME);
         PermissionRole permRole = createPermissionRoleInstance(pv,
                 roleValues.values(), true, true);
         PermissionRoleClient client = new PermissionRoleClient();
@@ -254,7 +255,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         PermissionRoleClient client = new PermissionRoleClient();
         ClientResponse<PermissionRole> res = client.read(
-                permValues.get("accounts").getPermissionId(), "123");
+                permValues.get(TEST_SERVICE_NAME).getPermissionId(), "123");
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -383,7 +384,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         PermissionRoleClient client = new PermissionRoleClient();
         ClientResponse<Response> res = client.delete(
-                permValues.get("accounts").getPermissionId(), "123");
+                permValues.get(TEST_SERVICE_NAME).getPermissionId(), "123");
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -424,7 +425,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         String method = ServiceRequestType.READ.httpMethodName();
-        String url = getResourceURL(permValues.get("accounts").getPermissionId());
+        String url = getResourceURL(permValues.get(TEST_SERVICE_NAME).getPermissionId());
         int statusCode = submitRequest(method, url);
 
         // Check the status code of the response: does it match

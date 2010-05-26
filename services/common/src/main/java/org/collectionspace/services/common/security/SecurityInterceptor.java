@@ -37,7 +37,9 @@ import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.HttpRequest;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.authorization.AuthZ;
@@ -67,22 +69,23 @@ public class SecurityInterceptor implements PreProcessInterceptor {
         if (logger.isDebugEnabled()) {
             logger.debug("received " + httpMethod + " on " + uriPath);
         }
+        String resName = getResourceName(request.getUri());
         checkActive();
-        if (uriPath.startsWith("dimensions")) {
-             AuthZ authZ = AuthZ.get();
-            CSpaceResource res = new URIResourceImpl(uriPath, httpMethod);
-            if (!authZ.isAccessAllowed(res)) {
-                logger.error("Access to " + res.getId() + " is NOT allowed to "
-                        + " user=" + AuthN.get().getUserId());
-                Response response = Response.status(
-                        Response.Status.FORBIDDEN).entity(uriPath + " " + httpMethod).type("text/plain").build();
-                throw new WebApplicationException(response);
-            }
-            if (logger.isDebugEnabled()) {
-                logger.debug("Access to " + res.getId() + " is allowed to "
-                        + " user=" + AuthN.get().getUserId());
-            }
+//        if (uriPath.startsWith("dimensions")) {
+        AuthZ authZ = AuthZ.get();
+        CSpaceResource res = new URIResourceImpl(resName, httpMethod);
+        if (!authZ.isAccessAllowed(res)) {
+            logger.error("Access to " + res.getId() + " is NOT allowed to "
+                    + " user=" + AuthN.get().getUserId());
+            Response response = Response.status(
+                    Response.Status.FORBIDDEN).entity(uriPath + " " + httpMethod).type("text/plain").build();
+            throw new WebApplicationException(response);
         }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Access to " + res.getId() + " is allowed to "
+                    + " user=" + AuthN.get().getUserId());
+        }
+//        }
         return null;
     }
 
@@ -125,5 +128,29 @@ public class SecurityInterceptor implements PreProcessInterceptor {
                     Response.Status.FORBIDDEN).entity(msg).type("text/plain").build();
             throw new WebApplicationException(response);
         }
+    }
+
+    private String getResourceName(UriInfo uriInfo) {
+        String uriPath = uriInfo.getPath();
+        MultivaluedMap<String, String> pathParams = uriInfo.getPathParameters();
+        for (String pathParamName : pathParams.keySet()) {
+            //assumption : path params for csid for any entity has substring csid in name
+            String pathParamValue = pathParams.get(pathParamName).get(0);
+            if ((pathParamName.toLowerCase().indexOf("csid") > -1)) {
+                //replace csids with wildcard
+                uriPath = uriPath.replace(pathParamValue, "*");
+            }
+            if ((pathParamName.toLowerCase().indexOf("predicate") > -1)) {
+                //replace csids with wildcard
+                uriPath = uriPath.replace(pathParamValue, "*");
+            }
+            if (pathParamName.toLowerCase().indexOf("specifier") > -1) {
+                //replace name and specifiers with wildcard
+                uriPath = uriPath.replace("urn:cspace:name(" + pathParamValue
+                        + ")", "*");
+            }
+        }
+        uriPath = uriPath.replace("//", "/");
+        return uriPath;
     }
 }

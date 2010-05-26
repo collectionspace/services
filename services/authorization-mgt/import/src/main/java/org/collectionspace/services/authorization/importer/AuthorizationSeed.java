@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceAction;
+import org.collectionspace.services.authorization.EffectType;
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.PermissionAction;
 import org.collectionspace.services.authorization.PermissionException;
@@ -117,7 +118,8 @@ public class AuthorizationSeed {
             CSpaceAction action = getAction(permAction.getName());
             URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(),
                     perm.getResourceName(), action);
-            AuthZ.get().addPermissions(uriRes, principals.toArray(new String[0]));
+            boolean grant = perm.getEffect().equals(EffectType.PERMIT) ? true : false;
+            AuthZ.get().addPermissions(uriRes, principals.toArray(new String[0]), grant);
         }
     }
 

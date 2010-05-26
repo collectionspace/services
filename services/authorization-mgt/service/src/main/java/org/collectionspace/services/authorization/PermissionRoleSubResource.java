@@ -41,15 +41,20 @@ import org.slf4j.LoggerFactory;
 public class PermissionRoleSubResource
         extends AbstractCollectionSpaceResourceImpl<PermissionRole, PermissionRole> {
 
+    public final static String ROLE_PERMROLE_SERVICE = "authorization/roles/permroles";
+    public final static String PERMISSION_PERMROLE_SERVICE = "authorization/permissions/permroles";
     //this service is never exposed as standalone RESTful service...just use unique
     //service name to identify binding
     /** The service name. */
-    final private String serviceName = "authorization/permroles";
+    private String serviceName = "authorization/permroles";
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(PermissionRoleSubResource.class);
     /** The storage client. */
     final StorageClient storageClient = new JpaRelationshipStorageClient<PermissionRole>();
 
+    public PermissionRoleSubResource(String serviceName) {
+        this.serviceName = serviceName;
+    }
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
      */
@@ -177,7 +182,6 @@ public class PermissionRoleSubResource
             logger.debug("deletePermissionRole with csid=" + csid);
         }
         ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext((PermissionRole) null, subject);
-        DocumentHandler handler = createDocumentHandler(ctx);
-        getStorageClient(ctx).delete(ctx, csid, handler);
+        getStorageClient(ctx).delete(ctx, csid);
     }
 }

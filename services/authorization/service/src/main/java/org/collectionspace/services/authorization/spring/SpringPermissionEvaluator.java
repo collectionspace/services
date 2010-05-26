@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.authorization.spring;
 
+import java.io.Serializable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.collectionspace.services.authorization.CSpaceAction;
@@ -48,13 +49,13 @@ public class SpringPermissionEvaluator implements CSpacePermissionEvaluator {
     }
 
     @Override
-    public boolean hasPermission(CSpaceResource res, CSpaceAction perm) {
-        PermissionEvaluator eval = provider.getProviderPermissionEvaluator();
-        Permission p = SpringAuthorizationProvider.mapAction(perm);
+    public boolean hasPermission(CSpaceResource res, CSpaceAction action) {
+        Permission perm = SpringAuthorizationProvider.getPermission(action);
         Authentication authToken = SecurityContextHolder.getContext().getAuthentication();
+        Serializable objectIdId = SpringAuthorizationProvider.getObjectIdentityIdentifier(res);
+        String objectIdType = SpringAuthorizationProvider.getObjectIdentityType(res);
+        PermissionEvaluator eval = provider.getProviderPermissionEvaluator();
         return eval.hasPermission(authToken,
-                Long.valueOf(res.getId().hashCode()),
-                res.getType().toString(),
-                p);
+                objectIdId, objectIdType, perm);
     }
 }

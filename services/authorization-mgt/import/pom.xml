@@ -116,40 +116,45 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <finalName>cspace-services-authorization-mgt-import</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <systemProperties>
-                        <property>
-                            <name>log4j.configuration</name>
-                            <value>file:${project.build.directory}/test-classes/log4j.properties</value>
-                        </property>
-                        <property>
-                            <name>importdir</name>
-                            <value>${basedir}/src/main/resources/import-data/</value>
-                        </property>
-                        <property>
-                            <name>exportdir</name>
-                            <value>${basedir}/src/main/resources/import-data/</value>
-                        </property>
-                        <property>
-                            <name>tenantbindings</name>
-                            <value>${basedir}/../../common/src/main/config/services/tenant-bindings.xml</value>
-                        </property>
-                        <property>
-                            <name>spring-beans-config</name>
-                            <value>applicationContext-authorization-test.xml</value>
-                        </property>
-                    </systemProperties>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <!-- use profile as this task is not needed for every build and test -->
+    <!--profiles>
+        <profile>
+            <id>import</id-->
+            <build>
+                <finalName>cspace-services-authorization-mgt-import</finalName>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <systemProperties>
+                                <property>
+                                    <name>log4j.configuration</name>
+                                    <value>file:${project.build.directory}/test-classes/log4j.properties</value>
+                                </property>
+                                <property>
+                                    <name>importdir</name>
+                                    <value>${basedir}/src/main/resources/import-data/</value>
+                                </property>
+                                <property>
+                                    <name>exportdir</name>
+                                    <value>${basedir}/src/main/resources/import-data/</value>
+                                </property>
+                                <property>
+                                    <name>tenantbindings</name>
+                                    <value>${basedir}/../../common/src/main/config/services/tenant-bindings.xml</value>
+                                </property>
+                                <property>
+                                    <name>spring-beans-config</name>
+                                    <value>applicationContext-authorization-test.xml</value>
+                                </property>
+                            </systemProperties>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        <!--/profile>
+    </profiles-->
 
 </project>
 

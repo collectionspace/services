@@ -41,7 +41,7 @@ public class URIResourceImpl extends CSpaceResourceImpl {
      * @param method an http method
      */
     public URIResourceImpl(String uri, String method) {
-        super(buildId(getParent(uri), getAction(method)),
+        super(buildId(uri, getAction(method)),
                 getAction(method), TYPE.URI);
         this.uri = uri;
         this.method = method;
@@ -54,7 +54,7 @@ public class URIResourceImpl extends CSpaceResourceImpl {
      * @param method an http method
      */
     public URIResourceImpl(String tenantId, String uri, String method) {
-        super(tenantId, buildId(getParent(uri), getAction(method)),
+        super(tenantId, buildId(uri, getAction(method)),
                 getAction(method), TYPE.URI);
         this.uri = uri;
         this.method = method;
@@ -63,7 +63,7 @@ public class URIResourceImpl extends CSpaceResourceImpl {
     /**
      * constructor that is usually called from administrative interface
      * uses current tenant id from the context
-     * @param resourceName
+     * @param resourceName no leading / and no trailing / needed
      * @param actionType
      */
     public URIResourceImpl(String resourceName, CSpaceAction action) {
@@ -75,7 +75,7 @@ public class URIResourceImpl extends CSpaceResourceImpl {
     /**
      * constructor that is usually called from administrative interface
      * @param tenantId id of the tenant to which this resource is associated
-     * @param resourceName
+     * @param resourceName no leading / and no trailing / needed
      * @param actionType
      */
     public URIResourceImpl(String tenantId, String resourceName, CSpaceAction action) {
@@ -98,13 +98,27 @@ public class URIResourceImpl extends CSpaceResourceImpl {
     }
 
     private static String buildId(String resourceName, CSpaceAction action) {
-        return resourceName + SEPARATOR_HASH + action.toString();
+        return sanitize(resourceName) + SEPARATOR_HASH + action.toString();
     }
 
     private static String getParent(String uri) {
         StringTokenizer stz = new StringTokenizer(uri, "/");
         //FIXME the following ignores sub resources as well as object instances
         return stz.nextToken();
+    }
+
+    private static String sanitize(String uri) {
+        uri = uri.trim();
+        if (uri.startsWith("/")) {
+            uri = uri.substring(1);
+        }
+        if (uri.endsWith("/")) {
+            uri = uri.substring(0, uri.length() - 1);
+        }
+        if (uri.endsWith("/*")) {
+            uri = uri.substring(0, uri.length() - 2);
+        }
+        return uri;
     }
 
     /**
@@ -123,8 +137,10 @@ public class URIResourceImpl extends CSpaceResourceImpl {
             return CSpaceAction.UPDATE;
         } else if ("DELETE".equalsIgnoreCase(method)) {
             return CSpaceAction.DELETE;
+        } else {
+            //for HEAD, OPTIONS, etc. return READ
+            return CSpaceAction.READ;
         }
-        throw new IllegalStateException("no method found!");
     }
 
     @Override

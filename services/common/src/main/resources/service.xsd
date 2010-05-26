@@ -32,6 +32,8 @@
 
     <xs:complexType name="ServiceBindingType">
         <xs:sequence>
+            <!-- other URI paths using which this service binding could be accessed -->
+            <xs:element name="uriPath" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
             <!-- object representation served by the service -->
             <xs:element name="object" type="ServiceObjectType" minOccurs="1" maxOccurs="1"/>
             <!-- document handler to be used to process the content (need to be in classpath) -->
@@ -44,8 +46,9 @@
             <!-- repositoryWorkspaceId could be workspace id -->
             <!-- used only for Nuxeo rest client -->
             <xs:element name="repositoryWorkspaceId" type="xs:string" minOccurs="0" maxOccurs="1"/>
-						<xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
+        <!-- name of the service, this is also the default URI path to access this service binding -->
         <xs:attribute name="name" type="xs:string" use="required"/>
         <xs:attribute name="type" type="xs:string" use="optional"/>
         <xs:attribute name="version" type="types:VersionType" use="required"/>

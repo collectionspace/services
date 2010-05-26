@@ -48,7 +48,8 @@ public class AuthorizationSeedTest extends AbstractAuthorizationTestImpl {
             String tenantBindingFile = getTenantBindingFile();
             authzGen.initialize(tenantBindingFile);
             authzGen.createDefaultServicePermissions();
-            authzGen.createDefaultPermissionsRoles("ROLE_ADMINISTRATOR");
+            //create default role(s) for the tenant and assign permissions
+            authzGen.createDefaultPermissionsRoles();
             String exportDir = getExportDir();
             authzGen.exportPermissions(exportDir + PERMISSION_FILE);
             authzGen.exportPermissionRoles(exportDir + PERMISSION_ROLE_FILE);

@@ -79,11 +79,11 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
 
         if (ctx == null) {
             throw new IllegalArgumentException(
-                    "JpaRelationshipStorageClient.create : ctx is missing");
+                    "create : ctx is missing");
         }
         if (handler == null) {
             throw new IllegalArgumentException(
-                    "JpaRelationshipStorageClient.create: handler is missing");
+                    "create: handler is missing");
         }
         EntityManagerFactory emf = null;
         EntityManager em = null;
@@ -137,14 +137,14 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             throws DocumentNotFoundException, DocumentException {
         if (ctx == null) {
             throw new IllegalArgumentException(
-                    "JpaRelationshipStorageClient.get: ctx is missing");
+                    "get: ctx is missing");
         }
         if (handler == null) {
             throw new IllegalArgumentException(
-                    "JpaRelationshipStorageClient.get: handler is missing");
+                    "get: handler is missing");
         }
         if (getObject(ctx, id) == null) {
-            String msg = "JpaRelationshipStorageClient.get: "
+            String msg = "get: "
                     + "could not find the object entity with id=" + id;
             logger.error(msg);
             throw new DocumentNotFoundException(msg);
@@ -188,13 +188,13 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
                 if (em != null && em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
                 }
-                String msg = "JpaRelationshipStorageClient.get: "
+                String msg = "get: "
                         + " could not find entity with id=" + id;
                 logger.error(msg, nre);
                 throw new DocumentNotFoundException(msg, nre);
             }
             if (rl.size() == 0) {
-                String msg = "JpaRelationshipStorageClient.get: "
+                String msg = "get: "
                         + " could not find entity with id=" + id;
                 logger.error(msg);
                 throw new DocumentNotFoundException(msg);
@@ -232,10 +232,10 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
 
         if (ctx == null) {
             throw new IllegalArgumentException(
-                    "JpaRelationshipStorageClient.delete : ctx is missing");
+                    "delete : ctx is missing");
         }
         if (getObject(ctx, id) == null) {
-            String msg = "JpaRelationshipStorageClient.delete : "
+            String msg = "delete : "
                     + "could not find the object entity with id=" + id;
             logger.error(msg);
             throw new DocumentNotFoundException(msg);

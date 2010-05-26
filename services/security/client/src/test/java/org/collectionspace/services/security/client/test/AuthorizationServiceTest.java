@@ -101,6 +101,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     private Hashtable<String, RoleValue> roleValues = new Hashtable<String, RoleValue>();
     private String bigbirdPermId;
     private String elmoPermId;
+    private final static String TEST_SERVICE_NAME = "dimensions";
     /*
      * This method is called only by the parent class, AbstractServiceTestImpl
      */
@@ -120,7 +121,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     }
 
     private void seedPermissions() {
-        String res = "dimensions";
+        String res = TEST_SERVICE_NAME;
 
         PermissionAction pac = new PermissionAction();
         pac.setName(ActionType.CREATE);
@@ -153,14 +154,14 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     }
 
     private void seedRoles() {
-        String rn1 = "ROLE_MMI_CM";
+        String rn1 = "ROLE_TEST_CM";
         String r1RoleId = createRole(rn1);
         RoleValue rv1 = new RoleValue();
         rv1.setRoleId(r1RoleId);
         rv1.setRoleName(rn1);
         roleValues.put(rv1.getRoleName(), rv1);
 
-        String rn2 = "ROLE_MMI_INTERN";
+        String rn2 = "ROLE_TEST_INTERN";
         String r2RoleId = createRole(rn2);
         RoleValue rv2 = new RoleValue();
         rv2.setRoleId(r2RoleId);
@@ -189,22 +190,22 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     private void seedAccountRoles() {
 
         List<RoleValue> bigbirdRoleValues = new ArrayList<RoleValue>();
-        bigbirdRoleValues.add(roleValues.get("ROLE_MMI_CM"));
+        bigbirdRoleValues.add(roleValues.get("ROLE_TEST_CM"));
         createAccountRole(accValues.get("bigbird2010"), bigbirdRoleValues);
 
         List<RoleValue> elmoRoleValues = new ArrayList<RoleValue>();
-        elmoRoleValues.add(roleValues.get("ROLE_MMI_INTERN"));
+        elmoRoleValues.add(roleValues.get("ROLE_TEST_INTERN"));
         createAccountRole(accValues.get("elmo2010"), elmoRoleValues);
     }
 
     private void seedPermissionRoles() {
 
         List<RoleValue> bigbirdRoleValues = new ArrayList<RoleValue>();
-        bigbirdRoleValues.add(roleValues.get("ROLE_MMI_CM"));
+        bigbirdRoleValues.add(roleValues.get("ROLE_TEST_CM"));
         createPermissionRole(permValues.get(bigbirdPermId), bigbirdRoleValues);
 
         List<RoleValue> elmoRoleValues = new ArrayList<RoleValue>();
-        elmoRoleValues.add(roleValues.get("ROLE_MMI_INTERN"));
+        elmoRoleValues.add(roleValues.get("ROLE_TEST_INTERN"));
         createPermissionRole(permValues.get(elmoPermId), elmoRoleValues);
 
     }
@@ -502,9 +503,13 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
 
-        deletePermissionRoles();
+        //FIXME delete on permission role deletes all roles associated with the permission
+        //this would delete association with ROLE_ADMINISTRATION too
+        //deletePermissionRoles();
         deleteAccountRoles();
-        deletePermissions();
+        //FIXME delete on permission role deletes all roles associated with the permission
+        //this would delete association with ROLE_ADMINISTRATION too
+        //deletePermissions();
         deleteRoles();
         deleteAccounts();
     }

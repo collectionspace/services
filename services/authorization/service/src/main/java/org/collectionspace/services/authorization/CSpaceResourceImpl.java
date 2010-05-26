@@ -71,7 +71,7 @@ public abstract class CSpaceResourceImpl implements CSpaceResource {
         if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("id cannot be null or empty");
         }
-        this.id = id;
+        this.id = id.toLowerCase();
         if (type == null) {
             throw new IllegalArgumentException("type cannot be null");
         }

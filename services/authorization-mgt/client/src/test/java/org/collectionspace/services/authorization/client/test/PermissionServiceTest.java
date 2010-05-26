@@ -197,8 +197,8 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         setupCreate(testName);
         // Submit the request to the service and store the response.
         List<PermissionAction> actions = PermissionFactory.createDefaultActions();
-        Permission permission1 = createPermissionInstance("collectionobjects",
-                "default permissions for collectionobjects",
+        Permission permission1 = createPermissionInstance("test-objects",
+                "default permissions for test-objects",
                 actions,
                 EffectType.PERMIT,
                 true,
@@ -212,8 +212,8 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         allResourceIdsCreated.add(extractId(res));
 
-        Permission permission2 = createPermissionInstance("acquisitions",
-                "default permissions for acquisitions",
+        Permission permission2 = createPermissionInstance("test-acquisitions",
+                "default permissions for test-acquisitions",
                 actions,
                 EffectType.PERMIT,
                 true,
@@ -226,7 +226,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         allResourceIdsCreated.add(extractId(res));
 
-        Permission permission3 = createPermissionInstance("ids",
+        Permission permission3 = createPermissionInstance("test-ids",
                 "default permissions for id service",
                 actions,
                 EffectType.PERMIT,
@@ -549,8 +549,8 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         // The only relevant ID may be the one used in updatePermission(), below.
         PermissionClient client = new PermissionClient();
         List<PermissionAction> actions = PermissionFactory.createDefaultActions();
-        Permission permission = createPermissionInstance("acquisitions",
-                "default permissions for acquisitions",
+        Permission permission = createPermissionInstance("test-acquisitions",
+                "default permissions for test-acquisitions",
                 actions,
                 EffectType.PERMIT,
                 true,
