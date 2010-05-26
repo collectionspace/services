@@ -992,7 +992,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"deactivate", "readNonExistent", "testSubmitRequest"})
     public void updateWrongUser(String testName) throws Exception {
 
-        setupUpdate();
+        setupUpdate(testName);
 
         // Submit the request to the service and store the response.
         //

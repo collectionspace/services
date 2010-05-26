@@ -69,7 +69,8 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     final String TEST_PARTIAL_TERM_DISPLAY_NAME =
             TEST_PARTIAL_TERM_FORE_NAME + " " + TEST_PARTIAL_TERM_SUR_NAME;
 
-    // Non-existent test name for partial term matching
+    // Non-existent partial term name (first letters of each of the words
+    // in a pangram for the English alphabet).
     private static final String TEST_PARTIAL_TERM_NON_EXISTENT = "jlmbsoq";
 
     /** The known resource id. */
@@ -92,6 +93,10 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
 
     // The number of matches expected on each partial term.
     final int NUM_MATCHES_EXPECTED = 1;
+
+    // The minimum number of characters that must be included
+    // a partial term, in order to permit matching to occur.
+    final int PARTIAL_TERM_MIN_LENGTH = 1;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -122,6 +127,18 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         return TEST_PARTIAL_TERM_NON_EXISTENT;
     }
 
+    private String getPartialTermMinimumLength() {
+        String partialTerm = getPartialTerm();
+        if (partialTerm == null || partialTerm.trim().isEmpty()) {
+            return partialTerm;
+        }
+        if (getPartialTerm().length() > PARTIAL_TERM_MIN_LENGTH) {
+            return partialTerm.substring(0, PARTIAL_TERM_MIN_LENGTH);
+        } else {
+          return partialTerm;
+        }
+    }
+
     @BeforeClass
     public void setup() {
         try {
@@ -143,13 +160,13 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     // Success outcomes
 
     /**
-     * Read item list by partial term.
+     * Reads an item list by partial term.
      */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"readListByPartialTerm"})
     public void partialTermMatch(String testName) {
         if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName));
+            logger.debug(testBanner(testName, logger));
         }
         int numMatchesFound = 0;
         String partialTerm = getPartialTerm();
@@ -165,36 +182,50 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     }
 
     /**
-     * Read item list by partial term, where the match is case-insensitive.
-     * Tests by attempting a partial match on all-lowercase and all-uppercase
-     * variations of the partial term.
+     * Reads an item list by partial term, with a partial term that consists
+     * of an all-lowercase variation of the expected match, to test case-insensitive
+     * matching.
      */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
-    public void partialTermMatchCaseInsensitive(String testName) {
+    public void partialTermMatchCaseInsensitiveLowerCase(String testName) {
         if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName));
+            logger.debug(testBanner(testName, logger));
         }
         int numMatchesFound = 0;
 
-        final String PARTIAL_TERM_LOWERCASE = getPartialTerm().toLowerCase();
+        final String partialTerm = getPartialTerm().toLowerCase();
         if (logger.isDebugEnabled()) {
-            logger.debug("Attempting match on partial term '" + PARTIAL_TERM_LOWERCASE + "' ...");
+            logger.debug("Attempting match on partial term '" + partialTerm + "' ...");
         }
         numMatchesFound =
-            readItemListByPartialTerm(knownResourceId, PARTIAL_TERM_LOWERCASE);
+            readItemListByPartialTerm(knownResourceId, partialTerm);
                 if (logger.isDebugEnabled()) {
         logger.debug("Found " + numMatchesFound + " match(es), expected " +
                 NUM_MATCHES_EXPECTED + " match(es).");
         }
         Assert.assertEquals(numMatchesFound, NUM_MATCHES_EXPECTED);
+    }
 
-        final String PARTIAL_TERM_UPPERCASE = getPartialTerm().toUpperCase();
+    /**
+     * Reads an item list by partial term, with a partial term that consists
+     * of an all-uppercase variation of the expected match, to test case-insensitive
+     * matching.
+     */
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
+    public void partialTermMatchCaseInsensitiveUpperCase(String testName) {
         if (logger.isDebugEnabled()) {
-            logger.debug("Attempting match on partial term '" + PARTIAL_TERM_UPPERCASE + "' ...");
+            logger.debug(testBanner(testName, logger));
+        }
+        int numMatchesFound = 0;
+
+        final String partialTerm = getPartialTerm().toUpperCase();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Attempting match on partial term '" + partialTerm + "' ...");
         }
         numMatchesFound =
-            readItemListByPartialTerm(knownResourceId, PARTIAL_TERM_UPPERCASE);
+            readItemListByPartialTerm(knownResourceId, partialTerm);
         if (logger.isDebugEnabled()) {
             logger.debug("Found " + numMatchesFound + " match(es), expected " +
                 NUM_MATCHES_EXPECTED + " match(es).");
@@ -203,8 +234,32 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     }
 
     /**
-     * Read item list by partial term, with at least one Unicode UTF-8 character
-     * (outside the USASCII range) in the partial term.
+     * Reads an item list by partial term, with a partial term that is of
+     * the minimum character length that may be expected to be matched.
+     */
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
+    public void partialTermMatchMinimumLength(String testName) {
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, logger));
+        }
+        int numMatchesFound = 0;
+        String partialTerm = getPartialTermMinimumLength();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Attempting match on partial term '" + partialTerm + "' ...");
+        }
+        numMatchesFound = readItemListByPartialTerm(knownResourceId, partialTerm);
+        // Zero matches are expected on a non-existent term.
+        if (logger.isDebugEnabled()) {
+            logger.debug("Found " + numMatchesFound + " match(es), expected " +
+                NUM_MATCHES_EXPECTED + " match(es).");
+        }
+        Assert.assertEquals(numMatchesFound, NUM_MATCHES_EXPECTED);
+    }
+
+    /**
+     * Reads an item list by partial term, with a partial term that contains
+     * at least one Unicode UTF-8 character (outside the USASCII range).
      */
     // FIXME: Test currently fails with a true UTF-8 String - need to investigate why.
     // Will be commented out for now until we get this working ...
@@ -213,7 +268,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
     public void partialTermMatchUTF8(String testName) {
         if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName));
+            logger.debug(testBanner(testName, logger));
         }
         int numMatchesFound = 0;
         String partialTerm = getPartialTermUtf8();
@@ -233,14 +288,14 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     // Failure outcomes
 
     /**
-     * Read item list by partial term, where the partial term is not
+     * Reads an item list by partial term, with a partial term that is not
      * expected to be matched by any term in any resource.
      */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
     public void partialTermMatchOnNonexistentTerm(String testName) {
         if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName));
+            logger.debug(testBanner(testName, logger));
         }
         int numMatchesFound = 0;
         int ZERO_MATCHES_EXPECTED = 0;
@@ -258,21 +313,20 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     }
 
     /**
-     * Read item list by partial term.
+     * Reads an item list by partial term, given an authority and a term.
      *
-     * @param testName The name of the test which has invoked this method.
      * @param authorityCsid The CSID of the authority within which partial term matching
      *     will be performed.
      * @param partialTerm A partial term to match item resources.
      * @return The number of item resources matched by the partial term.
      */
-    private int readItemListByPartialTerm( String authorityCsid, String partialTerm) {
+    private int readItemListByPartialTerm(String authorityCsid, String partialTerm) {
 
         // Perform setup.
         int expectedStatusCode = Response.Status.OK.getStatusCode();
         ServiceRequestType requestType = ServiceRequestType.READ_LIST;
         String testName = "readItemListByPartialTerm";
-        testSetup(expectedStatusCode, requestType);
+        testSetup(expectedStatusCode, requestType, testName, logger);
 
 	// Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
@@ -362,6 +416,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         return SERVICE_PATH_COMPONENT;
     }
 
+
     // ---------------------------------------------------------------
     // Utilities: setup routines for search tests
     // ---------------------------------------------------------------
@@ -372,7 +427,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         int expectedStatusCode = Response.Status.CREATED.getStatusCode();
         ServiceRequestType requestType = ServiceRequestType.CREATE;
         String testName = "createPersonAuthority";
-        testSetup(expectedStatusCode, requestType, testName);
+        testSetup(expectedStatusCode, requestType, testName, logger);
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();

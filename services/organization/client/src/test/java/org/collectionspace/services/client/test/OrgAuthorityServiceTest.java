@@ -484,7 +484,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     public void read(String testName) throws Exception {
 
         // Perform setup.
-        setupRead();
+        setupRead(testName);
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -525,7 +525,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         public void readByName(String testName) throws Exception {
 
         // Perform setup.
-        setupRead();
+        setupRead(testName);
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -561,7 +561,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     public void readByName(String testName) throws Exception {
 
         // Perform setup.
-        setupRead();
+        setupRead(testName);
 
         // Submit the request to the service and store the response.
         ClientResponse<MultipartInput> res = client.read(knownResourceId);

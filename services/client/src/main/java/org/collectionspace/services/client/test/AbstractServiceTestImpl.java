@@ -54,7 +54,10 @@ import org.testng.annotations.Test;
 public abstract class AbstractServiceTestImpl extends BaseServiceTest implements ServiceTest {
 
     /** The logger. */
-    protected final Logger logger = LoggerFactory.getLogger(AbstractServiceTestImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(AbstractServiceTestImpl.class);
+
+    // A non-existent logger.
+    static private final Logger LOGGER_NULL = null;
 
     /** The Constant DEFAULT_LIST_SIZE. */
     static protected final int DEFAULT_LIST_SIZE = 10;
@@ -62,7 +65,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 
     /* Use this to keep track of resources to delete */
     protected List<String> allResourceIdsCreated = new ArrayList<String>();
-    
+
     /**
      * Gets the logger.
      *
@@ -88,20 +91,25 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 
     /**
      * Sets up create tests.
+     *
+     * @param testName The name of the test being run.
      */
-    protected void setupCreate() {
-        setupCreate("Create");
+    protected void setupCreate(String testName) {
+        setupCreate(testName, LOGGER_NULL);
     }
 
     /**
      * Sets up create tests.
      *
-     * @param label A label to be displayed prior to running this test.
+     * @param testName The name of the test being run.
+     *
+     * @param testLogger The logger to use within the current base class,
+     *     when generating log statements related to that test.
      */
-    protected void setupCreate(String label) {
+    protected void setupCreate(String testName, Logger testLogger) {
         EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.CREATE;
-        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, label);
+        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, testName, testLogger);
     }
 
     /* (non-Javadoc)
@@ -124,20 +132,25 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 
     /**
      * Sets up create tests with empty entity body.
+     *
+     * @param testName The name of the test being run.
      */
-    protected void setupCreateWithEmptyEntityBody() {
-        setupCreateWithEmptyEntityBody("CreateWithEmptyEntityBody");
+    protected void setupCreateWithEmptyEntityBody(String testName) {
+        setupCreateWithEmptyEntityBody(testName, LOGGER_NULL);
     }
 
     /**
      * Sets up create tests with empty entity body.
      *
-     * @param label A label to be displayed prior to running this test.
+     * @param testName The name of the test being run.
+     *
+     * @param testLogger The logger to use within the current base class,
+     *     when generating log statements related to that test.
      */
-    protected void setupCreateWithEmptyEntityBody(String label) {
+    protected void setupCreateWithEmptyEntityBody(String testName, Logger testLogger) {
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.CREATE;
-        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, label);
+        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, testName, testLogger);
     }
 
     /* (non-Javadoc)
@@ -148,20 +161,25 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 
     /**
      * Sets up create tests with malformed xml.
+     *
+     * @param testName The name of the test being run.
      */
-    protected void setupCreateWithMalformedXml() {
-        setupCreateWithMalformedXml("CreateWithMalformedXml");
+    protected void setupCreateWithMalformedXml(String testName) {
+        setupCreateWithMalformedXml(testName, LOGGER_NULL);
     }
 
     /**
      * Sets up create tests with malformed xml.
      *
-     * @param label A label to be displayed prior to running this test.
+     * @param testName The name of the test being run.
+     *
+     * @param testLogger The logger to use within the current base class,
+     *     when generating log statements related to that test.
      */
-    protected void setupCreateWithMalformedXml(String label) {
+    protected void setupCreateWithMalformedXml(String testName, Logger testLogger) {
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.CREATE;
-        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, label);
+        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, testName, testLogger);
     }
 
     /* (non-Javadoc)
@@ -172,20 +190,25 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 
     /**
      * Sets up create tests with wrong xml schema.
+     *
+     * @param testName The name of the test being run.
      */
-    protected void setupCreateWithWrongXmlSchema() {
-        setupCreateWithWrongXmlSchema("CreateWithWrongXmlSchema");
+    protected void setupCreateWithWrongXmlSchema(String testName) {
+        setupCreateWithWrongXmlSchema(testName, LOGGER_NULL);
     }
 
     /**
      * Sets up create tests with wrong xml schema.
      *
-     * @param label the new up create with wrong xml schema
+     * @param testName The name of the test being run.
+     *
+     * @param testLogger The logger to use within the current base class,
+     *     when generating log statements related to that test.
      */
-    protected void setupCreateWithWrongXmlSchema(String label) {
+    protected void setupCreateWithWrongXmlSchema(String testName, Logger testLogger) {
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.CREATE;
-        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, label);
+        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, testName, testLogger);
     }
 
     // ---------------------------------------------------------------
@@ -202,20 +225,25 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 
     /**
      * Sets up read tests.
+     *
+     * @param testName The name of the test being run.
      */
-    protected void setupRead() {
-        setupRead("Read");
+    protected void setupRead(String testName) {
+        setupRead(testName, LOGGER_NULL);
     }
 
     /**
      * Sets up read tests.
      *
-     * @param label A label to be displayed prior to running this test.
+     * @param testName The name of the test being run.
+     *
+     * @param testLogger The logger to use within the current base class,
+     *     when generating log statements related to that test.
      */
-    protected void setupRead(String label) {
+    protected void setupRead(String testName, Logger testLogger) {
         EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.READ;
-        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, label);
+        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, testName, testLogger);
     }
 
     // Failure outcomes
@@ -228,20 +256,25 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 
     /**
      * Sets up read non existent tests.
+     *
+     * @param testName The name of the test being run.
      */
-    protected void setupReadNonExistent() {
-        setupReadNonExistent("ReadNonExistent");
+    protected void setupReadNonExistent(String testName) {
+        setupReadNonExistent(testName, LOGGER_NULL);
     }
 
     /**
      * Sets up read non existent tests.
      *
-     * @param label A label to be displayed prior to running this test.
+     * @param testName The name of the test being run.
+     *
+     * @param testLogger The logger to use within the current base class,
+     *     when generating log statements related to that test.
      */
-    protected void setupReadNonExistent(String label) {
+    protected void setupReadNonExistent(String testName, Logger testLogger) {
         EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.READ;
-        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, label);
+        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, testName, testLogger);
     }
 
     // ---------------------------------------------------------------
@@ -260,20 +293,25 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 
     /**
      * Sets up read list tests.
+     *
+     * @param testName The name of the test being run.
      */
-    protected void setupReadList() {
-        setupReadList("ReadList");
+    protected void setupReadList(String testName) {
+        setupReadList(testName, LOGGER_NULL);
     }
 
     /**
      * Sets up read list tests.
      *
-     * @param label A label to be displayed prior to running this test.
+     * @param testName The name of the test being run.
+     *
+     * @param testLogger The logger to use within the current base class,
+     *     when generating log statements related to that test.
      */
-    protected void setupReadList(String label) {
+    protected void setupReadList(String testName, Logger testLogger) {
         EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.READ_LIST;
-        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, label);
+        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, testName, testLogger);
     }
 
     // Failure outcomes
@@ -294,20 +332,25 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 
     /**
      * Sets up update tests.
+     *
+     * @param testName The name of the test being run.
      */
-    protected void setupUpdate() {
-        setupUpdate("Update");
+    protected void setupUpdate(String testName) {
+        setupUpdate(testName, LOGGER_NULL);
     }
 
     /**
      * Sets up update tests.
      *
-     * @param label A label to be displayed prior to running this test.
+     * @param testName The name of the test being run.
+     *
+     * @param testLogger The logger to use within the current base class,
+     *     when generating log statements related to that test.
      */
-    protected void setupUpdate(String label) {
+    protected void setupUpdate(String testName, Logger testLogger) {
         EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.UPDATE;
-        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, label);
+        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, testName, testLogger);
     }
 
     // Failure outcomes
@@ -320,20 +363,25 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 
     /**
      * Sets up update tests with an empty entity body.
+     *
+     * @param testName The name of the test being run.
      */
-    protected void setupUpdateWithEmptyEntityBody() {
-        setupUpdateWithEmptyEntityBody("UpdateWithEmptyEntityBody");
+    protected void setupUpdateWithEmptyEntityBody(String testName) {
+        setupUpdateWithEmptyEntityBody(testName, LOGGER_NULL);
     }
 
     /**
      * Sets up update tests with an empty entity body.
      *
-     * @param label A label to be displayed prior to running this test.
+     * @param testName The name of the test being run.
+     *
+     * @param testLogger The logger to use within the current base class,
+     *     when generating log statements related to that test.
      */
-    protected void setupUpdateWithEmptyEntityBody(String label) {
+    protected void setupUpdateWithEmptyEntityBody(String testName, Logger testLogger) {
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.UPDATE;
-        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, label);
+        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, testName, testLogger);
     }
 
     /* (non-Javadoc)
@@ -344,20 +392,25 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 
     /**
      * Sets up update tests with malformed xml.
+     *
+     * @param testName The name of the test being run.
      */
-    protected void setupUpdateWithMalformedXml() {
-        setupUpdateWithMalformedXml("UpdateWithMalformedXml");
+    protected void setupUpdateWithMalformedXml(String testName) {
+        setupUpdateWithMalformedXml(testName, LOGGER_NULL);
     }
 
     /**
      * Sets up update tests with malformed xml.
      *
-     * @param label A label to be displayed prior to running this test.
+     * @param testName The name of the test being run.
+     *
+     * @param testLogger The logger to use within the current base class,
+     *     when generating log statements related to that test.
      */
-    protected void setupUpdateWithMalformedXml(String label) {
+    protected void setupUpdateWithMalformedXml(String testName, Logger testLogger) {
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.UPDATE;
-        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, label);
+        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, testName, testLogger);
     }
 
     /* (non-Javadoc)
@@ -368,20 +421,25 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 
     /**
      * Sets up update tests with wrong xml schema.
+     *
+     * @param testName The name of the test being run.
      */
-    protected void setupUpdateWithWrongXmlSchema() {
-        setupUpdateWithWrongXmlSchema("UpdateWithWrongXmlSchema");
+    protected void setupUpdateWithWrongXmlSchema(String testName) {
+        setupUpdateWithWrongXmlSchema(testName, LOGGER_NULL);
     }
 
     /**
      * Sets up update tests with wrong xml schema.
      *
-     * @param label A label to be displayed prior to running this test.
+     * @param testName The name of the test being run.
+     *
+     * @param testLogger The logger to use within the current base class,
+     *     when generating log statements related to that test.
      */
-    protected void setupUpdateWithWrongXmlSchema(String label) {
+    protected void setupUpdateWithWrongXmlSchema(String testName, Logger testLogger) {
         EXPECTED_STATUS_CODE = Response.Status.BAD_REQUEST.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.UPDATE;
-        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, label);
+        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, testName, testLogger);
     }
     
     /* (non-Javadoc)
@@ -392,20 +450,25 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 
     /**
      * Sets up update non existent tests.
+     *
+     * @param testName The name of the test being run.
      */
-    protected void setupUpdateNonExistent() {
-        setupUpdateNonExistent("UpdateNonExistent");
+    protected void setupUpdateNonExistent(String testName) {
+        setupUpdateNonExistent(testName, LOGGER_NULL);
     }
 
     /**
      * Sets up update non existent tests
      *
-     * @param label A label to be displayed prior to running this test.
+     * @param testName The name of the test being run.
+     *
+     * @param testLogger The logger to use within the current base class,
+     *     when generating log statements related to that test.
      */
-    protected void setupUpdateNonExistent(String label) {
+    protected void setupUpdateNonExistent(String testName, Logger testLogger) {
         EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.UPDATE;
-        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, label);
+        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, testName, testLogger);
     }
 
     // ---------------------------------------------------------------
@@ -422,20 +485,25 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 
     /**
      * Sets up delete tests.
+     *
+     * @param testName The name of the test being run.
      */
-    protected void setupDelete() {
-        setupDelete("Delete");
+    protected void setupDelete(String testName) {
+        setupDelete(testName, LOGGER_NULL);
     }
 
     /**
      * Sets up delete tests.
      *
-     * @param label A label to be displayed prior to running this test.
+     * @param testName The name of the test being run.
+     *
+     * @param testLogger The logger to use within the current base class,
+     *     when generating log statements related to that test.
      */
-    protected void setupDelete(String label) {
+    protected void setupDelete(String testName, Logger testLogger) {
         EXPECTED_STATUS_CODE = Response.Status.OK.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.DELETE;
-        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, label);
+        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, testName, testLogger);
     }
 
     // Failure outcomes
@@ -448,20 +516,25 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 
     /**
      * Sets up delete non existent tests.
+     *
+     * @param testName The name of the test being run.
      */
-    protected void setupDeleteNonExistent() {
-        setupDeleteNonExistent("DeleteNonExistent");
+    protected void setupDeleteNonExistent(String testName) {
+        setupDeleteNonExistent(testName, LOGGER_NULL);
     }
 
     /**
      * Sets up delete non existent tests.
      *
-     * @param label A label to be displayed prior to running this test.
+     * @param testName The name of the test being run.
+     *
+     * @param testLogger The logger to use within the current base class,
+     *     when generating log statements related to that test.
      */
-    protected void setupDeleteNonExistent(String label) {
+    protected void setupDeleteNonExistent(String testName, Logger testLogger) {
         EXPECTED_STATUS_CODE = Response.Status.NOT_FOUND.getStatusCode();
         REQUEST_TYPE = ServiceRequestType.DELETE;
-        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, label);
+        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE, testName, testLogger);
     }
 
     // ---------------------------------------------------------------

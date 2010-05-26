@@ -472,7 +472,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
     @AfterClass(alwaysRun = true)
     @Override
     public void cleanUp() {
-        setupDelete("cleanup");
+        setupDelete("cleanUp");
         String noTest = System.getProperty("noTestCleanup");
     	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -518,7 +518,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      * @return the string
      */
     private String createPermission(String resName, EffectType effect) {
-        setupCreate();
+        setupCreate("createPermission");
         PermissionClient permClient = new PermissionClient();
         List<PermissionAction> actions = PermissionFactory.createDefaultActions();
         Permission permission = PermissionFactory.createPermissionInstance(resName,
@@ -543,7 +543,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      * @param permId the perm id
      */
     private void deletePermission(String permId) {
-        setupDelete();
+        setupDelete("deletePermission");
         PermissionClient permClient = new PermissionClient();
         ClientResponse<Response> res = permClient.delete(permId);
         int statusCode = res.getStatus();
@@ -568,7 +568,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      * @return the string
      */
     private String createRole(String roleName) {
-        setupCreate();
+        setupCreate("createRole");
         RoleClient roleClient = new RoleClient();
 
         Role role = RoleFactory.createRoleInstance(roleName,
@@ -592,7 +592,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      * @param roleId the role id
      */
     private void deleteRole(String roleId) {
-        setupDelete();
+        setupDelete("deleteRole");
         RoleClient roleClient = new RoleClient();
         ClientResponse<Response> res = roleClient.delete(roleId);
         int statusCode = res.getStatus();

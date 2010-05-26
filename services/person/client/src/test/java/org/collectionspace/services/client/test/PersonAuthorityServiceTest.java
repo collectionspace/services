@@ -525,7 +525,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     public void read(String testName) throws Exception {
 
         // Perform setup.
-        setupRead();
+        setupRead(testName);
         
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
@@ -565,7 +565,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         public void readByName(String testName) throws Exception {
 
         // Perform setup.
-        setupRead();
+        setupRead(testName);
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();

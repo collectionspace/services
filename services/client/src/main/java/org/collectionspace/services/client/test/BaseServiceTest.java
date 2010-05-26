@@ -72,9 +72,9 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 public abstract class BaseServiceTest {
 
     //Maven's base directory -i.e., the one containing the current pom.xml
-    static protected final String MAVEN_BASEDIR_PROPERTY = "maven.basedir";
+    protected static final String MAVEN_BASEDIR_PROPERTY = "maven.basedir";
     /** The Constant logger. */
-    static protected final Logger logger = LoggerFactory.getLogger(BaseServiceTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(BaseServiceTest.class);
     /** The Constant serviceClient. */
     protected static final TestServiceClient serviceClient = new TestServiceClient();
     /** The non-existent id. */
@@ -96,7 +96,10 @@ public abstract class BaseServiceTest {
 
     protected final static String BANNER_SEPARATOR_LINE =
         "===================================================";
-
+    protected final static String BANNER_PREFIX =
+        "\n" + BANNER_SEPARATOR_LINE + "\n";
+    protected final static String BANNER_SUFFIX =
+        "\n" + BANNER_SEPARATOR_LINE;
 
     /**
      * Instantiates a new base service test.
@@ -129,7 +132,6 @@ public abstract class BaseServiceTest {
      *
      * @param   m  The currently running test method.
      *
-     * @return  The name of the currently running test method.
      */
     @DataProvider(name = "testName")
     public static Object[][] testName(Method m) {
@@ -157,23 +159,9 @@ public abstract class BaseServiceTest {
         REQUEST_TYPE = ServiceRequestType.NON_EXISTENT;
     }
 
-
-        /**
-     * Initializes setup values for a given test.
-     *
-     * @param expectedStatusCode  A status code expected to be returned in the response.
-     *
-     * @param serviceRequestType  A type of service request (e.g. CREATE, DELETE).
-     */
-    protected void testSetup(
-            int expectedStatusCode,
-            ServiceRequestType reqType) {
-        String testName = null;
-        testSetup(expectedStatusCode, reqType, testName);
-    }
-
     /**
-     * Initializes setup values for a given test.
+     * Initializes setup values for a given test, and prints a banner
+     * identifying the test being run, using the local logger for this class.
      *
      * @param expectedStatusCode  A status code expected to be returned in the response.
      *
@@ -185,17 +173,61 @@ public abstract class BaseServiceTest {
             int expectedStatusCode,
             ServiceRequestType reqType,
             String testName) {
+        testSetup(expectedStatusCode, reqType, testName, null);
+    }
 
+    /**
+     * Initializes setup values for a given test, and prints a banner
+     * identifying the test being run, using a specified logger.
+     *
+     * @param expectedStatusCode  A status code expected to be returned in the response.
+     *
+     * @param serviceRequestType  A type of service request (e.g. CREATE, DELETE).
+     *
+     * @param testName The name of the test being run.
+     *
+     * @param testLogger An optional logger to use within the current base
+     *     class, when generating log statements related to that test.
+     *     If null, the logger of the current base class will be used.
+     */
+    protected void testSetup(
+            int expectedStatusCode,
+            ServiceRequestType reqType,
+            String testName,
+            Logger testLogger) {
+
+        testSetup(expectedStatusCode, reqType);
+
+        // Print a banner identifying the test being run.
+        //
+        // If an optional logger has been provided, such as by a
+        // calling class, use that logger to print the banner.
+        if (testLogger != null) {
+            if (testLogger.isDebugEnabled()) {
+               testLogger.debug(testBanner(testName, testLogger));
+            }
+        // Otherwise, use this base class's logger to print the banner.
+        } else {
+            testLogger = logger;
+            if (testLogger.isDebugEnabled()) {
+                testLogger.debug(testBanner(testName));
+            }
+        }
+    }
+
+    /**
+     * Initializes setup values for a given test.
+     *
+     * @param expectedStatusCode  A status code expected to be returned in the response.
+     *
+     * @param serviceRequestType  A type of service request (e.g. CREATE, DELETE).
+     */
+    protected void testSetup(
+            int expectedStatusCode,
+            ServiceRequestType reqType) {
         clearSetup();
         EXPECTED_STATUS_CODE = expectedStatusCode;
         REQUEST_TYPE = reqType;
-        
-        // Print a banner identifying the test being run.
-        if ((testName != null) && (! testName.trim().isEmpty())) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(testBanner(testName));
-            }
-        }
     }
 
     /**
@@ -558,25 +590,68 @@ public abstract class BaseServiceTest {
      */
     protected static String testBanner(String testName) {
         testName = (testName == null || testName.trim().isEmpty()) ?
-            "Test = no test name specified" : " Test = " + testName;
+            " Test = no test name specified" : " Test = " + testName;
         return banner(testName);
     }
 
     /**
-     * Returns text inside a banner.
+     * Returns a test-specific banner.
      *
-     * @param label The label to be output inside a banner.
+     * @param testName The name of a test method.
      *
-     * @return A banner.
+     * @param testLogger An optional logger to use within the current base
+     *     class, when generating log statements related to that test.
+     *
+     * @return A test-specific banner.
+     */
+    protected static String testBanner(String testName, Logger testLogger) {
+        String testClass = testLogger.getName();
+        return testBanner(testName, testClass);
+    }
+
+    /**
+     * Returns a test-specific banner.
+     *
+     * @param testName The name of a test method.
+     *
+     * @param testClass The name of a test class.
+     *
+     * @return A test-specific banner.
+     */
+    protected static String testBanner(String testName, String testClass) {
+        testName = (testName == null || testName.trim().isEmpty()) ?
+            " Test = no test name specified" : " Test = " + testName;
+        testClass = (testClass == null || testClass.trim().isEmpty()) ?
+            "Class = no test class specified" : "Class = " + classNameFromPackageName(testClass);
+        String testLabel = testClass + "\n" + testName;
+        return banner(testLabel);
+    }
+
+    /**
+     * Returns a 'banner', consisting of a text label inside a pair of prefix
+     * and suffix strings.
+     *
+     * @param label The label to be output inside the banner.
+     *
+     * @return The banner.
      */
     protected static String banner(String label) {
         StringBuffer sb = new StringBuffer();
-        sb.append("\n");
-        sb.append(BANNER_SEPARATOR_LINE);
-        sb.append("\n");
-        sb.append(" " + label);
-        sb.append("\n");
-        sb.append(BANNER_SEPARATOR_LINE);
+        sb.append(BANNER_PREFIX);
+        sb.append(label);
+        sb.append(BANNER_SUFFIX);
         return sb.toString();
+    }
+
+    protected static String classNameFromPackageName(String className) {
+        if (className == null || className.trim().isEmpty()) {
+            return className;
+        }
+        final char PKG_SEPARATOR = '.';
+        int pos = className.lastIndexOf(PKG_SEPARATOR) + 1;
+        if (pos > 0) {
+            className = className.substring(pos);
+        }
+        return className;
     }
 }
