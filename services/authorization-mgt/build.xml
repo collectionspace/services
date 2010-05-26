@@ -115,6 +115,11 @@
             description="create tables(s), indices for authorization service">
     </target>
 
+    <target name="import"
+            description="import default authorizations">
+        <ant antfile="import/build.xml" target="import" inheritAll="false"/>
+    </target>
+
     <target name="deploy" depends="install"
             description="deploy authorization service">
         <ant antfile="service/build.xml" target="deploy" inheritall="false"/>

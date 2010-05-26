@@ -110,6 +110,29 @@
     </target>
 
 
+    <target name="import" depends="import-unix,import-windows"
+            description="import authorization" />
+    <target name="import-unix" if="osfamily-unix">
+        <exec executable="mvn" failonerror="true">
+            <arg value="exec:java" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+    <target name="import-windows" if="osfamily-windows">
+        <exec executable="cmd" failonerror="true">
+            <arg value="/c" />
+            <arg value="mvn.bat" />
+            <arg value="exec:java" />
+            <arg value="-f" />
+            <arg value="${basedir}/pom.xml" />
+            <arg value="-N" />
+            <arg value="${mvn.opts}" />
+        </exec>
+    </target>
+
 
     <target name="deploy" depends="install"
             description="deploy authorization-mgt import in ${jboss.server.cspace}">

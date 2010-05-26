@@ -140,6 +140,11 @@
         <ant antfile="id/build.xml" target="create_db" inheritAll="false"/>
     </target>
 
+    <target name="import"
+            description="import default configuration">
+        <ant antfile="authorization-mgt/build.xml" target="import" inheritAll="false"/>
+    </target>
+
     <!-- this target is called in order based on the dependencies between the services -->
     <target name="deploy" depends="install"
             description="deploy services in ${jboss.server.cspace}">
