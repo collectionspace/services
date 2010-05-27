@@ -34,6 +34,9 @@ import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.domain.naturalhistory.CollectionobjectsNaturalhistory;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.collectionspace.services.collectionobject.ResponsibleDepartmentList;
+import org.collectionspace.services.collectionobject.OtherNumber;
+import org.collectionspace.services.collectionobject.OtherNumberList;
+
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -998,20 +1001,42 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     private MultipartOutput createCollectionObjectInstance(String commonPartName,
             String objectNumber, String objectName) {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
+        
         ResponsibleDepartmentList deptList = new ResponsibleDepartmentList();
         List<String> depts = deptList.getResponsibleDepartment();
         // @TODO Use properly formatted refNames for representative departments
         // in this example test record. The following are mere placeholders.
         depts.add("urn:org.collectionspace.services.department:Registrar");
-        if (multivalue) {
+        if (multivalue == true) {
             depts.add("urn:org.walkerart.department:Fine Art");
         }
+        //
+        // FIXME: REM - Can someone please document why we are toggling this
+        // value?  Thanks.
+        //
         multivalue = !multivalue;
+
+        OtherNumberList otherNumList = new OtherNumberList();
+        List<OtherNumber> otherNumbers = otherNumList.getOtherNumber();
+        
+        OtherNumber otherNumber1 = new OtherNumber();        
+        otherNumber1.setNumberValue("101");
+        otherNumber1.setNumberType("integer");
+        otherNumbers.add(otherNumber1);
+        
+        OtherNumber otherNumber2 = new OtherNumber();
+        otherNumber2.setNumberValue("101.502.23.456");
+        otherNumber2.setNumberType("ipaddress");
+        otherNumbers.add(otherNumber2);        
+        
         //FIXME: Title does not need to be set.
         collectionObject.setTitle("atitle");
         collectionObject.setResponsibleDepartments(deptList);
         collectionObject.setObjectNumber(objectNumber);
+        
+        collectionObject.setOtherNumberList(otherNumList);
         collectionObject.setOtherNumber("urn:org.walkerart.id:123");
+        
         collectionObject.setObjectName(objectName);
         collectionObject.setAge(""); //test for null string
         collectionObject.setBriefDescription("Papier mache bird cow mask with horns, "

@@ -38,23 +38,44 @@ import org.slf4j.LoggerFactory;
  *
  * $LastChangedRevision: $
  * $LastChangedDate: $
+ * @param <T> 
+ * @param <TL> 
+ * @param <WT> 
+ * @param <WTL> 
  */
 public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
         implements DocumentHandler<T, TL, WT, WTL> {
 
+    /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(AbstractDocumentHandlerImpl.class);
+    
+    /** The properties. */
     private Map<String, Object> properties = new HashMap<String, Object>();
+    
+    /** The doc filter. */
     private DocumentFilter docFilter = null;
+    
+    /** The service context. */
     private ServiceContext serviceContext;
 
+    /**
+     * Instantiates a new abstract document handler impl.
+     */
     public AbstractDocumentHandlerImpl() {
+    	// Empty constructor
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#getServiceContext()
+     */
     @Override
     public ServiceContext getServiceContext() {
         return serviceContext;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#setServiceContext(org.collectionspace.services.common.context.ServiceContext)
+     */
     @Override
     public void setServiceContext(ServiceContext ctx) {
         serviceContext = ctx;
@@ -80,7 +101,10 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
 //    	DocumentFilter docFilter = this.createDocumentFilter(ctx);
 //    	this.setDocumentFilter(docFilter);
 //    }
-    @Override
+    /* (non-Javadoc)
+ * @see org.collectionspace.services.common.document.DocumentHandler#createDocumentFilter()
+ */
+@Override
     public abstract DocumentFilter createDocumentFilter();
 
     /**
@@ -99,6 +123,9 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
         this.docFilter = docFilter;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#prepare(org.collectionspace.services.common.document.DocumentHandler.Action)
+     */
     @Override
     final public void prepare(Action action) throws Exception {
         switch (action) {
@@ -127,26 +154,44 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#prepareCreate()
+     */
     @Override
     public void prepareCreate() throws Exception {
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#prepareUpdate()
+     */
     @Override
     public void prepareUpdate() throws Exception {
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#prepareGet()
+     */
     @Override
     public void prepareGet() throws Exception {
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#prepareGetAll()
+     */
     @Override
     public void prepareGetAll() throws Exception {
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#prepareDelete()
+     */
     @Override
     public void prepareDelete() throws Exception {
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#handle(org.collectionspace.services.common.document.DocumentHandler.Action, org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     final public void handle(Action action, DocumentWrapper<?> wrapDoc) throws Exception {
         switch (action) {
@@ -173,23 +218,41 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#handleCreate(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public abstract void handleCreate(DocumentWrapper<WT> wrapDoc) throws Exception;
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#handleUpdate(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public abstract void handleUpdate(DocumentWrapper<WT> wrapDoc) throws Exception;
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#handleGet(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public abstract void handleGet(DocumentWrapper<WT> wrapDoc) throws Exception;
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#handleGetAll(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public abstract void handleGetAll(DocumentWrapper<WTL> wrapDoc) throws Exception;
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#handleDelete(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void handleDelete(DocumentWrapper<WT> wrapDoc) throws Exception {
         
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#complete(org.collectionspace.services.common.document.DocumentHandler.Action, org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     final public void complete(Action action, DocumentWrapper<?> wrapDoc) throws Exception {
         switch (action) {
@@ -215,59 +278,104 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#completeCreate(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void completeCreate(DocumentWrapper<WT> wrapDoc) throws Exception {
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#completeUpdate(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void completeUpdate(DocumentWrapper<WT> wrapDoc) throws Exception {
         //no specific action needed
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#completeGet(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void completeGet(DocumentWrapper<WT> wrapDoc) throws Exception {
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#completeGetAll(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void completeGetAll(DocumentWrapper<WTL> wrapDoc) throws Exception {
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#completeDelete(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void completeDelete(DocumentWrapper<WT> wrapDoc) throws Exception {
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public abstract T extractCommonPart(DocumentWrapper<WT> wrapDoc)
             throws Exception;
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#fillCommonPart(java.lang.Object, org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public abstract void fillCommonPart(T obj, DocumentWrapper<WT> wrapDoc)
             throws Exception;
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public abstract TL extractCommonPartList(DocumentWrapper<WTL> wrapDoc)
             throws Exception;
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#fillCommonPartList(java.lang.Object, org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     final public void fillCommonPartList(TL obj, DocumentWrapper<WTL> wrapDoc) throws Exception {
         throw new UnsupportedOperationException("bulk create/update not yet supported");
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#getCommonPart()
+     */
     @Override
     public abstract T getCommonPart();
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#setCommonPart(java.lang.Object)
+     */
     @Override
     public abstract void setCommonPart(T obj);
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#getCommonPartList()
+     */
     @Override
     public abstract TL getCommonPartList();
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#setCommonPartList(java.lang.Object)
+     */
     @Override
     public abstract void setCommonPartList(TL obj);
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#getQProperty(java.lang.String)
+     */
     @Override
     public abstract String getQProperty(String prop);
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#getUnQProperty(java.lang.String)
+     */
     @Override
     public String getUnQProperty(String qProp) {
         StringTokenizer tkz = new StringTokenizer(qProp, ":");
@@ -281,11 +389,20 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
         return tkz.nextToken();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentHandler#getServiceContextPath()
+     */
     @Override
     public String getServiceContextPath() {
         return "/" + getServiceContext().getServiceName().toLowerCase() + "/";
     }
 
+    /**
+     * Validate.
+     *
+     * @param action the action
+     * @throws Exception the exception
+     */
     private void validate(Action action) throws Exception {
         List<ValidatorHandler> valHandlers = serviceContext.getValidatorHandlers();
         for (ValidatorHandler handler : valHandlers) {

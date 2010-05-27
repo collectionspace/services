@@ -25,20 +25,14 @@ package org.collectionspace.services.nuxeo.client.java;
 
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
-import javax.ws.rs.core.MediaType;
-
-import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.document.DocumentUtils;
-import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.service.ObjectPartType;
+
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import javax.ws.rs.core.MediaType;
 import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -80,10 +74,10 @@ public abstract class RemoteSubItemDocumentModelHandlerImpl<T, TL> extends
         // and then check that here, so skip other parts.
         if(part.getMediaType().equals(MediaType.APPLICATION_XML_TYPE)){
             if(payload != null){
-                Document document = DocumentUtils.parseDocument(payload);
+                Document document = DocumentUtils.parseDocument(payload, partMeta);
                 //TODO: callback to handler if registered to validate the
                 //document
-                Map<String, Object> objectProps = DocumentUtils.parseProperties(document);
+                Map<String, Object> objectProps = DocumentUtils.parseProperties(document.getFirstChild());
                 // Now pull out the subitem props and set them into the Subitem schema
                 Map<String, Object> subitemProps = null;
                 for(String key:fields){

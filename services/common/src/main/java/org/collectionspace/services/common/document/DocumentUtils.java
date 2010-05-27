@@ -46,6 +46,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.TransformerConfigurationException; 
 import javax.xml.transform.TransformerException; 
 
+import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.service.ObjectPartContentType;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.service.XmlContentType;
@@ -66,7 +67,6 @@ import org.w3c.dom.Text;
  * $LastChangedDate: $
  */
 public class DocumentUtils {
-
     /** The Constant logger. */
     private static final Logger logger =
         LoggerFactory.getLogger(DocumentUtils.class);
@@ -77,8 +77,7 @@ public class DocumentUtils {
     /**
      * The Class NameValue.
      */
-    private static class NameValue {
-    	
+    private static class NameValue {    	
 	    /**
 	     * Instantiates a new name value.
 	     */
@@ -115,6 +114,7 @@ public class DocumentUtils {
 	    		
 	    	String s = new String(buff);
 	    	logger.debug(s);
+	    	System.out.println(s);
 	    	//
 	    	// Essentially, reset the stream and return it in its original state
 	    	//
@@ -128,11 +128,21 @@ public class DocumentUtils {
      * parseProperties given payload to create XML document. this
      * method also closes given stream after parsing.
      * @param payload stream
+     * @param partMeta 
      * @return parsed Document
      * @throws Exception
      */
-    public static Document parseDocument(InputStream payload)
+    public static Document parseDocument(InputStream payload, ObjectPartType partMeta)
             throws Exception {
+    	final String FILE_SEPARATOR = System.getProperty("file.separator");
+    	final String XML_SCHEMA_EXTENSION = ".xsd";
+    	final String SCHEMAS_DIR = "schemas";
+    	final String JAXP_SCHEMA_SOURCE =
+            "http://java.sun.com/xml/jaxp/properties/schemaSource";
+    	final String JAXP_SCHEMA_LANGUAGE =
+            "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
+        final String W3C_XML_SCHEMA =
+            "http://www.w3.org/2001/XMLSchema";    	
     	Document result = null;
     	
     	if (logger.isDebugEnabled() == true) {
@@ -141,19 +151,60 @@ public class DocumentUtils {
     		}
     	}
     	
+    	//
+    	// Look for an XML Schema (.xsd) file for the incoming part payload
+    	//
+    	String serverRoot = ServiceMain.getInstance().getServerRootDir();
+    	String schemasDir = serverRoot + FILE_SEPARATOR + 
+    		SCHEMAS_DIR + FILE_SEPARATOR;
+    	
+    	//
+    	// Send a warning to the log file if the XML Schema file is missing
+    	//
+    	String schemaName = schemasDir + partMeta.getLabel() + XML_SCHEMA_EXTENSION;
+    	File schemaFile = null;
+    	try {
+    		schemaFile = new File(schemaName);
+    	} catch (Exception e) {
+    		if (logger.isDebugEnabled() == true) {
+    			logger.warn("Missing schema file: " + schemaName);
+    		}
+    	}
+    	
         try {
             // Create a builder factory
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setValidating(false);//TODO take validating value from meta
+//            factory.setNamespaceAware(true);
+            factory.setValidating(true);
+            try {
+            	factory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
+            	if (schemaFile != null) {
+            		factory.setAttribute(JAXP_SCHEMA_SOURCE, schemaFile);
+            	}
+            } catch (IllegalArgumentException x) {
+                logger.warn("Error: JAXP DocumentBuilderFactory attribute not recognized: "
+                        + JAXP_SCHEMA_LANGUAGE);
+                logger.warn("Check to see if parser conforms to JAXP 1.2 spec.");
+                throw x;
+            }
 
+            //
+            // Lexical Control Settings that focus on content
+            //
+            factory.setCoalescing(true);
+            factory.setExpandEntityReferences(true);
+            factory.setIgnoringComments(true);
+            factory.setIgnoringElementContentWhitespace(true);            
+            
             // Create the builder and parse the file
             result = factory.newDocumentBuilder().parse(payload);
+            result.normalizeDocument();
             
             // Write it to the log so we can see what we've created.
             if (logger.isDebugEnabled() == true) {
+            	logger.debug(xmlToString(result));
             	System.out.println(xmlToString(result));
             }
-
         } finally {
             if (payload != null) {
                 payload.close();
@@ -169,11 +220,11 @@ public class DocumentUtils {
      * @return map key=property name, value=property value
      * @throws Exception
      */
-    public static Map<String, Object> parseProperties(Document document)
+    public static Map<String, Object> parseProperties(Node document)
             throws Exception {
         HashMap<String, Object> objectProps = new HashMap<String, Object>();
         // Get a list of all elements in the document
-        Node root = document.getFirstChild();
+        Node root = document;//.getFirstChild();
         NodeList rootChildren = root.getChildNodes();
         for (int i = 0; i < rootChildren.getLength(); i++) {
             Node node = rootChildren.item(i);
@@ -204,28 +255,77 @@ public class DocumentUtils {
     }
 
     /**
-     * getMultiValues retrieve multi-value element values
+     * getMultiStringValues retrieve multi-value element values
      * assumption: backend does not support more than 1 level deep hierarchy
      * @param node
      * @return
      */
-    private static String[] getMultiValues(Node node) {
+    private static String[] getMultiStringValues(Node node) {
         ArrayList<String> vals = new ArrayList<String>();
         NodeList nodeChildren = node.getChildNodes();
         for (int i = 0; i < nodeChildren.getLength(); i++) {
             Node child = nodeChildren.item(i);
             String name = child.getNodeName();
-            //assumption: backend does not support more than 1 level deep
+            //assumption: backend does not support more than 2 levels deep
             //hierarchy
             String value = null;
             if (child.getNodeType() == Node.ELEMENT_NODE) {
                 value = getTextNodeValue(child);
                 vals.add(qualify(name, value));
-            } else {
-                //skip text nodes with whitespaces
             }
         }
         return vals.toArray(new String[0]);
+    }
+    
+    /**
+     * Removes all the immediate child text nodes.
+     *
+     * @param parent the parent
+     * @return the element
+     */
+    private static Node removeTextNodes(Node parent) {
+    	Node result = parent;
+    	
+    	NodeList nodeList = parent.getChildNodes();
+    	int nodeListSize = nodeList.getLength();
+    	for (int i = 0; i < nodeListSize; i++) {
+    		Node child = nodeList.item(i);
+    		if (child != null && child.getNodeType() == Node.TEXT_NODE) {
+    			parent.removeChild(child);
+    		}
+    	}
+    	
+    	return result;
+    }
+
+    /**
+     * getMultiValues retrieve multi-value element values
+     * assumption: backend does not support more than 1 level deep hierarchy
+     * @param node
+     * @return
+     */
+    private static Object getMultiValues(Node node) throws Exception {
+    	Object result = null;    	
+    	
+        Node child = removeTextNodes(node).getFirstChild();
+        Node grandChild = child.getFirstChild();
+        
+        if (grandChild != null) {
+	        if (grandChild.getNodeType() == Node.TEXT_NODE) {
+	        	result = getMultiStringValues(node);
+	        } else {
+	            ArrayList<Map<String, Object>> values = new ArrayList<Map<String, Object>>();
+	            NodeList nodeChildren = node.getChildNodes();
+	            for (int i = 0; i < nodeChildren.getLength(); i++) {
+	            	Node nodeChild = nodeChildren.item(i);
+	            	Map<String, Object> hashMap = parseProperties(nodeChild);
+	            	values.add(hashMap);
+	            }
+	            result = values;
+	        }
+        }
+        
+        return result;
     }
 
     /**
@@ -314,22 +414,36 @@ public class DocumentUtils {
         root.setAttribute("xmlns:" + ns, xc.getNamespaceURI());
         document.appendChild(root);
 
+        buildDocument(document, root, objectProps);
+        
+        return document;
+    }
+    
+    /**
+     * Builds the document.
+     *
+     * @param document the document
+     * @param e the e
+     * @param objectProps the object props
+     * @throws Exception the exception
+     */
+    public static void buildDocument(Document document, Element e,
+            Map<String, Object> objectProps) throws Exception {
         for (String prop : objectProps.keySet()) {
             Object value = objectProps.get(prop);
             if (value != null) {
                 //no need to qualify each element name as namespace is already added
-                Element e = document.createElement(prop);
-                root.appendChild(e);
+                Element newElement = document.createElement(prop);
+                e.appendChild(newElement);
                 if (value instanceof ArrayList<?>) {
                     //multi-value element
-                    insertMultiValues(document, e, (ArrayList<String>) value);
+                    insertMultiValues(document, newElement, (ArrayList<String>) value);
                 } else {
                     String strValue = objectProps.get(prop).toString();
-                    insertTextNode(document, e, strValue);
+                    insertTextNode(document, newElement, strValue);
                 }
             }
         }
-        return document;
     }
 
     /**
@@ -339,16 +453,62 @@ public class DocumentUtils {
      * @param e the e
      * @param vals the vals
      */
-    private static void insertMultiValues(Document document, Element e, ArrayList<String> vals) {
+    private static void insertMultiStringValues(Document document, Element e, ArrayList<String> vals) {
         String parentName = e.getNodeName();
         
-        for (Object o : vals) {
-            String val = (String) o; //force cast
+        for (String o : vals) {
+            String val = o;
             NameValue nv = unqualify(val);
             Element c = document.createElement(nv.name);
             e.appendChild(c);
             insertTextNode(document, c, nv.value);
         }
+    }
+    
+    /**
+     * Insert multi hash map values.
+     *
+     * @param document the document
+     * @param e the e
+     * @param vals the vals
+     * @throws Exception the exception
+     */
+    private static void insertMultiHashMapValues(Document document, Element e, ArrayList<Map<String, Object>> vals)
+    		throws Exception {
+        String parentName = e.getNodeName();
+        String childName = null;
+        if (parentName.endsWith("List") == true) {
+        	int parentNameLen = parentName.length();
+        	childName = parentName.substring(0, parentNameLen - "List".length());
+        } else {
+        	throw new Exception("Unknown node type from a Nuxeo document type.");
+        }
+                
+        for (Map<String, Object> map : vals) {
+            Element newNode = document.createElement(childName);
+            e.appendChild(newNode);
+            buildDocument(document, newNode, map);
+        }
+    }
+
+    /**
+     * Insert multi values.
+     *
+     * @param document the document
+     * @param e the e
+     * @param vals the vals
+     * @throws Exception the exception
+     */
+    private static void insertMultiValues(Document document, Element e, ArrayList<?> vals)
+    		throws Exception {
+    	if (vals != null && vals.size() > 0) {
+	    	Object firstElement = vals.get(0);
+	    	if (firstElement instanceof String) {
+	    		insertMultiStringValues(document, e, (ArrayList<String>)vals);
+	    	} else if (firstElement instanceof Map<?, ?>) {
+	    		insertMultiHashMapValues(document, e, (ArrayList<Map<String, Object>>)vals);
+	    	}
+    	}
     }
 
     /**
@@ -433,7 +593,7 @@ public class DocumentUtils {
     /**
      * getXmlDocoument retrieve w3c.Document from given file
      * @param fileName
-     * @return
+     * @return Document
      * @throws Exception
      */
     public static Document getXmlDocument(String fileName) throws Exception {

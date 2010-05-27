@@ -11,17 +11,34 @@
     $LastChangedDate$
 -->
 
-<xs:schema 
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:ns="http://collectionspace.org/collectionobject/"
     xmlns="http://collectionspace.org/collectionobject/"
-    targetNamespace="http://collectionspace.org/collectionobject/"
-    version="0.1">
+    targetNamespace="http://collectionspace.org/collectionobject/" version="0.1">
+
+    <xs:complexType name="otherNumberList">
+        <xs:sequence>
+            <xs:element name="otherNumber" type="ns:otherNumber" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="otherNumber">
+        <xs:sequence>
+            <xs:element name="numberValue" type="xs:string"/>
+            <xs:element name="numberType" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
 
     <!-- Object identification information -->
     <xs:element name="objectNumber" type="xs:string"/>
+    <xs:element name="otherNumberList" type="ns:otherNumberList"/>
+
+    <!-- Remove these two elements when the App/UI layer is using the new repeatable 'otherNumbers' field -->
     <xs:element name="otherNumber" type="xs:string"/>
     <xs:element name="otherNumberType" type="xs:string"/>
+
     <xs:element name="briefDescription" type="xs:string"/>
     <xs:element name="comments" type="xs:string"/>
     <xs:element name="distinguishingFeatures" type="xs:string"/>
@@ -36,7 +53,8 @@
     <xs:element name="responsibleDepartments">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="responsibleDepartment" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="responsibleDepartment" type="xs:string"
+                    minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -44,95 +62,95 @@
     <xs:element name="objectTitleLanguage" type="xs:string"/>
     <xs:element name="titleTranslation" type="xs:string"/>
     <xs:element name="titleType" type="xs:string"/>
-                
+
     <!-- Object description information -->
-    <xs:element name="age" type="xs:string" />
-    <xs:element name="ageQualifier" type="xs:string" />
-    <xs:element name="ageUnit" type="xs:string" />
-    <xs:element name="color" type="xs:string" />
+    <xs:element name="age" type="xs:string"/>
+    <xs:element name="ageQualifier" type="xs:string"/>
+    <xs:element name="ageUnit" type="xs:string"/>
+    <xs:element name="color" type="xs:string"/>
 
     <!-- Object description: Content information -->
-    <xs:element name="contentActivity" type="xs:string" />
-    <xs:element name="contentConcept" type="xs:string" />
-    <xs:element name="contentDate" type="xs:string" />
-    <xs:element name="contentDescription" type="xs:string" />
-    <xs:element name="contentEventName" type="xs:string" />
-    <xs:element name="contentEventNameType" type="xs:string" />
-    <xs:element name="contentNote" type="xs:string" />
-    <xs:element name="contentLanguage" type="xs:string" />
-    <xs:element name="contentObject" type="xs:string" />
-    <xs:element name="contentObjectType" type="xs:string" />
-    <xs:element name="contentOrganization" type="xs:string" />
-    <xs:element name="contentOther" type="xs:string" />
-    <xs:element name="contentOtherType" type="xs:string" />
-    <xs:element name="contentPeople" type="xs:string" />
-    <xs:element name="contentPerson" type="xs:string" />
-    <xs:element name="contentPlace" type="xs:string" />
-    <xs:element name="contentPosition" type="xs:string" />
-    <xs:element name="contentScript" type="xs:string" />
-    <xs:element name="copyNumber" type="xs:string" />
+    <xs:element name="contentActivity" type="xs:string"/>
+    <xs:element name="contentConcept" type="xs:string"/>
+    <xs:element name="contentDate" type="xs:string"/>
+    <xs:element name="contentDescription" type="xs:string"/>
+    <xs:element name="contentEventName" type="xs:string"/>
+    <xs:element name="contentEventNameType" type="xs:string"/>
+    <xs:element name="contentNote" type="xs:string"/>
+    <xs:element name="contentLanguage" type="xs:string"/>
+    <xs:element name="contentObject" type="xs:string"/>
+    <xs:element name="contentObjectType" type="xs:string"/>
+    <xs:element name="contentOrganization" type="xs:string"/>
+    <xs:element name="contentOther" type="xs:string"/>
+    <xs:element name="contentOtherType" type="xs:string"/>
+    <xs:element name="contentPeople" type="xs:string"/>
+    <xs:element name="contentPerson" type="xs:string"/>
+    <xs:element name="contentPlace" type="xs:string"/>
+    <xs:element name="contentPosition" type="xs:string"/>
+    <xs:element name="contentScript" type="xs:string"/>
+    <xs:element name="copyNumber" type="xs:string"/>
 
     <!-- Object description: Dimension information -->
-    <xs:element name="dimension" type="xs:string" />
-    <xs:element name="dimensionMeasuredPart" type="xs:string" />
-    <xs:element name="dimensionMeasurementUnit" type="xs:string" />
-    <xs:element name="dimensionValue" type="xs:string" />
-    <xs:element name="dimensionValueDate" type="xs:string" />
-    <xs:element name="dimensionValueQualifier" type="xs:string" />
-                
-    <xs:element name="editionNumber" type="xs:string" />
-    <xs:element name="form" type="xs:string" />
+    <xs:element name="dimension" type="xs:string"/>
+    <xs:element name="dimensionMeasuredPart" type="xs:string"/>
+    <xs:element name="dimensionMeasurementUnit" type="xs:string"/>
+    <xs:element name="dimensionValue" type="xs:string"/>
+    <xs:element name="dimensionValueDate" type="xs:string"/>
+    <xs:element name="dimensionValueQualifier" type="xs:string"/>
+
+    <xs:element name="editionNumber" type="xs:string"/>
+    <xs:element name="form" type="xs:string"/>
 
     <!-- Object description: Inscription content information -->
-    <xs:element name="inscriptionContent" type="xs:string" />
-    <xs:element name="inscriber" type="xs:string" />
-    <xs:element name="inscriptionDate" type="xs:string" />
-    <xs:element name="inscriptionInterpretation" type="xs:string" />
-    <xs:element name="inscriptionLanguage" type="xs:string" />
-    <xs:element name="inscriptionMethod" type="xs:string" />
-    <xs:element name="inscriptionPosition" type="xs:string" />
-    <xs:element name="inscriptionScript" type="xs:string" />
-    <xs:element name="inscriptionTranslation" type="xs:string" />
-    <xs:element name="inscriptionTransliteration" type="xs:string" />
-    <xs:element name="inscriptionType" type="xs:string" />
-                
+    <xs:element name="inscriptionContent" type="xs:string"/>
+    <xs:element name="inscriber" type="xs:string"/>
+    <xs:element name="inscriptionDate" type="xs:string"/>
+    <xs:element name="inscriptionInterpretation" type="xs:string"/>
+    <xs:element name="inscriptionLanguage" type="xs:string"/>
+    <xs:element name="inscriptionMethod" type="xs:string"/>
+    <xs:element name="inscriptionPosition" type="xs:string"/>
+    <xs:element name="inscriptionScript" type="xs:string"/>
+    <xs:element name="inscriptionTranslation" type="xs:string"/>
+    <xs:element name="inscriptionTransliteration" type="xs:string"/>
+    <xs:element name="inscriptionType" type="xs:string"/>
+
     <!-- Object description: Inscription description information -->
-    <xs:element name="inscriptionDescription" type="xs:string" />
-    <xs:element name="inscriptionDescriptionInscriber" type="xs:string" />
-    <xs:element name="inscriptionDescriptionDate" type="xs:string" />
-    <xs:element name="inscriptionDescriptionInterpretation" type="xs:string" />
-    <xs:element name="inscriptionDescriptionMethod" type="xs:string" />
-    <xs:element name="inscriptionDescriptionPosition" type="xs:string" />
-    <xs:element name="inscriptionDescriptionType" type="xs:string" />
+    <xs:element name="inscriptionDescription" type="xs:string"/>
+    <xs:element name="inscriptionDescriptionInscriber" type="xs:string"/>
+    <xs:element name="inscriptionDescriptionDate" type="xs:string"/>
+    <xs:element name="inscriptionDescriptionInterpretation" type="xs:string"/>
+    <xs:element name="inscriptionDescriptionMethod" type="xs:string"/>
+    <xs:element name="inscriptionDescriptionPosition" type="xs:string"/>
+    <xs:element name="inscriptionDescriptionType" type="xs:string"/>
 
     <!-- Object description: Material information -->
-    <xs:element name="material" type="xs:string" />
-    <xs:element name="materialComponent" type="xs:string" />
-    <xs:element name="materialComponentNote" type="xs:string" />
-    <xs:element name="materialName" type="xs:string" />
-    <xs:element name="materialSource" type="xs:string" />
+    <xs:element name="material" type="xs:string"/>
+    <xs:element name="materialComponent" type="xs:string"/>
+    <xs:element name="materialComponentNote" type="xs:string"/>
+    <xs:element name="materialName" type="xs:string"/>
+    <xs:element name="materialSource" type="xs:string"/>
 
     <!-- Misc Object description information -->
-    <xs:element name="objectStatus" type="xs:string" />
-    <xs:element name="phase" type="xs:string" />
-    <xs:element name="physicalDescription" type="xs:string" />
-    <xs:element name="sex" type="xs:string" />
-    <xs:element name="style" type="xs:string" />
-    <xs:element name="technicalAttribute" type="xs:string" />
-    <xs:element name="technicalAttributeMeasurement" type="xs:string" />
-    <xs:element name="technicalAttributeMeasurementUnit" type="xs:string" />
-    <xs:element name="objectComponentName" type="xs:string" />
-    <xs:element name="objectComponentInformation" type="xs:string" />
-				
+    <xs:element name="objectStatus" type="xs:string"/>
+    <xs:element name="phase" type="xs:string"/>
+    <xs:element name="physicalDescription" type="xs:string"/>
+    <xs:element name="sex" type="xs:string"/>
+    <xs:element name="style" type="xs:string"/>
+    <xs:element name="technicalAttribute" type="xs:string"/>
+    <xs:element name="technicalAttributeMeasurement" type="xs:string"/>
+    <xs:element name="technicalAttributeMeasurementUnit" type="xs:string"/>
+    <xs:element name="objectComponentName" type="xs:string"/>
+    <xs:element name="objectComponentInformation" type="xs:string"/>
+
     <!-- Object description: Date information -->
-    <xs:element name="dateAssociation" type="xs:string" />
-    <xs:element name="dateEarliestSingle" type="xs:string" />
-    <xs:element name="dateEarliestSingleCertainty" type="xs:string" />
-    <xs:element name="dateEarliestSingleQualifier" type="xs:string" />
-    <xs:element name="dateLatest" type="xs:string" />
-    <xs:element name="dateLatestCertainty" type="xs:string" />
-    <xs:element name="dateLatestQualifier" type="xs:string" />
-    <xs:element name="datePeriod" type="xs:string" />
-    <xs:element name="dateText" type="xs:string" />
-    
+    <xs:element name="dateAssociation" type="xs:string"/>
+    <xs:element name="dateEarliestSingle" type="xs:string"/>
+    <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
+    <xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
+    <xs:element name="dateLatest" type="xs:string"/>
+    <xs:element name="dateLatestCertainty" type="xs:string"/>
+    <xs:element name="dateLatestQualifier" type="xs:string"/>
+    <xs:element name="datePeriod" type="xs:string"/>
+    <xs:element name="dateText" type="xs:string"/>
+
 </xs:schema>

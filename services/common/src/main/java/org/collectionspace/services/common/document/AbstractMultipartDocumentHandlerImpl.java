@@ -33,6 +33,10 @@ import org.slf4j.LoggerFactory;
  *
  * $LastChangedRevision: $
  * $LastChangedDate: $
+ * @param <T> 
+ * @param <TL> 
+ * @param <WT> 
+ * @param <WTL> 
  */
 public abstract class AbstractMultipartDocumentHandlerImpl<T, TL, WT, WTL>
         extends AbstractDocumentHandlerImpl<T, TL, WT, WTL>
@@ -41,8 +45,12 @@ public abstract class AbstractMultipartDocumentHandlerImpl<T, TL, WT, WTL>
     private final Logger logger = LoggerFactory.getLogger(AbstractMultipartDocumentHandlerImpl.class);
 
     public AbstractMultipartDocumentHandlerImpl() {
+    	//Empty constructor
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#handleCreate(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public abstract void handleCreate(DocumentWrapper<WT> wrapDoc) throws Exception;
 

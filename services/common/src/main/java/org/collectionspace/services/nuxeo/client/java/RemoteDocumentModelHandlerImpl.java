@@ -66,10 +66,14 @@ import org.w3c.dom.Document;
 public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         extends DocumentModelHandler<T, TL> {
 
+    /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(RemoteDocumentModelHandlerImpl.class);
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#setServiceContext(org.collectionspace.services.common.context.ServiceContext)
+     */
     @Override
-    public void setServiceContext(ServiceContext ctx) {
+    public void setServiceContext(ServiceContext ctx) {  //FIXME: Apply proper generics to ServiceContext<MultipartInput, MultipartOutput>
         if(ctx instanceof MultipartServiceContext){
             super.setServiceContext(ctx);
         }else{
@@ -78,6 +82,9 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#completeUpdate(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void completeUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         DocumentModel docModel = wrapDoc.getWrappedObject();
@@ -94,17 +101,24 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         }
     }
 
-    protected void addOutputPart(Map<String, Object> unQObjectProperties, String schema, ObjectPartType partMeta)
+    /**
+     * Adds the output part.
+     *
+     * @param unQObjectProperties the un q object properties
+     * @param schema the schema
+     * @param partMeta the part meta
+     * @throws Exception the exception
+     */
+    private void addOutputPart(Map<String, Object> unQObjectProperties, String schema, ObjectPartType partMeta)
     		throws Exception {
 		Document doc = DocumentUtils.buildDocument(partMeta, schema,
 				unQObjectProperties);
-		if (logger.isDebugEnabled()) {
-			DocumentUtils.writeDocument(doc, System.out);
+		if (logger.isDebugEnabled() == true) {			
+			logger.debug(DocumentUtils.xmlToString(doc));
 		}
 		MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
 		ctx.addOutputPart(schema, doc, partMeta.getContent().getContentType());
-    }
-    
+    }    
     
     /**
      * Extract paging info.
@@ -133,6 +147,9 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
     }
     
     
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractAllParts(org.collectionspace.services.common.document.DocumentWrapper)
+	 */
 	@Override
 	public void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc)
 			throws Exception {
@@ -150,6 +167,9 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
 		}
 	}
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#fillAllParts(org.collectionspace.services.common.document.DocumentWrapper)
+     */
     @Override
     public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
 
@@ -202,10 +222,10 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         //check if this is an xml part
         if(part.getMediaType().equals(MediaType.APPLICATION_XML_TYPE)){
             if(payload != null){
-                Document document = DocumentUtils.parseDocument(payload);
+                Document document = DocumentUtils.parseDocument(payload, partMeta);
                 //TODO: callback to handler if registered to validate the
                 //document
-                Map<String, Object> objectProps = DocumentUtils.parseProperties(document);
+                Map<String, Object> objectProps = DocumentUtils.parseProperties(document.getFirstChild());
                 docModel.setProperties(partMeta.getLabel(), objectProps);
             }
         }

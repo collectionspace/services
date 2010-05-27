@@ -19,7 +19,20 @@
   xmlns="http://collectionspace.org/services/collectionobject"
   targetNamespace="http://collectionspace.org/services/collectionobject"
   version="0.1">
-            
+
+    <xs:complexType name="otherNumberList">
+        <xs:sequence>
+            <xs:element name="otherNumber" type="ns:otherNumber" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="otherNumber">
+        <xs:sequence>
+            <xs:element name="numberValue" type="xs:string"/>
+            <xs:element name="numberType" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    
 <!--
     Avoid XmlRootElement nightmare:
     See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
@@ -34,8 +47,12 @@
                 
                 <!-- Object identification information -->
                 <xs:element name="objectNumber" type="xs:string"/>
+                <xs:element name="otherNumberList" type="ns:otherNumberList" />
+                
+                <!-- Remove these two elements when the App/UI layer is using the new repeatable 'otherNumbers' field -->
                 <xs:element name="otherNumber" type="xs:string"/>
                 <xs:element name="otherNumberType" type="xs:string"/>
+
                 <xs:element name="briefDescription" type="xs:string"/>
                 <xs:element name="comments" type="xs:string"/>
                 <xs:element name="distinguishingFeatures" type="xs:string"/>
