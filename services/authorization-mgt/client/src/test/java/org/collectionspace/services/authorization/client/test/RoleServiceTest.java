@@ -57,9 +57,12 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownResourceId = null;
+    private String knownRoleName = "ROLE_USERS_TEST";
+    private String verifyResourceId = null;
+    private String verifyRoleName = "collections_manager_test";
 //    private List<String> allResourceIdsCreated = new ArrayList<String>();
     /** The add tenant. */
-boolean addTenant = true;
+    boolean addTenant = true;
     /*
      * This method is called only by the parent class, AbstractServiceTestImpl
      */
@@ -77,28 +80,28 @@ boolean addTenant = true;
      */
     @Override
     protected CollectionSpaceClient getClientInstance() {
-    	return new RoleClient();
+        return new RoleClient();
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getAbstractCommonList(
-			ClientResponse<AbstractCommonList> response) {
-    	//FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
-    	throw new UnsupportedOperationException();
+    protected AbstractCommonList getAbstractCommonList(
+            ClientResponse<AbstractCommonList> response) {
+        //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
+        throw new UnsupportedOperationException();
     }
-    
-	/* (non-Javadoc)
-	 * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
-	 */
-	@Test(dataProvider = "testName")
-	@Override
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
+     */
+    @Test(dataProvider = "testName")
+    @Override
     public void readPaginatedList(String testName) throws Exception {
-			//FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
-	}    
- 
+        //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
+    }
+
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
@@ -117,7 +120,7 @@ boolean addTenant = true;
 
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
-        Role role = createRoleInstance("ROLE_USERS_TEST",
+        Role role = createRoleInstance(knownRoleName,
                 "all users are required to be in this role",
                 true);
         ClientResponse<Response> res = client.create(role);
@@ -212,8 +215,10 @@ boolean addTenant = true;
         setupCreate(testName);
 
         // Submit the request to the service and store the response.
-         RoleClient client = new RoleClient();
-       Role role1 = createRoleInstance("ROLE_COLLECTIONS_MANGER_TEST",
+        RoleClient client = new RoleClient();
+        //create a role with lowercase role name without role prefix
+        //the service should make it upper case and add the role prefix
+        Role role1 = createRoleInstance(verifyRoleName,
                 "collection manager",
                 true);
         ClientResponse<Response> res = client.create(role1);
@@ -221,7 +226,8 @@ boolean addTenant = true;
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        allResourceIdsCreated.add(extractId(res));
+        verifyResourceId = extractId(res);
+        allResourceIdsCreated.add(verifyResourceId);
 
         Role role2 = createRoleInstance("ROLE_COLLECTIONS_CURATOR_TEST",
                 "collections curator",
@@ -254,7 +260,7 @@ boolean addTenant = true;
      */
     @Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -262,7 +268,7 @@ boolean addTenant = true;
      */
     @Override
     public void createWithMalformedXml(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -270,7 +276,7 @@ boolean addTenant = true;
      */
     @Override
     public void createWithWrongXmlSchema(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     // ---------------------------------------------------------------
@@ -306,10 +312,39 @@ boolean addTenant = true;
         Assert.assertNotNull(output);
     }
 
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"createList"})
+    public void readToVerify(String testName) throws Exception {
+
+        // Perform setup.
+        setupRead(testName);
+
+        // Submit the request to the service and store the response.
+        RoleClient client = new RoleClient();
+        ClientResponse<Role> res = client.read(verifyResourceId);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        Role output = (Role) res.getEntity();
+        Assert.assertNotNull(output);
+
+        String roleNameToVerify = "ROLE_" + verifyRoleName.toUpperCase();
+        Assert.assertEquals(output.getRoleName(), roleNameToVerify,
+                "RoleName fix did not work!");
+    }
     // Failure outcomes
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readNonExistent(java.lang.String)
      */
+
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read"})
@@ -428,9 +463,10 @@ boolean addTenant = true;
 
         Role roleToUpdate = new Role();
         roleToUpdate.setCsid(knownResourceId);
-
+        roleToUpdate.setRoleName(knownRoleName);
+        
         // Update the content of this resource.
-        roleToUpdate.setRoleName("updated-role");
+        roleToUpdate.setDescription("updated role description");
         if (logger.isDebugEnabled()) {
             logger.debug("updated object");
             logger.debug(objectAsXmlString(roleToUpdate,
@@ -452,9 +488,39 @@ boolean addTenant = true;
         Role roleUpdated = (Role) res.getEntity();
         Assert.assertNotNull(roleUpdated);
 
-        Assert.assertEquals(roleUpdated.getRoleName(),
-                roleToUpdate.getRoleName(),
+        Assert.assertEquals(roleUpdated.getDescription(),
+                roleToUpdate.getDescription(),
                 "Data in updated object did not match submitted data.");
+    }
+
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"read", "readList", "readNonExistent"})
+    public void updateNotAllowed(String testName) throws Exception {
+
+        // Perform setup.
+        setupUpdate(testName);
+
+        Role roleToUpdate = new Role();
+        roleToUpdate.setCsid(knownResourceId);
+        // Update the content of this resource.
+        roleToUpdate.setRoleName("UPDATED-ROLE_USERS_TEST");
+        if (logger.isDebugEnabled()) {
+            logger.debug("updated object");
+            logger.debug(objectAsXmlString(roleToUpdate,
+                    Role.class));
+        }
+        RoleClient client = new RoleClient();
+        // Submit the request to the service and store the response.
+        ClientResponse<Role> res = client.update(knownResourceId, roleToUpdate);
+        int statusCode = res.getStatus();
+        // Check the status code of the response: does it match the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+
     }
 
     // Failure outcomes
@@ -465,7 +531,7 @@ boolean addTenant = true;
      */
     @Override
     public void updateWithEmptyEntityBody(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -473,7 +539,7 @@ boolean addTenant = true;
      */
     @Override
     public void updateWithMalformedXml(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -481,7 +547,7 @@ boolean addTenant = true;
      */
     @Override
     public void updateWithWrongXmlSchema(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -526,7 +592,7 @@ boolean addTenant = true;
      */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"update"})
+    dependsOnMethods = {"updateNotAllowed"})
     public void delete(String testName) throws Exception {
 
         // Perform setup.

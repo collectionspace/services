@@ -32,6 +32,7 @@ import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RolesList;
 
 import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
+import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.JaxbUtils;
@@ -53,6 +54,7 @@ public class RoleDocumentHandler
     public void handleCreate(DocumentWrapper<Role> wrapDoc) throws Exception {
         String id = UUID.randomUUID().toString();
         Role role = wrapDoc.getWrappedObject();
+        role.setRoleName(fixRoleName(role.getRoleName()));
         role.setCsid(id);
         //FIXME: if admin updating the role is a CS admin rather than
         //the tenant admin, tenant id should be retrieved from the request
@@ -63,6 +65,7 @@ public class RoleDocumentHandler
     public void handleUpdate(DocumentWrapper<Role> wrapDoc) throws Exception {
         Role roleFound = wrapDoc.getWrappedObject();
         Role roleReceived = getCommonPart();
+        roleReceived.setRoleName(fixRoleName(roleReceived.getRoleName()));
         merge(roleReceived, roleFound);
     }
 
@@ -73,9 +76,12 @@ public class RoleDocumentHandler
      * @param to
      * @return merged role
      */
-    private Role merge(Role from, Role to) {
-        if (from.getRoleName() != null) {
-            to.setRoleName(from.getRoleName());
+    private Role merge(Role from, Role to) throws Exception {
+        //role name cannot be changed
+        if (!(from.getRoleName().equalsIgnoreCase(to.getRoleName()))) {
+            String msg = "Role name cannot be changed " + to.getRoleName();
+            logger.error(msg);
+            throw new BadRequestException(msg);
         }
         if (from.getRoleGroup() != null) {
             to.setRoleGroup(from.getRoleGroup());
@@ -177,5 +183,14 @@ public class RoleDocumentHandler
      */
     private void sanitize(Role role) {
         role.setTenantId(null);
+    }
+
+    private String fixRoleName(String role) {
+        String roleName = role.toUpperCase();
+        String rolePrefix = "ROLE_";
+        if (!roleName.startsWith(rolePrefix)) {
+            roleName = rolePrefix + roleName;
+        }
+        return roleName;
     }
 }

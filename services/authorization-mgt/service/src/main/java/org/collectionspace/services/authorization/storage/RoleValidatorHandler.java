@@ -62,9 +62,9 @@ public class RoleValidatorHandler implements ValidatorHandler {
                 }
             } else if (action.equals(Action.UPDATE)) {
                 //update specific validation here
-                if (role.getRoleName() != null && role.getRoleName().isEmpty()) {
+                if (role.getRoleName() == null || role.getRoleName().isEmpty()) {
                     invalid = true;
-                    msgBldr.append("\nroleName : cannot be empty");
+                    msgBldr.append("\nroleName : cannot be missing or empty");
                 }
             }
             if (invalid) {

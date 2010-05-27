@@ -61,9 +61,9 @@ public class PermissionValidatorHandler implements ValidatorHandler {
                 }
             } else if (action.equals(Action.UPDATE)) {
                 //update specific validation here
-                if (permission.getResourceName() != null && permission.getResourceName().isEmpty()) {
+                if (permission.getResourceName() == null || permission.getResourceName().isEmpty()) {
                     invalid = true;
-                    msgBldr.append("\nresourceName : cannot be empty");
+                    msgBldr.append("\nresourceName : cannot be missing or empty");
                 }
             }
             if (invalid) {

@@ -24,7 +24,6 @@
 package org.collectionspace.services.authorization.storage;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,6 +32,7 @@ import org.collectionspace.services.authorization.PermissionAction;
 import org.collectionspace.services.authorization.PermissionsList;
 
 import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
+import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.JaxbUtils;
@@ -78,15 +78,14 @@ public class PermissionDocumentHandler
      * @param to
      * @return merged permission
      */
-    private Permission merge(Permission from, Permission to) {
-        Date now = new Date();
-        to.setUpdatedAtItem(now);
-        if (from.getResourceName() != null) {
-            to.setResourceName(from.getResourceName());
+    private Permission merge(Permission from, Permission to) throws Exception {
+        if (!(from.getResourceName().equalsIgnoreCase(to.getResourceName()))) {
+            String msg = "Resource name cannot be changed " + to.getResourceName();
+            logger.error(msg);
+            throw new BadRequestException(msg);
         }
-        if (from.getAttributeName() != null) {
-            to.setAttributeName(from.getAttributeName());
-        }
+        //resource name, attribute  cannot be changed
+
         if (from.getDescription() != null) {
             to.setDescription(from.getDescription());
         }
@@ -111,6 +110,9 @@ public class PermissionDocumentHandler
         Permission upAcc = wrapDoc.getWrappedObject();
         getServiceContext().setOutput(permission);
         sanitize(upAcc);
+        //FIXME update lower-layer authorization (acls)
+        //will require deleting old permissions for this resource and adding
+        //new based on new actions and effect
     }
 
     @Override

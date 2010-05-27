@@ -60,7 +60,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownResourceId = null;
-    
+    private String knownResource = "accounts-test";
     /** The add tenant. */
     boolean addTenant = true;
     /*
@@ -80,36 +80,36 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     protected CollectionSpaceClient getClientInstance() {
-    	return new PermissionClient();
+        return new PermissionClient();
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getAbstractCommonList(
-			ClientResponse<AbstractCommonList> response) {
-    	//FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
-    	throw new UnsupportedOperationException();
+    protected AbstractCommonList getAbstractCommonList(
+            ClientResponse<AbstractCommonList> response) {
+        //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
+        throw new UnsupportedOperationException();
     }
-    
-	/* (non-Javadoc)
-	 * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
-	 */
-	@Test(dataProvider = "testName")
-	@Override
-    public void readPaginatedList(String testName) throws Exception {
-		//FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
-	}    
 
-	// ---------------------------------------------------------------
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
+     */
+    @Test(dataProvider = "testName")
+    @Override
+    public void readPaginatedList(String testName) throws Exception {
+        //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
+    }
+
+    // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
     /* (non-Javadoc)
-	 * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
-	 */
-	@Override
+     * @see org.collectionspace.services.client.test.ServiceTest#create(java.lang.String)
+     */
+    @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
 
@@ -120,7 +120,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         List<PermissionAction> actions = PermissionFactory.createDefaultActions();
-        Permission permission = createPermissionInstance("accounts",
+        Permission permission = createPermissionInstance(knownResource,
                 "default permissions for account",
                 actions,
                 EffectType.PERMIT,
@@ -249,7 +249,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -257,7 +257,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithMalformedXml(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -265,7 +265,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithWrongXmlSchema(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     // ---------------------------------------------------------------
@@ -423,8 +423,9 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
 
         Permission permToUpdate = new Permission();
         permToUpdate.setCsid(knownResourceId);
+        permToUpdate.setResourceName(knownResource);
         // Update the content of this resource.
-        permToUpdate.setResourceName("updated-resource");
+        permToUpdate.setDescription("updated description");
         if (logger.isDebugEnabled()) {
             logger.debug("updated object");
             logger.debug(objectAsXmlString(permToUpdate,
@@ -446,9 +447,39 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         Permission permUpdated = (Permission) res.getEntity();
         Assert.assertNotNull(permUpdated);
 
-        Assert.assertEquals(permUpdated.getResourceName(),
-                permToUpdate.getResourceName(),
+        Assert.assertEquals(permUpdated.getDescription(),
+                permToUpdate.getDescription(),
                 "Data in updated object did not match submitted data.");
+    }
+
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"read", "readList", "readNonExistent"})
+    public void updateNotAllowed(String testName) throws Exception {
+
+        // Perform setup.
+        setupUpdate(testName);
+
+        Permission permToUpdate = new Permission();
+        permToUpdate.setCsid(knownResourceId);
+        // Update the content of this resource.
+        permToUpdate.setResourceName("updated-resource");
+        if (logger.isDebugEnabled()) {
+            logger.debug("updated object");
+            logger.debug(objectAsXmlString(permToUpdate,
+                    Permission.class));
+        }
+        PermissionClient client = new PermissionClient();
+        // Submit the request to the service and store the response.
+        ClientResponse<Permission> res = client.update(knownResourceId, permToUpdate);
+        int statusCode = res.getStatus();
+        // Check the status code of the response: does it match the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
+
     }
 
     /**
@@ -458,7 +489,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
      * @throws Exception the exception
      */
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"update"})
+    dependsOnMethods = {"updateNotAllowed"})
     public void updateActions(String testName) throws Exception {
 
         // Perform setup.
@@ -466,6 +497,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
 
         Permission permToUpdate = new Permission();
         permToUpdate.setCsid(knownResourceId);
+        permToUpdate.setResourceName(knownResource);
         // Update the content of this resource.
         List<PermissionAction> actions = PermissionFactory.createDefaultActions();
         int default_actions = actions.size();
@@ -513,7 +545,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void updateWithEmptyEntityBody(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -521,7 +553,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void updateWithMalformedXml(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -529,7 +561,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void updateWithWrongXmlSchema(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)

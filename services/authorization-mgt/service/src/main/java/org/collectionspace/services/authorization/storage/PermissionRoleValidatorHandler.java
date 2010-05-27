@@ -69,7 +69,7 @@ public class PermissionRoleValidatorHandler implements ValidatorHandler {
                         invalid = true;
                     }
                 }
-            } 
+                    }
             if (invalid) {
                 String msg = msgBldr.toString();
                 logger.error(msg);
