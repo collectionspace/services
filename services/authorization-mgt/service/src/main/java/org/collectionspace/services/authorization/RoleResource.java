@@ -152,8 +152,8 @@ public class RoleResource
             throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.POST_FAILED +
-                    ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.POST_FAILED
+                    + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -161,8 +161,8 @@ public class RoleResource
             }
             logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.POST_FAILED +
-                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.POST_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
     }
@@ -196,8 +196,8 @@ public class RoleResource
             result = (Role) ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.GET_FAILED +
-                    ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.GET_FAILED
+                    + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
@@ -213,8 +213,8 @@ public class RoleResource
             }
             logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.GET_FAILED +
-                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.GET_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
 
@@ -251,8 +251,8 @@ public class RoleResource
             roleList = (RolesList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.LIST_FAILED +
-                    ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.LIST_FAILED
+                    + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
 
         } catch (Exception e) {
@@ -261,8 +261,8 @@ public class RoleResource
             }
             logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.LIST_FAILED +
-                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.LIST_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return roleList;
@@ -287,8 +287,8 @@ public class RoleResource
         if (csid == null || "".equals(csid)) {
             logger.error("updateRole: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    ServiceMessages.PUT_FAILED + "role " +
-                    ServiceMessages.MISSING_INVALID_CSID + csid).type(
+                    ServiceMessages.PUT_FAILED + "role "
+                    + ServiceMessages.MISSING_INVALID_CSID + csid).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
@@ -300,13 +300,13 @@ public class RoleResource
             result = (Role) ctx.getOutput();
         } catch (BadRequestException bre) {
             Response response = Response.status(
-                    Response.Status.BAD_REQUEST).entity(ServiceMessages.PUT_FAILED +
-                    bre.getErrorReason()).type("text/plain").build();
+                    Response.Status.BAD_REQUEST).entity(ServiceMessages.PUT_FAILED
+                    + bre.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.PUT_FAILED  +
-                    ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.PUT_FAILED
+                    + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
@@ -320,8 +320,8 @@ public class RoleResource
             logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    ServiceMessages.PUT_FAILED +
-                    ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+                    ServiceMessages.PUT_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return result;
@@ -354,7 +354,7 @@ public class RoleResource
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.DELETE_FAILED  + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.DELETE_FAILED + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
 
         } catch (DocumentNotFoundException dnfe) {
@@ -370,6 +370,154 @@ public class RoleResource
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(
                     ServiceMessages.DELETE_FAILED + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+
+    }
+
+    @POST
+    @Path("{csid}/permroles")
+    public Response createRolePermission(@PathParam("csid") String roleCsid,
+            PermissionRole input) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("createRolePermission with roleCsid=" + roleCsid);
+        }
+        if (roleCsid == null || "".equals(roleCsid)) {
+            logger.error("createRolePermission: missing roleCsid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    ServiceMessages.POST_FAILED + "permroles role "
+                    + ServiceMessages.MISSING_INVALID_CSID + roleCsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        try {
+            PermissionRoleSubResource subResource =
+                    new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
+            String permrolecsid = subResource.createPermissionRole(input, SubjectType.PERMISSION);
+            UriBuilder path = UriBuilder.fromResource(PermissionResource.class);
+            path.path(roleCsid + "/permroles/" + permrolecsid);
+            Response response = Response.created(path.build()).build();
+            return response;
+        } catch (BadRequestException bre) {
+            Response response = Response.status(
+                    Response.Status.BAD_REQUEST).entity("Create failed reason "
+                    + bre.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Create failed reason "
+                    + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception in createRolePermission", e);
+            }
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.POST_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+    }
+
+    @GET
+    @Path("{csid}/permroles/{permrolecsid}")
+    public PermissionRole getRolePermission(
+            @PathParam("csid") String roleCsid,
+            @PathParam("permrolecsid") String permrolecsid) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("getRolePermission with roleCsid=" + roleCsid);
+        }
+        if (roleCsid == null || "".equals(roleCsid)) {
+            logger.error("getRolePermission: missing roleCsid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    ServiceMessages.GET_FAILED + "permroles role "
+                    + ServiceMessages.MISSING_INVALID_CSID + roleCsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        PermissionRole result = null;
+        try {
+            PermissionRoleSubResource subResource =
+                    new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
+            //get relationships for a role
+            result = subResource.getPermissionRole(roleCsid, SubjectType.PERMISSION);
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.GET_FAILED
+                    + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getRolePermission", dnfe);
+            }
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    ServiceMessages.GET_FAILED + "permroles role csid=" + roleCsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getRolePermission", e);
+            }
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.GET_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        if (result == null) {
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    ServiceMessages.GET_FAILED + "permroles role csid=" + roleCsid
+                    + ": was not found.").type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return result;
+    }
+
+    @DELETE
+    @Path("{csid}/permroles/{permrolecsid}")
+    public Response deleteRolePermission(
+            @PathParam("csid") String roleCsid,
+            @PathParam("permrolecsid") String permrolecsid) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("deleteRolePermission with roleCsid=" + roleCsid);
+        }
+        if (roleCsid == null || "".equals(roleCsid)) {
+            logger.error("deleteRolePermission: missing roleCsid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    ServiceMessages.DELETE_FAILED + "permroles role "
+                    + ServiceMessages.MISSING_INVALID_CSID + roleCsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        try {
+            PermissionRoleSubResource subResource =
+                    new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
+            //delete all relationships for a permission
+            subResource.deletePermissionRole(roleCsid, SubjectType.PERMISSION);
+            return Response.status(HttpResponseCodes.SC_OK).build();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.DELETE_FAILED
+                    + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("caught exception in deleteRolePermission", dnfe);
+            }
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    ServiceMessages.DELETE_FAILED + "role csid=" + roleCsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.DELETE_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
             throw new WebApplicationException(response);
         }
 

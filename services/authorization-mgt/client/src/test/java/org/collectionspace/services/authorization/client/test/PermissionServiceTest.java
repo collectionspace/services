@@ -611,7 +611,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"updateActions"})
+    dependsOnMethods = {"updateActions", "testSubmitRequest"})
     public void delete(String testName) throws Exception {
 
         // Perform setup.
@@ -667,7 +667,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
      * of the methods above.
      * @throws Exception 
      */
-    @Test(dependsOnMethods = {"create", "read"})
+    @Test(dependsOnMethods = {"create"})
     public void testSubmitRequest() throws Exception {
 
         // Expected status code: 200 OK

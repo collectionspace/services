@@ -23,9 +23,9 @@
  */
 package org.collectionspace.services.client;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.RoleValue;
@@ -39,16 +39,17 @@ import org.slf4j.LoggerFactory;
 public class PermissionRoleFactory {
 
     static private final Logger logger = LoggerFactory.getLogger(PermissionRoleFactory.class);
-        /**
-     * create permRolerole instance
-     * @param permId
-     * @param roleValues array of role ids
+
+    /**
+     * create permRolerole instance with permission as object and role as subject
+     * @param pv permvalue
+     * @param rvs roleValues
      * @param userPermId
      * @param useRoleId
      * @return
      */
     public static PermissionRole createPermissionRoleInstance(PermissionValue pv,
-            Collection<RoleValue> rvs,
+            List<RoleValue> rvs,
             boolean usePermId,
             boolean useRoleId) {
 
@@ -62,12 +63,37 @@ public class PermissionRoleFactory {
             permRole.setPermissions(pvs);
         }
         if (useRoleId) {
-            //FIXME is there a better way?
-            ArrayList<RoleValue> rvas = new ArrayList<RoleValue>();
-            for (RoleValue rv : rvs) {
-                rvas.add(rv);
-            }
-            permRole.setRoles(rvas);
+            permRole.setRoles(rvs);
+        }
+
+        return permRole;
+    }
+
+
+    /**
+     * create permRolerole instance with role as object and permission as subject
+     * @param rv roleValue
+     * @param pvs permValues
+     * @param userPermId
+     * @param useRoleId
+     * @return
+     */
+    public static PermissionRole createPermissionRoleInstance(RoleValue rv,
+            List<PermissionValue> pvs,
+            boolean usePermId,
+            boolean useRoleId) {
+
+        PermissionRole permRole = new PermissionRole();
+        //service consume is not required to provide subject as it is determined
+        //from URI used
+//        permRole.setSubject(SubjectType.ROLE);
+        if (useRoleId) {
+            ArrayList<RoleValue> rvs = new ArrayList<RoleValue>();
+            rvs.add(rv);
+            permRole.setRoles(rvs);
+        }
+        if (usePermId) {
+            permRole.setPermissions(pvs);
         }
 
         return permRole;

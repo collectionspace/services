@@ -533,7 +533,7 @@
         <!-- end person service meta-data -->
         <!-- begin locationauthority service meta-data -->
         <tenant:serviceBindings name="Locationauthorities" version="0.1">
-                        <!-- other URI paths using which this service could be accessed -->
+            <!-- other URI paths using which this service could be accessed -->
             <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /locationauthorities/*/items/
             </service:uriPath>
@@ -912,6 +912,8 @@
         </tenant:serviceBindings>
         <!-- end permission service meta-data -->
         <!-- begin permission-role service meta-data -->
+        <!-- the following service is same as authorization/roles/permroles service -->
+        <!-- except that it is available as a sub resource of the permission service -->
         <tenant:serviceBindings name="authorization/permissions/permroles" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
             <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
@@ -985,6 +987,45 @@
             </service:object>
         </tenant:serviceBindings>
         <!-- end account-role service meta-data -->
+        <!-- begin role-permission service meta-data -->
+        <!-- the following service is same as authorization/permissions/permroles service -->
+        <!-- except that it is available as a sub resource of the role service -->
+        <tenant:serviceBindings name="authorization/roles/permroles" version="0.1">
+            <!-- other URI paths using which this service could be accessed -->
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /authorization/roles/*/permroles/
+            </service:uriPath>
+            <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.authorization.storage.PermissionRoleDocumentHandler
+            </service:documentHandler>
+            <!--service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.authorization.storage.PermissionRoleValidatorHandler
+            </service:validatorHandler-->
+            <service:object name="PermissionRole" version="0.1"
+                            xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:part id="0" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="permroles_system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/common/system"
+                            schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="permroles" updated="" order="1">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/authorization"
+                            schemaLocation="http://collectionspace.org/services/authorization http://services.collectionspace.org/authorization/permissions_roles.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end role-permission service meta-data -->
     </tenant:tenantBinding>
     <!-- end movingimages.us tenant meta-data -->
 </tenant:TenantBindingConfig>

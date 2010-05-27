@@ -592,7 +592,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"updateNotAllowed"})
+    dependsOnMethods = {"updateNotAllowed", "testSubmitRequest"})
     public void delete(String testName) throws Exception {
 
         // Perform setup.
@@ -648,7 +648,8 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
      * of the methods above.
      * @throws Exception 
      */
-    @Test(dependsOnMethods = {"create", "read"})
+
+    @Test(dependsOnMethods = {"create"})
     public void testSubmitRequest() throws Exception {
 
         // Expected status code: 200 OK

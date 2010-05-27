@@ -3,7 +3,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>5a0bad92-cac6-4694-84d6-d393a52aafd9</permissionId>
+            <permissionId>68eea582-e5b0-4aab-a01b-e45126ce1924</permissionId>
             <resourceName>idgenerators</resourceName>
         </permission>
         <role>
@@ -14,7 +14,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>3e0a37ab-4ca3-4659-bef6-ff7e7c3ce590</permissionId>
+            <permissionId>150c809f-ffd6-4b23-b86b-a6533feeda29</permissionId>
             <resourceName>id</resourceName>
         </permission>
         <role>
@@ -25,7 +25,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>0d8826df-d61a-448e-8d8a-9e41bf178582</permissionId>
+            <permissionId>30f13249-56c6-428e-9f9b-be092520ca30</permissionId>
             <resourceName>
                 /idgenerators/*/ids
             </resourceName>
@@ -38,7 +38,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>f872859a-7f05-4d0a-b898-ef8f1b7745ba</permissionId>
+            <permissionId>e5005679-b03a-4911-9081-741dced66508</permissionId>
             <resourceName>collectionobjects</resourceName>
         </permission>
         <role>
@@ -49,7 +49,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>cca70419-20ce-4bf7-ad9f-cb5d8c542577</permissionId>
+            <permissionId>676a2ce3-f65a-445e-bc0f-cce5dc056eac</permissionId>
             <resourceName>
                 /collectionobjects/*/authorityrefs/
             </resourceName>
@@ -62,7 +62,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>ca89d98e-7fc4-44e5-9e5f-fea49bdb7e89</permissionId>
+            <permissionId>200f1961-8910-4170-8f7b-32fcf7eef047</permissionId>
             <resourceName>intakes</resourceName>
         </permission>
         <role>
@@ -73,7 +73,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>c3e6c0c6-b6c0-4bb1-a03d-2e86857b74b4</permissionId>
+            <permissionId>aa534e0f-6979-4c52-873c-d58bd0151f9c</permissionId>
             <resourceName>
                 /intakes/*/authorityrefs/
             </resourceName>
@@ -86,7 +86,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>cea2e847-0944-49c0-8746-4622c1169a65</permissionId>
+            <permissionId>0a3692cd-94f6-44dd-854a-1fb0b19fe71d</permissionId>
             <resourceName>loansin</resourceName>
         </permission>
         <role>
@@ -97,7 +97,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>b163f821-5791-4044-be1c-ddbd3738a4b4</permissionId>
+            <permissionId>f56deb15-81a5-47ad-89c7-ea4738451b8c</permissionId>
             <resourceName>
                 /loansin/*/authorityrefs/
             </resourceName>
@@ -110,7 +110,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>3a77ffcf-8052-466c-99d7-61fff28d9f88</permissionId>
+            <permissionId>1628fe32-a657-4577-a6cd-87bcf942d56d</permissionId>
             <resourceName>loansout</resourceName>
         </permission>
         <role>
@@ -121,7 +121,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>859d46be-9bf6-4bce-9950-3e07fd35fc91</permissionId>
+            <permissionId>d38171bb-62b2-402b-a8e9-329433f7092c</permissionId>
             <resourceName>
                 /loansout/*/authorityrefs/
             </resourceName>
@@ -134,7 +134,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>f079772b-b15a-45b9-9e30-ba93ec62886b</permissionId>
+            <permissionId>bf39f493-8e5b-4ca1-baaf-67dd8283b299</permissionId>
             <resourceName>movements</resourceName>
         </permission>
         <role>
@@ -145,7 +145,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>05a0e8d6-c623-470f-8562-e1ebaa8661a0</permissionId>
+            <permissionId>30130f70-6122-478c-9425-428815c0006c</permissionId>
             <resourceName>
                 /movements/*/authorityrefs/
             </resourceName>
@@ -158,7 +158,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>72115711-331e-4e6d-a4d7-2d9ad22bb2e3</permissionId>
+            <permissionId>61dc8d8b-8d2e-4d0b-a76f-87d5be9a583c</permissionId>
             <resourceName>vocabularies</resourceName>
         </permission>
         <role>
@@ -169,7 +169,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>401d9a19-add1-475b-97c6-715d18001fed</permissionId>
+            <permissionId>cdff0a6a-ca8a-4651-a291-d7e4e9e531ba</permissionId>
             <resourceName>vocabularyitems</resourceName>
         </permission>
         <role>
@@ -180,7 +180,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>862e5aa7-40e0-433c-b918-025a649543e0</permissionId>
+            <permissionId>2bbbbe30-9562-4686-8237-00422e24e1d6</permissionId>
             <resourceName>
                 /vocabularies/*/items/
             </resourceName>
@@ -193,7 +193,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>b8fbde29-bb5a-4d88-88c9-01881b4953a7</permissionId>
+            <permissionId>60e310d8-8d49-4ced-bdff-d1bc82d8cabd</permissionId>
             <resourceName>orgauthorities</resourceName>
         </permission>
         <role>
@@ -204,7 +204,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>458a330f-1b4d-4e52-950c-f2aacf9a4870</permissionId>
+            <permissionId>0562b8c3-1883-4491-b77f-d8437c1433d6</permissionId>
             <resourceName>
                 /orgauthorities/*/items/*/authorityrefs/
             </resourceName>
@@ -217,7 +217,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>3552c6ca-c830-4aa0-a940-00296e87ba3d</permissionId>
+            <permissionId>44cba976-171b-408e-b3ed-3bd5b18e95e1</permissionId>
             <resourceName>organizations</resourceName>
         </permission>
         <role>
@@ -228,7 +228,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>821f288c-4958-405c-bc73-b34f47411066</permissionId>
+            <permissionId>c8e68564-bd16-462d-b191-a4fb4ad6d93a</permissionId>
             <resourceName>
                 /orgauthorities/*/items/
             </resourceName>
@@ -241,7 +241,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>5a99cd36-768a-4001-b855-d75899fcb19b</permissionId>
+            <permissionId>faf6fdb6-654e-44a3-b7de-e98eb3105e3f</permissionId>
             <resourceName>
                 /orgauthorities/*/items/*/refobjs
             </resourceName>
@@ -254,7 +254,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>75127a9c-d433-419e-b2b8-fb3368dc2fd3</permissionId>
+            <permissionId>fc3845e7-122b-44c6-b46f-756421291994</permissionId>
             <resourceName>personauthorities</resourceName>
         </permission>
         <role>
@@ -265,7 +265,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>33af3708-d5ab-4668-be8f-535de4845150</permissionId>
+            <permissionId>44b6f2f5-2ae5-4f9f-aaf6-21361e38992e</permissionId>
             <resourceName>
                 /personauthorities/*/items/
             </resourceName>
@@ -278,7 +278,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>b918c0ec-7005-4f51-ac6b-62daf86560b1</permissionId>
+            <permissionId>f488f02a-0107-4991-847f-db811fa843f5</permissionId>
             <resourceName>
                 /personauthorities/*/items/*/refobjs
             </resourceName>
@@ -291,7 +291,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>026f957b-763f-4e31-8a5c-90c6f4c1017d</permissionId>
+            <permissionId>b1236cf3-c8e3-462a-b189-e5bcebdd382e</permissionId>
             <resourceName>persons</resourceName>
         </permission>
         <role>
@@ -302,7 +302,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>96749d08-3320-408d-b812-815fb0702562</permissionId>
+            <permissionId>7e329610-aa02-4d66-9a44-f7f5302c2ea4</permissionId>
             <resourceName>
                 /personauthorities/*/items/
             </resourceName>
@@ -315,7 +315,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>6da6f72b-ecf0-4f08-a220-223a2f0e0b16</permissionId>
+            <permissionId>abee33c0-e304-44e1-ae27-0e518e0ee55b</permissionId>
             <resourceName>locationauthorities</resourceName>
         </permission>
         <role>
@@ -326,7 +326,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>454c4a67-e21d-4402-9d13-5f0eb05e6028</permissionId>
+            <permissionId>1924cf31-7025-4f43-896e-e6d7a7352788</permissionId>
             <resourceName>
                 /locationauthorities/*/items/
             </resourceName>
@@ -339,7 +339,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>8b04ac84-968d-476d-8cac-fc0fd507f8d7</permissionId>
+            <permissionId>273e7918-f911-4f54-bc86-122aa539e813</permissionId>
             <resourceName>locations</resourceName>
         </permission>
         <role>
@@ -350,7 +350,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>cdeb851e-0f68-43de-8b29-e2e2b9e3faf3</permissionId>
+            <permissionId>934a970c-221e-41b5-92be-6ba22276bd7a</permissionId>
             <resourceName>acquisitions</resourceName>
         </permission>
         <role>
@@ -361,7 +361,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>c1ada994-34f7-4a5d-a91f-3414ac872bae</permissionId>
+            <permissionId>61a10a62-4f23-4427-b262-f978a3b03806</permissionId>
             <resourceName>
                 /acquisitions/*/authorityrefs/
             </resourceName>
@@ -374,7 +374,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>8d4b8274-fc30-4175-b5de-a328d16b898a</permissionId>
+            <permissionId>463dc11d-8324-4fb9-9d07-7c134c68eb47</permissionId>
             <resourceName>relations</resourceName>
         </permission>
         <role>
@@ -385,7 +385,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>6be0be1c-9269-475a-8ac0-e2cd1e38836c</permissionId>
+            <permissionId>3c536b47-b851-4dca-bbd2-12d0fc20f713</permissionId>
             <resourceName>
                 relations/subject/*/type/*/object/*
             </resourceName>
@@ -398,7 +398,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>849ece17-b3f6-4792-a7aa-ecf950e76bf5</permissionId>
+            <permissionId>87c457d9-3bf4-40d4-a3e1-7a9aae90c5c9</permissionId>
             <resourceName>accounts</resourceName>
         </permission>
         <role>
@@ -409,7 +409,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>a7f645ca-e8be-4c76-9b2b-22d154f487a3</permissionId>
+            <permissionId>5762278c-fceb-4d67-908d-af389ac309ba</permissionId>
             <resourceName>dimensions</resourceName>
         </permission>
         <role>
@@ -420,7 +420,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>cb815554-aab2-43a9-9f4b-49ecd72b95e7</permissionId>
+            <permissionId>bd9104e1-1931-4d0e-aff4-d06ec78f069f</permissionId>
             <resourceName>contacts</resourceName>
         </permission>
         <role>
@@ -431,7 +431,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>3b67af55-4d7a-43b6-aba3-0327aa7f5eb1</permissionId>
+            <permissionId>aa3c23d7-7d42-43f0-899a-3b8bc0c03c3a</permissionId>
             <resourceName>
                 /personauthorities/*/items/*/contacts
             </resourceName>
@@ -444,7 +444,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>986483a9-d97d-464a-91d8-992c7653e7fa</permissionId>
+            <permissionId>a0f846e4-343c-4479-831e-04cc40e51902</permissionId>
             <resourceName>
                 /orgauthorities/*/items/*/contacts
             </resourceName>
@@ -457,7 +457,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>5a619a25-91d8-4fa9-808f-05c3bb349506</permissionId>
+            <permissionId>b975509e-d1bd-42a2-98d4-bfde50a342c3</permissionId>
             <resourceName>notes</resourceName>
         </permission>
         <role>
@@ -468,7 +468,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>37f949ba-bdf5-435f-9649-4301bd29b957</permissionId>
+            <permissionId>c9524c19-4819-4aea-aab3-341887d83b3f</permissionId>
             <resourceName>authorization/roles</resourceName>
         </permission>
         <role>
@@ -479,7 +479,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>dd02ab68-4774-4533-8969-641eca0e0178</permissionId>
+            <permissionId>eec11401-da9e-4a33-b68d-b3d4906c3329</permissionId>
             <resourceName>authorization/permissions</resourceName>
         </permission>
         <role>
@@ -490,7 +490,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>64d08e83-0a6b-4c0e-bd63-ce20219463c9</permissionId>
+            <permissionId>975a8e80-8a30-426c-9d5b-aa32f6813f6d</permissionId>
             <resourceName>authorization/permissions/permroles</resourceName>
         </permission>
         <role>
@@ -501,7 +501,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>8eeb4333-fdf1-4171-bd24-d719b24d1452</permissionId>
+            <permissionId>76ae1b26-9c42-4011-8130-178d90ff4c3b</permissionId>
             <resourceName>
                 /authorization/permissions/*/permroles/
             </resourceName>
@@ -514,7 +514,7 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>a5f3dd1c-66c2-41a3-bbfb-dd2c72162fe5</permissionId>
+            <permissionId>662f9c6c-f8f1-4a78-922e-9c4250237b36</permissionId>
             <resourceName>accounts/accountroles</resourceName>
         </permission>
         <role>
@@ -525,9 +525,33 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>56145553-6b17-449c-ae8a-b7ed14f85af1</permissionId>
+            <permissionId>e8cca9fb-a6cc-4944-a441-857d661280a9</permissionId>
             <resourceName>
                 /accounts/*/accountroles/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>1</roleId>
+            <roleName>ROLE_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>f771df0b-98c8-4f84-aaf3-ae62c113d4cb</permissionId>
+            <resourceName>authorization/roles/permroles</resourceName>
+        </permission>
+        <role>
+            <roleId>1</roleId>
+            <roleName>ROLE_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>937a7ab0-6c26-497b-a901-49f550987320</permissionId>
+            <resourceName>
+                /authorization/roles/*/permroles/
             </resourceName>
         </permission>
         <role>

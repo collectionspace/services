@@ -667,8 +667,10 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     private String createPermissionRole(PermissionValue pv,
             Collection<RoleValue> rvs) {
         setupCreate("createPermissionRole");
+                List<RoleValue> rvls = new ArrayList<RoleValue>();
+        rvls.addAll(rvs);
         PermissionRole permRole = PermissionRoleFactory.createPermissionRoleInstance(
-                pv, rvs, true, true);
+                pv, rvls, true, true);
         PermissionRoleClient client = new PermissionRoleClient();
         ClientResponse<Response> res = client.create(pv.getPermissionId(), permRole);
         int statusCode = res.getStatus();

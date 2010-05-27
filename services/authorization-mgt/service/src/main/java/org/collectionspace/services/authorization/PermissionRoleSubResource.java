@@ -58,6 +58,7 @@ public class PermissionRoleSubResource
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
      */
+
     @Override
     protected String getVersionString() {
         /** The last change revision. */
@@ -108,8 +109,13 @@ public class PermissionRoleSubResource
         //subject name is necessary to indicate if role or permission is a subject
         ctx.setProperty(ServiceContextProperties.SUBJECT, subject);
         //set context for the relationship query
-        ctx.setProperty(ServiceContextProperties.OBJECT_CLASS, Permission.class);
-        ctx.setProperty(ServiceContextProperties.OBJECT_ID, "permission_id");
+        if (subject == SubjectType.ROLE) {
+            ctx.setProperty(ServiceContextProperties.OBJECT_CLASS, Permission.class);
+            ctx.setProperty(ServiceContextProperties.OBJECT_ID, "permission_id");
+        } else if (subject == SubjectType.PERMISSION) {
+            ctx.setProperty(ServiceContextProperties.OBJECT_CLASS, Role.class);
+            ctx.setProperty(ServiceContextProperties.OBJECT_ID, "role_id");
+        }
         return ctx;
     }
 
