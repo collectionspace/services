@@ -73,6 +73,9 @@ public class DocumentUtils {
 
     /** The NAM e_ valu e_ separator. */
     private static String NAME_VALUE_SEPARATOR = "|";
+    
+    /** The XML elements with this suffix will indicate. */
+    private static String STRUCTURED_TYPE_SUFFIX = "List";
 
     /**
      * The Class NameValue.
@@ -83,11 +86,9 @@ public class DocumentUtils {
 	     */
 	    NameValue() {
     		// default scoped constructor to removed "synthetic accessor" warning
-    	}
-        
+    	}        
         /** The name. */
-        String name;
-        
+        String name;        
         /** The value. */
         String value;
     };
@@ -114,7 +115,7 @@ public class DocumentUtils {
 	    		
 	    	String s = new String(buff);
 	    	logger.debug(s);
-	    	System.out.println(s);
+	    	System.out.println(s); //FIXME: REM - Remove this when we figure out why the logger.debug() call is not working.
 	    	//
 	    	// Essentially, reset the stream and return it in its original state
 	    	//
@@ -143,21 +144,20 @@ public class DocumentUtils {
             "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
         final String W3C_XML_SCHEMA =
             "http://www.w3.org/2001/XMLSchema";    	
-    	Document result = null;
     	
+        Document result = null;
+        // Log the incoming unprocessed payload
     	if (logger.isDebugEnabled() == true) {
     		if (payload instanceof ByteArrayInputStream) {
     			payload = logByteArrayInputStream((ByteArrayInputStream)payload);
     		}
-    	}
-    	
+    	}    	
     	//
     	// Look for an XML Schema (.xsd) file for the incoming part payload
     	//
     	String serverRoot = ServiceMain.getInstance().getServerRootDir();
     	String schemasDir = serverRoot + FILE_SEPARATOR + 
-    		SCHEMAS_DIR + FILE_SEPARATOR;
-    	
+    		SCHEMAS_DIR + FILE_SEPARATOR;    	
     	//
     	// Send a warning to the log file if the XML Schema file is missing
     	//
@@ -166,28 +166,17 @@ public class DocumentUtils {
     	try {
     		schemaFile = new File(schemaName);
     	} catch (Exception e) {
-    		if (logger.isDebugEnabled() == true) {
-    			logger.warn("Missing schema file: " + schemaName);
+    		if (logger.isWarnEnabled() == true) {
+    			logger.warn("Missing schema file for incoming payload: " + schemaName);
     		}
     	}
     	
+    	//
+    	// Create and setup a DOMBuilder factory.
+    	//
         try {
             // Create a builder factory
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//            factory.setNamespaceAware(true);
-            factory.setValidating(true);
-            try {
-            	factory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
-            	if (schemaFile != null) {
-            		factory.setAttribute(JAXP_SCHEMA_SOURCE, schemaFile);
-            	}
-            } catch (IllegalArgumentException x) {
-                logger.warn("Error: JAXP DocumentBuilderFactory attribute not recognized: "
-                        + JAXP_SCHEMA_LANGUAGE);
-                logger.warn("Check to see if parser conforms to JAXP 1.2 spec.");
-                throw x;
-            }
-
             //
             // Lexical Control Settings that focus on content
             //
@@ -195,15 +184,33 @@ public class DocumentUtils {
             factory.setExpandEntityReferences(true);
             factory.setIgnoringComments(true);
             factory.setIgnoringElementContentWhitespace(true);            
-            
+            //
+            // Enable XML validation
+            //
+            factory.setNamespaceAware(true);
+            factory.setValidating(true);
+            try {
+            	factory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
+            	if (schemaFile != null) {
+            		factory.setAttribute(JAXP_SCHEMA_SOURCE, schemaFile);
+            	}
+            } catch (IllegalArgumentException e) {
+                String msg = "Error: JAXP DocumentBuilderFactory attribute not recognized: " +
+                        JAXP_SCHEMA_LANGUAGE + ". Check to see if parser conforms to JAXP 1.2 spec.";
+                if (logger.isWarnEnabled() == true) {
+                	logger.warn(msg);
+                }
+                throw e;
+            }
+            //
             // Create the builder and parse the file
+            //
             result = factory.newDocumentBuilder().parse(payload);
-            result.normalizeDocument();
             
             // Write it to the log so we can see what we've created.
             if (logger.isDebugEnabled() == true) {
             	logger.debug(xmlToString(result));
-            	System.out.println(xmlToString(result));
+            	System.out.println(xmlToString(result)); //FIXME: REM - Need this until we figure out why messages are not showing up in logger.
             }
         } finally {
             if (payload != null) {
@@ -371,11 +378,13 @@ public class DocumentUtils {
      * @return
      */
     private static String qualify(String name, String value) {
+        String result = null;
         if (isQualified(name, value)) {
-            return value;
+            result = value;
+        } else {
+        	result = name + NAME_VALUE_SEPARATOR + value;
         }
-        return name + NAME_VALUE_SEPARATOR + value;
-
+        return result;
     }
 
     /**
@@ -396,16 +405,17 @@ public class DocumentUtils {
             return null;
         }
 
+        //FIXME: We support XML validation on the way in, so we should add it here (on the way out) as well.
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document document = builder.newDocument();
         document.setXmlStandalone(true);
         //JAXB unmarshaller recognizes the following kind of namespace qualification
         //only. More investigation is needed to use other prefix
-//        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-//        <ns2:collectionobjects-common xmlns:ns2="http://collectionspace.org/services/collectionobject">
-//        <objectNumber>objectNumber-1252960222412</objectNumber>
-//        <objectName>objectName-1252960222412</objectName>
-//        </ns2:collectionobjects-common>
+		// <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+		// <ns2:collectionobjects-common xmlns:ns2="http://collectionspace.org/services/collectionobject">
+		// <objectNumber>objectNumber-1252960222412</objectNumber>
+		// <objectName>objectName-1252960222412</objectName>
+		// </ns2:collectionobjects-common>
 
         String ns = "ns2";
         Element root = document.createElementNS(xc.getNamespaceURI(), ns + ":" + rootElementName);
@@ -466,7 +476,7 @@ public class DocumentUtils {
     }
     
     /**
-     * Insert multi hash map values.
+     * Create a set of complex/structured elements from an array of Maps.
      *
      * @param document the document
      * @param e the e
@@ -477,11 +487,22 @@ public class DocumentUtils {
     		throws Exception {
         String parentName = e.getNodeName();
         String childName = null;
-        if (parentName.endsWith("List") == true) {
+        //
+        // By convention, elements with a structured/complex type should have a parent element with a name ending with the suffix
+        // STRUCTURED_TYPE_SUFFIX.  We synthesize the element name for the structured type by stripping the suffix from the parent name.
+        // For example, <otherNumberList><otherNumber> <!-- sequence of simple types --> <otherNumber/><otherNumberList/>
+        //
+        if (parentName.endsWith(STRUCTURED_TYPE_SUFFIX) == true) {
         	int parentNameLen = parentName.length();
-        	childName = parentName.substring(0, parentNameLen - "List".length());
+        	childName = parentName.substring(0, parentNameLen - STRUCTURED_TYPE_SUFFIX.length());
         } else {
-        	throw new Exception("Unknown node type from a Nuxeo document type.");
+        	String msg = "Unrecognized parent element name. Elements with complex/structured " +
+				"types should have a parent element whose name ends with '" +
+				STRUCTURED_TYPE_SUFFIX + "'.";
+        	if (logger.isErrorEnabled() == true) {
+        		logger.error(msg);
+        	}
+        	throw new Exception(msg);
         }
                 
         for (Map<String, Object> map : vals) {
@@ -492,7 +513,8 @@ public class DocumentUtils {
     }
 
     /**
-     * Insert multi values.
+     * Create a set of elements for an array of values.  Currently, we're assuming the
+     * values can be only of type Map or String.
      *
      * @param document the document
      * @param e the e
@@ -507,6 +529,13 @@ public class DocumentUtils {
 	    		insertMultiStringValues(document, e, (ArrayList<String>)vals);
 	    	} else if (firstElement instanceof Map<?, ?>) {
 	    		insertMultiHashMapValues(document, e, (ArrayList<Map<String, Object>>)vals);
+	    	} else {
+	    		String msg = "Unbounded elements need to be arrays of either Strings or Maps.  We encountered an array of " +
+	    			firstElement.getClass().getName();
+	    		if (logger.isErrorEnabled() == true) {
+	    			logger.error(msg);
+	    		}
+	    		throw new Exception(msg);
 	    	}
     	}
     }
@@ -600,7 +629,7 @@ public class DocumentUtils {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         File f = new File(fileName);
         if (!f.exists()) {
-            throw new IllegalArgumentException("test data file " + fileName + " not found!");
+            throw new IllegalArgumentException("Test data file " + fileName + " not found!");
         }
         // Create the builder and parse the file
         return factory.newDocumentBuilder().parse(f);

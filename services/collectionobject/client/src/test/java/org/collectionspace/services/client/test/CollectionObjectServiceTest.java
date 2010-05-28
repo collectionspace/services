@@ -1020,12 +1020,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         List<OtherNumber> otherNumbers = otherNumList.getOtherNumber();
         
         OtherNumber otherNumber1 = new OtherNumber();        
-        otherNumber1.setNumberValue("101");
+        otherNumber1.setNumberValue("101." + objectName);
         otherNumber1.setNumberType("integer");
         otherNumbers.add(otherNumber1);
         
         OtherNumber otherNumber2 = new OtherNumber();
-        otherNumber2.setNumberValue("101.502.23.456");
+        otherNumber2.setNumberValue("101.502.23.456." + objectName);
         otherNumber2.setNumberType("ipaddress");
         otherNumbers.add(otherNumber2);        
         

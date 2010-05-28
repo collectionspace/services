@@ -58,6 +58,7 @@ public class CollectionObjectFactory {
      *
      * @param commonPartName the common part name
      * @param collectionObject the collection object
+     * @param nhPartName 
      * @param nhPartname natural history part name
      * @param conh the conh
      * @return the multipart output
@@ -76,7 +77,6 @@ public class CollectionObjectFactory {
             nhPart.getHeaders().add("label", nhPartName);
         }
         return multipart;
-
     }
 
 
