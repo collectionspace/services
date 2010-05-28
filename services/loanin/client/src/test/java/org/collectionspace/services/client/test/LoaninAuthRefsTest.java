@@ -62,17 +62,15 @@ import org.slf4j.LoggerFactory;
  */
 public class LoaninAuthRefsTest extends BaseServiceTest {
 
-   private final Logger logger =
-       LoggerFactory.getLogger(LoaninAuthRefsTest.class);
-
+    private final String CLASS_NAME = LoaninAuthRefsTest.class.getName();
+    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    
     // Instance variables specific to this test.
     final String SERVICE_PATH_COMPONENT = "loansin";
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     private String knownResourceId = null;
     private List<String> loaninIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();
-    private int CREATED_STATUS = Response.Status.CREATED.getStatusCode();
-    private int OK_STATUS = Response.Status.OK.getStatusCode();
     private String personAuthCSID = null;
     private String lendersAuthorizerRefName = null;
     private String lendersContactRefName = null;
@@ -105,7 +103,10 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void createWithAuthRefs(String testName) throws Exception {
 
-        testSetup(CREATED_STATUS, ServiceRequestType.CREATE,testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
@@ -171,7 +172,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
 
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, CREATED_STATUS);
+        Assert.assertEquals(statusCode, STATUS_CREATED);
         personAuthCSID = extractId(res);
 
         // Create temporary Person resources, and their corresponding refNames
@@ -207,7 +208,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
 
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, CREATED_STATUS);
+        Assert.assertEquals(statusCode, STATUS_CREATED);
     	return extractId(res);
     }
 
@@ -216,8 +217,11 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         dependsOnMethods = {"createWithAuthRefs"})
     public void readAndCheckAuthRefs(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        testSetup(OK_STATUS, ServiceRequestType.READ,testName);
+        testSetup(STATUS_OK, ServiceRequestType.READ);
 
         // Submit the request to the service and store the response.
         LoaninClient loaninClient = new LoaninClient();

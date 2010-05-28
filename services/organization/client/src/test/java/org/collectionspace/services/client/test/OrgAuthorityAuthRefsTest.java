@@ -61,8 +61,8 @@ import org.slf4j.LoggerFactory;
 public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
 
    /** The logger. */
-   private final Logger logger =
-       LoggerFactory.getLogger(OrgAuthorityAuthRefsTest.class);
+    private final String CLASS_NAME = OrgAuthorityAuthRefsTest.class.getName();
+    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
     /** The SERVIC e_ pat h_ component. */
@@ -90,19 +90,13 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
     /** The person ids created. */
     private List<String> personIdsCreated = new ArrayList<String>();
     
-    /** The CREATE d_ status. */
-    private int CREATED_STATUS = Response.Status.CREATED.getStatusCode();
-    
-    /** The O k_ status. */
-    private int OK_STATUS = Response.Status.OK.getStatusCode();
-    
     /** The person auth csid. */
     private String personAuthCSID = null;
     
     /** The organization contact person ref name. */
     private String organizationContactPersonRefName = null;
     
-    /** The NU m_ aut h_ ref s_ expected. */
+    /** The number of authorityreferences expected. */
     private final int NUM_AUTH_REFS_EXPECTED = 1;
 
     /* (non-Javadoc)
@@ -135,7 +129,10 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void createWithAuthRefs(String testName) throws Exception {
 
-        testSetup(CREATED_STATUS, ServiceRequestType.CREATE,testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
         // Create a new Organization Authority resource.
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
@@ -216,7 +213,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
 	        int statusCode = res.getStatus();	
 	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
 	            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, CREATED_STATUS);
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
 	        personAuthCSID = extractId(res);
         } finally {
         	res.releaseConnection();
@@ -254,7 +251,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
 	
 	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
 	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, CREATED_STATUS);
+	        Assert.assertEquals(statusCode, STATUS_CREATED);
 	    	result = extractId(res);
     	} finally {
     		res.releaseConnection();
@@ -274,8 +271,11 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         dependsOnMethods = {"createWithAuthRefs"})
     public void readAndCheckAuthRefs(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        testSetup(OK_STATUS, ServiceRequestType.READ,testName);
+        testSetup(STATUS_OK, ServiceRequestType.READ);
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();

@@ -61,8 +61,8 @@ import org.slf4j.LoggerFactory;
  */
 public class PersonAuthRefDocsTest extends BaseServiceTest {
 
-   private final Logger logger =
-       LoggerFactory.getLogger(PersonAuthRefDocsTest.class);
+    private final String CLASS_NAME = PersonAuthRefDocsTest.class.getName();
+    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
     final String SERVICE_PATH_COMPONENT = "intakes";
@@ -70,8 +70,6 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
     private String knownIntakeId = null;
     private List<String> intakeIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();
-    private int CREATED_STATUS = Response.Status.CREATED.getStatusCode();
-    private int OK_STATUS = Response.Status.OK.getStatusCode();
     private String personAuthCSID = null; 
     private String currentOwnerPersonCSID = null; 
     private String currentOwnerRefName = null;
@@ -106,7 +104,10 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void createIntakeWithAuthRefs(String testName) throws Exception {
 
-        testSetup(CREATED_STATUS, ServiceRequestType.CREATE,testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
@@ -173,7 +174,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
 
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, CREATED_STATUS);
+        Assert.assertEquals(statusCode, STATUS_CREATED);
         personAuthCSID = extractId(res);
         
         currentOwnerRefName = PersonAuthorityClientUtils.createPersonRefName(
@@ -217,7 +218,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
 
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, CREATED_STATUS);
+        Assert.assertEquals(statusCode, STATUS_CREATED);
     	return extractId(res);
     }
 
@@ -226,8 +227,11 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         dependsOnMethods = {"createIntakeWithAuthRefs"})
     public void readAndCheckAuthRefDocs(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        testSetup(OK_STATUS, ServiceRequestType.READ,testName);
+        testSetup(STATUS_OK, ServiceRequestType.READ);
         
         // Get the auth ref docs and check them
        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();

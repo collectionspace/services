@@ -65,8 +65,9 @@ import org.testng.annotations.BeforeClass;
 public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
 
     /** The Constant logger. */
-    static private final Logger logger =
-            LoggerFactory.getLogger(PermissionRoleServiceTest.class);
+    private final static String CLASS_NAME = PermissionRoleServiceTest.class.getName();
+    private final static Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownResourceId = null;
@@ -169,10 +170,14 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
-        setupCreate(testName);
+        setupCreate();
 
         // Submit the request to the service and store the response.
         PermissionValue pv = permValues.get(TEST_SERVICE_NAME + TEST_MARKER);
@@ -255,8 +260,11 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupRead(testName);
+        setupRead();
 
         // Submit the request to the service and store the response.
         PermissionRoleClient client = new PermissionRoleClient();
@@ -293,8 +301,11 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void readNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadNonExistent(testName);
+        setupReadNonExistent();
 
         // Submit the request to the service and store the response.
         PermissionRoleClient client = new PermissionRoleClient();
@@ -397,8 +408,11 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"read"})
     public void delete(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDelete(testName);
+        setupDelete();
 
         // Submit the request to the service and store the response.
         PermissionRoleClient client = new PermissionRoleClient();
@@ -497,7 +511,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
     @AfterClass(alwaysRun = true)
     @Override
     public void cleanUp() {
-        setupDelete("cleanUp");
+        setupDelete();
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -543,7 +557,10 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      * @return the string
      */
     private String createPermission(String resName, EffectType effect) {
-        setupCreate("createPermission");
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner("createPermission"));
+        }
+        setupCreate();
         PermissionClient permClient = new PermissionClient();
         List<PermissionAction> actions = PermissionFactory.createDefaultActions();
         Permission permission = PermissionFactory.createPermissionInstance(resName,
@@ -577,7 +594,10 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      * @param permId the perm id
      */
     private void deletePermission(String permId) {
-        setupDelete("deletePermission");
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner("deletePermission"));
+        }
+        setupDelete();
         PermissionClient permClient = new PermissionClient();
         ClientResponse<Response> res = null;
         try {
@@ -603,7 +623,10 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      * @return the string
      */
     private String createRole(String roleName) {
-        setupCreate("createRole");
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner("createRole"));
+        }
+        setupCreate();
         RoleClient roleClient = new RoleClient();
 
         Role role = RoleFactory.createRoleInstance(roleName,
@@ -634,7 +657,10 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      * @param roleId the role id
      */
     private void deleteRole(String roleId) {
-        setupDelete("deleteRole");
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner("deleteRole"));
+        }
+        setupDelete();
         RoleClient roleClient = new RoleClient();
         ClientResponse<Response> res = null;
         try {

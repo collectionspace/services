@@ -61,8 +61,8 @@ import org.slf4j.LoggerFactory;
  */
 public class AcquisitionAuthRefsTest extends BaseServiceTest {
 
-   private final Logger logger =
-       LoggerFactory.getLogger(AcquisitionAuthRefsTest.class);
+    private final String CLASS_NAME = AcquisitionAuthRefsTest.class.getName();
+    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
     final String SERVICE_PATH_COMPONENT = "acquisitions";
@@ -104,7 +104,12 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void createWithAuthRefs(String testName) throws Exception {
 
-        testSetup(CREATED_STATUS, ServiceRequestType.CREATE,testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        };
+        
+        // Perform setup.
+        testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
@@ -200,9 +205,13 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         dependsOnMethods = {"createWithAuthRefs"})
     public void readAndCheckAuthRefs(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        };
+        
         // Perform setup.
-        testSetup(OK_STATUS, ServiceRequestType.READ,testName);
-
+        testSetup(STATUS_OK, ServiceRequestType.READ);
+        
         // Submit the request to the service and store the response.
         AcquisitionClient acquisitionClient = new AcquisitionClient();
         ClientResponse<MultipartInput> res = acquisitionClient.read(knownResourceId);

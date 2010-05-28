@@ -64,8 +64,9 @@ import org.testng.annotations.BeforeClass;
 public class AccountRoleServiceTest extends AbstractServiceTestImpl {
 
     /** The Constant logger. */
-    static private final Logger logger =
-            LoggerFactory.getLogger(AccountRoleServiceTest.class);
+    private final static String CLASS_NAME = AccountRoleServiceTest.class.getName();
+    private final static Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownResourceId = null;
@@ -172,10 +173,13 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            testBanner(testName, CLASS_NAME);
+        }
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
-        setupCreate(testName);
+        setupCreate();
 
         // Submit the request to the service and store the response.
         AccountValue pv = accValues.get("acc-role-user1");
@@ -255,8 +259,12 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            testBanner(testName, CLASS_NAME);
+        }
+        
         // Perform setup.
-        setupRead(testName);
+        setupRead();
 
         // Submit the request to the service and store the response.
         AccountRoleClient client = new AccountRoleClient();
@@ -288,8 +296,12 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void readNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            testBanner(testName, CLASS_NAME);
+        }
+        
         // Perform setup.
-        setupReadNonExistent(testName);
+        setupReadNonExistent();
 
         // Submit the request to the service and store the response.
         AccountRoleClient client = new AccountRoleClient();
@@ -387,8 +399,13 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read"})
     public void delete(String testName) throws Exception {
+        
+        if (logger.isDebugEnabled()) {
+            testBanner(testName, CLASS_NAME);
+        }
+        
         // Perform setup.
-        setupDelete(testName);
+        setupDelete();
 
         // Submit the request to the service and store the response.
         AccountRoleClient client = new AccountRoleClient();
@@ -482,7 +499,8 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     @AfterClass(alwaysRun = true)
     @Override
     public void cleanUp() {
-        setupDelete("cleanUp");
+        
+        setupDelete();
 
         String noTest = System.getProperty("noTestCleanup");
     	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
@@ -529,7 +547,13 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
      * @return the string
      */
     private String createAccount(String userName, String email) {
-        setupCreate("createAccount");
+        
+        if (logger.isDebugEnabled()) {
+            testBanner("createAccount");
+        }
+        
+        setupCreate();
+        
         AccountClient accClient = new AccountClient();
         AccountsCommon account = AccountFactory.createAccountInstance(
                 userName, userName, userName, email,
@@ -553,7 +577,13 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
      * @param accId the acc id
      */
     private void deleteAccount(String accId) {
-        setupDelete("deleteAccount");
+        
+        if (logger.isDebugEnabled()) {
+            testBanner("deleteAccount");
+        }
+        
+        setupDelete();
+        
         AccountClient accClient = new AccountClient();
         ClientResponse<Response> res = accClient.delete(accId);
         int statusCode = res.getStatus();
@@ -577,7 +607,10 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
      * @return the string
      */
     private String createRole(String roleName) {
-        setupCreate("createRole");
+        if (logger.isDebugEnabled()) {
+            testBanner("createRole");
+        }
+        setupCreate();
         RoleClient roleClient = new RoleClient();
 
         Role role = RoleFactory.createRoleInstance(roleName,
@@ -601,7 +634,10 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
      * @param roleId the role id
      */
     private void deleteRole(String roleId) {
-        setupDelete("deleteRole");
+        if (logger.isDebugEnabled()) {
+            testBanner("deleteRole");
+        }
+        setupDelete();
         RoleClient roleClient = new RoleClient();
         ClientResponse<Response> res = roleClient.delete(roleId);
         int statusCode = res.getStatus();

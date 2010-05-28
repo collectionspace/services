@@ -49,7 +49,9 @@ import org.testng.annotations.Test;
  */
 public class ServiceLayerTest {
 
-    final Logger logger = LoggerFactory.getLogger(ServiceTest.class);
+    private final String CLASS_NAME = ServiceLayerTest.class.getName();
+    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    
     private TestServiceClient serviceClient = new TestServiceClient();
     private HttpClient httpClient = serviceClient.getHttpClient();
 
@@ -73,6 +75,10 @@ public class ServiceLayerTest {
 
     @Test
     public void servicesExist() {
+        
+        if (logger.isDebugEnabled()) {
+            logger.debug(BaseServiceTest.testBanner("servicesExist", CLASS_NAME));
+        }
         //use ID service that should always be present in a working service layer
         String url = serviceClient.getBaseURL() + "idgenerators";
         OptionsMethod method = new OptionsMethod(url);
@@ -98,6 +104,9 @@ public class ServiceLayerTest {
 
     @Test
     public void methodNotAllowed() {
+        if (logger.isDebugEnabled()) {
+            logger.debug(BaseServiceTest.testBanner("methodNotAllowed", CLASS_NAME));
+        }
         // Delete is not allowed on the root URL of the id service
         String url = serviceClient.getBaseURL() + "idgenerators";
         DeleteMethod method = new DeleteMethod(url);
@@ -122,6 +131,9 @@ public class ServiceLayerTest {
 
     @Test
     public void nonexistentService() {
+        if (logger.isDebugEnabled()) {
+            logger.debug(BaseServiceTest.testBanner("nonexistentService", CLASS_NAME));
+        }
         String url = serviceClient.getBaseURL() + "nonexistent-service";
         GetMethod method = new GetMethod(url);
         try {
@@ -145,6 +157,9 @@ public class ServiceLayerTest {
 
 //    @Test
     public void serviceSecure() {
+        if (logger.isDebugEnabled()) {
+            logger.debug(BaseServiceTest.testBanner("serviceSecure", CLASS_NAME));
+        }
         String url = serviceClient.getBaseURL() + "collectionobjects";
         GetMethod method = new GetMethod(url);
         // This vanilla HTTP client does not contain credentials or any other
@@ -174,6 +189,9 @@ public class ServiceLayerTest {
 
     @Test
     public void traceSupported() {
+        if (logger.isDebugEnabled()) {
+            logger.debug(BaseServiceTest.testBanner("traceSupported", CLASS_NAME));
+        }
         String url = serviceClient.getBaseURL() + "collectionobjects";
         TraceMethod method = new TraceMethod(url);
         try {
@@ -202,6 +220,9 @@ public class ServiceLayerTest {
 
     @Test
     public void headSupported() {
+        if (logger.isDebugEnabled()) {
+            logger.debug(BaseServiceTest.testBanner("headSupported", CLASS_NAME));
+        }
         String url = serviceClient.getBaseURL() + "intakes";
         HeadMethod method = new HeadMethod(url);
         try {

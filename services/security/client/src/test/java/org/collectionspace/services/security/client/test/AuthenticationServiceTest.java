@@ -62,9 +62,11 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     private String knownResourceId = null;
     private String barneyAccountId = null; //active
     private String georgeAccountId = null; //inactive
+    
     /** The logger. */
-    final Logger logger = LoggerFactory.getLogger(AuthenticationServiceTest.class);
-
+    private final String CLASS_NAME = AuthenticationServiceTest.class.getName();
+    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTest#getServicePathComponent()
      */
@@ -100,10 +102,15 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createActiveAccount(String testName) throws Exception {
+        
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
-        setupCreate(testName);
+        setupCreate();
+        
         AccountClient accountClient = new AccountClient();
         accountClient.setAuth(true, "test", true, "test", true);
 
@@ -132,10 +139,13 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createInactiveAccount(String testName) throws Exception {
-        // Perform setup, such as initializing the type of service request
-        // (e.g. CREATE, DELETE), its valid and expected status codes, and
-        // its associated HTTP method name (e.g. POST, DELETE).
-        setupCreate(testName);
+        
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupCreate();
+        
         AccountClient accountClient = new AccountClient();
         accountClient.setAuth(true, "test", true, "test", true);
 
@@ -160,7 +170,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         }
         res.releaseConnection();
         //deactivate
-        setupUpdate(testName);
+        setupUpdate();
         account.setStatus(Status.INACTIVE);
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ":updated object");
@@ -189,7 +199,10 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"createActiveAccount"})
     @Override
     public void create(String testName) {
-        setupCreate(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupCreate();
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "barney", true, "barney08", true);
         String identifier = BaseServiceTest.createIdentifier();
@@ -214,7 +227,10 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"createActiveAccount"})
     public void createWithoutAuthn(String testName) {
-        setupCreate(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupCreate();
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(false, "test", true, "test", true);
         String identifier = BaseServiceTest.createIdentifier();
@@ -233,7 +249,9 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
 
     @Test(dataProvider = "testName", dependsOnMethods = {"createInactiveAccount"})
     public void createWithInactiveAccount(String testName) {
-        banner(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName));
+        }
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "george", true, "george08", true);
         String identifier = BaseServiceTest.createIdentifier();
@@ -255,7 +273,9 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     @Test(dataProvider = "testName", dependsOnMethods = {"createActiveAccount"})
     public void createWithoutPassword(String testName) {
-        banner(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName));
+        }
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "test", true, "", false);
         String identifier = BaseServiceTest.createIdentifier();
@@ -274,7 +294,9 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     @Test(dataProvider = "testName", dependsOnMethods = {"createActiveAccount"})
     public void createWithUnknownUser(String testName) {
-        banner(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName));
+        }
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "foo", true, "bar", true);
         String identifier = BaseServiceTest.createIdentifier();
@@ -293,7 +315,9 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     @Test(dataProvider = "testName", dependsOnMethods = {"createActiveAccount"})
     public void createWithIncorrectPassword(String testName) {
-        banner(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName));
+        }
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "test", true, "bar", true);
         String identifier = BaseServiceTest.createIdentifier();
@@ -312,7 +336,9 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     @Test(dataProvider = "testName", dependsOnMethods = {"createActiveAccount"})
     public void createWithIncorrectUserPassword(String testName) {
-        banner(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName));
+        }
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "foo", true, "bar", true);
         String identifier = BaseServiceTest.createIdentifier();
@@ -332,7 +358,9 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      */
     @Test(dataProvider = "testName", dependsOnMethods = {"createActiveAccount"})
     public void createWithoutTenant(String testName) {
-        banner(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName));
+        }
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "babybop", true, "babybop09", true);
         String identifier = BaseServiceTest.createIdentifier();
@@ -354,7 +382,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
     public void delete(String testName) {
-        setupDelete(testName);
+        setupDelete();
 
     }
 
@@ -362,8 +390,11 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create", "createWithInactiveAccount"})
     public void deleteAccounts(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDelete(testName);
+        setupDelete();
         AccountClient accountClient = new AccountClient();
         accountClient.setAuth(true, "test", true, "test", true);
         // Submit the request to the service and store the response.

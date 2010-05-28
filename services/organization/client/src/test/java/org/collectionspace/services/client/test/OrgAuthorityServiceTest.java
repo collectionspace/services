@@ -62,23 +62,23 @@ import org.testng.annotations.Test;
 public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
     /** The logger. */
-    private final Logger logger =
-        LoggerFactory.getLogger(OrgAuthorityServiceTest.class);
+    private final String CLASS_NAME = OrgAuthorityServiceTest.class.getName();
+    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
-    /** The SERVIC e_ pat h_ component. */
+    /** The service path component. */
     final String SERVICE_PATH_COMPONENT = "orgauthorities";
     
-    /** The ITE m_ servic e_ pat h_ component. */
+    /** The item service path component. */
     final String ITEM_SERVICE_PATH_COMPONENT = "items";
     
-    /** The CONTAC t_ servic e_ pat h_ component. */
+    /** The contact service path component. */
     final String CONTACT_SERVICE_PATH_COMPONENT = "contacts";
     
-    /** The TES t_ or g_ shortname. */
+    /** The test organization shortname. */
     private final String TEST_ORG_SHORTNAME = "Test Org";
     
-    /** The TES t_ or g_ foundin g_ place. */
+    /** The test organization founding place. */
     private final String TEST_ORG_FOUNDING_PLACE = "Anytown, USA";
     
     /** The known resource id. */
@@ -136,10 +136,13 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"create"})
     public void create(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
-        setupCreate(testName);
+        setupCreate();
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -199,7 +202,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"create"}, dependsOnMethods = {"create"})
     public void createItem(String testName) {
-        setupCreate(testName);
+        setupCreate();
         String newID = createItemInAuthority(knownResourceId, knownResourceRefName);
     }
 
@@ -255,7 +258,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"create"}, dependsOnMethods = {"createItem"})
     public void createContact(String testName) {
-        setupCreate(testName);
+        setupCreate();
         String newID = createContactInItem(knownResourceId, knownItemResourceId);
     }
 
@@ -269,10 +272,10 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
    private String createContactInItem(String parentcsid, String itemcsid) {
 
         final String testName = "createContactInItem";
-        setupCreate(testName);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ":...");
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
         }
+        setupCreate();
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -351,51 +354,57 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"create"}, dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithEmptyEntityBody(String testName) throws Exception {
 
-    // Perform setup.
-    setupCreateWithEmptyEntityBody(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupCreateWithEmptyEntityBody();
 
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getServiceRootURL();
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = "";
-    int statusCode = submitRequest(method, url, mediaType, entity);
+        // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
+        String url = getServiceRootURL();
+        String mediaType = MediaType.APPLICATION_XML;
+        final String entity = "";
+        int statusCode = submitRequest(method, url, mediaType, entity);
 
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()) {
-        logger.debug(testName + ": url=" + url +
-            " status=" + statusCode);
-     }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()) {
+            logger.debug(testName + ": url=" + url +
+                " status=" + statusCode);
+         }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        }
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
         groups = {"create"}, dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithMalformedXml(String testName) throws Exception {
 
-    // Perform setup.
-    setupCreateWithMalformedXml(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupCreateWithMalformedXml();
 
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getServiceRootURL();
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = MALFORMED_XML_DATA; // Constant from base class.
-    int statusCode = submitRequest(method, url, mediaType, entity);
+        // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
+        String url = getServiceRootURL();
+        String mediaType = MediaType.APPLICATION_XML;
+        final String entity = MALFORMED_XML_DATA; // Constant from base class.
+        int statusCode = submitRequest(method, url, mediaType, entity);
 
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-        logger.debug(testName + ": url=" + url +
-            " status=" + statusCode);
-     }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": url=" + url +
+                " status=" + statusCode);
+         }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
@@ -403,25 +412,28 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"create"}, dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithWrongXmlSchema(String testName) throws Exception {
 
-    // Perform setup.
-    setupCreateWithWrongXmlSchema(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupCreateWithWrongXmlSchema();
 
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getServiceRootURL();
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = WRONG_XML_SCHEMA_DATA;
-    int statusCode = submitRequest(method, url, mediaType, entity);
+        // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
+        String url = getServiceRootURL();
+        String mediaType = MediaType.APPLICATION_XML;
+        final String entity = WRONG_XML_SCHEMA_DATA;
+        int statusCode = submitRequest(method, url, mediaType, entity);
 
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-        logger.debug(testName + ": url=" + url +
-            " status=" + statusCode);
-     }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": url=" + url +
+                " status=" + statusCode);
+         }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 */
 
@@ -483,8 +495,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"read"}, dependsOnGroups = {"create"})
     public void read(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupRead(testName);
+        setupRead();
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -524,8 +539,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
             groups = {"read"}, dependsOnGroups = {"create"})
         public void readByName(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupRead(testName);
+        setupRead();
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -560,8 +578,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"read"}, dependsOnMethods = {"read"})
     public void readByName(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupRead(testName);
+        setupRead();
 
         // Submit the request to the service and store the response.
         ClientResponse<MultipartInput> res = client.read(knownResourceId);
@@ -597,8 +618,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"read"}, dependsOnMethods = {"read"})
     public void readItem(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupRead(testName);
+        setupRead();
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -642,8 +666,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
             dependsOnMethods = {"readItem", "updateItem"})
     public void verifyItemDisplayName(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -770,8 +797,12 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
             dependsOnMethods = {"verifyItemDisplayName"})
     public void verifyIllegalItemDisplayName(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-    	setupUpdateWithWrongXmlSchema(testName);
+        testSetup(STATUS_BAD_REQUEST, ServiceRequestType.UPDATE);
+    	// setupUpdateWithWrongXmlSchema(testName, logger);
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -822,8 +853,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"read"}, dependsOnMethods = {"readItem"})
     public void readContact(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupRead(testName);
+        setupRead();
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -865,8 +899,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"read"}, dependsOnMethods = {"read"})
     public void readNonExistent(String testName) {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadNonExistent(testName);
+        setupReadNonExistent();
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -892,8 +929,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"read"}, dependsOnMethods = {"readItem"})
     public void readItemNonExistent(String testName) {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadNonExistent(testName);
+        setupReadNonExistent();
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -919,8 +959,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"read"}, dependsOnMethods = {"readContact"})
     public void readContactNonExistent(String testName) {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadNonExistent(testName);
+        setupReadNonExistent();
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -951,8 +994,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"readList"}, dependsOnGroups = {"createList", "read"})
     public void readList(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadList(testName);
+        setupReadList();
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -1015,8 +1061,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
         final String testName = "readItemList";
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadList(testName);
+        setupReadList();
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -1093,8 +1142,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     private void readContactList(String parentcsid, String itemcsid) {
         final String testName = "readContactList";
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadList(testName);
+        setupReadList();
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -1159,8 +1211,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"update"}, dependsOnGroups = {"read", "readList"})
     public void update(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
 
         // Retrieve the contents of a resource to update.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -1225,8 +1280,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"update"}, dependsOnMethods = {"update"})
     public void updateItem(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
 
         // Retrieve the contents of a resource to update.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -1294,8 +1352,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"update"}, dependsOnMethods = {"updateItem"})
     public void updateContact(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
 
         // Retrieve the contents of a resource to update.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -1386,25 +1447,28 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"update"}, dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateWithEmptyEntityBody(String testName) throws Exception {
 
-    // Perform setup.
-    setupUpdateWithEmptyEntityBody(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupUpdateWithEmptyEntityBody();
 
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getResourceURL(knownResourceId);
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = "";
-    int statusCode = submitRequest(method, url, mediaType, entity);
+        // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
+        String url = getResourceURL(knownResourceId);
+        String mediaType = MediaType.APPLICATION_XML;
+        final String entity = "";
+        int statusCode = submitRequest(method, url, mediaType, entity);
 
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-        logger.debug(testName + ": url=" + url +
-            " status=" + statusCode);
-     }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": url=" + url +
+                " status=" + statusCode);
+         }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
@@ -1412,51 +1476,54 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"update"}, dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateWithMalformedXml(String testName) throws Exception {
 
-    // Perform setup.
-    setupUpdateWithMalformedXml(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupUpdateWithMalformedXml();
 
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getResourceURL(knownResourceId);
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = MALFORMED_XML_DATA;
-    int statusCode = submitRequest(method, url, mediaType, entity);
+        // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
+        String url = getResourceURL(knownResourceId);
+        String mediaType = MediaType.APPLICATION_XML;
+        final String entity = MALFORMED_XML_DATA;
+        int statusCode = submitRequest(method, url, mediaType, entity);
 
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-        logger.debug(testName + ": url=" + url +
-           " status=" + statusCode);
-     }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-    }
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": url=" + url +
+               " status=" + statusCode);
+         }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        }
 
-    @Override
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        groups = {"update"}, dependsOnMethods = {"update", "testSubmitRequest"})
-    public void updateWithWrongXmlSchema(String testName) throws Exception {
+        @Override
+        @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
+            groups = {"update"}, dependsOnMethods = {"update", "testSubmitRequest"})
+        public void updateWithWrongXmlSchema(String testName) throws Exception {
 
-    // Perform setup.
-    setupUpdateWithWrongXmlSchema(testName);
+        // Perform setup.
+        setupUpdateWithWrongXmlSchema(testName, logger);
 
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getResourceURL(knownResourceId);
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = WRONG_XML_SCHEMA_DATA;
-    int statusCode = submitRequest(method, url, mediaType, entity);
+        // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
+        String url = getResourceURL(knownResourceId);
+        String mediaType = MediaType.APPLICATION_XML;
+        final String entity = WRONG_XML_SCHEMA_DATA;
+        int statusCode = submitRequest(method, url, mediaType, entity);
 
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-        logger.debug("updateWithWrongXmlSchema: url=" + url +
-            " status=" + statusCode);
-     }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug("updateWithWrongXmlSchema: url=" + url +
+                " status=" + statusCode);
+         }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 */
 
@@ -1468,8 +1535,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"update"}, dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdateNonExistent(testName);
+        setupUpdateNonExistent();
 
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
@@ -1500,8 +1570,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"update"}, dependsOnMethods = {"updateItem", "testItemSubmitRequest"})
     public void updateNonExistentItem(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdateNonExistent(testName);
+        setupUpdateNonExistent();
 
         // Submit the request to the service and store the response.
         // Note: The ID(s) used when creating the request payload may be arbitrary.
@@ -1558,8 +1631,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"delete"}, dependsOnGroups = {"create", "read", "readList", "update"})
     public void deleteContact(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDelete(testName);
+        setupDelete();
 
          if(logger.isDebugEnabled()){
             logger.debug("parentcsid =" + knownResourceId +
@@ -1593,8 +1669,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"delete"}, dependsOnMethods = {"deleteContact"})
     public void deleteItem(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDelete(testName);
+        setupDelete();
 
         if(logger.isDebugEnabled()){
             logger.debug("parentcsid =" + knownResourceId +
@@ -1624,8 +1703,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"delete"}, dependsOnMethods = {"deleteItem"})
     public void delete(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDelete(testName);
+        setupDelete();
 
         if(logger.isDebugEnabled()){
             logger.debug("parentcsid =" + knownResourceId);
@@ -1655,8 +1737,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"delete"}, dependsOnMethods = {"delete"})
     public void deleteNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDeleteNonExistent(testName);
+        setupDeleteNonExistent();
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -1682,8 +1767,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"delete"}, dependsOnMethods = {"deleteItem"})
     public void deleteNonExistentItem(String testName) {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDeleteNonExistent(testName);
+        setupDeleteNonExistent();
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
@@ -1709,8 +1797,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"delete"}, dependsOnMethods = {"deleteContact"})
     public void deleteNonExistentContact(String testName) {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDeleteNonExistent(testName);
+        setupDeleteNonExistent();
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();

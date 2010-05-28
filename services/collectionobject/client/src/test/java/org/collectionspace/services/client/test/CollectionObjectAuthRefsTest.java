@@ -62,14 +62,14 @@ import org.slf4j.LoggerFactory;
 public class CollectionObjectAuthRefsTest extends BaseServiceTest {
 
    /** The logger. */
-   private final Logger logger =
-       LoggerFactory.getLogger(CollectionObjectAuthRefsTest.class);
+    private final String CLASS_NAME = CollectionObjectAuthRefsTest.class.getName();
+    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
-    /** The SERVIC e_ pat h_ component. */
+    /** The service path component. */
     final String SERVICE_PATH_COMPONENT = "collectionobjects";
     
-    /** The PERSO n_ authorit y_ name. */
+    /** The person authority name. */
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     
     /** The known resource id. */
@@ -80,12 +80,6 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     
     /** The person ids created. */
     private List<String> personIdsCreated = new ArrayList<String>();
-    
-    /** The CREATE d_ status. */
-    private int CREATED_STATUS = Response.Status.CREATED.getStatusCode();
-    
-    /** The O k_ status. */
-    private int OK_STATUS = Response.Status.OK.getStatusCode();
     
     /** The person auth csid. */
     private String personAuthCSID = null; 
@@ -102,7 +96,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     /** The inscriber ref name. */
     private String inscriberRefName = null;
     
-    /** The NU m_ aut h_ ref s_ expected. */
+    /** The number of authority references expected. */
     private final int NUM_AUTH_REFS_EXPECTED = 4;
 
     /* (non-Javadoc)
@@ -135,7 +129,10 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void createWithAuthRefs(String testName) throws Exception {
 
-        testSetup(CREATED_STATUS, ServiceRequestType.CREATE,testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
@@ -197,7 +194,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
 
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, CREATED_STATUS);
+        Assert.assertEquals(statusCode, STATUS_CREATED);
         personAuthCSID = extractId(res);
         
         contentOrganizationRefName = PersonAuthorityClientUtils.createPersonRefName(
@@ -238,7 +235,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
 
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, CREATED_STATUS);
+        Assert.assertEquals(statusCode, STATUS_CREATED);
     	return extractId(res);
     }
 
@@ -253,8 +250,11 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         dependsOnMethods = {"createWithAuthRefs"})
     public void readAndCheckAuthRefs(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        testSetup(OK_STATUS, ServiceRequestType.READ,testName);
+        testSetup(STATUS_OK, ServiceRequestType.READ);
 
         // Submit the request to the service and store the response.
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();

@@ -89,17 +89,26 @@ public abstract class BaseServiceTest {
     protected static final String MALFORMED_XML_DATA = XML_DECLARATION
             + "<malformed_xml>wrong schema contents</malformed_xml";
     /** The wrong XML schema data. */
-    protected final String WRONG_XML_SCHEMA_DATA = XML_DECLARATION
+    protected static final String WRONG_XML_SCHEMA_DATA = XML_DECLARATION
             + "<wrong_schema>wrong schema contents</wrong_schema>";
     /** The null charset. */
-    final String NULL_CHARSET = null;
+    private static final String NULL_CHARSET = null;
 
-    protected final static String BANNER_SEPARATOR_LINE =
+    private static final String BANNER_SEPARATOR_LINE =
         "===================================================";
-    protected final static String BANNER_PREFIX =
+    private static final String BANNER_PREFIX =
         "\n" + BANNER_SEPARATOR_LINE + "\n";
-    protected final static String BANNER_SUFFIX =
+    private static final String BANNER_SUFFIX =
         "\n" + BANNER_SEPARATOR_LINE;
+    
+    protected static final int STATUS_BAD_REQUEST =
+        Response.Status.BAD_REQUEST.getStatusCode();
+    protected static final int STATUS_CREATED =
+        Response.Status.CREATED.getStatusCode();
+    protected static final int STATUS_NOT_FOUND =
+        Response.Status.NOT_FOUND.getStatusCode();
+    protected static final int STATUS_OK =
+        Response.Status.OK.getStatusCode();
 
     /**
      * Instantiates a new base service test.
@@ -160,63 +169,8 @@ public abstract class BaseServiceTest {
     }
 
     /**
-     * Initializes setup values for a given test, and prints a banner
+     * Initializes setup values for a given test.  Returns a banner
      * identifying the test being run, using the local logger for this class.
-     *
-     * @param expectedStatusCode  A status code expected to be returned in the response.
-     *
-     * @param serviceRequestType  A type of service request (e.g. CREATE, DELETE).
-     *
-     * @param testName The name of the test being run.
-     */
-    protected void testSetup(
-            int expectedStatusCode,
-            ServiceRequestType reqType,
-            String testName) {
-        testSetup(expectedStatusCode, reqType, testName, null);
-    }
-
-    /**
-     * Initializes setup values for a given test, and prints a banner
-     * identifying the test being run, using a specified logger.
-     *
-     * @param expectedStatusCode  A status code expected to be returned in the response.
-     *
-     * @param serviceRequestType  A type of service request (e.g. CREATE, DELETE).
-     *
-     * @param testName The name of the test being run.
-     *
-     * @param testLogger An optional logger to use within the current base
-     *     class, when generating log statements related to that test.
-     *     If null, the logger of the current base class will be used.
-     */
-    protected void testSetup(
-            int expectedStatusCode,
-            ServiceRequestType reqType,
-            String testName,
-            Logger testLogger) {
-
-        testSetup(expectedStatusCode, reqType);
-
-        // Print a banner identifying the test being run.
-        //
-        // If an optional logger has been provided, such as by a
-        // calling class, use that logger to print the banner.
-        if (testLogger != null) {
-            if (testLogger.isDebugEnabled()) {
-               testLogger.debug(testBanner(testName, testLogger));
-            }
-        // Otherwise, use this base class's logger to print the banner.
-        } else {
-            testLogger = logger;
-            if (testLogger.isDebugEnabled()) {
-                testLogger.debug(testBanner(testName));
-            }
-        }
-    }
-
-    /**
-     * Initializes setup values for a given test.
      *
      * @param expectedStatusCode  A status code expected to be returned in the response.
      *
@@ -582,7 +536,7 @@ public abstract class BaseServiceTest {
     }
 
     /**
-     * Returns label text inside a test-specific banner.
+     * Returns a test-specific banner.
      *
      * @param testName The name of a test method.
      *
@@ -592,21 +546,6 @@ public abstract class BaseServiceTest {
         testName = (testName == null || testName.trim().isEmpty()) ?
             " Test = no test name specified" : " Test = " + testName;
         return banner(testName);
-    }
-
-    /**
-     * Returns a test-specific banner.
-     *
-     * @param testName The name of a test method.
-     *
-     * @param testLogger An optional logger to use within the current base
-     *     class, when generating log statements related to that test.
-     *
-     * @return A test-specific banner.
-     */
-    protected static String testBanner(String testName, Logger testLogger) {
-        String testClass = testLogger.getName();
-        return testBanner(testName, testClass);
     }
 
     /**

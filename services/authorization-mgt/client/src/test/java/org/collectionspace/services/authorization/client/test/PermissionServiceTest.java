@@ -55,8 +55,9 @@ import org.slf4j.LoggerFactory;
 public class PermissionServiceTest extends AbstractServiceTestImpl {
 
     /** The Constant logger. */
-    static private final Logger logger =
-            LoggerFactory.getLogger(PermissionServiceTest.class);
+    private final static String CLASS_NAME = PermissionServiceTest.class.getName();
+    private final static Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownResourceId = null;
@@ -113,10 +114,13 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
-        setupCreate(testName);
+        setupCreate();
 
         // Submit the request to the service and store the response.
         List<PermissionAction> actions = PermissionFactory.createDefaultActions();
@@ -162,7 +166,10 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     public void createWithoutResourceName(String testName) throws Exception {
 
-        setupCreate(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupCreate();
 
         // Submit the request to the service and store the response.
         List<PermissionAction> actions = PermissionFactory.createDefaultActions();
@@ -194,7 +201,10 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     public void createList(String testName) throws Exception {
 
-        setupCreate(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupCreate();
         // Submit the request to the service and store the response.
         List<PermissionAction> actions = PermissionFactory.createDefaultActions();
         Permission permission1 = createPermissionInstance("test-objects",
@@ -280,8 +290,11 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupRead(testName);
+        setupRead();
 
         // Submit the request to the service and store the response.
         PermissionClient client = new PermissionClient();
@@ -310,8 +323,11 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"read"})
     public void readNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadNonExistent(testName);
+        setupReadNonExistent();
 
         // Submit the request to the service and store the response.
         PermissionClient client = new PermissionClient();
@@ -340,8 +356,11 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"createList", "read"})
     public void readList(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadList(testName);
+        setupReadList();
 
         // Submit the request to the service and store the response.
         PermissionClient client = new PermissionClient();
@@ -375,8 +394,11 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"createList", "read"})
     public void searchResourceName(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadList(testName);
+        setupReadList();
 
         // Submit the request to the service and store the response.
         PermissionClient client = new PermissionClient();
@@ -418,8 +440,11 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"read", "readList", "readNonExistent"})
     public void update(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
 
         Permission permToUpdate = new Permission();
         permToUpdate.setCsid(knownResourceId);
@@ -457,7 +482,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     public void updateNotAllowed(String testName) throws Exception {
 
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
 
         Permission permToUpdate = new Permission();
         permToUpdate.setCsid(knownResourceId);
@@ -492,8 +517,11 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"updateNotAllowed"})
     public void updateActions(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
 
         Permission permToUpdate = new Permission();
         permToUpdate.setCsid(knownResourceId);
@@ -572,8 +600,11 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"readNonExistent", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdateNonExistent(testName);
+        setupUpdateNonExistent();
 
         // Submit the request to the service and store the response.
         //
@@ -614,8 +645,11 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"updateActions", "testSubmitRequest"})
     public void delete(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDelete(testName);
+        setupDelete();
 
         // Submit the request to the service and store the response.
         PermissionClient client = new PermissionClient();
@@ -641,8 +675,11 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"delete"})
     public void deleteNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDeleteNonExistent(testName);
+        setupDeleteNonExistent();
 
         // Submit the request to the service and store the response.
         PermissionClient client = new PermissionClient();

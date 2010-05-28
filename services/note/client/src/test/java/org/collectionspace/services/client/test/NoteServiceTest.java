@@ -55,8 +55,8 @@ import org.slf4j.LoggerFactory;
  */
 public class NoteServiceTest extends AbstractServiceTestImpl {
 
-   private final Logger logger =
-       LoggerFactory.getLogger(NoteServiceTest.class);
+    private final String CLASS_NAME = NoteServiceTest.class.getName();
+    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
     final String SERVICE_PATH_COMPONENT = "notes";
@@ -87,10 +87,13 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
-        setupCreate(testName);
+        setupCreate();
 
         // Submit the request to the service and store the response.
         NoteClient client = new NoteClient();
@@ -166,8 +169,11 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupRead(testName);
+        setupRead();
 
         // Submit the request to the service and store the response.
         NoteClient client = new NoteClient();
@@ -195,8 +201,11 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"read"})
     public void readNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadNonExistent(testName);
+        setupReadNonExistent();
 
         // Submit the request to the service and store the response.
         NoteClient client = new NoteClient();
@@ -222,8 +231,11 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"read"})
     public void readList(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadList(testName);
+        setupReadList();
 
         // Submit the request to the service and store the response.
         NoteClient client = new NoteClient();
@@ -270,8 +282,11 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"read"})
     public void update(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
 
         // Submit the request to the service and store the response.
         NoteClient client = new NoteClient();
@@ -352,8 +367,11 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdateNonExistent(testName);
+        setupUpdateNonExistent();
 
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
@@ -384,8 +402,11 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
     public void delete(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDelete(testName);
+        setupDelete();
 
         // Submit the request to the service and store the response.
         NoteClient client = new NoteClient();
@@ -407,9 +428,12 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"delete"})
     public void deleteNonExistent(String testName) throws Exception {
-
+        
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDeleteNonExistent(testName);
+        setupDeleteNonExistent();
 
         // Submit the request to the service and store the response.
         NoteClient client = new NoteClient();

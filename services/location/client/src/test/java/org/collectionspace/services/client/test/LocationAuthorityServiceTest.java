@@ -62,17 +62,18 @@ import org.testng.annotations.Test;
 public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 
     /** The logger. */
-    private final Logger logger =
-        LoggerFactory.getLogger(LocationAuthorityServiceTest.class);
+    private final String CLASS_NAME = LocationAuthorityServiceTest.class.getName();
+    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
+    
     /** The SERVICE path component. */
     final String SERVICE_PATH_COMPONENT = "locationauthorities";
     
-    /** The ITEM servicE path component. */
+    /** The ITEM service path component. */
     final String ITEM_SERVICE_PATH_COMPONENT = "items";
     
-    /** The CONTACT servicE path component. */
+    /** The CONTACT service path component. */
     final String CONTACT_SERVICE_PATH_COMPONENT = "contacts";
     
     /** The TEST name. */
@@ -152,10 +153,13 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"create"})
     public void create(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
-        setupCreate(testName);
+        setupCreate();
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
@@ -209,7 +213,10 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"create"}, dependsOnMethods = {"create"})
     public void createItem(String testName) {
-        setupCreate(testName);
+        if(logger.isDebugEnabled()){
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupCreate();
         String newID = createItemInAuthority(knownResourceId, knownResourceRefName);
     }
 
@@ -224,7 +231,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 
         final String testName = "createItemInAuthority";
         if(logger.isDebugEnabled()){
-            logger.debug(testName + ":...");
+            logger.debug(testBanner(testName, CLASS_NAME));
         }
 
         // Submit the request to the service and store the response.
@@ -343,8 +350,11 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"read"}, dependsOnGroups = {"create"})
     public void read(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupRead(testName);
+        setupRead();
         
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
@@ -380,8 +390,11 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
             groups = {"read"}, dependsOnGroups = {"create"})
         public void readByName(String testName) throws Exception {
 
-            // Perform setup.
-        setupRead(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupRead();
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
@@ -418,8 +431,11 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"read"}, dependsOnMethods = {"read"})
     public void readItem(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupRead(testName);
+        setupRead();
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
@@ -459,8 +475,11 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"readItem", "updateItem"})
     public void verifyItemDisplayName(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
@@ -569,8 +588,12 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
             dependsOnMethods = {"verifyItemDisplayName"})
     public void verifyIllegalItemDisplayName(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-    	setupUpdateWithWrongXmlSchema(testName);
+        // FIXME: create a setup configuration for this operation.
+    	setupUpdateWithWrongXmlSchema();
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
@@ -621,8 +644,11 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"read"}, dependsOnMethods = {"read"})
     public void readNonExistent(String testName) {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadNonExistent(testName);
+        setupReadNonExistent();
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
@@ -648,8 +674,11 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"read"}, dependsOnMethods = {"readItem"})
     public void readItemNonExistent(String testName) {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadNonExistent(testName);
+        setupReadNonExistent();
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
@@ -680,8 +709,11 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"readList"}, dependsOnGroups = {"createList", "read"})
     public void readList(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadList(testName);
+        setupReadList();
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
@@ -723,6 +755,10 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
      */
     @Test(groups = {"readList"}, dependsOnMethods = {"readList"})
     public void readItemList() {
+        String testName = "readItemList";
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         readItemList(knownResourceId, null);
     }
 
@@ -731,6 +767,10 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
      */
     @Test(groups = {"readList"}, dependsOnMethods = {"readItemList"})
     public void readItemListByAuthorityName() {
+        String testName = "readItemListByAuthorityName";
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         readItemList(null, knownResourceDisplayName);
     }
     
@@ -742,12 +782,12 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
      */
     private void readItemList(String vcsid, String name) {
 
-        final String testName = "readItemList";
+        String testName = "readItemList";
 
         // Perform setup.
-        setupReadList(testName);
+        setupReadList();
         
-	// Submit the request to the service and store the response.
+        // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
         ClientResponse<LocationsCommonList> res = null;
         if(vcsid!= null) {
@@ -821,8 +861,11 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"update"}, dependsOnGroups = {"read", "readList"})
     public void update(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
 
         // Retrieve the contents of a resource to update.
         LocationAuthorityClient client = new LocationAuthorityClient();
@@ -887,8 +930,11 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"update"}, dependsOnMethods = {"update"})
     public void updateItem(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
 
         // Retrieve the contents of a resource to update.
         LocationAuthorityClient client = new LocationAuthorityClient();
@@ -978,8 +1024,11 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"update"}, dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdateNonExistent(testName);
+        setupUpdateNonExistent();
 
         // Submit the request to the service and store the response.
         // Note: The ID(s) used when creating the request payload may be arbitrary.
@@ -1013,8 +1062,11 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"update"}, dependsOnMethods = {"updateItem", "testItemSubmitRequest"})
     public void updateNonExistentItem(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdateNonExistent(testName);
+        setupUpdateNonExistent();
 
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
@@ -1061,8 +1113,11 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"delete"}, dependsOnGroups = {"create", "read", "readList", "update"})
     public void deleteItem(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDelete(testName);
+        setupDelete();
 
         if(logger.isDebugEnabled()){
             logger.debug("parentcsid =" + knownResourceId +
@@ -1092,8 +1147,11 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"delete"}, dependsOnMethods = {"deleteItem"})
     public void delete(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDelete(testName);
+        setupDelete();
 
         if(logger.isDebugEnabled()){
             logger.debug("parentcsid =" + knownResourceId);
@@ -1123,8 +1181,11 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"delete"}, dependsOnMethods = {"delete"})
     public void deleteNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDeleteNonExistent(testName);
+        setupDeleteNonExistent();
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
@@ -1150,8 +1211,11 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         groups = {"delete"}, dependsOnMethods = {"deleteItem"})
     public void deleteNonExistentItem(String testName) {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDeleteNonExistent(testName);
+        setupDeleteNonExistent();
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();

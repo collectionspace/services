@@ -58,8 +58,8 @@ import org.testng.annotations.Test;
  */
 public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
-    private final Logger logger =
-        LoggerFactory.getLogger(VocabularyServiceTest.class);
+    private final String CLASS_NAME = VocabularyServiceTest.class.getName();
+    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
     final String SERVICE_PATH_COMPONENT = "vocabularies";
@@ -101,11 +101,14 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
-
+        
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
-        setupCreate(testName);
+        setupCreate();
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
@@ -148,8 +151,11 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"create"})
     public void createItem(String testName) {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupCreate(testName);
+        setupCreate();
 
         VocabularyClient client = new VocabularyClient();
         HashMap<String, String> itemInfo = new HashMap<String, String>();
@@ -207,25 +213,28 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithEmptyEntityBody(String testName) throws Exception {
 
-    // Perform setup.
-    setupCreateWithEmptyEntityBody(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupCreateWithEmptyEntityBody(testName, CLASS_NAME);
 
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getServiceRootURL();
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = "";
-    int statusCode = submitRequest(method, url, mediaType, entity);
+        // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
+        String url = getServiceRootURL();
+        String mediaType = MediaType.APPLICATION_XML;
+        final String entity = "";
+        int statusCode = submitRequest(method, url, mediaType, entity);
 
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()) {
-        logger.debug(testName + ": url=" + url +
-            " status=" + statusCode);
-     }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()) {
+            logger.debug(testName + ": url=" + url +
+                " status=" + statusCode);
+         }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
@@ -233,25 +242,28 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithMalformedXml(String testName) throws Exception {
 
-    // Perform setup.
-    setupCreateWithMalformedXml(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupCreateWithMalformedXml();
 
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getServiceRootURL();
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = MALFORMED_XML_DATA; // Constant from base class.
-    int statusCode = submitRequest(method, url, mediaType, entity);
+        // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
+        String url = getServiceRootURL();
+        String mediaType = MediaType.APPLICATION_XML;
+        final String entity = MALFORMED_XML_DATA; // Constant from base class.
+        int statusCode = submitRequest(method, url, mediaType, entity);
 
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-        logger.debug(testName + ": url=" + url +
-            " status=" + statusCode);
-     }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": url=" + url +
+                " status=" + statusCode);
+         }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
@@ -259,25 +271,28 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithWrongXmlSchema(String testName) throws Exception {
 
-    // Perform setup.
-    setupCreateWithWrongXmlSchema(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupCreateWithWrongXmlSchema();
 
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getServiceRootURL();
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = WRONG_XML_SCHEMA_DATA;
-    int statusCode = submitRequest(method, url, mediaType, entity);
+        // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
+        String url = getServiceRootURL();
+        String mediaType = MediaType.APPLICATION_XML;
+        final String entity = WRONG_XML_SCHEMA_DATA;
+        int statusCode = submitRequest(method, url, mediaType, entity);
 
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-        logger.debug(testName + ": url=" + url +
-            " status=" + statusCode);
-     }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": url=" + url +
+                " status=" + statusCode);
+         }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
      */
 
@@ -290,8 +305,11 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupRead(testName);
+        setupRead();
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
@@ -322,39 +340,45 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
             dependsOnMethods = {"read"})
         public void readByName(String testName) throws Exception {
 
-            // Perform setup.
-            setupRead(testName);
-
-            // Submit the request to the service and store the response.
-            ClientResponse<MultipartInput> res = client.read(knownResourceId);
-            int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if(logger.isDebugEnabled()){
-                logger.debug(testName + ": status = " + statusCode);
-            }
-            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-            //FIXME: remove the following try catch once Aron fixes signatures
-            try {
-                MultipartInput input = (MultipartInput) res.getEntity();
-                VocabulariesCommon vocabulary = (VocabulariesCommon) extractPart(input,
-                        client.getCommonPartName(), VocabulariesCommon.class);
-                Assert.assertNotNull(vocabulary);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
         }
+        // Perform setup.
+        setupRead();
+
+        // Submit the request to the service and store the response.
+        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        //FIXME: remove the following try catch once Aron fixes signatures
+        try {
+            MultipartInput input = (MultipartInput) res.getEntity();
+            VocabulariesCommon vocabulary = (VocabulariesCommon) extractPart(input,
+                    client.getCommonPartName(), VocabulariesCommon.class);
+            Assert.assertNotNull(vocabulary);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
     */
 
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"createItem", "read"})
     public void readItem(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupRead(testName);
+        setupRead();
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
@@ -383,8 +407,12 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
             dependsOnMethods = {"updateItem"})
     public void verifyIllegalItemDisplayName(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-    	setupUpdateWithWrongXmlSchema(testName);
+        testSetup(STATUS_BAD_REQUEST, ServiceRequestType.UPDATE);
+    	// setupUpdateWithWrongXmlSchema(testName);
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
@@ -449,8 +477,11 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"read"})
     public void readNonExistent(String testName) {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadNonExistent(testName);
+        setupReadNonExistent();
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
@@ -471,8 +502,11 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"readItem", "readNonExistent"})
     public void readItemNonExistent(String testName) {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadNonExistent(testName);
+        setupReadNonExistent();
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
@@ -498,8 +532,11 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"createList", "read"})
     public void readList(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadList(testName);
+        setupReadList();
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
@@ -546,7 +583,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         final String testName = "readItemList";
 
         // Perform setup.
-        setupReadList(testName);
+        setupReadList();
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
@@ -601,8 +638,11 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"read"})
     public void update(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
 
         // Retrieve the contents of a resource to update.
         VocabularyClient client = new VocabularyClient();
@@ -661,8 +701,11 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"readItem", "update"})
     public void updateItem(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
 
         // Retrieve the contents of a resource to update.
         VocabularyClient client = new VocabularyClient();
@@ -740,25 +783,28 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithEmptyEntityBody(String testName) throws Exception {
 
-    // Perform setup.
-    setupUpdateWithEmptyEntityBody(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupUpdateWithEmptyEntityBody();
 
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getResourceURL(knownResourceId);
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = "";
-    int statusCode = submitRequest(method, url, mediaType, entity);
+        // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
+        String url = getResourceURL(knownResourceId);
+        String mediaType = MediaType.APPLICATION_XML;
+        final String entity = "";
+        int statusCode = submitRequest(method, url, mediaType, entity);
 
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-        logger.debug(testName + ": url=" + url +
-            " status=" + statusCode);
-     }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": url=" + url +
+                " status=" + statusCode);
+         }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
@@ -766,25 +812,28 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithMalformedXml(String testName) throws Exception {
 
-    // Perform setup.
-    setupUpdateWithMalformedXml(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupUpdateWithMalformedXml();
 
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getResourceURL(knownResourceId);
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = MALFORMED_XML_DATA;
-    int statusCode = submitRequest(method, url, mediaType, entity);
+        // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
+        String url = getResourceURL(knownResourceId);
+        String mediaType = MediaType.APPLICATION_XML;
+        final String entity = MALFORMED_XML_DATA;
+        int statusCode = submitRequest(method, url, mediaType, entity);
 
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-        logger.debug(testName + ": url=" + url +
-           " status=" + statusCode);
-     }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": url=" + url +
+               " status=" + statusCode);
+         }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
@@ -792,25 +841,28 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithWrongXmlSchema(String testName) throws Exception {
 
-    // Perform setup.
-    setupUpdateWithWrongXmlSchema(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupUpdateWithWrongXmlSchema();
 
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getResourceURL(knownResourceId);
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = WRONG_XML_SCHEMA_DATA;
-    int statusCode = submitRequest(method, url, mediaType, entity);
+        // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
+        String url = getResourceURL(knownResourceId);
+        String mediaType = MediaType.APPLICATION_XML;
+        final String entity = WRONG_XML_SCHEMA_DATA;
+        int statusCode = submitRequest(method, url, mediaType, entity);
 
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-        logger.debug("updateWithWrongXmlSchema: url=" + url +
-            " status=" + statusCode);
-     }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug("updateWithWrongXmlSchema: url=" + url +
+                " status=" + statusCode);
+         }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
      */
 
@@ -820,8 +872,11 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdateNonExistent(testName);
+        setupUpdateNonExistent();
 
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
@@ -849,8 +904,11 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"updateItem", "testItemSubmitRequest"})
     public void updateNonExistentItem(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdateNonExistent(testName);
+        setupUpdateNonExistent();
 
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
@@ -885,8 +943,11 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
     public void delete(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDelete(testName);
+        setupDelete();
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
@@ -908,8 +969,11 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
             "updateItem", "verifyIllegalItemDisplayName"})
     public void deleteItem(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDelete(testName);
+        setupDelete();
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
@@ -932,8 +996,11 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"delete"})
     public void deleteNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDeleteNonExistent(testName);
+        setupDeleteNonExistent();
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
@@ -954,8 +1021,11 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"deleteItem"})
     public void deleteNonExistentItem(String testName) {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDeleteNonExistent(testName);
+        setupDeleteNonExistent();
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
@@ -983,8 +1053,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     public void testSubmitRequest() {
 
         // Expected status code: 200 OK
-        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
-
+        setupRead();
+        
         // Submit the request to the service and store the response.
         String method = ServiceRequestType.READ.httpMethodName();
         String url = getResourceURL(knownResourceId);
@@ -996,7 +1066,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
             logger.debug("testSubmitRequest: url=" + url +
                 " status=" + statusCode);
         }
-        Assert.assertEquals(statusCode, EXPECTED_STATUS);
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
     }
 

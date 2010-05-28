@@ -52,8 +52,9 @@ import org.slf4j.LoggerFactory;
 public class RoleServiceTest extends AbstractServiceTestImpl {
 
     /** The logger. */
-    private final Logger logger =
-            LoggerFactory.getLogger(RoleServiceTest.class);
+    private final static String CLASS_NAME = RoleServiceTest.class.getName();
+    private final static Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownResourceId = null;
@@ -113,10 +114,13 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
-        setupCreate(testName);
+        setupCreate();
 
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
@@ -157,7 +161,10 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     public void createForUniqueRole(String testName) throws Exception {
 
-        setupCreate(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupCreate();
 
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
@@ -185,7 +192,10 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     public void createWithoutRoleName(String testName) throws Exception {
 
-        setupCreate(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupCreate();
 
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
@@ -212,7 +222,10 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     public void createList(String testName) throws Exception {
 
-        setupCreate(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupCreate();
 
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
@@ -291,8 +304,11 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupRead(testName);
+        setupRead();
 
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
@@ -317,7 +333,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     public void readToVerify(String testName) throws Exception {
 
         // Perform setup.
-        setupRead(testName);
+        setupRead();
 
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
@@ -350,8 +366,11 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"read"})
     public void readNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadNonExistent(testName);
+        setupReadNonExistent();
 
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
@@ -380,8 +399,11 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"createList", "read"})
     public void readList(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadList(testName);
+        setupReadList();
 
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
@@ -415,8 +437,11 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"createList", "read"})
     public void searchRoleName(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadList(testName);
+        setupReadList();
 
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
@@ -458,8 +483,11 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"read", "readList", "readNonExistent"})
     public void update(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
 
         Role roleToUpdate = new Role();
         roleToUpdate.setCsid(knownResourceId);
@@ -498,7 +526,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     public void updateNotAllowed(String testName) throws Exception {
 
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
 
         Role roleToUpdate = new Role();
         roleToUpdate.setCsid(knownResourceId);
@@ -558,8 +586,11 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"readNonExistent", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdateNonExistent(testName);
+        setupUpdateNonExistent();
 
         // Submit the request to the service and store the response.
         //
@@ -595,8 +626,11 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"updateNotAllowed", "testSubmitRequest"})
     public void delete(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDelete(testName);
+        setupDelete();
 
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
@@ -622,8 +656,11 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"delete"})
     public void deleteNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDeleteNonExistent(testName);
+        setupDeleteNonExistent();
 
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();

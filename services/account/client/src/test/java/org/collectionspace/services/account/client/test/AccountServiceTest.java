@@ -54,8 +54,9 @@ import org.testng.annotations.AfterClass;
 public class AccountServiceTest extends AbstractServiceTestImpl {
 
     /** The Constant logger. */
-    static private final Logger logger =
-            LoggerFactory.getLogger(AccountServiceTest.class);
+    private final String CLASS_NAME = AccountServiceTest.class.getName();
+    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownResourceId = null;
@@ -112,10 +113,13 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
-        setupCreate(testName);
+        setupCreate();
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
@@ -156,7 +160,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     public void createForUniqueUser(String testName) throws Exception {
 
-        setupCreate(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupCreate();
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
@@ -183,7 +190,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     public void createWithInvalidTenant(String testName) throws Exception {
 
-        setupCreate(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupCreate();
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
@@ -212,7 +222,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     public void createWithoutUser(String testName) throws Exception {
 
-        setupCreate(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupCreate();
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
@@ -240,7 +253,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     public void createWithInvalidEmail(String testName) throws Exception {
 
-        setupCreate(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupCreate();
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
@@ -268,7 +284,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     public void createWithoutScreenName(String testName) throws Exception {
 
-        setupCreate(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupCreate();
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
@@ -296,7 +315,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     public void createWithInvalidPassword(String testName) throws Exception {
 
-        setupCreate(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupCreate();
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
@@ -324,7 +346,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     public void createWithMostInvalid(String testName) throws Exception {
 
-        setupCreate(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupCreate();
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
@@ -351,7 +376,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     public void createList(String testName) throws Exception {
 
-        setupCreate(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupCreate();
         // Submit the request to the service and store the response.
         AccountsCommon account1 =
                 createAccountInstance("curious", "curious", "hithere08", "curious@george.com",
@@ -426,8 +454,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupRead(testName);
+        setupRead();
 
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
@@ -456,8 +487,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"read"})
     public void readNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadNonExistent(testName);
+        setupReadNonExistent();
 
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
@@ -486,8 +520,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"createList", "read"})
     public void readList(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadList(testName);
+        setupReadList();
 
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
@@ -521,8 +558,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"createList", "read"})
     public void searchScreenName(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadList(testName);
+        setupReadList();
 
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
@@ -557,8 +597,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"createList", "read"})
     public void searchUserId(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadList(testName);
+        setupReadList();
 
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
@@ -593,8 +636,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"createList", "read"})
     public void searchEmail(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadList(testName);
+        setupReadList();
 
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
@@ -629,8 +675,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"createList", "read"})
     public void searchScreenNameEmail(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadList(testName);
+        setupReadList();
 
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
@@ -669,8 +718,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"read", "readList", "readNonExistent"})
     public void update(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
 
         AccountClient client = new AccountClient();
         ClientResponse<AccountsCommon> res = client.read(knownResourceId);
@@ -727,8 +779,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"update"})
     public void updatePassword(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
 
         AccountClient client = new AccountClient();
         ClientResponse<AccountsCommon> res = client.read(knownResourceId);
@@ -786,8 +841,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"update"})
     public void updatePasswordWithoutUser(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
 
         AccountsCommon accountToUpdate = new AccountsCommon();
         accountToUpdate.setCsid(knownResourceId);
@@ -824,8 +882,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"update"})
     public void updateInvalidPassword(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
         AccountClient client = new AccountClient();
         ClientResponse<AccountsCommon> res = client.read(knownResourceId);
         if (logger.isDebugEnabled()) {
@@ -874,8 +935,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"updatePasswordWithoutUser"})
     public void deactivate(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
 
         AccountClient client = new AccountClient();
         ClientResponse<AccountsCommon> res = client.read(knownResourceId);
@@ -957,8 +1021,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"deactivate", "readNonExistent", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdateNonExistent(testName);
+        setupUpdateNonExistent();
 
         // Submit the request to the service and store the response.
         //
@@ -992,7 +1059,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"deactivate", "readNonExistent", "testSubmitRequest"})
     public void updateWrongUser(String testName) throws Exception {
 
-        setupUpdate(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupUpdate();
 
         // Submit the request to the service and store the response.
         //
@@ -1044,8 +1114,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"testSubmitRequest", "updateWrongUser"})
     public void delete(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDelete(testName);
+        setupDelete();
 
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
@@ -1071,8 +1144,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"delete"})
     public void deleteNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDeleteNonExistent(testName);
+        setupDeleteNonExistent();
 
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
@@ -1100,8 +1176,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     @Test(dependsOnMethods = {"create", "read"})
     public void testSubmitRequest() throws Exception {
 
-        // Expected status code: 200 OK
-        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
+        setupRead();
 
         // Submit the request to the service and store the response.
         String method = ServiceRequestType.READ.httpMethodName();
@@ -1114,7 +1189,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
             logger.debug("testSubmitRequest: url=" + url
                     + " status=" + statusCode);
         }
-        Assert.assertEquals(statusCode, EXPECTED_STATUS);
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
     }
 

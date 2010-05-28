@@ -52,8 +52,9 @@ import org.testng.annotations.Test;
  */
 public class PersonAuthoritySearchTest extends BaseServiceTest {
 
-    static final Logger logger = LoggerFactory.getLogger(PersonAuthoritySearchTest.class);
-
+    private final String CLASS_NAME = PersonAuthoritySearchTest.class.getName();
+    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    
     /** The service path component. */
     final String SERVICE_PATH_COMPONENT = "personauthorities";
     
@@ -166,7 +167,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         groups = {"readListByPartialTerm"})
     public void partialTermMatch(String testName) {
         if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, logger));
+            logger.debug(testBanner(testName, CLASS_NAME));
         }
         int numMatchesFound = 0;
         String partialTerm = getPartialTerm();
@@ -190,7 +191,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
     public void partialTermMatchCaseInsensitiveLowerCase(String testName) {
         if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, logger));
+            logger.debug(testBanner(testName, CLASS_NAME));
         }
         int numMatchesFound = 0;
 
@@ -216,7 +217,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
     public void partialTermMatchCaseInsensitiveUpperCase(String testName) {
         if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, logger));
+            logger.debug(testBanner(testName, CLASS_NAME));
         }
         int numMatchesFound = 0;
 
@@ -241,7 +242,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
     public void partialTermMatchMinimumLength(String testName) {
         if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, logger));
+            logger.debug(testBanner(testName, CLASS_NAME));
         }
         int numMatchesFound = 0;
         String partialTerm = getPartialTermMinimumLength();
@@ -268,7 +269,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
     public void partialTermMatchUTF8(String testName) {
         if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, logger));
+            logger.debug(testBanner(testName, CLASS_NAME));
         }
         int numMatchesFound = 0;
         String partialTerm = getPartialTermUtf8();
@@ -295,7 +296,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
     public void partialTermMatchOnNonexistentTerm(String testName) {
         if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, logger));
+            logger.debug(testBanner(testName, CLASS_NAME));
         }
         int numMatchesFound = 0;
         int ZERO_MATCHES_EXPECTED = 0;
@@ -322,13 +323,14 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
      */
     private int readItemListByPartialTerm(String authorityCsid, String partialTerm) {
 
+        String testName = "readItemListByPartialTerm";
+
         // Perform setup.
         int expectedStatusCode = Response.Status.OK.getStatusCode();
         ServiceRequestType requestType = ServiceRequestType.READ_LIST;
-        String testName = "readItemListByPartialTerm";
-        testSetup(expectedStatusCode, requestType, testName, logger);
+        testSetup(expectedStatusCode, requestType);
 
-	// Submit the request to the service and store the response.
+        // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<PersonsCommonList> res = null;
         if (authorityCsid != null) {
@@ -423,11 +425,12 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
 
     public void createAuthority() throws Exception {
 
+        String testName = "createAuthority";
+
         // Perform setup.
         int expectedStatusCode = Response.Status.CREATED.getStatusCode();
         ServiceRequestType requestType = ServiceRequestType.CREATE;
-        String testName = "createPersonAuthority";
-        testSetup(expectedStatusCode, requestType, testName, logger);
+        testSetup(expectedStatusCode, requestType);
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
@@ -443,6 +446,11 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     	ClientResponse<Response> res = client.create(multipart);
         try {
             int statusCode = res.getStatus();
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if(logger.isDebugEnabled()){
+                logger.debug(testName + ": status = " + statusCode);
+            }
             Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
             Assert.assertEquals(statusCode, this.EXPECTED_STATUS_CODE);
@@ -473,11 +481,12 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
      */
     private void createItemInAuthorityForPartialTermMatch(String authorityCsid, String authRefName)
         throws Exception {
+            
+        String testName = "createItemInAuthorityForPartialTermMatch";
 
         int expectedStatusCode = Response.Status.CREATED.getStatusCode();
         ServiceRequestType requestType = ServiceRequestType.CREATE;
-        String testName = "createItemInAuthorityForPartialTermMatch";
-        testSetup(expectedStatusCode, requestType, testName);
+        testSetup(expectedStatusCode, requestType);
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();

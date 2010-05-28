@@ -61,8 +61,8 @@ import org.slf4j.LoggerFactory;
  */
 public class OrganizationAuthRefDocsTest extends BaseServiceTest {
 
-   private final Logger logger =
-       LoggerFactory.getLogger(OrganizationAuthRefDocsTest.class);
+    private final String CLASS_NAME = OrganizationAuthRefDocsTest.class.getName();
+    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
     final String SERVICE_PATH_COMPONENT = "intakes";
@@ -70,8 +70,6 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
     private String knownIntakeId = null;
     private List<String> intakeIdsCreated = new ArrayList<String>();
     private List<String> orgIdsCreated = new ArrayList<String>();
-    private int CREATED_STATUS = Response.Status.CREATED.getStatusCode();
-    private int OK_STATUS = Response.Status.OK.getStatusCode();
     private String orgAuthCSID = null; 
     private String currentOwnerOrgCSID = null; 
     private String currentOwnerRefName = null;
@@ -106,7 +104,10 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void createIntakeWithAuthRefs(String testName) throws Exception {
 
-        testSetup(CREATED_STATUS, ServiceRequestType.CREATE,testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
@@ -173,7 +174,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
 
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, CREATED_STATUS);
+        Assert.assertEquals(statusCode, STATUS_CREATED);
         orgAuthCSID = extractId(res);
         
         currentOwnerRefName = OrgAuthorityClientUtils.createOrganizationRefName(
@@ -217,7 +218,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
 
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, CREATED_STATUS);
+        Assert.assertEquals(statusCode, STATUS_CREATED);
     	return extractId(res);
     }
 
@@ -226,8 +227,11 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
         dependsOnMethods = {"createIntakeWithAuthRefs"})
     public void readAndCheckAuthRefDocs(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        testSetup(OK_STATUS, ServiceRequestType.READ,testName);
+        testSetup(STATUS_OK, ServiceRequestType.READ);
         
         // Get the auth ref docs and check them
        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();

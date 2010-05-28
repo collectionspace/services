@@ -88,8 +88,9 @@ import org.testng.annotations.BeforeClass;
  */
 public class AuthorizationServiceTest extends AbstractServiceTestImpl {
 
-    static private final Logger logger =
-            LoggerFactory.getLogger(AuthorizationServiceTest.class);
+    private final String CLASS_NAME = AuthorizationServiceTest.class.getName();
+    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    
     // Instance variables specific to this test.
     private String knownResourceId = null;
     private List<String> allResourceIdsCreated = new ArrayList();
@@ -242,7 +243,10 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
-        setupCreate(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupCreate();
 
         // Submit the request to the service and store the response.
         DimensionClient client = new DimensionClient();
@@ -302,8 +306,11 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupRead(testName);
+        setupRead();
 
         // Submit the request to the service and store the response.
         DimensionClient client = new DimensionClient();
@@ -334,7 +341,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     public void readNonExistent(String testName) throws Exception {
 
         // Perform setup.
-        setupReadNonExistent(testName);
+        setupReadNonExistent();
     }
 
     // ---------------------------------------------------------------
@@ -345,7 +352,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"createList", "read"})
     public void readList(String testName) throws Exception {
-        setupReadList(testName);
+        setupReadList();
     }
 
     // Failure outcomes
@@ -358,14 +365,18 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read", "readList", "readNonExistent"})
     public void update(String testName) throws Exception {
-        setupUpdate(testName);
+        setupUpdate();
 
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read", "readList", "readNonExistent"})
     public void updateNotAllowed(String testName) throws Exception {
-        setupUpdate(testName);
+        
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupUpdate();
 
         DimensionClient client = new DimensionClient();
 
@@ -421,8 +432,12 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"updateNotAllowed"})
     public void deleteNotAllowed(String testName) throws Exception {
+        
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDelete(testName);
+        setupDelete();
 
         // Submit the request to the service and store the response.
         DimensionClient client = new DimensionClient();
@@ -446,8 +461,12 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"deleteNotAllowed"})
     public void delete(String testName) throws Exception {
+        
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDelete(testName);
+        setupDelete();
 
         // Submit the request to the service and store the response.
         DimensionClient client = new DimensionClient();
@@ -491,7 +510,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     @AfterClass(alwaysRun = true)
     public void cleanUp() {
-        setupDelete("cleanup");
+        setupDelete();
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -521,7 +540,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
 
     private String createPermission(String resName,
             List<PermissionAction> actions, EffectType effect) {
-        setupCreate("createPermission");
+        setupCreate();
         PermissionClient permClient = new PermissionClient();
         Permission permission = PermissionFactory.createPermissionInstance(resName,
                 "default permissions for " + resName,
@@ -540,7 +559,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     }
 
     private void deletePermission(String permId) {
-        setupDelete("deletePermission");
+        setupDelete();
         PermissionClient permClient = new PermissionClient();
         ClientResponse<Response> res = permClient.delete(permId);
         int statusCode = res.getStatus();
@@ -555,7 +574,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     }
 
     private String createRole(String roleName) {
-        setupCreate("createRole");
+        setupCreate();
         RoleClient roleClient = new RoleClient();
 
         Role role = RoleFactory.createRoleInstance(roleName,
@@ -574,7 +593,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     }
 
     private void deleteRole(String roleId) {
-        setupDelete("deleteRole");
+        setupDelete();
         RoleClient roleClient = new RoleClient();
         ClientResponse<Response> res = roleClient.delete(roleId);
         int statusCode = res.getStatus();
@@ -589,7 +608,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     }
 
     private String createAccount(String userName, String email) {
-        setupCreate("createAccount");
+        setupCreate();
         AccountClient accClient = new AccountClient();
         AccountsCommon account = AccountFactory.createAccountInstance(
                 userName, userName, userName, email,
@@ -608,7 +627,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     }
 
     private void deleteAccount(String accId) {
-        setupDelete("deleteAccount");
+        setupDelete();
         AccountClient accClient = new AccountClient();
         ClientResponse<Response> res = accClient.delete(accId);
         int statusCode = res.getStatus();
@@ -624,7 +643,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
 
     private String createAccountRole(AccountValue av,
             Collection<RoleValue> rvs) {
-        setupCreate("createAccountRole");
+        setupCreate();
 
         // Submit the request to the service and store the response.
         AccountRole accRole = AccountRoleFactory.createAccountRoleInstance(
@@ -645,7 +664,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
 
     private void deleteAccountRole(String screenName) {
         // Perform setup.
-        setupDelete("deleteAccountRole");
+        setupDelete();
 
         // Submit the request to the service and store the response.
         AccountRoleClient client = new AccountRoleClient();
@@ -666,7 +685,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
 
     private String createPermissionRole(PermissionValue pv,
             Collection<RoleValue> rvs) {
-        setupCreate("createPermissionRole");
+        setupCreate();
                 List<RoleValue> rvls = new ArrayList<RoleValue>();
         rvls.addAll(rvs);
         PermissionRole permRole = PermissionRoleFactory.createPermissionRoleInstance(
@@ -688,7 +707,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     private void deletePermissionRole(String permId) {
 
         // Perform setup.
-        setupDelete("deletePermissionRole");
+        setupDelete();
 
         // Submit the request to the service and store the response.
         PermissionRoleClient client = new PermissionRoleClient();

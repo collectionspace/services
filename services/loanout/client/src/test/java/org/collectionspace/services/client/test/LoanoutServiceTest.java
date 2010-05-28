@@ -53,11 +53,11 @@ import org.slf4j.LoggerFactory;
 public class LoanoutServiceTest extends AbstractServiceTestImpl {
 
    /** The logger. */
-   private final Logger logger =
-       LoggerFactory.getLogger(LoanoutServiceTest.class);
+    private final String CLASS_NAME = LoanoutServiceTest.class.getName();
+    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
-    /** The SERVIC e_ pat h_ component. */
+    /** The service path component. */
     final String SERVICE_PATH_COMPONENT = "loansout";
     
     /** The known resource id. */
@@ -91,10 +91,13 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void create(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
-        setupCreate(testName);
+        setupCreate();
 
         // Submit the request to the service and store the response.
         LoanoutClient client = new LoanoutClient();
@@ -176,25 +179,28 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithEmptyEntityBody(String testName) throws Exception {
 
-    // Perform setup.
-    setupCreateWithEmptyEntityBody(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupCreateWithEmptyEntityBody();
 
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getServiceRootURL();
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = "";
-    int statusCode = submitRequest(method, url, mediaType, entity);
+        // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
+        String url = getServiceRootURL();
+        String mediaType = MediaType.APPLICATION_XML;
+        final String entity = "";
+        int statusCode = submitRequest(method, url, mediaType, entity);
 
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-        logger.debug("createWithEmptyEntityBody url=" + url +
-            " status=" + statusCode);
-     }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug("createWithEmptyEntityBody url=" + url +
+                " status=" + statusCode);
+         }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
@@ -202,25 +208,28 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithMalformedXml(String testName) throws Exception {
 
-    // Perform setup.
-    setupCreateWithMalformedXml(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupCreateWithMalformedXml();
 
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getServiceRootURL();
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = MALFORMED_XML_DATA; // Constant from base class.
-    int statusCode = submitRequest(method, url, mediaType, entity);
+        // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
+        String url = getServiceRootURL();
+        String mediaType = MediaType.APPLICATION_XML;
+        final String entity = MALFORMED_XML_DATA; // Constant from base class.
+        int statusCode = submitRequest(method, url, mediaType, entity);
 
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-        logger.debug(testName + ": url=" + url +
-            " status=" + statusCode);
-     }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": url=" + url +
+                " status=" + statusCode);
+         }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
@@ -228,25 +237,28 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"create", "testSubmitRequest"})
     public void createWithWrongXmlSchema(String testName) throws Exception {
 
-    // Perform setup.
-    setupCreateWithWrongXmlSchema(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupCreateWithWrongXmlSchema();
 
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getServiceRootURL();
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = WRONG_XML_SCHEMA_DATA;
-    int statusCode = submitRequest(method, url, mediaType, entity);
+        // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
+        String url = getServiceRootURL();
+        String mediaType = MediaType.APPLICATION_XML;
+        final String entity = WRONG_XML_SCHEMA_DATA;
+        int statusCode = submitRequest(method, url, mediaType, entity);
 
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-        logger.debug(testName + ": url=" + url +
-            " status=" + statusCode);
-     }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": url=" + url +
+                " status=" + statusCode);
+         }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
      */
 
@@ -262,8 +274,11 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"create"})
     public void read(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupRead(testName);
+        setupRead();
 
         // Submit the request to the service and store the response.
         LoanoutClient client = new LoanoutClient();
@@ -294,8 +309,11 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"read"})
     public void readNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadNonExistent(testName);
+        setupReadNonExistent();
 
         // Submit the request to the service and store the response.
         LoanoutClient client = new LoanoutClient();
@@ -324,8 +342,11 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"createList", "read"})
     public void readList(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupReadList(testName);
+        setupReadList();
 
         // Submit the request to the service and store the response.
         LoanoutClient client = new LoanoutClient();
@@ -375,8 +396,11 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"read"})
     public void update(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdate(testName);
+        setupUpdate();
 
         // Retrieve the contents of a resource to update.
         LoanoutClient client = new LoanoutClient();
@@ -463,25 +487,28 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithEmptyEntityBody(String testName) throws Exception {
 
-    // Perform setup.
-    setupUpdateWithEmptyEntityBody(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupUpdateWithEmptyEntityBody();
 
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getResourceURL(knownResourceId);
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = "";
-    int statusCode = submitRequest(method, url, mediaType, entity);
+        // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
+        String url = getResourceURL(knownResourceId);
+        String mediaType = MediaType.APPLICATION_XML;
+        final String entity = "";
+        int statusCode = submitRequest(method, url, mediaType, entity);
 
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-        logger.debug(testName + ": url=" + url +
-            " status=" + statusCode);
-     }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": url=" + url +
+                " status=" + statusCode);
+         }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
@@ -489,25 +516,28 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithMalformedXml(String testName) throws Exception {
 
-    // Perform setup.
-    setupUpdateWithMalformedXml(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupUpdateWithMalformedXml();
 
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getResourceURL(knownResourceId);
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = MALFORMED_XML_DATA;
-    int statusCode = submitRequest(method, url, mediaType, entity);
+        // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
+        String url = getResourceURL(knownResourceId);
+        String mediaType = MediaType.APPLICATION_XML;
+        final String entity = MALFORMED_XML_DATA;
+        int statusCode = submitRequest(method, url, mediaType, entity);
 
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-        logger.debug(testName + ": url=" + url +
-         " status=" + statusCode);
-     }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": url=" + url +
+             " status=" + statusCode);
+         }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
     @Override
@@ -515,25 +545,28 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"create", "update", "testSubmitRequest"})
     public void updateWithWrongXmlSchema(String testName) throws Exception {
 
-    // Perform setup.
-    setupUpdateWithWrongXmlSchema(testName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupUpdateWithWrongXmlSchema();
 
-    // Submit the request to the service and store the response.
-    String method = REQUEST_TYPE.httpMethodName();
-    String url = getResourceURL(knownResourceId);
-    String mediaType = MediaType.APPLICATION_XML;
-    final String entity = WRONG_XML_SCHEMA_DATA;
-    int statusCode = submitRequest(method, url, mediaType, entity);
+        // Submit the request to the service and store the response.
+        String method = REQUEST_TYPE.httpMethodName();
+        String url = getResourceURL(knownResourceId);
+        String mediaType = MediaType.APPLICATION_XML;
+        final String entity = WRONG_XML_SCHEMA_DATA;
+        int statusCode = submitRequest(method, url, mediaType, entity);
 
-    // Check the status code of the response: does it match
-    // the expected response(s)?
-    if(logger.isDebugEnabled()){
-        logger.debug(testName + ": url=" + url +
-        " status=" + statusCode);
-     }
-    Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": url=" + url +
+            " status=" + statusCode);
+         }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
      */
 
@@ -545,8 +578,11 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"update", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupUpdateNonExistent(testName);
+        setupUpdateNonExistent();
 
         // Submit the request to the service and store the response.
         // Note: The ID used in this 'create' call may be arbitrary.
@@ -579,8 +615,11 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
     public void delete(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDelete(testName);
+        setupDelete();
 
         // Submit the request to the service and store the response.
         LoanoutClient client = new LoanoutClient();
@@ -606,8 +645,11 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"delete"})
     public void deleteNonExistent(String testName) throws Exception {
 
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
         // Perform setup.
-        setupDeleteNonExistent(testName);
+        setupDeleteNonExistent();
 
         // Submit the request to the service and store the response.
         LoanoutClient client = new LoanoutClient();
