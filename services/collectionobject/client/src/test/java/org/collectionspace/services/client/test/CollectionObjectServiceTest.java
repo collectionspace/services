@@ -30,6 +30,7 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionObjectFactory;
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.collectionobject.BriefDescriptionList;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.domain.naturalhistory.CollectionobjectsNaturalhistory;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
@@ -1050,7 +1051,15 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     private MultipartOutput createCollectionObjectInstance(String commonPartName,
             String objectNumber, String objectName) {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
-        
+
+ /*
+        BriefDescriptionList descriptionList = new BriefDescriptionList();
+        List<String> descriptions = descriptionList.getBriefDescription();
+        descriptions.add("Papier mache bird cow mask with horns, "
+                + "painted red with black and yellow spots. "
+                + "Puerto Rico. ca. 8&quot; high, 6&quot; wide, projects 10&quot; (with horns).");
+ */
+
         ResponsibleDepartmentList deptList = new ResponsibleDepartmentList();
         List<String> depts = deptList.getResponsibleDepartment();
         // @TODO Use properly formatted refNames for representative departments
@@ -1088,6 +1097,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         
         collectionObject.setObjectName(objectName);
         collectionObject.setAge(""); //test for null string
+        // collectionObject.setBriefDescriptions(descriptionList);
         collectionObject.setBriefDescription("Papier mache bird cow mask with horns, "
                 + "painted red with black and yellow spots. "
                 + "Puerto Rico. ca. 8&quot; high, 6&quot; wide, projects 10&quot; (with horns).");

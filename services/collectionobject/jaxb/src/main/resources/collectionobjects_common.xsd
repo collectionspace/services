@@ -45,15 +45,18 @@
             <xs:sequence>
                 <xs:element name="csid" type="xs:string" />
                 
-                <!-- Object identification information -->
+                <!-- Object Identification Information -->
                 <xs:element name="objectNumber" type="xs:string"/>
                 <xs:element name="otherNumberList" type="ns:otherNumberList" />
                 
-                <!-- Remove these two elements when the App/UI layer is using the new repeatable 'otherNumbers' field -->
+                <!-- Remove these two elements when the App/UI layer is -->
+                <!-- using the new repeatable 'otherNumbers' field -->
                 <xs:element name="otherNumber" type="xs:string"/>
                 <xs:element name="otherNumberType" type="xs:string"/>
 
                 <xs:element name="briefDescription" type="xs:string"/>
+                <!-- xs:element name="briefDescriptions" type="briefDescriptionList"/ -->
+
                 <xs:element name="comments" type="xs:string"/>
                 <xs:element name="distinguishingFeatures" type="xs:string"/>
                 <xs:element name="numberOfObjects" type="xs:string"/>
@@ -70,13 +73,13 @@
                 <xs:element name="titleTranslation" type="xs:string"/>
                 <xs:element name="titleType" type="xs:string"/>
 
-                <!-- Object description information -->
+                <!-- Object Description Information -->
                 <xs:element name="age" type="xs:string" />
                 <xs:element name="ageQualifier" type="xs:string" />
                 <xs:element name="ageUnit" type="xs:string" />
                 <xs:element name="color" type="xs:string" />
 
-                <!-- Object description Content information -->
+                <!-- Object Description - Content Information -->
                 <xs:element name="contentActivity" type="xs:string" />
                 <xs:element name="contentConcept" type="xs:string" />
                 <xs:element name="contentDate" type="xs:string" />
@@ -98,7 +101,7 @@
 
                 <xs:element name="copyNumber" type="xs:string" />
 
-                <!-- Object description Dimension information -->
+                <!-- Object Description - Dimension Information -->
                 <xs:element name="dimension" type="xs:string" />
                 <xs:element name="dimensionMeasuredPart" type="xs:string" />
                 <xs:element name="dimensionMeasurementUnit" type="xs:string" />
@@ -109,7 +112,7 @@
                 <xs:element name="editionNumber" type="xs:string" />
                 <xs:element name="form" type="xs:string" />
 
-                <!-- Object description Inscription content information -->
+                <!-- Object description Inscription - Content Information -->
                 <xs:element name="inscriptionContent" type="xs:string" />
                 <xs:element name="inscriber" type="xs:string" />
                 <xs:element name="inscriptionDate" type="xs:string" />
@@ -122,7 +125,7 @@
                 <xs:element name="inscriptionTransliteration" type="xs:string" />
                 <xs:element name="inscriptionType" type="xs:string" />
                 
-                <!-- Object description Inscription description information -->
+                <!-- Object Description Inscription - Description Information -->
                 <xs:element name="inscriptionDescription" type="xs:string" />
                 <xs:element name="inscriptionDescriptionInscriber" type="xs:string" />
                 <xs:element name="inscriptionDescriptionDate" type="xs:string" />
@@ -131,14 +134,14 @@
                 <xs:element name="inscriptionDescriptionPosition" type="xs:string" />
                 <xs:element name="inscriptionDescriptionType" type="xs:string" />
 
-                <!-- Object description Material information -->
+                <!-- Object Description Material Information -->
                 <xs:element name="material" type="xs:string" />
                 <xs:element name="materialComponent" type="xs:string" />
                 <xs:element name="materialComponentNote" type="xs:string" />
                 <xs:element name="materialName" type="xs:string" />
                 <xs:element name="materialSource" type="xs:string" />
 
-                <!-- Misc Object description information -->
+                <!-- Misc Object Description Information -->
                 <xs:element name="objectStatus" type="xs:string" />
                 <xs:element name="phase" type="xs:string" />
                 <xs:element name="physicalDescription" type="xs:string" />
@@ -149,8 +152,73 @@
                 <xs:element name="technicalAttributeMeasurementUnit" type="xs:string" />
                 <xs:element name="objectComponentName" type="xs:string" />
                 <xs:element name="objectComponentInformation" type="xs:string" />
+
+                <!-- Object Production Information -->
+                <xs:element name="objectProductionDate" type="xs:string" />
+                <xs:element name="objectProductionNote" type="xs:string" />
+                <xs:element name="objectProductionOrganization" type="xs:string" />
+                <xs:element name="objectProductionPeople" type="xs:string" />
+                <xs:element name="objectProductionPerson" type="xs:string" />
+                <xs:element name="objectProductionPlace" type="xs:string" />
+                <xs:element name="objectProductionReason" type="xs:string" />
+                <xs:element name="technique" type="xs:string" />
+                <xs:element name="techniqueType" type="xs:string" />
+
+                <!-- Object History and Association Information - Association -->
+                <xs:element name="associatedActivityNote" type="xs:string" />
+                <xs:element name="associatedConcept" type="xs:string" />
+                <xs:element name="associatedCulturalAffinity" type="xs:string" />
+                <xs:element name="associatedDate" type="xs:string" />
+                <xs:element name="associatedEventName" type="xs:string" />
+                <xs:element name="associatedEventNameType" type="xs:string" />
+                <xs:element name="associatedEventOrganization" type="xs:string" />
+                <xs:element name="associatedEventPeople" type="xs:string" />
+                <xs:element name="associatedEventPerson" type="xs:string" />
+                <xs:element name="associatedEventPlace" type="xs:string" />
+                <xs:element name="associatedObject" type="xs:string" />
+                <xs:element name="associatedOrganization" type="xs:string" />
+                <xs:element name="associatedPeople" type="xs:string" />
+                <xs:element name="associatedPerson" type="xs:string" />
+                <xs:element name="associatedPlace" type="xs:string" />
+                <xs:element name="associationNote" type="xs:string" />
+                <xs:element name="associationType" type="xs:string" />
+
+                <!-- Object History and Association Information - History -->
+                <xs:element name="objectHistoryNote" type="xs:string" />
+                <xs:element name="owner" type="xs:string" />
+                <xs:element name="ownershipAccess" type="xs:string" />
+                <xs:element name="ownershipCategory" type="xs:string" />
+                <xs:element name="ownershipDates" type="xs:string" />
+                <xs:element name="ownershipExchangeMethod" type="xs:string" />
+                <xs:element name="ownershipExchangeNote" type="xs:string" />
+                <xs:element name="ownershipExchangePriceDenomination" type="xs:string" />
+                <xs:element name="ownershipExchangePriceValue" type="xs:string" />
+                <xs:element name="ownershipPlace" type="xs:string" />
+                <xs:element name="usage" type="xs:string" />
+                <xs:element name="usageNote" type="xs:string" />
+
+                <!-- Object Owner's Contribution Information -->
+                <xs:element name="ownersPersonalExperience" type="xs:string" />
+                <xs:element name="ownersPersonalResponse" type="xs:string" />
+                <xs:element name="ownersReference" type="xs:string" />
+                <xs:element name="ownersContributionNote" type="xs:string" />
+
+                <!-- Object Viewers Contribution Information -->
+                <xs:element name="viewersRole" type="xs:string" />
+                <xs:element name="viewersPersonalExperience" type="xs:string" />
+                <xs:element name="viewersPersonalResponse" type="xs:string" />
+                <xs:element name="viewersReference" type="xs:string" />
+                <xs:element name="viewersContributionNote" type="xs:string" />
+
+                <!-- Reference Information -->
+                <xs:element name="reference" type="xs:string" />
+                <xs:element name="catalogNumber" type="xs:string" />
+
+                <!-- Object Collection Information -->
+                <xs:element name="fieldCollectionEventName" type="xs:string" />
 				
-                <!-- Object description Date information -->
+                <!-- Object Description Date Information -->
+                <!-- This appears to be a placeholder structured date -->
                 <xs:element name="dateAssociation" type="xs:string" />
                 <xs:element name="dateEarliestSingle" type="xs:string" />
                 <xs:element name="dateEarliestSingleCertainty" type="xs:string" />
@@ -168,6 +236,12 @@
     <xs:complexType name="responsibleDepartmentList">
         <xs:sequence>
             <xs:element name="responsibleDepartment" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="briefDescriptionList">
+        <xs:sequence>
+            <xs:element name="briefDescription" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
         </xs:sequence>
     </xs:complexType>
     
