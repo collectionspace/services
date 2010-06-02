@@ -53,6 +53,7 @@
                     <orm:table name="roles">
                         <orm:unique-constraint>
                             <orm:column-name>rolename</orm:column-name>
+                            <orm:column-name>tenant_id</orm:column-name>
                         </orm:unique-constraint>
                     </orm:table>
                 </hj:entity>
