@@ -130,8 +130,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         par.setName(ActionType.READ);
         PermissionAction pau = new PermissionAction();
         pau.setName(ActionType.UPDATE);
-        PermissionAction pad = new PermissionAction();
-        pad.setName(ActionType.DELETE);
+
 
         //bigbird can create, read and update but not delete
         List<PermissionAction> bbactions = new ArrayList<PermissionAction>();
