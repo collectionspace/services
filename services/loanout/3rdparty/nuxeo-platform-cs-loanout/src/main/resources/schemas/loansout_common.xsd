@@ -28,14 +28,11 @@
     <xs:element name="lendersAuthorizationDate" type="xs:string"/>
     <xs:element name="lendersContact" type="xs:string"/>
     
-    <!--
-         Omitting loaned object status fields in release 0.5.2,
-         as these are likely to be repeatable or else handled
-         in some alternate way in release 0.7.
-    -->
-    <!-- xs:element name="loanedObjectStatus" type="xs:string"/ -->
-    <!-- xs:element name="loanedObjectStatusDate" type="xs:string"/ -->
-    <!-- xs:element name="loanedObjectStatusNote" type="xs:string"/ -->
+    <!-- The three fields below were added as scalars specifically for release 0.7. -->
+    <!-- These fields will be removed, to be replaced by sub-loans, in a future release. -->
+    <xs:element name="loanedObjectStatus" type="xs:string"/>
+    <xs:element name="loanedObjectStatusDate" type="xs:string"/>
+    <xs:element name="loanedObjectStatusNote" type="xs:string"/>
     
     <xs:element name="loanOutDate" type="xs:string"/>
     <xs:element name="loanReturnDate" type="xs:string"/>
