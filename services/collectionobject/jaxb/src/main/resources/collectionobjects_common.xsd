@@ -72,6 +72,7 @@
                 <xs:element name="objectTitleLanguage" type="xs:string"/>
                 <xs:element name="titleTranslation" type="xs:string"/>
                 <xs:element name="titleType" type="xs:string"/>
+                <xs:element name="recordStatus" type="xs:string"/>
 
                 <!-- Object Description Information -->
                 <xs:element name="age" type="xs:string" />
