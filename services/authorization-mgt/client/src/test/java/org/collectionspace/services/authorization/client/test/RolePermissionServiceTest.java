@@ -24,6 +24,7 @@ package org.collectionspace.services.authorization.client.test;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import javax.ws.rs.core.Response;
@@ -79,6 +80,8 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
     private Hashtable<String, PermissionValue> permValues = new Hashtable<String, PermissionValue>();
     /** The role values. */
     private Hashtable<String, RoleValue> roleValues = new Hashtable<String, RoleValue>();
+
+    private Date now = new Date();
     /*
      * This method is called only by the parent class, AbstractServiceTestImpl
      */
@@ -91,13 +94,16 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
         return new RolePermissionClient().getServicePathComponent();
     }
 
+    private String getRoleName() {
+        return TEST_ROLE_NAME + TEST_MARKER + now.toString();
+    }
     /**
      * Seed data.
      */
     @BeforeClass(alwaysRun = true)
     public void seedData() {
 
-        String rn1 = TEST_ROLE_NAME + TEST_MARKER;
+        String rn1 = getRoleName();
         String r1RoleId = createRole(rn1);
         RoleValue rv1 = new RoleValue();
         rv1.setRoleId(r1RoleId);
@@ -166,7 +172,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
         setupCreate();
 
         // Submit the request to the service and store the response.
-        RoleValue rv = roleValues.get(TEST_ROLE_NAME + TEST_MARKER);
+        RoleValue rv = roleValues.get(getRoleName());
         PermissionRole permRole = createPermissionRoleInstance(rv,
                 permValues.values(), true, true);
         RolePermissionClient client = new RolePermissionClient();
@@ -257,7 +263,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
         ClientResponse<PermissionRole> res = null;
         try {
             res = client.read(
-                    roleValues.get(TEST_ROLE_NAME + TEST_MARKER).getRoleId(), "123");
+                    roleValues.get(getRoleName()).getRoleId(), "123");
             int statusCode = res.getStatus();
 
             // Check the status code of the response: does it match
@@ -405,7 +411,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
         ClientResponse<Response> res = null;
         try {
             res = client.delete(
-                    roleValues.get(TEST_ROLE_NAME + TEST_MARKER).getRoleId(), "123");
+                    roleValues.get(getRoleName()).getRoleId(), "123");
             int statusCode = res.getStatus();
 
             // Check the status code of the response: does it match
@@ -450,7 +456,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         String method = ServiceRequestType.READ.httpMethodName();
-        String url = getResourceURL(roleValues.get(TEST_ROLE_NAME + TEST_MARKER).getRoleId());
+        String url = getResourceURL(roleValues.get(getRoleName()).getRoleId());
         int statusCode = submitRequest(method, url);
 
         // Check the status code of the response: does it match
@@ -609,6 +615,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
 
         Role role = RoleFactory.createRoleInstance(roleName,
                 "role for " + roleName, true);
+        role.setRoleGroup("something");
         ClientResponse<Response> res = null;
         String id = null;
         try {
