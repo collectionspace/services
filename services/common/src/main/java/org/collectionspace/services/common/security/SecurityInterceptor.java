@@ -67,7 +67,8 @@ public class SecurityInterceptor implements PreProcessInterceptor {
         String httpMethod = request.getHttpMethod();
         String uriPath = request.getUri().getPath();
         if (logger.isDebugEnabled()) {
-            logger.debug("received " + httpMethod + " on " + uriPath);
+            logger.debug("received " + httpMethod + " on " + uriPath +
+                    " from user=" + AuthN.get().getUserId());
         }
         String resName = getResourceName(request.getUri());
         checkActive();
@@ -84,11 +85,12 @@ public class SecurityInterceptor implements PreProcessInterceptor {
                     Response.Status.FORBIDDEN).entity(uriPath + " " + httpMethod).type("text/plain").build();
             throw new WebApplicationException(response);
         }
-*/
+
         if (logger.isDebugEnabled()) {
             logger.debug("Access to " + res.getId() + " is allowed to "
                     + " user=" + AuthN.get().getUserId());
         }
+ */
 //        }
         return null;
     }
