@@ -66,17 +66,13 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     /** The Constant logger. */
     private final static String CLASS_NAME = AccountRoleServiceTest.class.getName();
     private final static Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownResourceId = null;
-    
     /** The all resource ids created. */
     private List<String> allResourceIdsCreated = new ArrayList<String>();
-    
     /** The acc values. */
     private Hashtable<String, AccountValue> accValues = new Hashtable<String, AccountValue>();
-    
     /** The role values. */
     private Hashtable<String, RoleValue> roleValues = new Hashtable<String, RoleValue>();
     /*
@@ -97,7 +93,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     @BeforeClass(alwaysRun = true)
     public void seedData() {
         String userId = "acc-role-user1";
-        String accId = createAccount(userId, "acc-role-test@cspace.org");
+        String accId = createAccount(userId, "acc-role-user1-test@cspace.org");
         AccountValue ava = new AccountValue();
         ava.setScreenName(userId);
         ava.setUserId(userId);
@@ -105,20 +101,12 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
         accValues.put(ava.getScreenName(), ava);
 
         String userId2 = "acc-role-user2";
-        String coAccId = createAccount(userId2, "acc-role-test@cspace.org");
+        String coAccId = createAccount(userId2, "acc-role-user2-test@cspace.org");
         AccountValue avc = new AccountValue();
         avc.setScreenName(userId2);
         avc.setUserId(userId2);
         avc.setAccountId(coAccId);
         accValues.put(avc.getScreenName(), avc);
-
-        String ri = "acc-role-user3";
-        String iAccId = createAccount(ri, "acc-role-test@cspace.org");
-        AccountValue avi = new AccountValue();
-        avi.setScreenName(ri);
-        avi.setUserId(ri);
-        avi.setAccountId(iAccId);
-        accValues.put(avi.getScreenName(), avi);
 
         String rn1 = "ROLE_CO1";
         String r1RoleId = createRole(rn1);
@@ -140,28 +128,28 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     protected CollectionSpaceClient getClientInstance() {
-    	return new AccountRoleClient();
+        return new AccountRoleClient();
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getAbstractCommonList(
-			ClientResponse<AbstractCommonList> response) {
-    	//FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
-    	throw new UnsupportedOperationException();
+    protected AbstractCommonList getAbstractCommonList(
+            ClientResponse<AbstractCommonList> response) {
+        //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
+        throw new UnsupportedOperationException();
     }
-    
-	/* (non-Javadoc)
-	 * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
-	 */
-	@Test(dataProvider = "testName")
-	@Override
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
+     */
+    @Test(dataProvider = "testName")
+    @Override
     public void readPaginatedList(String testName) throws Exception {
-		//FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
-	}    
-    
+        //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
+    }
+
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
@@ -188,24 +176,24 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
         AccountRoleClient client = new AccountRoleClient();
         ClientResponse<Response> res = client.create(pv.getAccountId(), accRole);
         try {
-	        int statusCode = res.getStatus();
-	
-	        if (logger.isDebugEnabled()) {
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	
-	        // Store the ID returned from this create operation
-	        // for additional tests below.
-	        //this is is not important in case of this relationship
-	        knownResourceId = extractId(res);
-	        if (logger.isDebugEnabled()) {
-	            logger.debug(testName + ": knownResourceId=" + knownResourceId);
-	        }
+            int statusCode = res.getStatus();
+
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+            // Store the ID returned from this create operation
+            // for additional tests below.
+            //this is is not important in case of this relationship
+            knownResourceId = extractId(res);
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": knownResourceId=" + knownResourceId);
+            }
         } finally {
-        	res.releaseConnection();
+            res.releaseConnection();
         }
     }
 
@@ -217,7 +205,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     dependsOnMethods = {"create"})
     @Override
     public void createList(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     // Failure outcomes
@@ -228,7 +216,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -236,7 +224,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithMalformedXml(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -244,7 +232,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithWrongXmlSchema(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     // ---------------------------------------------------------------
@@ -262,7 +250,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             testBanner(testName, CLASS_NAME);
         }
-        
+
         // Perform setup.
         setupRead();
 
@@ -272,19 +260,19 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
                 accValues.get("acc-role-user1").getAccountId(), "123");
         int statusCode = res.getStatus();
         try {
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if (logger.isDebugEnabled()) {
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	
-	        AccountRole output = (AccountRole) res.getEntity();
-	        Assert.assertNotNull(output);
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+            AccountRole output = (AccountRole) res.getEntity();
+            Assert.assertNotNull(output);
         } finally {
-        	res.releaseConnection();
+            res.releaseConnection();
         }
     }
 
@@ -299,7 +287,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             testBanner(testName, CLASS_NAME);
         }
-        
+
         // Perform setup.
         setupReadNonExistent();
 
@@ -308,16 +296,52 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
         ClientResponse<AccountRole> res = client.read(this.NON_EXISTENT_ID, "123");
         int statusCode = res.getStatus();
         try {
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if (logger.isDebugEnabled()) {
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         } finally {
-        	res.releaseConnection();
+            res.releaseConnection();
+        }
+    }
+
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"create"})
+    public void readNoRelationship(String testName) throws Exception {
+
+        if (logger.isDebugEnabled()) {
+            testBanner(testName, CLASS_NAME);
+        }
+
+        // Perform setup.
+        setupRead();
+
+        // Submit the request to the service and store the response.
+        AccountRoleClient client = new AccountRoleClient();
+        ClientResponse<AccountRole> res = client.read(
+                accValues.get("acc-role-user2").getAccountId(), "123");
+        int statusCode = res.getStatus();
+        try {
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
+            AccountRole output = (AccountRole) res.getEntity();
+
+            String sOutput = objectAsXmlString(output, AccountRole.class);
+            if(logger.isDebugEnabled()) {
+                logger.debug(testName + " received " + sOutput);
+            }
+        } finally {
+            res.releaseConnection();
         }
     }
 
@@ -332,7 +356,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"createList", "read"})
     public void readList(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     // Failure outcomes
@@ -348,7 +372,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read", "readList", "readNonExistent"})
     public void update(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     // Failure outcomes
@@ -359,7 +383,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void updateWithEmptyEntityBody(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -367,7 +391,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void updateWithMalformedXml(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -375,7 +399,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void updateWithWrongXmlSchema(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -385,7 +409,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"readNonExistent", "testSubmitRequest"})
     public void updateNonExistent(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     // ---------------------------------------------------------------
@@ -399,11 +423,11 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read"})
     public void delete(String testName) throws Exception {
-        
+
         if (logger.isDebugEnabled()) {
             testBanner(testName, CLASS_NAME);
         }
-        
+
         // Perform setup.
         setupDelete();
 
@@ -413,16 +437,16 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
                 accValues.get("acc-role-user1").getAccountId(), "123");
         int statusCode = res.getStatus();
         try {
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if (logger.isDebugEnabled()) {
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         } finally {
-        	res.releaseConnection();
+            res.releaseConnection();
         }
     }
 
@@ -499,34 +523,34 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     @AfterClass(alwaysRun = true)
     @Override
     public void cleanUp() {
-        
+
         setupDelete();
 
         String noTest = System.getProperty("noTestCleanup");
-    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+        if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Skipping Cleanup phase ...");
             }
             return;
-    	}
+        }
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
-        
+
         AccountRoleClient client = new AccountRoleClient();
         for (String resourceId : allResourceIdsCreated) {
             ClientResponse<Response> res = client.delete(resourceId, "123");
             try {
-	            int statusCode = res.getStatus();
-	            if (logger.isDebugEnabled()) {
-	                logger.debug("clenaup: delete relationships for accission id="
-	                        + resourceId + " status=" + statusCode);
-	            }
-	            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+                int statusCode = res.getStatus();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("clenaup: delete relationships for accission id="
+                            + resourceId + " status=" + statusCode);
+                }
+                Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+                Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
             } finally {
-            	res.releaseConnection();
+                res.releaseConnection();
             }
         }
 
@@ -547,13 +571,13 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
      * @return the string
      */
     private String createAccount(String userName, String email) {
-        
+
         if (logger.isDebugEnabled()) {
             testBanner("createAccount");
         }
-        
+
         setupCreate();
-        
+
         AccountClient accClient = new AccountClient();
         AccountsCommon account = AccountFactory.createAccountInstance(
                 userName, userName, userName, email,
@@ -577,26 +601,26 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
      * @param accId the acc id
      */
     private void deleteAccount(String accId) {
-        
+
         if (logger.isDebugEnabled()) {
             testBanner("deleteAccount");
         }
-        
+
         setupDelete();
-        
+
         AccountClient accClient = new AccountClient();
         ClientResponse<Response> res = accClient.delete(accId);
         int statusCode = res.getStatus();
         try {
-	        if (logger.isDebugEnabled()) {
-	            logger.debug("deleteAccount: delete account id="
-	                    + accId + " status=" + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            if (logger.isDebugEnabled()) {
+                logger.debug("deleteAccount: delete account id="
+                        + accId + " status=" + statusCode);
+            }
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         } finally {
-        	res.releaseConnection();
+            res.releaseConnection();
         }
     }
 
@@ -642,15 +666,15 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
         ClientResponse<Response> res = roleClient.delete(roleId);
         int statusCode = res.getStatus();
         try {
-	        if (logger.isDebugEnabled()) {
-	            logger.debug("deleteRole: delete role id=" + roleId
-	                    + " status=" + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            if (logger.isDebugEnabled()) {
+                logger.debug("deleteRole: delete role id=" + roleId
+                        + " status=" + statusCode);
+            }
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         } finally {
-        	res.releaseConnection();
+            res.releaseConnection();
         }
     }
 }

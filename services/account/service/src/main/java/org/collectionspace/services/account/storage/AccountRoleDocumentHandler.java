@@ -85,6 +85,9 @@ public class AccountRoleDocumentHandler
         List<AccountRoleRel> arrl = wrapDoc.getWrappedObject();
         AccountRole ar = new AccountRole();
         SubjectType subject = getSubject(getServiceContext());
+        if (arrl.size() == 0) {
+            return ar;
+        }
         AccountRoleRel ar0 = arrl.get(0);
         if (SubjectType.ROLE.equals(subject)) {
 
@@ -130,6 +133,7 @@ public class AccountRoleDocumentHandler
             //subject mismatch should have been checked during validation
         }
         if (subject.equals(SubjectType.ROLE)) {
+            //FIXME: potential index out of bounds exception...negative test needed
             AccountValue av = ar.getAccounts().get(0);
 
             for (RoleValue rv : ar.getRoles()) {
@@ -137,6 +141,7 @@ public class AccountRoleDocumentHandler
                 arrl.add(arr);
             }
         } else if (SubjectType.ACCOUNT.equals(subject)) {
+            //FIXME: potential index out of bounds exception...negative test needed
             RoleValue rv = ar.getRoles().get(0);
             for (AccountValue av : ar.getAccounts()) {
                 AccountRoleRel arr = buildAccountRoleRel(av, rv);
@@ -213,8 +218,8 @@ public class AccountRoleDocumentHandler
     static SubjectType getSubject(ServiceContext ctx) {
         Object o = ctx.getProperty(ServiceContextProperties.SUBJECT);
         if (o == null) {
-            throw new IllegalArgumentException(ServiceContextProperties.SUBJECT +
-                    " property is missing in context "
+            throw new IllegalArgumentException(ServiceContextProperties.SUBJECT
+                    + " property is missing in context "
                     + ctx.toString());
         }
         return (SubjectType) o;

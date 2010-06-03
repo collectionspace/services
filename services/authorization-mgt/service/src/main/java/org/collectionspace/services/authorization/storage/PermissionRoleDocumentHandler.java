@@ -82,7 +82,6 @@ public class PermissionRoleDocumentHandler
         throw new UnsupportedOperationException("operation not relevant for PermissionRoleDocumentHandler");
     }
 
-
     @Override
     public void completeDelete(DocumentWrapper<List<PermissionRoleRel>> wrapDoc) throws Exception {
 //
@@ -95,6 +94,9 @@ public class PermissionRoleDocumentHandler
         List<PermissionRoleRel> prrl = wrapDoc.getWrappedObject();
         PermissionRole pr = new PermissionRole();
         SubjectType subject = PermissionRoleUtil.getRelationSubject(getServiceContext());
+        if (prrl.size() == 0) {
+            return pr;
+        }
         PermissionRoleRel prr0 = prrl.get(0);
         if (SubjectType.ROLE.equals(subject)) {
 
@@ -140,12 +142,14 @@ public class PermissionRoleDocumentHandler
             //subject mismatch should have been checked during validation
         }
         if (subject.equals(SubjectType.ROLE)) {
+            //FIXME: potential index out of bounds exception...negative test needed
             PermissionValue pv = pr.getPermissions().get(0);
             for (RoleValue rv : pr.getRoles()) {
                 PermissionRoleRel prr = buildPermissonRoleRel(pv, rv);
                 prrl.add(prr);
             }
         } else if (SubjectType.PERMISSION.equals(subject)) {
+            //FIXME: potential index out of bounds exception...negative test needed
             RoleValue rv = pr.getRoles().get(0);
             for (PermissionValue pv : pr.getPermissions()) {
                 PermissionRoleRel prr = buildPermissonRoleRel(pv, rv);

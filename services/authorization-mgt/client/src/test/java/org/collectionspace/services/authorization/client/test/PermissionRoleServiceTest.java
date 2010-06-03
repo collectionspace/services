@@ -67,7 +67,6 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
     /** The Constant logger. */
     private final static String CLASS_NAME = PermissionRoleServiceTest.class.getName();
     private final static Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownResourceId = null;
@@ -75,6 +74,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
     private List<String> allResourceIdsCreated = new ArrayList<String>();
     final private static String TEST_MARKER = "_PermissionRoleServiceTest";
     final private static String TEST_SERVICE_NAME = "fakeservice";
+    final private static String NO_REL_SUFFIX = "-no-rel";
     /** The perm values. */
     private Hashtable<String, PermissionValue> permValues = new Hashtable<String, PermissionValue>();
     /** The role values. */
@@ -103,12 +103,12 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         pva.setPermissionId(accPermId);
         permValues.put(pva.getResourceName(), pva);
 
-//        String rc = "collectionobjects";
-//        String coPermId = createPermission(rc, EffectType.DENY);
-//        PermissionValue pvc = new PermissionValue();
-//        pvc.setResourceName(rc);
-//        pvc.setPermissionId(coPermId);
-//        permValues.put(pvc.getResourceName(), pvc);
+        String rc = TEST_SERVICE_NAME + TEST_MARKER + NO_REL_SUFFIX;
+        String coPermId = createPermission(rc, EffectType.DENY);
+        PermissionValue pvc = new PermissionValue();
+        pvc.setResourceName(rc);
+        pvc.setPermissionId(coPermId);
+        permValues.put(pvc.getResourceName(), pvc);
 //
 //        String ri = "intakes";
 //        String iPermId = createPermission(ri, EffectType.DENY);
@@ -173,7 +173,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
-        
+
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
@@ -329,6 +329,46 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         }
     }
 
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"create"})
+    public void readNoRelationship(String testName) throws Exception {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupRead();
+
+        // Submit the request to the service and store the response.
+        PermissionRoleClient client = new PermissionRoleClient();
+        ClientResponse<PermissionRole> res = null;
+        try {
+            res = client.read(
+                    permValues.get(TEST_SERVICE_NAME + TEST_MARKER + NO_REL_SUFFIX).getPermissionId(), "123");
+            int statusCode = res.getStatus();
+
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
+
+            PermissionRole output = (PermissionRole) res.getEntity();
+
+            String sOutput = objectAsXmlString(output, PermissionRole.class);
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + " received " + sOutput);
+            }
+        } finally {
+            if (res != null) {
+                res.releaseConnection();
+            }
+        }
+
+    }
     // ---------------------------------------------------------------
     // CRUD tests : READ_LIST tests
     // ---------------------------------------------------------------
@@ -336,6 +376,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readList(java.lang.String)
      */
+
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"createList", "read"})
