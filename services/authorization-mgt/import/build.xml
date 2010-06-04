@@ -112,7 +112,7 @@
 
     <target name="import" depends="import-unix,import-windows"
             description="import authorization" />
-    <target name="import-unix" if="osfamily-unix">
+    <target name="import-unix" if="osfamily-unix" depends="setup_hibernate.cfg">
         <exec executable="mvn" failonerror="true">
             <arg value="exec:java" />
             <arg value="-f" />
@@ -121,7 +121,7 @@
             <arg value="${mvn.opts}" />
         </exec>
     </target>
-    <target name="import-windows" if="osfamily-windows">
+    <target name="import-windows" if="osfamily-windows" depends="setup_hibernate.cfg">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
             <arg value="mvn.bat" />
@@ -134,6 +134,19 @@
     </target>
 
 
+    <target name="setup_hibernate.cfg" description="replace property keywords in hibernate.cfg.xml">
+        <property name="src.hibernate.cfg" value="${basedir}/src/main/resources/hibernate.cfg.xml"/>
+        <property name="dest.hibernate.cfg" value="${basedir}/target/classes/hibernate.cfg.xml"/>
+        <delete file="${dest.hibernate.cfg}" verbose="true" />
+        <filter token="DB_URL" value="${db.jdbc.url}" />
+        <filter token="DB_DRIVER_CLASS" value="${db.jdbc.driver.class}" />
+        <filter token="DB_USER" value="${env.DB_USER}" /> <!-- double-sub from ${db.user} fails -->
+        <filter token="DB_PASSWORD" value="${env.DB_PASSWORD}" /> <!-- double-sub from ${db.user.password} fails -->
+        <filter token="DB_DIALECT" value="${db.dialect}" />
+        <copy tofile="${dest.hibernate.cfg}" file="${src.hibernate.cfg}" filtering="true"/>
+    </target>
+
+    
     <target name="deploy" depends="install"
             description="deploy authorization-mgt import in ${jboss.server.cspace}">
     </target>

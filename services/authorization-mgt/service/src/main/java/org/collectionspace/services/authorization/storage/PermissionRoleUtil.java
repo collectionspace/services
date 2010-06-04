@@ -23,7 +23,11 @@
  */
 package org.collectionspace.services.authorization.storage;
 
+import java.util.List;
 import org.collectionspace.services.authorization.PermissionRole;
+import org.collectionspace.services.authorization.PermissionRoleRel;
+import org.collectionspace.services.authorization.PermissionValue;
+import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextProperties;
@@ -37,13 +41,12 @@ public class PermissionRoleUtil {
     static SubjectType getRelationSubject(ServiceContext ctx) {
         Object o = ctx.getProperty(ServiceContextProperties.SUBJECT);
         if (o == null) {
-            throw new IllegalArgumentException(ServiceContextProperties.SUBJECT +
-                    " property is missing in context "
+            throw new IllegalArgumentException(ServiceContextProperties.SUBJECT
+                    + " property is missing in context "
                     + ctx.toString());
         }
         return (SubjectType) o;
     }
-
 
     static SubjectType getRelationSubject(ServiceContext ctx, PermissionRole pr) {
         SubjectType subject = pr.getSubject();
@@ -52,5 +55,40 @@ public class PermissionRoleUtil {
             subject = getRelationSubject(ctx);
         }
         return subject;
+    }
+
+    /**
+     * buildPermissionRoleRel builds persistent relationship entities from given
+     * permissionrole
+     * @param pr permissionrole
+     * @param subject
+     * @param prrl persistent entities built are inserted into this list
+     */
+    static public void buildPermissionRoleRel(PermissionRole pr, SubjectType subject, List<PermissionRoleRel> prrl) {
+
+        if (subject.equals(SubjectType.ROLE)) {
+            //FIXME: potential index out of bounds exception...negative test needed
+            PermissionValue pv = pr.getPermissions().get(0);
+            for (RoleValue rv : pr.getRoles()) {
+                PermissionRoleRel prr = buildPermissonRoleRel(pv, rv);
+                prrl.add(prr);
+            }
+        } else if (SubjectType.PERMISSION.equals(subject)) {
+            //FIXME: potential index out of bounds exception...negative test needed
+            RoleValue rv = pr.getRoles().get(0);
+            for (PermissionValue pv : pr.getPermissions()) {
+                PermissionRoleRel prr = buildPermissonRoleRel(pv, rv);
+                prrl.add(prr);
+            }
+        }
+    }
+    
+    static private PermissionRoleRel buildPermissonRoleRel(PermissionValue pv, RoleValue rv) {
+        PermissionRoleRel prr = new PermissionRoleRel();
+        prr.setPermissionId(pv.getPermissionId());
+        prr.setPermissionResource(pv.getResourceName());
+        prr.setRoleId(rv.getRoleId());
+        prr.setRoleName(rv.getRoleName());
+        return prr;
     }
 }

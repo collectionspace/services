@@ -3,560 +3,1678 @@
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>68eea582-e5b0-4aab-a01b-e45126ce1924</permissionId>
+            <permissionId>de3657a1-99f8-46b6-b4bb-2e28f9def87f</permissionId>
             <resourceName>idgenerators</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>de3657a1-99f8-46b6-b4bb-2e28f9def87f</permissionId>
+            <resourceName>idgenerators</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>150c809f-ffd6-4b23-b86b-a6533feeda29</permissionId>
+            <permissionId>b6644980-aeef-4d8f-a048-338057f9d973</permissionId>
             <resourceName>id</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>b6644980-aeef-4d8f-a048-338057f9d973</permissionId>
+            <resourceName>id</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>30f13249-56c6-428e-9f9b-be092520ca30</permissionId>
+            <permissionId>ddcdcc15-7f5a-49d8-8354-82c2e52d4727</permissionId>
             <resourceName>
                 /idgenerators/*/ids
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>ddcdcc15-7f5a-49d8-8354-82c2e52d4727</permissionId>
+            <resourceName>
+                /idgenerators/*/ids
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>e5005679-b03a-4911-9081-741dced66508</permissionId>
+            <permissionId>b203fb49-56c3-4662-b4bd-4008a6462364</permissionId>
             <resourceName>collectionobjects</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>b203fb49-56c3-4662-b4bd-4008a6462364</permissionId>
+            <resourceName>collectionobjects</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>676a2ce3-f65a-445e-bc0f-cce5dc056eac</permissionId>
+            <permissionId>2dde10d0-2ce9-471b-9c66-c67a6e7c511f</permissionId>
             <resourceName>
                 /collectionobjects/*/authorityrefs/
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>2dde10d0-2ce9-471b-9c66-c67a6e7c511f</permissionId>
+            <resourceName>
+                /collectionobjects/*/authorityrefs/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>200f1961-8910-4170-8f7b-32fcf7eef047</permissionId>
+            <permissionId>b8323642-cd0a-491f-a952-cf36d2b32134</permissionId>
             <resourceName>intakes</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>b8323642-cd0a-491f-a952-cf36d2b32134</permissionId>
+            <resourceName>intakes</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>aa534e0f-6979-4c52-873c-d58bd0151f9c</permissionId>
+            <permissionId>3c3e7ff6-7ecd-4643-b662-3fcb54e62abe</permissionId>
             <resourceName>
                 /intakes/*/authorityrefs/
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>3c3e7ff6-7ecd-4643-b662-3fcb54e62abe</permissionId>
+            <resourceName>
+                /intakes/*/authorityrefs/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>0a3692cd-94f6-44dd-854a-1fb0b19fe71d</permissionId>
+            <permissionId>e248b5af-6eb3-4063-8816-6c2b0c55537c</permissionId>
             <resourceName>loansin</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>e248b5af-6eb3-4063-8816-6c2b0c55537c</permissionId>
+            <resourceName>loansin</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>f56deb15-81a5-47ad-89c7-ea4738451b8c</permissionId>
+            <permissionId>6529cf6d-34ae-4bab-a6e2-ab19973620fb</permissionId>
             <resourceName>
                 /loansin/*/authorityrefs/
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>6529cf6d-34ae-4bab-a6e2-ab19973620fb</permissionId>
+            <resourceName>
+                /loansin/*/authorityrefs/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>1628fe32-a657-4577-a6cd-87bcf942d56d</permissionId>
+            <permissionId>1145d28d-269a-41fd-806f-b0d6511cf273</permissionId>
             <resourceName>loansout</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>1145d28d-269a-41fd-806f-b0d6511cf273</permissionId>
+            <resourceName>loansout</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>d38171bb-62b2-402b-a8e9-329433f7092c</permissionId>
+            <permissionId>8773ed3b-9432-44e8-900e-1bc3908e7911</permissionId>
             <resourceName>
                 /loansout/*/authorityrefs/
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>8773ed3b-9432-44e8-900e-1bc3908e7911</permissionId>
+            <resourceName>
+                /loansout/*/authorityrefs/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>bf39f493-8e5b-4ca1-baaf-67dd8283b299</permissionId>
+            <permissionId>21786a64-02e0-4359-9c61-47cf821f2362</permissionId>
             <resourceName>movements</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>21786a64-02e0-4359-9c61-47cf821f2362</permissionId>
+            <resourceName>movements</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>30130f70-6122-478c-9425-428815c0006c</permissionId>
+            <permissionId>d501423e-9425-4c99-bf6f-478a2a9f971e</permissionId>
             <resourceName>
                 /movements/*/authorityrefs/
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>d501423e-9425-4c99-bf6f-478a2a9f971e</permissionId>
+            <resourceName>
+                /movements/*/authorityrefs/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>61dc8d8b-8d2e-4d0b-a76f-87d5be9a583c</permissionId>
+            <permissionId>88075c4c-d5ed-420a-a767-1ab662066feb</permissionId>
             <resourceName>vocabularies</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>88075c4c-d5ed-420a-a767-1ab662066feb</permissionId>
+            <resourceName>vocabularies</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>cdff0a6a-ca8a-4651-a291-d7e4e9e531ba</permissionId>
+            <permissionId>2444d28d-883f-4566-a378-f03b95d100b9</permissionId>
             <resourceName>vocabularyitems</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>2444d28d-883f-4566-a378-f03b95d100b9</permissionId>
+            <resourceName>vocabularyitems</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>2bbbbe30-9562-4686-8237-00422e24e1d6</permissionId>
+            <permissionId>80a57584-6438-4df3-95df-bba1d7d9a275</permissionId>
             <resourceName>
                 /vocabularies/*/items/
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>80a57584-6438-4df3-95df-bba1d7d9a275</permissionId>
+            <resourceName>
+                /vocabularies/*/items/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>60e310d8-8d49-4ced-bdff-d1bc82d8cabd</permissionId>
+            <permissionId>812a71ed-0dfe-4371-a390-4776ab5519f2</permissionId>
             <resourceName>orgauthorities</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>812a71ed-0dfe-4371-a390-4776ab5519f2</permissionId>
+            <resourceName>orgauthorities</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>0562b8c3-1883-4491-b77f-d8437c1433d6</permissionId>
+            <permissionId>a9aeff96-179f-4b1d-8e74-25358185fdae</permissionId>
             <resourceName>
                 /orgauthorities/*/items/*/authorityrefs/
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>a9aeff96-179f-4b1d-8e74-25358185fdae</permissionId>
+            <resourceName>
+                /orgauthorities/*/items/*/authorityrefs/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>44cba976-171b-408e-b3ed-3bd5b18e95e1</permissionId>
+            <permissionId>23897bf4-c727-4737-a70c-dc446519e1d5</permissionId>
             <resourceName>organizations</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>23897bf4-c727-4737-a70c-dc446519e1d5</permissionId>
+            <resourceName>organizations</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>c8e68564-bd16-462d-b191-a4fb4ad6d93a</permissionId>
+            <permissionId>64f48448-c5ed-4096-acc8-17daebf2924f</permissionId>
             <resourceName>
                 /orgauthorities/*/items/
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>64f48448-c5ed-4096-acc8-17daebf2924f</permissionId>
+            <resourceName>
+                /orgauthorities/*/items/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>faf6fdb6-654e-44a3-b7de-e98eb3105e3f</permissionId>
+            <permissionId>90bea796-bf38-46a6-8a9e-fc9a1eed157d</permissionId>
             <resourceName>
                 /orgauthorities/*/items/*/refobjs
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>90bea796-bf38-46a6-8a9e-fc9a1eed157d</permissionId>
+            <resourceName>
+                /orgauthorities/*/items/*/refobjs
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>fc3845e7-122b-44c6-b46f-756421291994</permissionId>
+            <permissionId>e61b8b12-3db0-499a-b074-79afec3f141a</permissionId>
             <resourceName>personauthorities</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>e61b8b12-3db0-499a-b074-79afec3f141a</permissionId>
+            <resourceName>personauthorities</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>44b6f2f5-2ae5-4f9f-aaf6-21361e38992e</permissionId>
+            <permissionId>ce34076c-83b0-409c-b2b8-2d3805af9056</permissionId>
             <resourceName>
                 /personauthorities/*/items/
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>ce34076c-83b0-409c-b2b8-2d3805af9056</permissionId>
+            <resourceName>
+                /personauthorities/*/items/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>f488f02a-0107-4991-847f-db811fa843f5</permissionId>
+            <permissionId>acac0886-627b-43e6-810c-f62c928b99bf</permissionId>
             <resourceName>
                 /personauthorities/*/items/*/refobjs
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>acac0886-627b-43e6-810c-f62c928b99bf</permissionId>
+            <resourceName>
+                /personauthorities/*/items/*/refobjs
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>b1236cf3-c8e3-462a-b189-e5bcebdd382e</permissionId>
+            <permissionId>1aa13e33-4b21-4e6f-b670-2fc13f8fd2b4</permissionId>
             <resourceName>persons</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>1aa13e33-4b21-4e6f-b670-2fc13f8fd2b4</permissionId>
+            <resourceName>persons</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>7e329610-aa02-4d66-9a44-f7f5302c2ea4</permissionId>
+            <permissionId>cbb98b91-25ed-4e8b-af4d-48f11e981e19</permissionId>
             <resourceName>
                 /personauthorities/*/items/
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>cbb98b91-25ed-4e8b-af4d-48f11e981e19</permissionId>
+            <resourceName>
+                /personauthorities/*/items/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>abee33c0-e304-44e1-ae27-0e518e0ee55b</permissionId>
+            <permissionId>7c9e5c9a-8eb7-4579-ad94-e6d4f90c9ae8</permissionId>
             <resourceName>locationauthorities</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>7c9e5c9a-8eb7-4579-ad94-e6d4f90c9ae8</permissionId>
+            <resourceName>locationauthorities</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>1924cf31-7025-4f43-896e-e6d7a7352788</permissionId>
+            <permissionId>ce653183-2722-46c9-8f19-2e719c9cb06c</permissionId>
             <resourceName>
                 /locationauthorities/*/items/
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>ce653183-2722-46c9-8f19-2e719c9cb06c</permissionId>
+            <resourceName>
+                /locationauthorities/*/items/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>273e7918-f911-4f54-bc86-122aa539e813</permissionId>
+            <permissionId>59b8de3a-9b1d-4e82-9aa5-0d28dd5a46ac</permissionId>
             <resourceName>locations</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>59b8de3a-9b1d-4e82-9aa5-0d28dd5a46ac</permissionId>
+            <resourceName>locations</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>934a970c-221e-41b5-92be-6ba22276bd7a</permissionId>
+            <permissionId>37e00906-0fa5-4d20-be21-739f66bcac52</permissionId>
             <resourceName>acquisitions</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>37e00906-0fa5-4d20-be21-739f66bcac52</permissionId>
+            <resourceName>acquisitions</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>61a10a62-4f23-4427-b262-f978a3b03806</permissionId>
+            <permissionId>1ebea466-ab70-4368-8965-aa9305661d50</permissionId>
             <resourceName>
                 /acquisitions/*/authorityrefs/
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>1ebea466-ab70-4368-8965-aa9305661d50</permissionId>
+            <resourceName>
+                /acquisitions/*/authorityrefs/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>463dc11d-8324-4fb9-9d07-7c134c68eb47</permissionId>
+            <permissionId>c48e8d4a-7972-469f-a2bc-1bca201cd772</permissionId>
             <resourceName>relations</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>c48e8d4a-7972-469f-a2bc-1bca201cd772</permissionId>
+            <resourceName>relations</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>3c536b47-b851-4dca-bbd2-12d0fc20f713</permissionId>
+            <permissionId>b2f182cb-61d7-4016-a2e2-075c13afefd0</permissionId>
             <resourceName>
                 relations/subject/*/type/*/object/*
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>b2f182cb-61d7-4016-a2e2-075c13afefd0</permissionId>
+            <resourceName>
+                relations/subject/*/type/*/object/*
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>87c457d9-3bf4-40d4-a3e1-7a9aae90c5c9</permissionId>
+            <permissionId>6ba014c0-80e1-456f-9c3c-de339391d254</permissionId>
             <resourceName>accounts</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>6ba014c0-80e1-456f-9c3c-de339391d254</permissionId>
+            <resourceName>accounts</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>5762278c-fceb-4d67-908d-af389ac309ba</permissionId>
+            <permissionId>ee04f607-8e32-46dd-b5c9-b7657cdd290c</permissionId>
             <resourceName>dimensions</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>ee04f607-8e32-46dd-b5c9-b7657cdd290c</permissionId>
+            <resourceName>dimensions</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>bd9104e1-1931-4d0e-aff4-d06ec78f069f</permissionId>
+            <permissionId>828327fc-7b3d-4bde-b6d6-e48c74c3f4fd</permissionId>
             <resourceName>contacts</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>828327fc-7b3d-4bde-b6d6-e48c74c3f4fd</permissionId>
+            <resourceName>contacts</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>aa3c23d7-7d42-43f0-899a-3b8bc0c03c3a</permissionId>
+            <permissionId>2d48d7a3-faba-4e8d-93a3-0863de7d92da</permissionId>
             <resourceName>
                 /personauthorities/*/items/*/contacts
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>2d48d7a3-faba-4e8d-93a3-0863de7d92da</permissionId>
+            <resourceName>
+                /personauthorities/*/items/*/contacts
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>a0f846e4-343c-4479-831e-04cc40e51902</permissionId>
+            <permissionId>7d8f835d-d9c0-4508-b279-eef890db247a</permissionId>
             <resourceName>
                 /orgauthorities/*/items/*/contacts
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>7d8f835d-d9c0-4508-b279-eef890db247a</permissionId>
+            <resourceName>
+                /orgauthorities/*/items/*/contacts
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>b975509e-d1bd-42a2-98d4-bfde50a342c3</permissionId>
+            <permissionId>ab92d994-29eb-4d64-bd49-b3cafd8f0a5b</permissionId>
             <resourceName>notes</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>ab92d994-29eb-4d64-bd49-b3cafd8f0a5b</permissionId>
+            <resourceName>notes</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>c9524c19-4819-4aea-aab3-341887d83b3f</permissionId>
+            <permissionId>db65825c-50c3-49a8-af5f-68115f16537b</permissionId>
             <resourceName>authorization/roles</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>db65825c-50c3-49a8-af5f-68115f16537b</permissionId>
+            <resourceName>authorization/roles</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>eec11401-da9e-4a33-b68d-b3d4906c3329</permissionId>
+            <permissionId>f7f41db6-f85f-4cd3-a2d6-d9185b6dd8e9</permissionId>
             <resourceName>authorization/permissions</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>f7f41db6-f85f-4cd3-a2d6-d9185b6dd8e9</permissionId>
+            <resourceName>authorization/permissions</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>975a8e80-8a30-426c-9d5b-aa32f6813f6d</permissionId>
+            <permissionId>074e7f98-2580-48d3-969d-4043f156eaa2</permissionId>
             <resourceName>authorization/permissions/permroles</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>074e7f98-2580-48d3-969d-4043f156eaa2</permissionId>
+            <resourceName>authorization/permissions/permroles</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>76ae1b26-9c42-4011-8130-178d90ff4c3b</permissionId>
+            <permissionId>0cdd6f4e-58b6-4c11-bbbd-0984c30d6dbd</permissionId>
             <resourceName>
                 /authorization/permissions/*/permroles/
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>0cdd6f4e-58b6-4c11-bbbd-0984c30d6dbd</permissionId>
+            <resourceName>
+                /authorization/permissions/*/permroles/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>662f9c6c-f8f1-4a78-922e-9c4250237b36</permissionId>
+            <permissionId>361c4bed-bd81-4f22-82df-f462111663a9</permissionId>
             <resourceName>accounts/accountroles</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>361c4bed-bd81-4f22-82df-f462111663a9</permissionId>
+            <resourceName>accounts/accountroles</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>e8cca9fb-a6cc-4944-a441-857d661280a9</permissionId>
+            <permissionId>e272da20-719c-49d1-9584-c21cedcd3a65</permissionId>
             <resourceName>
                 /accounts/*/accountroles/
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>e272da20-719c-49d1-9584-c21cedcd3a65</permissionId>
+            <resourceName>
+                /accounts/*/accountroles/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>f771df0b-98c8-4f84-aaf3-ae62c113d4cb</permissionId>
+            <permissionId>d7618a4f-d8be-45f6-b0f3-2816ecdca341</permissionId>
             <resourceName>authorization/roles/permroles</resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>d7618a4f-d8be-45f6-b0f3-2816ecdca341</permissionId>
+            <resourceName>authorization/roles/permroles</resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
         </role>
     </permissionRole>
     <permissionRole>
         <subject>ROLE</subject>
         <permission>
-            <permissionId>937a7ab0-6c26-497b-a901-49f550987320</permissionId>
+            <permissionId>3b6b0755-9044-46ee-8a85-4e44ac68dd0a</permissionId>
             <resourceName>
                 /authorization/roles/*/permroles/
             </resourceName>
         </permission>
         <role>
-            <roleId>1</roleId>
+            <roleId>ad3a2b4c-ef74-47f0-bdb0-f6a906acd370</roleId>
+            <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>3b6b0755-9044-46ee-8a85-4e44ac68dd0a</permissionId>
+            <resourceName>
+                /authorization/roles/*/permroles/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>0</roleId>
             <roleName>ROLE_ADMINISTRATOR</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>da5253a4-471f-4ada-9d7d-8f1a9a747647</permissionId>
+            <resourceName>idgenerators</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>4d524373-a5df-45e2-aec6-2e214f08431e</permissionId>
+            <resourceName>id</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>c757f1c4-3282-4055-b0e1-2c818fec709b</permissionId>
+            <resourceName>
+                /idgenerators/*/ids
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>e383a971-0335-41da-88e6-f7625303f186</permissionId>
+            <resourceName>collectionobjects</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>b2c49fb3-fb34-4425-86c7-73c48873a983</permissionId>
+            <resourceName>
+                /collectionobjects/*/authorityrefs/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>2ac4ace4-20f8-4a5f-b984-4753e5452a87</permissionId>
+            <resourceName>intakes</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>64af5fcc-a57d-4fa6-820c-4ab857a46590</permissionId>
+            <resourceName>
+                /intakes/*/authorityrefs/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>0258eabe-02d3-494c-b405-30e3463a2feb</permissionId>
+            <resourceName>loansin</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>ae5f5fab-7205-4b92-932f-857b68c5d4b5</permissionId>
+            <resourceName>
+                /loansin/*/authorityrefs/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>9e8b0907-e262-42f9-a4da-6e0bf6493e5a</permissionId>
+            <resourceName>loansout</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>b46b29bc-1795-4e3e-a247-59e23742b705</permissionId>
+            <resourceName>
+                /loansout/*/authorityrefs/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>f90c5454-58e9-4b32-a8e4-03b80ed6f58e</permissionId>
+            <resourceName>movements</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>e7c31362-9bb7-48a4-a324-63e84401df30</permissionId>
+            <resourceName>
+                /movements/*/authorityrefs/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>90f3a12c-0ac1-417b-942e-88f2b11383b7</permissionId>
+            <resourceName>vocabularies</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>c961fc05-1a2c-4890-88b4-42757378e323</permissionId>
+            <resourceName>vocabularyitems</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>4d13ef59-1443-40ee-8e45-9892c83ec9a1</permissionId>
+            <resourceName>
+                /vocabularies/*/items/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>6caa049b-25cc-486c-935f-bf215d550bcd</permissionId>
+            <resourceName>orgauthorities</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>08c36f8b-2432-44c4-a1dd-cba8c8ea53e5</permissionId>
+            <resourceName>
+                /orgauthorities/*/items/*/authorityrefs/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>c0149cbb-a984-4e32-8302-c045a3e82bf2</permissionId>
+            <resourceName>organizations</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>b2e0c247-9e3b-4bf3-a956-8b98a8505263</permissionId>
+            <resourceName>
+                /orgauthorities/*/items/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>35cb8d8b-4309-4177-9c1c-157dbeb36f5d</permissionId>
+            <resourceName>
+                /orgauthorities/*/items/*/refobjs
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>c890f437-7356-4bcd-b5b1-0e36b13e6358</permissionId>
+            <resourceName>personauthorities</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>778904e1-8b67-4ace-af24-8b756385ce80</permissionId>
+            <resourceName>
+                /personauthorities/*/items/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>d531417d-b61b-471c-90ff-f21969f00e4c</permissionId>
+            <resourceName>
+                /personauthorities/*/items/*/refobjs
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>46581f00-1338-417d-9ff5-1250a8eb5e3c</permissionId>
+            <resourceName>persons</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>b707073a-6c2f-4bc5-b8b2-800be7cc17ec</permissionId>
+            <resourceName>
+                /personauthorities/*/items/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>88832e9b-0f62-406e-8a64-ea61d53153ed</permissionId>
+            <resourceName>locationauthorities</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>5b8c3d7d-f027-4675-9edf-1f7733ce360d</permissionId>
+            <resourceName>
+                /locationauthorities/*/items/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>a73bebb8-d109-4fbd-aa29-f71766eac61a</permissionId>
+            <resourceName>locations</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>7d6dcff6-167f-4634-a35d-ec635e34fc60</permissionId>
+            <resourceName>acquisitions</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>2007cc99-7208-4238-9792-bceb5df78733</permissionId>
+            <resourceName>
+                /acquisitions/*/authorityrefs/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>94594f80-9ae2-4f51-b1f1-21e49bca2f5e</permissionId>
+            <resourceName>relations</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>e75b9dd6-737a-43cd-b847-c8effa3d6055</permissionId>
+            <resourceName>
+                relations/subject/*/type/*/object/*
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>da6da169-41d0-4f7f-a246-e7a9c96967de</permissionId>
+            <resourceName>accounts</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>8b1fc4c6-1610-490d-8972-17ac113b36d9</permissionId>
+            <resourceName>dimensions</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>97455f0e-2064-4667-9bfe-540a05b571ae</permissionId>
+            <resourceName>contacts</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>10655b0e-d168-4ac5-96fc-5ff88621aaee</permissionId>
+            <resourceName>
+                /personauthorities/*/items/*/contacts
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>1209a058-b37e-438d-906a-03bc49a4928c</permissionId>
+            <resourceName>
+                /orgauthorities/*/items/*/contacts
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>eb97ccdf-daaa-436e-bd40-f86e3d7dc8d0</permissionId>
+            <resourceName>notes</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>655fb068-d229-47e0-b636-48e53217d070</permissionId>
+            <resourceName>authorization/roles</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>556204b7-df13-40fe-8185-ac4e9924a033</permissionId>
+            <resourceName>authorization/permissions</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>3d5ecccd-37a5-4185-88b3-66aa1def43b5</permissionId>
+            <resourceName>authorization/permissions/permroles</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>049d792a-f1c7-42de-8d88-c09a1143340f</permissionId>
+            <resourceName>
+                /authorization/permissions/*/permroles/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>b85355db-2c33-4469-bb27-bf4fb1ac4039</permissionId>
+            <resourceName>accounts/accountroles</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>ce37cf6c-a550-49de-9bdf-0ede7cafb617</permissionId>
+            <resourceName>
+                /accounts/*/accountroles/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>e1af00a3-a7c9-441f-a48c-f9698f47298a</permissionId>
+            <resourceName>authorization/roles/permroles</resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
+        </role>
+    </permissionRole>
+    <permissionRole>
+        <subject>ROLE</subject>
+        <permission>
+            <permissionId>8fc74578-d253-4eb7-a0e3-43bc70a88a62</permissionId>
+            <resourceName>
+                /authorization/roles/*/permroles/
+            </resourceName>
+        </permission>
+        <role>
+            <roleId>25f537c9-a213-41de-97f0-18524d5f4eb2</roleId>
+            <roleName>ROLE_TENANT_READER</roleName>
         </role>
     </permissionRole>
 </ns2:permissions_roles_list>

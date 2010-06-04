@@ -40,6 +40,13 @@ import org.collectionspace.services.authorization.driver.AuthorizationSeedDriver
  */
 public class ImportAuthz {
 
+    final private static String OPTIONS_USERNAME = "username";
+    final private static String OPTIONS_PASSWORD = "password";
+    final private static String OPTIONS_TENANT_BINDING = "tenant binding file";
+    final private static String OPTIONS_IMPORT_DIR = "importdir";
+    final private static String OPTIONS_EXPORT_DIR = "exportdir";
+    final private static String OPTIONS_HELP = "help";
+
     public static void main(String[] args) {
 
         Options options = createOptions();
@@ -48,33 +55,50 @@ public class ImportAuthz {
         try {
             // parse the command line arguments
             CommandLine line = parser.parse(options, args);
+            if (line.hasOption("h")) {
+                printUsage();
+                System.exit(1);
+            }
             String user = line.getOptionValue("u");
             String password = line.getOptionValue("p");
             String tenantBinding = line.getOptionValue("b");
-            String importDir = line.getOptionValue("idir");
             String exportDir = line.getOptionValue("edir");
             System.out.println("user=" + user
                     + " password=" + password
                     + " tenantBinding=" + tenantBinding
-                    + " importDir=" + importDir
                     + " exportDir=" + exportDir);
             AuthorizationSeedDriver driver = new AuthorizationSeedDriver(
-                    user, password, tenantBinding, importDir, exportDir);
-            driver.seedData();
+                    user, password, tenantBinding, exportDir);
+            driver.generate();
+            driver.seed();
         } catch (ParseException exp) {
             // oops, something went wrong
             System.err.println("Parsing failed.  Reason: " + exp.getMessage());
+        } catch (Exception e) {
+            System.out.println("Error : " + e.getMessage());
+            printUsage();
         }
 
     }
 
     private static Options createOptions() {
         Options options = new Options();
-        options.addOption("u", true, "username");
-        options.addOption("p", true, "password");
-        options.addOption("b", true, "tenant binding file");
-        options.addOption("idir", true, "import dir");
-        options.addOption("edir", true, "export dir");
+        options.addOption("u", true, OPTIONS_USERNAME);
+        options.addOption("p", true, OPTIONS_PASSWORD);
+        options.addOption("b", true, OPTIONS_TENANT_BINDING);
+        options.addOption("edir", true, OPTIONS_EXPORT_DIR);
+        options.addOption("h", true, OPTIONS_HELP);
         return options;
+    }
+
+    private static void printUsage() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\nUsage : java -cp <classpath> " + ImportAuthz.class.getName() + " <options>");
+        sb.append("\nOptions :");
+        sb.append("\n   -u  <" + OPTIONS_USERNAME + "> cspace username");
+        sb.append("\n   -p  <" + OPTIONS_PASSWORD + "> password");
+        sb.append("\n   -b  <" + OPTIONS_TENANT_BINDING + "> tenant binding file (fully qualified path)");
+        sb.append("\n   -edir  <" + OPTIONS_EXPORT_DIR + "> directory to export authz data into");
+        System.out.println(sb.toString());
     }
 }

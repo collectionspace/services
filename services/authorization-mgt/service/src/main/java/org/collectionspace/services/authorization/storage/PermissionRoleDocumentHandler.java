@@ -141,21 +141,7 @@ public class PermissionRoleDocumentHandler
         } else {
             //subject mismatch should have been checked during validation
         }
-        if (subject.equals(SubjectType.ROLE)) {
-            //FIXME: potential index out of bounds exception...negative test needed
-            PermissionValue pv = pr.getPermissions().get(0);
-            for (RoleValue rv : pr.getRoles()) {
-                PermissionRoleRel prr = buildPermissonRoleRel(pv, rv);
-                prrl.add(prr);
-            }
-        } else if (SubjectType.PERMISSION.equals(subject)) {
-            //FIXME: potential index out of bounds exception...negative test needed
-            RoleValue rv = pr.getRoles().get(0);
-            for (PermissionValue pv : pr.getPermissions()) {
-                PermissionRoleRel prr = buildPermissonRoleRel(pv, rv);
-                prrl.add(prr);
-            }
-        }
+        PermissionRoleUtil.buildPermissionRoleRel(pr, subject, prrl);
     }
 
     @Override
@@ -209,14 +195,5 @@ public class PermissionRoleDocumentHandler
         rv.setRoleId(prr.getRoleId());
         rv.setRoleName(prr.getRoleName());
         return rv;
-    }
-
-    private PermissionRoleRel buildPermissonRoleRel(PermissionValue pv, RoleValue rv) {
-        PermissionRoleRel prr = new PermissionRoleRel();
-        prr.setPermissionId(pv.getPermissionId());
-        prr.setPermissionResource(pv.getResourceName());
-        prr.setRoleId(rv.getRoleId());
-        prr.setRoleName(rv.getRoleName());
-        return prr;
     }
 }

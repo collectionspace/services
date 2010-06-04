@@ -24,10 +24,19 @@
 package org.collectionspace.services.authorization.driver;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import org.collectionspace.services.authorization.AuthZ;
+import org.collectionspace.services.authorization.Permission;
+import org.collectionspace.services.authorization.PermissionRole;
+import org.collectionspace.services.authorization.PermissionRoleRel;
+import org.collectionspace.services.authorization.Role;
+import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.authorization.importer.AuthorizationGen;
 import org.collectionspace.services.authorization.importer.AuthorizationSeed;
+import org.collectionspace.services.authorization.importer.AuthorizationStore;
+import org.collectionspace.services.authorization.storage.PermissionRoleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -48,13 +57,14 @@ public class AuthorizationSeedDriver {
 
     final Logger logger = LoggerFactory.getLogger(AuthorizationSeedDriver.class);
     final static private String SPRING_SECURITY_METADATA = "applicationContext-authorization-test.xml";
+    final static private String ROLE_FILE = "import-roles.xml";
     final static private String PERMISSION_FILE = "import-permissions.xml";
     final static private String PERMISSION_ROLE_FILE = "import-permissions-roles.xml";
-    private String user = "test";
-    private String password = "test";
+    private String user;
+    private String password;
     private String tenantBindingFile;
-    private String importDir;
     private String exportDir;
+    private AuthorizationGen authzGen;
     private org.springframework.jdbc.datasource.DataSourceTransactionManager txManager;
 
     /**
@@ -68,49 +78,61 @@ public class AuthorizationSeedDriver {
      */
     public AuthorizationSeedDriver(String user, String password,
             String tenantBindingFile,
-            String importDir, String exportDir) {
+            String exportDir) {
         if (user == null || user.isEmpty()) {
-            this.user = user;
+            throw new IllegalArgumentException("username required.");
         }
+        this.user = user;
+
         if (password == null || password.isEmpty()) {
-            this.password = password;
+            throw new IllegalArgumentException("password required.");
         }
+        this.password = password;
+        
         if (tenantBindingFile == null || tenantBindingFile.isEmpty()) {
-            throw new IllegalStateException("tenantbindings are required.");
+            throw new IllegalArgumentException("tenantbinding file are required.");
         }
         this.tenantBindingFile = tenantBindingFile;
         if (exportDir == null || exportDir.isEmpty()) {
-            throw new IllegalStateException("exportdir required.");
+            throw new IllegalArgumentException("exportdir required.");
         }
         this.exportDir = exportDir;
-        if (importDir == null || importDir.isEmpty()) {
-            importDir = exportDir;
-        } else {
-            this.importDir = importDir;
-        }
 
     }
 
-    public void seedData() {
-        setup();
-        TransactionStatus status = null;
+    public void generate() {
         try {
-            AuthorizationGen authzGen = new AuthorizationGen();
+            authzGen = new AuthorizationGen();
             authzGen.initialize(tenantBindingFile);
-            authzGen.createDefaultServicePermissions();
-            //create default role(s) for the tenant and assign permissions
-            authzGen.createDefaultPermissionsRoles();
-            authzGen.exportPermissions(exportDir + File.separator + PERMISSION_FILE);
-            authzGen.exportPermissionRoles(exportDir + File.separator + PERMISSION_ROLE_FILE);
+            authzGen.createDefaultRoles();
+            authzGen.createDefaultPermissions();
+            authzGen.associateDefaultPermissionsRoles();
+            authzGen.exportDefaultRoles(exportDir + File.separator + ROLE_FILE);
+            authzGen.exportDefaultPermissions(exportDir + File.separator + PERMISSION_FILE);
+            authzGen.exportDefaultPermissionRoles(exportDir + File.separator + PERMISSION_ROLE_FILE);
             if (logger.isDebugEnabled()) {
                 logger.debug("authroization generation completed ");
             }
+        } catch (Exception ex) {
+            if (logger.isDebugEnabled()) {
+                ex.printStackTrace();
+            }
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public void seed() {
+        TransactionStatus status = null;
+        try {
+            store();
+
+            setupSpring();
             status = beginTransaction("seedData");
             AuthorizationSeed authzSeed = new AuthorizationSeed();
-            authzSeed.seedPermissions(importDir + File.separator + PERMISSION_FILE,
-                    importDir + File.separator + PERMISSION_ROLE_FILE);
+            authzSeed.seedPermissions(exportDir + File.separator + PERMISSION_FILE,
+                    exportDir + File.separator + PERMISSION_ROLE_FILE);
             if (logger.isDebugEnabled()) {
-                logger.debug("authroization seeding completed ");
+                logger.debug("authorization seeding completed ");
             }
         } catch (Exception ex) {
             if (status != null) {
@@ -128,7 +150,7 @@ public class AuthorizationSeedDriver {
         }
     }
 
-    private void setup() {
+    private void setupSpring() {
 
         ClassPathXmlApplicationContext appContext = new ClassPathXmlApplicationContext(
                 new String[]{SPRING_SECURITY_METADATA});
@@ -136,6 +158,9 @@ public class AuthorizationSeedDriver {
         System.setProperty("spring-beans-config", SPRING_SECURITY_METADATA);
         AuthZ authZ = AuthZ.get();
         txManager = (org.springframework.jdbc.datasource.DataSourceTransactionManager) appContext.getBean("transactionManager");
+        if (logger.isDebugEnabled()) {
+            logger.debug("spring setup complete");
+        }
     }
 
     private void login() {
@@ -144,10 +169,40 @@ public class AuthorizationSeedDriver {
         gauths.add(gauth);
         Authentication authRequest = new UsernamePasswordAuthenticationToken(user, password, gauths);
         SecurityContextHolder.getContext().setAuthentication(authRequest);
+        if (logger.isDebugEnabled()) {
+            logger.debug("login successful for user=" + user);
+        }
     }
 
     private void logout() {
         SecurityContextHolder.getContext().setAuthentication(null);
+        if (logger.isDebugEnabled()) {
+            logger.debug("logged out user=" + user);
+        }
+    }
+
+    private void store() throws Exception {
+        AuthorizationStore authzStore = new AuthorizationStore();
+        for (Role role : authzGen.getDefaultRoles()) {
+            authzStore.store(role);
+        }
+
+        for (Permission perm : authzGen.getDefaultPermissions()) {
+            authzStore.store(perm);
+        }
+
+        List<PermissionRoleRel> permRoleRels = new ArrayList<PermissionRoleRel>();
+        for (PermissionRole pr : authzGen.getDefaultPermissionRoles()) {
+            PermissionRoleUtil.buildPermissionRoleRel(pr, SubjectType.ROLE, permRoleRels);
+        }
+        for (PermissionRoleRel permRoleRel : permRoleRels) {
+            authzStore.store(permRoleRel);
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("authroization storage completed ");
+        }
+
     }
 
     private TransactionStatus beginTransaction(String name) {

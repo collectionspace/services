@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:roles_list xmlns:ns2="http://collectionspace.org/services/authorization">
+    <role csid="ad3a2b4c-ef74-47f0-bdb0-f6a906acd370">
+        <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
+        <description>generated tenant admin role</description>
+        <tenant_id>1</tenant_id>
+        <createdAt>2010-06-04T14:14:37.372</createdAt>
+    </role>
+    <role csid="25f537c9-a213-41de-97f0-18524d5f4eb2">
+        <roleName>ROLE_TENANT_READER</roleName>
+        <description>generated tenant read only role</description>
+        <tenant_id>1</tenant_id>
+        <createdAt>2010-06-04T14:14:37.386</createdAt>
+    </role>
+</ns2:roles_list>

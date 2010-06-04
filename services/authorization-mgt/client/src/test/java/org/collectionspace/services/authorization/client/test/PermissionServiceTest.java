@@ -413,7 +413,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        int EXPECTED_ITEMS = 1;
+        int EXPECTED_ITEMS = 5; //seeded permissions
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": received = " + list.getPermissions().size()
                     + " expected=" + EXPECTED_ITEMS);
