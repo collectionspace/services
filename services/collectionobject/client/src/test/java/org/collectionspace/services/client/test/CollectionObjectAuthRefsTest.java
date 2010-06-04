@@ -289,12 +289,20 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         AuthorityRefList list = res2.getEntity();
+        
+        List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
+        int numAuthRefsFound = items.size();
+        if(logger.isDebugEnabled()){
+            logger.debug("Expected " + NUM_AUTH_REFS_EXPECTED +
+                " authority references, found " + numAuthRefsFound);
+        }
+        Assert.assertEquals(numAuthRefsFound, NUM_AUTH_REFS_EXPECTED,
+            "Did not find all expected authority references! " +
+            "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
-        if(iterateThroughList && logger.isDebugEnabled()){
-            List<AuthorityRefList.AuthorityRefItem> items =
-                    list.getAuthorityRefItem();
+        if(iterateThroughList && logger.isDebugEnabled()){;
             int i = 0;
             for(AuthorityRefList.AuthorityRefItem item : items){
                 logger.debug(testName + ": list-item[" + i + "] Field:" +
@@ -307,7 +315,6 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
                         item.getUri());
                 i++;
             }
-            Assert.assertEquals(i, NUM_AUTH_REFS_EXPECTED, "Did not find all authrefs!");
         }
     }
 
