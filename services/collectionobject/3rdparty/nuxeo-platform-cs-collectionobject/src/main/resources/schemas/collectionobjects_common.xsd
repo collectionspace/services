@@ -68,6 +68,7 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <xs:element name="collection" type="xs:string"/>
     <xs:element name="title" type="xs:string"/>
     <xs:element name="objectTitleLanguage" type="xs:string"/>
     <xs:element name="titleTranslation" type="xs:string"/>
