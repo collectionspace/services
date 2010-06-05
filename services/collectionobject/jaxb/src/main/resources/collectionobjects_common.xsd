@@ -178,6 +178,7 @@
                 <xs:element name="associatedEventPerson" type="xs:string" />
                 <xs:element name="associatedEventPlace" type="xs:string" />
                 <xs:element name="associatedObject" type="xs:string" />
+                <xs:element name="associatedObjectType" type="xs:string" />
                 <xs:element name="associatedOrganization" type="xs:string" />
                 <xs:element name="associatedPeople" type="xs:string" />
                 <xs:element name="associatedPerson" type="xs:string" />
