@@ -43,7 +43,9 @@
         </exec>
     </target>    
 
-    <target name="dist" depends="package"
+    <!-- Dependency on package removed in 0.7 release branch only -->
+    <!-- per CSPACE-2112 -->
+    <target name="dist" 
     	description="distribute location service importer tool">
     </target>
 
