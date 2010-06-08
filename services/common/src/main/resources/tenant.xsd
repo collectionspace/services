@@ -5,22 +5,22 @@
     You may not use this file except in compliance with this License.
 
     You may obtain a copy of the ECL 2.0 License at
-    
+
     https://source.collectionspace.org/collection-space/LICENSE.txt
 
     Document   : tenant-binding.xsd
     Revision   : $LastChangedRevision$
     Created on : $LastChangedDate$
     Description:
-        
+
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns="http://collectionspace.org/services/common/tenant"
-  xmlns:types="http://collectionspace.org/services/common/types"
-  xmlns:service="http://collectionspace.org/services/common/service"
-  targetNamespace="http://collectionspace.org/services/common/tenant"
-  version="0.1"
-  elementFormDefault="qualified">
+           xmlns="http://collectionspace.org/services/common/tenant"
+           xmlns:types="http://collectionspace.org/services/common/types"
+           xmlns:service="http://collectionspace.org/services/common/service"
+           targetNamespace="http://collectionspace.org/services/common/tenant"
+           version="0.1"
+           elementFormDefault="qualified">
 
     <xs:import namespace="http://collectionspace.org/services/common/types" schemaLocation="types.xsd" />
     <xs:import namespace="http://collectionspace.org/services/common/service" schemaLocation="service.xsd" />
@@ -40,8 +40,12 @@
         TenantBindingType describes bindings for each tenant in CollectionSpace
     -->
     <xs:complexType name="TenantBindingType">
+        <xs:annotation>
+            <xs:documentation>Tenant bindings</xs:documentation>
+        </xs:annotation>
         <xs:sequence>
-						<xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="repositoryDomain" type="RepositoryDomainType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="serviceBindings" type="service:ServiceBindingType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <!-- tenant id, a UUID -->
@@ -52,8 +56,16 @@
         <!-- display name as Museum of Moving Images -->
         <xs:attribute name="displayName" type="xs:string" use="required"/>
         <xs:attribute name="version" type="types:VersionType" use="required"/>
-        <!-- repository domain -->
-        <xs:attribute name="repositoryDomain" type="xs:string" use="optional" default="default-domain"/>
+
+    </xs:complexType>
+
+    <xs:complexType name="RepositoryDomainType">
+        <xs:annotation>
+            <xs:documentation>Repository domain configuartion</xs:documentation>
+        </xs:annotation>
+        <xs:sequence/>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="repositoryClient" type="xs:string" use="optional" default="nuxeo-java"/>
     </xs:complexType>
 
 </xs:schema>

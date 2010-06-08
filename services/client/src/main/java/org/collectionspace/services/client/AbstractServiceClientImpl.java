@@ -232,6 +232,10 @@ public abstract class AbstractServiceClientImpl implements
             if (password != null && !"".equals(password)) {
                 properties.setProperty(PASSWORD_PROPERTY, password);
             }
+            String tenant = System.getProperty(TENANT_PROPERTY);
+            if (tenant != null && !"".equals(tenant)) {
+                properties.setProperty(TENANT_PROPERTY, tenant);
+            }
             if (logger.isDebugEnabled()) {
                 printProperties();
             }

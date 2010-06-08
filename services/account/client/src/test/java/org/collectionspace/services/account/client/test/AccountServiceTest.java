@@ -56,11 +56,9 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     /** The Constant logger. */
     private final String CLASS_NAME = AccountServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownResourceId = null;
-    
     /** The add tenant. */
     static boolean addTenant = true;
 
@@ -80,28 +78,28 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     protected CollectionSpaceClient getClientInstance() {
-    	return new AccountClient();
+        return new AccountClient();
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getAbstractCommonList(
-			ClientResponse<AbstractCommonList> response) {
-    	//FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
-    	throw new UnsupportedOperationException();
+    protected AbstractCommonList getAbstractCommonList(
+            ClientResponse<AbstractCommonList> response) {
+        //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
+        throw new UnsupportedOperationException();
     }
-    
-	/* (non-Javadoc)
-	 * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
-	 */
-	@Test(dataProvider = "testName")
-	@Override
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.test.AbstractServiceTestImpl#readPaginatedList(java.lang.String)
+     */
+    @Test(dataProvider = "testName")
+    @Override
     public void readPaginatedList(String testName) throws Exception {
-		//FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
-	}    
-     
+        //FIXME: http://issues.collectionspace.org/browse/CSPACE-1697
+    }
+
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
@@ -121,11 +119,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // its associated HTTP method name (e.g. POST, DELETE).
         setupCreate();
 
+        AccountClient client = new AccountClient();
         // Submit the request to the service and store the response.
         AccountsCommon account =
                 createAccountInstance("barney", "barney", "hithere08", "barney@dinoland.com",
-                true, false, true, true);
-        AccountClient client = new AccountClient();
+                client.getTenantId(), true, false, true, true);
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
 
@@ -166,10 +164,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         setupCreate();
 
         // Submit the request to the service and store the response.
+        AccountClient client = new AccountClient();
         AccountsCommon account =
                 createAccountInstance("barney1", "barney", "hithere08", "barney@dinoland.com",
-                true, false, true, true);
-        AccountClient client = new AccountClient();
+                client.getTenantId(), true, false, true, true);
+
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
         if (logger.isDebugEnabled()) {
@@ -196,10 +195,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         setupCreate();
 
         // Submit the request to the service and store the response.
+        AccountClient client = new AccountClient();
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "hithere08", "babybop@dinoland.com",
-                true, true, true, true);
-        AccountClient client = new AccountClient();
+                client.getTenantId(), true, true, true, true);
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
         // Does it exactly match the expected status code?
@@ -228,10 +227,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         setupCreate();
 
         // Submit the request to the service and store the response.
+        AccountClient client = new AccountClient();
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "hithere08", "babybop@dinoland.com",
-                true, false, false, true);
-        AccountClient client = new AccountClient();
+                client.getTenantId(), true, false, false, true);
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
         // Does it exactly match the expected status code?
@@ -259,10 +258,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         setupCreate();
 
         // Submit the request to the service and store the response.
+        AccountClient client = new AccountClient();
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "hithere08", "babybop.dinoland.com",
-                true, false, true, true);
-        AccountClient client = new AccountClient();
+                client.getTenantId(), true, false, true, true);
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
         // Does it exactly match the expected status code?
@@ -290,10 +289,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         setupCreate();
 
         // Submit the request to the service and store the response.
+        AccountClient client = new AccountClient();
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "hithere08", "babybop@dinoland.com",
-                false, false, true, true);
-        AccountClient client = new AccountClient();
+                client.getTenantId(), false, false, true, true);
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
         // Does it exactly match the expected status code?
@@ -321,10 +320,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         setupCreate();
 
         // Submit the request to the service and store the response.
+        AccountClient client = new AccountClient();
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "shpswd", "babybop@dinoland.com",
-                true, false, true, true);
-        AccountClient client = new AccountClient();
+                client.getTenantId(), true, false, true, true);
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
         // Does it exactly match the expected status code?
@@ -336,13 +335,13 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, Response.Status.BAD_REQUEST.getStatusCode());
     }
 
-        /**
-         * Creates the with most invalid.
-         *
-         * @param testName the test name
-         * @throws Exception the exception
-         */
-        @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    /**
+     * Creates the with most invalid.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"create"})
     public void createWithMostInvalid(String testName) throws Exception {
 
@@ -352,10 +351,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         setupCreate();
 
         // Submit the request to the service and store the response.
+        AccountClient client = new AccountClient();
         AccountsCommon account =
                 createAccountInstance("babybop", "babybop", "hithere08", "babybop/dinoland.com",
-                false, true, false, false);
-        AccountClient client = new AccountClient();
+                client.getTenantId(), false, true, false, false);
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
         // Does it exactly match the expected status code?
@@ -381,10 +380,10 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         }
         setupCreate();
         // Submit the request to the service and store the response.
+        AccountClient client = new AccountClient();
         AccountsCommon account1 =
                 createAccountInstance("curious", "curious", "hithere08", "curious@george.com",
-                true, false, true, true);
-        AccountClient client = new AccountClient();
+                client.getTenantId(), true, false, true, true);
         ClientResponse<Response> res = client.create(account1);
         int statusCode = res.getStatus();
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -394,7 +393,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
 
         AccountsCommon account2 =
                 createAccountInstance("tom", "tom", "hithere09", "tom@jerry.com",
-                true, false, true, true);
+                client.getTenantId(), true, false, true, true);
         res = client.create(account2);
         statusCode = res.getStatus();
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -405,7 +404,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
 
         AccountsCommon account3 =
                 createAccountInstance("mj", "mj", "hithere10", "mj@dinoland.com",
-                true, false, true, true);
+                client.getTenantId(), true, false, true, true);
         res = client.create(account3);
         statusCode = res.getStatus();
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -423,7 +422,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithEmptyEntityBody(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -431,7 +430,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithMalformedXml(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -439,7 +438,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void createWithWrongXmlSchema(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     // ---------------------------------------------------------------
@@ -994,7 +993,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void updateWithEmptyEntityBody(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -1002,7 +1001,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void updateWithMalformedXml(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -1010,7 +1009,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public void updateWithWrongXmlSchema(String testName) throws Exception {
-    	//FIXME: Should this test really be empty?  If so, please comment accordingly.
+        //FIXME: Should this test really be empty?  If so, please comment accordingly.
     }
 
     /* (non-Javadoc)
@@ -1034,7 +1033,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         AccountClient client = new AccountClient();
         AccountsCommon account =
                 createAccountInstance("simba", "simba", "tiger", "simba@lionking.com",
-                true, false, true, true);
+                client.getTenantId(), true, false, true, true);
         ClientResponse<AccountsCommon> res =
                 client.update(NON_EXISTENT_ID, account);
         int statusCode = res.getStatus();
@@ -1209,13 +1208,12 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
      * @return
      */
     AccountsCommon createAccountInstance(String screenName,
-            String userName, String passwd, String email,
+            String userName, String passwd, String email, String tenantId,
             boolean useScreenName, boolean invalidTenant, boolean useUser, boolean usePassword) {
 
         AccountsCommon account = AccountFactory.createAccountInstance(screenName,
-                userName, passwd, email, useScreenName,
-                addTenant, invalidTenant, useUser, usePassword);
-
+                userName, passwd, email, tenantId, useScreenName,
+                invalidTenant, useUser, usePassword);
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, account common");
             logger.debug(objectAsXmlString(account,
@@ -1224,6 +1222,7 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         return account;
 
     }
+
 
     /**
      * Prints the list.

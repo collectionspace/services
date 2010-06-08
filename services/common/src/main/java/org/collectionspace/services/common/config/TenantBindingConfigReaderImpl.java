@@ -29,6 +29,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.collectionspace.services.common.service.ServiceBindingType;
+import org.collectionspace.services.common.tenant.RepositoryDomainType;
 import org.collectionspace.services.common.tenant.TenantBindingType;
 import org.collectionspace.services.common.tenant.TenantBindingConfig;
 import org.collectionspace.services.common.types.PropertyItemType;
@@ -50,6 +51,9 @@ public class TenantBindingConfigReaderImpl
     //tenant id, tenant binding
     private Hashtable<String, TenantBindingType> tenantBindings =
             new Hashtable<String, TenantBindingType>();
+    //repository domains
+    private Hashtable<String, RepositoryDomainType> domains =
+            new Hashtable<String, RepositoryDomainType>();
     //tenant-qualified servicename, service binding
     private Hashtable<String, ServiceBindingType> serviceBindings =
             new Hashtable<String, ServiceBindingType>();
@@ -83,11 +87,18 @@ public class TenantBindingConfigReaderImpl
         tenantBindingConfig = (TenantBindingConfig) parse(configFile, TenantBindingConfig.class);
         for (TenantBindingType tenantBinding : tenantBindingConfig.getTenantBinding()) {
             tenantBindings.put(tenantBinding.getId(), tenantBinding);
+            readDomains(tenantBinding);
             readServiceBindings(tenantBinding);
             if (logger.isDebugEnabled()) {
                 logger.debug("read() added tenant id=" + tenantBinding.getId()
                         + " name=" + tenantBinding.getName());
             }
+        }
+    }
+
+    private void readDomains(TenantBindingType tenantBinding) throws Exception {
+        for (RepositoryDomainType domain : tenantBinding.getRepositoryDomain()) {
+            domains.put(domain.getName(), domain);
         }
     }
 
@@ -125,6 +136,38 @@ public class TenantBindingConfigReaderImpl
     public TenantBindingType getTenantBinding(
             String tenantId) {
         return tenantBindings.get(tenantId);
+    }
+
+    /**
+     * getRepositoryDomain gets repository domain configuration for the given name
+     * @param domainName
+     * @return
+     */
+    public RepositoryDomainType getRepositoryDomain(String domainName) {
+        return domains.get(domainName.trim());
+    }
+
+    /**
+     * getRepositoryDomain gets repository domain configuration for the given service
+     * and given tenant id
+     * @param tenantId
+     * @param serviceName
+     * @return
+     */
+    public RepositoryDomainType getRepositoryDomain(String tenantId, String serviceName) {
+        ServiceBindingType serviceBinding = getServiceBinding(tenantId, serviceName);
+        if (serviceBinding == null) {
+            throw new IllegalArgumentException("no service binding found for " + serviceName
+                    + " of tenant with id=" + tenantId);
+        }
+        if (serviceBinding.getRepositoryDomain() == null) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("No repository domain configured for " + serviceName
+                        + " of tenant with id=" + tenantId);
+            }
+            return null;
+        }
+        return domains.get(serviceBinding.getRepositoryDomain().trim());
     }
 
     /**

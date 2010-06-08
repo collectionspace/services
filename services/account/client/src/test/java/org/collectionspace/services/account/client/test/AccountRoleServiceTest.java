@@ -580,8 +580,8 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
 
         AccountClient accClient = new AccountClient();
         AccountsCommon account = AccountFactory.createAccountInstance(
-                userName, userName, userName, email,
-                true, true, false, true, true);
+                userName, userName, userName, email, accClient.getTenantId(),
+                true, false, true, true);
         ClientResponse<Response> res = accClient.create(account);
         int statusCode = res.getStatus();
         if (logger.isDebugEnabled()) {

@@ -55,9 +55,7 @@ public class PermissionDocumentHandler
         String id = UUID.randomUUID().toString();
         Permission permission = wrapDoc.getWrappedObject();
         permission.setCsid(id);
-        //FIXME: if admin updating the permission is a CS admin rather than
-        //the tenant admin, tenant id should be retrieved from the request
-        permission.setTenantId(getServiceContext().getTenantId());
+        setTenant(permission);
     }
 
     @Override
@@ -200,5 +198,12 @@ public class PermissionDocumentHandler
      */
     private void sanitize(Permission permission) {
         permission.setTenantId(null);
+    }
+
+    private void setTenant(Permission permission) {
+        //set tenant only if not available from input
+        if (permission.getTenantId() == null || permission.getTenantId().isEmpty()) {
+            permission.setTenantId(getServiceContext().getTenantId());
+        }
     }
 }

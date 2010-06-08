@@ -114,7 +114,7 @@ public class ServiceMain {
         //all configs are read, connector is initialized, retrieve workspaceids
         Hashtable<String, TenantBindingType> tenantBindings =
                 getTenantBindingConfigReader().getTenantBindings();
-        TenantRepository.get().retrieveAllWorkspaceIds(tenantBindings);
+        TenantRepository.get().setup(tenantBindings);
     }
 
     /**

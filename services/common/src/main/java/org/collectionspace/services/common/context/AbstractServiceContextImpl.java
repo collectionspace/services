@@ -41,6 +41,7 @@ import org.collectionspace.services.common.security.SecurityContextImpl;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.service.ServiceBindingType;
+import org.collectionspace.services.common.tenant.RepositoryDomainType;
 import org.collectionspace.services.common.tenant.TenantBindingType;
 import org.collectionspace.services.common.types.PropertyItemType;
 import org.collectionspace.services.common.types.PropertyType;
@@ -78,6 +79,8 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     private ServiceBindingType serviceBinding;
     /** The tenant binding. */
     private TenantBindingType tenantBinding;
+    /** repository domain used by the service */
+    private RepositoryDomainType repositoryDomain;
     /** The override document type. */
     private String overrideDocumentType = null;
     /** The val handlers. */
@@ -91,9 +94,8 @@ public abstract class AbstractServiceContextImpl<IT, OT>
      * Instantiates a new abstract service context impl.
      */
     private AbstractServiceContextImpl() {
-    	// private constructor for singleton pattern
-    } 
-
+        // private constructor for singleton pattern
+    }
     // request query params
     /** The query params. */
     private MultivaluedMap<String, String> queryParams;
@@ -134,6 +136,13 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         if (logger.isDebugEnabled()) {
             logger.debug("tenantId=" + tenantId
                     + " service binding=" + serviceBinding.getName());
+        }
+        repositoryDomain = tReader.getRepositoryDomain(tenantId, serviceName);
+        if (repositoryDomain != null) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("tenantId=" + tenantId
+                        + " repository doamin=" + repositoryDomain.getName());
+            }
         }
     }
 
@@ -243,10 +252,10 @@ public abstract class AbstractServiceContextImpl<IT, OT>
      */
     @Override
     public String getRepositoryClientName() {
-        if (serviceBinding.getRepositoryClient() == null) {
+        if (repositoryDomain == null) {
             return null;
         }
-        return serviceBinding.getRepositoryClient().trim();
+        return repositoryDomain.getRepositoryClient();
     }
 
     /* (non-Javadoc)
@@ -263,7 +272,10 @@ public abstract class AbstractServiceContextImpl<IT, OT>
      */
     @Override
     public String getRepositoryDomainName() {
-        return tenantBinding.getRepositoryDomain();
+        if (repositoryDomain == null) {
+            return null;
+        }
+        return repositoryDomain.getName();
     }
 
     /* (non-Javadoc)
@@ -523,7 +535,9 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         msg.append("tenant id=" + tenantBinding.getId() + " ");
         msg.append("tenant name=" + tenantBinding.getName() + " ");
         msg.append(tenantBinding.getDisplayName() + " ");
-        msg.append("tenant repository domain=" + tenantBinding.getRepositoryDomain());
+        if (repositoryDomain != null) {
+            msg.append("tenant repository domain=" + repositoryDomain.getName());
+        }
         for (Map.Entry<String, Object> entry : properties.entrySet()) {
             msg.append("property name=" + entry.getKey() + " value=" + entry.getValue().toString());
         }

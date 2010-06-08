@@ -62,11 +62,10 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     private String knownResourceId = null;
     private String barneyAccountId = null; //active
     private String georgeAccountId = null; //inactive
-    
     /** The logger. */
     private final String CLASS_NAME = AuthenticationServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.AbstractServiceTest#getServicePathComponent()
      */
@@ -102,7 +101,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createActiveAccount(String testName) throws Exception {
-        
+
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
@@ -110,13 +109,14 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
         // its associated HTTP method name (e.g. POST, DELETE).
         setupCreate();
-        
+
         AccountClient accountClient = new AccountClient();
         accountClient.setAuth(true, "test", true, "test", true);
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
-                createAccountInstance("barney", "barney08", "barney@dinoland.com", false);
+                createAccountInstance("barney", "barney08", "barney@dinoland.com",
+                accountClient.getTenantId(), false);
         ClientResponse<Response> res = accountClient.create(account);
         int statusCode = res.getStatus();
 
@@ -139,19 +139,20 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createInactiveAccount(String testName) throws Exception {
-        
+
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
         // Perform setup.
         setupCreate();
-        
+
         AccountClient accountClient = new AccountClient();
         accountClient.setAuth(true, "test", true, "test", true);
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
-                createAccountInstance("george", "george08", "george@curiousland.com", false);
+                createAccountInstance("george", "george08", "george@curiousland.com",
+                accountClient.getTenantId(), false);
         ClientResponse<Response> res = accountClient.create(account);
         int statusCode = res.getStatus();
 
@@ -460,11 +461,11 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     }
 
     private AccountsCommon createAccountInstance(String screenName,
-            String passwd, String email, boolean invalidTenant) {
+            String passwd, String email, String tenantId, boolean invalidTenant) {
 
         AccountsCommon account = AccountFactory.createAccountInstance(screenName,
-                screenName, passwd, email,
-                true, true, invalidTenant, true, true);
+                screenName, passwd, email, tenantId,
+                true, invalidTenant, true, true);
 
         List<AccountTenant> atl = account.getTenants();
 

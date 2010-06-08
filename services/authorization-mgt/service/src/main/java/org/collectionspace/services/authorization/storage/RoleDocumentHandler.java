@@ -56,9 +56,7 @@ public class RoleDocumentHandler
         Role role = wrapDoc.getWrappedObject();
         role.setRoleName(fixRoleName(role.getRoleName()));
         role.setCsid(id);
-        //FIXME: if admin updating the role is a CS admin rather than
-        //the tenant admin, tenant id should be retrieved from the request
-        role.setTenantId(getServiceContext().getTenantId());
+        setTenant(role);
     }
 
     @Override
@@ -192,5 +190,12 @@ public class RoleDocumentHandler
             roleName = rolePrefix + roleName;
         }
         return roleName;
+    }
+
+    private void setTenant(Role role) {
+        //set tenant only if not available from input
+        if (role.getTenantId() == null || role.getTenantId().isEmpty()) {
+            role.setTenantId(getServiceContext().getTenantId());
+        }
     }
 }

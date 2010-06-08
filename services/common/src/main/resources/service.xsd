@@ -41,8 +41,8 @@
             <!-- validator handler(s) to be used to validate the content (need to be in classpath) -->
             <!-- validator handler is called for create (POST) and update (PUT) requests only -->
             <xs:element name="validatorHandler" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            <!-- name of the repository client (from service-config.xml) -->
-            <xs:element name="repositoryClient" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <!-- name of the repository domain -->
+            <xs:element name="repositoryDomain" type="xs:string" minOccurs="0" maxOccurs="1"/>
             <!-- repositoryWorkspaceId could be workspace id -->
             <!-- used only for Nuxeo rest client -->
             <xs:element name="repositoryWorkspaceId" type="xs:string" minOccurs="0" maxOccurs="1"/>

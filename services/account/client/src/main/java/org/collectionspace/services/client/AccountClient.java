@@ -69,9 +69,9 @@ public class AccountClient extends AbstractServiceClientImpl {
 
     @Override
     public CollectionSpaceProxy getProxy() {
-    	return this.accountProxy;
+        return this.accountProxy;
     }
-    
+
     /**
      * allow to reset proxy as per security needs
      */
@@ -135,7 +135,12 @@ public class AccountClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.hello.client.AccountProxy#deleteAccount(java.lang.Long)
      */
     @Override
-	public ClientResponse<Response> delete(String csid) {
+    public ClientResponse<Response> delete(String csid) {
         return accountProxy.delete(csid);
+    }
+    
+    
+    public String getTenantId() {
+        return getProperty(AccountClient.TENANT_PROPERTY);
     }
 }

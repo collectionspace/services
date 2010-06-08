@@ -62,8 +62,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     private String verifyResourceId = null;
     private String verifyRoleName = "collections_manager_test";
 //    private List<String> allResourceIdsCreated = new ArrayList<String>();
-    /** The add tenant. */
-    boolean addTenant = true;
+
     /*
      * This method is called only by the parent class, AbstractServiceTestImpl
      */
@@ -168,7 +167,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
-        Role role = createRoleInstance("ROLE_USERS",
+        Role role = createRoleInstance(knownRoleName,
                 "role users",
                 true);
         ClientResponse<Response> res = client.create(role);
@@ -199,7 +198,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         RoleClient client = new RoleClient();
-        Role role = createRoleInstance("ROLE_USERS",
+        Role role = createRoleInstance("",
                 "role for users",
                 false);
         ClientResponse<Response> res = client.create(role);
@@ -301,7 +300,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"create"})
+    dependsOnMethods = {"createForUniqueRole"})
     public void read(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {

@@ -469,8 +469,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         DimensionClient client = new DimensionClient();
-        //default user test/test has delete permission
-        client.setAuth(true, "test", true, "test", true);
+
         ClientResponse<Response> res = client.delete(knownResourceId);
         int statusCode = res.getStatus();
 
@@ -608,11 +607,11 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
 
     private String createAccount(String userName, String email) {
         setupCreate();
-        AccountClient accClient = new AccountClient();
+        AccountClient accountClient = new AccountClient();
         AccountsCommon account = AccountFactory.createAccountInstance(
-                userName, userName, userName, email,
-                true, true, false, true, true);
-        ClientResponse<Response> res = accClient.create(account);
+                userName, userName, userName, email, accountClient.getTenantId(),
+                true, false, true, true);
+        ClientResponse<Response> res = accountClient.create(account);
         int statusCode = res.getStatus();
         if (logger.isDebugEnabled()) {
             logger.debug("createAccount: userName=" + userName
@@ -756,5 +755,10 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         for (AccountValue av1 : accValues.values()) {
             deleteAccount(av1.getAccountId());
         }
+    }
+
+
+    private String getTenantId(AccountClient client) {
+        return client.getProperty(AccountClient.TENANT_PROPERTY);
     }
 }

@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.common.repository;
 
+import java.util.Hashtable;
 import java.util.List;
 
 import org.collectionspace.services.common.context.ServiceContext;
@@ -46,6 +47,30 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
 public interface RepositoryClient extends StorageClient {
 
     /**
+     * createDomain creates a doamin in the default repository
+     * @param space name
+     * @return id of newly created domain space
+     * @throws java.lang.Exception
+     */
+    public String createDomain(String domainName) throws Exception;
+
+    /**
+     * getDomainSpaceId gets id of the given domain
+     * @param domainName
+     * @return
+     * @throws Exception
+     */
+    public String getDomainId(String domainName) throws Exception;
+
+    /**
+     * retrieveWorkspaceIds retrieve workspace ids for given domain
+     * @param domainName
+     * @return Hashtable<workspaceName, workspaceId>
+     * @throws Exception
+     */
+    public Hashtable<String, String> retrieveWorkspaceIds(String domainName) throws Exception;
+
+    /**
      * createWorkspace creates a workspace in default repository under given domain
      * @param tenantDomain domain representing tenant
      * @param workspaceName name of the workspace
@@ -62,7 +87,7 @@ public interface RepositoryClient extends StorageClient {
      * @throws java.lang.Exception
      */
     public String getWorkspaceId(String tenantDomain, String workspaceName) throws Exception;
-    
+
     /**
      * get wrapped documentModel from the Nuxeo repository
      * @param ctx service context under which this method is invoked
@@ -71,7 +96,7 @@ public interface RepositoryClient extends StorageClient {
      * @throws DocumentException
      */
     public DocumentWrapper<DocumentModel> getDoc(
-    		ServiceContext ctx, String id)
+            ServiceContext ctx, String id)
             throws DocumentNotFoundException, DocumentException;
 
     /**
@@ -82,7 +107,7 @@ public interface RepositoryClient extends StorageClient {
      * @throws DocumentException
      */
     public DocumentWrapper<DocumentModel> findDoc(
-    		ServiceContext ctx, String where)
+            ServiceContext ctx, String where)
             throws DocumentNotFoundException, DocumentException;
 
     /**
@@ -93,7 +118,7 @@ public interface RepositoryClient extends StorageClient {
      * @throws DocumentException
      */
     public String findDocCSID(
-    		ServiceContext ctx, String where)
+            ServiceContext ctx, String where)
             throws DocumentNotFoundException, DocumentException;
 
     /**
@@ -110,9 +135,9 @@ public interface RepositoryClient extends StorageClient {
      * @throws DocumentException 
      */
     public DocumentWrapper<DocumentModelList> findDocs(
-    		ServiceContext ctx,
-    		List<String> docTypes,
-    		String where,
-    		int pageSize, int pageNum, boolean computeTotal )
+            ServiceContext ctx,
+            List<String> docTypes,
+            String where,
+            int pageSize, int pageNum, boolean computeTotal)
             throws DocumentNotFoundException, DocumentException;
 }

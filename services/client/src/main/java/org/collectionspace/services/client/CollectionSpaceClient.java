@@ -33,16 +33,18 @@ import org.jboss.resteasy.client.ClientResponse;
  */
 public interface CollectionSpaceClient {
 
-    /** The AUT h_ property. */
+    /** The AUTH property. */
     String AUTH_PROPERTY = "cspace.auth";
-    /** The PASSWOR d_ property. */
+    /** The PASSWORD property. */
     String PASSWORD_PROPERTY = "cspace.password";
-    /** The SS l_ property. */
+    /** The SSL property. */
     String SSL_PROPERTY = "cspace.ssl";
-    /** The UR l_ property. */
+    /** The URL property. */
     String URL_PROPERTY = "cspace.url";
-    /** The USE r_ property. */
+    /** The USER property. */
     String USER_PROPERTY = "cspace.user";
+    /** The tenant property */
+    String TENANT_PROPERTY = "cspace.tenant";
 
     /**
      * Gets the proxy.
@@ -147,8 +149,8 @@ public interface CollectionSpaceClient {
      * @return the client response
      */
     public ClientResponse<AbstractCommonList> readList(String pageSize,
-    		String pageNumber);
-    
+            String pageNumber);
+
     /**
      * Delete.
      *
@@ -156,5 +158,4 @@ public interface CollectionSpaceClient {
      * @return the client response
      */
     public ClientResponse<Response> delete(String csid);
-
 }

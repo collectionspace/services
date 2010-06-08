@@ -120,10 +120,10 @@ public class JaxbUtils {
         Method m = c.getMethod(methodName);
 
         Object r = m.invoke(o);
-        if (logger.isDebugEnabled()) {
-            logger.debug("getValue returned value=" + r
-                    + " for " + c.getName());
-        }
+//        if (logger.isDebugEnabled()) {
+//            logger.debug("getValue returned value=" + r
+//                    + " for " + c.getName());
+//        }
         return r;
     }
 
@@ -154,10 +154,10 @@ public class JaxbUtils {
         Class c = o.getClass();
         Method m = c.getMethod(methodName, argType);
         Object r = m.invoke(o, argValue);
-        if (logger.isDebugEnabled()) {
-            logger.debug("completed invocation of " + methodName
-                    + " for " + c.getName());
-        }
+//        if (logger.isDebugEnabled()) {
+//            logger.debug("completed invocation of " + methodName
+//                    + " for " + c.getName());
+//        }
         return r;
     }
 }

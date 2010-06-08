@@ -45,16 +45,17 @@ public class AccountFactory {
      * @param userName
      * @param passwd
      * @param email
+     * @param tenantId add non-null tenant id else let service take tenant id of
+     * the authenticated user
      * @param useScreenName
-     * @param addTenant
      * @param invalidTenant
      * @param useUser
      * @param usePassword
      * @return
      */
    public static AccountsCommon createAccountInstance(String screenName,
-            String userName, String passwd, String email,
-            boolean useScreenName, boolean addTenant, boolean invalidTenant,
+            String userName, String passwd, String email, String tenantId,
+            boolean useScreenName, boolean invalidTenant,
             boolean useUser, boolean usePassword) {
 
         AccountsCommon account = new AccountsCommon();
@@ -86,11 +87,10 @@ public class AccountFactory {
         if (!invalidTenant) {
             //tenant is not required to be added during create, service layer
             //picks up tenant from security context if needed
-            if (addTenant) {
-                at.setTenantId("1");
+            if (tenantId != null) {
+                at.setTenantId(tenantId);
                 atList.add(at);
                 account.setTenants(atList);
-                addTenant = !addTenant;
             }
         } else {
             //use invalid tenant id...called from validation test

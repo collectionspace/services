@@ -86,7 +86,8 @@ public class AuthorizationSeed {
             throws Exception {
         for (Permission p : permList.getPermissions()) {
             if (logger.isDebugEnabled()) {
-                logger.debug("adding permission for res=" + p.getResourceName());
+                logger.debug("adding permission for res=" + p.getResourceName() +
+                        " for tenant=" + p.getTenantId());
             }
             for (PermissionRole pr : permRoleList.getPermissionRoles()) {
                 if (pr.getPermissions().get(0).getPermissionId().equals(p.getCsid())) {

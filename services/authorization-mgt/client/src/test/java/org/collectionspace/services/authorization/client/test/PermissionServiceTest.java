@@ -62,8 +62,6 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     /** The known resource id. */
     private String knownResourceId = null;
     private String knownResource = "accounts-test";
-    /** The add tenant. */
-    boolean addTenant = true;
     /*
      * This method is called only by the parent class, AbstractServiceTestImpl
      */
@@ -413,7 +411,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        int EXPECTED_ITEMS = 5; //seeded permissions
+        int EXPECTED_ITEMS = 9; //seeded permissions
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": received = " + list.getPermissions().size()
                     + " expected=" + EXPECTED_ITEMS);
