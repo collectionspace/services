@@ -142,7 +142,7 @@
                     <mainClass>org.collectionspace.ImportAuthz</mainClass>
                     <arguments>
                         <argument>-u</argument>
-                        <argument>test</argument>
+                        <argument>tommy</argument>
                         <argument>-p</argument>
                         <argument>test</argument>
                         <argument>-b</argument>

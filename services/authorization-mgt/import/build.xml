@@ -134,7 +134,7 @@
     </target>
 
 
-    <target name="setup_hibernate.cfg" description="replace property keywords in hibernate.cfg.xml">
+    <target name="setup_hibernate.cfg" description="replace property keywords in hibernate.cfg.xml" depends="install">
         <property name="src.hibernate.cfg" value="${basedir}/src/main/resources/hibernate.cfg.xml"/>
         <property name="dest.hibernate.cfg" value="${basedir}/target/classes/hibernate.cfg.xml"/>
         <delete file="${dest.hibernate.cfg}" verbose="true" />
