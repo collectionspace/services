@@ -22,7 +22,6 @@
  *  limitations under the License.
 
  */
-
 package org.collectionspace.services.authorization.storage;
 
 import java.util.ArrayList;
@@ -46,24 +45,22 @@ public class PermissionJpaFilter extends JpaDocumentFilter {
      * @param ctx the ctx
      */
     public PermissionJpaFilter(ServiceContext ctx) {
-    	super(ctx);
+        super(ctx);
     }
-    
+
     @Override
     public List<ParamBinding> buildWhereForSearch(StringBuilder queryStrBldr) {
 
         List<ParamBinding> paramList = new ArrayList<ParamBinding>();
-        boolean hasWhere = false;
-        //TODO: add tenant id
 
         String resName = null;
         List<String> rn = getQueryParam(PermissionStorageConstants.Q_RESOURCE_NAME);
         if (null != rn && rn.size() > 0) {
             resName = rn.get(0);
         }
+        queryStrBldr.append(addTenant(false, paramList));
         if (null != resName && !resName.isEmpty()) {
-            hasWhere = true;
-            queryStrBldr.append(" WHERE");
+            queryStrBldr.append(" AND");
             queryStrBldr.append(" UPPER(a." + PermissionStorageConstants.RESOURCE_NAME + ")");
             queryStrBldr.append(" LIKE");
             queryStrBldr.append(" :" + PermissionStorageConstants.Q_RESOURCE_NAME);

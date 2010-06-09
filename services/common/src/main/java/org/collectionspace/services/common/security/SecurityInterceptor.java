@@ -73,10 +73,10 @@ public class SecurityInterceptor implements PreProcessInterceptor {
         checkActive();
         AuthZ authZ = AuthZ.get();
         CSpaceResource res = new URIResourceImpl(resName, httpMethod);
-/*
-  TEMPORARILY commented out by Aron per Sanjay's suggestion in CSPACE-1946.
-  NOTE: This effectively DISABLES authorization checks at the services layer.
- */
+        /*
+        TEMPORARILY commented out by Aron per Sanjay's suggestion in CSPACE-1946.
+        NOTE: This effectively DISABLES authorization checks at the services layer.
+         */
         if (!authZ.isAccessAllowed(res)) {
             logger.error("Access to " + res.getId() + " is NOT allowed to "
                     + " user=" + AuthN.get().getUserId());
@@ -86,7 +86,8 @@ public class SecurityInterceptor implements PreProcessInterceptor {
         }
         if (logger.isDebugEnabled()) {
             logger.debug("Access to " + res.getId() + " is allowed to "
-                    + " user=" + AuthN.get().getUserId());
+                    + " user=" + AuthN.get().getUserId() +
+                    " for tenant id=" + AuthN.get().getCurrentTenantName());
         }
         return null;
     }
@@ -97,7 +98,7 @@ public class SecurityInterceptor implements PreProcessInterceptor {
      */
     private void checkActive() throws WebApplicationException {
         String userId = AuthN.get().getUserId();
-
+        String tenantId = AuthN.get().getCurrentTenantId();
         try {
             //can't use JAXB here as this runs from the common jar which cannot
             //depend upon the account service

@@ -40,24 +40,21 @@ public class AccountJpaFilter extends JpaDocumentFilter {
     private final Logger logger = LoggerFactory.getLogger(AccountJpaFilter.class);
 
     public AccountJpaFilter(ServiceContext ctx) {
-    	super(ctx);
+        super(ctx);
     }
-    
+
     @Override
     public List<ParamBinding> buildWhereForSearch(StringBuilder queryStrBldr) {
 
         List<ParamBinding> paramList = new ArrayList<ParamBinding>();
-        boolean hasWhere = false;
-        //TODO: add tenant id
-
         String screenName = null;
         List<String> snvals = getQueryParam(AccountStorageConstants.Q_SCREEN_NAME);
         if (null != snvals && snvals.size() > 0) {
             screenName = snvals.get(0);
         }
+        queryStrBldr.append(addTenant(false, paramList));
         if (null != screenName && !screenName.isEmpty()) {
-            hasWhere = true;
-            queryStrBldr.append(" WHERE");
+            queryStrBldr.append(" AND");
             queryStrBldr.append(" UPPER(a." + AccountStorageConstants.SCREEN_NAME + ")");
             queryStrBldr.append(" LIKE");
             queryStrBldr.append(" :" + AccountStorageConstants.Q_SCREEN_NAME);
@@ -71,17 +68,12 @@ public class AccountJpaFilter extends JpaDocumentFilter {
             uid = uidvals.get(0);
         }
         if (null != uid && !uid.isEmpty()) {
-            if (hasWhere) {
-                queryStrBldr.append(" AND");
-            } else {
-                queryStrBldr.append(" WHERE");
-            }
+            queryStrBldr.append(" AND");
             queryStrBldr.append(" UPPER(a." + AccountStorageConstants.USER_ID + ")");
             queryStrBldr.append(" LIKE");
             queryStrBldr.append(" :" + AccountStorageConstants.Q_USER_ID);
             paramList.add(new ParamBinding(AccountStorageConstants.Q_USER_ID, "%"
                     + uid.toUpperCase() + "%"));
-            hasWhere = true;
         }
 
         String email = null;
@@ -90,21 +82,18 @@ public class AccountJpaFilter extends JpaDocumentFilter {
             email = emailvals.get(0);
         }
         if (null != email && !email.isEmpty()) {
-            if (hasWhere) {
-                queryStrBldr.append(" AND");
-            } else {
-                queryStrBldr.append(" WHERE");
-            }
+
+            queryStrBldr.append(" AND");
             queryStrBldr.append(" UPPER(a." + AccountStorageConstants.EMAIL + ")");
             queryStrBldr.append(" LIKE");
             queryStrBldr.append(" :" + AccountStorageConstants.Q_EMAIL);
             paramList.add(new ParamBinding(AccountStorageConstants.Q_EMAIL, "%"
                     + email.toUpperCase() + "%"));
-            hasWhere = true;
         }
-
+        
         if (logger.isDebugEnabled()) {
-            logger.debug("query=" + queryStrBldr.toString());
+            String query = queryStrBldr.toString();
+            logger.debug("query=" + query);
         }
 
         return paramList;
@@ -113,5 +102,12 @@ public class AccountJpaFilter extends JpaDocumentFilter {
     @Override
     public List<ParamBinding> buildWhere(StringBuilder queryStrBldr) {
         return new ArrayList<ParamBinding>();
+    }
+
+    @Override
+    protected String addTenant(boolean append, List<ParamBinding> paramList) {
+        String whereClause = " JOIN a.tenants as at WHERE at.tenantId = :tenantId";
+        paramList.add(new ParamBinding("tenantId", getTenantId()));
+        return whereClause;
     }
 }

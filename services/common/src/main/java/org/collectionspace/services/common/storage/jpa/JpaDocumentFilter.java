@@ -47,18 +47,36 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.collectionspace.services.common.storage.jpa;
 
+import java.util.List;
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.context.ServiceContext;
-
 
 /**
  * JPA query specific document filter
  */
 public class JpaDocumentFilter extends DocumentFilter {
-	public JpaDocumentFilter(ServiceContext ctx) {
-		super(ctx);
-	}
+
+    public JpaDocumentFilter(ServiceContext ctx) {
+        super(ctx);
+    }
+
+    /**
+     * addTenant adds tenant id to the where clause
+     * @param append indicates if append to existing where clause
+     * @param paramList
+     * @return whereClause with tenant context
+     */
+    protected String addTenant(boolean append, List<ParamBinding> paramList) {
+        String whereClause = "";
+        if (!append) {
+            whereClause = " WHERE tenantId = :tenantId";
+        } else {
+            whereClause = " AND tenantId = :tenantId";
+        }
+        paramList.add(new ParamBinding("tenantId", getTenantId()));
+        return whereClause;
+    }
 }

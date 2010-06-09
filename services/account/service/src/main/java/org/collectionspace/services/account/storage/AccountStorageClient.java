@@ -24,6 +24,7 @@
 package org.collectionspace.services.account.storage;
 
 import java.util.Date;
+import java.util.HashMap;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import org.collectionspace.services.account.AccountsCommon;
@@ -32,6 +33,7 @@ import org.collectionspace.services.authentication.User;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
@@ -124,6 +126,57 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             throw new DocumentException(e);
         } finally {
             if (em != null) {
+                JpaStorageUtils.releaseEntityManagerFactory(emf);
+            }
+        }
+    }
+
+        @Override
+    public void get(ServiceContext ctx, String id, DocumentHandler handler)
+            throws DocumentNotFoundException, DocumentException {
+        if (ctx == null) {
+            throw new IllegalArgumentException(
+                    "get: ctx is missing");
+        }
+        if (handler == null) {
+            throw new IllegalArgumentException(
+                    "get: handler is missing");
+        }
+        DocumentFilter docFilter = handler.getDocumentFilter();
+        if (docFilter == null) {
+            docFilter = handler.createDocumentFilter();
+        }
+        EntityManagerFactory emf = null;
+        EntityManager em = null;
+        try {
+            handler.prepare(Action.GET);
+            Object o = null;
+            String whereClause = " JOIN a.tenants as at where csid = :csid and at.tenantId = :tenantId";
+            HashMap<String, Object> params = new HashMap<String, Object>();
+            params.put("csid", id);
+            params.put("tenantId", ctx.getTenantId());
+
+            o = JpaStorageUtils.getEntity(
+                    "org.collectionspace.services.account.AccountsCommon", whereClause, params);
+            if (null == o) {
+                if (em != null && em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                String msg = "could not find entity with id=" + id;
+                throw new DocumentNotFoundException(msg);
+            }
+            DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(o);
+            handler.handle(Action.GET, wrapDoc);
+            handler.complete(Action.GET, wrapDoc);
+        } catch (DocumentException de) {
+            throw de;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception ", e);
+            }
+            throw new DocumentException(e);
+        } finally {
+            if (emf != null) {
                 JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }

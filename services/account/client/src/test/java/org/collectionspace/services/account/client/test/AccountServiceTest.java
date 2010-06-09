@@ -22,7 +22,6 @@
  */
 package org.collectionspace.services.account.client.test;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.Response;
 
@@ -42,7 +41,6 @@ import org.testng.annotations.Test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.AfterClass;
 
 /**
  * AccountServiceTest, carries out tests against a
@@ -59,6 +57,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownResourceId = null;
+    private String knownUserId = "barney";
+    private String knownUserPassword = "hithere08";
     /** The add tenant. */
     static boolean addTenant = true;
 
@@ -122,8 +122,9 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         AccountClient client = new AccountClient();
         // Submit the request to the service and store the response.
         AccountsCommon account =
-                createAccountInstance("barney", "barney", "hithere08", "barney@dinoland.com",
-                client.getTenantId(), true, false, true, true);
+                createAccountInstance(knownUserId, knownUserId, knownUserPassword,
+                "barney@dinoland.com", client.getTenantId(),
+                true, false, true, true);
         ClientResponse<Response> res = client.create(account);
         int statusCode = res.getStatus();
 
@@ -166,7 +167,8 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         AccountClient client = new AccountClient();
         AccountsCommon account =
-                createAccountInstance("barney1", "barney", "hithere08", "barney@dinoland.com",
+                createAccountInstance("barney1", knownUserId, knownUserPassword,
+                "barney@dinoland.com",
                 client.getTenantId(), true, false, true, true);
 
         ClientResponse<Response> res = client.create(account);

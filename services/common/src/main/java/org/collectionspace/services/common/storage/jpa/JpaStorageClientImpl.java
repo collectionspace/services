@@ -166,16 +166,13 @@ public class JpaStorageClientImpl implements StorageClient {
             throw new IllegalArgumentException(
                     "get: handler is missing");
         }
-        DocumentFilter docFilter = handler.getDocumentFilter();
-        if (docFilter == null) {
-            docFilter = handler.createDocumentFilter();
-        }
         EntityManagerFactory emf = null;
         EntityManager em = null;
         try {
             handler.prepare(Action.GET);
             Object o = null;
-            o = JpaStorageUtils.getEntity(getEntityName(ctx), id, docFilter);
+            o = JpaStorageUtils.getEntity(getEntityName(ctx), id, 
+                    ctx.getTenantId());
             if (null == o) {
                 if (em != null && em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
@@ -237,7 +234,6 @@ public class JpaStorageClientImpl implements StorageClient {
             queryStrBldr.append(getEntityName(ctx));
             queryStrBldr.append(" a");
             List<DocumentFilter.ParamBinding> params = docFilter.buildWhereForSearch(queryStrBldr);
-            //TODO: add tenant csidReceived
             emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
             String queryStr = queryStrBldr.toString(); //for debugging
@@ -408,13 +404,14 @@ public class JpaStorageClientImpl implements StorageClient {
         try {
             StringBuilder deleteStr = new StringBuilder("DELETE FROM ");
             deleteStr.append(getEntityName(ctx));
-            deleteStr.append(" WHERE csid = :csid");
+            deleteStr.append(" WHERE csid = :csid and tenantId = :tenantId");
             //TODO: add tenant csidReceived
 
             emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
             Query q = em.createQuery(deleteStr.toString());
             q.setParameter("csid", id);
+            q.setParameter("tenantId", ctx.getTenantId());
 
             int rcount = 0;
             em.getTransaction().begin();

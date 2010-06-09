@@ -57,6 +57,7 @@ public class JpaStorageUtils {
         try {
             emf = getEntityManagerFactory();
             em = emf.createEntityManager();
+            //FIXME: it would be nice to verify tenantid as well
             entityFound = em.find(entityClazz, id);
         } finally {
             if (em != null) {
@@ -80,50 +81,57 @@ public class JpaStorageUtils {
             logger.error(msg);
             throw new UnsupportedOperationException(msg);
         }
+        //FIXME: it would be nice to verify tenantid as well
         return em.find(entityClazz, id);
     }
 
     /**
-     * getEntity using whereClause clause from given docFilter
+     * getEntity 
      * @param entityName fully qualified entity name
      * @param id
-     * @param docFilter
+     * @param tenantId
      * @return null if entity is not found
      */
-    public static Object getEntity(String entityName, String id, DocumentFilter docFilter) {
+    public static Object getEntity(String entityName, String id,
+            String tenantId) {
         EntityManagerFactory emf = null;
         EntityManager em = null;
         Object o = null;
+        if (entityName == null) {
+            throw new IllegalArgumentException("entityName is required");
+        }
+        if (id == null) {
+            throw new IllegalArgumentException("id is required");
+        }
+        if (tenantId == null) {
+            throw new IllegalArgumentException("tenantId is required");
+        }
         try {
-            if (docFilter == null) {
-                docFilter = new DocumentFilter();
-            }
             StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
             queryStrBldr.append(entityName);
             queryStrBldr.append(" a");
-            queryStrBldr.append(" WHERE csid = :csid");
-            //TODO: add tenant id
-            String where = docFilter.getWhereClause();
-            if ((null != where) && (where.length() > 0)) {
-                queryStrBldr.append(" AND " + where);
-            }
+            queryStrBldr.append(" WHERE csid = :csid AND tenantId = :tenantId");
             emf = getEntityManagerFactory();
             em = emf.createEntityManager();
             String queryStr = queryStrBldr.toString(); //for debugging
             Query q = em.createQuery(queryStr);
             q.setParameter("csid", id);
-            List<DocumentFilter.ParamBinding> params =
-                    docFilter.buildWhereForSearch(queryStrBldr);
-            for (DocumentFilter.ParamBinding p : params) {
-                q.setParameter(p.getName(), p.getValue());
-            }
+            q.setParameter("tenantId", tenantId);
             o = q.getSingleResult();
         } catch (NoResultException nre) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
             if (logger.isDebugEnabled()) {
-                logger.debug("could not find entity with id=" + id);
+                logger.debug("could not find entity with id=" + id, nre);
+            }
+            //returns null
+        } catch (Exception e) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("could not find entity(2) with id=" + id, e);
             }
             //returns null
         } finally {
@@ -143,6 +151,12 @@ public class JpaStorageUtils {
      */
     public static Object getEntity(String entityName,
             String whereClause, HashMap<String, Object> paramBindings) {
+        if (entityName == null) {
+            throw new IllegalArgumentException("entityName is required");
+        }
+        if (whereClause == null) {
+            throw new IllegalArgumentException("whereClause is required");
+        }
         EntityManagerFactory emf = null;
         EntityManager em = null;
         Object o = null;
@@ -151,7 +165,7 @@ public class JpaStorageUtils {
             queryStrBldr.append(entityName);
             queryStrBldr.append(" a");
             queryStrBldr.append(" " + whereClause);
-
+            //FIXME it would be nice to insert tenant id in the where clause here
             emf = getEntityManagerFactory();
             em = emf.createEntityManager();
             String queryStr = queryStrBldr.toString(); //for debugging
@@ -165,7 +179,15 @@ public class JpaStorageUtils {
                 em.getTransaction().rollback();
             }
             if (logger.isDebugEnabled()) {
-                logger.debug("could not find entity with where=" + whereClause);
+                logger.debug("could not find entity with where=" + whereClause, nre);
+            }
+            //returns null
+        } catch (Exception e) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("could not find entity (2) with where=" + whereClause, e);
             }
             //returns null
         } finally {

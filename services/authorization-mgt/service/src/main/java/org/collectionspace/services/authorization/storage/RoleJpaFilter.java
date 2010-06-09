@@ -39,30 +39,29 @@ public class RoleJpaFilter extends JpaDocumentFilter {
     private final Logger logger = LoggerFactory.getLogger(RoleJpaFilter.class);
 
     public RoleJpaFilter(ServiceContext ctx) {
-    	super(ctx);
+        super(ctx);
     }
-    
+
     @Override
     public List<ParamBinding> buildWhereForSearch(StringBuilder queryStrBldr) {
 
         List<ParamBinding> paramList = new ArrayList<ParamBinding>();
-        boolean hasWhere = false;
-        //TODO: add tenant id
-
         String roleName = null;
         List<String> rn = getQueryParam(RoleStorageConstants.Q_ROLE_NAME);
         if (null != rn && rn.size() > 0) {
             roleName = rn.get(0);
         }
+        queryStrBldr.append(addTenant(false, paramList));
         if (null != roleName && !roleName.isEmpty()) {
-            hasWhere = true;
-            queryStrBldr.append(" WHERE");
+            queryStrBldr.append(" AND");
             queryStrBldr.append(" UPPER(a." + RoleStorageConstants.ROLE_NAME + ")");
             queryStrBldr.append(" LIKE");
             queryStrBldr.append(" :" + RoleStorageConstants.Q_ROLE_NAME);
             paramList.add(new ParamBinding(RoleStorageConstants.Q_ROLE_NAME, "%"
                     + roleName.toUpperCase() + "%"));
+            queryStrBldr.append(addTenant(true, paramList));
         }
+
 
         if (logger.isDebugEnabled()) {
             String query = queryStrBldr.toString();

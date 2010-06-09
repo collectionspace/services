@@ -20,32 +20,30 @@ package org.collectionspace.services.common.document;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
+import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.common.context.ServiceContext;
 
 /**
  * The Class DocumentFilter.
  */
+//FIXME: it would be nice to instantiate the doc filter with the service context
+//so tenant context and other things available from the service context
+//could be utilized while building the where clause.
 public class DocumentFilter {
 
     /** The Constant DEFAULT_PAGE_SIZE_INIT. */
     public static final int DEFAULT_PAGE_SIZE_INIT = 40;
-    
     /** The Constant PAGE_SIZE_DEFAULT_PROPERTY. */
     public static final String PAGE_SIZE_DEFAULT_PROPERTY = "pageSizeDefault";
-    
     /** The default page size. */
     public static int defaultPageSize = DEFAULT_PAGE_SIZE_INIT;
-
     /** The where clause. */
     protected String whereClause;	// Filtering clause. Omit the "WHERE".
-    
     /** The start page. */
     protected int startPage;		// Pagination offset for list results
-    
     /** The page size. */
     protected int pageSize;			// Pagination limit for list results
-    
     //queryParams is not initialized as it would require a multi-valued map implementation
     //unless it is used from opensource lib...this variable holds ref to
     //implementation available in JBoss RESTeasy
@@ -59,7 +57,6 @@ public class DocumentFilter {
 
         /** The name. */
         private String name;
-        
         /** The value. */
         private Object value;
 
@@ -216,15 +213,15 @@ public class DocumentFilter {
      * @param conjunction the conjunction
      */
     public void appendWhereClause(String theWhereClause, String conjunction) {
-    	if (theWhereClause != null && theWhereClause.length() > 0) {
-	        String currentClause = getWhereClause();
-	        if (currentClause != null) {
-	            String newClause = currentClause.concat(conjunction + theWhereClause);
-	            this.setWhereClause(newClause);
-	        } else {
-	        	this.setWhereClause(theWhereClause);
-	        }
-    	}
+        if (theWhereClause != null && theWhereClause.length() > 0) {
+            String currentClause = getWhereClause();
+            if (currentClause != null) {
+                String newClause = currentClause.concat(conjunction + theWhereClause);
+                this.setWhereClause(newClause);
+            } else {
+                this.setWhereClause(theWhereClause);
+            }
+        }
     }
 
     /**
@@ -301,12 +298,12 @@ public class DocumentFilter {
         int newPageSize = DocumentFilter.defaultPageSize;
         if (thePageSizeStr != null) {
             try {
-            	newPageSize = Integer.valueOf(thePageSizeStr);
+                newPageSize = Integer.valueOf(thePageSizeStr);
             } catch (NumberFormatException e) {
                 //FIXME This should cause a warning in the log file and should result in the
                 //FIXME page size being set to the default.  We don't need to throw an exception here.
-                throw new NumberFormatException("Bad value for: " +
-                		IClientQueryParams.PAGE_SIZE_PARAM);
+                throw new NumberFormatException("Bad value for: "
+                        + IClientQueryParams.PAGE_SIZE_PARAM);
             }
         }
 
@@ -323,8 +320,8 @@ public class DocumentFilter {
             try {
                 startPage = Integer.valueOf(startPageStr);
             } catch (NumberFormatException e) {
-                throw new NumberFormatException("Bad value for: " +
-                		IClientQueryParams.START_PAGE_PARAM);
+                throw new NumberFormatException("Bad value for: "
+                        + IClientQueryParams.START_PAGE_PARAM);
             }
         }
     }
@@ -380,5 +377,14 @@ public class DocumentFilter {
      */
     public void setQueryParams(MultivaluedMap<String, String> theQueryParams) {
         this.queryParams = theQueryParams;
+    }
+
+    /**
+     * getTenantId
+     * //FIXME: it would be nice to take tenantId from service context
+     * @return
+     */
+    protected String getTenantId() {
+        return AuthN.get().getCurrentTenantId();
     }
 }
