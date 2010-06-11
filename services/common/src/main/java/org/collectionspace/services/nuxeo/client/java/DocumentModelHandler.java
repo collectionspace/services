@@ -73,11 +73,20 @@ public abstract class DocumentModelHandler<T, TL>
 
     @Override
     public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	// TODO for sub-docs - check to see if the current service context is a multipart input, 
+    	// OR a docfragment, and call a variant to fill the DocModel.
         fillAllParts(wrapDoc);
     }
+    
+    // TODO for sub-docs - Add completeCreate in which we look for set-aside doc fragments 
+    // and create the subitems. We will create service contexts with the doc fragments
+    // and then call 
+
 
     @Override
     public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	// TODO for sub-docs - check to see if the current service context is a multipart input, 
+    	// OR a docfragment, and call a variant to fill the DocModel.
         fillAllParts(wrapDoc);
     }
 

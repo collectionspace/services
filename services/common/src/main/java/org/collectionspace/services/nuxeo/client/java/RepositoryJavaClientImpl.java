@@ -226,6 +226,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
             setCollectionSpaceCoreValues(ctx, doc, Action.CREATE);
             doc = repoSession.createDocument(doc);
             repoSession.save();
+// TODO for sub-docs need to call into the handler to let it deal with subitems. Pass in the id,
+// and assume the handler has the state it needs (doc fragments). 
             handler.complete(Action.CREATE, wrapDoc);
             return id;
         } catch (BadRequestException bre) {

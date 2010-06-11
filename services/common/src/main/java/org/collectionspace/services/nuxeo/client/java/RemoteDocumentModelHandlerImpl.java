@@ -218,6 +218,9 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
     protected void fillPart(InputPart part, DocumentModel docModel, ObjectPartType partMeta)
             throws Exception {
         InputStream payload = part.getBody(InputStream.class, null);
+        
+// TODO for sub-docs - after we parse the doc, we need to look for elements that are configured as 
+// subitem lists, for this part (schema), pull them out, and set them aside for later processing.
 
         //check if this is an xml part
         if(part.getMediaType().equals(MediaType.APPLICATION_XML_TYPE)){
