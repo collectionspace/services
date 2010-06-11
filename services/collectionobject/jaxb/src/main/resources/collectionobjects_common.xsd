@@ -54,8 +54,7 @@
                 <xs:element name="otherNumber" type="xs:string"/>
                 <xs:element name="otherNumberType" type="xs:string"/>
 
-                <xs:element name="briefDescription" type="xs:string"/>
-                <!-- xs:element name="briefDescriptions" type="briefDescriptionList"/ -->
+                <xs:element name="briefDescriptions" type="briefDescriptionList"/>
 
                 <xs:element name="comments" type="xs:string"/>
                 <xs:element name="distinguishingFeatures" type="xs:string"/>

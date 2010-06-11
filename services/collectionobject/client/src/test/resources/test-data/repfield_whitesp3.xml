@@ -4,7 +4,12 @@
 
 <otherNumber>XXX</otherNumber>
 <otherNumberType>otherNumberType</otherNumberType>
-<briefDescription>briefDescription</briefDescription>
+<briefDescriptions>
+<!-- test childnode as whitespace -->
+<briefDescription> briefDescription1</briefDescription>
+<briefDescription>briefDescription2</briefDescription>
+</briefDescriptions>
+
 <comments>comments</comments>
 <distinguishingFeatures>distFeatures</distinguishingFeatures>
 <numberOfObjects>numberOfObjects</numberOfObjects>

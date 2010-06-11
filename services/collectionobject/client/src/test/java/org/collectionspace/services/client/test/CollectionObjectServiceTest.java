@@ -66,9 +66,6 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownResourceId = null;
-    
-    /** The multivalue. */
-    private boolean multivalue; //toggle
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
@@ -1052,27 +1049,21 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
             String objectNumber, String objectName) {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
 
- /*
         BriefDescriptionList descriptionList = new BriefDescriptionList();
         List<String> descriptions = descriptionList.getBriefDescription();
         descriptions.add("Papier mache bird cow mask with horns, "
                 + "painted red with black and yellow spots. "
                 + "Puerto Rico. ca. 8&quot; high, 6&quot; wide, projects 10&quot; (with horns).");
- */
+        descriptions.add("Papier mache bird cow mask with horns, "
+                + "painted red with black and yellow spots. "
+                + "Puerto Rico. ca. 8&quot; high, 6&quot; wide, projects 10&quot; (with horns).");
 
         ResponsibleDepartmentList deptList = new ResponsibleDepartmentList();
         List<String> depts = deptList.getResponsibleDepartment();
         // @TODO Use properly formatted refNames for representative departments
         // in this example test record. The following are mere placeholders.
         depts.add("urn:org.collectionspace.services.department:Registrar");
-        if (multivalue == true) {
-            depts.add("urn:org.walkerart.department:Fine Art");
-        }
-        //
-        // FIXME: REM - Can someone please document why we are toggling this
-        // value?  Thanks.
-        //
-        multivalue = !multivalue;
+        depts.add("urn:org.walkerart.department:Fine Art");
 
         OtherNumberList otherNumList = new OtherNumberList();
         List<OtherNumber> otherNumbers = otherNumList.getOtherNumber();
@@ -1093,14 +1084,14 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         collectionObject.setObjectNumber(objectNumber);
         
         collectionObject.setOtherNumberList(otherNumList);
+
+        // FIXME this can be removed when the repeatable other number list
+        // is supported by the application layers
         collectionObject.setOtherNumber("urn:org.walkerart.id:123");
         
         collectionObject.setObjectName(objectName);
         collectionObject.setAge(""); //test for null string
-        // collectionObject.setBriefDescriptions(descriptionList);
-        collectionObject.setBriefDescription("Papier mache bird cow mask with horns, "
-                + "painted red with black and yellow spots. "
-                + "Puerto Rico. ca. 8&quot; high, 6&quot; wide, projects 10&quot; (with horns).");
+        collectionObject.setBriefDescriptions(descriptionList);
 
         CollectionobjectsNaturalhistory conh = new CollectionobjectsNaturalhistory();
         conh.setNhString("test-string");

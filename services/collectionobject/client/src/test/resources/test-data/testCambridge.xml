@@ -11,7 +11,7 @@
   <objectNumber>objectNumber</objectNumber>
   <otherNumber>XXX</otherNumber>
   <otherNumberType>otherNumberType</otherNumberType>
-  <briefDescription>briefDescription</briefDescription>
+  <!-- briefDescription>briefDescription</briefDescription -->
   <comments>comments</comments>
   <distinguishingFeatures>distFeatures</distinguishingFeatures>
   <numberOfObjects>numberOfObjects</numberOfObjects>
