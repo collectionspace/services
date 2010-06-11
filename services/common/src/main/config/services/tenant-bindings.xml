@@ -663,7 +663,31 @@
         <tenant:serviceBindings name="Relations" version="0.1">
             <!-- other URI paths using which this service could be accessed -->'
             <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                relations/subject/*/type/*/object/*
+                /relations/object/*
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /relations/object/*/type/*
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /relations/subject/*
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /relations/subject/*/type/*
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /relations/subject/*/type/*/object/*
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /relations/type/*
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /relations/type/*/object/*
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /relations/type/*/subject/*
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /relations/type/*/subject/*/object/*
             </service:uriPath>
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
@@ -1684,7 +1708,31 @@
         <tenant:serviceBindings name="Relations" version="0.1">
             <!-- other URI paths using which this service could be accessed -->'
             <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                relations/subject/*/type/*/object/*
+                /relations/object/*
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /relations/object/*/type/*
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /relations/subject/*
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /relations/subject/*/type/*
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /relations/subject/*/type/*/object/*
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /relations/type/*
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /relations/type/*/object/*
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /relations/type/*/subject/*
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /relations/type/*/subject/*/object/*
             </service:uriPath>
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 pahma-domain
