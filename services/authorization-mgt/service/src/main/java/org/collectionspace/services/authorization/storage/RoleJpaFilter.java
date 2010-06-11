@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentFilter;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,9 +52,16 @@ public class RoleJpaFilter extends JpaDocumentFilter {
         if (null != rn && rn.size() > 0) {
             roleName = rn.get(0);
         }
-        queryStrBldr.append(addTenant(false, paramList));
+        boolean csAdmin = SecurityUtils.isCSpaceAdmin();
+        if (!csAdmin) {
+            queryStrBldr.append(addTenant(false, paramList));
+        }
         if (null != roleName && !roleName.isEmpty()) {
-            queryStrBldr.append(" AND");
+            if (!csAdmin) {
+                queryStrBldr.append(" AND");
+            } else {
+                queryStrBldr.append(" WHERE");
+            }
             queryStrBldr.append(" UPPER(a." + RoleStorageConstants.ROLE_NAME + ")");
             queryStrBldr.append(" LIKE");
             queryStrBldr.append(" :" + RoleStorageConstants.Q_ROLE_NAME);

@@ -36,6 +36,7 @@ import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.JaxbUtils;
+import org.collectionspace.services.common.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -197,7 +198,9 @@ public class PermissionDocumentHandler
      * @param permission
      */
     private void sanitize(Permission permission) {
-        permission.setTenantId(null);
+        if (!SecurityUtils.isCSpaceAdmin()) {
+            permission.setTenantId(null);
+        }
     }
 
     private void setTenant(Permission permission) {

@@ -37,6 +37,7 @@ import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.JaxbUtils;
+import org.collectionspace.services.common.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -212,7 +213,9 @@ public class AccountDocumentHandler
      */
     private void sanitize(AccountsCommon account) {
         account.setPassword(null);
-        account.setTenants(new ArrayList<AccountTenant>(0));
+        if (!SecurityUtils.isCSpaceAdmin()) {
+            account.setTenants(new ArrayList<AccountTenant>(0));
+        }
     }
 
     /* (non-Javadoc)

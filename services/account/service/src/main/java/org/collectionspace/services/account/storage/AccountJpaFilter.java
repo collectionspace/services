@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentFilter;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,9 +53,16 @@ public class AccountJpaFilter extends JpaDocumentFilter {
         if (null != snvals && snvals.size() > 0) {
             screenName = snvals.get(0);
         }
-        queryStrBldr.append(addTenant(false, paramList));
+        boolean csAdmin = SecurityUtils.isCSpaceAdmin();
+        if (!csAdmin) {
+            queryStrBldr.append(addTenant(false, paramList));
+        }
         if (null != screenName && !screenName.isEmpty()) {
-            queryStrBldr.append(" AND");
+            if (!csAdmin) {
+                queryStrBldr.append(" AND");
+            } else {
+                queryStrBldr.append(" WHERE");
+            }
             queryStrBldr.append(" UPPER(a." + AccountStorageConstants.SCREEN_NAME + ")");
             queryStrBldr.append(" LIKE");
             queryStrBldr.append(" :" + AccountStorageConstants.Q_SCREEN_NAME);
@@ -68,7 +76,11 @@ public class AccountJpaFilter extends JpaDocumentFilter {
             uid = uidvals.get(0);
         }
         if (null != uid && !uid.isEmpty()) {
-            queryStrBldr.append(" AND");
+            if (!csAdmin) {
+                queryStrBldr.append(" AND");
+            } else {
+                queryStrBldr.append(" WHERE");
+            }
             queryStrBldr.append(" UPPER(a." + AccountStorageConstants.USER_ID + ")");
             queryStrBldr.append(" LIKE");
             queryStrBldr.append(" :" + AccountStorageConstants.Q_USER_ID);
@@ -83,14 +95,18 @@ public class AccountJpaFilter extends JpaDocumentFilter {
         }
         if (null != email && !email.isEmpty()) {
 
-            queryStrBldr.append(" AND");
+            if (!csAdmin) {
+                queryStrBldr.append(" AND");
+            } else {
+                queryStrBldr.append(" WHERE");
+            }
             queryStrBldr.append(" UPPER(a." + AccountStorageConstants.EMAIL + ")");
             queryStrBldr.append(" LIKE");
             queryStrBldr.append(" :" + AccountStorageConstants.Q_EMAIL);
             paramList.add(new ParamBinding(AccountStorageConstants.Q_EMAIL, "%"
                     + email.toUpperCase() + "%"));
         }
-        
+
         if (logger.isDebugEnabled()) {
             String query = queryStrBldr.toString();
             logger.debug("query=" + query);
@@ -106,8 +122,9 @@ public class AccountJpaFilter extends JpaDocumentFilter {
 
     @Override
     protected String addTenant(boolean append, List<ParamBinding> paramList) {
+        String tenantId = getTenantId();
         String whereClause = " JOIN a.tenants as at WHERE at.tenantId = :tenantId";
-        paramList.add(new ParamBinding("tenantId", getTenantId()));
+        paramList.add(new ParamBinding("tenantId", tenantId));
         return whereClause;
     }
 }

@@ -24,7 +24,6 @@
 package org.collectionspace.services.authorization.storage;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,6 +35,7 @@ import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.JaxbUtils;
+import org.collectionspace.services.common.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -180,7 +180,9 @@ public class RoleDocumentHandler
      * @param roleFound
      */
     private void sanitize(Role role) {
-        role.setTenantId(null);
+        if (!SecurityUtils.isCSpaceAdmin()) {
+            role.setTenantId(null);
+        }
     }
 
     private String fixRoleName(String role) {

@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.authorization.storage;
 
+import java.util.HashMap;
 import java.util.List;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionRoleRel;
@@ -31,6 +32,7 @@ import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextProperties;
+import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 
 /**
  *
@@ -82,7 +84,7 @@ public class PermissionRoleUtil {
             }
         }
     }
-    
+
     static private PermissionRoleRel buildPermissonRoleRel(PermissionValue pv, RoleValue rv) {
         PermissionRoleRel prr = new PermissionRoleRel();
         prr.setPermissionId(pv.getPermissionId());
@@ -90,5 +92,26 @@ public class PermissionRoleUtil {
         prr.setRoleId(rv.getRoleId());
         prr.setRoleName(rv.getRoleName());
         return prr;
+    }
+
+    static boolean isInvalidTenant(String tenantId, StringBuilder msgBldr) {
+        boolean invalid = false;
+
+        if (tenantId == null || tenantId.isEmpty()) {
+            invalid = true;
+            msgBldr.append("\n tenant : tenantId is missing");
+        }
+        String whereClause = "where id = :id";
+        HashMap<String, Object> params = new HashMap<String, Object>();
+        params.put("id", tenantId);
+
+        Object tenantFound = JpaStorageUtils.getEntity(
+                "org.collectionspace.services.account.Tenant", whereClause, params);
+        if (tenantFound == null) {
+            invalid = true;
+            msgBldr.append("\n tenant : tenantId=" + tenantId
+                    + " not found");
+        }
+        return invalid;
     }
 }

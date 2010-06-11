@@ -22,6 +22,7 @@
  */
 package org.collectionspace.services.common.security;
 
+import org.collectionspace.authentication.AuthN;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +65,24 @@ public class SecurityUtils {
             String msg = "Password length should be >8 and <24";
             logger.error(msg);
             throw new IllegalArgumentException(msg);
+        }
+    }
+
+    /**
+     * isCSpaceAdmin check if authenticated user is a CSpace administrator
+     * @param tenantId
+     * @return
+     */
+    public static boolean isCSpaceAdmin() {
+        String tenantId = AuthN.get().getCurrentTenantId();
+        if (tenantId != null) {
+            if (!"0".equals(tenantId)) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return false;
         }
     }
 }

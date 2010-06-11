@@ -35,6 +35,7 @@ import org.collectionspace.services.authorization.PermissionAction;
 import org.collectionspace.services.authorization.PermissionException;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
+import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.authorization.URIResourceImpl;
@@ -80,12 +81,19 @@ public class AuthorizationDelegate {
             }
         } else if (SubjectType.PERMISSION.equals(subject)) {
             RoleValue rv = pr.getRoles().get(0);
+            Role r = getRole(rv.getRoleId());
+            if (r == null) {
+                String msg = "addPermissions: No role found for id=" + rv.getRoleId();
+                logger.error(msg);
+                throw new DocumentNotFoundException(msg);
+            }
             String[] roles = {rv.getRoleName()};
             for (PermissionValue pv : pr.getPermissions()) {
                 Permission p = getPermission(pv.getPermissionId());
                 if (p == null) {
                     String msg = "addPermissions: No permission found for id=" + pv.getPermissionId();
                     logger.error(msg);
+                    //TODO: would be nice contiue to still send 400 back
                     continue;
                 }
                 CSpaceResource[] resources = getResources(p);
@@ -155,10 +163,14 @@ public class AuthorizationDelegate {
     private static String[] getRoles(List<RoleValue> rvl) {
         List<String> rvls = new ArrayList<String>();
         for (RoleValue rv : rvl) {
-            //assumption: rolename is relationship metadata is mandatory
-            if (rv.getRoleName() != null) {
-                rvls.add(rv.getRoleName());
+            Role r = getRole(rv.getRoleId());
+            if (r == null) {
+                String msg = "getRoles: No role found for id=" + rv.getRoleId();
+                logger.error(msg);
+                //TODO: would be nice contiue to still send 400 back
+                continue;
             }
+            rvls.add(r.getRoleName());
         }
         return rvls.toArray(new String[0]);
     }
@@ -174,9 +186,14 @@ public class AuthorizationDelegate {
         List<CSpaceResource> rl = new ArrayList<CSpaceResource>();
 
         for (PermissionAction pa : p.getActions()) {
-
-            CSpaceResource res = new URIResourceImpl(p.getResourceName(),
-                    getAction(pa.getName()));
+            CSpaceResource res = null;
+            if (p.getTenantId() == null) {
+                res = new URIResourceImpl(p.getResourceName(),
+                        getAction(pa.getName()));
+            } else {
+                res = new URIResourceImpl(p.getTenantId(), p.getResourceName(),
+                        getAction(pa.getName()));
+            }
             rl.add(res);
         }
         return rl.toArray(new CSpaceResource[0]);
@@ -186,6 +203,12 @@ public class AuthorizationDelegate {
         Permission p = (Permission) JpaStorageUtils.getEntity(permCsid,
                 Permission.class);
         return p;
+    }
+
+    private static Role getRole(String roleCsid) {
+        Role r = (Role) JpaStorageUtils.getEntity(roleCsid,
+                Role.class);
+        return r;
     }
 
     /**

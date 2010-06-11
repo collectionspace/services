@@ -24,13 +24,12 @@
 package org.collectionspace.services.common.storage.jpa;
 
 import java.util.HashMap;
-import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
-import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,13 +109,19 @@ public class JpaStorageUtils {
             StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
             queryStrBldr.append(entityName);
             queryStrBldr.append(" a");
-            queryStrBldr.append(" WHERE csid = :csid AND tenantId = :tenantId");
+            queryStrBldr.append(" WHERE csid = :csid");
+            boolean csAdmin = SecurityUtils.isCSpaceAdmin();
+            if (!csAdmin) {
+                queryStrBldr.append(" AND tenantId = :tenantId");
+            }
             emf = getEntityManagerFactory();
             em = emf.createEntityManager();
             String queryStr = queryStrBldr.toString(); //for debugging
             Query q = em.createQuery(queryStr);
             q.setParameter("csid", id);
-            q.setParameter("tenantId", tenantId);
+            if (!csAdmin) {
+                q.setParameter("tenantId", tenantId);
+            }
             o = q.getSingleResult();
         } catch (NoResultException nre) {
             if (em != null && em.getTransaction().isActive()) {
