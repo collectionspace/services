@@ -214,6 +214,39 @@ public enum ServiceRequestType {
             return javax.ws.rs.HttpMethod.DELETE;
         }
     },
+    SEARCH {
+
+        @Override
+        public int[] validStatusCodes() {
+            final int[] STATUS_CODES = {
+                Response.Status.OK.getStatusCode(),
+                Response.Status.UNAUTHORIZED.getStatusCode(),
+                Response.Status.FORBIDDEN.getStatusCode(),
+                Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()
+            };
+            Arrays.sort(STATUS_CODES);
+            return STATUS_CODES;
+        }
+
+        @Override
+        public boolean isValidStatusCode(int statusCode) {
+            if (Arrays.binarySearch(SEARCH.validStatusCodes(), statusCode) >= 0) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public String validStatusCodesAsString() {
+            return Arrays.toString(SEARCH.validStatusCodes());
+        }
+
+        @Override
+        public String httpMethodName() {
+            return javax.ws.rs.HttpMethod.GET;
+        }
+    },
     // Used by guard code.
     NON_EXISTENT {
 

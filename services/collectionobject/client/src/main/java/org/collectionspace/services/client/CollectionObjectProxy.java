@@ -101,10 +101,9 @@ public interface CollectionObjectProxy extends CollectionSpaceProxy {
      * @return the client response
      */
     @GET
-    @Path("/search")
     @Produces({"application/xml"})
     ClientResponse<CollectionobjectsCommonList> keywordSearch(
-    		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords);
+    		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
 
     //(C)reate
     /**
