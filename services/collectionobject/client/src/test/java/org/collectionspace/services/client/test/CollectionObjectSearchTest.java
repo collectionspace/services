@@ -163,33 +163,6 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
     public void keywordSearchRepeatableScalarField(String testName) throws Exception {
     }
 
-    private void createCollectionObjects(long numToCreate, String keywords) {
-        testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
-        CollectionObjectClient client = new CollectionObjectClient();
-        for (long i = 0; i < numToCreate; i++) {
-            MultipartOutput multipart = createCollectionObjectInstance(keywords);
-            ClientResponse<Response> res = client.create(multipart);
-            try {
-                int statusCode = res.getStatus();
-                Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-                allResourceIdsCreated.add(extractId(res));
-            } finally {
-                res.releaseConnection();
-            }
-        }
-    }
-
-    private MultipartOutput createCollectionObjectInstance(String keywords) {
-        CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
-        collectionObject.setObjectNumber(createIdentifier());
-        collectionObject.setTitle(keywords);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(collectionObject,
-                MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new CollectionObjectClient().getCommonPartName());
-        return multipart;
-    }
-
     // Failure outcomes
 
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
@@ -265,6 +238,33 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+    
+    private void createCollectionObjects(long numToCreate, String keywords) {
+        testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
+        CollectionObjectClient client = new CollectionObjectClient();
+        for (long i = 0; i < numToCreate; i++) {
+            MultipartOutput multipart = createCollectionObjectInstance(keywords);
+            ClientResponse<Response> res = client.create(multipart);
+            try {
+                int statusCode = res.getStatus();
+                Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+                allResourceIdsCreated.add(extractId(res));
+            } finally {
+                res.releaseConnection();
+            }
+        }
+    }
+
+    private MultipartOutput createCollectionObjectInstance(String keywords) {
+        CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
+        collectionObject.setObjectNumber(createIdentifier());
+        collectionObject.setTitle(keywords);
+        MultipartOutput multipart = new MultipartOutput();
+        OutputPart commonPart = multipart.addPart(collectionObject,
+                MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", new CollectionObjectClient().getCommonPartName());
+        return multipart;
+    }
 
     private void itemizeListItems(CollectionobjectsCommonList list) {
         List<CollectionobjectsCommonList.CollectionObjectListItem> items =
