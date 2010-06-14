@@ -196,7 +196,7 @@ public class PermissionRoleSubResource
      * csid of object (permission/role) and subject (role/permission)
      * @param csid
      * @param subject
-     * @param input with role and permissions to delete
+     * @param input with role and permission relationships to delete
      * @return
      * @throws Exception
      */

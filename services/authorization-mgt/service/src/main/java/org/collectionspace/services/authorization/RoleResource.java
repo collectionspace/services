@@ -350,6 +350,12 @@ public class RoleResource
             throw new WebApplicationException(response);
         }
         try {
+            //FIXME ideally the following two ops should be in the same tx CSPACE-658
+            //delete all relationships for this permission
+            PermissionRoleSubResource subResource =
+                    new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
+            subResource.deletePermissionRole(csid, SubjectType.PERMISSION);
+
             ServiceContext ctx = createServiceContext((Role) null, Role.class);
             ((JpaStorageClientImpl) getStorageClient(ctx)).deleteWhere(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();

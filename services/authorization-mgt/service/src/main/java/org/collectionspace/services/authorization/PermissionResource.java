@@ -348,14 +348,14 @@ public class PermissionResource
             throw new WebApplicationException(response);
         }
         try {
-            //FIXME ideally the following two ops shoudl be in the same tx CSPACE-658
+            //FIXME ideally the following two ops should be in the same tx CSPACE-658
             //delete all relationships for this permission
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.PERMISSION_PERMROLE_SERVICE);
             subResource.deletePermissionRole(csid, SubjectType.ROLE);
-            //delete permissions at the provider too
-            //at the PermissionRoleSubResource/DocHandler levels, there is no visibility
-            //if permission is deleted
+            //delete permissions in the authz provider too
+            //at the PermissionRoleSubResource/DocHandler level, there is no visibility
+            //if permission is deleted, so do it here
             AuthorizationDelegate.deletePermissions(csid);
 
             ServiceContext<Permission, Permission> ctx = createServiceContext((Permission) null, Permission.class);
