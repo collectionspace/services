@@ -90,7 +90,6 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
 
     private final String CLASS_NAME = AuthorizationServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    
     // Instance variables specific to this test.
     private String knownResourceId = null;
     private List<String> allResourceIdsCreated = new ArrayList();
@@ -371,7 +370,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"read", "readList", "readNonExistent"})
     public void updateNotAllowed(String testName) throws Exception {
-        
+
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
@@ -431,7 +430,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"updateNotAllowed"})
     public void deleteNotAllowed(String testName) throws Exception {
-        
+
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
@@ -460,7 +459,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"deleteNotAllowed"})
     public void delete(String testName) throws Exception {
-        
+
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
@@ -520,9 +519,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
 
-        //FIXME delete on permission role deletes all roles associated with the permission
-        //this would delete association with ROLE_ADMINISTRATION too
-        //deletePermissionRoles();
+        deletePermissionRoles();
         deleteAccountRoles();
         //FIXME delete on permission role deletes all roles associated with the permission
         //this would delete association with ROLE_ADMINISTRATION too
@@ -684,7 +681,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     private String createPermissionRole(PermissionValue pv,
             Collection<RoleValue> rvs) {
         setupCreate();
-                List<RoleValue> rvls = new ArrayList<RoleValue>();
+        List<RoleValue> rvls = new ArrayList<RoleValue>();
         rvls.addAll(rvs);
         PermissionRole permRole = PermissionRoleFactory.createPermissionRoleInstance(
                 pv, rvls, true, true);
@@ -702,14 +699,19 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         return extractId(res);
     }
 
-    private void deletePermissionRole(String permId) {
+    private void deletePermissionRole(PermissionValue pv,
+            Collection<RoleValue> rvs) {
+        List<RoleValue> rvls = new ArrayList<RoleValue>();
+        rvls.addAll(rvs);
 
         // Perform setup.
         setupDelete();
 
         // Submit the request to the service and store the response.
         PermissionRoleClient client = new PermissionRoleClient();
-        ClientResponse<Response> res = client.delete(permId, "123");
+        PermissionRole permRole = PermissionRoleFactory.createPermissionRoleInstance(
+                pv, rvls, true, true);
+        ClientResponse<Response> res = client.delete(pv.getPermissionId(), permRole);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -725,10 +727,14 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
 
     private void deletePermissionRoles() {
 
-        //first delete relationships between the entities
-        for (PermissionValue pv : permValues.values()) {
-            deletePermissionRole(pv.getPermissionId());
-        }
+        List<RoleValue> bigbirdRoleValues = new ArrayList<RoleValue>();
+        bigbirdRoleValues.add(roleValues.get("ROLE_TEST_CM"));
+        deletePermissionRole(permValues.get(bigbirdPermId), bigbirdRoleValues);
+
+        List<RoleValue> elmoRoleValues = new ArrayList<RoleValue>();
+        elmoRoleValues.add(roleValues.get("ROLE_TEST_INTERN"));
+        deletePermissionRole(permValues.get(elmoPermId), elmoRoleValues);
+
     }
 
     private void deleteAccountRoles() {
@@ -756,7 +762,6 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
             deleteAccount(av1.getAccountId());
         }
     }
-
 
     private String getTenantId(AccountClient client) {
         return client.getProperty(AccountClient.TENANT_PROPERTY);

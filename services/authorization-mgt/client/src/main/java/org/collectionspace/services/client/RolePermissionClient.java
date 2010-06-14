@@ -68,8 +68,8 @@ public class RolePermissionClient extends AbstractServiceClientImpl {
      */
     @Override
     public CollectionSpaceProxy getProxy() {
-    	return this.rolePermissionProxy;
-    }    
+        return this.rolePermissionProxy;
+    }
 
     /**
      * allow to reset proxy as per security needs.
@@ -84,7 +84,6 @@ public class RolePermissionClient extends AbstractServiceClientImpl {
         }
     }
 
-
     /**
      * Read.
      *
@@ -98,7 +97,7 @@ public class RolePermissionClient extends AbstractServiceClientImpl {
     }
 
     /**
-     * Creates the.
+     * Creates the relationships.
      *
      * @param csid the csid
      * @param permRole the perm role
@@ -110,15 +109,12 @@ public class RolePermissionClient extends AbstractServiceClientImpl {
     }
 
     /**
-     * Delete.
-     *
-     * @param csid the csid
-     * @param prcsid relationship does not have an id, junk is fine
-     * @return response
-     * @see
+     * delete given relationships between given role and permission(s)
+     * @param csid
+     * @param permRole
+     * @return
      */
-    public ClientResponse<Response> delete(String csid, String prcsid) {
-        return rolePermissionProxy.delete(csid, prcsid);
+    public ClientResponse<Response> delete(String csid, PermissionRole permRole) {
+        return rolePermissionProxy.delete(csid, "delete", permRole);
     }
-        
 }

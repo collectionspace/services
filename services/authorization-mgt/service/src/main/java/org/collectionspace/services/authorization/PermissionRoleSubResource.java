@@ -190,4 +190,24 @@ public class PermissionRoleSubResource
         ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext((PermissionRole) null, subject);
         getStorageClient(ctx).delete(ctx, csid);
     }
+
+    /**
+     * deletePermissionRole deletes permission-role relationships using given
+     * csid of object (permission/role) and subject (role/permission)
+     * @param csid
+     * @param subject
+     * @param input with role and permissions to delete
+     * @return
+     * @throws Exception
+     */
+    public void deletePermissionRole(String csid,
+            SubjectType subject, PermissionRole input) throws Exception {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("deletePermissionRole(input) with csid=" + csid);
+        }
+        ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext(input, subject);
+        DocumentHandler handler = createDocumentHandler(ctx);
+        getStorageClient(ctx).delete(ctx, csid, handler);
+    }
 }

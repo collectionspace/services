@@ -73,10 +73,6 @@ public class SecurityInterceptor implements PreProcessInterceptor {
         checkActive();
         AuthZ authZ = AuthZ.get();
         CSpaceResource res = new URIResourceImpl(resName, httpMethod);
-        /*
-        TEMPORARILY commented out by Aron per Sanjay's suggestion in CSPACE-1946.
-        NOTE: This effectively DISABLES authorization checks at the services layer.
-         */
         if (!authZ.isAccessAllowed(res)) {
             logger.error("Access to " + res.getId() + " is NOT allowed to "
                     + " user=" + AuthN.get().getUserId());

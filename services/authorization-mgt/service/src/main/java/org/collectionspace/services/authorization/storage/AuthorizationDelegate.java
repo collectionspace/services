@@ -113,19 +113,44 @@ public class AuthorizationDelegate {
      */
     static void deletePermissions(ServiceContext ctx, PermissionRole pr)
             throws Exception {
-        PermissionValue pv = pr.getPermissions().get(0);
-        deletePermissions(pv);
-    }
-
-    /**
-     * deletePermissions delete permissions associated with given PermissionValue
-     * @param pv permission value
-     * @throws Exception
-     * @see PermissionValue
-     */
-    static void deletePermissions(PermissionValue pv)
-            throws Exception {
-        deletePermissions(pv.getPermissionId());
+        SubjectType subject = PermissionRoleUtil.getRelationSubject(ctx, pr);
+        AuthZ authz = AuthZ.get();
+        if (subject.equals(SubjectType.ROLE)) {
+            PermissionValue pv = pr.getPermissions().get(0);
+            Permission p = getPermission(pv.getPermissionId());
+            if (p == null) {
+                String msg = "deletePermissions: No permission found for id=" + pv.getPermissionId();
+                logger.error(msg);
+                throw new DocumentNotFoundException(msg);
+            }
+            CSpaceResource[] resources = getResources(p);
+            String[] roles = getRoles(pr.getRoles());
+            for (CSpaceResource res : resources) {
+                authz.deletePermissions(res, roles);
+            }
+        } else if (SubjectType.PERMISSION.equals(subject)) {
+            RoleValue rv = pr.getRoles().get(0);
+            Role r = getRole(rv.getRoleId());
+            if (r == null) {
+                String msg = "deletePermissions: No role found for id=" + rv.getRoleId();
+                logger.error(msg);
+                throw new DocumentNotFoundException(msg);
+            }
+            String[] roles = {rv.getRoleName()};
+            for (PermissionValue pv : pr.getPermissions()) {
+                Permission p = getPermission(pv.getPermissionId());
+                if (p == null) {
+                    String msg = "deletePermissions: No permission found for id=" + pv.getPermissionId();
+                    logger.error(msg);
+                    //TODO: would be nice contiue to still send 400 back
+                    continue;
+                }
+                CSpaceResource[] resources = getResources(p);
+                for (CSpaceResource res : resources) {
+                    authz.deletePermissions(res, roles);
+                }
+            }
+        }
     }
 
     /**

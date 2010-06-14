@@ -520,8 +520,6 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
     // CRUD tests : DELETE tests
     // ---------------------------------------------------------------
     // Success outcomes
- 
-
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     dependsOnMethods = {"deleteNonExistent"})
@@ -632,9 +630,7 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
         //tenant admin users are used to create accounts, roles and permissions and relationships
         //assumption : two tenant admin users exist before running this test
 
-        //FIXME delete on permission role deletes all roles associated with the permission
-        //this would delete association with ROLE_ADMINISTRATION too
-        //deletePermissionRoles();
+        deletePermissionRoles();
         deleteAccountRoles();
         //FIXME delete on permission role deletes all roles associated with the permission
         //this would delete association with ROLE_ADMINISTRATION too
@@ -646,9 +642,12 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
     private void deletePermissionRoles() {
 
         //first delete relationships between the entities
+
         for (String tenantId : tenantPermissions.keySet()) {
+            List<RoleValue> tenantRoleValues = new ArrayList<RoleValue>();
+            tenantRoleValues.add(tenantRoles.get(tenantId));
             PermissionValue pv = tenantPermissions.get(tenantId);
-            deletePermissionRole(tenantId, pv.getPermissionId());
+            deletePermissionRole(tenantId, pv, tenantRoleValues);
         }
     }
 
@@ -866,7 +865,7 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
         return extractId(res);
     }
 
-    private void deletePermissionRole(String tenantId, String permId) {
+    private void deletePermissionRole(String tenantId, PermissionValue pv, List<RoleValue> rvls) {
 
         // Perform setup.
         setupDelete();
@@ -875,7 +874,9 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
         PermissionRoleClient client = new PermissionRoleClient();
         UserInfo ui = tenantAdminUsers.get(tenantId);
         client.setAuth(true, ui.userName, true, ui.password, true);
-        ClientResponse<Response> res = client.delete(permId, "123");
+        PermissionRole permRole = PermissionRoleFactory.createPermissionRoleInstance(
+                pv, rvls, true, true);
+        ClientResponse<Response> res = client.delete(pv.getPermissionId(), permRole);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match

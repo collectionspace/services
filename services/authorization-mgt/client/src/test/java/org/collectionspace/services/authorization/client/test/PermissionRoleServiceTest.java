@@ -459,8 +459,10 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         PermissionRoleClient client = new PermissionRoleClient();
         ClientResponse<Response> res = null;
         try {
-            res = client.delete(
-                    permValues.get(TEST_SERVICE_NAME + TEST_MARKER).getPermissionId(), "123");
+            PermissionValue pv = permValues.get(TEST_SERVICE_NAME + TEST_MARKER);
+        PermissionRole permRole = createPermissionRoleInstance(pv,
+                roleValues.values(), true, true);
+            res = client.delete(pv.getPermissionId(), permRole);
             int statusCode = res.getStatus();
 
             // Check the status code of the response: does it match
@@ -562,24 +564,6 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         }
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
-        }
-
-        PermissionRoleClient client = new PermissionRoleClient();
-        for (String resourceId : allResourceIdsCreated) {
-
-            ClientResponse<Response> res = client.delete(resourceId, "123");
-            int statusCode = res.getStatus();
-            try {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("cleanup: delete relationships for permission id="
-                            + resourceId + " status=" + statusCode);
-                }
-                Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-                Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-            } finally {
-                res.releaseConnection();
-            }
         }
 
         for (PermissionValue pv : permValues.values()) {

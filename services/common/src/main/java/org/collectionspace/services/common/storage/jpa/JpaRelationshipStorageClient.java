@@ -296,6 +296,67 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
     }
 
     /**
+     * delete of a relationship deletes one or more relationships between
+     * permission and role
+     * the object and subjects of the relationship is chosen (by doc handler) from
+     * the payload
+     * @param ctx
+     * @param handler
+     * @return
+     * @throws DocumentNotFoundException
+     * @throws DocumentException
+     */
+    @Override
+    public void delete(ServiceContext ctx, String id, DocumentHandler handler)
+            throws DocumentNotFoundException, DocumentException {
+
+        if (ctx == null) {
+            throw new IllegalArgumentException(
+                    "delete : ctx is missing");
+        }
+        if (handler == null) {
+            throw new IllegalArgumentException(
+                    "delete : handler is missing");
+        }
+        EntityManagerFactory emf = null;
+        EntityManager em = null;
+        try {
+            handler.prepare(Action.DELETE);
+            List<T> rl = new ArrayList<T>();
+            DocumentWrapper<List<T>> wrapDoc =
+                    new DocumentWrapperImpl<List<T>>(rl);
+            handler.handle(Action.DELETE, wrapDoc);
+            emf = JpaStorageUtils.getEntityManagerFactory();
+            em = emf.createEntityManager();
+            em.getTransaction().begin();
+            //the following could be much more efficient if done with a single
+            //sql/jql
+            for (T r : rl) {
+                em.remove(r);
+            }
+            em.getTransaction().commit();
+            handler.complete(Action.DELETE, wrapDoc);
+        } catch (DocumentException de) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw de;
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("delete(ctx, ix, handler): Caught exception ", e);
+            }
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw new DocumentException(e);
+        } finally {
+            if (emf != null) {
+                JpaStorageUtils.releaseEntityManagerFactory(emf);
+            }
+        }
+    }
+
+    /**
      * getObjectId returns the id of the object in a relationship
      * @param ctx
      * @return

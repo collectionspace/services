@@ -31,6 +31,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
@@ -377,8 +378,13 @@ public class RoleResource
 
     @POST
     @Path("{csid}/permroles")
-    public Response createRolePermission(@PathParam("csid") String roleCsid,
+    public Response createRolePermission(@QueryParam("_method") String method, @PathParam("csid") String roleCsid,
             PermissionRole input) {
+        if (method != null) {
+            if ("delete".equalsIgnoreCase(method)) {
+                return deleteRolePermission(roleCsid, input);
+            }
+        }
         if (logger.isDebugEnabled()) {
             logger.debug("createRolePermission with roleCsid=" + roleCsid);
         }
@@ -477,14 +483,14 @@ public class RoleResource
         return result;
     }
 
-    @DELETE
-    @Path("{csid}/permroles/{permrolecsid}")
     public Response deleteRolePermission(
             @PathParam("csid") String roleCsid,
-            @PathParam("permrolecsid") String permrolecsid) {
+            PermissionRole input) {
+
         if (logger.isDebugEnabled()) {
             logger.debug("deleteRolePermission with roleCsid=" + roleCsid);
         }
+
         if (roleCsid == null || "".equals(roleCsid)) {
             logger.error("deleteRolePermission: missing roleCsid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
@@ -497,7 +503,7 @@ public class RoleResource
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
             //delete all relationships for a permission
-            subResource.deletePermissionRole(roleCsid, SubjectType.PERMISSION);
+            subResource.deletePermissionRole(roleCsid, SubjectType.PERMISSION, input);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(

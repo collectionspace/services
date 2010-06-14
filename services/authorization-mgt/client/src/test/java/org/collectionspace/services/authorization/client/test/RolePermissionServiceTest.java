@@ -187,9 +187,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
         ClientResponse<Response> res = null;
         try {
             res = client.create(rv.getRoleId(), permRole);
-
             int statusCode = res.getStatus();
-
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": status = " + statusCode);
             }
@@ -358,7 +356,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
             PermissionRole output = (PermissionRole) res.getEntity();
 
             String sOutput = objectAsXmlString(output, PermissionRole.class);
-            if(logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled()) {
                 logger.debug(testName + " received " + sOutput);
             }
         } finally {
@@ -458,8 +456,11 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
         RolePermissionClient client = new RolePermissionClient();
         ClientResponse<Response> res = null;
         try {
+            RoleValue rv = roleValues.get(getRoleName());
+            PermissionRole permRole = createPermissionRoleInstance(rv,
+                    permValues.values(), true, true);
             res = client.delete(
-                    roleValues.get(getRoleName()).getRoleId(), "123");
+                    roleValues.get(getRoleName()).getRoleId(), permRole);
             int statusCode = res.getStatus();
 
             // Check the status code of the response: does it match
@@ -538,7 +539,8 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
         PermissionRole permRole = PermissionRoleFactory.createPermissionRoleInstance(
                 rv, pvls, usePermId, useRoleId);
         if (logger.isDebugEnabled()) {
-            logger.debug("to be created, permRole");
+            logger.debug("" +
+                    "permRole");
             logger.debug(objectAsXmlString(permRole, PermissionRole.class));
         }
         return permRole;
@@ -561,25 +563,6 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
-
-        RolePermissionClient client = new RolePermissionClient();
-        for (String resourceId : allResourceIdsCreated) {
-
-            ClientResponse<Response> res = client.delete(resourceId, "123");
-            int statusCode = res.getStatus();
-            try {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("cleanup: delete relationships for permission id="
-                            + resourceId + " status=" + statusCode);
-                }
-                Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-                Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-            } finally {
-                res.releaseConnection();
-            }
-        }
-
         for (PermissionValue pv : permValues.values()) {
             deletePermission(pv.getPermissionId());
         }

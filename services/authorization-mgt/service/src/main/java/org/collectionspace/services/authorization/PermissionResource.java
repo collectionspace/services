@@ -31,6 +31,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
@@ -387,8 +388,14 @@ public class PermissionResource
 
     @POST
     @Path("{csid}/permroles")
-    public Response createPermissionRole(@PathParam("csid") String permCsid,
+    public Response createPermissionRole(@QueryParam("_method") String method,
+            @PathParam("csid") String permCsid,
             PermissionRole input) {
+                if (method != null) {
+            if ("delete".equalsIgnoreCase(method)) {
+                return deletePermissionRole(permCsid, input);
+            }
+        }
         if (logger.isDebugEnabled()) {
             logger.debug("createPermissionRole with permCsid=" + permCsid);
         }
@@ -487,11 +494,9 @@ public class PermissionResource
         return result;
     }
 
-    @DELETE
-    @Path("{csid}/permroles/{permrolecsid}")
     public Response deletePermissionRole(
             @PathParam("csid") String permCsid,
-            @PathParam("permrolecsid") String permrolecsid) {
+            PermissionRole input) {
         if (logger.isDebugEnabled()) {
             logger.debug("deletePermissionRole with permCsid=" + permCsid);
         }
@@ -507,7 +512,7 @@ public class PermissionResource
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.PERMISSION_PERMROLE_SERVICE);
             //delete all relationships for a permission
-            subResource.deletePermissionRole(permCsid, SubjectType.ROLE);
+            subResource.deletePermissionRole(permCsid, SubjectType.ROLE, input);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(

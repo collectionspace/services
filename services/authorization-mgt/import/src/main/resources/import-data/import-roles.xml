@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:roles_list xmlns:ns2="http://collectionspace.org/services/authorization">
-    <role csid="b6af2c74-4238-44e1-b7c5-12b9a262a39e">
+    <role csid="45c752ca-75aa-4801-a65e-5b85119e4dde">
         <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
         <description>generated tenant admin role</description>
         <tenant_id>2</tenant_id>
-        <createdAt>2010-06-09T12:04:57.219</createdAt>
+        <createdAt>2010-06-14T11:14:34.801</createdAt>
     </role>
-    <role csid="9e848daa-2b35-444a-871b-95c9b998ed76">
+    <role csid="b5c798e6-3c1c-4c86-b9e0-40a5717bb084">
         <roleName>ROLE_TENANT_ADMINISTRATOR</roleName>
         <description>generated tenant admin role</description>
         <tenant_id>1</tenant_id>
-        <createdAt>2010-06-09T12:04:57.225</createdAt>
+        <createdAt>2010-06-14T11:14:34.843</createdAt>
     </role>
-    <role csid="f7cf0799-0f99-475b-a429-c7cca1349341">
+    <role csid="58b72cb3-d619-43cb-b58b-853802a09f83">
         <roleName>ROLE_TENANT_READER</roleName>
         <description>generated tenant read only role</description>
         <tenant_id>2</tenant_id>
-        <createdAt>2010-06-09T12:04:57.224</createdAt>
+        <createdAt>2010-06-14T11:14:34.842</createdAt>
     </role>
-    <role csid="bbbf085e-3680-4836-a525-52d6d687c1e6">
+    <role csid="16a94748-d98b-4a6d-b404-795915856dca">
         <roleName>ROLE_TENANT_READER</roleName>
         <description>generated tenant read only role</description>
         <tenant_id>1</tenant_id>
-        <createdAt>2010-06-09T12:04:57.225</createdAt>
+        <createdAt>2010-06-14T11:14:34.843</createdAt>
     </role>
 </ns2:roles_list>
