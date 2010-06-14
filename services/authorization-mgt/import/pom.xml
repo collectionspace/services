@@ -148,7 +148,7 @@
                         <argument>-b</argument>
                         <argument>${basedir}/../../common/src/main/config/services/tenant-bindings.xml</argument>
                         <argument>-edir</argument>
-                        <argument>${basedir}/src/main/resources/import-data/</argument>
+                        <argument>${basedir}/target</argument>
                     </arguments>
                     <systemProperties>
                     </systemProperties>
