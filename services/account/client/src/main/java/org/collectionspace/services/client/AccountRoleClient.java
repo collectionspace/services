@@ -95,7 +95,8 @@ public class AccountRoleClient extends AbstractServiceClientImpl {
     }
 
     /**
-     * @param accRole
+     * @param csid
+     * @param accRole relationships to create
      * @return
      * @see 
      */
@@ -106,11 +107,11 @@ public class AccountRoleClient extends AbstractServiceClientImpl {
 
     /**
      * @param csid
-     * @param arcsid relationship does not have an id, junk is fine
+     * @param accRole relationship to delete
      * @return
      * @see 
      */
-    public ClientResponse<Response> delete(String csid, String arcsid) {
-        return accountRoleProxy.delete(csid, arcsid);
+    public ClientResponse<Response> delete(String csid, AccountRole accRole) {
+        return accountRoleProxy.delete(csid, "delete", accRole);
     }
 }

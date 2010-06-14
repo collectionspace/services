@@ -521,11 +521,53 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
 
         deletePermissionRoles();
         deleteAccountRoles();
-        //FIXME delete on permission role deletes all roles associated with the permission
-        //this would delete association with ROLE_ADMINISTRATION too
+        //FIXME delete on permission deletes all associations with roles
+        //this would delete association with ROLE_ADMINISTRATOR too
         //deletePermissions();
         deleteRoles();
         deleteAccounts();
+    }
+
+    private void deletePermissionRoles() {
+
+        List<RoleValue> bigbirdRoleValues = new ArrayList<RoleValue>();
+        bigbirdRoleValues.add(roleValues.get("ROLE_TEST_CM"));
+        deletePermissionRole(permValues.get(bigbirdPermId), bigbirdRoleValues);
+
+        List<RoleValue> elmoRoleValues = new ArrayList<RoleValue>();
+        elmoRoleValues.add(roleValues.get("ROLE_TEST_INTERN"));
+        deletePermissionRole(permValues.get(elmoPermId), elmoRoleValues);
+
+    }
+
+    private void deleteAccountRoles() {
+        List<RoleValue> bigbirdRoleValues = new ArrayList<RoleValue>();
+        bigbirdRoleValues.add(roleValues.get("ROLE_TEST_CM"));
+        deleteAccountRole(accValues.get("bigbird2010"), bigbirdRoleValues);
+
+        List<RoleValue> elmoRoleValues = new ArrayList<RoleValue>();
+        elmoRoleValues.add(roleValues.get("ROLE_TEST_INTERN"));
+        deleteAccountRole(accValues.get("elmo2010"), elmoRoleValues);
+    }
+
+    private void deletePermissions() {
+        //delete entities
+        for (PermissionValue pv : permValues.values()) {
+            deletePermission(pv.getPermissionId());
+        }
+    }
+
+    private void deleteRoles() {
+        for (RoleValue rv : roleValues.values()) {
+            deleteRole(rv.getRoleId());
+        }
+    }
+
+    private void deleteAccounts() {
+
+        for (AccountValue av1 : accValues.values()) {
+            deleteAccount(av1.getAccountId());
+        }
     }
 
     private String createPermission(String resName, EffectType effect) {
@@ -657,14 +699,17 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         return extractId(res);
     }
 
-    private void deleteAccountRole(String screenName) {
+    private void deleteAccountRole(AccountValue av,
+            Collection<RoleValue> rvs) {
         // Perform setup.
         setupDelete();
 
         // Submit the request to the service and store the response.
         AccountRoleClient client = new AccountRoleClient();
+        AccountRole accRole = AccountRoleFactory.createAccountRoleInstance(
+                av, rvs, true, true);
         ClientResponse<Response> res = client.delete(
-                accValues.get(screenName).getAccountId(), "123");
+                av.getAccountId(), accRole);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -723,47 +768,5 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         res.releaseConnection();
-    }
-
-    private void deletePermissionRoles() {
-
-        List<RoleValue> bigbirdRoleValues = new ArrayList<RoleValue>();
-        bigbirdRoleValues.add(roleValues.get("ROLE_TEST_CM"));
-        deletePermissionRole(permValues.get(bigbirdPermId), bigbirdRoleValues);
-
-        List<RoleValue> elmoRoleValues = new ArrayList<RoleValue>();
-        elmoRoleValues.add(roleValues.get("ROLE_TEST_INTERN"));
-        deletePermissionRole(permValues.get(elmoPermId), elmoRoleValues);
-
-    }
-
-    private void deleteAccountRoles() {
-        for (AccountValue av : accValues.values()) {
-            deleteAccountRole(av.getUserId());
-        }
-    }
-
-    private void deletePermissions() {
-        //delete entities
-        for (PermissionValue pv : permValues.values()) {
-            deletePermission(pv.getPermissionId());
-        }
-    }
-
-    private void deleteRoles() {
-        for (RoleValue rv : roleValues.values()) {
-            deleteRole(rv.getRoleId());
-        }
-    }
-
-    private void deleteAccounts() {
-
-        for (AccountValue av1 : accValues.values()) {
-            deleteAccount(av1.getAccountId());
-        }
-    }
-
-    private String getTenantId(AccountClient client) {
-        return client.getProperty(AccountClient.TENANT_PROPERTY);
     }
 }

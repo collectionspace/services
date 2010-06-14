@@ -632,16 +632,13 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
 
         deletePermissionRoles();
         deleteAccountRoles();
-        //FIXME delete on permission role deletes all roles associated with the permission
-        //this would delete association with ROLE_ADMINISTRATION too
+        //deletePermissions would delete association with ROLE_XXX_ADMINISTRTOR too
         //deletePermissions();
         deleteRoles();
         deleteAccounts();
     }
 
     private void deletePermissionRoles() {
-
-        //first delete relationships between the entities
 
         for (String tenantId : tenantPermissions.keySet()) {
             List<RoleValue> tenantRoleValues = new ArrayList<RoleValue>();
@@ -653,8 +650,10 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
 
     private void deleteAccountRoles() {
         for (String tenantId : tenantAccounts.keySet()) {
+            List<RoleValue> tenantRoleValues = new ArrayList<RoleValue>();
+            tenantRoleValues.add(tenantRoles.get(tenantId));
             AccountValue av = tenantAccounts.get(tenantId);
-            deleteAccountRole(tenantId, av.getAccountId());
+            deleteAccountRole(tenantId, av, tenantRoleValues);
         }
     }
 
@@ -819,7 +818,8 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
         return extractId(res);
     }
 
-    private void deleteAccountRole(String tenantId, String accountId) {
+    private void deleteAccountRole(String tenantId, AccountValue av,
+            List<RoleValue> rvs) {
         // Perform setup.
         setupDelete();
 
@@ -827,8 +827,10 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
         AccountRoleClient client = new AccountRoleClient();
         UserInfo ui = tenantAdminUsers.get(tenantId);
         client.setAuth(true, ui.userName, true, ui.password, true);
+        AccountRole accRole = AccountRoleFactory.createAccountRoleInstance(
+                av, rvs, true, true);
         ClientResponse<Response> res = client.delete(
-                accountId, "123");
+                av.getAccountId(), accRole);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match

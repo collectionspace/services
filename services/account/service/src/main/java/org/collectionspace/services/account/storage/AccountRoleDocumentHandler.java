@@ -79,6 +79,11 @@ public class AccountRoleDocumentHandler
     }
 
     @Override
+    public void handleDelete(DocumentWrapper<List<AccountRoleRel>> wrapDoc) throws Exception {
+        fillCommonPart(getCommonPart(), wrapDoc);
+    }
+
+    @Override
     public AccountRole extractCommonPart(
             DocumentWrapper<List<AccountRoleRel>> wrapDoc)
             throws Exception {

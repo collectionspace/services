@@ -48,11 +48,10 @@ public class AccountRoleSubResource
 
     final public static String ACCOUNT_ACCOUNTROLE_SERVICE = "accounts/accountroles";
     final public static String ROLE_ACCOUNTROLE_SERVICE = "roles/accountroles";
-    
     //this service is never exposed as standalone RESTful service...just use unique
     //service name to identify binding
     /** The service name. */
-    private String serviceName =  ACCOUNT_ACCOUNTROLE_SERVICE;
+    private String serviceName = ACCOUNT_ACCOUNTROLE_SERVICE;
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(AccountRoleSubResource.class);
     /** The storage client. */
@@ -65,11 +64,10 @@ public class AccountRoleSubResource
     AccountRoleSubResource(String serviceName) {
         this.serviceName = serviceName;
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
      */
-
     @Override
     protected String getVersionString() {
         /** The last change revision. */
@@ -174,9 +172,9 @@ public class AccountRoleSubResource
     }
 
     /**
-     * deleteAccountRole deletes account-role relationships using given
+     * deleteAccountRole deletes all account-role relationships using given
      * csid of object (account/role) and subject (role/account)
-     * @param csid
+     * @param csid of the object
      * @param subject
      * @return
      * @throws Exception
@@ -189,5 +187,22 @@ public class AccountRoleSubResource
         }
         ServiceContext<AccountRole, AccountRole> ctx = createServiceContext((AccountRole) null, subject);
         getStorageClient(ctx).delete(ctx, csid);
+    }
+
+    /**
+     * deleteAccountRole deletes given account-role relationships using given
+     * csid of object (account/role) and subject (role/account)
+     * @param csid of the object
+     * @param subject
+     * @param input with account role relationships to delete
+     * @return
+     * @throws Exception
+     */
+    public void deleteAccountRole(String csid, SubjectType subject, AccountRole input)
+            throws Exception {
+
+        ServiceContext<AccountRole, AccountRole> ctx = createServiceContext(input, subject);
+        DocumentHandler handler = createDocumentHandler(ctx);
+        getStorageClient(ctx).delete(ctx, csid, handler);
     }
 }

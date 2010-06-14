@@ -31,6 +31,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
@@ -379,8 +380,14 @@ public class AccountResource
 
     @POST
     @Path("{csid}/accountroles")
-    public Response createAccountRole(@PathParam("csid") String accCsid,
+    public Response createAccountRole(@QueryParam("_method") String method,
+            @PathParam("csid") String accCsid,
             AccountRole input) {
+        if (method != null) {
+            if ("delete".equalsIgnoreCase(method)) {
+                return deleteAccountRole(accCsid, input);
+            }
+        }
         if (logger.isDebugEnabled()) {
             logger.debug("createAccountRole with accCsid=" + accCsid);
         }
@@ -477,11 +484,9 @@ public class AccountResource
         return result;
     }
 
-    @DELETE
-    @Path("{csid}/accountroles/{accrolecsid}")
     public Response deleteAccountRole(
             @PathParam("csid") String accCsid,
-            @PathParam("accrolecsid") String accrolecsid) {
+            AccountRole input) {
         if (logger.isDebugEnabled()) {
             logger.debug("deleteAccountRole with accCsid=" + accCsid);
         }
@@ -497,7 +502,7 @@ public class AccountResource
             AccountRoleSubResource subResource =
                     new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
             //delete all relationships for an account
-            subResource.deleteAccountRole(accCsid, SubjectType.ROLE);
+            subResource.deleteAccountRole(accCsid, SubjectType.ROLE, input);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(

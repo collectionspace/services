@@ -56,6 +56,15 @@ public class SpringPermissionManager implements CSpacePermissionManager {
         this.provider = provider;
     }
 
+    /**
+     * addPermissions adds permissions according to the given grant for given
+     * resource#action for each given principal
+     * @param res
+     * @param action
+     * @param principals
+     * @param grant
+     * @throws PermissionException
+     */
     @Override
     public void addPermissions(CSpaceResource res, CSpaceAction action, String[] principals, boolean grant)
             throws PermissionException {
@@ -120,6 +129,14 @@ public class SpringPermissionManager implements CSpacePermissionManager {
         }
     }
 
+    /**
+     * deletePermissions removes permisions for given resource#action for each given principal
+     * @param res
+     * @param action
+     * @param principals
+     * @throws PermissionNotFoundException
+     * @throws PermissionException
+     */
     @Override
     public void deletePermissions(CSpaceResource res, CSpaceAction action, String[] principals)
             throws PermissionNotFoundException, PermissionException {
@@ -178,6 +195,15 @@ public class SpringPermissionManager implements CSpacePermissionManager {
         }
     }
 
+    /**
+     * deletePermissions
+     * @param res
+     * @param action
+     * @throws PermissionNotFoundException
+     * @throws PermissionException
+     */
+    //non-javadoc NOTE: this is a very destructive operation. it would remove all permissions
+    //to access given resource#action for ANY role including administrators
     @Override
     public void deletePermissions(CSpaceResource res, CSpaceAction action)
             throws PermissionNotFoundException, PermissionException {
@@ -222,6 +248,14 @@ public class SpringPermissionManager implements CSpacePermissionManager {
 
     }
 
+    /**
+     * deletePermissions
+     * @param res
+     * @throws PermissionNotFoundException
+     * @throws PermissionException
+     */
+    //non-javadoc NOTE: this is a very very destructive operation. it would remove all permissions
+    //to access given resource for ANY action for ANY role including administrators
     @Override
     public void deletePermissions(CSpaceResource res)
             throws PermissionNotFoundException, PermissionException {
@@ -258,6 +292,15 @@ public class SpringPermissionManager implements CSpacePermissionManager {
         }
     }
 
+    /**
+     * addPermission adds permission grant for given object identity for given permission
+     * for given sid
+     * @param oid
+     * @param permission
+     * @param sid
+     * @param grant
+     * @throws PermissionException
+     */
     private void addPermission(ObjectIdentity oid, Permission permission,
             Sid sid, boolean grant) throws PermissionException {
         MutableAcl acl;
@@ -285,6 +328,13 @@ public class SpringPermissionManager implements CSpacePermissionManager {
         }
     }
 
+    /**
+     * deletePermissions deletes given permission on given object id for given sid
+     * @param oid
+     * @param permission
+     * @param sid
+     */
+    //non-javadoc NOTE: if sid is null it would remove ACEs for all sid(s)
     private void deletePermissions(ObjectIdentity oid, Permission permission, Sid sid) /** throws AclDataAccessException */
     {
         int i = 0;

@@ -158,6 +158,10 @@ public class AuthorizationDelegate {
      * @param permCsid
      * @throws Exception
      */
+    //Non-javadoc comment : this is a very dangerous operation as it deletes
+    //the Spring ACL instead of ACE(s) that is associated with each role
+    //the ACL might be needed for other ACEs (including those for ROLE_ADMINISTRATOR,
+    //ROLE_TENANT_ADMINISTRATOR, etc.)...
     static public void deletePermissions(String permCsid) throws Exception {
         Permission p = getPermission(permCsid);
         if (p == null) {

@@ -170,11 +170,11 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
         setupCreate();
 
         // Submit the request to the service and store the response.
-        AccountValue pv = accValues.get("acc-role-user1");
-        AccountRole accRole = createAccountRoleInstance(pv,
+        AccountValue av = accValues.get("acc-role-user1");
+        AccountRole accRole = createAccountRoleInstance(av,
                 roleValues.values(), true, true);
         AccountRoleClient client = new AccountRoleClient();
-        ClientResponse<Response> res = client.create(pv.getAccountId(), accRole);
+        ClientResponse<Response> res = client.create(av.getAccountId(), accRole);
         try {
             int statusCode = res.getStatus();
 
@@ -433,8 +433,11 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         AccountRoleClient client = new AccountRoleClient();
+                AccountValue av = accValues.get("acc-role-user1");
+        AccountRole accRole = createAccountRoleInstance(av,
+                roleValues.values(), true, true);
         ClientResponse<Response> res = client.delete(
-                accValues.get("acc-role-user1").getAccountId(), "123");
+                accValues.get("acc-role-user1").getAccountId(), accRole);
         int statusCode = res.getStatus();
         try {
             // Check the status code of the response: does it match
@@ -496,7 +499,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
     /**
      * Creates the account role instance.
      *
-     * @param pv the pv
+     * @param av the av
      * @param rvs the rvs
      * @param usePermId the use perm id
      * @param useRoleId the use role id
@@ -537,22 +540,6 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
 
-        AccountRoleClient client = new AccountRoleClient();
-        for (String resourceId : allResourceIdsCreated) {
-            ClientResponse<Response> res = client.delete(resourceId, "123");
-            try {
-                int statusCode = res.getStatus();
-                if (logger.isDebugEnabled()) {
-                    logger.debug("clenaup: delete relationships for accission id="
-                            + resourceId + " status=" + statusCode);
-                }
-                Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                        invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-                Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-            } finally {
-                res.releaseConnection();
-            }
-        }
 
         for (AccountValue pv : accValues.values()) {
             deleteAccount(pv.getAccountId());

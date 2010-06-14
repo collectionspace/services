@@ -353,9 +353,11 @@ public class PermissionResource
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.PERMISSION_PERMROLE_SERVICE);
             subResource.deletePermissionRole(csid, SubjectType.ROLE);
-            //delete permissions in the authz provider too
+            //NOTE for delete permissions in the authz provider
             //at the PermissionRoleSubResource/DocHandler level, there is no visibility
-            //if permission is deleted, so do it here
+            //if permission is deleted, so do it here, however,
+            //this is a very dangerous operation as it deletes the Spring ACL instead of ACE(s)
+            //the ACL might be needed for other ACEs roles...
             AuthorizationDelegate.deletePermissions(csid);
 
             ServiceContext<Permission, Permission> ctx = createServiceContext((Permission) null, Permission.class);
