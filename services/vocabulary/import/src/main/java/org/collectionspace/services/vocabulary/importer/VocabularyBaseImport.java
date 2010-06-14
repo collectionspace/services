@@ -53,7 +53,7 @@ public class VocabularyBaseImport {
     final String SERVICE_PATH_COMPONENT = "vocabularies";
     final String ITEM_SERVICE_PATH_COMPONENT = "items";
 
-    public void createEnumeration(String vocabName, List<String> enumValues) {
+    public void createEnumeration(String vocabDisplayName, String shortName, List<String> enumValues) {
 
         // Expected status code: 201 Created
         int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
@@ -61,30 +61,29 @@ public class VocabularyBaseImport {
         ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Import: Create vocabulary: \"" + vocabName + "\"");
+            logger.debug("Import: Create vocabulary: \"" + vocabDisplayName + "\"");
         }
-        String baseVocabRefName = VocabularyClientUtils.createVocabularyRefName(vocabName, false);
-        String fullVocabRefName = baseVocabRefName + "'" + vocabName + "'";
+        String baseVocabRefName = VocabularyClientUtils.createVocabularyRefName(shortName, null);
         MultipartOutput multipart = VocabularyClientUtils.createEnumerationInstance(
-                vocabName, fullVocabRefName, client.getCommonPartName());
+        		vocabDisplayName, shortName, client.getCommonPartName());
         ClientResponse<Response> res = client.create(multipart);
 
         int statusCode = res.getStatus();
 
         if (!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-            throw new RuntimeException("Could not create enumeration: \"" + vocabName
+            throw new RuntimeException("Could not create enumeration: \"" + vocabDisplayName
                     + "\" " + VocabularyClientUtils.invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         }
         if (statusCode != EXPECTED_STATUS_CODE) {
             throw new RuntimeException("Unexpected Status when creating enumeration: \""
-                    + vocabName + "\", Status:" + statusCode);
+                    + vocabDisplayName + "\", Status:" + statusCode);
         }
 
         // Store the ID returned from this create operation
         // for additional tests below.
         String newVocabId = VocabularyClientUtils.extractId(res);
         if (logger.isDebugEnabled()) {
-            logger.debug("Import: Created vocabulary: \"" + vocabName + "\" ID:"
+            logger.debug("Import: Created vocabulary: \"" + vocabDisplayName + "\" ID:"
                     + newVocabId);
         }
         for (String itemName : enumValues) {
@@ -105,6 +104,12 @@ public class VocabularyBaseImport {
         final String entryReasonsVocabName = "Entry Reasons";
         final String responsibleDeptsVocabName = "Responsible Departments";
         final String termStatusVocabName = "Term Status";
+        
+        final String acquisitionMethodsShortName = "acqMethods";
+        final String entryMethodsShortName = "entryMethods";
+        final String entryReasonsShortName = "entryReasons";
+        final String responsibleDeptsShortName = "responsibleDepts";
+        final String termStatusShortName = "termStatus";
 
         List<String> acquisitionMethodsEnumValues =
                 Arrays.asList("Gift", "Purchase", "Exchange", "Transfer", "Treasure");
@@ -120,11 +125,11 @@ public class VocabularyBaseImport {
         List<String> termStatusEnumValues =
                 Arrays.asList("Provisional", "Under Review", "Accepted", "Rejected");
 
-        vbi.createEnumeration(acquisitionMethodsVocabName, acquisitionMethodsEnumValues);
-        vbi.createEnumeration(entryMethodsVocabName, entryMethodsEnumValues);
-        vbi.createEnumeration(entryReasonsVocabName, entryReasonsEnumValues);
-        vbi.createEnumeration(responsibleDeptsVocabName, respDeptNamesEnumValues);
-        vbi.createEnumeration(termStatusVocabName, termStatusEnumValues);
+        vbi.createEnumeration(acquisitionMethodsVocabName, acquisitionMethodsShortName, acquisitionMethodsEnumValues);
+        vbi.createEnumeration(entryMethodsVocabName, entryMethodsShortName, entryMethodsEnumValues);
+        vbi.createEnumeration(entryReasonsVocabName, entryReasonsShortName, entryReasonsEnumValues);
+        vbi.createEnumeration(responsibleDeptsVocabName, responsibleDeptsShortName, respDeptNamesEnumValues);
+        vbi.createEnumeration(termStatusVocabName, termStatusShortName, termStatusEnumValues);
 
         logger.info("VocabularyBaseImport complete.");
     }

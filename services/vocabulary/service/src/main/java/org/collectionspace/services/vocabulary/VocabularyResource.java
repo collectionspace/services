@@ -39,6 +39,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.VocabularyJAXBSchema;
 import org.collectionspace.services.VocabularyItemJAXBSchema;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
@@ -162,6 +163,10 @@ public class VocabularyResource extends
             path.path("" + csid);
             Response response = Response.created(path.build()).build();
             return response;
+        } catch (BadRequestException bre) {
+            Response response = Response.status(
+                    Response.Status.BAD_REQUEST).entity("Create failed reason " + bre.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Create failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -235,6 +240,70 @@ public class VocabularyResource extends
     }
 
     /**
+     * Gets the vocabulary by name.
+     * 
+     * @param specifier the specifier
+     * 
+     * @return the vocabulary
+     */
+    @GET
+    @Path("urn:cspace:name({specifier})")
+    public MultipartOutput getVocabularyByName(@PathParam("specifier") String specifier) {
+        if (specifier == null) {
+            logger.error("getVocabularyByName: missing name!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "get failed on Vocabulary (missing specifier)").type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        String whereClause =
+        	VocabularyJAXBSchema.VOCABULARIES_COMMON+
+        	":"+VocabularyJAXBSchema.SHORT_IDENTIFIER+
+        	"='"+specifier+"'";
+        // We only get a single doc - if there are multiple,
+        // it is an error in use.
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("getVocabularyByName with name=" + specifier);
+        } 
+        MultipartOutput result = null;
+        try {
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            DocumentHandler handler = createDocumentHandler(ctx);
+            DocumentFilter myFilter = new DocumentFilter(whereClause, 0, 1);
+            handler.setDocumentFilter(myFilter);
+            getRepositoryClient(ctx).get(ctx, handler);
+            result = (MultipartOutput) ctx.getOutput();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getVocabularyByName", dnfe);
+            }
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Get failed on Vocabulary spec=" + specifier).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getVocabularyByName", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        if (result == null) {
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Get failed, the requested Vocabulary spec:" + specifier + ": was not found.").type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return result;
+    }
+
+    /**
      * Gets the vocabulary list.
      * 
      * @param ui the ui
@@ -249,14 +318,11 @@ public class VocabularyResource extends
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
-//            DocumentFilter myFilter = handler.createDocumentFilter(); //new DocumentFilter();
             DocumentFilter myFilter = handler.getDocumentFilter();
-//            myFilter.setPagination(queryParams);
             String nameQ = queryParams.getFirst("refName");
             if (nameQ != null) {
                 myFilter.setWhereClause("vocabularies_common:refName='" + nameQ + "'");
             }
-//            handler.setDocumentFilter(myFilter);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             vocabularyObjectList = (VocabulariesCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {

@@ -12,7 +12,8 @@ public interface VocabularyItemJAXBSchema {
 	final static String DISPLAY_NAME = "displayName";
 	final static String IN_VOCABULARY = "inVocabulary";
 	final static String REF_NAME = "refName";
-        final static String STATUS = "status";
+	final static String SHORT_IDENTIFIER = "shortIdentifier";
+    final static String STATUS = "status";
 	final static String CSID = "csid";
 }
 

@@ -22,9 +22,11 @@ public class VocabularyClientUtils {
         LoggerFactory.getLogger(VocabularyClientUtils.class);
 
     public static MultipartOutput createEnumerationInstance(
-    		String displayName, String refName, String headerLabel ) {
+    		String displayName, String shortIdentifier, String headerLabel ) {
         VocabulariesCommon vocabulary = new VocabulariesCommon();
         vocabulary.setDisplayName(displayName);
+        vocabulary.setShortIdentifier(shortIdentifier);
+        String refName = createVocabularyRefName(shortIdentifier, displayName);
         vocabulary.setRefName(refName);
         vocabulary.setVocabType("enum");
         MultipartOutput multipart = new MultipartOutput();
@@ -42,13 +44,15 @@ public class VocabularyClientUtils {
 		// Note that we do not use the map, but we will once we add more info to the 
 		// items
     public static MultipartOutput createVocabularyItemInstance(String inVocabulary, 
-    		String vocabItemRefName, Map<String, String> vocabItemInfo, String headerLabel){
+    		String vocabularyRefName, Map<String, String> vocabItemInfo, String headerLabel){
         VocabularyitemsCommon vocabularyItem = new VocabularyitemsCommon();
         vocabularyItem.setInVocabulary(inVocabulary);
-       	vocabularyItem.setRefName(vocabItemRefName);
-       	String value = null;
-        if((value = (String)vocabItemInfo.get(VocabularyItemJAXBSchema.DISPLAY_NAME))!=null)
-        	vocabularyItem.setDisplayName(value);
+    	String shortId = vocabItemInfo.get(VocabularyItemJAXBSchema.SHORT_IDENTIFIER);
+    	String displayName = vocabItemInfo.get(VocabularyItemJAXBSchema.DISPLAY_NAME);
+       	vocabularyItem.setShortIdentifier(shortId);
+       	vocabularyItem.setDisplayName(displayName);
+    	String refName = createVocabularyItemRefName(vocabularyRefName, shortId, displayName);
+       	vocabularyItem.setRefName(refName);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(vocabularyItem,
             MediaType.APPLICATION_XML_TYPE);
@@ -68,27 +72,25 @@ public class VocabularyClientUtils {
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
     	// Type of service request being tested
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
-    	String displayName = itemMap.get(VocabularyItemJAXBSchema.DISPLAY_NAME);
-    	String refName = createVocabularyItemRefName(vocabularyRefName, displayName, true);
 
     	if(logger.isDebugEnabled()){
-    		logger.debug("Import: Create Item: \""+displayName
+    		logger.debug("Import: Create Item: \""+itemMap.get(VocabularyItemJAXBSchema.DISPLAY_NAME)
     				+"\" in personAuthorityulary: \"" + vocabularyRefName +"\"");
     	}
     	MultipartOutput multipart = 
-    		createVocabularyItemInstance( vcsid, refName,
+    		createVocabularyItemInstance( vcsid, vocabularyRefName,
     				itemMap, client.getItemCommonPartName() );
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
 
     	int statusCode = res.getStatus();
 
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-    		throw new RuntimeException("Could not create Item: \""+refName
+    		throw new RuntimeException("Could not create Item: \""+itemMap.get(VocabularyItemJAXBSchema.DISPLAY_NAME)
     				+"\" in personAuthority: \"" + vocabularyRefName
     				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
-    		throw new RuntimeException("Unexpected Status when creating Item: \""+refName
+    		throw new RuntimeException("Unexpected Status when creating Item: \""+itemMap.get(VocabularyItemJAXBSchema.DISPLAY_NAME)
     				+"\" in personAuthority: \"" + vocabularyRefName +"\", Status:"+ statusCode);
     	}
 
@@ -126,19 +128,19 @@ public class VocabularyClientUtils {
         return id;
     }
     
-    public static String createVocabularyRefName(String vocabularyName, boolean withDisplaySuffix) {
+    public static String createVocabularyRefName(String shortIdentifier, String displaySuffix) {
     	String refName = "urn:cspace:org.collectionspace.demo:vocabulary:name("
-    			+vocabularyName+")";
-    	if(withDisplaySuffix)
-    		refName += "'"+vocabularyName+"'";
+    			+shortIdentifier+")";
+    	if(displaySuffix!=null&&!displaySuffix.isEmpty())
+    		refName += "'"+displaySuffix+"'";
     	return refName;
     }
 
     public static String createVocabularyItemRefName(
-    						String vocabularyRefName, String vocabItemName, boolean withDisplaySuffix) {
-    	String refName = vocabularyRefName+":item:name("+vocabItemName+")";
-    	if(withDisplaySuffix)
-    		refName += "'"+vocabItemName+"'";
+    						String vocabularyRefName, String shortIdentifier, String displaySuffix) {
+    	String refName = vocabularyRefName+":item:name("+shortIdentifier+")";
+    	if(displaySuffix!=null&&!displaySuffix.isEmpty())
+    		refName += "'"+displaySuffix+"'";
     	return refName;
     }
 

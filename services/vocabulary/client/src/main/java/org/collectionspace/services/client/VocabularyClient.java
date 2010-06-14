@@ -124,6 +124,16 @@ public class VocabularyClient extends AbstractServiceClientImpl {
     }
 
     /**
+     * Read by name.
+     *
+     * @param name the name
+     * @return the client response
+     */
+    public ClientResponse<MultipartInput> readByName(String name) {
+        return vocabularyProxy.readByName(name);
+    }
+
+    /**
      * Creates the.
      *
      * @param multipart the multipart

@@ -49,6 +49,8 @@
  */
 package org.collectionspace.services.vocabulary.nuxeo;
 
+import java.util.regex.Pattern;
+
 import org.collectionspace.services.vocabulary.VocabularyitemsCommon;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -65,6 +67,7 @@ import org.slf4j.LoggerFactory;
 public class VocabularyItemValidatorHandler implements ValidatorHandler {
 
     final Logger logger = LoggerFactory.getLogger(VocabularyItemValidatorHandler.class);
+    private static final Pattern shortIdBadPattern = Pattern.compile("[\\W]"); //.matcher(input).matches()
 
     @Override
     public void validate(Action action, ServiceContext ctx)
@@ -78,10 +81,18 @@ public class VocabularyItemValidatorHandler implements ValidatorHandler {
                     VocabularyitemsCommon.class);
             String msg = "";
             boolean invalid = false;
-						String displayName = vocabItem.getDisplayName();
+			String displayName = vocabItem.getDisplayName();
             if((displayName==null)||(displayName.length()<2)) {
                 invalid = true;
                 msg += "displayName must be non-null, and at least 2 chars long!";
+            }
+			String shortId = vocabItem.getShortIdentifier();
+            if(shortId==null){
+                invalid = true;
+                msg += "shortIdentifier must be non-null";
+            } else if(shortIdBadPattern.matcher(shortId).find()) {
+                invalid = true;
+                msg += "shortIdentifier must only contain standard word characters";
             }
             /*
             if(action.equals(Action.CREATE)) {
