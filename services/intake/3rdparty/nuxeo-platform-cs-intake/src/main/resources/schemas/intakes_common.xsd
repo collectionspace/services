@@ -2,7 +2,7 @@
 
 <!--
     Intake schema (XSD)
-    
+
     Entity  : Intake
     Part    : Common
     Used for: Nuxeo EP core document type
@@ -20,7 +20,7 @@
     
     <!-- See http://wiki.collectionspace.org/display/collectionspace/Intake+Schema -->
 
-<!--  Object Entry Information Group -->
+    <!--  Object Entry Information Group -->
     <xs:element name="currentOwner" type="xs:string"/>
     <xs:element name="depositor" type="xs:string"/>
     <xs:element name="depositorsRequirements" type="xs:string"/>
@@ -32,22 +32,8 @@
     <xs:element name="packingNote" type="xs:string"/>
     <xs:element name="returnDate" type="xs:string"/>
     
-<!--  Date Information Group -->
-    <xs:element name="associationDate" type="xs:string"/>
-    <xs:element name="earliestDate" type="xs:string"/>
-    <xs:element name="earliestDateCertainty" type="xs:string"/>
-    <xs:element name="earliestDateQualifier" type="xs:string"/>
-    <xs:element name="latestDate" type="xs:string"/>
-    <xs:element name="latestDateCertainty" type="xs:string"/>
-    <xs:element name="latestDateQualifier" type="xs:string"/>
-    <xs:element name="datePeriod" type="xs:string"/>
-    <xs:element name="dateText" type="xs:string"/>
-    
     <!--  Object Collection Information Group -->
-    <xs:element name="fieldCollectionDate" type="xs:string"/>
     <xs:element name="fieldCollectionEventName" type="xs:string"/>
-    <xs:element name="fieldCollectionNumber" type="xs:string"/>
-    <xs:element name="fieldCollector" type="xs:string"/>
 
     <!-- Valuation Information Group -->
     <xs:element name="valuationReferenceNumber" type="xs:string"/>
@@ -60,19 +46,31 @@
     <xs:element name="insuranceRenewalDate" type="xs:string"/>
     <xs:element name="insurer" type="xs:string"/>
     
-<!-- Object Location Information Group -->
+    <!-- Object Location Information Group -->
     <xs:element name="currentLocation" type="xs:string"/>
     <xs:element name="currentLocationFitness" type="xs:string"/>
     <xs:element name="currentLocationNote" type="xs:string"/>
     <xs:element name="locationDate" type="xs:string"/>
     <xs:element name="normalLocation" type="xs:string"/>
     
-<!-- Condition Check/Technical Assessment Information Group -->
+    <!-- Condition Check/Technical Assessment Information Group -->
     <xs:element name="conditionCheckDate" type="xs:string"/>
     <xs:element name="conditionCheckMethod" type="xs:string"/>
     <xs:element name="conditionCheckNote" type="xs:string"/>
     <xs:element name="conditionCheckReason" type="xs:string"/>
     <xs:element name="conditionCheckReferenceNumber" type="xs:string"/>
-    <xs:element name="conditionCheckAssesor" type="xs:string"/>
+    <xs:element name="conditionCheckerAssessor" type="xs:string"/>
+
+    <!--  Date Information Group -->
+    <!-- This appears to be a placeholder structured date -->
+    <xs:element name="dateAssociation" type="xs:string"/>
+    <xs:element name="earliestDate" type="xs:string"/>
+    <xs:element name="earliestDateCertainty" type="xs:string"/>
+    <xs:element name="earliestDateQualifier" type="xs:string"/>
+    <xs:element name="latestDate" type="xs:string"/>
+    <xs:element name="latestDateCertainty" type="xs:string"/>
+    <xs:element name="latestDateQualifier" type="xs:string"/>
+    <xs:element name="datePeriod" type="xs:string"/>
+    <xs:element name="dateText" type="xs:string"/>
     
 </xs:schema>

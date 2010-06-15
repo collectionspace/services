@@ -74,9 +74,8 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
     private String currentOwnerOrgCSID = null; 
     private String currentOwnerRefName = null;
     private String depositorRefName = null;
-    private String conditionCheckAssesorRefName = null;
+    private String conditionCheckerAssessorRefName = null;
     private String insurerRefName = null;
-    private String fieldCollectorRefName = null;
     private String valuerRefName = null;
     private final int NUM_AUTH_REF_DOCS_EXPECTED = 1;
 
@@ -121,9 +120,8 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
                 "entryDate-" + identifier,
 								currentOwnerRefName,
 								depositorRefName,
-								conditionCheckAssesorRefName,
+								conditionCheckerAssessorRefName,
 								insurerRefName,
-								fieldCollectorRefName,
 								valuerRefName );
 
         ClientResponse<Response> res = intakeClient.create(multipart);
@@ -186,17 +184,13 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
 									authRefName, "Debbie Depositor", true);
         orgIdsCreated.add(createOrganization("Debbie", "Depositor", depositorRefName));
         
-        conditionCheckAssesorRefName = OrgAuthorityClientUtils.createOrganizationRefName(
-									authRefName, "Andrew Assessor", true);
-        orgIdsCreated.add(createOrganization("Andrew", "Assessor", conditionCheckAssesorRefName));
+        conditionCheckerAssessorRefName = OrgAuthorityClientUtils.createOrganizationRefName(
+									authRefName, "Andrew Checker-Assessor", true);
+        orgIdsCreated.add(createOrganization("Andrew", "Checker-Assessor", conditionCheckerAssessorRefName));
         
         insurerRefName = OrgAuthorityClientUtils.createOrganizationRefName(
 									authRefName, "Ingrid Insurer", true);
         orgIdsCreated.add(createOrganization("Ingrid", "Insurer", insurerRefName));
-        
-        fieldCollectorRefName = OrgAuthorityClientUtils.createOrganizationRefName(
-									authRefName, "Connie Collector", true);
-        orgIdsCreated.add(createOrganization("Connie", "Collector", fieldCollectorRefName));
         
         valuerRefName = OrgAuthorityClientUtils.createOrganizationRefName(
 									authRefName, "Vince Valuer", true);
@@ -326,18 +320,16 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
     		String entryDate,
 				String currentOwner,
 				String depositor,
-				String conditionCheckAssesor,
+				String conditionCheckerAssessor,
 				String insurer,
-				String fieldCollector,
 				String Valuer ) {
         IntakesCommon intake = new IntakesCommon();
         intake.setEntryNumber(entryNumber);
         intake.setEntryDate(entryDate);
         intake.setCurrentOwner(currentOwner);
         intake.setDepositor(depositor);
-        intake.setConditionCheckAssesor(conditionCheckAssesor);
+        intake.setConditionCheckerAssessor(conditionCheckerAssessor);
         intake.setInsurer(insurer);
-        intake.setFieldCollector(fieldCollector);
         intake.setValuer(Valuer);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =

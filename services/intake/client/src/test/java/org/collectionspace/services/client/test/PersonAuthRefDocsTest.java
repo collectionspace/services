@@ -74,9 +74,8 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
     private String currentOwnerPersonCSID = null; 
     private String currentOwnerRefName = null;
     private String depositorRefName = null;
-    private String conditionCheckAssesorRefName = null;
+    private String conditionCheckerAssessorRefName = null;
     private String insurerRefName = null;
-    private String fieldCollectorRefName = null;
     private String valuerRefName = null;
     private final int NUM_AUTH_REF_DOCS_EXPECTED = 1;
 
@@ -119,12 +118,11 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         MultipartOutput multipart = createIntakeInstance(
                 "entryNumber-" + identifier,
                 "entryDate-" + identifier,
-								currentOwnerRefName,
-								depositorRefName,
-								conditionCheckAssesorRefName,
-								insurerRefName,
-								fieldCollectorRefName,
-								valuerRefName );
+		currentOwnerRefName,
+		depositorRefName,
+		conditionCheckerAssessorRefName,
+		insurerRefName,
+		valuerRefName );
 
         ClientResponse<Response> res = intakeClient.create(multipart);
         try {
@@ -186,17 +184,13 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
 									authRefName, "Debbie Depositor", true);
         personIdsCreated.add(createPerson("Debbie", "Depositor", depositorRefName));
         
-        conditionCheckAssesorRefName = PersonAuthorityClientUtils.createPersonRefName(
-									authRefName, "Andrew Assessor", true);
-        personIdsCreated.add(createPerson("Andrew", "Assessor", conditionCheckAssesorRefName));
+        conditionCheckerAssessorRefName = PersonAuthorityClientUtils.createPersonRefName(
+									authRefName, "Andrew Checker-Assessor", true);
+        personIdsCreated.add(createPerson("Andrew", "Checker-Assessor", conditionCheckerAssessorRefName));
         
         insurerRefName = PersonAuthorityClientUtils.createPersonRefName(
 									authRefName, "Ingrid Insurer", true);
         personIdsCreated.add(createPerson("Ingrid", "Insurer", insurerRefName));
-        
-        fieldCollectorRefName = PersonAuthorityClientUtils.createPersonRefName(
-									authRefName, "Connie Collector", true);
-        personIdsCreated.add(createPerson("Connie", "Collector", fieldCollectorRefName));
         
         valuerRefName = PersonAuthorityClientUtils.createPersonRefName(
 									authRefName, "Vince Valuer", true);
@@ -326,18 +320,16 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
     		String entryDate,
 				String currentOwner,
 				String depositor,
-				String conditionCheckAssesor,
+				String conditionCheckerAssessor,
 				String insurer,
-				String fieldCollector,
 				String Valuer ) {
         IntakesCommon intake = new IntakesCommon();
         intake.setEntryNumber(entryNumber);
         intake.setEntryDate(entryDate);
         intake.setCurrentOwner(currentOwner);
         intake.setDepositor(depositor);
-        intake.setConditionCheckAssesor(conditionCheckAssesor);
+        intake.setConditionCheckerAssessor(conditionCheckerAssessor);
         intake.setInsurer(insurer);
-        intake.setFieldCollector(fieldCollector);
         intake.setValuer(Valuer);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =

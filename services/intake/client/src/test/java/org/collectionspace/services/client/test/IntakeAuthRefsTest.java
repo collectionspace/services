@@ -72,11 +72,10 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
     private String personAuthCSID = null; 
     private String currentOwnerRefName = null;
     private String depositorRefName = null;
-    private String conditionCheckAssesorRefName = null;
+    private String conditionCheckerAssessorRefName = null;
     private String insurerRefName = null;
-    private String fieldCollectorRefName = null;
     private String valuerRefName = null;
-    private final int NUM_AUTH_REFS_EXPECTED = 6;
+    private final int NUM_AUTH_REFS_EXPECTED = 5;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -120,9 +119,8 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
                 "entryDate-" + identifier,
                 currentOwnerRefName,
                 depositorRefName,
-                conditionCheckAssesorRefName,
+                conditionCheckerAssessorRefName,
                 insurerRefName,
-                fieldCollectorRefName,
                 valuerRefName );
         ClientResponse<Response> res = intakeClient.create(multipart);
 
@@ -177,17 +175,13 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
 									authRefName, "Debbie Depositor", true);
         personIdsCreated.add(createPerson("Debbie", "Depositor", depositorRefName));
         
-        conditionCheckAssesorRefName = PersonAuthorityClientUtils.createPersonRefName(
-									authRefName, "Andrew Assessor", true);
-        personIdsCreated.add(createPerson("Andrew", "Assessor", conditionCheckAssesorRefName));
+        conditionCheckerAssessorRefName = PersonAuthorityClientUtils.createPersonRefName(
+									authRefName, "Andrew Checker-Assessor", true);
+        personIdsCreated.add(createPerson("Andrew", "Checker-Assessor", conditionCheckerAssessorRefName));
         
         insurerRefName = PersonAuthorityClientUtils.createPersonRefName(
 									authRefName, "Ingrid Insurer", true);
         personIdsCreated.add(createPerson("Ingrid", "Insurer", insurerRefName));
-        
-        fieldCollectorRefName = PersonAuthorityClientUtils.createPersonRefName(
-									authRefName, "Connie Collector", true);
-        personIdsCreated.add(createPerson("Connie", "Collector", fieldCollectorRefName));
         
         valuerRefName = PersonAuthorityClientUtils.createPersonRefName(
 									authRefName, "Vince Valuer", true);
@@ -333,21 +327,20 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
     }
 
    private MultipartOutput createIntakeInstance(String entryNumber,
-    		String entryDate,
-				String currentOwner,
-				String depositor,
-				String conditionCheckAssesor,
-				String insurer,
-				String fieldCollector,
-				String Valuer ) {
+        String entryDate,
+        String currentOwner,
+        String depositor,
+        String conditionCheckerAssessor,
+        String insurer,
+        String Valuer ) {
+
         IntakesCommon intake = new IntakesCommon();
         intake.setEntryNumber(entryNumber);
         intake.setEntryDate(entryDate);
         intake.setCurrentOwner(currentOwner);
         intake.setDepositor(depositor);
-        intake.setConditionCheckAssesor(conditionCheckAssesor);
+        intake.setConditionCheckerAssessor(conditionCheckerAssessor);
         intake.setInsurer(insurer);
-        intake.setFieldCollector(fieldCollector);
         intake.setValuer(Valuer);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =

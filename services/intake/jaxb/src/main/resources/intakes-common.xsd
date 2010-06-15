@@ -44,9 +44,39 @@
                 <xs:element name="entryReason" type="xs:string"/>
                 <xs:element name="packingNote" type="xs:string"/>
                 <xs:element name="returnDate" type="xs:string"/>
-                
+
+                <!--  Object Collection Information Group -->
+                <xs:element name="fieldCollectionEventName" type="xs:string"/>
+
+                <!-- Valuation Information Group -->
+                <xs:element name="valuationReferenceNumber" type="xs:string"/>
+                <xs:element name="valuer" type="xs:string"/>
+
+                <!-- Insurance Information Group -->
+                <xs:element name="insuranceNote" type="xs:string"/>
+                <xs:element name="insurancePolicyNumber" type="xs:string"/>
+                <xs:element name="insuranceReferenceNumber" type="xs:string"/>
+                <xs:element name="insuranceRenewalDate" type="xs:string"/>
+                <xs:element name="insurer" type="xs:string"/>
+
+                <!-- Object Location Information Group -->
+                <xs:element name="currentLocation" type="xs:string"/>
+                <xs:element name="currentLocationFitness" type="xs:string"/>
+                <xs:element name="currentLocationNote" type="xs:string"/>
+                <xs:element name="locationDate" type="xs:string"/>
+                <xs:element name="normalLocation" type="xs:string"/>
+
+                <!-- Condition Check/Technical Assessment Information Group -->
+                <xs:element name="conditionCheckDate" type="xs:string"/>
+                <xs:element name="conditionCheckMethod" type="xs:string"/>
+                <xs:element name="conditionCheckNote" type="xs:string"/>
+                <xs:element name="conditionCheckReason" type="xs:string"/>
+                <xs:element name="conditionCheckReferenceNumber" type="xs:string"/>
+                <xs:element name="conditionCheckerAssessor" type="xs:string"/>
+
                 <!--  Date Information Group -->
-                <xs:element name="associationDate" type="xs:string"/>
+                <!-- This appears to be a placeholder structured date -->
+                <xs:element name="dateAssociation" type="xs:string"/>
                 <xs:element name="earliestDate" type="xs:string"/>
                 <xs:element name="earliestDateCertainty" type="xs:string"/>
                 <xs:element name="earliestDateQualifier" type="xs:string"/>
@@ -55,38 +85,7 @@
                 <xs:element name="latestDateQualifier" type="xs:string"/>
                 <xs:element name="datePeriod" type="xs:string"/>
                 <xs:element name="dateText" type="xs:string"/>
-                
-                <!--  Object Collection Information Group -->
-                <xs:element name="fieldCollectionDate" type="xs:string"/>
-                <xs:element name="fieldCollectionEventName" type="xs:string"/>
-                <xs:element name="fieldCollectionNumber" type="xs:string"/>
-                <xs:element name="fieldCollector" type="xs:string"/>
-                
-                <!-- Valuation Information Group -->
-                <xs:element name="valuationReferenceNumber" type="xs:string"/>
-                <xs:element name="valuer" type="xs:string"/>
-                
-                <!-- Insurance Information Group -->
-                <xs:element name="insuranceNote" type="xs:string"/>
-                <xs:element name="insurancePolicyNumber" type="xs:string"/>
-                <xs:element name="insuranceReferenceNumber" type="xs:string"/>
-                <xs:element name="insuranceRenewalDate" type="xs:string"/>
-                <xs:element name="insurer" type="xs:string"/>
-                
-                <!-- Object Location Information Group -->
-                <xs:element name="currentLocation" type="xs:string"/>
-                <xs:element name="currentLocationFitness" type="xs:string"/>
-                <xs:element name="currentLocationNote" type="xs:string"/>
-                <xs:element name="locationDate" type="xs:string"/>
-                <xs:element name="normalLocation" type="xs:string"/>
-                
-                <!-- Condition Check/Technical Assessment Information Group -->
-                <xs:element name="conditionCheckDate" type="xs:string"/>
-                <xs:element name="conditionCheckMethod" type="xs:string"/>
-                <xs:element name="conditionCheckNote" type="xs:string"/>
-                <xs:element name="conditionCheckReason" type="xs:string"/>
-                <xs:element name="conditionCheckReferenceNumber" type="xs:string"/>
-                <xs:element name="conditionCheckAssesor" type="xs:string"/>
+
             </xs:sequence>
         </xs:complexType>
     </xs:element>
