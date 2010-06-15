@@ -64,20 +64,17 @@
 <dimensionValueQualifier>dimensionValueQualifier</dimensionValueQualifier>
   <editionNumber>editionNumber</editionNumber>
   <form>form</form>
-  <inscriptionContent>inscriptionContent</inscriptionContent>
-  <inscriber>inscriber</inscriber>
-  <inscriptionDate>inscriptionDate</inscriptionDate>
-
-<inscriptionInterpretation>inscriptionInterpretation</inscriptionInterpretation>
-  <inscriptionLanguage>inscriptionLanguage</inscriptionLanguage>
-  <inscriptionMethod>inscriptionMethod</inscriptionMethod>
-  <inscriptionPosition>inscriptionPosition</inscriptionPosition>
-  <inscriptionScript>inscriptionScript</inscriptionScript>
-  <inscriptionTranslation>inscriptionTranslation</inscriptionTranslation>
-
-<inscriptionTransliteration>inscriptionTransliteration</inscriptionTransliteration>
-  <inscriptionType>inscriptionType</inscriptionType>
-  <inscriptionDescription>inscriptionDescription</inscriptionDescription>
+ <inscriptionContent>inscriptionContent</inscriptionContent>
+<inscriptionContentInscriber>inscriptionContentInscriber</inscriptionContentInscriber>
+<inscriptionContentDate>inscriptionContentDate</inscriptionContentDate>
+<inscriptionContentInterpretation>inscriptionContentInterpretation</inscriptionContentInterpretation>
+<inscriptionContentLanguage>inscriptionContentLanguage</inscriptionContentLanguage>
+<inscriptionContentMethod>inscriptionContentMethod</inscriptionContentMethod>
+<inscriptionContentPosition>inscriptionContentPosition</inscriptionContentPosition>
+<inscriptionContentScript>inscriptionContentScript</inscriptionContentScript>
+<inscriptionContentTranslation>inscriptionContentTranslation</inscriptionContentTranslation>
+<inscriptionContentTransliteration>inscriptionContentTransliteration</inscriptionContentTransliteration>
+<inscriptionContentType>inscriptionContentType</inscriptionContentType>  <inscriptionDescription>inscriptionDescription</inscriptionDescription>
 
 <inscriptionDescriptionInscriber>inscriptionDescriptionInscriber</inscriptionDescriptionInscriber>
 

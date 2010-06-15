@@ -66,7 +66,7 @@
                         <types:item><types:key>authRef</types:key><types:value>contentOrganization</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>contentPeople</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>contentPerson</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>inscriber</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>inscriptionContentInscriber</types:value></types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
@@ -1114,7 +1114,7 @@
                         <types:item><types:key>authRef</types:key><types:value>contentOrganization</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>contentPeople</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>contentPerson</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>inscriber</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>inscriptionContentInscriber</types:value></types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent

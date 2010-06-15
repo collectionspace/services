@@ -69,7 +69,7 @@
                 <xs:element name="responsibleDepartments" type="responsibleDepartmentList"/>
                 <xs:element name="collection" type="xs:string"/>
                 <xs:element name="title" type="xs:string"/>
-                <xs:element name="objectTitleLanguage" type="xs:string"/>
+                <xs:element name="titleLanguage" type="xs:string"/>
                 <xs:element name="titleTranslation" type="xs:string"/>
                 <xs:element name="titleType" type="xs:string"/>
                 <xs:element name="recordStatus" type="xs:string"/>
@@ -115,16 +115,16 @@
 
                 <!-- Object description Inscription - Content Information -->
                 <xs:element name="inscriptionContent" type="xs:string" />
-                <xs:element name="inscriber" type="xs:string" />
-                <xs:element name="inscriptionDate" type="xs:string" />
-                <xs:element name="inscriptionInterpretation" type="xs:string" />
-                <xs:element name="inscriptionLanguage" type="xs:string" />
-                <xs:element name="inscriptionMethod" type="xs:string" />
-                <xs:element name="inscriptionPosition" type="xs:string" />
-                <xs:element name="inscriptionScript" type="xs:string" />
-                <xs:element name="inscriptionTranslation" type="xs:string" />
-                <xs:element name="inscriptionTransliteration" type="xs:string" />
-                <xs:element name="inscriptionType" type="xs:string" />
+                <xs:element name="inscriptionContentInscriber" type="xs:string" />
+                <xs:element name="inscriptionContentDate" type="xs:string" />
+                <xs:element name="inscriptionContentInterpretation" type="xs:string" />
+                <xs:element name="inscriptionContentLanguage" type="xs:string" />
+                <xs:element name="inscriptionContentMethod" type="xs:string" />
+                <xs:element name="inscriptionContentPosition" type="xs:string" />
+                <xs:element name="inscriptionContentScript" type="xs:string" />
+                <xs:element name="inscriptionContentTranslation" type="xs:string" />
+                <xs:element name="inscriptionContentTransliteration" type="xs:string" />
+                <xs:element name="inscriptionContentType" type="xs:string" />
                 
                 <!-- Object Description Inscription - Description Information -->
                 <xs:element name="inscriptionDescription" type="xs:string" />
@@ -166,6 +166,7 @@
                 <xs:element name="techniqueType" type="xs:string" />
 
                 <!-- Object History and Association Information - Association -->
+                <xs:element name="associatedActivity" type="xs:string" />
                 <xs:element name="associatedActivityNote" type="xs:string" />
                 <xs:element name="associatedConcept" type="xs:string" />
                 <xs:element name="associatedCulturalAffinity" type="xs:string" />
@@ -193,7 +194,7 @@
                 <xs:element name="ownershipDates" type="xs:string" />
                 <xs:element name="ownershipExchangeMethod" type="xs:string" />
                 <xs:element name="ownershipExchangeNote" type="xs:string" />
-                <xs:element name="ownershipExchangePriceDenomination" type="xs:string" />
+                <xs:element name="ownershipExchangePriceCurrency" type="xs:string" />
                 <xs:element name="ownershipExchangePriceValue" type="xs:string" />
                 <xs:element name="ownershipPlace" type="xs:string" />
                 <xs:element name="usage" type="xs:string" />

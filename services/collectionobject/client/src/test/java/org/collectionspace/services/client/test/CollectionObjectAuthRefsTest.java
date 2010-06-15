@@ -94,7 +94,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     private String contentPersonRefName = null;
     
     /** The inscriber ref name. */
-    private String inscriberRefName = null;
+    private String contentInscriberRefName = null;
     
     /** The number of authority references expected. */
     private final int NUM_AUTH_REFS_EXPECTED = 4;
@@ -147,7 +147,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
 								contentOrganizationRefName,
 								contentPeopleRefName,
 								contentPersonRefName,
-								inscriberRefName );
+								contentInscriberRefName );
 
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
 
@@ -197,21 +197,21 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         Assert.assertEquals(statusCode, STATUS_CREATED);
         personAuthCSID = extractId(res);
         
-        contentOrganizationRefName = PersonAuthorityClientUtils.createPersonRefName(
-        							authRefName, "Omni Org", true);
+        contentOrganizationRefName =
+            PersonAuthorityClientUtils.createPersonRefName(authRefName, "Omni Org", true);
         personIdsCreated.add(createPerson("Omni", "Org", contentOrganizationRefName));
         
-        contentPeopleRefName = PersonAuthorityClientUtils.createPersonRefName(
-									authRefName, "Pushy People", true);
+        contentPeopleRefName =
+            PersonAuthorityClientUtils.createPersonRefName(authRefName, "Pushy People", true);
         personIdsCreated.add(createPerson("Pushy", "People", contentPeopleRefName));
         
-        contentPersonRefName = PersonAuthorityClientUtils.createPersonRefName(
-									authRefName, "Connie ContactPerson", true);
+        contentPersonRefName =
+                PersonAuthorityClientUtils.createPersonRefName(authRefName, "Connie ContactPerson", true);
         personIdsCreated.add(createPerson("Connie", "ContactPerson", contentPersonRefName));
         
-        inscriberRefName = PersonAuthorityClientUtils.createPersonRefName(
-									authRefName, "Ingrid Inscriber", true);
-        personIdsCreated.add(createPerson("Ingrid", "Inscriber", inscriberRefName));
+        contentInscriberRefName =
+            PersonAuthorityClientUtils.createPersonRefName(authRefName, "Ingrid Inscriber", true);
+        personIdsCreated.add(createPerson("Ingrid", "Inscriber", contentInscriberRefName));
     }
     
     /**
@@ -276,7 +276,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         Assert.assertNotNull(collectionObject);
         // Check a couple of fields
         Assert.assertEquals(collectionObject.getContentOrganization(), contentOrganizationRefName);
-        Assert.assertEquals(collectionObject.getInscriber(), inscriberRefName);
+        Assert.assertEquals(collectionObject.getInscriptionContentInscriber(), contentInscriberRefName);
         
         // Get the auth refs and check them
         ClientResponse<AuthorityRefList> res2 = collectionObjectClient.getAuthorityRefs(knownResourceId);
@@ -393,7 +393,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         collectionObject.setContentOrganization(contentOrganization);
         collectionObject.setContentPeople(contentPeople);
         collectionObject.setContentPerson(contentPerson);
-        collectionObject.setInscriber(inscriber);
+        collectionObject.setInscriptionContentInscriber(inscriber);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(collectionObject, MediaType.APPLICATION_XML_TYPE);

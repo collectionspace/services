@@ -107,6 +107,7 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 
     // Success outcomes
 
+    // FIXME: Rename to searchWithOneKeyword
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void keywordSearchOneWord(String testName) throws Exception {
 
@@ -159,12 +160,14 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 
     }
 
+    // FIXME: Rename to searchWithOneKeywordInRepeatableScalarField
     // @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void keywordSearchRepeatableScalarField(String testName) throws Exception {
     }
 
     // Failure outcomes
 
+    // FIXME: Rename to searchWithNonExistentKeyword
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
     public void keywordSearchNonExistentKeyword(String testName) throws Exception {
 
