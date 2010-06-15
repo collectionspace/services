@@ -595,6 +595,50 @@ public class VocabularyResource extends
         return vocabularyItemObjectList;
     }
 
+    
+    /**
+     * Gets the vocabulary item list.
+     * 
+     * @param parentcsid the parentcsid
+     * @param partialTerm the partial term
+     * @param ui the ui
+     * 
+     * @return the vocabulary item list
+     */
+    @GET
+    @Path("urn:cspace:name({specifier})/items")
+    @Produces("application/xml")
+    public VocabularyitemsCommonList getVocabularyItemListByVocabName(
+            @PathParam("specifier") String specifier,
+            @QueryParam(IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
+            @Context UriInfo ui) {
+        try {
+	        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+	        String whereClause =
+	        	VocabularyJAXBSchema.VOCABULARIES_COMMON+
+	        	":"+VocabularyJAXBSchema.SHORT_IDENTIFIER+
+	        	"='"+specifier+"'";
+	        // Need to get an Authority by name
+	        ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+	        String parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
+	        return getVocabularyItemList(parentcsid, partialTerm, ui);
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Caught exception in getVocabularyItemListByVocabName", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+    	
+    }
+    
+    
+
     /**
      * Update vocabulary item.
      * 

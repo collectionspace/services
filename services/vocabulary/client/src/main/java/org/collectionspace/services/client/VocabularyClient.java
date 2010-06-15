@@ -176,6 +176,16 @@ public class VocabularyClient extends AbstractServiceClientImpl {
     }
 
     /**
+     * Read item list for named vocabulary.
+     *
+     * @param specifier the specifier
+     * @return the client response
+     */
+    public ClientResponse<VocabularyitemsCommonList> readItemListForNamedVocabulary(String specifier) {
+        return vocabularyProxy.readItemListForNamedVocabulary(specifier);
+    }
+
+    /**
      * Read item.
      *
      * @param vcsid the vcsid

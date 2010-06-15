@@ -8,7 +8,10 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.vocabulary.VocabulariesCommonList;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommonList;
@@ -58,6 +61,12 @@ public interface VocabularyProxy extends CollectionSpaceProxy {
     @Produces({"application/xml"})
     @Path("/{vcsid}/items/")
     ClientResponse<VocabularyitemsCommonList> readItemList(@PathParam("vcsid") String vcsid);
+    
+    // List Items using the name of the Vocab
+    @GET
+    @Produces({"application/xml"})
+    @Path("/urn:cspace:name({specifier})/items")
+    ClientResponse<VocabularyitemsCommonList> readItemListForNamedVocabulary(@PathParam("specifier") String specifier);
 
     //(C)reate Item
     @POST

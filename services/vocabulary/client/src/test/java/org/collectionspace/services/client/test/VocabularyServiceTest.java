@@ -187,7 +187,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-            dependsOnMethods = {"create", "createItem"})
+            dependsOnMethods = {"create", "createItem", "readItem"})
     public void createList(String testName) throws Exception {
         for (int i = 0; i < 3; i++) {
         	// Force create to reset the known resource info
@@ -682,28 +682,39 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
                         item.getDisplayName());
                 logger.debug(testName + ": list-item[" + i + "] URI=" +
                         item.getUri());
-                readItemList(csid);
+                readItemListInt(csid, null, "readList");
                 i++;
             }
         }
     }
 
-    @Test(dependsOnMethods = {"createList", "readItem"})
-    public void readItemList() {
-        readItemList(knownResourceId);
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+            dependsOnMethods = {"createList", "readItem"})
+    public void readItemList(String testName) {
+    	readItemListInt(knownResourceId, null, testName);
     }
 
-    private void readItemList(String vcsid) {
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+            dependsOnMethods = {"createList", "readItem"})
+    public void readItemListByName(String testName) {
+    	readItemListInt(null, knownResourceShortIdentifer, testName);
+    }
 
-        final String testName = "readItemList";
+    private void readItemListInt(String vcsid, String shortId, String testName) {
 
         // Perform setup.
         setupReadList();
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
-        ClientResponse<VocabularyitemsCommonList> res =
-                client.readItemList(vcsid);
+        ClientResponse<VocabularyitemsCommonList> res = null;
+        if(vcsid!=null) {
+            res = client.readItemList(vcsid);
+        } else if(shortId!=null) {
+            res = client.readItemListForNamedVocabulary(shortId);
+        } else {
+        	Assert.fail("Internal Error: readItemList both vcsid and shortId are null!");
+        }
         VocabularyitemsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
