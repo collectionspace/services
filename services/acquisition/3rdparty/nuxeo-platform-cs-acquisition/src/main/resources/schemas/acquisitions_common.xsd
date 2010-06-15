@@ -20,12 +20,12 @@
     
     <!-- See http://wiki.collectionspace.org/display/collectionspace/Acquisition+Schema -->
 
-<!--  Object Entry Information Group -->
+    <!--  Object Entry Information Group -->
     <xs:element name="accessionDate" type="xs:string"/>
     <xs:element name="acquisitionAuthorizer" type="xs:string"/>
     <xs:element name="acquisitionAuthorizerDate" type="xs:string"/>
     <xs:element name="acquisitionDate" type="xs:string"/>
-    <xs:element name="acquisitionFundingDenomination" type="xs:string"/>
+    <xs:element name="acquisitionFundingCurrency" type="xs:string"/>
     <xs:element name="acquisitionFundingValue" type="xs:string"/>
     <xs:element name="acquisitionFundingSource" type="xs:string"/>
     <xs:element name="acquisitionFundingSourceProvisos" type="xs:string"/>
@@ -34,6 +34,7 @@
     <xs:element name="acquisitionProvisos" type="xs:string"/>
     <xs:element name="acquisitionReason" type="xs:string"/>
     <xs:element name="acquisitionReferenceNumber" type="xs:string"/>
+    <xs:element name="owner" type="xs:string"/>
     <xs:element name="acquisitionSources">
         <xs:complexType>
             <xs:sequence>
@@ -41,20 +42,19 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="groupPurchasePriceDenomination" type="xs:string"/>
+    <xs:element name="groupPurchasePriceCurrency" type="xs:string"/>
     <xs:element name="groupPurchasePriceValue" type="xs:string"/>
-    <xs:element name="objectOfferPriceDenomination" type="xs:string"/>
+    <xs:element name="objectOfferPriceCurrency" type="xs:string"/>
     <xs:element name="objectOfferPriceValue" type="xs:string"/>
-    <xs:element name="objectPurchaseOfferPriceDenomination" type="xs:string"/>
+    <xs:element name="objectPurchaseOfferPriceCurrency" type="xs:string"/>
     <xs:element name="objectPurchaseOfferPriceValue" type="xs:string"/>
-    <xs:element name="objectPurchasePriceDenomination" type="xs:string"/>
+    <xs:element name="objectPurchasePriceCurrency" type="xs:string"/>
     <xs:element name="objectPurchasePriceValue" type="xs:string"/>
-    <xs:element name="originalObjectPurchasePriceDenomination" type="xs:string"/>
+    <xs:element name="originalObjectPurchasePriceCurrency" type="xs:string"/>
     <xs:element name="originalObjectPurchasePriceValue" type="xs:string"/>
     <xs:element name="transferOfTitleNumber" type="xs:string"/>
+
     <!-- Object Collection Information Group -->
-    <xs:element name="fieldCollectionDate" type="xs:string"/>
     <xs:element name="fieldCollectionEventName" type="xs:string"/>
-    <xs:element name="fieldCollectionNumber" type="xs:string"/>
-    <xs:element name="fieldCollector" type="xs:string"/>
+
 </xs:schema>

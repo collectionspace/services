@@ -650,7 +650,6 @@
                         <types:item><types:key>authRef</types:key><types:value>acquisitionAuthorizer</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>acquisitionFundingSource</types:value></types:item>
                         <!-- Need to handle repeating ref fields, like "acquisitionSources" -->
-                        <types:item><types:key>authRef</types:key><types:value>fieldCollector</types:value></types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
@@ -1695,7 +1694,6 @@
                         <types:item><types:key>authRef</types:key><types:value>acquisitionAuthorizer</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>acquisitionFundingSource</types:value></types:item>
                         <!-- Need to handle repeating ref fields, like "acquisitionSources" -->
-                        <types:item><types:key>authRef</types:key><types:value>fieldCollector</types:value></types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent

@@ -14,7 +14,7 @@
         <row><widget>acquisitionAuthorizer</widget></row>
         <row><widget>acquisitionAuthorizerDate</widget></row>
         <row><widget>acquisitionDate</widget></row>
-        <row><widget>acquisitionFundingDenomination</widget></row>
+        <row><widget>acquisitionFundingCurrency</widget></row>
         <row><widget>acquisitionFundingValue</widget></row>
         <row><widget>acquisitionFundingSource</widget></row>
         <row><widget>acquisitionFundingSourceProvisos</widget></row>
@@ -23,22 +23,20 @@
         <row><widget>acquisitionProvisos</widget></row>
         <row><widget>acquisitionReason</widget></row>
         <row><widget>acquisitionReferenceNumber</widget></row>
-        <row><widget>acquisitionSource</widget></row>
-        <row><widget>groupPurchasePriceDenomination</widget></row>
+        <row><widget>owner</widget></row>
+        <!-- row><widget>acquisitionSource</widget></row -->
+        <row><widget>groupPurchasePriceCurrency</widget></row>
         <row><widget>groupPurchasePriceValue</widget></row>
-        <row><widget>objectOfferPriceDenomination</widget></row>
+        <row><widget>objectOfferPriceCurrency</widget></row>
         <row><widget>objectOfferPriceValue</widget></row>
-        <row><widget>objectPurchaseOfferPriceDenomination</widget></row>
+        <row><widget>objectPurchaseOfferPriceCurrency</widget></row>
         <row><widget>objectPurchaseOfferPriceValue</widget></row>
-        <row><widget>objectPurchasePriceDenomination</widget></row>
+        <row><widget>objectPurchasePriceCurrency</widget></row>
         <row><widget>objectPurchasePriceValue</widget></row>
-        <row><widget>originalObjectPurchasePriceDenomination</widget></row>
+        <row><widget>originalObjectPurchasePriceCurrency</widget></row>
         <row><widget>originalObjectPurchasePriceValue</widget></row>
         <row><widget>transferOfTitleNumber</widget></row>
-        <row><widget>fieldCollectionDate</widget></row>
         <row><widget>fieldCollectionEventName</widget></row>
-        <row><widget>fieldCollectionNumber</widget></row>
-        <row><widget>fieldCollector</widget></row>
       </rows>
 
       <widget name="accessionDate" type="text">
@@ -93,13 +91,13 @@
         </properties>
       </widget>
       
-      <widget name="acquisitionFundingDenomination" type="text">
+      <widget name="acquisitionFundingCurrency" type="text">
         <labels>
-          <label mode="any">acquisitionFundingDenomination</label>
+          <label mode="any">acquisitionFundingCurrency</label>
         </labels>
         <translated>true</translated>
         <fields>
-          <field>acquisitions_common:acquisitionFundingDenomination</field>
+          <field>acquisitions_common:acquisitionFundingCurrency</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -210,6 +208,20 @@
         </properties>
       </widget>
       
+        <widget name="owner" type="text">
+        <labels>
+          <label mode="any">owner</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>acquisitions_common:owner</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <!--
       <widget name="acquisitionSource" type="text">
         <labels>
           <label mode="any">acquisitionSources</label>
@@ -222,14 +234,15 @@
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
+      -->
       
-      <widget name="groupPurchasePriceDenomination" type="text">
+      <widget name="groupPurchasePriceCurrency" type="text">
         <labels>
-          <label mode="any">groupPurchasePriceDenomination</label>
+          <label mode="any">groupPurchasePriceCurrency</label>
         </labels>
         <translated>true</translated>
         <fields>
-          <field>acquisitions_common:groupPurchasePriceDenomination</field>
+          <field>acquisitions_common:groupPurchasePriceCurrency</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -249,13 +262,13 @@
         </properties>
       </widget>
 
-      <widget name="objectOfferPriceDenomination" type="text">
+      <widget name="objectOfferPriceCurrency" type="text">
         <labels>
-          <label mode="any">objectOfferPriceDenomination</label>
+          <label mode="any">objectOfferPriceCurrency</label>
         </labels>
         <translated>true</translated>
         <fields>
-          <field>acquisitions_common:objectOfferPriceDenomination</field>
+          <field>acquisitions_common:objectOfferPriceCurrency</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -275,13 +288,13 @@
         </properties>
       </widget>
       
-      <widget name="objectPurchaseOfferPriceDenomination" type="text">
+      <widget name="objectPurchaseOfferPriceCurrency" type="text">
         <labels>
-          <label mode="any">objectPurchaseOfferPriceDenomination</label>
+          <label mode="any">objectPurchaseOfferPriceCurrency</label>
         </labels>
         <translated>true</translated>
         <fields>
-          <field>acquisitions_common:objectPurchaseOfferPriceDenomination</field>
+          <field>acquisitions_common:objectPurchaseOfferPriceCurrency</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -301,13 +314,13 @@
         </properties>
       </widget>
 
-      <widget name="objectPurchasePriceDenomination" type="text">
+      <widget name="objectPurchasePriceCurrency" type="text">
         <labels>
-          <label mode="any">objectPurchasePriceDenomination</label>
+          <label mode="any">objectPurchasePriceCurrency</label>
         </labels>
         <translated>true</translated>
         <fields>
-          <field>acquisitions_common:objectPurchasePriceDenomination</field>
+          <field>acquisitions_common:objectPurchasePriceCurrency</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -327,13 +340,13 @@
         </properties>
       </widget>
 
-      <widget name="originalObjectPurchasePriceDenomination" type="text">
+      <widget name="originalObjectPurchasePriceCurrency" type="text">
         <labels>
-          <label mode="any">originalObjectPurchasePriceDenomination</label>
+          <label mode="any">originalObjectPurchasePriceCurrency</label>
         </labels>
         <translated>true</translated>
         <fields>
-          <field>acquisitions_common:originalObjectPurchasePriceDenomination</field>
+          <field>acquisitions_common:originalObjectPurchasePriceCurrency</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -366,19 +379,6 @@
         </properties>
       </widget>
 
-      <widget name="fieldCollectionDate" type="text">
-        <labels>
-          <label mode="any">fieldCollectionDate</label>
-        </labels>
-        <translated>true</translated>
-        <fields>
-          <field>acquisitions_common:fieldCollectionDate</field>
-        </fields>
-        <properties widgetMode="edit">
-          <property name="styleClass">dataInputText</property>
-        </properties>
-      </widget>
-
       <widget name="fieldCollectionEventName" type="text">
         <labels>
           <label mode="any">fieldCollectionEventName</label>
@@ -386,32 +386,6 @@
         <translated>true</translated>
         <fields>
           <field>acquisitions_common:fieldCollectionEventName</field>
-        </fields>
-        <properties widgetMode="edit">
-          <property name="styleClass">dataInputText</property>
-        </properties>
-      </widget>
-
-      <widget name="fieldCollectionNumber" type="text">
-        <labels>
-          <label mode="any">fieldCollectionNumber</label>
-        </labels>
-        <translated>true</translated>
-        <fields>
-          <field>acquisitions_common:fieldCollectionNumber</field>
-        </fields>
-        <properties widgetMode="edit">
-          <property name="styleClass">dataInputText</property>
-        </properties>
-      </widget>
-
-      <widget name="fieldCollector" type="text">
-        <labels>
-          <label mode="any">fieldCollector</label>
-        </labels>
-        <translated>true</translated>
-        <fields>
-          <field>acquisitions_common:fieldCollector</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>

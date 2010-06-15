@@ -70,15 +70,12 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
     private String knownResourceId = null;
     private List<String> acquisitionIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();
-    private int CREATED_STATUS = Response.Status.CREATED.getStatusCode();
-    private int OK_STATUS = Response.Status.OK.getStatusCode();
     private String personAuthCSID = null; 
     private String acquisitionAuthorizerRefName = null;
     private String acquisitionFundingSourceRefName = null;
     // Not ready for multiples, yet
     //private String acquisitionSourcesRefName = null;
-    private String fieldCollectorRefName = null;
-    private final int NUM_AUTH_REFS_EXPECTED = 3;
+    private final int NUM_AUTH_REFS_EXPECTED = 2;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -118,10 +115,9 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         createPersonRefs();
         
         MultipartOutput multipart = createAcquisitionInstance(
-                				"April 1, 2010",
-								acquisitionAuthorizerRefName,
-								acquisitionFundingSourceRefName,
-								fieldCollectorRefName );
+            "April 1, 2010",
+	    acquisitionAuthorizerRefName,
+	    acquisitionFundingSourceRefName);
 
         AcquisitionClient acquisitionClient = new AcquisitionClient();
         ClientResponse<Response> res = acquisitionClient.create(multipart);
@@ -157,30 +153,25 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
     
     protected void createPersonRefs(){
     	String authRefName = 
-    		PersonAuthorityClientUtils.createPersonAuthRefName(PERSON_AUTHORITY_NAME, false);
+    	    PersonAuthorityClientUtils.createPersonAuthRefName(PERSON_AUTHORITY_NAME, false);
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
-    			PERSON_AUTHORITY_NAME, authRefName, personAuthClient.getCommonPartName());
+    	    PERSON_AUTHORITY_NAME, authRefName, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
 
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, CREATED_STATUS);
+            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, STATUS_CREATED);
         personAuthCSID = extractId(res);
         
         acquisitionAuthorizerRefName = PersonAuthorityClientUtils.createPersonRefName(
-        							authRefName, "Annie Authorizer", true);
+            authRefName, "Annie Authorizer", true);
         personIdsCreated.add(createPerson("Annie", "Authorizer", acquisitionAuthorizerRefName));
         
         acquisitionFundingSourceRefName = PersonAuthorityClientUtils.createPersonRefName(
-									authRefName, "Sammy Source", true);
+	    authRefName, "Sammy Source", true);
         personIdsCreated.add(createPerson("Sammy", "Source", acquisitionFundingSourceRefName));
-        
-        
-        fieldCollectorRefName = PersonAuthorityClientUtils.createPersonRefName(
-									authRefName, "Connie Collector", true);
-        personIdsCreated.add(createPerson("Connie", "Collector", fieldCollectorRefName));
     }
     
     protected String createPerson(String firstName, String surName, String refName ) {
@@ -189,14 +180,14 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     	MultipartOutput multipart = 
-    		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
-    				refName, personInfo, personAuthClient.getItemCommonPartName());
+    	    PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
+    		refName, personInfo, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         int statusCode = res.getStatus();
 
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, CREATED_STATUS);
+            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, STATUS_CREATED);
     	return extractId(res);
     }
 
@@ -223,7 +214,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
             logger.debug(testName + ".read: status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         MultipartInput input = (MultipartInput) res.getEntity();
@@ -232,7 +223,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         Assert.assertNotNull(acquisition);
         // Check a couple of fields
         Assert.assertEquals(acquisition.getAcquisitionAuthorizer(), acquisitionAuthorizerRefName);
-        Assert.assertEquals(acquisition.getFieldCollector(), fieldCollectorRefName);
+        Assert.assertEquals(acquisition.getAcquisitionFundingSource(), acquisitionFundingSourceRefName);
         
         // Get the auth refs and check them
         ClientResponse<AuthorityRefList> res2 =
@@ -327,15 +318,14 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
     }
 
    private MultipartOutput createAcquisitionInstance(
-    			String accessionDate,
-				String acquisitionAuthorizer,
-				String acquisitionFundingSource,
-				String fieldCollector ) {
+    	String accessionDate,
+	String acquisitionAuthorizer,
+	String acquisitionFundingSource) {
+       
         AcquisitionsCommon acquisition = new AcquisitionsCommon();
         acquisition.setAccessionDate(accessionDate);
         acquisition.setAcquisitionAuthorizer(acquisitionAuthorizer);
         acquisition.setAcquisitionFundingSource(acquisitionFundingSource);
-        acquisition.setFieldCollector(fieldCollector);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(acquisition, MediaType.APPLICATION_XML_TYPE);
