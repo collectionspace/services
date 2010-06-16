@@ -74,18 +74,6 @@
                 <xs:element name="conditionCheckReferenceNumber" type="xs:string"/>
                 <xs:element name="conditionCheckerAssessor" type="xs:string"/>
 
-                <!--  Date Information Group -->
-                <!-- This appears to be a placeholder structured date -->
-                <xs:element name="dateAssociation" type="xs:string"/>
-                <xs:element name="earliestDate" type="xs:string"/>
-                <xs:element name="earliestDateCertainty" type="xs:string"/>
-                <xs:element name="earliestDateQualifier" type="xs:string"/>
-                <xs:element name="latestDate" type="xs:string"/>
-                <xs:element name="latestDateCertainty" type="xs:string"/>
-                <xs:element name="latestDateQualifier" type="xs:string"/>
-                <xs:element name="datePeriod" type="xs:string"/>
-                <xs:element name="dateText" type="xs:string"/>
-
             </xs:sequence>
         </xs:complexType>
     </xs:element>
