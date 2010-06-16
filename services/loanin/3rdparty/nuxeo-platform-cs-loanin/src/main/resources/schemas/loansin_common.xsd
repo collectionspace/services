@@ -22,13 +22,7 @@
 
     <!--  Loan In Information Group -->
     <xs:element name="loanInNumber" type="xs:string"/>
-    <xs:element name="lenders">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="lender" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+    <xs:element name="lender" type="xs:string"/>
     <xs:element name="lendersAuthorizer" type="xs:string"/>
     <xs:element name="lendersAuthorizationDate" type="xs:string"/>
     <xs:element name="lendersContact" type="xs:string"/>

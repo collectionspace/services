@@ -72,12 +72,13 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
     private List<String> loaninIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
+    private String lenderRefName = null;
     private String lendersAuthorizerRefName = null;
     private String lendersContactRefName = null;
     private String loanInContactRefName = null;
     // FIXME: May change when repeatable / multivalue 'lenders' field is added
     // to tenant-bindings.xml
-    private final int NUM_AUTH_REFS_EXPECTED = 3;
+    private final int NUM_AUTH_REFS_EXPECTED = 4;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -122,6 +123,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         MultipartOutput multipart = createLoaninInstance(
                 "loanInNumber-" + identifier,
                 "returnDate-" + identifier,
+                lenderRefName,
                 lendersAuthorizerRefName,
                 lendersContactRefName,
                 loanInContactRefName);
@@ -177,6 +179,10 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
 
         // Create temporary Person resources, and their corresponding refNames
         // by which they can be identified.
+        lenderRefName =
+            PersonAuthorityClientUtils.createPersonRefName(authRefName, "Linus Lender", true);
+        personIdsCreated.add(createPerson("Linus", "Lender", lenderRefName));
+
         lendersAuthorizerRefName =
             PersonAuthorityClientUtils.createPersonRefName(authRefName, "Art Lendersauthorizor", true);
         personIdsCreated.add(createPerson("Art", "Lendersauthorizor", lendersAuthorizerRefName));
@@ -245,7 +251,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
             logger.debug(objectAsXmlString(loanin, LoansinCommon.class));
         }
         // Check a couple of fields
-        // FIXME
+        Assert.assertEquals(loanin.getLender(), lenderRefName);
         Assert.assertEquals(loanin.getLendersAuthorizer(), lendersAuthorizerRefName);
         Assert.assertEquals(loanin.getLendersContact(), lendersContactRefName);
         Assert.assertEquals(loanin.getLoanInContact(), loanInContactRefName);
@@ -269,9 +275,6 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
             logger.debug("Expected " + NUM_AUTH_REFS_EXPECTED +
                 " authority references, found " + numAuthRefsFound);
         }
-        Assert.assertEquals(numAuthRefsFound, NUM_AUTH_REFS_EXPECTED,
-            "Did not find all expected authority references! " +
-            "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
@@ -289,6 +292,11 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
                 i++;
             }
         }
+
+        Assert.assertEquals(numAuthRefsFound, NUM_AUTH_REFS_EXPECTED,
+            "Did not find all expected authority references! " +
+            "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
+
     }
 
 
@@ -351,12 +359,14 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
 
    private MultipartOutput createLoaninInstance(String loaninNumber,
     		String returnDate,
+                String lender,
                 String lendersAuthorizer,
                 String lendersContact,
                 String loaninContact) {
         LoansinCommon loanin = new LoansinCommon();
         loanin.setLoanInNumber(loaninNumber);
         loanin.setLoanInNumber(returnDate);
+        loanin.setLender(lender);
         loanin.setLendersAuthorizer(lendersAuthorizer);
         loanin.setLendersContact(lendersContact);
         loanin.setLoanInContact(loaninContact);

@@ -32,7 +32,6 @@ import org.collectionspace.services.client.LoaninClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanin.LoansinCommon;
 import org.collectionspace.services.loanin.LoansinCommonList;
-import org.collectionspace.services.loanin.LenderList;
 
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -774,12 +773,7 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         LoansinCommon loanin = new LoansinCommon();
         loanin.setLoanInNumber(loaninNumber);
         loanin.setLoanReturnDate(returnDate);
-        LenderList lenderList = new LenderList();
-        lenderList.getLender().add(
-            "urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth):person:name(Harry Lender)'Harry Lender'");
-        lenderList.getLender().add(
-            "urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth):person:name(Sally Lender)'Sally Lender'");
-        loanin.setLenders(lenderList);
+        loanin.setLender("urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth):person:name(Harry Lender)'Harry Lender'");
         loanin.setLoanPurpose("For Surfboards of the 1960s exhibition.");
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
