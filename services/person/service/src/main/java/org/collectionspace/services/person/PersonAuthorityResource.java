@@ -960,7 +960,7 @@ public class PersonAuthorityResource extends
                 ContactJAXBSchema.CONTACTS_COMMON + ":" +
                 ContactJAXBSchema.IN_ITEM +
                 "='" + itemcsid + "'" +
-                " AND ecm:isProxy = 0");
+                " AND ecm:isProxy = 0"); //FIXME: REM - This clause is unnecessary because the getFiltered() method adds it
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             contactObjectList = (ContactsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
