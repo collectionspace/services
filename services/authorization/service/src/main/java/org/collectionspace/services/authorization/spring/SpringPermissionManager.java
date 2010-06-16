@@ -354,14 +354,13 @@ public class SpringPermissionManager implements CSpacePermissionManager {
                 if (ace.getSid().equals(sid)
                         && ace.getPermission().equals(permission)) {
                     foundAces.add(i);
-                    i++;
                 }
             } else {
                 if (ace.getPermission().equals(permission)) {
                     foundAces.add(i);
-                    i++;
                 }
             }
+            i++;
         }
         for (int j = foundAces.size() - 1; j >= 0; j--) {
             //the following operation does not work while iterating in the while loop
