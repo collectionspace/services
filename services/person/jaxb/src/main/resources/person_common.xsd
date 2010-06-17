@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Person schema (XSD)
+
+    Entity  : Person
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+
+    $LastChangedRevision: $
+    $LastChangedDate: $
+-->
+
 <xs:schema 
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
@@ -8,7 +20,6 @@
     targetNamespace="http://collectionspace.org/services/person"
     version="0.1"
     >
-    
     
     <!-- avoid XmlRootElement nightnmare, see http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html-->
     <!-- See http://wiki.collectionspace.org/display/collectionspace/Person+Service+Home -->    
@@ -31,7 +42,6 @@
                 <xs:element name="initials" type="xs:string"/>
                 <xs:element name="salutation" type="xs:string"/>
                 <xs:element name="title" type="xs:string"/>
-                <xs:element name="honorifics" type="xs:string"/>
                 <xs:element name="nameAdditions" type="xs:string"/>
                 <xs:element name="birthDate" type="xs:string"/>
                 <xs:element name="deathDate" type="xs:string"/>

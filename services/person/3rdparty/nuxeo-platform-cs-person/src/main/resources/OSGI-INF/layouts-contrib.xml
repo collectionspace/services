@@ -73,7 +73,6 @@
         <row><widget>initials</widget></row>
         <row><widget>salutation</widget></row>
         <row><widget>title</widget></row>
-        <row><widget>honorifics</widget></row>
         <row><widget>nameAdditions</widget></row>
         <row><widget>birthDate</widget></row>
         <row><widget>deathDate</widget></row>
@@ -200,19 +199,6 @@
         <translated>true</translated>
         <fields>
           <field schema="persons_common">title</field>
-        </fields>
-        <properties widgetMode="edit">
-          <property name="styleClass">dataInputText</property>
-        </properties>
-      </widget>
-
-      <widget name="honorifics" type="text">
-        <labels>
-          <label mode="any">honorifics</label>
-        </labels>
-        <translated>true</translated>
-        <fields>
-          <field schema="persons_common">honorifics</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>

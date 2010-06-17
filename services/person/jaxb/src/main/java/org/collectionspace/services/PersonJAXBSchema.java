@@ -20,7 +20,6 @@ public interface PersonJAXBSchema {
 	final static String INITIALS = "initials";
 	final static String SALUTATIONS = "salutations";
 	final static String TITLE = "title";
-        final static String HONORIFICS = "honorifics";
 	final static String NAME_ADDITIONS = "nameAdditions";
 	final static String BIRTH_DATE = "birthDate";
 	final static String DEATH_DATE = "deathDate";
