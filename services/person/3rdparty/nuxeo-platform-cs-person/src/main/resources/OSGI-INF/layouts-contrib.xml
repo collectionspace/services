@@ -85,7 +85,7 @@
         <row><widget>schoolOrStyle</widget></row>
         <row><widget>bioNote</widget></row>
         <row><widget>nameNote</widget></row>
-        <row><widget>status</widget></row>
+        <row><widget>termStatus</widget></row>
       </rows>
 
       <widget name="displayName" type="text">
@@ -361,13 +361,13 @@
         </properties>
       </widget>
 
-      <widget name="status" type="text">
+      <widget name="termStatus" type="text">
         <labels>
-          <label mode="any">status</label>
+          <label mode="any">termStatus</label>
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="persons_common">status</field>
+          <field schema="persons_common">termStatus</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>

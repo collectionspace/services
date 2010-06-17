@@ -32,6 +32,6 @@ public interface PersonJAXBSchema {
 	final static String SCHOOL_OR_STYLE = "schoolOrStyle";
 	final static String BIO_NOTE = "bioNote";
 	final static String NAME_NOTE = "nameNote";
-        final static String STATUS = "status";
+    final static String TERM_STATUS = "termStatus";
 }
 

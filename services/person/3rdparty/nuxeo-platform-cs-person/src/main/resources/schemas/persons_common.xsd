@@ -44,7 +44,7 @@
     <xs:element name="schoolOrStyle" type="xs:string"/>
     <xs:element name="bioNote" type="xs:string"/>
     <xs:element name="nameNote" type="xs:string"/>
-    <xs:element name="status" type="xs:string"/>
+    <xs:element name="termStatus" type="xs:string"/>
 
 </xs:schema>
 
