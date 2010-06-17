@@ -179,8 +179,8 @@ public class OrgAuthorityClientUtils {
         	organization.setSubBody(value);
         if((value = (String)orgInfo.get(OrganizationJAXBSchema.HISTORY))!=null)
         	organization.setHistory(value);
-        if((value = (String)orgInfo.get(OrganizationJAXBSchema.STATUS))!=null)
-        	organization.setStatus(value);
+        if((value = (String)orgInfo.get(OrganizationJAXBSchema.TERM_STATUS))!=null)
+        	organization.setTermStatus(value);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(organization,
             MediaType.APPLICATION_XML_TYPE);

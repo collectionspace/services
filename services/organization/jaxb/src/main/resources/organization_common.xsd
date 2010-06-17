@@ -35,7 +35,7 @@
                 <xs:element name="function" type="xs:string"/>
                 <xs:element name="subBody" type="xs:string"/>
                 <xs:element name="history" type="xs:string"/>
-                <xs:element name="status" type="xs:string"/>
+                <xs:element name="termStatus" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
