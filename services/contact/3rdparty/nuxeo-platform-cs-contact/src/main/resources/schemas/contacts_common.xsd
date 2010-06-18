@@ -23,9 +23,9 @@
     <xs:element name="inItem" type="xs:string" />
     <xs:element name="addressType" type="xs:string"/>
     <xs:element name="addressPlace" type="xs:string"/>
+    <xs:element name="web" type="xs:string"/>
     <xs:element name="email" type="xs:string"/>
     <xs:element name="telephoneNumber" type="xs:string"/>
     <xs:element name="faxNumber" type="xs:string"/>
-    <xs:element name="notes" type="xs:string"/>
     
 </xs:schema>
