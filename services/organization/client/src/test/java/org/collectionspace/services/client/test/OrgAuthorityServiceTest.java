@@ -1150,9 +1150,10 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
+        ContactsCommonList list = null;
         ClientResponse<ContactsCommonList> res =
                 client.readContactList(parentcsid, itemcsid);
-        ContactsCommonList list = res.getEntity();
+        list = res.getEntity();
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
