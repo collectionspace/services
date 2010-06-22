@@ -68,8 +68,9 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
     /** The SERVIC e_ pat h_ component. */
     final String SERVICE_PATH_COMPONENT = "orgauthorities";
     
-    /** The PERSO n_ authorit y_ name. */
+    // Temporary Person and Organization Authority names, used for test purposes.
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
+    final String ORG_AUTHORITY_NAME = "TestOrgAuth";
     
     /** The known resource ref name. */
     private String knownResourceRefName = null;
@@ -90,14 +91,19 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
     /** The person ids created. */
     private List<String> personIdsCreated = new ArrayList<String>();
     
-    /** The person auth csid. */
+    // CSID for the instance of the test Person authority
+    // created during testing.
     private String personAuthCSID = null;
     
     /** The organization contact person ref name. */
     private String organizationContactPersonRefName = null;
+
+    // The refName of an Organization item that represents
+    // the sub-body organization of a second Organization item.
+    private String subBodyRefName = null;
     
     /** The number of authorityreferences expected. */
-    private final int NUM_AUTH_REFS_EXPECTED = 1;
+    private final int NUM_AUTH_REFS_EXPECTED = 2;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -148,30 +154,33 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         // Submit the request to the service and store the response.
         ClientResponse<Response> res = orgAuthClient.create(multipart);
         try {
-	        int statusCode = res.getStatus();
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        //
-	        // Specifically:
-	        // Does it fall within the set of valid status codes?
-	        // Does it exactly match the expected status code?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	
-	        // Store the IDs from every resource created by tests,
-	        // so they can be deleted after tests have been run.
-	        knownAuthResourceId = extractId(res);
+            int statusCode = res.getStatus();
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            //
+            // Specifically:
+            // Does it fall within the set of valid status codes?
+            // Does it exactly match the expected status code?
+            if(logger.isDebugEnabled()){
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+            // Store the IDs from every resource created by tests,
+            // so they can be deleted after tests have been run.
+            knownAuthResourceId = extractId(res);
         } finally {
-        	res.releaseConnection();
+            res.releaseConnection();
         }        
         allResourceIdsCreated.add(knownAuthResourceId);
 
         // Create all the person refs and entities
         createPersonRefs();
+
+        // Create all the organization sub-body refs and entities
+        createSubBodyOrgRefs();
 
         // Initialize values for a new Organization item, to be created within
         // the newly-created Organization Authority resource.
@@ -185,6 +194,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         testOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "Test Organization Name");
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, "Anytown, USA");
         testOrgMap.put(OrganizationJAXBSchema.CONTACT_NAME, organizationContactPersonRefName);
+        testOrgMap.put(OrganizationJAXBSchema.SUB_BODY, subBodyRefName);
 
         // Finishing creating the new Organization item, then
         // submit the request to the service and store the response.
@@ -203,26 +213,26 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding
         // refName by which it can be identified.
-    	String authRefName = 
+    	String personAuthRefName =
     	    PersonAuthorityClientUtils.createPersonAuthRefName(PERSON_AUTHORITY_NAME, false);
     	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
-    	    PERSON_AUTHORITY_NAME, authRefName, personAuthClient.getCommonPartName());
+    	    PERSON_AUTHORITY_NAME, personAuthRefName, personAuthClient.getCommonPartName());
         
     	ClientResponse<Response> res = personAuthClient.create(multipart);
         try {
-	        int statusCode = res.getStatus();	
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	            invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, STATUS_CREATED);
-	        personAuthCSID = extractId(res);
+            int statusCode = res.getStatus();
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, STATUS_CREATED);
+            personAuthCSID = extractId(res);
         } finally {
-        	res.releaseConnection();
+            res.releaseConnection();
         }
 
         // Create a temporary Person resource, and its corresponding refName
         // by which it can be identified.
         organizationContactPersonRefName =
-            PersonAuthorityClientUtils.createPersonRefName(authRefName, "Charlie Orgcontact", true);
+            PersonAuthorityClientUtils.createPersonRefName(personAuthRefName, "Charlie Orgcontact", true);
         personIdsCreated.add(createPerson("Charlie", "Orgcontact", organizationContactPersonRefName));
 
     }
@@ -257,6 +267,46 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
     		res.releaseConnection();
     	}
     	
+    	return result;
+    }
+
+    private void createSubBodyOrgRefs() {
+        // Create a temporary sub-body Organization resource, and its corresponding refName
+        // by which it can be identified.
+        //
+        // This sub-body Organization resource will be created in the same
+        // Organization authority as its parent Organization resource.
+
+        String subBodyResourceId = createSubBodyOrganization("Test SubBody Organization", subBodyRefName);
+        allItemResourceIdsCreated.put(subBodyResourceId, knownAuthResourceId);
+    }
+
+    protected String createSubBodyOrganization(String subBodyName, String refName) {
+        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
+        Map<String, String> subBodyOrgMap = new HashMap<String,String>();
+        subBodyOrgMap.put(OrganizationJAXBSchema.SHORT_NAME,
+            subBodyName + "-" + createIdentifier());
+        subBodyOrgMap.put(OrganizationJAXBSchema.LONG_NAME, subBodyName + " Long Name");
+        subBodyOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, subBodyName + " Founding Place");
+        String subBodyDisplayName = OrgAuthorityClientUtils.createDisplayName(subBodyOrgMap);
+        subBodyRefName =
+            OrgAuthorityClientUtils.createOrganizationRefName(knownResourceRefName, subBodyDisplayName, true);
+    	MultipartOutput multipart =
+    	    OrgAuthorityClientUtils.createOrganizationInstance(knownAuthResourceId,
+    		subBodyRefName, subBodyOrgMap, orgAuthClient.getItemCommonPartName());
+
+    	String result = null;
+    	ClientResponse<Response> res = orgAuthClient.createItem(knownAuthResourceId, multipart);
+    	try {
+            int statusCode = res.getStatus();
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, STATUS_CREATED);
+            result = extractId(res);
+    	} finally {
+    	    res.releaseConnection();
+    	}
+
     	return result;
     }
 
@@ -301,7 +351,8 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         }
         // Check one or more of the authority fields in the Organization item
         Assert.assertEquals(organization.getContactName(), organizationContactPersonRefName);
-        
+        Assert.assertEquals(organization.getSubBody(), subBodyRefName);
+
         // Get the auth refs and check them
         // FIXME - need to create this method in the client
         // and get the ID for the organization item

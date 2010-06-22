@@ -94,18 +94,7 @@ public class OrgAuthorityClientUtils {
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
     	// Type of service request being tested
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
-    	String displayName = orgInfo.get(OrganizationJAXBSchema.DISPLAY_NAME);
-    	String displayNameComputedStr = orgInfo.get(OrganizationJAXBSchema.DISPLAY_NAME_COMPUTED);
-    	boolean displayNameComputed = (displayNameComputedStr==null) || displayNameComputedStr.equalsIgnoreCase("true");
-    	if( displayName == null ) {
-    		if(!displayNameComputed) {
-	    		throw new RuntimeException(
-	    		"CreateItem: Must supply a displayName if displayNameComputed is set to false.");
-    		}
-    		displayName = prepareDefaultDisplayName(
-        			orgInfo.get(OrganizationJAXBSchema.SHORT_NAME ),    			
-        			orgInfo.get(OrganizationJAXBSchema.FOUNDING_PLACE ));
-    	}
+        String displayName = createDisplayName(orgInfo);
     	String refName = createOrganizationRefName(orgAuthorityRefName, displayName, true);
 
     	if(logger.isDebugEnabled()){
@@ -288,6 +277,22 @@ public class OrgAuthorityClientUtils {
 			newStr.append(foundingPlace);
 		}
 		return newStr.toString();
+    }
+
+    public static String createDisplayName(Map<String, String> orgInfo) {
+        String displayName = orgInfo.get(OrganizationJAXBSchema.DISPLAY_NAME);
+    	String displayNameComputedStr = orgInfo.get(OrganizationJAXBSchema.DISPLAY_NAME_COMPUTED);
+    	boolean displayNameComputed = (displayNameComputedStr==null) || displayNameComputedStr.equalsIgnoreCase("true");
+    	if( displayName == null ) {
+            if(!displayNameComputed) {
+                throw new RuntimeException(
+                "CreateItem: Must supply a displayName if displayNameComputed is set to false.");
+            }
+            displayName = prepareDefaultDisplayName(
+                orgInfo.get(OrganizationJAXBSchema.SHORT_NAME ),
+                orgInfo.get(OrganizationJAXBSchema.FOUNDING_PLACE ));
+    	}
+        return displayName;
     }
     
 }
