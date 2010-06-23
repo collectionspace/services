@@ -132,6 +132,8 @@ public class OrgAuthorityDocumentModelHandler
                     OrgAuthorityJAXBSchema.DISPLAY_NAME));
             ilistItem.setRefName((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     OrgAuthorityJAXBSchema.REF_NAME));
+            ilistItem.setShortIdentifier((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+                    OrgAuthorityJAXBSchema.SHORT_IDENTIFIER));
             ilistItem.setVocabType((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     OrgAuthorityJAXBSchema.VOCAB_TYPE));
             String id = NuxeoUtils.extractId(docModel.getPathAsString());

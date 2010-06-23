@@ -122,6 +122,8 @@ public class LocationAuthorityDocumentModelHandler
                     LocationAuthorityJAXBSchema.DISPLAY_NAME));
             ilistItem.setRefName((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     LocationAuthorityJAXBSchema.REF_NAME));
+            ilistItem.setShortIdentifier((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+            		LocationAuthorityJAXBSchema.SHORT_IDENTIFIER));
             ilistItem.setVocabType((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     LocationAuthorityJAXBSchema.VOCAB_TYPE));
             String id = NuxeoUtils.extractId(docModel.getPathAsString());

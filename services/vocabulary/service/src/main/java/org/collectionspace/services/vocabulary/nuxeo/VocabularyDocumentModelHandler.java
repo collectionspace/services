@@ -132,6 +132,8 @@ public class VocabularyDocumentModelHandler
                     VocabularyJAXBSchema.DISPLAY_NAME));
             ilistItem.setRefName((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     VocabularyJAXBSchema.REF_NAME));
+            ilistItem.setShortIdentifier((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+            		VocabularyJAXBSchema.SHORT_IDENTIFIER));
             ilistItem.setVocabType((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     VocabularyJAXBSchema.VOCAB_TYPE));
             String id = NuxeoUtils.extractId(docModel.getPathAsString());

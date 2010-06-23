@@ -65,6 +65,8 @@
                                         minOccurs="1" />
                                     <xs:element name="refName" type="xs:string"
                                         minOccurs="1" />
+                                    <xs:element name="shortIdentifier" type="xs:string"
+                                        minOccurs="1" />
                                     <xs:element name="vocabType" type="xs:string"
                                         minOccurs="1" />
                                     <!-- uri to retrieve vocabulary details -->
