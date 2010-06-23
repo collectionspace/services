@@ -34,6 +34,7 @@
                 <xs:element name="csid" type="xs:string" />
                 
                 <!--  OrgAuthority Information Group -->
+								<xs:element name="shortIdentifier" type="xs:string"/>
                 <xs:element name="displayName" type="xs:string"/>
                 <xs:element name="refName" type="xs:string"/>
                 <xs:element name="vocabType" type="xs:string"/>                

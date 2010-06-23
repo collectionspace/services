@@ -118,11 +118,11 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         MultipartOutput multipart = createIntakeInstance(
                 "entryNumber-" + identifier,
                 "entryDate-" + identifier,
-		currentOwnerRefName,
-		depositorRefName,
-		conditionCheckerAssessorRefName,
-		insurerRefName,
-		valuerRefName );
+								currentOwnerRefName,
+								depositorRefName,
+								conditionCheckerAssessorRefName,
+								insurerRefName,
+								valuerRefName );
 
         ClientResponse<Response> res = intakeClient.create(multipart);
         try {
@@ -163,10 +163,8 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
      */
     protected void createPersonRefs(){
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-    	String authRefName = 
-    		PersonAuthorityClientUtils.createPersonAuthRefName(PERSON_AUTHORITY_NAME, false);
     	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
-    			PERSON_AUTHORITY_NAME, authRefName, personAuthClient.getCommonPartName());
+    			PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
 
@@ -175,38 +173,50 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         Assert.assertEquals(statusCode, STATUS_CREATED);
         personAuthCSID = extractId(res);
         
-        currentOwnerRefName = PersonAuthorityClientUtils.createPersonRefName(
-        							authRefName, "Olivier Owner", true);
-				currentOwnerPersonCSID = createPerson("Olivier", "Owner", currentOwnerRefName);
-        personIdsCreated.add(currentOwnerPersonCSID);
+        String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
         
-        depositorRefName = PersonAuthorityClientUtils.createPersonRefName(
-									authRefName, "Debbie Depositor", true);
-        personIdsCreated.add(createPerson("Debbie", "Depositor", depositorRefName));
+        String csid = createPerson("Olivier", "Owner", "olivierOwner", authRefName);
+        Assert.assertNotNull(csid);
+        currentOwnerPersonCSID = csid;
+        currentOwnerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        Assert.assertNotNull(currentOwnerRefName);
+        personIdsCreated.add(csid);
         
-        conditionCheckerAssessorRefName = PersonAuthorityClientUtils.createPersonRefName(
-									authRefName, "Andrew Checker-Assessor", true);
-        personIdsCreated.add(createPerson("Andrew", "Checker-Assessor", conditionCheckerAssessorRefName));
+        csid = createPerson("Debbie", "Depositor", "debbieDepositor", authRefName);
+        Assert.assertNotNull(csid);
+        depositorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        Assert.assertNotNull(depositorRefName);
+        personIdsCreated.add(csid);
         
-        insurerRefName = PersonAuthorityClientUtils.createPersonRefName(
-									authRefName, "Ingrid Insurer", true);
-        personIdsCreated.add(createPerson("Ingrid", "Insurer", insurerRefName));
+        csid = createPerson("Andrew", "Assessor", "andrewAssessor", authRefName);
+        Assert.assertNotNull(csid);
+        conditionCheckerAssessorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        Assert.assertNotNull(conditionCheckerAssessorRefName);
+        personIdsCreated.add(csid);
         
-        valuerRefName = PersonAuthorityClientUtils.createPersonRefName(
-									authRefName, "Vince Valuer", true);
-        personIdsCreated.add(createPerson("Vince", "Valuer", valuerRefName));
+        csid = createPerson("Ingrid", "Insurer", "ingridInsurer", authRefName);
+        Assert.assertNotNull(csid);
+        insurerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        Assert.assertNotNull(insurerRefName);
+        personIdsCreated.add(csid);
         
-
+        csid = createPerson("Vince", "Valuer", "vinceValuer", authRefName);
+        Assert.assertNotNull(csid);
+        valuerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        Assert.assertNotNull(valuerRefName);
+        personIdsCreated.add(csid);
+        
     }
     
-    protected String createPerson(String firstName, String surName, String refName ) {
+    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
+        personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
     	MultipartOutput multipart = 
     		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
-    				refName, personInfo, personAuthClient.getItemCommonPartName());
+    				authRefName, personInfo, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         int statusCode = res.getStatus();
 

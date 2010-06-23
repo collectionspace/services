@@ -69,6 +69,9 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     // Displayname
     final String TEST_PARTIAL_TERM_DISPLAY_NAME =
             TEST_PARTIAL_TERM_FORE_NAME + " " + TEST_PARTIAL_TERM_SUR_NAME;
+    //
+    // shortId
+    final String TEST_SHORT_ID = "lechWalesa";
 
     // Non-existent partial term name (first letters of each of the words
     // in a pangram for the English alphabet).
@@ -434,13 +437,12 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        String identifier = createIdentifier();
-    	String displayName = "displayName-" + identifier;
-    	String baseRefName = PersonAuthorityClientUtils.createPersonAuthRefName(displayName, false);
-    	String fullRefName = PersonAuthorityClientUtils.createPersonAuthRefName(displayName, true);
+        String shortId = createIdentifier();
+    	String displayName = "displayName-" + shortId;
+    	String baseRefName = PersonAuthorityClientUtils.createPersonAuthRefName(shortId, null);
     	MultipartOutput multipart =
             PersonAuthorityClientUtils.createPersonAuthorityInstance(
-    	    displayName, fullRefName, client.getCommonPartName());
+    	    displayName, shortId, client.getCommonPartName());
 
     	String newID = null;
     	ClientResponse<Response> res = client.create(multipart);
@@ -479,7 +481,8 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
      * @param authorityCsid The CSID of the Authority in which the term will be created.
      * @param authRefName The refName of the Authority in which the term will be created.
      */
-    private void createItemInAuthorityForPartialTermMatch(String authorityCsid, String authRefName)
+    private void createItemInAuthorityForPartialTermMatch(
+    		String authorityCsid, String authRefName)
         throws Exception {
             
         String testName = "createItemInAuthorityForPartialTermMatch";
@@ -490,19 +493,18 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        String refName = PersonAuthorityClientUtils.createPersonRefName(authRefName,
-                TEST_PARTIAL_TERM_DISPLAY_NAME, true);
         Map<String, String> partialTermPersonMap = new HashMap<String,String>();
         //
         // Fill the property map
         //
+        partialTermPersonMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, TEST_SHORT_ID );
         partialTermPersonMap.put(PersonJAXBSchema.DISPLAY_NAME_COMPUTED, "false");
         partialTermPersonMap.put(PersonJAXBSchema.DISPLAY_NAME, TEST_PARTIAL_TERM_DISPLAY_NAME);
         partialTermPersonMap.put(PersonJAXBSchema.FORE_NAME, TEST_PARTIAL_TERM_FORE_NAME);
         partialTermPersonMap.put(PersonJAXBSchema.SUR_NAME, TEST_PARTIAL_TERM_SUR_NAME);
         partialTermPersonMap.put(PersonJAXBSchema.GENDER, "male");
         MultipartOutput multipart =
-            PersonAuthorityClientUtils.createPersonInstance(authorityCsid, refName, partialTermPersonMap,
+            PersonAuthorityClientUtils.createPersonInstance(authorityCsid, authRefName, partialTermPersonMap,
                 client.getItemCommonPartName() );
 
         String newID = null;

@@ -244,13 +244,13 @@ public class PersonAuthorityResource extends
         }
         String whereClause =
         	PersonAuthorityJAXBSchema.PERSONAUTHORITIES_COMMON+
-        	":"+PersonAuthorityJAXBSchema.DISPLAY_NAME+
+        	":"+PersonAuthorityJAXBSchema.SHORT_IDENTIFIER+
         	"='"+specifier+"'";
         // We only get a single doc - if there are multiple,
         // it is an error in use.
 
         if (logger.isDebugEnabled()) {
-            logger.debug("getPersonAuthority with name=" + specifier);
+            logger.debug("getPersonAuthorityByName with name=" + specifier);
         } 
         MultipartOutput result = null;
         try {
@@ -266,7 +266,7 @@ public class PersonAuthorityResource extends
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
-                logger.debug("getPersonAuthority", dnfe);
+                logger.debug("getPersonAuthorityByName", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Get failed on PersonAuthority spec=" + specifier).type(
@@ -274,7 +274,7 @@ public class PersonAuthorityResource extends
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
-                logger.debug("getPersonAuthority", e);
+                logger.debug("getPersonAuthorityByName", e);
             }
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed").type("text/plain").build();
@@ -657,6 +657,144 @@ public class PersonAuthorityResource extends
     }
 
     /**
+     * Gets the person by name.
+     * 
+     * @param parentcsid the parentcsid
+     * @param itemspecifier the shrotId of the person
+     * 
+     * @return the person
+     */
+    @GET
+    @Path("{csid}/items/urn:cspace:name({itemspecifier})")
+    public MultipartOutput getPersonByName(
+            @PathParam("csid") String parentcsid,
+            @PathParam("itemspecifier") String itemspecifier) {
+        if (parentcsid == null || "".equals(parentcsid)
+            || itemspecifier == null || "".equals(itemspecifier)) {
+            logger.error("getPersonByName: missing parentcsid or itemspecifier!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "get failed on Person with parentcsid=" 
+            		+ parentcsid + " and itemspecifier=" + itemspecifier).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        String whereClause =
+        	PersonJAXBSchema.PERSONS_COMMON+
+        	":"+PersonJAXBSchema.SHORT_IDENTIFIER+
+        	"='"+itemspecifier+"'";
+        if (logger.isDebugEnabled()) {
+            logger.debug("getPerson with parentcsid=" + parentcsid + " and itemspecifier=" + itemspecifier);
+        }
+        MultipartOutput result = null;
+        try {
+            // Note that we have to create the service context for the Items, not the main service
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getItemServiceName());
+            DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
+            DocumentFilter myFilter = new DocumentFilter(whereClause, 0, 1);
+            handler.setDocumentFilter(myFilter);
+            getRepositoryClient(ctx).get(ctx, handler);
+            // TODO should we assert that the item is in the passed personAuthority?
+            result = (MultipartOutput) ctx.getOutput();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getPerson", dnfe);
+            }
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Get failed on Person itemspecifier=" + itemspecifier).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getPerson", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        if (result == null) {
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Get failed, the requested Person itemspecifier:" + itemspecifier + ": was not found.").type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return result;
+    }
+
+    /**
+     * Gets the person by name, in a named authority.
+     * 
+     * @param parentspecifier the shortId of the parent
+     * @param itemspecifier the shortId of the person
+     * 
+     * @return the person
+     */
+    @GET
+    @Path("urn:cspace:name({parentspecifier})/items/urn:cspace:name({itemspecifier})")
+    public MultipartOutput getPersonByNameInNamedAuthority(
+            @PathParam("parentspecifier") String parentspecifier,
+            @PathParam("itemspecifier") String itemspecifier) {
+        if (parentspecifier == null || "".equals(parentspecifier)
+            || itemspecifier == null || "".equals(itemspecifier)) {
+            logger.error("getPersonByNameInNamedAuthority: missing parentcsid or itemspecifier!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "get failed on Person with parentspecifier=" 
+            		+ parentspecifier + " and itemspecifier=" + itemspecifier).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        String whereClause =
+        	PersonJAXBSchema.PERSONS_COMMON+
+        	":"+PersonJAXBSchema.SHORT_IDENTIFIER+
+        	"='"+itemspecifier+"'";
+        if (logger.isDebugEnabled()) {
+            logger.debug("getPersonByNameInNamedAuthority with parentspecifier=" 
+            		+ parentspecifier + " and itemspecifier=" + itemspecifier);
+        }
+        MultipartOutput result = null;
+        try {
+            // Note that we have to create the service context for the Items, not the main service
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getItemServiceName());
+        	// HACK HACK Since we do not use the parent CSID yet this should work.
+            DocumentHandler handler = createItemDocumentHandler(ctx, parentspecifier);
+            DocumentFilter myFilter = new DocumentFilter(whereClause, 0, 1);
+            handler.setDocumentFilter(myFilter);
+            getRepositoryClient(ctx).get(ctx, handler);
+            // TODO should we assert that the item is in the passed personAuthority?
+            result = (MultipartOutput) ctx.getOutput();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getPersonByNameInNamedAuthority", dnfe);
+            }
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Get failed on Person itemspecifier=" + itemspecifier).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getPersonByNameInNamedAuthority", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        if (result == null) {
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Get failed, the requested Person itemspecifier:" + itemspecifier + ": was not found.").type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return result;
+    }
+
+    /**
      * Gets the person list.
      * 
      * @param parentcsid the parentcsid
@@ -727,31 +865,15 @@ public class PersonAuthorityResource extends
             @Context UriInfo ui) {
         PersonsCommonList personObjectList = new PersonsCommonList();
         try {
+            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             String whereClause = PersonAuthorityJAXBSchema.PERSONAUTHORITIES_COMMON +
-            	":" + PersonAuthorityJAXBSchema.DISPLAY_NAME +
+            	":" + PersonAuthorityJAXBSchema.SHORT_IDENTIFIER +
             	"='" + parentSpecifier+"'";
             // Need to get an Authority by name
-            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             String parentcsid = 
             	getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
-            ctx = createServiceContext(getItemServiceName(), queryParams);
-            DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
-
-            // Add the where clause "persons_common:inAuthority='" + parentcsid + "'"
-            handler.getDocumentFilter().setWhereClause(PersonJAXBSchema.PERSONS_COMMON + ":" +
-            		PersonJAXBSchema.IN_AUTHORITY + "='" + parentcsid + "'");
-            
-            // AND persons_common:displayName LIKE '%partialTerm%'
-            if (partialTerm != null && !partialTerm.isEmpty()) {
-            	String ptClause = PersonJAXBSchema.PERSONS_COMMON + ":" +
-            		PersonJAXBSchema.DISPLAY_NAME +
-            		" LIKE " +
-            		"'%" + partialTerm + "%'";
-            	handler.getDocumentFilter().appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
-            }            
-            getRepositoryClient(ctx).getFiltered(ctx, handler);
-            personObjectList = (PersonsCommonList) handler.getCommonPartList();
+            return getPersonList(parentcsid, partialTerm, ui);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -764,7 +886,6 @@ public class PersonAuthorityResource extends
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return personObjectList;
     }
 
     /**

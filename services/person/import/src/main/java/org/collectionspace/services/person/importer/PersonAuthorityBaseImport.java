@@ -62,7 +62,7 @@ public class PersonAuthorityBaseImport {
     // Instance variables specific to this test.
     private PersonAuthorityClient client = new PersonAuthorityClient();
 
-    public void createPersonAuthority(String personAuthorityName, 
+    public void createPersonAuthority(String displayName, String shortId, 
     		List<Map<String, String>> personMaps ) {
 
     	// Expected status code: 201 Created
@@ -71,33 +71,31 @@ public class PersonAuthorityBaseImport {
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
 
     	if(logger.isDebugEnabled()){
-    		logger.debug("Import: Create personAuthority: \"" + personAuthorityName +"\"");
+    		logger.debug("Import: Create personAuthority: \"" + displayName +"\"");
     	}
     	String basePersonRefName = 
-    		PersonAuthorityClientUtils.createPersonAuthRefName(personAuthorityName, false);
-    	String fullPersonRefName = 
-    		PersonAuthorityClientUtils.createPersonAuthRefName(personAuthorityName, true);
+    		PersonAuthorityClientUtils.createPersonAuthRefName(shortId, null);
     	MultipartOutput multipart = 
     		PersonAuthorityClientUtils.createPersonAuthorityInstance(
-  				personAuthorityName, fullPersonRefName, client.getCommonPartName());
+  				displayName, shortId, client.getCommonPartName());
     	ClientResponse<Response> res = client.create(multipart);
 
     	int statusCode = res.getStatus();
 
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-    		throw new RuntimeException("Could not create enumeration: \""+personAuthorityName
+    		throw new RuntimeException("Could not create enumeration: \""+displayName
     				+"\" "+ PersonAuthorityClientUtils.invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
     		throw new RuntimeException("Unexpected Status when creating enumeration: \""
-    				+personAuthorityName +"\", Status:"+ statusCode);
+    				+displayName +"\", Status:"+ statusCode);
     	}
 
     	// Store the ID returned from this create operation
     	// for additional tests below.
     	String newPersonAuthorityId = PersonAuthorityClientUtils.extractId(res);
     	if(logger.isDebugEnabled()){
-    		logger.debug("Import: Created personAuthorityulary: \"" + personAuthorityName +"\" ID:"
+    		logger.debug("Import: Created personAuthorityulary: \"" + displayName +"\" ID:"
     				+newPersonAuthorityId );
     	}
     	for(Map<String,String> personMap : personMaps){
@@ -113,12 +111,14 @@ public class PersonAuthorityBaseImport {
 
 		PersonAuthorityBaseImport pabi = new PersonAuthorityBaseImport();
 		final String demoPersonAuthorityName = "Demo Person Authority";
+		final String demoPersonAuthorityShortId = "demoPersonAuth";
 
 		/* Strings are:  
 			shortName, longName, nameAdditions, contactName, 
 	        foundingDate, dissolutionDate, foundingPlace, function, description
          */		
         Map<String, String> johnWayneMap = new HashMap<String,String>();
+        johnWayneMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, "johnWayne_Actor");
         johnWayneMap.put(PersonJAXBSchema.FORE_NAME, "John");
         johnWayneMap.put(PersonJAXBSchema.SUR_NAME, "Wayne");
         johnWayneMap.put(PersonJAXBSchema.GENDER, "male");
@@ -132,6 +132,7 @@ public class PersonAuthorityBaseImport {
         		"He was also known for his conservative political views and his support in " +
         		"the 1950s for anti-communist positions.");
         Map<String, String> patrickSchmitzMap = new HashMap<String,String>();
+        patrickSchmitzMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, "plSchmitz_Geek");
         patrickSchmitzMap.put(PersonJAXBSchema.FORE_NAME, "Patrick");
         patrickSchmitzMap.put(PersonJAXBSchema.SUR_NAME, "Schmitz");
         patrickSchmitzMap.put(PersonJAXBSchema.GENDER, "male");
@@ -148,7 +149,8 @@ public class PersonAuthorityBaseImport {
         List<Map<String, String>> personsMaps = 
         	Arrays.asList(johnWayneMap, patrickSchmitzMap, janeDoeMap );
 
-        pabi.createPersonAuthority(demoPersonAuthorityName, personsMaps);
+        pabi.createPersonAuthority(demoPersonAuthorityName, 
+        					demoPersonAuthorityShortId, personsMaps);
 
 		logger.info("PersonAuthorityBaseImport complete.");
 	}

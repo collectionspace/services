@@ -76,42 +76,23 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
     /** The CONTACT service path component. */
     final String CONTACT_SERVICE_PATH_COMPONENT = "contacts";
     
-    /** The TEST name. */
     final String TEST_NAME = "Shelf 1";
-    
-    /** The TEST conditionNote. */
+    final String TEST_SHORTID = "shelf1";
     final String TEST_CONDITION_NOTE = "Basically clean";
-    
-    /** The TEST death date. */
     final String TEST_CONDITION_NOTE_DATE = "June 11, 1979";
- 
-    /** The TEST securityNote. */
     final String TEST_SECURITY_NOTE = "Kind of safe";
-    
-    /** The TEST location type. */
     // TODO Make loc type be a controlled vocab term.
     final String TEST_LOCATION_TYPE = "Shelf";
-    
-    /** The TEST location type. */
     // TODO Make status type be a controlled vocab term.
     final String TEST_STATUS = "Approved";
     
     /** The known resource id. */
     private String knownResourceId = null;
-    
-    /** The known resource display name. */
-    private String knownResourceDisplayName = null;
-    
-    /** The known resource ref name. */
+    private String knownResourceShortIdentifer = null;
     private String knownResourceRefName = null;
-    
-    /** The known locationType ref name. */
     private String knownLocationTypeRefName = null;
-    
-    /** The known item resource id. */
     private String knownItemResourceId = null;
-    
-    /** The known contact resource id. */
+    private String knownItemResourceShortIdentifer = null;
     private String knownContactResourceId = null;
     
     /** The n items to create in list. */
@@ -124,6 +105,18 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
     private Map<String, String> allItemResourceIdsCreated =
         new HashMap<String, String>();
     
+    protected void setKnownResource( String id, String shortIdentifer,
+    		String refName ) {
+    	knownResourceId = id;
+    	knownResourceShortIdentifer = shortIdentifer;
+    	knownResourceRefName = refName;
+    }
+
+    protected void setKnownItemResource( String id, String shortIdentifer ) {
+    	knownItemResourceId = id;
+    	knownItemResourceShortIdentifer = shortIdentifer;
+    }
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -163,13 +156,12 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
-        String identifier = createIdentifier();
-    	String displayName = "displayName-" + identifier;
-    	String baseRefName = LocationAuthorityClientUtils.createLocationAuthRefName(displayName, false);
-    	String fullRefName = LocationAuthorityClientUtils.createLocationAuthRefName(displayName, true);
+        String shortId = createIdentifier();
+    	String displayName = "displayName-" + shortId;
+    	String baseRefName = LocationAuthorityClientUtils.createLocationAuthRefName(shortId, null);
     	MultipartOutput multipart = 
             LocationAuthorityClientUtils.createLocationAuthorityInstance(
-    	    displayName, fullRefName, client.getCommonPartName());
+    	    displayName, shortId, client.getCommonPartName());
         ClientResponse<Response> res = client.create(multipart);
         int statusCode = res.getStatus();
 
@@ -186,16 +178,11 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(this.REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, this.EXPECTED_STATUS_CODE);
 
-        // Store the refname from the first resource created
-        // for additional tests below.
-        knownResourceRefName = baseRefName;
-
         String newID = LocationAuthorityClientUtils.extractId(res);
         // Store the ID returned from the first resource created
         // for additional tests below.
         if (knownResourceId == null){
-            knownResourceId = newID;
-            knownResourceDisplayName = displayName;
+        	setKnownResource( newID, shortId, baseRefName );
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
@@ -217,7 +204,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
         setupCreate();
-        String newID = createItemInAuthority(knownResourceId, knownResourceRefName);
+        createItemInAuthority(knownResourceId, knownResourceRefName);
     }
 
     /**
@@ -229,45 +216,32 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
      */
     private String createItemInAuthority(String vcsid, String authRefName) {
 
-        final String testName = "createItemInAuthority";
+        final String testName = "createItemInAuthority("+vcsid+","+authRefName+")";
         if(logger.isDebugEnabled()){
             logger.debug(testBanner(testName, CLASS_NAME));
         }
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
-        String identifier = createIdentifier();
-        String refName = LocationAuthorityClientUtils.createLocationRefName(authRefName, TEST_NAME, true);
         Map<String, String> shelf1Map = new HashMap<String,String>();
         // TODO Make loc type and status be controlled vocabs.
         shelf1Map.put(LocationJAXBSchema.NAME, TEST_NAME);
+        shelf1Map.put(LocationJAXBSchema.SHORT_IDENTIFIER, TEST_SHORTID);
         shelf1Map.put(LocationJAXBSchema.CONDITION_NOTE, TEST_CONDITION_NOTE);
         shelf1Map.put(LocationJAXBSchema.CONDITION_NOTE_DATE, TEST_CONDITION_NOTE_DATE);
         shelf1Map.put(LocationJAXBSchema.SECURITY_NOTE, TEST_SECURITY_NOTE);
         shelf1Map.put(LocationJAXBSchema.LOCATION_TYPE, TEST_LOCATION_TYPE);
         shelf1Map.put(LocationJAXBSchema.STATUS, TEST_STATUS);
-        MultipartOutput multipart = 
-            LocationAuthorityClientUtils.createLocationInstance(vcsid, refName, shelf1Map,
-                client.getItemCommonPartName() );
-        ClientResponse<Response> res = client.createItem(vcsid, multipart);
-        int statusCode = res.getStatus();
-        String newID = LocationAuthorityClientUtils.extractId(res);
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        
+        String newID = LocationAuthorityClientUtils.createItemInAuthority(vcsid,
+        		authRefName, shelf1Map, client );
 
         // Store the ID returned from the first item resource created
         // for additional tests below.
         if (knownItemResourceId == null){
-            knownItemResourceId = newID;
+        	setKnownItemResource(newID, TEST_SHORTID);
             if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
+                logger.debug(testName + ": knownItemResourceId=" + newID);
             }
         }
 
@@ -391,14 +365,14 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         public void readByName(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
+            logger.debug(testBanner(testName+"("+knownResourceShortIdentifer+")", CLASS_NAME));
         }
         // Perform setup.
         setupRead();
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
-        ClientResponse<MultipartInput> res = client.readByName(knownResourceDisplayName);
+        ClientResponse<MultipartInput> res = client.readByName(knownResourceShortIdentifer);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -771,7 +745,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
-        readItemList(null, knownResourceDisplayName);
+        readItemList(null, knownResourceShortIdentifer);
     }
     
     /**
@@ -780,7 +754,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
      * @param vcsid the vcsid
      * @param name the name
      */
-    private void readItemList(String vcsid, String name) {
+    private void readItemList(String vcsid, String shortId) {
 
         String testName = "readItemList";
 
@@ -792,8 +766,8 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         ClientResponse<LocationsCommonList> res = null;
         if(vcsid!= null) {
 	        res = client.readItemList(vcsid);
-        } else if(name!= null) {
-   	        res = client.readItemListForNamedAuthority(name);
+        } else if(shortId!= null) {
+   	        res = client.readItemListForNamedAuthority(shortId);
         } else {
         	Assert.fail("readItemList passed null csid and name!");
         }
@@ -1035,9 +1009,8 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         // The only relevant ID may be the one used in update(), below.
         LocationAuthorityClient client = new LocationAuthorityClient();
    	String displayName = "displayName-NON_EXISTENT_ID";
-    	String fullRefName = LocationAuthorityClientUtils.createLocationAuthRefName(displayName, true);
     	MultipartOutput multipart = LocationAuthorityClientUtils.createLocationAuthorityInstance(
-    				displayName, fullRefName, client.getCommonPartName());
+    				displayName, "nonEx", client.getCommonPartName());
         ClientResponse<MultipartInput> res =
                 client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
@@ -1074,12 +1047,13 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         LocationAuthorityClient client = new LocationAuthorityClient();
         Map<String, String> nonexMap = new HashMap<String,String>();
         nonexMap.put(LocationJAXBSchema.NAME, TEST_NAME);
+        nonexMap.put(LocationJAXBSchema.SHORT_IDENTIFIER, "nonEx");
         nonexMap.put(LocationJAXBSchema.LOCATION_TYPE, TEST_LOCATION_TYPE);
         nonexMap.put(LocationJAXBSchema.STATUS, TEST_STATUS);
         MultipartOutput multipart = 
     	LocationAuthorityClientUtils.createLocationInstance(NON_EXISTENT_ID, 
-    			LocationAuthorityClientUtils.createLocationRefName(NON_EXISTENT_ID, NON_EXISTENT_ID, true), nonexMap,
-    			client.getItemCommonPartName() );
+    			LocationAuthorityClientUtils.createLocationRefName(knownResourceRefName, "nonEx", "Non Existent"), 
+    			nonexMap, client.getItemCommonPartName() );
         ClientResponse<MultipartInput> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();

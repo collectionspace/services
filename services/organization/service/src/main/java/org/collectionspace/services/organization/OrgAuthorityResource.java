@@ -253,7 +253,7 @@ public class OrgAuthorityResource extends
         }
         String whereClause =
         	OrgAuthorityJAXBSchema.ORGAUTHORITIES_COMMON+
-        	":"+OrgAuthorityJAXBSchema.DISPLAY_NAME+
+        	":"+OrgAuthorityJAXBSchema.SHORT_IDENTIFIER+
         	"='"+specifier+"'";
         // We only get a single doc - if there are multiple,
         // it is an error in use.
@@ -678,6 +678,144 @@ public class OrgAuthorityResource extends
     }
 
     /**
+     * Gets the person by name.
+     * 
+     * @param parentcsid the parentcsid
+     * @param itemspecifier the shrotId of the person
+     * 
+     * @return the person
+     */
+    @GET
+    @Path("{csid}/items/urn:cspace:name({itemspecifier})")
+    public MultipartOutput getOrganizationByName(
+            @PathParam("csid") String parentcsid,
+            @PathParam("itemspecifier") String itemspecifier) {
+        if (parentcsid == null || "".equals(parentcsid)
+            || itemspecifier == null || "".equals(itemspecifier)) {
+            logger.error("getOrganizationByName: missing parentcsid or itemspecifier!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "get failed on Organization with parentcsid=" 
+            		+ parentcsid + " and itemspecifier=" + itemspecifier).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        String whereClause =
+        	OrganizationJAXBSchema.ORGANIZATIONS_COMMON+
+        	":"+OrganizationJAXBSchema.SHORT_IDENTIFIER+
+        	"='"+itemspecifier+"'";
+        if (logger.isDebugEnabled()) {
+            logger.debug("getOrganizationByName with parentcsid=" + parentcsid + " and itemspecifier=" + itemspecifier);
+        }
+        MultipartOutput result = null;
+        try {
+            // Note that we have to create the service context for the Items, not the main service
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getItemServiceName());
+            DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
+            DocumentFilter myFilter = new DocumentFilter(whereClause, 0, 1);
+            handler.setDocumentFilter(myFilter);
+            getRepositoryClient(ctx).get(ctx, handler);
+            // TODO should we assert that the item is in the passed personAuthority?
+            result = (MultipartOutput) ctx.getOutput();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getOrganization", dnfe);
+            }
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Get failed on Organization itemspecifier=" + itemspecifier).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getOrganizationByName", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        if (result == null) {
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Get failed, the requested Organization itemspecifier:" + itemspecifier + ": was not found.").type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return result;
+    }
+
+    /**
+     * Gets the person by name, in a named authority.
+     * 
+     * @param parentspecifier the shortId of the parent
+     * @param itemspecifier the shortId of the person
+     * 
+     * @return the person
+     */
+    @GET
+    @Path("urn:cspace:name({parentspecifier})/items/urn:cspace:name({itemspecifier})")
+    public MultipartOutput getOrganizationByNameInNamedAuthority(
+            @PathParam("parentspecifier") String parentspecifier,
+            @PathParam("itemspecifier") String itemspecifier) {
+        if (parentspecifier == null || "".equals(parentspecifier)
+            || itemspecifier == null || "".equals(itemspecifier)) {
+            logger.error("getOrganizationByNameInNamedAuthority: missing parentcsid or itemspecifier!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    "get failed on Organization with parentspecifier=" 
+            		+ parentspecifier + " and itemspecifier=" + itemspecifier).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        String whereClause =
+        	OrganizationJAXBSchema.ORGANIZATIONS_COMMON+
+        	":"+OrganizationJAXBSchema.SHORT_IDENTIFIER+
+        	"='"+itemspecifier+"'";
+        if (logger.isDebugEnabled()) {
+            logger.debug("getOrganizationByNameInNamedAuthority with parentspecifier=" 
+            		+ parentspecifier + " and itemspecifier=" + itemspecifier);
+        }
+        MultipartOutput result = null;
+        try {
+            // Note that we have to create the service context for the Items, not the main service
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getItemServiceName());
+        	// HACK HACK Since we do not use the parent CSID yet this should work.
+            DocumentHandler handler = createItemDocumentHandler(ctx, parentspecifier);
+            DocumentFilter myFilter = new DocumentFilter(whereClause, 0, 1);
+            handler.setDocumentFilter(myFilter);
+            getRepositoryClient(ctx).get(ctx, handler);
+            // TODO should we assert that the item is in the passed personAuthority?
+            result = (MultipartOutput) ctx.getOutput();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getOrganizationByNameInNamedAuthority", dnfe);
+            }
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Get failed on Person itemspecifier=" + itemspecifier).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getOrganizationByNameInNamedAuthority", e);
+            }
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed").type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        if (result == null) {
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    "Get failed, the requested Person itemspecifier:" + itemspecifier + ": was not found.").type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return result;
+    }
+
+    /**
      * Gets the authority refs for an Organization item.
      * @param parentcsid 
      *
@@ -795,30 +933,12 @@ public class OrgAuthorityResource extends
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             String whereClause =
             	OrgAuthorityJAXBSchema.ORGAUTHORITIES_COMMON+
-            	":" + OrgAuthorityJAXBSchema.DISPLAY_NAME+
+            	":" + OrgAuthorityJAXBSchema.SHORT_IDENTIFIER+
             	"='" + parentSpecifier+"'";
             // Need to get an Authority by name
             ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             String parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
-
-            ctx = createServiceContext(getItemServiceName(), queryParams);
-            DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
-            DocumentFilter myFilter = handler.getDocumentFilter();// new DocumentFilter();
-
-            // Add the where clause "organizations_common:inAuthority='" + parentcsid + "'"
-            myFilter.setWhereClause(OrganizationJAXBSchema.ORGANIZATIONS_COMMON + ":" +
-            		OrganizationJAXBSchema.IN_AUTHORITY + "='" + parentcsid + "'");
-            
-            // AND organizations_common:displayName LIKE '%partialTerm%'
-            if (partialTerm != null && !partialTerm.isEmpty()) {
-            	String ptClause = OrganizationJAXBSchema.ORGANIZATIONS_COMMON + ":" +
-            		OrganizationJAXBSchema.DISPLAY_NAME +
-            		" LIKE " +
-            		"'%" + partialTerm + "%'";
-            	myFilter.appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
-            }            
-            getRepositoryClient(ctx).getFiltered(ctx, handler);
-            personObjectList = (OrganizationsCommonList) handler.getCommonPartList();
+            return getOrganizationList(parentcsid, partialTerm, ui);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -831,7 +951,6 @@ public class OrgAuthorityResource extends
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return personObjectList;
     }
 
     /**

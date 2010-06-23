@@ -123,7 +123,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         MultipartOutput multipart = createLoaninInstance(
                 "loanInNumber-" + identifier,
                 "returnDate-" + identifier,
-                lenderRefName,
+								lenderRefName,
                 lendersAuthorizerRefName,
                 lendersContactRefName,
                 loanInContactRefName);
@@ -165,10 +165,8 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding
         // refName by which it can be identified.
-    	String authRefName = 
-    		PersonAuthorityClientUtils.createPersonAuthRefName(PERSON_AUTHORITY_NAME, false);
     	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
-    	    PERSON_AUTHORITY_NAME, authRefName, personAuthClient.getCommonPartName());
+    	    PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
 
@@ -177,23 +175,25 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         Assert.assertEquals(statusCode, STATUS_CREATED);
         personAuthCSID = extractId(res);
 
+        String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
+        
         // Create temporary Person resources, and their corresponding refNames
         // by which they can be identified.
-        lenderRefName =
-            PersonAuthorityClientUtils.createPersonRefName(authRefName, "Linus Lender", true);
-        personIdsCreated.add(createPerson("Linus", "Lender", lenderRefName));
+       	String csid = createPerson("Linus", "Lender", "linusLender", authRefName);
+        personIdsCreated.add(csid);
+        lenderRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
 
-        lendersAuthorizerRefName =
-            PersonAuthorityClientUtils.createPersonRefName(authRefName, "Art Lendersauthorizor", true);
-        personIdsCreated.add(createPerson("Art", "Lendersauthorizor", lendersAuthorizerRefName));
+       	csid = createPerson("Art", "Lendersauthorizor", "artLendersauthorizor", authRefName);
+        personIdsCreated.add(csid);
+        lendersAuthorizerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
 
-        lendersContactRefName =
-            PersonAuthorityClientUtils.createPersonRefName(authRefName, "Larry Lenderscontact", true);
-        personIdsCreated.add(createPerson("Larry", "Lenderscontact", lendersContactRefName));
+        csid = createPerson("Larry", "Lenderscontact", "larryLenderscontact", authRefName);
+        personIdsCreated.add(csid);
+        lendersContactRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         
-        loanInContactRefName =
-            PersonAuthorityClientUtils.createPersonRefName(authRefName, "Carrie Loanincontact", true);
-        personIdsCreated.add(createPerson("Carrie", "Loanincontact", loanInContactRefName));
+        csid = createPerson("Carrie", "Loanincontact", "carrieLoanincontact", authRefName);
+        personIdsCreated.add(csid);
+        loanInContactRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
 
         // FIXME: Add instance(s) of 'lenders' field when we can work with
         // repeatable / multivalued authority reference fields.  Be sure to
@@ -201,14 +201,15 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         // revise check for numbers of authority fields expected in readAndCheckAuthRefs.
     }
     
-    protected String createPerson(String firstName, String surName, String refName ) {
+    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
+        personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
     	MultipartOutput multipart = 
     		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
-    				refName, personInfo, personAuthClient.getItemCommonPartName());
+    				authRefName, personInfo, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         int statusCode = res.getStatus();
 

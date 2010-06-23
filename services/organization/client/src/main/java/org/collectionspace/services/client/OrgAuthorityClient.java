@@ -226,6 +226,39 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
     }
 
     /**
+     * Read named item.
+     *
+     * @param vcsid the vcsid
+     * @param shortId the shortIdentifier
+     * @return the client response
+     */
+    public ClientResponse<MultipartInput> readNamedItem(String vcsid, String shortId) {
+        return orgAuthorityProxy.readNamedItem(vcsid, shortId);
+    }
+
+    /**
+     * Read item in Named Authority.
+     *
+     * @param authShortId the shortIdentifier for the Authority
+     * @param csid the csid
+     * @return the client response
+     */
+    public ClientResponse<MultipartInput> readItemInNamedAuthority(String authShortId, String csid) {
+        return orgAuthorityProxy.readItemInNamedAuthority(authShortId, csid);
+    }
+
+    /**
+     * Read named item in Named Authority.
+     *
+     * @param authShortId the shortIdentifier for the Authority
+     * @param itemShortId the shortIdentifier for the item
+     * @return the client response
+     */
+    public ClientResponse<MultipartInput> readNamedItemInNamedAuthority(String authShortId, String itemShortId) {
+        return orgAuthorityProxy.readNamedItem(authShortId, itemShortId);
+    }
+
+    /**
      * Creates the item.
      *
      * @param vcsid the vcsid

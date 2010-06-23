@@ -81,17 +81,12 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     /** The test organization founding place. */
     private final String TEST_ORG_FOUNDING_PLACE = "Anytown, USA";
     
-    /** The known resource id. */
+    // Hold some values for a recently created item to verify upon read.
     private String knownResourceId = null;
-    
-    /** The known resource display name. */
-    private String knownResourceDisplayName = null;
-    
-    /** The known resource ref name. */
+    private String knownResourceShortIdentifer = null;
     private String knownResourceRefName = null;
-    
-    /** The known item resource id. */
     private String knownItemResourceId = null;
+    private String knownItemResourceShortIdentifer = null;
     
     /** The known contact resource id. */
     private String knownContactResourceId = null;
@@ -107,6 +102,18 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     private Map<String, String> allContactResourceIdsCreated =
         new HashMap<String, String>();
     
+    protected void setKnownResource( String id, String shortIdentifer,
+    		String refName ) {
+    	knownResourceId = id;
+    	knownResourceShortIdentifer = shortIdentifer;
+    	knownResourceRefName = refName;
+    }
+
+    protected void setKnownItemResource( String id, String shortIdentifer ) {
+    	knownItemResourceId = id;
+    	knownItemResourceShortIdentifer = shortIdentifer;
+    }
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -146,12 +153,12 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        String identifier = createIdentifier();
-        String displayName = "displayName-" + identifier;
-    	String refName = OrgAuthorityClientUtils.createOrgAuthRefName(displayName, true);
+        String shortId = createIdentifier();
+        String displayName = "displayName-" + shortId;
+    	String baseRefName = OrgAuthorityClientUtils.createOrgAuthRefName(shortId, null);
     	MultipartOutput multipart = 
     	    OrgAuthorityClientUtils.createOrgAuthorityInstance(
-	        displayName, refName, client.getCommonPartName());
+    	    		displayName, shortId, client.getCommonPartName());
         
     	String newID = null;
     	ClientResponse<Response> res = client.create(multipart);
@@ -171,10 +178,6 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
-	        // Store the refname from the first resource created
-	        // for additional tests below.
-	        knownResourceRefName = refName;
-	
 	        newID = OrgAuthorityClientUtils.extractId(res);
         } finally {
         	res.releaseConnection();
@@ -183,8 +186,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         // Store the ID returned from the first resource created
         // for additional tests below.
         if (knownResourceId == null){
-            knownResourceId = newID;
-            knownResourceDisplayName = displayName;
+        	setKnownResource( newID, shortId, baseRefName ); 
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
@@ -222,9 +224,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        String identifier = createIdentifier();
-        String refName = OrgAuthorityClientUtils.createOrganizationRefName(knownResourceRefName, identifier, true);
+        String shortId = "testOrg";
         Map<String, String> testOrgMap = new HashMap<String,String>();
+        testOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
         testOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, TEST_ORG_SHORTNAME);
         testOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "The real official test organization");
         testOrgMap.put(OrganizationJAXBSchema.CONTACT_NAME, "joe@test.org");
@@ -236,7 +238,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         // Store the ID returned from the first item resource created
         // for additional tests below.
         if (knownItemResourceId == null){
-            knownItemResourceId = newID;
+        	setKnownItemResource(newID, shortId);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
             }
@@ -494,39 +496,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"read"}, dependsOnGroups = {"create"})
     public void read(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupRead();
-
-        // Submit the request to the service and store the response.
-        OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
-        try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	        //FIXME: remove the following try catch once Aron fixes signatures
-	        try {
-	            MultipartInput input = (MultipartInput) res.getEntity();
-	            OrgauthoritiesCommon orgAuthority = (OrgauthoritiesCommon) extractPart(input,
-	                    client.getCommonPartName(), OrgauthoritiesCommon.class);
-	            Assert.assertNotNull(orgAuthority);
-	        } catch (Exception e) {
-	            throw new RuntimeException(e);
-	        }
-        } finally {
-        	res.releaseConnection();
-        }
+    	readInternal(testName, knownResourceId, null);
     }
 
     /**
@@ -538,6 +508,10 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
             groups = {"read"}, dependsOnGroups = {"create"})
         public void readByName(String testName) throws Exception {
+    	readInternal(testName, null, knownResourceShortIdentifer);
+    }
+    
+    protected void readInternal(String testName, String CSID, String shortId) {
 
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
@@ -547,7 +521,14 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<MultipartInput> res = client.readByName(knownResourceDisplayName);
+        ClientResponse<MultipartInput> res = null;
+        if(CSID!=null) {
+            res = client.read(CSID);
+        } else if(shortId!=null) {
+        	res = client.readByName(shortId);
+        } else {
+        	Assert.fail("readInternal: Internal error. One of CSID or shortId must be non-null");
+        }
         try {
 	        int statusCode = res.getStatus();
 	
@@ -573,50 +554,60 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         }
     }
 
-/*
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        groups = {"read"}, dependsOnMethods = {"read"})
-    public void readByName(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupRead();
-
-        // Submit the request to the service and store the response.
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        //FIXME: remove the following try catch once Aron fixes signatures
-        try {
-            MultipartInput input = (MultipartInput) res.getEntity();
-            OrgauthoritiesCommon orgAuthority = (OrgauthoritiesCommon) extractPart(input,
-                    client.getCommonPartName(), OrgauthoritiesCommon.class);
-            Assert.assertNotNull(orgAuthority);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    /**
+     * Read item.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    		groups = {"readItem"}, dependsOnGroups = {"read"})
+    public void readItem(String testName) throws Exception {
+        readItemInternal(testName, knownResourceId, null, knownItemResourceId, null);
     }
-*/
 
     /**
- * Read item.
- *
- * @param testName the test name
- * @throws Exception the exception
- */
-@Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"read"}, dependsOnMethods = {"read"})
-    public void readItem(String testName) throws Exception {
+     * Read item in Named Auth.
+     * 
+     * TODO Enable this if we really need this - it is a funky case, where we would have
+     * the shortId of the item, but the CSID of the parent authority!? Unlikely.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    		groups = {"readItem"}, dependsOnGroups = {"read"})
+    public void readItemInNamedAuth(String testName) throws Exception {
+        readItemInternal(testName, null, knownResourceShortIdentifer, knownItemResourceId, null);
+    }
+     */
+
+    /**
+     * Read named item.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    		groups = {"readItem"}, dependsOnGroups = {"read"})
+    public void readNamedItem(String testName) throws Exception {
+        readItemInternal(testName, knownResourceId, null, null, knownItemResourceShortIdentifer);
+    }
+
+    /**
+     * Read Named item in Named Auth.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    		groups = {"readItem"}, dependsOnGroups = {"read"})
+    public void readNamedItemInNamedAuth(String testName) throws Exception {
+        readItemInternal(testName, null, knownResourceShortIdentifer, null, knownItemResourceShortIdentifer);
+    }
+
+    protected void readItemInternal(String testName, 
+    		String authCSID, String authShortId, String itemCSID, String itemShortId) 
+    	throws Exception {
 
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
@@ -626,7 +617,26 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
+        ClientResponse<MultipartInput> res = null;
+        if(authCSID!=null) {
+            if(itemCSID!=null) {
+                res = client.readItem(authCSID, itemCSID);
+            } else if(itemShortId!=null) {
+            	res = client.readNamedItem(authCSID, itemShortId);
+            } else {
+            	Assert.fail("readInternal: Internal error. One of CSID or shortId must be non-null");
+            }
+        } else if(authShortId!=null) {
+            if(itemCSID!=null) {
+                res = client.readItemInNamedAuthority(authShortId, itemCSID);
+            } else if(itemShortId!=null) {
+            	res = client.readNamedItemInNamedAuthority(authShortId, itemShortId);
+            } else {
+            	Assert.fail("readInternal: Internal error. One of CSID or shortId must be non-null");
+            }
+        } else {
+        	Assert.fail("readInternal: Internal error. One of authCSID or authShortId must be non-null");
+        }
         try {
 	        int statusCode = res.getStatus();
 	
@@ -647,8 +657,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	        boolean showFull = true;
 	        if(showFull && logger.isDebugEnabled()){
 	            logger.debug(testName + ": returned payload:");
-	            logger.debug(objectAsXmlString(organization,
-	                    OrganizationsCommon.class));
+	            logger.debug(objectAsXmlString(organization, OrganizationsCommon.class));
 	        }
 	        Assert.assertEquals(organization.getInAuthority(), knownResourceId);
         } finally {
@@ -850,7 +859,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
      * @throws Exception the exception
      */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"read"}, dependsOnMethods = {"readItem"})
+        groups = {"readItem"}, dependsOnMethods = {"readItem"})
     public void readContact(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -926,7 +935,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"read"}, dependsOnMethods = {"readItem"})
+        groups = {"readItem"}, dependsOnMethods = {"readItem"})
     public void readItemNonExistent(String testName) {
 
         if (logger.isDebugEnabled()) {
@@ -956,7 +965,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"read"}, dependsOnMethods = {"readContact"})
+        groups = {"readItem"}, dependsOnMethods = {"readContact"})
     public void readContactNonExistent(String testName) {
 
         if (logger.isDebugEnabled()) {
@@ -1048,7 +1057,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
      */
     @Test(groups = {"readList"}, dependsOnMethods = {"readItemList"})
     public void readItemListByAuthorityName() {
-        readItemList(null, knownResourceDisplayName);
+        readItemList(null, knownResourceShortIdentifer);
     }
 
     /**
@@ -1546,7 +1555,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        MultipartOutput multipart = createOrgAuthorityInstance(NON_EXISTENT_ID);
+    	MultipartOutput multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
+    			NON_EXISTENT_ID, NON_EXISTENT_ID, 
+				new OrgAuthorityClient().getCommonPartName());
         ClientResponse<MultipartInput> res =
                 client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
@@ -1582,11 +1593,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         // The only relevant ID may be the one used in update(), below.
         OrgAuthorityClient client = new OrgAuthorityClient();
         Map<String, String> nonexOrgMap = new HashMap<String,String>();
+        nonexOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, "nonExistent");
         nonexOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "Non-existent");
-        String refName = OrgAuthorityClientUtils.createOrganizationRefName(knownResourceRefName, NON_EXISTENT_ID, true);
         MultipartOutput multipart = 
         	OrgAuthorityClientUtils.createOrganizationInstance(
-        		NON_EXISTENT_ID, refName,
+        		NON_EXISTENT_ID, knownResourceRefName,
         		nonexOrgMap, client.getItemCommonPartName() );
         ClientResponse<MultipartInput> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
@@ -2055,19 +2066,5 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         String itemResourceIdentifier, String contactResourceIdentifier) {
         return getContactServiceRootURL(parentResourceIdentifier,
             itemResourceIdentifier) + "/" + contactResourceIdentifier;
-    }
-
-    /**
-     * Creates the org authority instance.
-     *
-     * @param identifier the identifier
-     * @return the multipart output
-     */
-    private MultipartOutput createOrgAuthorityInstance(String identifier) {
-    	String displayName = "displayName-" + identifier;
-    	String refName = OrgAuthorityClientUtils.createOrgAuthRefName(displayName, true);
-        return OrgAuthorityClientUtils.createOrgAuthorityInstance(
-				displayName, refName, 
-				new OrgAuthorityClient().getCommonPartName());
     }
 }

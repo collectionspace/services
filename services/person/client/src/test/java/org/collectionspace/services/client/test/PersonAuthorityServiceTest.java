@@ -88,18 +88,13 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     
     /** The test death date. */
     final String TEST_DEATH_DATE = "June 11, 1979";
- 
-    /** The known resource id. */
+
+    // Hold some values for a recently created item to verify upon read.
     private String knownResourceId = null;
-    
-    /** The known resource display name. */
-    private String knownResourceDisplayName = null;
-    
-    /** The known resource ref name. */
+    private String knownResourceShortIdentifer = null;
     private String knownResourceRefName = null;
-    
-    /** The known item resource id. */
     private String knownItemResourceId = null;
+    private String knownItemResourceShortIdentifer = null;
 
     // The resource ID of an item resource used for partial term matching tests.
     private String knownItemPartialTermResourceId = null;
@@ -118,6 +113,19 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     private Map<String, String> allContactResourceIdsCreated =
         new HashMap<String, String>();
 
+    protected void setKnownResource( String id, String shortIdentifer,
+    		String refName ) {
+    	knownResourceId = id;
+    	knownResourceShortIdentifer = shortIdentifer;
+    	knownResourceRefName = refName;
+    }
+
+    protected void setKnownItemResource( String id, String shortIdentifer ) {
+    	knownItemResourceId = id;
+    	knownItemResourceShortIdentifer = shortIdentifer;
+    }
+
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -157,13 +165,12 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        String identifier = createIdentifier();
-    	String displayName = "displayName-" + identifier;
-    	String baseRefName = PersonAuthorityClientUtils.createPersonAuthRefName(displayName, false);
-    	String fullRefName = PersonAuthorityClientUtils.createPersonAuthRefName(displayName, true);
+        String shortId = createIdentifier();
+    	String displayName = "displayName-" + shortId;
+    	String baseRefName = PersonAuthorityClientUtils.createPersonAuthRefName(shortId, null);
     	MultipartOutput multipart = 
             PersonAuthorityClientUtils.createPersonAuthorityInstance(
-    	    displayName, fullRefName, client.getCommonPartName());
+    	    displayName, shortId, client.getCommonPartName());
         
     	String newID = null;
     	ClientResponse<Response> res = client.create(multipart);
@@ -187,15 +194,10 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     	} finally {
     		res.releaseConnection();
     	}
-        // Store the refname from the first resource created
-        // for additional tests below.
-        knownResourceRefName = baseRefName;
-        // Store the ID returned from the first resource created
-        // for additional tests below.
+        // Save values for additional tests
         if (knownResourceId == null){
-            knownResourceId = newID;
-            knownResourceDisplayName = displayName;
-            if (logger.isDebugEnabled()) {
+        	setKnownResource( newID, shortId, baseRefName ); 
+        	if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
             }
         }
@@ -235,13 +237,15 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        String refName = PersonAuthorityClientUtils.createPersonRefName(authRefName, "John Wayne", true);
+        
         Map<String, String> johnWayneMap = new HashMap<String,String>();
         //
         // Fill the property map
         //
+        String shortId = "johnWayneActor";
         johnWayneMap.put(PersonJAXBSchema.DISPLAY_NAME_COMPUTED, "false");
         johnWayneMap.put(PersonJAXBSchema.DISPLAY_NAME, "John Wayne");
+        johnWayneMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
         
         johnWayneMap.put(PersonJAXBSchema.FORE_NAME, TEST_FORE_NAME);
         johnWayneMap.put(PersonJAXBSchema.SUR_NAME, TEST_SUR_NAME);
@@ -256,7 +260,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
             "He was also known for his conservative political views and his support in " +
             "the 1950s for anti-communist positions.");
         MultipartOutput multipart = 
-            PersonAuthorityClientUtils.createPersonInstance(vcsid, refName, johnWayneMap,
+            PersonAuthorityClientUtils.createPersonInstance(vcsid, authRefName, johnWayneMap,
                 client.getItemCommonPartName() );
 
         String newID = null;
@@ -280,7 +284,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Store the ID returned from the first item resource created
         // for additional tests below.
         if (knownItemResourceId == null){
-            knownItemResourceId = newID;
+        	setKnownItemResource(newID, shortId);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);                
             }
@@ -548,38 +552,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"read"}, dependsOnGroups = {"create"})
     public void read(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupRead();
-        
-        // Submit the request to the service and store the response.
-        PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
-        try {
-	        int statusCode = res.getStatus();
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	        //FIXME: remove the following try catch once Aron fixes signatures
-	        try {
-	            MultipartInput input = (MultipartInput) res.getEntity();
-	            PersonauthoritiesCommon personAuthority = (PersonauthoritiesCommon) extractPart(input,
-	                    client.getCommonPartName(), PersonauthoritiesCommon.class);
-	            Assert.assertNotNull(personAuthority);
-	        } catch (Exception e) {
-	            throw new RuntimeException(e);
-	        }
-        } finally {
-        	res.releaseConnection();
-        }
+    	readInternal(testName, knownResourceId, null);
     }
 
     /**
@@ -591,7 +564,10 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
             groups = {"read"}, dependsOnGroups = {"create"})
         public void readByName(String testName) throws Exception {
-
+    	readInternal(testName, null, knownResourceShortIdentifer);
+    }
+    
+    protected void readInternal(String testName, String CSID, String shortId) {
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
@@ -600,7 +576,14 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<MultipartInput> res = client.readByName(knownResourceDisplayName);
+        ClientResponse<MultipartInput> res = null;
+        if(CSID!=null) {
+            res = client.read(CSID);
+        } else if(shortId!=null) {
+        	res = client.readByName(shortId);
+        } else {
+        	Assert.fail("readInternal: Internal error. One of CSID or shortId must be non-null");
+        }
         try {
 	        int statusCode = res.getStatus();
 	        // Check the status code of the response: does it match
@@ -625,51 +608,58 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
     }
 
-/*
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
-        groups = {"read"}, dependsOnMethods = {"read"})
-    public void readByName(String testName) throws Exception {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(testBanner(testName, CLASS_NAME));
-        }
-        // Perform setup.
-        setupRead();
-
-        // Submit the request to the service and store the response.
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        //FIXME: remove the following try catch once Aron fixes signatures
-        try {
-            MultipartInput input = (MultipartInput) res.getEntity();
-            PersonauthoritiesCommon personAuthority = (PersonauthoritiesCommon) extractPart(input,
-                    client.getCommonPartName(), PersonauthoritiesCommon.class);
-            Assert.assertNotNull(personAuthority);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    /**
+     * Read item.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    		groups = {"readItem"}, dependsOnGroups = {"read"})
+    public void readItem(String testName) throws Exception {
+        readItemInternal(testName, knownResourceId, null, knownItemResourceId, null);
     }
-*/
 
     /**
- * Read item.
- *
- * @param testName the test name
- * @throws Exception the exception
- */
-@Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"read"}, dependsOnMethods = {"read"})
-    public void readItem(String testName) throws Exception {
-        
+     * Read item in Named Auth.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    		groups = {"readItem"}, dependsOnGroups = {"read"})
+    public void readItemInNamedAuth(String testName) throws Exception {
+        readItemInternal(testName, null, knownResourceShortIdentifer, knownItemResourceId, null);
+    }
+
+    /**
+     * Read named item.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    		groups = {"readItem"}, dependsOnGroups = {"read"})
+    public void readNamedItem(String testName) throws Exception {
+        readItemInternal(testName, knownResourceId, null, null, knownItemResourceShortIdentifer);
+    }
+
+    /**
+     * Read Named item in Named Auth.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    		groups = {"readItem"}, dependsOnGroups = {"read"})
+    public void readNamedItemInNamedAuth(String testName) throws Exception {
+        readItemInternal(testName, null, knownResourceShortIdentifer, null, knownItemResourceShortIdentifer);
+    }
+
+    protected void readItemInternal(String testName, 
+    		String authCSID, String authShortId, String itemCSID, String itemShortId) 
+    	throws Exception {
+
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
@@ -678,7 +668,26 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
+        ClientResponse<MultipartInput> res = null;
+        if(authCSID!=null) {
+            if(itemCSID!=null) {
+                res = client.readItem(authCSID, itemCSID);
+            } else if(itemShortId!=null) {
+            	res = client.readNamedItem(authCSID, itemShortId);
+            } else {
+            	Assert.fail("readInternal: Internal error. One of CSID or shortId must be non-null");
+            }
+        } else if(authShortId!=null) {
+            if(itemCSID!=null) {
+                res = client.readItemInNamedAuthority(authShortId, itemCSID);
+            } else if(itemShortId!=null) {
+            	res = client.readNamedItemInNamedAuthority(authShortId, itemShortId);
+            } else {
+            	Assert.fail("readInternal: Internal error. One of CSID or shortId must be non-null");
+            }
+        } else {
+        	Assert.fail("readInternal: Internal error. One of authCSID or authShortId must be non-null");
+        }
         try {
 	        int statusCode = res.getStatus();
 	
@@ -913,7 +922,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      * @throws Exception the exception
      */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"read"}, dependsOnMethods = {"readItem"})
+        groups = {"readItem"}, dependsOnMethods = {"readItem"})
     public void readContact(String testName) throws Exception {
         
         if (logger.isDebugEnabled()) {
@@ -998,7 +1007,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"read"}, dependsOnMethods = {"readItem"})
+        groups = {"readItem"}, dependsOnMethods = {"readItem"})
     public void readItemNonExistent(String testName) {
 
         if (logger.isDebugEnabled()) {
@@ -1032,7 +1041,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"read"}, dependsOnMethods = {"readContact"})
+        groups = {"readItem"}, dependsOnMethods = {"readContact"})
     public void readContactNonExistent(String testName) {
 
         if (logger.isDebugEnabled()) {
@@ -1115,7 +1124,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
                         item.getDisplayName());
                 logger.debug(testName + ": list-item[" + i + "] URI=" +
                         item.getUri());
-                readItemList(csid, null);
+                readItemList(csid, null, testName);
                 i++;
             }
         }
@@ -1124,17 +1133,19 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     /**
      * Read item list.
      */
-    @Test(groups = {"readList"}, dependsOnMethods = {"readList"})
-    public void readItemList() {
-        readItemList(knownResourceId, null);
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    		groups = {"readList"}, dependsOnMethods = {"readList"})
+    public void readItemList(String testName) {
+        readItemList(knownResourceId, null, testName);
     }
 
     /**
      * Read item list by authority name.
      */
-    @Test(groups = {"readList"}, dependsOnMethods = {"readItemList"})
-    public void readItemListByAuthorityName() {
-        readItemList(null, knownResourceDisplayName);
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    		groups = {"readList"}, dependsOnMethods = {"readItemList"})
+    public void readItemListByAuthorityName(String testName) {
+        readItemList(null, knownResourceShortIdentifer, testName);
     }
     
     /**
@@ -1143,9 +1154,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      * @param vcsid the vcsid
      * @param name the name
      */
-    private void readItemList(String vcsid, String name) {
-
-        final String testName = "readItemList";
+    private void readItemList(String vcsid, String name, String testName) {
 
         // Perform setup.
         setupReadList();
@@ -1683,9 +1692,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // The only relevant ID may be the one used in update(), below.
         PersonAuthorityClient client = new PersonAuthorityClient();
         String displayName = "displayName-NON_EXISTENT_ID";
-    	String fullRefName = PersonAuthorityClientUtils.createPersonAuthRefName(displayName, true);
     	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
-    				displayName, fullRefName, client.getCommonPartName());
+    				displayName, "NON_EXISTENT_SHORT_ID", client.getCommonPartName());
         ClientResponse<MultipartInput> res =
                 client.update(NON_EXISTENT_ID, multipart);
         try {
@@ -1725,13 +1733,14 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // The only relevant ID may be the one used in update(), below.
         PersonAuthorityClient client = new PersonAuthorityClient();
         Map<String, String> nonexMap = new HashMap<String,String>();
+        nonexMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, "nonEX");
         nonexMap.put(PersonJAXBSchema.FORE_NAME, "John");
         nonexMap.put(PersonJAXBSchema.SUR_NAME, "Wayne");
         nonexMap.put(PersonJAXBSchema.GENDER, "male");
         MultipartOutput multipart = 
     	PersonAuthorityClientUtils.createPersonInstance(NON_EXISTENT_ID, 
-    			PersonAuthorityClientUtils.createPersonRefName(NON_EXISTENT_ID, NON_EXISTENT_ID, true), nonexMap,
-    			client.getItemCommonPartName() );
+    			PersonAuthorityClientUtils.createPersonAuthRefName(NON_EXISTENT_ID, null),
+    			nonexMap, client.getItemCommonPartName() );
         ClientResponse<MultipartInput> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
         try {

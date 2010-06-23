@@ -58,7 +58,7 @@ public class OrgAuthorityBaseImport {
     final String SERVICE_PATH_COMPONENT = "orgauthorities";
     final String ITEM_SERVICE_PATH_COMPONENT = "items";
 
-    public void createOrgAuthority(String orgAuthorityName, 
+    public void createOrgAuthority(String orgAuthorityDisplayName, String orgAuthorityShortId, 
     		List<Map<String,String>> orgInfos ) {
 
     	// Expected status code: 201 Created
@@ -67,32 +67,30 @@ public class OrgAuthorityBaseImport {
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
 
     	if(logger.isDebugEnabled()){
-    		logger.debug("Import: Create orgAuthority: \"" + orgAuthorityName +"\"");
+    		logger.debug("Import: Create orgAuthority: \"" + orgAuthorityShortId +"\"");
     	}
-    	String baseOrgAuthRefName = OrgAuthorityClientUtils.createOrgAuthRefName(orgAuthorityName, false);
-    	String fullOrgAuthRefName = OrgAuthorityClientUtils.createOrgAuthRefName(orgAuthorityName, true);
+    	String baseOrgAuthRefName = OrgAuthorityClientUtils.createOrgAuthRefName(orgAuthorityShortId, null);
     	MultipartOutput multipart = 
-    		OrgAuthorityClientUtils.createOrgAuthorityInstance(
-    				orgAuthorityName, fullOrgAuthRefName, 
-    				client.getCommonPartName());
+    	    OrgAuthorityClientUtils.createOrgAuthorityInstance(
+    	    		orgAuthorityDisplayName, orgAuthorityShortId, client.getCommonPartName());
     	ClientResponse<Response> res = client.create(multipart);
 
     	int statusCode = res.getStatus();
 
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-    		throw new RuntimeException("Could not create enumeration: \""+orgAuthorityName
+    		throw new RuntimeException("Could not create enumeration: \""+orgAuthorityShortId
     				+"\" "+ OrgAuthorityClientUtils.invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
     		throw new RuntimeException("Unexpected Status when creating enumeration: \""
-    				+orgAuthorityName +"\", Status:"+ statusCode);
+    				+orgAuthorityShortId +"\", Status:"+ statusCode);
     	}
 
     	// Store the ID returned from this create operation
     	// for additional tests below.
     	String newOrgAuthorityId = OrgAuthorityClientUtils.extractId(res);
     	if(logger.isDebugEnabled()){
-    		logger.debug("Import: Created orgAuthorityulary: \"" + orgAuthorityName +"\" ID:"
+    		logger.debug("Import: Created orgAuthorityulary: \"" + orgAuthorityShortId +"\" ID:"
     				+newOrgAuthorityId );
     	}
     	for(Map<String,String> orgInfo : orgInfos){
@@ -112,14 +110,17 @@ public class OrgAuthorityBaseImport {
 
 		OrgAuthorityBaseImport oabi = new OrgAuthorityBaseImport();
 		final String demoOrgAuthorityName = "Demo Org Authority";
+		final String demoOrgAuthorityShortId = "demoOrgAuth";
 
         Map<String, String> mmiOrgMap = new HashMap<String,String>();
+        mmiOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, "mmi");
         mmiOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "MMI");
         mmiOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "Museum of the Moving Image");
         mmiOrgMap.put(OrganizationJAXBSchema.CONTACT_NAME, "Megan Forbes");
         mmiOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "1984");
         mmiOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, "Astoria, NY");
         Map<String, String> pahmaOrgMap = new HashMap<String,String>();
+        pahmaOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, "pahma");
         pahmaOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "PAHMA");
         pahmaOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "Phoebe A. Hearst Museum of Anthropology");
         pahmaOrgMap.put(OrganizationJAXBSchema.NAME_ADDITIONS, "University of California, Berkeley");
@@ -127,6 +128,7 @@ public class OrgAuthorityBaseImport {
         pahmaOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "1901");
         pahmaOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, "Berkeley, CA");
         Map<String, String> savoyOrgMap = new HashMap<String,String>();
+        savoyOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, "savoyTh");
         savoyOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "Savoy Theatre");
         savoyOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "1900");
         savoyOrgMap.put(OrganizationJAXBSchema.DISSOLUTION_DATE, "1952");
@@ -134,7 +136,7 @@ public class OrgAuthorityBaseImport {
         List<Map<String, String>> orgMaps = 
         	Arrays.asList(mmiOrgMap, pahmaOrgMap, savoyOrgMap );
 
-		oabi.createOrgAuthority(demoOrgAuthorityName, orgMaps);
+		oabi.createOrgAuthority(demoOrgAuthorityName, demoOrgAuthorityShortId, orgMaps);
 
 		logger.info("OrgAuthorityBaseImport complete.");
 	}

@@ -37,7 +37,10 @@ import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.organization.OrganizationsCommon;
 import org.collectionspace.services.organization.OrgauthoritiesCommon;
+import org.collectionspace.services.person.PersonauthoritiesCommon;
+import org.collectionspace.services.person.PersonsCommon;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
@@ -51,20 +54,88 @@ public class OrgAuthorityClientUtils {
     /** The Constant logger. */
     private static final Logger logger =
         LoggerFactory.getLogger(OrgAuthorityClientUtils.class);
+	private static final ServiceRequestType READ_REQ = ServiceRequestType.READ;
+
+    /**
+     * @param csid the id of the OrgAuthority
+     * @param client if null, creates a new client
+     * @return
+     */
+    public static String getAuthorityRefName(String csid, OrgAuthorityClient client){
+    	if(client==null)
+    		client = new OrgAuthorityClient();
+        ClientResponse<MultipartInput> res = client.read(csid);
+        try {
+	        int statusCode = res.getStatus();
+	        if(!READ_REQ.isValidStatusCode(statusCode)
+	        	||(statusCode != CollectionSpaceClientUtils.STATUS_OK)) {
+	    		throw new RuntimeException("Invalid status code returned: "+statusCode);
+	        }
+	        //FIXME: remove the following try catch once Aron fixes signatures
+	        try {
+	            MultipartInput input = (MultipartInput) res.getEntity();
+	            OrgauthoritiesCommon orgAuthority = 
+	            	(OrgauthoritiesCommon) CollectionSpaceClientUtils.extractPart(input,
+	                    client.getCommonPartName(), OrgauthoritiesCommon.class);
+		        if(orgAuthority==null) {
+		    		throw new RuntimeException("Null orgAuthority returned from service.");
+		        }
+	            return orgAuthority.getRefName();
+	        } catch (Exception e) {
+	            throw new RuntimeException(e);
+	        }
+        } finally {
+        	res.releaseConnection();
+        }
+    }
+
+    /**
+     * @param csid the id of the PersonAuthority
+     * @param client if null, creates a new client
+     * @return
+     */
+    public static String getOrgRefName(String inAuthority, String csid, OrgAuthorityClient client){
+    	if(client==null)
+    		client = new OrgAuthorityClient();
+        ClientResponse<MultipartInput> res = client.readItem(inAuthority, csid);
+        try {
+	        int statusCode = res.getStatus();
+	        if(!READ_REQ.isValidStatusCode(statusCode)
+		        	||(statusCode != CollectionSpaceClientUtils.STATUS_OK)) {
+	    		throw new RuntimeException("Invalid status code returned: "+statusCode);
+	        }
+	        //FIXME: remove the following try catch once Aron fixes signatures
+	        try {
+	            MultipartInput input = (MultipartInput) res.getEntity();
+	            OrganizationsCommon org = 
+	            	(OrganizationsCommon) CollectionSpaceClientUtils.extractPart(input,
+	                    client.getItemCommonPartName(), OrganizationsCommon.class);
+		        if(org==null) {
+		    		throw new RuntimeException("Null Organization returned from service.");
+		        }
+	            return org.getRefName();
+	        } catch (Exception e) {
+	            throw new RuntimeException(e);
+	        }
+        } finally {
+        	res.releaseConnection();
+        }
+    }
 
     /**
      * Creates the org authority instance.
      *
      * @param displayName the display name
-     * @param refName the ref name
+     * @param shortIdentifier the short Id 
      * @param headerLabel the header label
      * @return the multipart output
      */
     public static MultipartOutput createOrgAuthorityInstance(
-    		String displayName, String refName, String headerLabel ) {
+    		String displayName, String shortIdentifier, String headerLabel ) {
         OrgauthoritiesCommon orgAuthority = new OrgauthoritiesCommon();
         orgAuthority.setDisplayName(displayName);
-        orgAuthority.setRefName(refName);
+        orgAuthority.setShortIdentifier(shortIdentifier);
+        String refName = createOrgAuthRefName(shortIdentifier, displayName);
         orgAuthority.setVocabType("OrgAuthority");
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(orgAuthority, MediaType.APPLICATION_XML_TYPE);
@@ -81,13 +152,13 @@ public class OrgAuthorityClientUtils {
     /**
      * Creates the item in authority.
      *
-     * @param vcsid the vcsid
-     * @param orgAuthorityRefName the org authority ref name
-     * @param orgInfo the org info
+     * @param inAuthority the owning authority
+     * @param orgAuthorityRefName the owning Authority ref name
+     * @param orgInfo the org info. OrganizationJAXBSchema.SHORT_IDENTIFIER is REQUIRED.
      * @param client the client
      * @return the string
      */
-    public static String createItemInAuthority(String vcsid, 
+    public static String createItemInAuthority(String inAuthority, 
     		String orgAuthorityRefName, Map<String, String> orgInfo,
     		OrgAuthorityClient client) {
     	// Expected status code: 201 Created
@@ -95,26 +166,26 @@ public class OrgAuthorityClientUtils {
     	// Type of service request being tested
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
         String displayName = createDisplayName(orgInfo);
-    	String refName = createOrganizationRefName(orgAuthorityRefName, displayName, true);
 
     	if(logger.isDebugEnabled()){
     		logger.debug("Import: Create Item: \""+displayName
     				+"\" in orgAuthority: \"" + orgAuthorityRefName +"\"");
     	}
     	MultipartOutput multipart =
-    		createOrganizationInstance(vcsid, refName, orgInfo, client.getItemCommonPartName());
-    	ClientResponse<Response> res = client.createItem(vcsid, multipart);
+    		createOrganizationInstance(inAuthority, orgAuthorityRefName, 
+    				orgInfo, client.getItemCommonPartName());
+    	ClientResponse<Response> res = client.createItem(inAuthority, multipart);
     	String result;
     	try {	
 	    	int statusCode = res.getStatus();
 	
 	    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-	    		throw new RuntimeException("Could not create Item: \""+displayName
+   	    		throw new RuntimeException("Could not create Item: \""+orgInfo.get(OrganizationJAXBSchema.SHORT_IDENTIFIER)
 	    				+"\" in orgAuthority: \"" + orgAuthorityRefName
 	    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
 	    	}
 	    	if(statusCode != EXPECTED_STATUS_CODE) {
-	    		throw new RuntimeException("Unexpected Status when creating Item: \""+ displayName
+	    		throw new RuntimeException("Unexpected Status when creating Item: \""+ orgInfo.get(OrganizationJAXBSchema.SHORT_IDENTIFIER)
 	    				+"\" in orgAuthority: \"" + orgAuthorityRefName +"\", Status:"+ statusCode);
 	    	}
 	
@@ -130,22 +201,30 @@ public class OrgAuthorityClientUtils {
      * Creates the organization instance.
      *
      * @param inAuthority the in authority
-     * @param orgRefName the org ref name
+     * @param orgAuthRefName the owning Authority ref name
      * @param orgInfo the org info
      * @param headerLabel the header label
      * @return the multipart output
      */
     public static MultipartOutput createOrganizationInstance(String inAuthority, 
-    		String orgRefName, Map<String, String> orgInfo, String headerLabel){
+    		String orgAuthRefName, Map<String, String> orgInfo, String headerLabel){
         OrganizationsCommon organization = new OrganizationsCommon();
         organization.setInAuthority(inAuthority);
-       	organization.setRefName(orgRefName);
+    	String shortId = orgInfo.get(OrganizationJAXBSchema.SHORT_IDENTIFIER);
+    	if (shortId == null || shortId.isEmpty()) {
+    		throw new IllegalArgumentException("shortIdentifier cannot be null or empty");
+    	}      	
+    	organization.setShortIdentifier(shortId);
        	String value = null;
     	value = orgInfo.get(OrganizationJAXBSchema.DISPLAY_NAME_COMPUTED);
     	boolean displayNameComputed = (value==null) || value.equalsIgnoreCase("true"); 
    		organization.setDisplayNameComputed(displayNameComputed);
-        if((value = (String)orgInfo.get(OrganizationJAXBSchema.DISPLAY_NAME))!=null)
+       	if((value = (String)orgInfo.get(OrganizationJAXBSchema.DISPLAY_NAME))!=null)
         	organization.setDisplayName(value);
+   		
+    	String refName = createOrganizationRefName(orgAuthRefName, shortId, value);
+    	organization.setRefName(refName);
+
         if((value = (String)orgInfo.get(OrganizationJAXBSchema.SHORT_NAME))!=null)
         	organization.setShortName(value);
         if((value = (String)orgInfo.get(OrganizationJAXBSchema.LONG_NAME))!=null)
@@ -222,15 +301,15 @@ public class OrgAuthorityClientUtils {
     /**
      * Creates the org auth ref name.
      *
-     * @param orgAuthorityName the org authority name
-     * @param withDisplaySuffix the with display suffix
+     * @param shortId the orgAuthority shortIdentifier
+     * @param displaySuffix displayName to be appended, if non-null
      * @return the string
      */
-    public static String createOrgAuthRefName(String orgAuthorityName, boolean withDisplaySuffix) {
+    public static String createOrgAuthRefName(String shortId, String displaySuffix) {
     	String refName = "urn:cspace:org.collectionspace.demo:orgauthority:name("
-    			+orgAuthorityName+")";
-    	if(withDisplaySuffix)
-    		refName += "'"+orgAuthorityName+"'";
+			+shortId+")";
+    	if(displaySuffix!=null&&!displaySuffix.isEmpty())
+    		refName += "'"+displaySuffix+"'";
     	return refName;
     }
 
@@ -238,15 +317,15 @@ public class OrgAuthorityClientUtils {
      * Creates the organization ref name.
      *
      * @param orgAuthRefName the org auth ref name
-     * @param orgName the org name
-     * @param withDisplaySuffix the with display suffix
+     * @param shortId the person shortIdentifier
+     * @param displaySuffix displayName to be appended, if non-null
      * @return the string
      */
     public static String createOrganizationRefName(
-    						String orgAuthRefName, String orgName, boolean withDisplaySuffix) {
-    	String refName = orgAuthRefName+":organization:name("+orgName+")";
-    	if(withDisplaySuffix)
-    		refName += "'"+orgName+"'";
+			String orgAuthRefName, String shortId, String displaySuffix) {
+    	String refName = orgAuthRefName+":organization:name("+shortId+")";
+    	if(displaySuffix!=null&&!displaySuffix.isEmpty())
+    		refName += "'"+displaySuffix+"'";
     	return refName;
     }
 

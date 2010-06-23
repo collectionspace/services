@@ -173,6 +173,17 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
     }
 
     /**
+     * Gets the referencing objects.
+     *
+     * @param parentcsid the parentcsid
+     * @param csid the csid
+     * @return the referencing objects
+     */
+    public ClientResponse<AuthorityRefDocList> getReferencingObjects(String parentcsid, String csid) {
+        return personAuthorityProxy.getReferencingObjects(parentcsid, csid);
+    }
+
+    /**
      * Read item list.
      *
      * @param vcsid the vcsid
@@ -195,17 +206,6 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
     }
 
     /**
-     * Gets the referencing objects.
-     *
-     * @param parentcsid the parentcsid
-     * @param csid the csid
-     * @return the referencing objects
-     */
-    public ClientResponse<AuthorityRefDocList> getReferencingObjects(String parentcsid, String csid) {
-        return personAuthorityProxy.getReferencingObjects(parentcsid, csid);
-    }
-
-    /**
      * Read item list for named authority.
      *
      * @param specifier the specifier
@@ -224,6 +224,39 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      */
     public ClientResponse<MultipartInput> readItem(String vcsid, String csid) {
         return personAuthorityProxy.readItem(vcsid, csid);
+    }
+
+    /**
+     * Read named item.
+     *
+     * @param vcsid the vcsid
+     * @param shortId the shortIdentifier
+     * @return the client response
+     */
+    public ClientResponse<MultipartInput> readNamedItem(String vcsid, String shortId) {
+        return personAuthorityProxy.readNamedItem(vcsid, shortId);
+    }
+
+    /**
+     * Read item in Named Authority.
+     *
+     * @param authShortId the shortIdentifier for the Authority
+     * @param csid the csid
+     * @return the client response
+     */
+    public ClientResponse<MultipartInput> readItemInNamedAuthority(String authShortId, String csid) {
+        return personAuthorityProxy.readItemInNamedAuthority(authShortId, csid);
+    }
+
+    /**
+     * Read named item in Named Authority.
+     *
+     * @param authShortId the shortIdentifier for the Authority
+     * @param itemShortId the shortIdentifier for the item
+     * @return the client response
+     */
+    public ClientResponse<MultipartInput> readNamedItemInNamedAuthority(String authShortId, String itemShortId) {
+        return personAuthorityProxy.readNamedItem(authShortId, itemShortId);
     }
 
     /**

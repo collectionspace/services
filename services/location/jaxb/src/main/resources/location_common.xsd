@@ -22,6 +22,7 @@
                 
                 <!--  Location Information Group -->
 								<xs:element name="inAuthority" type="xs:string" />
+								<xs:element name="shortIdentifier" type="xs:string"/>
 								<xs:element name="refName" type="xs:string"/>
 								<xs:element name="displayName" type="xs:string"/>
 								<xs:element name="displayNameComputed" type="xs:boolean"/>

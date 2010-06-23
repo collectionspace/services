@@ -152,11 +152,9 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
     }
     
     protected void createPersonRefs(){
-    	String authRefName = 
-    	    PersonAuthorityClientUtils.createPersonAuthRefName(PERSON_AUTHORITY_NAME, false);
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
-    	    PERSON_AUTHORITY_NAME, authRefName, personAuthClient.getCommonPartName());
+    			PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
 
@@ -165,23 +163,26 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         Assert.assertEquals(statusCode, STATUS_CREATED);
         personAuthCSID = extractId(res);
         
-        acquisitionAuthorizerRefName = PersonAuthorityClientUtils.createPersonRefName(
-            authRefName, "Annie Authorizer", true);
-        personIdsCreated.add(createPerson("Annie", "Authorizer", acquisitionAuthorizerRefName));
+        String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
         
-        acquisitionFundingSourceRefName = PersonAuthorityClientUtils.createPersonRefName(
-	    authRefName, "Sammy Source", true);
-        personIdsCreated.add(createPerson("Sammy", "Source", acquisitionFundingSourceRefName));
+        String csid = createPerson("Annie", "Authorizer", "annieAuth", authRefName);
+        acquisitionAuthorizerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        personIdsCreated.add(csid);
+        
+        csid = createPerson("Sammy", "Source", "sammySource", authRefName);
+        acquisitionFundingSourceRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        personIdsCreated.add(csid);
     }
     
-    protected String createPerson(String firstName, String surName, String refName ) {
+    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
+        personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     	MultipartOutput multipart = 
-    	    PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
-    		refName, personInfo, personAuthClient.getItemCommonPartName());
+    		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
+    				authRefName, personInfo, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         int statusCode = res.getStatus();
 

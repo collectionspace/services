@@ -34,9 +34,11 @@ public class LocationAuthorityClientUtils {
      * @return	The MultipartOutput payload for the create call
      */
     public static MultipartOutput createLocationAuthorityInstance(
-    		String displayName, String refName, String headerLabel ) {
+    		String displayName, String shortIdentifier, String headerLabel ) {
         LocationauthoritiesCommon locationAuthority = new LocationauthoritiesCommon();
         locationAuthority.setDisplayName(displayName);
+        locationAuthority.setShortIdentifier(shortIdentifier);
+        String refName = createLocationAuthRefName(shortIdentifier, displayName);
         locationAuthority.setRefName(refName);
         locationAuthority.setVocabType("LocationAuthority");
         MultipartOutput multipart = new MultipartOutput();
@@ -59,9 +61,13 @@ public class LocationAuthorityClientUtils {
      * @return	The MultipartOutput payload for the create call
      */
     public static MultipartOutput createLocationInstance(String inAuthority, 
-    		String locationRefName, Map<String, String> locationInfo, String headerLabel){
+    		String locationAuthRefName, Map<String, String> locationInfo, String headerLabel){
         LocationsCommon location = new LocationsCommon();
+    	String shortId = locationInfo.get(LocationJAXBSchema.SHORT_IDENTIFIER);
+    	String displayName = locationInfo.get(LocationJAXBSchema.DISPLAY_NAME);
+    	location.setShortIdentifier(shortId);
         location.setInAuthority(inAuthority);
+    	String locationRefName = createLocationRefName(locationAuthRefName, shortId, displayName);
        	location.setRefName(locationRefName);
        	String value = null;
     	value = locationInfo.get(LocationJAXBSchema.DISPLAY_NAME_COMPUTED);
@@ -119,26 +125,26 @@ public class LocationAuthorityClientUtils {
     		    	locationMap.get(LocationJAXBSchema.NAME));
     	}
     	
-    	String refName = createLocationRefName(locationAuthorityRefName, displayName, true);
-
     	if(logger.isDebugEnabled()){
     		logger.debug("Import: Create Item: \""+displayName
     				+"\" in locationAuthority: \"" + locationAuthorityRefName +"\"");
     	}
     	MultipartOutput multipart = 
-    		createLocationInstance( vcsid, refName,
+    		createLocationInstance( vcsid, locationAuthorityRefName,
     			locationMap, client.getItemCommonPartName() );
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
 
     	int statusCode = res.getStatus();
 
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-    		throw new RuntimeException("Could not create Item: \""+refName
+    		throw new RuntimeException("Could not create Item: \""
+    				+locationMap.get(LocationJAXBSchema.SHORT_IDENTIFIER)
     				+"\" in locationAuthority: \"" + locationAuthorityRefName
     				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
-    		throw new RuntimeException("Unexpected Status when creating Item: \""+refName
+    		throw new RuntimeException("Unexpected Status when creating Item: \""
+    				+locationMap.get(LocationJAXBSchema.SHORT_IDENTIFIER)
     				+"\" in locationAuthority: \"" + locationAuthorityRefName +"\", Status:"+ statusCode);
     	}
 
@@ -200,19 +206,34 @@ public class LocationAuthorityClientUtils {
     	return createItemInAuthority(vcsid, commonPartXML, client );
     }    
 
-    public static String createLocationAuthRefName(String locationAuthorityName, boolean withDisplaySuffix) {
+    /**
+     * Creates the locationAuthority ref name.
+     *
+     * @param shortId the locationAuthority shortIdentifier
+     * @param displaySuffix displayName to be appended, if non-null
+     * @return the string
+     */
+    public static String createLocationAuthRefName(String shortId, String displaySuffix) {
     	String refName = "urn:cspace:org.collectionspace.demo:locationauthority:name("
-    			+locationAuthorityName+")";
-    	if(withDisplaySuffix)
-    		refName += "'"+locationAuthorityName+"'";
+			+shortId+")";
+		if(displaySuffix!=null&&!displaySuffix.isEmpty())
+			refName += "'"+displaySuffix+"'";
     	return refName;
     }
 
+    /**
+     * Creates the location ref name.
+     *
+     * @param locationAuthRefName the locationAuthority ref name
+     * @param shortId the location shortIdentifier
+     * @param displaySuffix displayName to be appended, if non-null
+     * @return the string
+     */
     public static String createLocationRefName(
-    						String locationAuthRefName, String locationName, boolean withDisplaySuffix) {
-    	String refName = locationAuthRefName+":location:name("+locationName+")";
-    	if(withDisplaySuffix)
-    		refName += "'"+locationName+"'";
+    						String locationAuthRefName, String shortId, String displaySuffix) {
+    	String refName = locationAuthRefName+":location:name("+shortId+")";
+		if(displaySuffix!=null&&!displaySuffix.isEmpty())
+			refName += "'"+displaySuffix+"'";
     	return refName;
     }
 

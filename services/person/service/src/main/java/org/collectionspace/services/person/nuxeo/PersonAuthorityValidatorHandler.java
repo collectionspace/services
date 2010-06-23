@@ -51,7 +51,7 @@ package org.collectionspace.services.person.nuxeo;
 
 import java.util.regex.Pattern;
 
-import org.collectionspace.services.person.PersonsCommon;
+import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
@@ -64,9 +64,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author 
  */
-public class PersonValidatorHandler implements ValidatorHandler {
+public class PersonAuthorityValidatorHandler implements ValidatorHandler {
 
-    final Logger logger = LoggerFactory.getLogger(PersonValidatorHandler.class);
+    final Logger logger = LoggerFactory.getLogger(PersonAuthorityValidatorHandler.class);
     private static final Pattern shortIdBadPattern = Pattern.compile("[\\W]"); //.matcher(input).matches()
 
     @Override
@@ -77,15 +77,12 @@ public class PersonValidatorHandler implements ValidatorHandler {
         }
         try {
             MultipartServiceContext mctx = (MultipartServiceContext) ctx;
-            PersonsCommon person = (PersonsCommon) mctx.getInputPart(mctx.getCommonPartLabel(),
-                    PersonsCommon.class);
+            PersonauthoritiesCommon personAuth = 
+							(PersonauthoritiesCommon) mctx.getInputPart(mctx.getCommonPartLabel(),
+                    PersonauthoritiesCommon.class);
             String msg = "";
             boolean invalid = false;
-            if(!person.isDisplayNameComputed() && (person.getDisplayName()==null)) {
-                invalid = true;
-                msg += "displayName must be non-null if displayNameComputed is false!";
-            }
-			String shortId = person.getShortIdentifier();
+						String shortId = personAuth.getShortIdentifier();
             if(shortId==null){
                 invalid = true;
                 msg += "shortIdentifier must be non-null";

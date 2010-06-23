@@ -213,7 +213,7 @@ public class LocationAuthorityResource extends
         }
         String whereClause =
         	LocationAuthorityJAXBSchema.LOCATIONAUTHORITIES_COMMON+
-        	":"+LocationAuthorityJAXBSchema.DISPLAY_NAME+
+        	":"+LocationAuthorityJAXBSchema.SHORT_IDENTIFIER+
         	"='"+specifier+"'";
         // We only get a single doc - if there are multiple,
         // it is an error in use.
@@ -697,7 +697,7 @@ public class LocationAuthorityResource extends
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
             String whereClause =
             	LocationAuthorityJAXBSchema.LOCATIONAUTHORITIES_COMMON+
-            	":"+LocationAuthorityJAXBSchema.DISPLAY_NAME+
+            	":"+LocationAuthorityJAXBSchema.SHORT_IDENTIFIER+
             	"='"+parentSpecifier+"'";
             // Need to get an Authority by name
             ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);

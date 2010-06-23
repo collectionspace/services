@@ -57,6 +57,7 @@ import org.collectionspace.services.common.document.InvalidDocumentException;
 import org.collectionspace.services.common.document.ValidatorHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -65,6 +66,7 @@ import org.slf4j.LoggerFactory;
 public class OrganizationValidatorHandler implements ValidatorHandler {
 
     final Logger logger = LoggerFactory.getLogger(OrganizationValidatorHandler.class);
+    private static final Pattern shortIdBadPattern = Pattern.compile("[\\W]"); //.matcher(input).matches()
 
     @Override
     public void validate(Action action, ServiceContext ctx)
@@ -81,6 +83,14 @@ public class OrganizationValidatorHandler implements ValidatorHandler {
             if(!org.isDisplayNameComputed() && (org.getDisplayName()==null)) {
                 invalid = true;
                 msg += "displayName must be non-null if displayNameComputed is false!";
+            }
+			String shortId = org.getShortIdentifier();
+            if(shortId==null){
+                invalid = true;
+                msg += "shortIdentifier must be non-null";
+            } else if(shortIdBadPattern.matcher(shortId).find()) {
+                invalid = true;
+                msg += "shortIdentifier must only contain standard word characters";
             }
             /*
             if(action.equals(Action.CREATE)) {

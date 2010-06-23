@@ -40,6 +40,7 @@ import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
@@ -53,19 +54,88 @@ public class PersonAuthorityClientUtils {
     /** The Constant logger. */
     private static final Logger logger =
         LoggerFactory.getLogger(PersonAuthorityClientUtils.class);
+	private static final ServiceRequestType READ_REQ = ServiceRequestType.READ;
+
+    /**
+     * @param csid the id of the PersonAuthority
+     * @param client if null, creates a new client
+     * @return
+     */
+    public static String getAuthorityRefName(String csid, PersonAuthorityClient client){
+    	if(client==null)
+    		client = new PersonAuthorityClient();
+        ClientResponse<MultipartInput> res = client.read(csid);
+        try {
+	        int statusCode = res.getStatus();
+	        if(!READ_REQ.isValidStatusCode(statusCode)
+	        	||(statusCode != CollectionSpaceClientUtils.STATUS_OK)) {
+	    		throw new RuntimeException("Invalid status code returned: "+statusCode);
+	        }
+	        //FIXME: remove the following try catch once Aron fixes signatures
+	        try {
+	            MultipartInput input = (MultipartInput) res.getEntity();
+	            PersonauthoritiesCommon personAuthority = 
+	            	(PersonauthoritiesCommon) CollectionSpaceClientUtils.extractPart(input,
+	                    client.getCommonPartName(), PersonauthoritiesCommon.class);
+		        if(personAuthority==null) {
+		    		throw new RuntimeException("Null personAuthority returned from service.");
+		        }
+	            return personAuthority.getRefName();
+	        } catch (Exception e) {
+	            throw new RuntimeException(e);
+	        }
+        } finally {
+        	res.releaseConnection();
+        }
+    }
+
+    /**
+     * @param csid the id of the PersonAuthority
+     * @param client if null, creates a new client
+     * @return
+     */
+    public static String getPersonRefName(String inAuthority, String csid, PersonAuthorityClient client){
+    	if(client==null)
+    		client = new PersonAuthorityClient();
+        ClientResponse<MultipartInput> res = client.readItem(inAuthority, csid);
+        try {
+	        int statusCode = res.getStatus();
+	        if(!READ_REQ.isValidStatusCode(statusCode)
+		        	||(statusCode != CollectionSpaceClientUtils.STATUS_OK)) {
+	    		throw new RuntimeException("Invalid status code returned: "+statusCode);
+	        }
+	        //FIXME: remove the following try catch once Aron fixes signatures
+	        try {
+	            MultipartInput input = (MultipartInput) res.getEntity();
+	            PersonsCommon person = 
+	            	(PersonsCommon) CollectionSpaceClientUtils.extractPart(input,
+	                    client.getItemCommonPartName(), PersonsCommon.class);
+		        if(person==null) {
+		    		throw new RuntimeException("Null person returned from service.");
+		        }
+	            return person.getRefName();
+	        } catch (Exception e) {
+	            throw new RuntimeException(e);
+	        }
+        } finally {
+        	res.releaseConnection();
+        }
+    }
 
     /**
      * Creates the person authority instance.
      *
      * @param displayName the display name
-     * @param refName the ref name
+     * @param shortIdentifier the short Id 
      * @param headerLabel the header label
      * @return the multipart output
      */
     public static MultipartOutput createPersonAuthorityInstance(
-    		String displayName, String refName, String headerLabel ) {
+    		String displayName, String shortIdentifier, String headerLabel ) {
         PersonauthoritiesCommon personAuthority = new PersonauthoritiesCommon();
         personAuthority.setDisplayName(displayName);
+        personAuthority.setShortIdentifier(shortIdentifier);
+        String refName = createPersonAuthRefName(shortIdentifier, displayName);
         personAuthority.setRefName(refName);
         personAuthority.setVocabType("PersonAuthority");
         MultipartOutput multipart = new MultipartOutput();
@@ -83,17 +153,21 @@ public class PersonAuthorityClientUtils {
     /**
      * Creates the person instance.
      *
-     * @param inAuthority the in authority
-     * @param personRefName the person ref name
+     * @param inAuthority the owning authority
+     * @param personAuthRefName the owning Authority ref name
      * @param personInfo the person info
      * @param headerLabel the header label
      * @return the multipart output
      */
     public static MultipartOutput createPersonInstance(String inAuthority, 
-    		String personRefName, Map<String, String> personInfo, String headerLabel){
+    		String personAuthRefName, Map<String, String> personInfo, String headerLabel){
         PersonsCommon person = new PersonsCommon();
         person.setInAuthority(inAuthority);
-       	person.setRefName(personRefName);
+    	String shortId = personInfo.get(PersonJAXBSchema.SHORT_IDENTIFIER);
+    	if (shortId == null || shortId.isEmpty()) {
+    		throw new IllegalArgumentException("shortIdentifier cannot be null or empty");
+    	}      	
+    	person.setShortIdentifier(shortId);
        	
        	//
        	// If the 'DISPLAY_NAME_COMPUTED' property is null or empty then
@@ -112,6 +186,8 @@ public class PersonAuthorityClientUtils {
     	if (displayNameComputed == false && displayName == null) {
     		throw new IllegalArgumentException("displayName cannot be null when displayComputed is 'false'");
     	}      	
+    	String refName = createPersonRefName(personAuthRefName, shortId, displayName);
+       	person.setRefName(refName);
     	
     	String value;
         if((value = (String)personInfo.get(PersonJAXBSchema.FORE_NAME))!=null) //FIXME: REM - I don't think we need to check for null -null is a valid value and won't cause any problems. 
@@ -168,7 +244,7 @@ public class PersonAuthorityClientUtils {
      *
      * @param vcsid the vcsid
      * @param personAuthorityRefName the person authority ref name
-     * @param personMap the person map
+     * @param personMap the person map. PersonJAXBSchema.SHORT_IDENTIFIER is REQUIRED.
      * @param client the client
      * @return the string
      */
@@ -195,16 +271,15 @@ public class PersonAuthorityClientUtils {
     		    	personMap.get(PersonJAXBSchema.SUR_NAME),
     		    	personMap.get(PersonJAXBSchema.BIRTH_DATE),
     		    	personMap.get(PersonJAXBSchema.DEATH_DATE));
+        	personMap.put(PersonJAXBSchema.DISPLAY_NAME, displayName);
     	}
     	
-    	String refName = createPersonRefName(personAuthorityRefName, displayName, true);
-
     	if(logger.isDebugEnabled()){
     		logger.debug("Import: Create Item: \"" + displayName
     				+"\" in personAuthorityulary: \"" + personAuthorityRefName +"\"");
     	}
     	MultipartOutput multipart = 
-    		createPersonInstance(vcsid, refName,
+    		createPersonInstance(vcsid, personAuthorityRefName,
     			personMap, client.getItemCommonPartName());
     	
     	String result = null;
@@ -213,12 +288,12 @@ public class PersonAuthorityClientUtils {
 	    	int statusCode = res.getStatus();
 	
 	    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-	    		throw new RuntimeException("Could not create Item: \""+refName
+	    		throw new RuntimeException("Could not create Item: \""+personMap.get(PersonJAXBSchema.SHORT_IDENTIFIER)
 	    				+"\" in personAuthority: \"" + personAuthorityRefName
 	    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
 	    	}
 	    	if(statusCode != EXPECTED_STATUS_CODE) {
-	    		throw new RuntimeException("Unexpected Status when creating Item: \""+refName
+	    		throw new RuntimeException("Unexpected Status when creating Item: \""+personMap.get(PersonJAXBSchema.SHORT_IDENTIFIER)
 	    				+"\" in personAuthority: \"" + personAuthorityRefName +"\", Status:"+ statusCode);
 	    	}
 	
@@ -231,17 +306,17 @@ public class PersonAuthorityClientUtils {
     }
 
     /**
-     * Creates the person auth ref name.
+     * Creates the personAuthority ref name.
      *
-     * @param personAuthorityName the person authority name
-     * @param withDisplaySuffix the with display suffix
+     * @param shortId the personAuthority shortIdentifier
+     * @param displaySuffix displayName to be appended, if non-null
      * @return the string
      */
-    public static String createPersonAuthRefName(String personAuthorityName, boolean withDisplaySuffix) {
+    public static String createPersonAuthRefName(String shortId, String displaySuffix) {
     	String refName = "urn:cspace:org.collectionspace.demo:personauthority:name("
-    			+personAuthorityName+")";
-    	if(withDisplaySuffix)
-    		refName += "'"+personAuthorityName+"'";
+    			+shortId+")";
+    	if(displaySuffix!=null&&!displaySuffix.isEmpty())
+    		refName += "'"+displaySuffix+"'";
     	return refName;
     }
 
@@ -249,15 +324,15 @@ public class PersonAuthorityClientUtils {
      * Creates the person ref name.
      *
      * @param personAuthRefName the person auth ref name
-     * @param personName the person name
-     * @param withDisplaySuffix the with display suffix
+     * @param shortId the person shortIdentifier
+     * @param displaySuffix displayName to be appended, if non-null
      * @return the string
      */
     public static String createPersonRefName(
-    						String personAuthRefName, String personName, boolean withDisplaySuffix) {
-    	String refName = personAuthRefName+":person:name("+personName+")";
-    	if(withDisplaySuffix)
-    		refName += "'"+personName+"'";
+    						String personAuthRefName, String shortId, String displaySuffix) {
+    	String refName = personAuthRefName+":person:name("+shortId+")";
+    	if(displaySuffix!=null&&!displaySuffix.isEmpty())
+    		refName += "'"+displaySuffix+"'";
     	return refName;
     }
 

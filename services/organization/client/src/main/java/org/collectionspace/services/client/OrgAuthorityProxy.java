@@ -8,8 +8,10 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.contact.ContactsCommonList;
@@ -80,7 +82,16 @@ public interface OrgAuthorityProxy extends CollectionSpaceProxy {
     @GET
     @Produces({"application/xml"})
     @Path("/urn:cspace:name({specifier})/items/")
-    ClientResponse<OrganizationsCommonList> readItemListForNamedAuthority(@PathParam("specifier") String specifier);
+    ClientResponse<OrganizationsCommonList> readItemListForNamedAuthority(
+    		@PathParam("specifier") String specifier);
+
+    // List Items for a named authority matching a partial term.
+    @GET
+    @Produces({"application/xml"})
+    @Path("/urn:cspace:name({specifier})/items/")
+    ClientResponse<OrganizationsCommonList> readItemListForNamedAuthority(
+    		@PathParam("specifier") String specifier,
+            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm);
 
     // List Item Authority References
     @GET
@@ -99,6 +110,21 @@ public interface OrgAuthorityProxy extends CollectionSpaceProxy {
     @GET
     @Path("/{vcsid}/items/{csid}")
     ClientResponse<MultipartInput> readItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
+
+    //(R)ead Named Item
+    @GET
+    @Path("/{vcsid}/items/urn:cspace:name({specifier})")
+    ClientResponse<MultipartInput> readNamedItem(@PathParam("vcsid") String vcsid, @PathParam("specifier") String specifier);
+
+    //(R)ead Item In Named Authority
+    @GET
+    @Path("/urn:cspace:name({specifier})/items/{csid}")
+    ClientResponse<MultipartInput> readItemInNamedAuthority(@PathParam("specifier") String specifier, @PathParam("csid") String csid);
+
+    //(R)ead Named Item In Named Authority
+    @GET
+    @Path("/urn:cspace:name({specifier})/items/urn:cspace:name({itemspecifier})")
+    ClientResponse<MultipartInput> readNamedItemInNamedAuthority(@PathParam("specifier") String specifier, @PathParam("itemspecifier") String itemspecifier);
 
     //(U)pdate Item
     @PUT

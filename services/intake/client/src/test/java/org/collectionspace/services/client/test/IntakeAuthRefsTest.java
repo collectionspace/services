@@ -155,10 +155,8 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
     
     protected void createPersonRefs(){
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-    	String authRefName = 
-    		PersonAuthorityClientUtils.createPersonAuthRefName(PERSON_AUTHORITY_NAME, false);
     	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
-    			PERSON_AUTHORITY_NAME, authRefName, personAuthClient.getCommonPartName());
+    			PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
 
@@ -167,37 +165,38 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
         Assert.assertEquals(statusCode, STATUS_CREATED);
         personAuthCSID = extractId(res);
         
-        currentOwnerRefName = PersonAuthorityClientUtils.createPersonRefName(
-        							authRefName, "Olivier Owner", true);
-        personIdsCreated.add(createPerson("Olivier", "Owner", currentOwnerRefName));
+        String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
         
-        depositorRefName = PersonAuthorityClientUtils.createPersonRefName(
-									authRefName, "Debbie Depositor", true);
-        personIdsCreated.add(createPerson("Debbie", "Depositor", depositorRefName));
+        String csid = createPerson("Olivier", "Owner", "olivierOwner", authRefName);
+        currentOwnerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        personIdsCreated.add(csid);
         
-        conditionCheckerAssessorRefName = PersonAuthorityClientUtils.createPersonRefName(
-									authRefName, "Andrew Checker-Assessor", true);
-        personIdsCreated.add(createPerson("Andrew", "Checker-Assessor", conditionCheckerAssessorRefName));
+        csid = createPerson("Debbie", "Depositor", "debbieDepositor", authRefName);
+        depositorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        personIdsCreated.add(csid);
         
-        insurerRefName = PersonAuthorityClientUtils.createPersonRefName(
-									authRefName, "Ingrid Insurer", true);
-        personIdsCreated.add(createPerson("Ingrid", "Insurer", insurerRefName));
+        csid = createPerson("Andrew", "Assessor", "andrewAssessor", authRefName);
+        conditionCheckerAssessorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        personIdsCreated.add(csid);
         
-        valuerRefName = PersonAuthorityClientUtils.createPersonRefName(
-									authRefName, "Vince Valuer", true);
-        personIdsCreated.add(createPerson("Vince", "Valuer", valuerRefName));
+        csid = createPerson("Ingrid", "Insurer", "ingridInsurer", authRefName);
+        insurerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        personIdsCreated.add(csid);
         
-
+        csid = createPerson("Vince", "Valuer", "vinceValuer", authRefName);
+        valuerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        personIdsCreated.add(csid);
     }
     
-    protected String createPerson(String firstName, String surName, String refName ) {
+    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         Map<String, String> personInfo = new HashMap<String,String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
+        personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
     	MultipartOutput multipart = 
     		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
-    				refName, personInfo, personAuthClient.getItemCommonPartName());
+    				authRefName, personInfo, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         int statusCode = res.getStatus();
 
@@ -327,13 +326,12 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
     }
 
    private MultipartOutput createIntakeInstance(String entryNumber,
-        String entryDate,
-        String currentOwner,
-        String depositor,
-        String conditionCheckerAssessor,
-        String insurer,
-        String Valuer ) {
-
+    		String entryDate,
+				String currentOwner,
+				String depositor,
+				String conditionCheckerAssessor,
+				String insurer,
+				String Valuer ) {
         IntakesCommon intake = new IntakesCommon();
         intake.setEntryNumber(entryNumber);
         intake.setEntryDate(entryDate);

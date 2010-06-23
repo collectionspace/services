@@ -89,7 +89,16 @@ public interface PersonAuthorityProxy extends CollectionSpaceProxy {
     @GET
     @Produces({"application/xml"})
     @Path("/urn:cspace:name({specifier})/items/")
-    ClientResponse<PersonsCommonList> readItemListForNamedAuthority(@PathParam("specifier") String specifier);
+    ClientResponse<PersonsCommonList> readItemListForNamedAuthority(
+    		@PathParam("specifier") String specifier);
+
+    // List Items for a named authority matching a partial term.
+    @GET
+    @Produces({"application/xml"})
+    @Path("/urn:cspace:name({specifier})/items/")
+    ClientResponse<PersonsCommonList> readItemListForNamedAuthority(
+    		@PathParam("specifier") String specifier,
+            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm);
 
     //(C)reate Item
     @POST
@@ -100,6 +109,21 @@ public interface PersonAuthorityProxy extends CollectionSpaceProxy {
     @GET
     @Path("/{vcsid}/items/{csid}")
     ClientResponse<MultipartInput> readItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
+
+    //(R)ead Named Item
+    @GET
+    @Path("/{vcsid}/items/urn:cspace:name({specifier})")
+    ClientResponse<MultipartInput> readNamedItem(@PathParam("vcsid") String vcsid, @PathParam("specifier") String specifier);
+
+    //(R)ead Item In Named Authority
+    @GET
+    @Path("/urn:cspace:name({specifier})/items/{csid}")
+    ClientResponse<MultipartInput> readItemInNamedAuthority(@PathParam("specifier") String specifier, @PathParam("csid") String csid);
+
+    //(R)ead Named Item In Named Authority
+    @GET
+    @Path("/urn:cspace:name({specifier})/items/urn:cspace:name({itemspecifier})")
+    ClientResponse<MultipartInput> readNamedItemInNamedAuthority(@PathParam("specifier") String specifier, @PathParam("itemspecifier") String itemspecifier);
 
     //(U)pdate Item
     @PUT

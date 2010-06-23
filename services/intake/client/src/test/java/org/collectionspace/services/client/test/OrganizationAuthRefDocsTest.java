@@ -71,6 +71,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
     private List<String> intakeIdsCreated = new ArrayList<String>();
     private List<String> orgIdsCreated = new ArrayList<String>();
     private String orgAuthCSID = null; 
+    private String orgAuthRefName = null; 
     private String currentOwnerOrgCSID = null; 
     private String currentOwnerRefName = null;
     private String depositorRefName = null;
@@ -163,10 +164,10 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
      */
     protected void createOrgRefs(){
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
-    	String authRefName = 
-    		OrgAuthorityClientUtils.createOrgAuthRefName(ORGANIZATION_AUTHORITY_NAME, false);
+        orgAuthRefName = 
+    		OrgAuthorityClientUtils.createOrgAuthRefName(ORGANIZATION_AUTHORITY_NAME, null);
     	MultipartOutput multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
-    			ORGANIZATION_AUTHORITY_NAME, authRefName, orgAuthClient.getCommonPartName());
+    			ORGANIZATION_AUTHORITY_NAME, ORGANIZATION_AUTHORITY_NAME, orgAuthClient.getCommonPartName());
         ClientResponse<Response> res = orgAuthClient.create(multipart);
         int statusCode = res.getStatus();
 
@@ -175,38 +176,40 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
         Assert.assertEquals(statusCode, STATUS_CREATED);
         orgAuthCSID = extractId(res);
         
-        currentOwnerRefName = OrgAuthorityClientUtils.createOrganizationRefName(
-        							authRefName, "Olivier Owner", true);
-				currentOwnerOrgCSID = createOrganization("Olivier", "Owner", currentOwnerRefName);
+		currentOwnerOrgCSID = createOrganization("olivierOwner", "Olivier Owner", "Olivier Owner");
         orgIdsCreated.add(currentOwnerOrgCSID);
+        currentOwnerRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, currentOwnerOrgCSID, orgAuthClient);
         
-        depositorRefName = OrgAuthorityClientUtils.createOrganizationRefName(
-									authRefName, "Debbie Depositor", true);
-        orgIdsCreated.add(createOrganization("Debbie", "Depositor", depositorRefName));
+		String newOrgCSID = createOrganization("debbieDepositor", "Debbie Depositor", "Debbie Depositor");
+        depositorRefName = 
+        	OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, newOrgCSID, orgAuthClient);
+        orgIdsCreated.add(newOrgCSID);
         
-        conditionCheckerAssessorRefName = OrgAuthorityClientUtils.createOrganizationRefName(
-									authRefName, "Andrew Checker-Assessor", true);
-        orgIdsCreated.add(createOrganization("Andrew", "Checker-Assessor", conditionCheckerAssessorRefName));
+		newOrgCSID = createOrganization("andrewCheckerAssessor", "Andrew Checker-Assessor", "Andrew Checker-Assessor");
+		conditionCheckerAssessorRefName = 
+        	OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, newOrgCSID, orgAuthClient);
+        orgIdsCreated.add(newOrgCSID);
         
-        insurerRefName = OrgAuthorityClientUtils.createOrganizationRefName(
-									authRefName, "Ingrid Insurer", true);
-        orgIdsCreated.add(createOrganization("Ingrid", "Insurer", insurerRefName));
+		newOrgCSID = createOrganization("ingridInsurer", "Ingrid Insurer", "Ingrid Insurer");
+		insurerRefName = 
+        	OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, newOrgCSID, orgAuthClient);
+        orgIdsCreated.add(newOrgCSID);
         
-        valuerRefName = OrgAuthorityClientUtils.createOrganizationRefName(
-									authRefName, "Vince Valuer", true);
-        orgIdsCreated.add(createOrganization("Vince", "Valuer", valuerRefName));
-        
-
+		newOrgCSID = createOrganization("vinceValuer", "Vince Valuer", "Vince Valuer");
+		valuerRefName = 
+        	OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, newOrgCSID, orgAuthClient);
+        orgIdsCreated.add(newOrgCSID);
     }
-    
-    protected String createOrganization(String shortName, String longName, String refName ) {
+
+    protected String createOrganization(String shortId, String shortName, String longName) {
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
         Map<String, String> orgInfo = new HashMap<String,String>();
+        orgInfo.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
         orgInfo.put(OrganizationJAXBSchema.SHORT_NAME, shortName);
         orgInfo.put(OrganizationJAXBSchema.LONG_NAME, longName);
     	MultipartOutput multipart = 
-    		OrgAuthorityClientUtils.createOrganizationInstance(orgAuthCSID, 
-    				refName, orgInfo, orgAuthClient.getItemCommonPartName());
+    		OrgAuthorityClientUtils.createOrganizationInstance(orgAuthCSID, orgAuthRefName,
+    				orgInfo, orgAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = orgAuthClient.createItem(orgAuthCSID, multipart);
         int statusCode = res.getStatus();
 
