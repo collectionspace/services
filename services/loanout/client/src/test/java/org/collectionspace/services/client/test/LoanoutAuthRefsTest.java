@@ -250,6 +250,7 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
             logger.debug(objectAsXmlString(loanout, LoansoutCommon.class));
         }
         // Check a couple of fields
+        Assert.assertEquals(loanout.getBorrower(), borrowerRefName);
         Assert.assertEquals(loanout.getBorrowersContact(), borrowersContactRefName);
         Assert.assertEquals(loanout.getLendersAuthorizer(), lendersAuthorizerRefName);
         Assert.assertEquals(loanout.getLendersContact(), lendersContactRefName);
