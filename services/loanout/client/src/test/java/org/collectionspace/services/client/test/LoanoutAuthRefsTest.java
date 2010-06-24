@@ -72,6 +72,7 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
     private List<String> loanoutIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
+    private String borrowerRefName = null;
     private String borrowersContactRefName = null;
     private String lendersAuthorizerRefName = null;
     private String lendersContactRefName = null;
@@ -79,7 +80,7 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
     // FIXME: Can add 'borrower' - likely to be an organization
     // authority - as an authRef to tests below, and increase the
     // number of expected authRefs to 4.
-    private final int NUM_AUTH_REFS_EXPECTED = 3;
+    private final int NUM_AUTH_REFS_EXPECTED = 4;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -124,6 +125,7 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
         MultipartOutput multipart = createLoanoutInstance(
                 "loanOutNumber-" + identifier,
                 "returnDate-" + identifier,
+                borrowerRefName,
                 borrowersContactRefName,
                 lendersAuthorizerRefName,
                 lendersContactRefName);
@@ -173,20 +175,28 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
         personAuthCSID = extractId(res);
         
         String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
-        
+
         // Create temporary Person resources, and their corresponding refNames
         // by which they can be identified.
-       	String csid = createPerson("Art", "Lendersauthorizor", "artLendersauthorizor", authRefName);
+
+        String csid = "";
+
+        csid = createPerson("Betty", "Borrower", "bettyBorrower", authRefName);
+        personIdsCreated.add(csid);
+        borrowerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+
+        csid = createPerson("Bradley", "BorrowersContact", "bradleyBorrowersContact", authRefName);
+        personIdsCreated.add(csid);
+        borrowersContactRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+
+        csid = createPerson("Art", "Lendersauthorizor", "artLendersauthorizor", authRefName);
         personIdsCreated.add(csid);
         lendersAuthorizerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
 
         csid = createPerson("Larry", "Lenderscontact", "larryLenderscontact", authRefName);
         personIdsCreated.add(csid);
         lendersContactRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
-        
-        csid = createPerson("Bradley", "BorrowersContact", "bradleyBorrowersContact", authRefName);
-        personIdsCreated.add(csid);
-        borrowersContactRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+    
     }
     
     protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
@@ -240,7 +250,7 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
             logger.debug(objectAsXmlString(loanout, LoansoutCommon.class));
         }
         // Check a couple of fields
-        // FIXME
+        Assert.assertEquals(loanout.getBorrowersContact(), borrowersContactRefName);
         Assert.assertEquals(loanout.getLendersAuthorizer(), lendersAuthorizerRefName);
         Assert.assertEquals(loanout.getLendersContact(), lendersContactRefName);
         
@@ -339,13 +349,15 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
 
    private MultipartOutput createLoanoutInstance(String loanoutNumber,
     		String returnDate,
+                String borrower,
                 String borrowersContact,
                 String lendersAuthorizer,
                 String lendersContact) {
         LoansoutCommon loanout = new LoansoutCommon();
         loanout.setLoanOutNumber(loanoutNumber);
         loanout.setLoanReturnDate(returnDate);
-        loanout.setBorrowersContact(lendersContact);
+        loanout.setBorrower(borrower);
+        loanout.setBorrowersContact(borrowersContact);
         loanout.setLendersAuthorizer(lendersAuthorizer);
         loanout.setLendersContact(lendersContact);
         MultipartOutput multipart = new MultipartOutput();
