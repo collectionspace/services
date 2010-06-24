@@ -14,7 +14,7 @@
   <property name="nuxeo.collectionspace_core.jar"
     value="org.collectionspace.services.3rdparty.nuxeo.collectionspace_core-${cspace.release}.jar"/>
   <property name="nuxeo.collectionspace_core.jars.all"
-    value="nuxeo-platform-collectionspace_core-*.jar"/>
+    value="org.collectionspace.services.3rdparty.nuxeo.collectionspace_core-*.jar"/>
   
   <condition property="osfamily-unix">
     <os family="unix" />
