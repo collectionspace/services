@@ -174,7 +174,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     */
 
     // Verify that record creation occurs successfully when the first value instance
-    // of a single, repeatble String scalar field is non-blank.
+    // of a single, repeatable String scalar field is non-blank.
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "testSubmitRequest"}, groups = {"cspace2242group"})
     public void createFromXmlNonBlankFirstValueInstance(String testName) throws Exception {
@@ -191,7 +191,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     }
 
     // Verify that record creation occurs successfully when the first value instance
-    // of a single, repeatble String scalar field is blank.
+    // of a single, repeatable String scalar field is blank.
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "testSubmitRequest"}, groups = {"cspace2242group"})
     public void createFromXmlBlankFirstValueInstance(String testName) throws Exception {
@@ -270,14 +270,15 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         testSubmitRequest(newId);
     }
 
-//    /*
-//     * Tests to diagnose and verify the fixed status of CSPACE-1248,
-//     * "Wedged records created!" (i.e. records with child repeatable
-//     * fields, which contain null values, can be successfully created
-//     * but an error occurs on trying to retrieve those records).
-//     */
+    /*
+     * Tests to diagnose and verify the fixed status of CSPACE-1248,
+     * "Wedged records created!" (i.e. records with child repeatable
+     * fields, which contain null values, can be successfully created
+     * but an error occurs on trying to retrieve those records).
+     */
+
     /**
-     * Creates the with null value repeatable field.
+     * Creates a CollectionObject resource with a null value repeatable field.
      *
      * @param testName the test name
      * @throws Exception the exception
