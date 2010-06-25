@@ -314,22 +314,29 @@ public class DocumentUtils {
     private static Object getMultiValues(Node node) throws Exception {
     	Object result = null;    	
     	
-        Node child = removeTextNodes(node).getFirstChild();
-        Node grandChild = child.getFirstChild();
-        
-        if (grandChild != null) {
-	        if (grandChild.getNodeType() == Node.TEXT_NODE) {
-	        	result = getMultiStringValues(node);
-	        } else {
-	            ArrayList<Map<String, Object>> values = new ArrayList<Map<String, Object>>();
-	            NodeList nodeChildren = node.getChildNodes();
-	            for (int i = 0; i < nodeChildren.getLength(); i++) {
-	            	Node nodeChild = nodeChildren.item(i);
-	            	Map<String, Object> hashMap = parseProperties(nodeChild);
-	            	values.add(hashMap);
-	            }
-	            result = values;
-	        }
+        Node child = removeTextNodes(node);
+        NodeList grandChildren = child.getChildNodes();
+        for (int j = 0; j < grandChildren.getLength(); j++) {
+
+            Node grandChild = grandChildren.item(j).getFirstChild();
+
+            // If any grandchild is non-null, return values for all grandchildren.
+            if (grandChild != null) {
+                if (grandChild.getNodeType() == Node.TEXT_NODE) {
+                        result = getMultiStringValues(node);
+                } else {
+                    ArrayList<Map<String, Object>> values = new ArrayList<Map<String, Object>>();
+                    NodeList nodeChildren = node.getChildNodes();
+                    for (int i = 0; i < nodeChildren.getLength(); i++) {
+                        Node nodeChild = nodeChildren.item(i);
+                        Map<String, Object> hashMap = parseProperties(nodeChild);
+                        values.add(hashMap);
+                    }
+                    result = values;
+                }
+                break;
+            }
+
         }
         
         return result;

@@ -204,7 +204,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         // Verify that at least one value instance of the repeatable field was successfully persisted.
         BriefDescriptionList descriptionList = collectionObject.getBriefDescriptions();
         List<String> descriptions = descriptionList.getBriefDescription();
-        // Assert.assertTrue(descriptions.size() > 0);
+        Assert.assertTrue(descriptions.size() > 0);
     }
 
     /**
