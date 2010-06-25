@@ -314,11 +314,11 @@ public class DocumentUtils {
     private static Object getMultiValues(Node node) throws Exception {
     	Object result = null;    	
     	
-        Node child = removeTextNodes(node);
-        NodeList grandChildren = child.getChildNodes();
-        for (int j = 0; j < grandChildren.getLength(); j++) {
+        Node nodeWithoutTextNodes = removeTextNodes(node);
+        NodeList children = nodeWithoutTextNodes.getChildNodes();
+        for (int j = 0; j < children.getLength(); j++) {
 
-            Node grandChild = grandChildren.item(j).getFirstChild();
+            Node grandChild = children.item(j).getFirstChild();
 
             // If any grandchild is non-null, return values for all grandchildren.
             if (grandChild != null) {
