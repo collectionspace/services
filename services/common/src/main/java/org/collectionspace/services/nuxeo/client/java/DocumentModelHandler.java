@@ -30,6 +30,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.AbstractMultipartDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.nuxeo.client.*;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -75,7 +76,7 @@ public abstract class DocumentModelHandler<T, TL>
     public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
     	// TODO for sub-docs - check to see if the current service context is a multipart input, 
     	// OR a docfragment, and call a variant to fill the DocModel.
-        fillAllParts(wrapDoc);
+        fillAllParts(wrapDoc, Action.CREATE);
     }
     
     // TODO for sub-docs - Add completeCreate in which we look for set-aside doc fragments 
@@ -87,7 +88,7 @@ public abstract class DocumentModelHandler<T, TL>
     public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
     	// TODO for sub-docs - check to see if the current service context is a multipart input, 
     	// OR a docfragment, and call a variant to fill the DocModel.
-        fillAllParts(wrapDoc);
+        fillAllParts(wrapDoc, Action.UPDATE);
     }
 
     @Override
@@ -110,7 +111,7 @@ public abstract class DocumentModelHandler<T, TL>
     public abstract T extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc) throws Exception;
 
     @Override
-    public abstract void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception;
+    public abstract void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception;
 
     @Override
     public abstract void fillCommonPart(T obj, DocumentWrapper<DocumentModel> wrapDoc) throws Exception;

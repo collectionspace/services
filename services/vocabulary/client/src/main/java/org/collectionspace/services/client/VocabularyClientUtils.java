@@ -7,7 +7,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.VocabularyItemJAXBSchema;
+import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommon;
 import org.collectionspace.services.vocabulary.VocabulariesCommon;
@@ -43,12 +43,12 @@ public class VocabularyClientUtils {
 
 		// Note that we do not use the map, but we will once we add more info to the 
 		// items
-    public static MultipartOutput createVocabularyItemInstance(String inVocabulary, 
+    public static MultipartOutput createVocabularyItemInstance(String inAuthority, 
     		String vocabularyRefName, Map<String, String> vocabItemInfo, String headerLabel){
         VocabularyitemsCommon vocabularyItem = new VocabularyitemsCommon();
-        vocabularyItem.setInVocabulary(inVocabulary);
-    	String shortId = vocabItemInfo.get(VocabularyItemJAXBSchema.SHORT_IDENTIFIER);
-    	String displayName = vocabItemInfo.get(VocabularyItemJAXBSchema.DISPLAY_NAME);
+        vocabularyItem.setInAuthority(inAuthority);
+    	String shortId = vocabItemInfo.get(AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
+    	String displayName = vocabItemInfo.get(AuthorityItemJAXBSchema.DISPLAY_NAME);
        	vocabularyItem.setShortIdentifier(shortId);
        	vocabularyItem.setDisplayName(displayName);
     	String refName = createVocabularyItemRefName(vocabularyRefName, shortId, displayName);
@@ -74,8 +74,8 @@ public class VocabularyClientUtils {
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
 
     	if(logger.isDebugEnabled()){
-    		logger.debug("Import: Create Item: \""+itemMap.get(VocabularyItemJAXBSchema.DISPLAY_NAME)
-    				+"\" in personAuthorityulary: \"" + vocabularyRefName +"\"");
+    		logger.debug("Import: Create Item: \""+itemMap.get(AuthorityItemJAXBSchema.SHORT_IDENTIFIER)
+    				+"\" in personAuthority: \"" + vcsid +"\"");
     	}
     	MultipartOutput multipart = 
     		createVocabularyItemInstance( vcsid, vocabularyRefName,
@@ -85,12 +85,12 @@ public class VocabularyClientUtils {
     	int statusCode = res.getStatus();
 
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-    		throw new RuntimeException("Could not create Item: \""+itemMap.get(VocabularyItemJAXBSchema.DISPLAY_NAME)
+    		throw new RuntimeException("Could not create Item: \""+itemMap.get(AuthorityItemJAXBSchema.DISPLAY_NAME)
     				+"\" in personAuthority: \"" + vocabularyRefName
     				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
-    		throw new RuntimeException("Unexpected Status when creating Item: \""+itemMap.get(VocabularyItemJAXBSchema.DISPLAY_NAME)
+    		throw new RuntimeException("Unexpected Status when creating Item: \""+itemMap.get(AuthorityItemJAXBSchema.DISPLAY_NAME)
     				+"\" in personAuthority: \"" + vocabularyRefName +"\", Status:"+ statusCode);
     	}
 

@@ -39,8 +39,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.VocabularyJAXBSchema;
-import org.collectionspace.services.VocabularyItemJAXBSchema;
+import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
+import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
@@ -69,9 +69,11 @@ public class VocabularyResource extends
 
     /** The Constant vocabularyServiceName. */
     private final static String vocabularyServiceName = "vocabularies";
+	private final static String VOCABULARIES_COMMON = "vocabularies_common";
     
     /** The Constant vocabularyItemServiceName. */
     private final static String vocabularyItemServiceName = "vocabularyitems";
+	private final static String VOCABULARYITEMS_COMMON = "vocabularyitems_common";
     
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(VocabularyResource.class);
@@ -139,8 +141,8 @@ public class VocabularyResource extends
     	
     	docHandler = (VocabularyItemDocumentModelHandler)createDocumentHandler(ctx,
     			ctx.getCommonPartLabel(getItemServiceName()),
-    			VocabularyitemsCommon.class);        	
-        docHandler.setInVocabulary(inVocabulary);
+    			VocabularyitemsCommon.class);  	
+        docHandler.setInAuthority(inVocabulary);
 
         return docHandler;
     }
@@ -257,8 +259,8 @@ public class VocabularyResource extends
             throw new WebApplicationException(response);
         }
         String whereClause =
-        	VocabularyJAXBSchema.VOCABULARIES_COMMON+
-        	":"+VocabularyJAXBSchema.SHORT_IDENTIFIER+
+        	VOCABULARIES_COMMON+
+        	":"+AuthorityJAXBSchema.SHORT_IDENTIFIER+
         	"='"+specifier+"'";
         // We only get a single doc - if there are multiple,
         // it is an error in use.
@@ -562,14 +564,14 @@ public class VocabularyResource extends
             DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
             DocumentFilter myFilter = handler.getDocumentFilter();
             myFilter.setWhereClause(
-                    VocabularyItemJAXBSchema.VOCABULARYITEMS_COMMON + ":"
-                    + VocabularyItemJAXBSchema.IN_VOCABULARY + "="
+                    VOCABULARYITEMS_COMMON + ":"
+                    + AuthorityItemJAXBSchema.IN_AUTHORITY + "="
                     + "'" + parentcsid + "'");
 
             // AND vocabularyitems_common:displayName LIKE '%partialTerm%'
             if (partialTerm != null && !partialTerm.isEmpty()) {
-                String ptClause = VocabularyItemJAXBSchema.VOCABULARYITEMS_COMMON + ":"
-                        + VocabularyItemJAXBSchema.DISPLAY_NAME
+                String ptClause = VOCABULARYITEMS_COMMON + ":"
+                        + AuthorityItemJAXBSchema.DISPLAY_NAME
                         + IQueryManager.SEARCH_LIKE
                         + "'%" + partialTerm + "%'";
                 myFilter.appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
@@ -615,8 +617,8 @@ public class VocabularyResource extends
         try {
 	        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
 	        String whereClause =
-	        	VocabularyJAXBSchema.VOCABULARIES_COMMON+
-	        	":"+VocabularyJAXBSchema.SHORT_IDENTIFIER+
+	        	VOCABULARIES_COMMON+
+	        	":"+AuthorityJAXBSchema.SHORT_IDENTIFIER+
 	        	"='"+specifier+"'";
 	        // Need to get an Authority by name
 	        ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);

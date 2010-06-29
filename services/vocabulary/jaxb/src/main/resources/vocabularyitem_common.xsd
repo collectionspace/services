@@ -14,21 +14,21 @@
 <!-- See http://wiki.collectionspace.org/display/collectionspace/Vocabulary+Schema -->    
     
     <!-- Vocabularyitem -->
-    <xs:element name="vocabularyitems_common">
-        <xs:complexType>
-            <xs:sequence>
-                <!--  Common identifier -->
-                <xs:element name="csid" type="xs:string" />
-                
-                <!--  Vocabularyitem Information Group -->
-                <xs:element name="inVocabulary" type="xs:string" />
-                <xs:element name="displayName" type="xs:string"/>
-								<xs:element name="shortIdentifier" type="xs:string"/>
-                <xs:element name="refName" type="xs:string"/>
-                <xs:element name="status" type="xs:string"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+	<xs:element name="vocabularyitems_common">
+		<xs:complexType>
+			<xs:sequence>
+				<!--  Common identifier -->
+				<xs:element name="csid" type="xs:string" />
+
+				<!--  Vocabularyitem Information Group -->
+				<xs:element name="inAuthority" type="xs:string" />
+				<xs:element name="displayName" type="xs:string" />
+				<xs:element name="shortIdentifier" type="xs:string" />
+				<xs:element name="refName" type="xs:string" />
+				<xs:element name="status" type="xs:string" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
     
     <!-- This is the base class for paginated lists -->
     <xs:complexType name="abstractCommonListItem">

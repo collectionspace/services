@@ -12,7 +12,8 @@
       <rows>
         <row><widget>displayName</widget></row>
         <row><widget>shortIdentifier</widget></row>
-        <row><widget>refName</widget></row>
+       <row><widget>CSID</widget></row>
+       <row><widget>refName</widget></row>
         <row><widget>vocabType</widget></row>
       </rows>
 
@@ -36,6 +37,19 @@
         <translated>true</translated>
         <fields>
           <field schema="vocabularies_common">shortIdentifier</field>
+        </fields>
+        <properties widgetMode="edit">
+          <property name="styleClass">dataInputText</property>
+        </properties>
+      </widget>
+      
+      <widget name="CSID" type="text">
+        <labels>
+          <label mode="any">CSID</label>
+        </labels>
+        <translated>true</translated>
+        <fields>
+          <field>ecm:name</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>
@@ -81,7 +95,7 @@
         <row><widget>displayName</widget></row>
         <row><widget>shortIdentifier</widget></row>
         <row><widget>refName</widget></row>
-        <row><widget>inVocabulary</widget></row>
+        <row><widget>inAuthority</widget></row>
         <row><widget>status</widget></row>
       </rows>
 
@@ -124,13 +138,13 @@
         </properties>
       </widget>
       
-      <widget name="inVocabulary" type="text">
+      <widget name="inAuthority" type="text">
         <labels>
-          <label mode="any">Vocab</label>
+          <label mode="any">inAuthority</label>
         </labels>
         <translated>true</translated>
         <fields>
-          <field schema="vocabularyitems_common">inVocabulary</field>
+          <field schema="vocabularyitems_common">inAuthority</field>
         </fields>
         <properties widgetMode="edit">
           <property name="styleClass">dataInputText</property>

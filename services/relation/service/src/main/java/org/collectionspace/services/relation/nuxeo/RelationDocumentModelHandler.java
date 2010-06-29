@@ -139,11 +139,11 @@ public class RelationDocumentModelHandler
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#fillAllParts(org.collectionspace.services.common.document.DocumentWrapper)
-     */
     @Override
     public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         super.fillAllParts(wrapDoc);
     }
+     */
 
     /**
      * Gets the relation list item.

@@ -18,5 +18,7 @@ Require-Bundle: org.nuxeo.runtime,
 Provide-Package: org.collectionspace.collectionspace_core
 Nuxeo-Component: OSGI-INF/core-types-contrib.xml,
  OSGI-INF/ecm-types-contrib.xml,
- OSGI-INF/layouts-contrib.xml
+ OSGI-INF/layouts-contrib.xml,
+ OSGI-INF/querymodel-contrib.xml
+
 

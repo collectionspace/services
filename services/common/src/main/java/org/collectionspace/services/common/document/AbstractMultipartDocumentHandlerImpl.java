@@ -68,7 +68,7 @@ public abstract class AbstractMultipartDocumentHandlerImpl<T, TL, WT, WTL>
             throws Exception;
 
     @Override
-    public abstract void fillAllParts(DocumentWrapper<WT> wrapDoc)
+    public abstract void fillAllParts(DocumentWrapper<WT> wrapDoc, Action action)
             throws Exception;
 
     @Override

@@ -17,6 +17,8 @@
  */
 package org.collectionspace.services.common.document;
 
+import org.collectionspace.services.common.document.DocumentHandler.Action;
+
 /**
  * MultipartDocumentHandler is a DocumentHandler provides document processing
  * methods for entities using schema extension that are mapped to multipart
@@ -45,7 +47,8 @@ public interface MultipartDocumentHandler<T, TL, WT, WTL>
      * repository. Called in handle CREATE/UPDATE actions.
      * @param obj input object
      * @param docWrap target document
+     * @param action one of Action.CREATE or Action.UPDATE
      * @throws Exception
      */
-    public void fillAllParts(DocumentWrapper<WT> docWrap) throws Exception;
+    public void fillAllParts(DocumentWrapper<WT> docWrap, Action action) throws Exception;
 }

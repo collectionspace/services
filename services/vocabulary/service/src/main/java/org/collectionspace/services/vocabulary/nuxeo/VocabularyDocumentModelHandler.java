@@ -26,15 +26,13 @@ package org.collectionspace.services.vocabulary.nuxeo;
 import java.util.Iterator;
 import java.util.List;
 
-import org.collectionspace.services.VocabularyJAXBSchema;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
-import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
+import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.vocabulary.VocabulariesCommon;
 import org.collectionspace.services.vocabulary.VocabulariesCommonList;
 import org.collectionspace.services.vocabulary.VocabulariesCommonList.VocabularyListItem;
 
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -48,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class VocabularyDocumentModelHandler
-        extends RemoteDocumentModelHandlerImpl<VocabulariesCommon, VocabulariesCommonList> {
+		extends AuthorityDocumentModelHandler<VocabulariesCommon, VocabulariesCommonList> {
 
     /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(VocabularyDocumentModelHandler.class);
@@ -56,65 +54,65 @@ public class VocabularyDocumentModelHandler
      * vocabulary is used to stash JAXB object to use when handle is called
      * for Action.CREATE, Action.UPDATE or Action.GET
      */
-    private VocabulariesCommon vocabulary;
+    //private VocabulariesCommon vocabulary;
     /**
      * vocabularyList is stashed when handle is called
      * for ACTION.GET_ALL
      */
-    private VocabulariesCommonList vocabularyList;
+    //private VocabulariesCommonList vocabularyList;
 
 
     /**
      * getCommonPart get associated vocabulary
      * @return
-     */
     @Override
     public VocabulariesCommon getCommonPart() {
         return vocabulary;
     }
+     */
 
     /**
      * setCommonPart set associated vocabulary
      * @param vocabulary
-     */
     @Override
     public void setCommonPart(VocabulariesCommon vocabulary) {
         this.vocabulary = vocabulary;
     }
+     */
 
     /**
      * getCommonPartList get associated vocabulary (for index/GET_ALL)
      * @return
-     */
     @Override
     public VocabulariesCommonList getCommonPartList() {
         return vocabularyList;
     }
+     */
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#setCommonPartList(java.lang.Object)
-     */
     @Override
     public void setCommonPartList(VocabulariesCommonList vocabularyList) {
         this.vocabularyList = vocabularyList;
     }
+     */
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
-     */
     @Override
     public VocabulariesCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
             throws Exception {
         throw new UnsupportedOperationException();
     }
+     */
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#fillCommonPart(java.lang.Object, org.collectionspace.services.common.document.DocumentWrapper)
-     */
     @Override
     public void fillCommonPart(VocabulariesCommon vocabularyObject, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         throw new UnsupportedOperationException();
     }
+     */
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
@@ -122,20 +120,21 @@ public class VocabularyDocumentModelHandler
     @Override
     public VocabulariesCommonList extractCommonPartList(
     		DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
+		String label = getServiceContext().getCommonPartLabel();
         VocabulariesCommonList coList = extractPagingInfo(new VocabulariesCommonList(), wrapDoc);
         List<VocabulariesCommonList.VocabularyListItem> list = coList.getVocabularyListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
             VocabularyListItem ilistItem = new VocabularyListItem();
-            ilistItem.setDisplayName((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-                    VocabularyJAXBSchema.DISPLAY_NAME));
-            ilistItem.setRefName((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-                    VocabularyJAXBSchema.REF_NAME));
-            ilistItem.setShortIdentifier((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-            		VocabularyJAXBSchema.SHORT_IDENTIFIER));
-            ilistItem.setVocabType((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-                    VocabularyJAXBSchema.VOCAB_TYPE));
+            ilistItem.setDisplayName((String) docModel.getProperty(label,
+                    AuthorityJAXBSchema.DISPLAY_NAME));
+            ilistItem.setRefName((String) docModel.getProperty(label,
+            		AuthorityJAXBSchema.REF_NAME));
+            ilistItem.setShortIdentifier((String) docModel.getProperty(label,
+            		AuthorityJAXBSchema.SHORT_IDENTIFIER));
+            ilistItem.setVocabType((String) docModel.getProperty(label,
+            		AuthorityJAXBSchema.VOCAB_TYPE));
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);
             ilistItem.setCsid(id);

@@ -142,9 +142,9 @@ public class AcquisitionDocumentModelHandler
     }
 
     @Override
-    public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
 
-        super.fillAllParts(wrapDoc);
+        super.fillAllParts(wrapDoc, action);
         fillDublinCoreObject(wrapDoc); //dublincore might not be needed in future
     }
 

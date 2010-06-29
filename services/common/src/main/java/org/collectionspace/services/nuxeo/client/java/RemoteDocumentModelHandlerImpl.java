@@ -42,6 +42,7 @@ import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.vocabulary.RefNameUtils;
 
@@ -171,7 +172,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#fillAllParts(org.collectionspace.services.common.document.DocumentWrapper)
      */
     @Override
-    public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
 
         //TODO filling extension parts should be dynamic
         //Nuxeo APIs lack to support stream/byte[] input, get/setting properties is
@@ -199,11 +200,11 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
             }
             
             //skip if the part is not in metadata
-            if(!partsMetaMap.containsKey(partLabel)){
+            ObjectPartType partMeta = partsMetaMap.get(partLabel);
+            if(partMeta==null){
                 continue;
             }
-            ObjectPartType partMeta = partsMetaMap.get(partLabel);
-            fillPart(part, docModel, partMeta);
+            fillPart(part, docModel, partMeta, action);
         }//rof
 
     }
@@ -215,7 +216,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
      * @param partMeta metadata for the object to fill
      * @throws Exception
      */
-    protected void fillPart(InputPart part, DocumentModel docModel, ObjectPartType partMeta)
+    protected void fillPart(InputPart part, DocumentModel docModel, ObjectPartType partMeta, Action action)
             throws Exception {
         InputStream payload = part.getBody(InputStream.class, null);
         
@@ -229,9 +230,23 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
                 //TODO: callback to handler if registered to validate the
                 //document
                 Map<String, Object> objectProps = DocumentUtils.parseProperties(document.getFirstChild());
+                if(action==Action.UPDATE) {
+                	this.filterReadOnlyPropertiesForPart(objectProps, partMeta);
+                }
                 docModel.setProperties(partMeta.getLabel(), objectProps);
             }
         }
+    }
+
+    /**
+     * Filters out read only properties, so they cannot be set on update.
+     * TODO: add configuration support to do this generally
+     * @param objectProps the properties parsed from the update payload
+     * @param partMeta metadata for the object to fill
+     */
+    public void filterReadOnlyPropertiesForPart(
+    		Map<String, Object> objectProps, ObjectPartType partMeta) {
+    	// Currently a no-op, but can be overridden in Doc handlers.
     }
 
     /**

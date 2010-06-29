@@ -88,7 +88,7 @@ public class VocabularyBaseImport {
         }
         for (String itemName : enumValues) {
             HashMap<String, String> itemInfo = new HashMap<String, String>();
-            itemInfo.put(VocabularyItemJAXBSchema.DISPLAY_NAME, itemName);
+            itemInfo.put(AuthorityItemJAXBSchema.DISPLAY_NAME, itemName);
             VocabularyClientUtils.createItemInVocabulary(newVocabId,
                     baseVocabRefName, itemInfo, client);
         }

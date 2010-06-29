@@ -29,7 +29,7 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.VocabularyItemJAXBSchema;
+import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.client.VocabularyClientUtils;
@@ -69,7 +69,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     private String knownResourceRefName = null;
     private String knownResourceFullRefName = null;
     private String knownItemResourceId = null;
-    private int nItemsToCreateInList = 3;
+    private int nItemsToCreateInList = 5;
     private List<String> allResourceIdsCreated = new ArrayList<String>();
     private Map<String, String> allResourceItemIdsCreated =
         new HashMap<String, String>();
@@ -157,7 +157,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         dependsOnMethods = {"create"})
     public void createItem(String testName) {
 
-        if (logger.isDebugEnabled()) {
+        if (null!=testName && logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
         // Perform setup.
@@ -166,8 +166,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         VocabularyClient client = new VocabularyClient();
         HashMap<String, String> itemInfo = new HashMap<String, String>();
         String shortId = createIdentifier();
-        itemInfo.put(VocabularyItemJAXBSchema.SHORT_IDENTIFIER, shortId);
-        itemInfo.put(VocabularyItemJAXBSchema.DISPLAY_NAME, "display-"+shortId);
+        itemInfo.put(AuthorityItemJAXBSchema.SHORT_IDENTIFIER, shortId);
+        itemInfo.put(AuthorityItemJAXBSchema.DISPLAY_NAME, "display-"+shortId);
         String newID = VocabularyClientUtils.createItemInVocabulary(knownResourceId,
 				knownResourceRefName, itemInfo, client);
 
@@ -175,7 +175,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         // for additional tests below.
         if (knownItemResourceId == null){
             knownItemResourceId = newID;
-            if (logger.isDebugEnabled()) {
+            if (null!=testName && logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);
             }
         }
@@ -192,10 +192,11 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         for (int i = 0; i < 3; i++) {
         	// Force create to reset the known resource info
         	setKnownResource(null, null, null, null);
+        	knownItemResourceId = null;
             create(testName);
             // Add nItemsToCreateInList items to each vocab
             for (int j = 0; j < nItemsToCreateInList; j++) {
-                createItem(testName);
+                createItem(null);
             }
         }
     }
@@ -257,8 +258,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
         HashMap<String, String> itemInfo = new HashMap<String, String>();
-        itemInfo.put(VocabularyItemJAXBSchema.SHORT_IDENTIFIER, "Bad Item Short Id!");
-        itemInfo.put(VocabularyItemJAXBSchema.DISPLAY_NAME, "Bad Item!");
+        itemInfo.put(AuthorityItemJAXBSchema.SHORT_IDENTIFIER, "Bad Item Short Id!");
+        itemInfo.put(AuthorityItemJAXBSchema.DISPLAY_NAME, "Bad Item!");
     	MultipartOutput multipart = 
     		VocabularyClientUtils.createVocabularyItemInstance( knownResourceId, knownResourceRefName,
     				itemInfo, client.getItemCommonPartName() );
@@ -267,12 +268,12 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     	int statusCode = res.getStatus();
 
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-    		throw new RuntimeException("Could not create Item: \""+itemInfo.get(VocabularyItemJAXBSchema.DISPLAY_NAME)
+    		throw new RuntimeException("Could not create Item: \""+itemInfo.get(AuthorityItemJAXBSchema.DISPLAY_NAME)
     				+"\" in personAuthority: \"" + knownResourceRefName
     				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
-    		throw new RuntimeException("Unexpected Status when creating Item: \""+itemInfo.get(VocabularyItemJAXBSchema.DISPLAY_NAME)
+    		throw new RuntimeException("Unexpected Status when creating Item: \""+itemInfo.get(AuthorityItemJAXBSchema.DISPLAY_NAME)
     				+"\" in personAuthority: \"" + knownResourceRefName +"\", Status:"+ statusCode);
     	}
     }
@@ -514,7 +515,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         VocabularyitemsCommon vocabularyItem = (VocabularyitemsCommon) extractPart(input,
                 client.getItemCommonPartName(), VocabularyitemsCommon.class);
         Assert.assertNotNull(vocabularyItem);
-        Assert.assertEquals(vocabularyItem.getInVocabulary(), knownResourceId);
+        Assert.assertEquals(vocabularyItem.getInAuthority(), knownResourceId);
     }
 
     // Failure outcomes
@@ -730,11 +731,12 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         List<VocabularyitemsCommonList.VocabularyitemListItem> items =
             list.getVocabularyitemListItem();
         int nItemsReturned = items.size();
+        long nItemsTotal = list.getTotalItems();
         if(logger.isDebugEnabled()){
             logger.debug("  " + testName + ": Expected "
-           		+ nItemsToCreateInList+" items; got: "+nItemsReturned);
+           		+ nItemsToCreateInList+" items; got: "+nItemsReturned+" of: "+nItemsTotal);
         }
-        Assert.assertEquals( nItemsReturned, nItemsToCreateInList);
+        Assert.assertEquals( nItemsTotal, nItemsToCreateInList);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
@@ -824,7 +826,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     }
 
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"readItem", "update"})
+        dependsOnMethods = {"readItem", "update", "verifyIgnoredUpdateWithInAuthority"})
     public void updateItem(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -886,6 +888,70 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(updatedVocabularyItem.getDisplayName(),
                 vocabularyItem.getDisplayName(),
                 "Data in updated VocabularyItem did not match submitted data.");
+    }
+
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    		dependsOnMethods = {"readItem"})
+    public void verifyIgnoredUpdateWithInAuthority(String testName) throws Exception {
+
+    	if (logger.isDebugEnabled()) {
+    		logger.debug(testBanner(testName, CLASS_NAME));
+    	}
+    	// Perform setup.
+        setupUpdate();
+
+    	// Submit the request to the service and store the response.
+    	VocabularyClient client = new VocabularyClient();
+    	ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
+    	int statusCode = res.getStatus();
+
+    	// Check the status code of the response: does it match
+    	// the expected response(s)?
+    	if(logger.isDebugEnabled()){
+    		logger.debug(testName + " read Vocab:"+knownResourceId+"/Item:"
+    				+knownItemResourceId+" status = " + statusCode);
+    	}
+    	Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    			invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    	Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
+
+    	MultipartInput input = (MultipartInput) res.getEntity();
+    	VocabularyitemsCommon vitem = (VocabularyitemsCommon) extractPart(input,
+    			client.getItemCommonPartName(), VocabularyitemsCommon.class);
+    	Assert.assertNotNull(vitem);
+    	// Try to Update with new parent vocab (use self, for test).
+        Assert.assertEquals(vitem.getInAuthority(),
+        		knownResourceId,
+                "VocabularyItem inAuthority does not match knownResourceId.");
+    	vitem.setInAuthority(knownItemResourceId);
+
+    	// Submit the updated resource to the service and store the response.
+    	MultipartOutput output = new MultipartOutput();
+    	OutputPart commonPart = output.addPart(vitem, MediaType.APPLICATION_XML_TYPE);
+    	commonPart.getHeaders().add("label", client.getItemCommonPartName());
+    	res = client.updateItem(knownResourceId, knownItemResourceId, output);
+    	statusCode = res.getStatus();
+
+    	// Check the status code of the response: does it match the expected response(s)?
+    	if(logger.isDebugEnabled()){
+    		logger.debug(testName + ": status = " + statusCode);
+    	}
+    	Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+    			invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Retrieve the updated resource and verify that the parent did not change
+    	res = client.readItem(knownResourceId, knownItemResourceId);
+        input = (MultipartInput) res.getEntity();
+        VocabularyitemsCommon updatedVocabularyItem =
+                (VocabularyitemsCommon) extractPart(input,
+                        client.getItemCommonPartName(), VocabularyitemsCommon.class);
+        Assert.assertNotNull(updatedVocabularyItem);
+
+        // Verify that the updated resource received the correct data.
+        Assert.assertEquals(updatedVocabularyItem.getInAuthority(),
+        		knownResourceId,
+                "VocabularyItem allowed update to the parent (inAuthority).");
     }
 
     // Failure outcomes
@@ -1040,8 +1106,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         // The only relevant ID may be the one used in update(), below.
         VocabularyClient client = new VocabularyClient();
         HashMap<String, String> itemInfo = new HashMap<String, String>();
-        itemInfo.put(VocabularyItemJAXBSchema.SHORT_IDENTIFIER, "nonex");
-        itemInfo.put(VocabularyItemJAXBSchema.DISPLAY_NAME, "display-nonex");
+        itemInfo.put(AuthorityItemJAXBSchema.SHORT_IDENTIFIER, "nonex");
+        itemInfo.put(AuthorityItemJAXBSchema.DISPLAY_NAME, "display-nonex");
         MultipartOutput multipart = 
         	VocabularyClientUtils.createVocabularyItemInstance(knownResourceId, 
         		VocabularyClientUtils.createVocabularyRefName(NON_EXISTENT_ID, null),
@@ -1066,7 +1132,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     // Success outcomes
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "readList", "testSubmitRequest", "update"})
+        dependsOnMethods = {"create", "readList", "testSubmitRequest", "update", "deleteItem"})
     public void delete(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -1092,7 +1158,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         dependsOnMethods = {"createItem", "readItemList", "testItemSubmitRequest",
-            "updateItem", "verifyIllegalItemDisplayName"})
+            "updateItem", "verifyIllegalItemDisplayName", "verifyIgnoredUpdateWithInAuthority"})
     public void deleteItem(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {

@@ -65,7 +65,8 @@ public abstract class RemoteSubItemDocumentModelHandlerImpl<T, TL> extends
      * @throws Exception
      */
 	@Override
-    protected void fillPart(InputPart part, DocumentModel docModel, ObjectPartType partMeta)
+    protected void fillPart(InputPart part, DocumentModel docModel, 
+    						ObjectPartType partMeta, Action action)
             throws Exception {
         InputStream payload = part.getBody(InputStream.class, null);
 

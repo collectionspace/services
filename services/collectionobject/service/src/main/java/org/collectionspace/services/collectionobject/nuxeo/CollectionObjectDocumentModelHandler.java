@@ -143,9 +143,9 @@ public class CollectionObjectDocumentModelHandler
      * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#fillAllParts(org.collectionspace.services.common.document.DocumentWrapper)
      */
     @Override
-    public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
 
-        super.fillAllParts(wrapDoc);
+        super.fillAllParts(wrapDoc, action);
         fillDublinCoreObject(wrapDoc); //dublincore might not be needed in future
     }
 

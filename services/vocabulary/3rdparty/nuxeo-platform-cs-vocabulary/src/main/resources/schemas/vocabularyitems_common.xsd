@@ -22,7 +22,7 @@
 
 		<!--  VocabularyItem Information Group -->
 		<!--  inVocabulary is the csid of the owning Vocabulary -->
-		<xs:element name="inVocabulary" type="xs:string" />
+		<xs:element name="inAuthority" type="xs:string" />
 		<xs:element name="refName" type="xs:string"/>
 		<xs:element name="shortIdentifier" type="xs:string"/>
 		<xs:element name="displayName" type="xs:string"/>
