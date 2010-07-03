@@ -83,8 +83,8 @@ public class LocationAuthorityClientUtils {
         	location.setSecurityNote(value);
         if((value = (String)locationInfo.get(LocationJAXBSchema.LOCATION_TYPE))!=null)
         	location.setLocationType(value);
-        if((value = (String)locationInfo.get(LocationJAXBSchema.STATUS))!=null)
-        	location.setStatus(value);
+        if((value = (String)locationInfo.get(LocationJAXBSchema.TERM_STATUS))!=null)
+        	location.setTermStatus(value);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(location,
             MediaType.APPLICATION_XML_TYPE);
@@ -132,23 +132,28 @@ public class LocationAuthorityClientUtils {
     	MultipartOutput multipart = 
     		createLocationInstance( vcsid, locationAuthorityRefName,
     			locationMap, client.getItemCommonPartName() );
+    	String newID = null;
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
+        try {
+	    	int statusCode = res.getStatus();
+	
+	    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
+	    		throw new RuntimeException("Could not create Item: \""
+	    				+locationMap.get(LocationJAXBSchema.SHORT_IDENTIFIER)
+	    				+"\" in locationAuthority: \"" + locationAuthorityRefName
+	    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	    	}
+	    	if(statusCode != EXPECTED_STATUS_CODE) {
+	    		throw new RuntimeException("Unexpected Status when creating Item: \""
+	    				+locationMap.get(LocationJAXBSchema.SHORT_IDENTIFIER)
+	    				+"\" in locationAuthority: \"" + locationAuthorityRefName +"\", Status:"+ statusCode);
+	    	}
+	        newID = extractId(res);
+        } finally {
+        	res.releaseConnection();
+        }
 
-    	int statusCode = res.getStatus();
-
-    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-    		throw new RuntimeException("Could not create Item: \""
-    				+locationMap.get(LocationJAXBSchema.SHORT_IDENTIFIER)
-    				+"\" in locationAuthority: \"" + locationAuthorityRefName
-    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    	}
-    	if(statusCode != EXPECTED_STATUS_CODE) {
-    		throw new RuntimeException("Unexpected Status when creating Item: \""
-    				+locationMap.get(LocationJAXBSchema.SHORT_IDENTIFIER)
-    				+"\" in locationAuthority: \"" + locationAuthorityRefName +"\", Status:"+ statusCode);
-    	}
-
-    	return extractId(res);
+    	return newID;
     }
 
     public static MultipartOutput createLocationInstance(
@@ -175,21 +180,26 @@ public class LocationAuthorityClientUtils {
     	
     	MultipartOutput multipart = 
     		createLocationInstance( commonPartXML, client.getItemCommonPartName() );
+    	String newID = null;
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
+        try {
+	    	int statusCode = res.getStatus();
+	
+	    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
+	    		throw new RuntimeException("Could not create Item: \""+commonPartXML
+	    				+"\" in locationAuthority: \"" + vcsid
+	    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	    	}
+	    	if(statusCode != EXPECTED_STATUS_CODE) {
+	    		throw new RuntimeException("Unexpected Status when creating Item: \""+commonPartXML
+	    				+"\" in locationAuthority: \"" + vcsid +"\", Status:"+ statusCode);
+	    	}
+	        newID = extractId(res);
+        } finally {
+        	res.releaseConnection();
+        }
 
-    	int statusCode = res.getStatus();
-
-    	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-    		throw new RuntimeException("Could not create Item: \""+commonPartXML
-    				+"\" in locationAuthority: \"" + vcsid
-    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-    	}
-    	if(statusCode != EXPECTED_STATUS_CODE) {
-    		throw new RuntimeException("Unexpected Status when creating Item: \""+commonPartXML
-    				+"\" in locationAuthority: \"" + vcsid +"\", Status:"+ statusCode);
-    	}
-
-    	return extractId(res);
+    	return newID;
     }
     
     /**

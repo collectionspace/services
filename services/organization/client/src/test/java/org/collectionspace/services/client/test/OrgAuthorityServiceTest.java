@@ -816,40 +816,45 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
-
-        // Check whether organization has expected displayName.
-        MultipartInput input = (MultipartInput) res.getEntity();
-        OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
-                client.getItemCommonPartName(), OrganizationsCommon.class);
-        Assert.assertNotNull(organization);
-        // Try to Update with computed false and no displayName
-    	organization.setDisplayNameComputed(false);
-        organization.setDisplayName(null);
-
-        // Submit the updated resource to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(organization, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getItemCommonPartName());
-        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug("updateItem: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
+	
+	        // Check whether organization has expected displayName.
+	        MultipartInput input = (MultipartInput) res.getEntity();
+	        OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
+	                client.getItemCommonPartName(), OrganizationsCommon.class);
+	        Assert.assertNotNull(organization);
+	        // Try to Update with computed false and no displayName
+	    	organization.setDisplayNameComputed(false);
+	        organization.setDisplayName(null);
+	
+	        // Submit the updated resource to the service and store the response.
+	        MultipartOutput output = new MultipartOutput();
+	        OutputPart commonPart = output.addPart(organization, MediaType.APPLICATION_XML_TYPE);
+	        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+	    	res.releaseConnection();
+	        res = client.updateItem(knownResourceId, knownItemResourceId, output);
+	        statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug("updateItem: status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     /**
@@ -873,30 +878,33 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         ClientResponse<MultipartInput> res =
             client.readContact(knownResourceId, knownItemResourceId,
             knownContactResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Check whether we've received a contact.
-        MultipartInput input = (MultipartInput) res.getEntity();
-        ContactsCommon contact = (ContactsCommon) extractPart(input,
-                new ContactClient().getCommonPartName(), ContactsCommon.class);
-        Assert.assertNotNull(contact);
-        boolean showFull = true;
-        if(showFull && logger.isDebugEnabled()){
-            logger.debug(testName + ": returned payload:");
-            logger.debug(objectAsXmlString(contact, ContactsCommon.class));
-        }
-        Assert.assertEquals(contact.getInAuthority(), knownResourceId);
-        Assert.assertEquals(contact.getInItem(), knownItemResourceId);
-
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Check whether we've received a contact.
+	        MultipartInput input = (MultipartInput) res.getEntity();
+	        ContactsCommon contact = (ContactsCommon) extractPart(input,
+	                new ContactClient().getCommonPartName(), ContactsCommon.class);
+	        Assert.assertNotNull(contact);
+	        boolean showFull = true;
+	        if(showFull && logger.isDebugEnabled()){
+	            logger.debug(testName + ": returned payload:");
+	            logger.debug(objectAsXmlString(contact, ContactsCommon.class));
+	        }
+	        Assert.assertEquals(contact.getInAuthority(), knownResourceId);
+	        Assert.assertEquals(contact.getInItem(), knownItemResourceId);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     // Failure outcomes
@@ -917,16 +925,20 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     /**
@@ -947,16 +959,20 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<MultipartInput> res = client.readItem(knownResourceId, NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     /**
@@ -978,16 +994,20 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<MultipartInput> res =
             client.readContact(knownResourceId, knownItemResourceId, NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     // ---------------------------------------------------------------
@@ -1012,36 +1032,40 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<OrgauthoritiesCommonList> res = client.readList();
-        OrgauthoritiesCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = false;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            List<OrgauthoritiesCommonList.OrgauthorityListItem> items =
-                    list.getOrgauthorityListItem();
-            int i = 0;
-            for (OrgauthoritiesCommonList.OrgauthorityListItem item : items) {
-                String csid = item.getCsid();
-                logger.debug(testName + ": list-item[" + i + "] csid=" +
-                        csid);
-                logger.debug(testName + ": list-item[" + i + "] displayName=" +
-                        item.getDisplayName());
-                logger.debug(testName + ": list-item[" + i + "] URI=" +
-                        item.getUri());
-                readItemList(csid, null);
-                i++;
-            }
-        }
+        try {
+	        OrgauthoritiesCommonList list = res.getEntity();
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Optionally output additional data about list members for debugging.
+	        boolean iterateThroughList = false;
+	        if (iterateThroughList && logger.isDebugEnabled()) {
+	            List<OrgauthoritiesCommonList.OrgauthorityListItem> items =
+	                    list.getOrgauthorityListItem();
+	            int i = 0;
+	            for (OrgauthoritiesCommonList.OrgauthorityListItem item : items) {
+	                String csid = item.getCsid();
+	                logger.debug(testName + ": list-item[" + i + "] csid=" +
+	                        csid);
+	                logger.debug(testName + ": list-item[" + i + "] displayName=" +
+	                        item.getDisplayName());
+	                logger.debug(testName + ": list-item[" + i + "] URI=" +
+	                        item.getUri());
+	                readItemList(csid, null);
+	                i++;
+	            }
+	        }
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     /**
@@ -1086,52 +1110,56 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         } else {
         	Assert.fail("readItemList passed null csid and name!");
         }
-        OrganizationsCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        List<OrganizationsCommonList.OrganizationListItem> items =
-            list.getOrganizationListItem();
-        int nItemsReturned = items.size();
-        // There will be one item created, associated with a
-        // known parent resource, by the createItem test.
-        //
-        // In addition, there will be 'nItemsToCreateInList'
-        // additional items created by the createItemList test,
-        // all associated with the same parent resource.
-        int nExpectedItems = nItemsToCreateInList + 1;
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": Expected "
-           		+ nExpectedItems +" items; got: "+nItemsReturned);
-        }
-        Assert.assertEquals(nItemsReturned, nExpectedItems);
-
-        int i = 0;
-        for (OrganizationsCommonList.OrganizationListItem item : items) {
-        	Assert.assertTrue((null != item.getRefName()), "Item refName is null!");
-        	Assert.assertTrue((null != item.getDisplayName()), "Item displayName is null!");
-        	// Optionally output additional data about list members for debugging.
-	        boolean showDetails = true;
-	        if (showDetails && logger.isDebugEnabled()) {
-                logger.debug("  " + testName + ": list-item[" + i + "] csid=" +
-                        item.getCsid());
-                logger.debug("  " + testName + ": list-item[" + i + "] refName=" +
-                        item.getRefName());
-                logger.debug("  " + testName + ": list-item[" + i + "] displayName=" +
-                        item.getDisplayName());
-                logger.debug("  " + testName + ": list-item[" + i + "] URI=" +
-                        item.getUri());
-            }
-            i++;
-        }
+        try {
+	        OrganizationsCommonList list = res.getEntity();
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        List<OrganizationsCommonList.OrganizationListItem> items =
+	            list.getOrganizationListItem();
+	        int nItemsReturned = items.size();
+	        // There will be one item created, associated with a
+	        // known parent resource, by the createItem test.
+	        //
+	        // In addition, there will be 'nItemsToCreateInList'
+	        // additional items created by the createItemList test,
+	        // all associated with the same parent resource.
+	        int nExpectedItems = nItemsToCreateInList + 1;
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": Expected "
+	           		+ nExpectedItems +" items; got: "+nItemsReturned);
+	        }
+	        Assert.assertEquals(nItemsReturned, nExpectedItems);
+	
+	        int i = 0;
+	        for (OrganizationsCommonList.OrganizationListItem item : items) {
+	        	Assert.assertTrue((null != item.getRefName()), "Item refName is null!");
+	        	Assert.assertTrue((null != item.getDisplayName()), "Item displayName is null!");
+	        	// Optionally output additional data about list members for debugging.
+		        boolean showDetails = true;
+		        if (showDetails && logger.isDebugEnabled()) {
+	                logger.debug("  " + testName + ": list-item[" + i + "] csid=" +
+	                        item.getCsid());
+	                logger.debug("  " + testName + ": list-item[" + i + "] refName=" +
+	                        item.getRefName());
+	                logger.debug("  " + testName + ": list-item[" + i + "] displayName=" +
+	                        item.getDisplayName());
+	                logger.debug("  " + testName + ": list-item[" + i + "] URI=" +
+	                        item.getUri());
+	            }
+	            i++;
+	        }
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     /**
@@ -1162,48 +1190,52 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         ContactsCommonList list = null;
         ClientResponse<ContactsCommonList> res =
                 client.readContactList(parentcsid, itemcsid);
-        list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        List<ContactsCommonList.ContactListItem> listitems =
-            list.getContactListItem();
-        int nItemsReturned = listitems.size();
-        // There will be one item created, associated with a
-        // known parent resource, by the createItem test.
-        //
-        // In addition, there will be 'nItemsToCreateInList'
-        // additional items created by the createItemList test,
-        // all associated with the same parent resource.
-        int nExpectedItems = nItemsToCreateInList + 1;
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": Expected "
-           		+ nExpectedItems +" items; got: "+nItemsReturned);
-        }
-        Assert.assertEquals(nItemsReturned, nExpectedItems);
-
-        int i = 0;
-        for (ContactsCommonList.ContactListItem listitem : listitems) {
-        	// Optionally output additional data about list members for debugging.
-	        boolean showDetails = false;
-	        if (showDetails && logger.isDebugEnabled()) {
-                logger.debug("  " + testName + ": list-item[" + i + "] csid=" +
-                        listitem.getCsid());
-                logger.debug("  " + testName + ": list-item[" + i + "] addressPlace=" +
-                        listitem.getAddressPlace());
-                logger.debug("  " + testName + ": list-item[" + i + "] URI=" +
-                        listitem.getUri());
-            }
-            i++;
-        }
+        try {
+	        list = res.getEntity();
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        List<ContactsCommonList.ContactListItem> listitems =
+	            list.getContactListItem();
+	        int nItemsReturned = listitems.size();
+	        // There will be one item created, associated with a
+	        // known parent resource, by the createItem test.
+	        //
+	        // In addition, there will be 'nItemsToCreateInList'
+	        // additional items created by the createItemList test,
+	        // all associated with the same parent resource.
+	        int nExpectedItems = nItemsToCreateInList + 1;
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": Expected "
+	           		+ nExpectedItems +" items; got: "+nItemsReturned);
+	        }
+	        Assert.assertEquals(nItemsReturned, nExpectedItems);
+	
+	        int i = 0;
+	        for (ContactsCommonList.ContactListItem listitem : listitems) {
+	        	// Optionally output additional data about list members for debugging.
+		        boolean showDetails = false;
+		        if (showDetails && logger.isDebugEnabled()) {
+	                logger.debug("  " + testName + ": list-item[" + i + "] csid=" +
+	                        listitem.getCsid());
+	                logger.debug("  " + testName + ": list-item[" + i + "] addressPlace=" +
+	                        listitem.getAddressPlace());
+	                logger.debug("  " + testName + ": list-item[" + i + "] URI=" +
+	                        listitem.getUri());
+	            }
+	            i++;
+	        }
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     // Failure outcomes
@@ -1231,53 +1263,58 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<MultipartInput> res =
                 client.read(knownResourceId);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
-        if(logger.isDebugEnabled()){
-            logger.debug("got OrgAuthority to update with ID: " + knownResourceId);
-        }
-        MultipartInput input = (MultipartInput) res.getEntity();
-        OrgauthoritiesCommon orgAuthority = (OrgauthoritiesCommon) extractPart(input,
-                client.getCommonPartName(), OrgauthoritiesCommon.class);
-        Assert.assertNotNull(orgAuthority);
-
-        // Update the contents of this resource.
-        orgAuthority.setDisplayName("updated-" + orgAuthority.getDisplayName());
-        orgAuthority.setVocabType("updated-" + orgAuthority.getVocabType());
-        if(logger.isDebugEnabled()){
-            logger.debug("to be updated OrgAuthority");
-            logger.debug(objectAsXmlString(orgAuthority, OrgauthoritiesCommon.class));
-        }
-
-        // Submit the updated resource to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(orgAuthority, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
-        res = client.update(knownResourceId, output);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Retrieve the updated resource and verify that its contents exist.
-        input = (MultipartInput) res.getEntity();
-        OrgauthoritiesCommon updatedOrgAuthority =
-                (OrgauthoritiesCommon) extractPart(input,
-                        client.getCommonPartName(), OrgauthoritiesCommon.class);
-        Assert.assertNotNull(updatedOrgAuthority);
-
-        // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedOrgAuthority.getDisplayName(),
-                orgAuthority.getDisplayName(),
-                "Data in updated object did not match submitted data.");
+        try {
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": read status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+	
+	        if(logger.isDebugEnabled()){
+	            logger.debug("got OrgAuthority to update with ID: " + knownResourceId);
+	        }
+	        MultipartInput input = (MultipartInput) res.getEntity();
+	        OrgauthoritiesCommon orgAuthority = (OrgauthoritiesCommon) extractPart(input,
+	                client.getCommonPartName(), OrgauthoritiesCommon.class);
+	        Assert.assertNotNull(orgAuthority);
+	
+	        // Update the contents of this resource.
+	        orgAuthority.setDisplayName("updated-" + orgAuthority.getDisplayName());
+	        orgAuthority.setVocabType("updated-" + orgAuthority.getVocabType());
+	        if(logger.isDebugEnabled()){
+	            logger.debug("to be updated OrgAuthority");
+	            logger.debug(objectAsXmlString(orgAuthority, OrgauthoritiesCommon.class));
+	        }
+	
+	        // Submit the updated resource to the service and store the response.
+	        MultipartOutput output = new MultipartOutput();
+	        OutputPart commonPart = output.addPart(orgAuthority, MediaType.APPLICATION_XML_TYPE);
+	        commonPart.getHeaders().add("label", client.getCommonPartName());
+	    	res.releaseConnection();
+	        res = client.update(knownResourceId, output);
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Retrieve the updated resource and verify that its contents exist.
+	        input = (MultipartInput) res.getEntity();
+	        OrgauthoritiesCommon updatedOrgAuthority =
+	                (OrgauthoritiesCommon) extractPart(input,
+	                        client.getCommonPartName(), OrgauthoritiesCommon.class);
+	        Assert.assertNotNull(updatedOrgAuthority);
+	
+	        // Verify that the updated resource received the correct data.
+	        Assert.assertEquals(updatedOrgAuthority.getDisplayName(),
+	                orgAuthority.getDisplayName(),
+	                "Data in updated object did not match submitted data.");
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     /**
@@ -1300,56 +1337,61 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<MultipartInput> res =
                 client.readItem(knownResourceId, knownItemResourceId);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
-        if(logger.isDebugEnabled()){
-            logger.debug("got Organization to update with ID: " +
-                knownItemResourceId +
-                " in OrgAuthority: " + knownResourceId );
-        }
-        MultipartInput input = (MultipartInput) res.getEntity();
-        OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
-                client.getItemCommonPartName(), OrganizationsCommon.class);
-        Assert.assertNotNull(organization);
-
-        // Update the contents of this resource.
-        organization.setCsid(null);
-        organization.setShortName("updated-" + organization.getShortName());
-        if(logger.isDebugEnabled()){
-            logger.debug("to be updated Organization");
-            logger.debug(objectAsXmlString(organization,
-                OrganizationsCommon.class));
-        }
-
-        // Submit the updated resource to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(organization, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getItemCommonPartName());
-        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Retrieve the updated resource and verify that its contents exist.
-        input = (MultipartInput) res.getEntity();
-        OrganizationsCommon updatedOrganization =
-                (OrganizationsCommon) extractPart(input,
-                        client.getItemCommonPartName(), OrganizationsCommon.class);
-        Assert.assertNotNull(updatedOrganization);
-
-        // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedOrganization.getShortName(),
-                organization.getShortName(),
-                "Data in updated Organization did not match submitted data.");
+        try {
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": read status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+	
+	        if(logger.isDebugEnabled()){
+	            logger.debug("got Organization to update with ID: " +
+	                knownItemResourceId +
+	                " in OrgAuthority: " + knownResourceId );
+	        }
+	        MultipartInput input = (MultipartInput) res.getEntity();
+	        OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
+	                client.getItemCommonPartName(), OrganizationsCommon.class);
+	        Assert.assertNotNull(organization);
+	
+	        // Update the contents of this resource.
+	        organization.setCsid(null);
+	        organization.setShortName("updated-" + organization.getShortName());
+	        if(logger.isDebugEnabled()){
+	            logger.debug("to be updated Organization");
+	            logger.debug(objectAsXmlString(organization,
+	                OrganizationsCommon.class));
+	        }
+	
+	        // Submit the updated resource to the service and store the response.
+	        MultipartOutput output = new MultipartOutput();
+	        OutputPart commonPart = output.addPart(organization, MediaType.APPLICATION_XML_TYPE);
+	        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+	    	res.releaseConnection();
+	        res = client.updateItem(knownResourceId, knownItemResourceId, output);
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Retrieve the updated resource and verify that its contents exist.
+	        input = (MultipartInput) res.getEntity();
+	        OrganizationsCommon updatedOrganization =
+	                (OrganizationsCommon) extractPart(input,
+	                        client.getItemCommonPartName(), OrganizationsCommon.class);
+	        Assert.assertNotNull(updatedOrganization);
+	
+	        // Verify that the updated resource received the correct data.
+	        Assert.assertEquals(updatedOrganization.getShortName(),
+	                organization.getShortName(),
+	                "Data in updated Organization did not match submitted data.");
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     /**
@@ -1372,56 +1414,61 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<MultipartInput> res =
                 client.readContact(knownResourceId, knownItemResourceId, knownContactResourceId);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
-        if(logger.isDebugEnabled()){
-            logger.debug("got Contact to update with ID: " +
-                knownContactResourceId +
-                " in item: " + knownItemResourceId +
-                " in parent: " + knownResourceId );
-        }
-        MultipartInput input = (MultipartInput) res.getEntity();
-        ContactsCommon contact = (ContactsCommon) extractPart(input,
-                new ContactClient().getCommonPartName(), ContactsCommon.class);
-        Assert.assertNotNull(contact);
-
-        // Update the contents of this resource.
-        contact.setAddressPlace("updated-" + contact.getAddressPlace());
-        if(logger.isDebugEnabled()){
-            logger.debug("to be updated Contact");
-            logger.debug(objectAsXmlString(contact,
-                ContactsCommon.class));
-        }
-
-        // Submit the updated resource to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(contact, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new ContactClient().getCommonPartName());
-        res = client.updateContact(knownResourceId, knownItemResourceId, knownContactResourceId, output);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Retrieve the updated resource and verify that its contents exist.
-        input = (MultipartInput) res.getEntity();
-        ContactsCommon updatedContact =
-                (ContactsCommon) extractPart(input,
-                        new ContactClient().getCommonPartName(), ContactsCommon.class);
-        Assert.assertNotNull(updatedContact);
-
-        // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedContact.getAddressPlace(),
-                contact.getAddressPlace(),
-                "Data in updated Contact did not match submitted data.");
+        try {
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": read status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+	
+	        if(logger.isDebugEnabled()){
+	            logger.debug("got Contact to update with ID: " +
+	                knownContactResourceId +
+	                " in item: " + knownItemResourceId +
+	                " in parent: " + knownResourceId );
+	        }
+	        MultipartInput input = (MultipartInput) res.getEntity();
+	        ContactsCommon contact = (ContactsCommon) extractPart(input,
+	                new ContactClient().getCommonPartName(), ContactsCommon.class);
+	        Assert.assertNotNull(contact);
+	
+	        // Update the contents of this resource.
+	        contact.setAddressPlace("updated-" + contact.getAddressPlace());
+	        if(logger.isDebugEnabled()){
+	            logger.debug("to be updated Contact");
+	            logger.debug(objectAsXmlString(contact,
+	                ContactsCommon.class));
+	        }
+	
+	        // Submit the updated resource to the service and store the response.
+	        MultipartOutput output = new MultipartOutput();
+	        OutputPart commonPart = output.addPart(contact, MediaType.APPLICATION_XML_TYPE);
+	        commonPart.getHeaders().add("label", new ContactClient().getCommonPartName());
+	    	res.releaseConnection();
+	        res = client.updateContact(knownResourceId, knownItemResourceId, knownContactResourceId, output);
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Retrieve the updated resource and verify that its contents exist.
+	        input = (MultipartInput) res.getEntity();
+	        ContactsCommon updatedContact =
+	                (ContactsCommon) extractPart(input,
+	                        new ContactClient().getCommonPartName(), ContactsCommon.class);
+	        Assert.assertNotNull(updatedContact);
+	
+	        // Verify that the updated resource received the correct data.
+	        Assert.assertEquals(updatedContact.getAddressPlace(),
+	                contact.getAddressPlace(),
+	                "Data in updated Contact did not match submitted data.");
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     // Failure outcomes
@@ -1560,16 +1607,20 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 				new OrgAuthorityClient().getCommonPartName());
         ClientResponse<MultipartInput> res =
                 client.update(NON_EXISTENT_ID, multipart);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     /**
@@ -1601,16 +1652,20 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         		nonexOrgMap, client.getItemCommonPartName() );
         ClientResponse<MultipartInput> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     /**
@@ -1659,16 +1714,20 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<Response> res =
             client.deleteContact(knownResourceId, knownItemResourceId, knownContactResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
    /**
@@ -1695,16 +1754,20 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<Response> res = client.deleteItem(knownResourceId, knownItemResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     /* (non-Javadoc)
@@ -1728,16 +1791,20 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<Response> res = client.delete(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     // Failure outcomes
@@ -1758,16 +1825,20 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     /**
@@ -1788,16 +1859,20 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<Response> res = client.deleteItem(knownResourceId, NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     /**
@@ -1819,16 +1894,20 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         OrgAuthorityClient client = new OrgAuthorityClient();
         ClientResponse<Response> res =
             client.deleteContact(knownResourceId, knownItemResourceId, NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     // ---------------------------------------------------------------

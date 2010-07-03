@@ -80,19 +80,13 @@ public class OrgAuthorityResource extends
 	AuthorityResource<OrgauthoritiesCommon, OrgauthoritiesCommonList, OrganizationsCommon,
 	OrganizationDocumentModelHandler> {
 
-    /** The Constant orgAuthorityServiceName. */
     private final static String orgAuthorityServiceName = "orgauthorities";
 	private final static String ORGAUTHORITIES_COMMON = "orgauthorities_common";
     
-    /** The Constant organizationServiceName. */
     private final static String organizationServiceName = "organizations";
 	private final static String ORGANIZATIONS_COMMON = "organizations_common";
     
-    /** The logger. */
     final Logger logger = LoggerFactory.getLogger(OrgAuthorityResource.class);
-    //FIXME retrieve client type from configuration
-    /** The Constant CLIENT_TYPE. */
-    //final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType();
     
     /** The contact resource. */
     private ContactResource contactResource = new ContactResource();

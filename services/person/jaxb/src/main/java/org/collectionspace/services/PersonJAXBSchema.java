@@ -29,6 +29,5 @@ public interface PersonJAXBSchema extends AuthorityJAXBSchema {
 	final static String SCHOOL_OR_STYLE = "schoolOrStyle";
 	final static String BIO_NOTE = "bioNote";
 	final static String NAME_NOTE = "nameNote";
-    final static String TERM_STATUS = "termStatus";
 }
 

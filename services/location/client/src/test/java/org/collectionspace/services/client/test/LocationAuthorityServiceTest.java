@@ -162,23 +162,28 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
     	MultipartOutput multipart = 
             LocationAuthorityClientUtils.createLocationAuthorityInstance(
     	    displayName, shortId, client.getCommonPartName());
+    	String newID = null;
         ClientResponse<Response> res = client.create(multipart);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        //
-        // Specifically:
-        // Does it fall within the set of valid status codes?
-        // Does it exactly match the expected status code?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        //
+	        // Specifically:
+	        // Does it fall within the set of valid status codes?
+	        // Does it exactly match the expected status code?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(this.REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(this.REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, this.EXPECTED_STATUS_CODE);
+	
+	        newID = LocationAuthorityClientUtils.extractId(res);
+        } finally {
+        	res.releaseConnection();
         }
-        Assert.assertTrue(this.REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(this.REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, this.EXPECTED_STATUS_CODE);
-
-        String newID = LocationAuthorityClientUtils.extractId(res);
         // Store the ID returned from the first resource created
         // for additional tests below.
         if (knownResourceId == null){
@@ -231,7 +236,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         shelf1Map.put(LocationJAXBSchema.CONDITION_NOTE_DATE, TEST_CONDITION_NOTE_DATE);
         shelf1Map.put(LocationJAXBSchema.SECURITY_NOTE, TEST_SECURITY_NOTE);
         shelf1Map.put(LocationJAXBSchema.LOCATION_TYPE, TEST_LOCATION_TYPE);
-        shelf1Map.put(LocationJAXBSchema.STATUS, TEST_STATUS);
+        shelf1Map.put(LocationJAXBSchema.TERM_STATUS, TEST_STATUS);
         
         String newID = LocationAuthorityClientUtils.createItemInAuthority(vcsid,
         		authRefName, shelf1Map, client );
@@ -332,25 +337,31 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
+    	String newID = null;
         ClientResponse<MultipartInput> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        //FIXME: remove the following try catch once Aron fixes signatures
         try {
-            MultipartInput input = (MultipartInput) res.getEntity();
-            LocationauthoritiesCommon locationAuthority = (LocationauthoritiesCommon) extractPart(input,
-                    client.getCommonPartName(), LocationauthoritiesCommon.class);
-            Assert.assertNotNull(locationAuthority);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	        //FIXME: remove the following try catch once Aron fixes signatures
+	        try {
+	            MultipartInput input = (MultipartInput) res.getEntity();
+	            LocationauthoritiesCommon locationAuthority = 
+	            	(LocationauthoritiesCommon) extractPart(input,
+	                    client.getCommonPartName(), LocationauthoritiesCommon.class);
+	            Assert.assertNotNull(locationAuthority);
+	        } catch (Exception e) {
+	            throw new RuntimeException(e);
+	        }
+        } finally {
+        	res.releaseConnection();
         }
     }
 
@@ -373,24 +384,28 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
         ClientResponse<MultipartInput> res = client.readByName(knownResourceShortIdentifer);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        //FIXME: remove the following try catch once Aron fixes signatures
         try {
-            MultipartInput input = (MultipartInput) res.getEntity();
-            LocationauthoritiesCommon locationAuthority = (LocationauthoritiesCommon) extractPart(input,
-                    client.getCommonPartName(), LocationauthoritiesCommon.class);
-            Assert.assertNotNull(locationAuthority);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	        //FIXME: remove the following try catch once Aron fixes signatures
+	        try {
+	            MultipartInput input = (MultipartInput) res.getEntity();
+	            LocationauthoritiesCommon locationAuthority = (LocationauthoritiesCommon) extractPart(input,
+	                    client.getCommonPartName(), LocationauthoritiesCommon.class);
+	            Assert.assertNotNull(locationAuthority);
+	        } catch (Exception e) {
+	            throw new RuntimeException(e);
+	        }
+        } finally {
+        	res.releaseConnection();
         }
     }
 
@@ -414,28 +429,32 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
         ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Check whether we've received a location.
-        MultipartInput input = (MultipartInput) res.getEntity();
-        LocationsCommon location = (LocationsCommon) extractPart(input,
-                client.getItemCommonPartName(), LocationsCommon.class);
-        Assert.assertNotNull(location);
-        boolean showFull = true;
-        if(showFull && logger.isDebugEnabled()){
-            logger.debug(testName + ": returned payload:");
-            logger.debug(objectAsXmlString(location, LocationsCommon.class));
-        }
-        Assert.assertEquals(location.getInAuthority(), knownResourceId);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Check whether we've received a location.
+	        MultipartInput input = (MultipartInput) res.getEntity();
+	        LocationsCommon location = (LocationsCommon) extractPart(input,
+	                client.getItemCommonPartName(), LocationsCommon.class);
+	        Assert.assertNotNull(location);
+	        boolean showFull = true;
+	        if(showFull && logger.isDebugEnabled()){
+	            logger.debug(testName + ": returned payload:");
+	            logger.debug(objectAsXmlString(location, LocationsCommon.class));
+	        }
+	        Assert.assertEquals(location.getInAuthority(), knownResourceId);
+	    } finally {
+	    	res.releaseConnection();
+	    }
 
     }
 
@@ -458,98 +477,104 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
         ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Check whether location has expected displayName.
-        MultipartInput input = (MultipartInput) res.getEntity();
-        LocationsCommon location = (LocationsCommon) extractPart(input,
-                client.getItemCommonPartName(), LocationsCommon.class);
-        Assert.assertNotNull(location);
-        String displayName = location.getDisplayName();
-        // Make sure displayName matches computed form
-        String expectedDisplayName = 
-            LocationAuthorityClientUtils.prepareDefaultDisplayName(TEST_NAME);
-        Assert.assertNotNull(displayName, expectedDisplayName);
-        
-        // Update the shortName and verify the computed name is updated.
-        location.setCsid(null);
-        location.setDisplayNameComputed(true);
-        location.setName("updated-" + TEST_NAME);
-        expectedDisplayName = 
-            LocationAuthorityClientUtils.prepareDefaultDisplayName("updated-" + TEST_NAME);
-
-        // Submit the updated resource to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(location, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getItemCommonPartName());
-        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug("updateItem: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Retrieve the updated resource and verify that its contents exist.
-        input = (MultipartInput) res.getEntity();
-        LocationsCommon updatedLocation =
-                (LocationsCommon) extractPart(input,
-                        client.getItemCommonPartName(), LocationsCommon.class);
-        Assert.assertNotNull(updatedLocation);
-
-        // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedLocation.getName(), location.getName(),
-            "Updated ForeName in Location did not match submitted data.");
-        // Verify that the updated resource computes the right displayName.
-        Assert.assertEquals(updatedLocation.getDisplayName(), expectedDisplayName,
-            "Updated ForeName in Location not reflected in computed DisplayName.");
-
-        // Now Update the displayName, not computed and verify the computed name is overriden.
-        location.setDisplayNameComputed(false);
-        expectedDisplayName = "TestName";
-        location.setDisplayName(expectedDisplayName);
-
-        // Submit the updated resource to the service and store the response.
-        output = new MultipartOutput();
-        commonPart = output.addPart(location, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getItemCommonPartName());
-        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug("updateItem: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Retrieve the updated resource and verify that its contents exist.
-        input = (MultipartInput) res.getEntity();
-        updatedLocation =
-                (LocationsCommon) extractPart(input,
-                        client.getItemCommonPartName(), LocationsCommon.class);
-        Assert.assertNotNull(updatedLocation);
-
-        // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedLocation.isDisplayNameComputed(), false,
-                "Updated displayNameComputed in Location did not match submitted data.");
-        // Verify that the updated resource computes the right displayName.
-        Assert.assertEquals(updatedLocation.getDisplayName(),
-        		expectedDisplayName,
-                "Updated DisplayName (not computed) in Location not stored.");
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Check whether location has expected displayName.
+	        MultipartInput input = (MultipartInput) res.getEntity();
+	        LocationsCommon location = (LocationsCommon) extractPart(input,
+	                client.getItemCommonPartName(), LocationsCommon.class);
+	        Assert.assertNotNull(location);
+	        String displayName = location.getDisplayName();
+	        // Make sure displayName matches computed form
+	        String expectedDisplayName = 
+	            LocationAuthorityClientUtils.prepareDefaultDisplayName(TEST_NAME);
+	        Assert.assertNotNull(displayName, expectedDisplayName);
+	        
+	        // Update the shortName and verify the computed name is updated.
+	        location.setCsid(null);
+	        location.setDisplayNameComputed(true);
+	        location.setName("updated-" + TEST_NAME);
+	        expectedDisplayName = 
+	            LocationAuthorityClientUtils.prepareDefaultDisplayName("updated-" + TEST_NAME);
+	
+	        // Submit the updated resource to the service and store the response.
+	        MultipartOutput output = new MultipartOutput();
+	        OutputPart commonPart = output.addPart(location, MediaType.APPLICATION_XML_TYPE);
+	        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+	    	res.releaseConnection();
+	        res = client.updateItem(knownResourceId, knownItemResourceId, output);
+	        statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug("updateItem: status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Retrieve the updated resource and verify that its contents exist.
+	        input = (MultipartInput) res.getEntity();
+	        LocationsCommon updatedLocation =
+	                (LocationsCommon) extractPart(input,
+	                        client.getItemCommonPartName(), LocationsCommon.class);
+	        Assert.assertNotNull(updatedLocation);
+	
+	        // Verify that the updated resource received the correct data.
+	        Assert.assertEquals(updatedLocation.getName(), location.getName(),
+	            "Updated ForeName in Location did not match submitted data.");
+	        // Verify that the updated resource computes the right displayName.
+	        Assert.assertEquals(updatedLocation.getDisplayName(), expectedDisplayName,
+	            "Updated ForeName in Location not reflected in computed DisplayName.");
+	
+	        // Now Update the displayName, not computed and verify the computed name is overriden.
+	        location.setDisplayNameComputed(false);
+	        expectedDisplayName = "TestName";
+	        location.setDisplayName(expectedDisplayName);
+	
+	        // Submit the updated resource to the service and store the response.
+	        output = new MultipartOutput();
+	        commonPart = output.addPart(location, MediaType.APPLICATION_XML_TYPE);
+	        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+	    	res.releaseConnection();
+	        res = client.updateItem(knownResourceId, knownItemResourceId, output);
+	        statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug("updateItem: status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Retrieve the updated resource and verify that its contents exist.
+	        input = (MultipartInput) res.getEntity();
+	        updatedLocation =
+	                (LocationsCommon) extractPart(input,
+	                        client.getItemCommonPartName(), LocationsCommon.class);
+	        Assert.assertNotNull(updatedLocation);
+	
+	        // Verify that the updated resource received the correct data.
+	        Assert.assertEquals(updatedLocation.isDisplayNameComputed(), false,
+	                "Updated displayNameComputed in Location did not match submitted data.");
+	        // Verify that the updated resource computes the right displayName.
+	        Assert.assertEquals(updatedLocation.getDisplayName(),
+	        		expectedDisplayName,
+	                "Updated DisplayName (not computed) in Location not stored.");
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     /**
@@ -572,40 +597,45 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
         ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
-
-        // Check whether Location has expected displayName.
-        MultipartInput input = (MultipartInput) res.getEntity();
-        LocationsCommon location = (LocationsCommon) extractPart(input,
-                client.getItemCommonPartName(), LocationsCommon.class);
-        Assert.assertNotNull(location);
-        // Try to Update with computed false and no displayName
-        location.setDisplayNameComputed(false);
-        location.setDisplayName(null);
-
-        // Submit the updated resource to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(location, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getItemCommonPartName());
-        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug("updateItem: status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        try {
+        	int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
+	
+	        // Check whether Location has expected displayName.
+	        MultipartInput input = (MultipartInput) res.getEntity();
+	        LocationsCommon location = (LocationsCommon) extractPart(input,
+	                client.getItemCommonPartName(), LocationsCommon.class);
+	        Assert.assertNotNull(location);
+	        // Try to Update with computed false and no displayName
+	        location.setDisplayNameComputed(false);
+	        location.setDisplayName(null);
+	
+	        // Submit the updated resource to the service and store the response.
+	        MultipartOutput output = new MultipartOutput();
+	        OutputPart commonPart = output.addPart(location, MediaType.APPLICATION_XML_TYPE);
+	        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+	    	res.releaseConnection();
+	        res = client.updateItem(knownResourceId, knownItemResourceId, output);
+	        statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug("updateItem: status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
    
 
@@ -627,16 +657,20 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
         ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     /**
@@ -657,16 +691,20 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
         ClientResponse<MultipartInput> res = client.readItem(knownResourceId, NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
 
@@ -692,36 +730,40 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
         ClientResponse<LocationauthoritiesCommonList> res = client.readList();
-        LocationauthoritiesCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = false;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            List<LocationauthoritiesCommonList.LocationauthorityListItem> items =
-                    list.getLocationauthorityListItem();
-            int i = 0;
-            for (LocationauthoritiesCommonList.LocationauthorityListItem item : items) {
-                String csid = item.getCsid();
-                logger.debug(testName + ": list-item[" + i + "] csid=" +
-                        csid);
-                logger.debug(testName + ": list-item[" + i + "] displayName=" +
-                        item.getDisplayName());
-                logger.debug(testName + ": list-item[" + i + "] URI=" +
-                        item.getUri());
-                readItemList(csid, null);
-                i++;
-            }
-        }
+        try {
+	        LocationauthoritiesCommonList list = res.getEntity();
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Optionally output additional data about list members for debugging.
+	        boolean iterateThroughList = false;
+	        if (iterateThroughList && logger.isDebugEnabled()) {
+	            List<LocationauthoritiesCommonList.LocationauthorityListItem> items =
+	                    list.getLocationauthorityListItem();
+	            int i = 0;
+	            for (LocationauthoritiesCommonList.LocationauthorityListItem item : items) {
+	                String csid = item.getCsid();
+	                logger.debug(testName + ": list-item[" + i + "] csid=" +
+	                        csid);
+	                logger.debug(testName + ": list-item[" + i + "] displayName=" +
+	                        item.getDisplayName());
+	                logger.debug(testName + ": list-item[" + i + "] URI=" +
+	                        item.getUri());
+	                readItemList(csid, null);
+	                i++;
+	            }
+	        }
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     /**
@@ -771,52 +813,56 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         } else {
         	Assert.fail("readItemList passed null csid and name!");
         }
-        LocationsCommonList list = res.getEntity();
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        List<LocationsCommonList.LocationListItem> items =
-            list.getLocationListItem();
-        int nItemsReturned = items.size();
-        // There will be one item created, associated with a
-        // known parent resource, by the createItem test.
-        //
-        // In addition, there will be 'nItemsToCreateInList'
-        // additional items created by the createItemList test,
-        // all associated with the same parent resource.
-        int nExpectedItems = nItemsToCreateInList + 1;
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": Expected "
-           		+ nExpectedItems +" items; got: "+nItemsReturned);
-        }
-        Assert.assertEquals(nItemsReturned, nExpectedItems);
-
-        int i = 0;
-        for (LocationsCommonList.LocationListItem item : items) {
-        	Assert.assertTrue((null != item.getRefName()), "Item refName is null!");
-        	Assert.assertTrue((null != item.getDisplayName()), "Item displayName is null!");
-        	// Optionally output additional data about list members for debugging.
-	        boolean showDetails = true;
-	        if (showDetails && logger.isDebugEnabled()) {
-                logger.debug("  " + testName + ": list-item[" + i + "] csid=" +
-                        item.getCsid());
-                logger.debug("  " + testName + ": list-item[" + i + "] refName=" +
-                        item.getRefName());
-                logger.debug("  " + testName + ": list-item[" + i + "] displayName=" +
-                        item.getDisplayName());
-                logger.debug("  " + testName + ": list-item[" + i + "] URI=" +
-                        item.getUri());
-            }
-            i++;
-        }
+        try {
+	        LocationsCommonList list = res.getEntity();
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        List<LocationsCommonList.LocationListItem> items =
+	            list.getLocationListItem();
+	        int nItemsReturned = items.size();
+	        // There will be one item created, associated with a
+	        // known parent resource, by the createItem test.
+	        //
+	        // In addition, there will be 'nItemsToCreateInList'
+	        // additional items created by the createItemList test,
+	        // all associated with the same parent resource.
+	        int nExpectedItems = nItemsToCreateInList + 1;
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": Expected "
+	           		+ nExpectedItems +" items; got: "+nItemsReturned);
+	        }
+	        Assert.assertEquals(nItemsReturned, nExpectedItems);
+	
+	        int i = 0;
+	        for (LocationsCommonList.LocationListItem item : items) {
+	        	Assert.assertTrue((null != item.getRefName()), "Item refName is null!");
+	        	Assert.assertTrue((null != item.getDisplayName()), "Item displayName is null!");
+	        	// Optionally output additional data about list members for debugging.
+		        boolean showDetails = true;
+		        if (showDetails && logger.isDebugEnabled()) {
+	                logger.debug("  " + testName + ": list-item[" + i + "] csid=" +
+	                        item.getCsid());
+	                logger.debug("  " + testName + ": list-item[" + i + "] refName=" +
+	                        item.getRefName());
+	                logger.debug("  " + testName + ": list-item[" + i + "] displayName=" +
+	                        item.getDisplayName());
+	                logger.debug("  " + testName + ": list-item[" + i + "] URI=" +
+	                        item.getUri());
+	            }
+	            i++;
+	        }
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
 
@@ -843,55 +889,59 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         LocationAuthorityClient client = new LocationAuthorityClient();
-        ClientResponse<MultipartInput> res =
-                client.read(knownResourceId);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
-        if(logger.isDebugEnabled()){
-            logger.debug("got LocationAuthority to update with ID: " + knownResourceId);
-        }
-        MultipartInput input = (MultipartInput) res.getEntity();
-        LocationauthoritiesCommon locationAuthority = (LocationauthoritiesCommon) extractPart(input,
-                client.getCommonPartName(), LocationauthoritiesCommon.class);
-        Assert.assertNotNull(locationAuthority);
-
-        // Update the contents of this resource.
-        locationAuthority.setDisplayName("updated-" + locationAuthority.getDisplayName());
-        locationAuthority.setVocabType("updated-" + locationAuthority.getVocabType());
-        if(logger.isDebugEnabled()){
-            logger.debug("to be updated LocationAuthority");
-            logger.debug(objectAsXmlString(locationAuthority, LocationauthoritiesCommon.class));
-        }
-
-        // Submit the updated resource to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(locationAuthority, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
-        res = client.update(knownResourceId, output);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Retrieve the updated resource and verify that its contents exist.
-        input = (MultipartInput) res.getEntity();
-        LocationauthoritiesCommon updatedLocationAuthority =
-                (LocationauthoritiesCommon) extractPart(input,
-                        client.getCommonPartName(), LocationauthoritiesCommon.class);
-        Assert.assertNotNull(updatedLocationAuthority);
-
-        // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedLocationAuthority.getDisplayName(),
-                locationAuthority.getDisplayName(),
-                "Data in updated object did not match submitted data.");
+        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        try {
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": read status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+	
+	        if(logger.isDebugEnabled()){
+	            logger.debug("got LocationAuthority to update with ID: " + knownResourceId);
+	        }
+	        MultipartInput input = (MultipartInput) res.getEntity();
+	        LocationauthoritiesCommon locationAuthority = (LocationauthoritiesCommon) extractPart(input,
+	                client.getCommonPartName(), LocationauthoritiesCommon.class);
+	        Assert.assertNotNull(locationAuthority);
+	
+	        // Update the contents of this resource.
+	        locationAuthority.setDisplayName("updated-" + locationAuthority.getDisplayName());
+	        locationAuthority.setVocabType("updated-" + locationAuthority.getVocabType());
+	        if(logger.isDebugEnabled()){
+	            logger.debug("to be updated LocationAuthority");
+	            logger.debug(objectAsXmlString(locationAuthority, LocationauthoritiesCommon.class));
+	        }
+	
+	        // Submit the updated resource to the service and store the response.
+	        MultipartOutput output = new MultipartOutput();
+	        OutputPart commonPart = output.addPart(locationAuthority, MediaType.APPLICATION_XML_TYPE);
+	        commonPart.getHeaders().add("label", client.getCommonPartName());
+	    	res.releaseConnection();
+	        res = client.update(knownResourceId, output);
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Retrieve the updated resource and verify that its contents exist.
+	        input = (MultipartInput) res.getEntity();
+	        LocationauthoritiesCommon updatedLocationAuthority =
+	                (LocationauthoritiesCommon) extractPart(input,
+	                        client.getCommonPartName(), LocationauthoritiesCommon.class);
+	        Assert.assertNotNull(updatedLocationAuthority);
+	
+	        // Verify that the updated resource received the correct data.
+	        Assert.assertEquals(updatedLocationAuthority.getDisplayName(),
+	                locationAuthority.getDisplayName(),
+	                "Data in updated object did not match submitted data.");
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     /**
@@ -914,55 +964,60 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         LocationAuthorityClient client = new LocationAuthorityClient();
         ClientResponse<MultipartInput> res =
                 client.readItem(knownResourceId, knownItemResourceId);
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": read status = " + res.getStatus());
-        }
-        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
-        if(logger.isDebugEnabled()){
-            logger.debug("got Location to update with ID: " +
-                knownItemResourceId +
-                " in LocationAuthority: " + knownResourceId );
-        }
-        MultipartInput input = (MultipartInput) res.getEntity();
-        LocationsCommon location = (LocationsCommon) extractPart(input,
-                client.getItemCommonPartName(), LocationsCommon.class);
-        Assert.assertNotNull(location);
-
-        // Update the contents of this resource.
-        location.setCsid(null);
-        location.setName("updated-" + location.getName());
-        if(logger.isDebugEnabled()){
-            logger.debug("to be updated Location");
-            logger.debug(objectAsXmlString(location,
-                LocationsCommon.class));
-        }        
-
-        // Submit the updated resource to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(location, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getItemCommonPartName());
-        res = client.updateItem(knownResourceId, knownItemResourceId, output);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-
-        // Retrieve the updated resource and verify that its contents exist.
-        input = (MultipartInput) res.getEntity();
-        LocationsCommon updatedLocation =
-                (LocationsCommon) extractPart(input,
-                        client.getItemCommonPartName(), LocationsCommon.class);
-        Assert.assertNotNull(updatedLocation);
-
-        // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedLocation.getName(), location.getName(),
-                "Data in updated Location did not match submitted data.");
+        try {
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": read status = " + res.getStatus());
+	        }
+	        Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
+	
+	        if(logger.isDebugEnabled()){
+	            logger.debug("got Location to update with ID: " +
+	                knownItemResourceId +
+	                " in LocationAuthority: " + knownResourceId );
+	        }
+	        MultipartInput input = (MultipartInput) res.getEntity();
+	        LocationsCommon location = (LocationsCommon) extractPart(input,
+	                client.getItemCommonPartName(), LocationsCommon.class);
+	        Assert.assertNotNull(location);
+	
+	        // Update the contents of this resource.
+	        location.setCsid(null);
+	        location.setName("updated-" + location.getName());
+	        if(logger.isDebugEnabled()){
+	            logger.debug("to be updated Location");
+	            logger.debug(objectAsXmlString(location,
+	                LocationsCommon.class));
+	        }        
+	
+	        // Submit the updated resource to the service and store the response.
+	        MultipartOutput output = new MultipartOutput();
+	        OutputPart commonPart = output.addPart(location, MediaType.APPLICATION_XML_TYPE);
+	        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+	    	res.releaseConnection();
+	        res = client.updateItem(knownResourceId, knownItemResourceId, output);
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	
+	        // Retrieve the updated resource and verify that its contents exist.
+	        input = (MultipartInput) res.getEntity();
+	        LocationsCommon updatedLocation =
+	                (LocationsCommon) extractPart(input,
+	                        client.getItemCommonPartName(), LocationsCommon.class);
+	        Assert.assertNotNull(updatedLocation);
+	
+	        // Verify that the updated resource received the correct data.
+	        Assert.assertEquals(updatedLocation.getName(), location.getName(),
+	                "Data in updated Location did not match submitted data.");
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     // Failure outcomes
@@ -1013,16 +1068,20 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
     				displayName, "nonEx", client.getCommonPartName());
         ClientResponse<MultipartInput> res =
                 client.update(NON_EXISTENT_ID, multipart);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     /**
@@ -1049,23 +1108,27 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         nonexMap.put(LocationJAXBSchema.NAME, TEST_NAME);
         nonexMap.put(LocationJAXBSchema.SHORT_IDENTIFIER, "nonEx");
         nonexMap.put(LocationJAXBSchema.LOCATION_TYPE, TEST_LOCATION_TYPE);
-        nonexMap.put(LocationJAXBSchema.STATUS, TEST_STATUS);
+        nonexMap.put(LocationJAXBSchema.TERM_STATUS, TEST_STATUS);
         MultipartOutput multipart = 
     	LocationAuthorityClientUtils.createLocationInstance(NON_EXISTENT_ID, 
     			LocationAuthorityClientUtils.createLocationRefName(knownResourceRefName, "nonEx", "Non Existent"), 
     			nonexMap, client.getItemCommonPartName() );
         ClientResponse<MultipartInput> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     // ---------------------------------------------------------------
@@ -1100,17 +1163,22 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
-        ClientResponse<Response> res = client.deleteItem(knownResourceId, knownItemResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        ClientResponse<Response> res = 
+        	client.deleteItem(knownResourceId, knownItemResourceId);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     /* (non-Javadoc)
@@ -1134,16 +1202,20 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
         ClientResponse<Response> res = client.delete(knownResourceId);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     // Failure outcomes
@@ -1164,16 +1236,20 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
         ClientResponse<Response> res = client.delete(NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     /**
@@ -1194,16 +1270,20 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
         ClientResponse<Response> res = client.deleteItem(knownResourceId, NON_EXISTENT_ID);
-        int statusCode = res.getStatus();
-
-        // Check the status code of the response: does it match
-        // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug(testName + ": status = " + statusCode);
-        }
-        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        try {
+	        int statusCode = res.getStatus();
+	
+	        // Check the status code of the response: does it match
+	        // the expected response(s)?
+	        if(logger.isDebugEnabled()){
+	            logger.debug(testName + ": status = " + statusCode);
+	        }
+	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+	    } finally {
+	    	res.releaseConnection();
+	    }
     }
 
     // ---------------------------------------------------------------
@@ -1296,12 +1376,14 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
             // below are ignored and not reported.
             ClientResponse<Response> res =
                 client.deleteItem(parentResourceId, itemResourceId);
+	    	res.releaseConnection();
         }
         // Clean up parent resources.
         for (String resourceId : allResourceIdsCreated) {
             // Note: Any non-success responses from the delete operation
             // below are ignored and not reported.
             ClientResponse<Response> res = client.delete(resourceId);
+	    	res.releaseConnection();
         }
     }
 

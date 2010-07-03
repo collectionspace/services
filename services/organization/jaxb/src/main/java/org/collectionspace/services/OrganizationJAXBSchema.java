@@ -22,7 +22,6 @@ public interface OrganizationJAXBSchema extends AuthorityJAXBSchema {
 	final static String FUNCTION = "function";
     final static String SUB_BODY = "subBody";
 	final static String HISTORY = "history";
-    final static String TERM_STATUS = "termStatus";
 }
 
 

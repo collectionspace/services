@@ -25,7 +25,7 @@
 				<xs:element name="displayName" type="xs:string" />
 				<xs:element name="shortIdentifier" type="xs:string" />
 				<xs:element name="refName" type="xs:string" />
-				<xs:element name="status" type="xs:string" />
+				<xs:element name="termStatus" type="xs:string" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

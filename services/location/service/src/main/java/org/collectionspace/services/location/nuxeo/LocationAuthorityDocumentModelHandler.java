@@ -26,10 +26,11 @@ package org.collectionspace.services.location.nuxeo;
 import java.util.Iterator;
 import java.util.List;
 
-import org.collectionspace.services.LocationAuthorityJAXBSchema;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
+import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.location.LocationauthoritiesCommon;
 import org.collectionspace.services.location.LocationauthoritiesCommonList;
 import org.collectionspace.services.location.LocationauthoritiesCommonList.LocationauthorityListItem;
@@ -48,63 +49,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class LocationAuthorityDocumentModelHandler
-        extends RemoteDocumentModelHandlerImpl<LocationauthoritiesCommon, LocationauthoritiesCommonList> {
-
-    private final Logger logger = LoggerFactory.getLogger(LocationAuthorityDocumentModelHandler.class);
-    /**
-     * locationAuthority is used to stash JAXB object to use when handle is called
-     * for Action.CREATE, Action.UPDATE or Action.GET
-     */
-    private LocationauthoritiesCommon locationAuthority;
-    /**
-     * locationAuthorityList is stashed when handle is called
-     * for ACTION.GET_ALL
-     */
-    private LocationauthoritiesCommonList locationAuthorityList;
-
-
-    /**
-     * getCommonPart get associated locationAuthority
-     * @return
-     */
-    @Override
-    public LocationauthoritiesCommon getCommonPart() {
-        return locationAuthority;
-    }
-
-    /**
-     * setCommonPart set associated locationAuthority
-     * @param locationAuthority
-     */
-    @Override
-    public void setCommonPart(LocationauthoritiesCommon locationAuthority) {
-        this.locationAuthority = locationAuthority;
-    }
-
-    /**
-     * getCommonPartList get associated locationAuthority (for index/GET_ALL)
-     * @return
-     */
-    @Override
-    public LocationauthoritiesCommonList getCommonPartList() {
-        return locationAuthorityList;
-    }
-
-    @Override
-    public void setCommonPartList(LocationauthoritiesCommonList locationAuthorityList) {
-        this.locationAuthorityList = locationAuthorityList;
-    }
-
-    @Override
-    public LocationauthoritiesCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
-            throws Exception {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void fillCommonPart(LocationauthoritiesCommon locationAuthorityObject, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-        throw new UnsupportedOperationException();
-    }
+        extends AuthorityDocumentModelHandler<LocationauthoritiesCommon, LocationauthoritiesCommonList> {
 
     @Override
     public LocationauthoritiesCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
@@ -114,18 +59,19 @@ public class LocationAuthorityDocumentModelHandler
         //FIXME: iterating over a long list of documents is not a long term
         //strategy...need to change to more efficient iterating in future
         List<LocationauthoritiesCommonList.LocationauthorityListItem> list = coList.getLocationauthorityListItem();
+        String label = getServiceContext().getCommonPartLabel();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
             LocationauthorityListItem ilistItem = new LocationauthorityListItem();
-            ilistItem.setDisplayName((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-                    LocationAuthorityJAXBSchema.DISPLAY_NAME));
-            ilistItem.setRefName((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-                    LocationAuthorityJAXBSchema.REF_NAME));
-            ilistItem.setShortIdentifier((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-            		LocationAuthorityJAXBSchema.SHORT_IDENTIFIER));
-            ilistItem.setVocabType((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-                    LocationAuthorityJAXBSchema.VOCAB_TYPE));
+            ilistItem.setDisplayName((String) docModel.getProperty(label,
+            		AuthorityJAXBSchema.DISPLAY_NAME));
+            ilistItem.setRefName((String) docModel.getProperty(label,
+            		AuthorityJAXBSchema.REF_NAME));
+            ilistItem.setShortIdentifier((String) docModel.getProperty(label,
+            		AuthorityJAXBSchema.SHORT_IDENTIFIER));
+            ilistItem.setVocabType((String) docModel.getProperty(label,
+            		AuthorityJAXBSchema.VOCAB_TYPE));
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);
             ilistItem.setCsid(id);
