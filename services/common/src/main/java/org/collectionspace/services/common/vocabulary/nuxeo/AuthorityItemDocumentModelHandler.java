@@ -29,6 +29,7 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
 /**
@@ -40,6 +41,8 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
         extends RemoteDocumentModelHandlerImpl<AICommon, AICommonList> {
 
+	private String authorityItemCommonSchemaName;
+	
     //private final Logger logger = LoggerFactory.getLogger(AuthorityItemDocumentModelHandler.class);
     /**
      * item is used to stash JAXB object to use when handle is called
@@ -56,6 +59,10 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
      * inVocabulary is the parent Authority for this context
      */
     protected String inAuthority;
+    
+    public AuthorityItemDocumentModelHandler(String authorityItemCommonSchemaName) {
+    	this.authorityItemCommonSchemaName = authorityItemCommonSchemaName;
+    }
 
     public String getInAuthority() {
 		return inAuthority;
@@ -109,6 +116,23 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
         throw new UnsupportedOperationException();
     }
     
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#extractPart(org.nuxeo.ecm.core.api.DocumentModel, java.lang.String, org.collectionspace.services.common.service.ObjectPartType)
+     */
+    @Override
+    protected Map<String, Object> extractPart(DocumentModel docModel, String schema, ObjectPartType partMeta)
+            throws Exception {
+    	Map<String, Object> unQObjectProperties = super.extractPart(docModel, schema, partMeta);
+    	
+    	// Add the CSID to the common part
+    	if (partMeta.getLabel().equalsIgnoreCase(authorityItemCommonSchemaName)) {
+	    	String csid = NuxeoUtils.extractId(docModel.getPathAsString());
+	    	unQObjectProperties.put("csid", csid);
+    	}
+    	
+    	return unQObjectProperties;
+    }
+    
     /**
      * Filters out AuthorityItemJAXBSchema.IN_AUTHORITY, to ensure that
      * the parent link remains untouched.
@@ -120,6 +144,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
     		Map<String, Object> objectProps, ObjectPartType partMeta) {
     	super.filterReadOnlyPropertiesForPart(objectProps, partMeta);
     	objectProps.remove(AuthorityItemJAXBSchema.IN_AUTHORITY);
+    	objectProps.remove(AuthorityItemJAXBSchema.CSID);
     }
 
 }

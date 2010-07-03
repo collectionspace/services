@@ -50,69 +50,6 @@ public class VocabularyDocumentModelHandler
 
     /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(VocabularyDocumentModelHandler.class);
-    /**
-     * vocabulary is used to stash JAXB object to use when handle is called
-     * for Action.CREATE, Action.UPDATE or Action.GET
-     */
-    //private VocabulariesCommon vocabulary;
-    /**
-     * vocabularyList is stashed when handle is called
-     * for ACTION.GET_ALL
-     */
-    //private VocabulariesCommonList vocabularyList;
-
-
-    /**
-     * getCommonPart get associated vocabulary
-     * @return
-    @Override
-    public VocabulariesCommon getCommonPart() {
-        return vocabulary;
-    }
-     */
-
-    /**
-     * setCommonPart set associated vocabulary
-     * @param vocabulary
-    @Override
-    public void setCommonPart(VocabulariesCommon vocabulary) {
-        this.vocabulary = vocabulary;
-    }
-     */
-
-    /**
-     * getCommonPartList get associated vocabulary (for index/GET_ALL)
-     * @return
-    @Override
-    public VocabulariesCommonList getCommonPartList() {
-        return vocabularyList;
-    }
-     */
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#setCommonPartList(java.lang.Object)
-    @Override
-    public void setCommonPartList(VocabulariesCommonList vocabularyList) {
-        this.vocabularyList = vocabularyList;
-    }
-     */
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
-    @Override
-    public VocabulariesCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
-            throws Exception {
-        throw new UnsupportedOperationException();
-    }
-     */
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#fillCommonPart(java.lang.Object, org.collectionspace.services.common.document.DocumentWrapper)
-    @Override
-    public void fillCommonPart(VocabulariesCommon vocabularyObject, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-        throw new UnsupportedOperationException();
-    }
-     */
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)

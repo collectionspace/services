@@ -2,18 +2,14 @@
  * 
  */
 package org.collectionspace.services;
+import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 
 /**
  * @author pschmitz
  *
  */
-public interface PersonJAXBSchema {
+public interface PersonJAXBSchema extends AuthorityJAXBSchema {
 	final static String PERSONS_COMMON = "persons_common";
-	final static String CSID = "csid";
-	final static String IN_AUTHORITY = "inAuthority";
-	final static String SHORT_IDENTIFIER = "shortIdentifier";
-	final static String REF_NAME = "refName";
-	final static String DISPLAY_NAME = "displayName";
 	final static String DISPLAY_NAME_COMPUTED = "displayNameComputed";
 	final static String FORE_NAME = "foreName";
 	final static String MIDDLE_NAME = "middleName";

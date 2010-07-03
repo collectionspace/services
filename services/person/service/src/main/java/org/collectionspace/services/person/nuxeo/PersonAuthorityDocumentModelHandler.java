@@ -26,15 +26,13 @@ package org.collectionspace.services.person.nuxeo;
 import java.util.Iterator;
 import java.util.List;
 
-import org.collectionspace.services.PersonAuthorityJAXBSchema;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
-import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonauthoritiesCommonList;
 import org.collectionspace.services.person.PersonauthoritiesCommonList.PersonauthorityListItem;
+import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -48,63 +46,9 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class PersonAuthorityDocumentModelHandler
-        extends RemoteDocumentModelHandlerImpl<PersonauthoritiesCommon, PersonauthoritiesCommonList> {
+		extends AuthorityDocumentModelHandler<PersonauthoritiesCommon, PersonauthoritiesCommonList> {
 
     private final Logger logger = LoggerFactory.getLogger(PersonAuthorityDocumentModelHandler.class);
-    /**
-     * personAuthority is used to stash JAXB object to use when handle is called
-     * for Action.CREATE, Action.UPDATE or Action.GET
-     */
-    private PersonauthoritiesCommon personAuthority;
-    /**
-     * personAuthorityList is stashed when handle is called
-     * for ACTION.GET_ALL
-     */
-    private PersonauthoritiesCommonList personAuthorityList;
-
-
-    /**
-     * getCommonPart get associated personAuthority
-     * @return
-     */
-    @Override
-    public PersonauthoritiesCommon getCommonPart() {
-        return personAuthority;
-    }
-
-    /**
-     * setCommonPart set associated personAuthority
-     * @param personAuthority
-     */
-    @Override
-    public void setCommonPart(PersonauthoritiesCommon personAuthority) {
-        this.personAuthority = personAuthority;
-    }
-
-    /**
-     * getCommonPartList get associated personAuthority (for index/GET_ALL)
-     * @return
-     */
-    @Override
-    public PersonauthoritiesCommonList getCommonPartList() {
-        return personAuthorityList;
-    }
-
-    @Override
-    public void setCommonPartList(PersonauthoritiesCommonList personAuthorityList) {
-        this.personAuthorityList = personAuthorityList;
-    }
-
-    @Override
-    public PersonauthoritiesCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
-            throws Exception {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void fillCommonPart(PersonauthoritiesCommon personAuthorityObject, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     public PersonauthoritiesCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
@@ -115,17 +59,18 @@ public class PersonAuthorityDocumentModelHandler
         //strategy...need to change to more efficient iterating in future
         List<PersonauthoritiesCommonList.PersonauthorityListItem> list = coList.getPersonauthorityListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
+        String label = getServiceContext().getCommonPartLabel();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
             PersonauthorityListItem ilistItem = new PersonauthorityListItem();
-            ilistItem.setDisplayName((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-                    PersonAuthorityJAXBSchema.DISPLAY_NAME));
-            ilistItem.setRefName((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-                    PersonAuthorityJAXBSchema.REF_NAME));
-            ilistItem.setShortIdentifier((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-            		PersonAuthorityJAXBSchema.SHORT_IDENTIFIER));
-            ilistItem.setVocabType((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-                    PersonAuthorityJAXBSchema.VOCAB_TYPE));
+            ilistItem.setDisplayName((String) docModel.getProperty(label,
+            		AuthorityJAXBSchema.DISPLAY_NAME));
+            ilistItem.setRefName((String) docModel.getProperty(label,
+            		AuthorityJAXBSchema.REF_NAME));
+            ilistItem.setShortIdentifier((String) docModel.getProperty(label,
+            		AuthorityJAXBSchema.SHORT_IDENTIFIER));
+            ilistItem.setVocabType((String) docModel.getProperty(label,
+            		AuthorityJAXBSchema.VOCAB_TYPE));
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);
             ilistItem.setCsid(id);

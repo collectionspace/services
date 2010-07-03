@@ -27,12 +27,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.OrganizationJAXBSchema;
-import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.service.ObjectPartType;
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.organization.OrganizationsCommon;
 import org.collectionspace.services.organization.OrganizationsCommonList;
@@ -49,48 +47,18 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class OrganizationDocumentModelHandler
-        extends RemoteDocumentModelHandlerImpl<OrganizationsCommon, OrganizationsCommonList> {
+		extends AuthorityItemDocumentModelHandler<OrganizationsCommon, OrganizationsCommonList> {
 
     /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(OrganizationDocumentModelHandler.class);
     /**
      * Common part schema label
      */
-    private static final String COMMON_PART_LABEL = "organizations_common";    
-    /**
-     * organization is used to stash JAXB object to use when handle is called
-     * for Action.CREATE, Action.UPDATE or Action.GET
-     */
-    private OrganizationsCommon organization;
-    /**
-     * organizationList is stashed when handle is called
-     * for ACTION.GET_ALL
-     */
-    private OrganizationsCommonList organizationList;
+    private static final String COMMON_PART_LABEL = "organizations_common";   
     
-    /**
-     * inAuthority is the parent OrgAuthority for this context
-     */
-    private String inAuthority;
-
-    /**
-     * Gets the in authority.
-     *
-     * @return the in authority
-     */
-    public String getInAuthority() {
-		return inAuthority;
-	}
-
-	/**
-	 * Sets the in authority.
-	 *
-	 * @param inAuthority the new in authority
-	 */
-	public void setInAuthority(String inAuthority) {
-		this.inAuthority = inAuthority;
-	}
-
+    public OrganizationDocumentModelHandler() {
+    	super(COMMON_PART_LABEL);
+    }
 	
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleCreate(org.collectionspace.services.common.document.DocumentWrapper)
@@ -160,75 +128,6 @@ public class OrganizationDocumentModelHandler
 		return newStr.toString();
     }
     
-    /**
-     * getCommonPart get associated organization
-     * @return
-     */
-    @Override
-    public OrganizationsCommon getCommonPart() {
-        return organization;
-    }
-
-    /**
-     * setCommonPart set associated organization
-     * @param organization
-     */
-    @Override
-    public void setCommonPart(OrganizationsCommon organization) {
-        this.organization = organization;
-    }
-
-    /**
-     * getCommonPartList get associated organization (for index/GET_ALL)
-     * @return
-     */
-    @Override
-    public OrganizationsCommonList getCommonPartList() {
-        return organizationList;
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#setCommonPartList(java.lang.Object)
-     */
-    @Override
-    public void setCommonPartList(OrganizationsCommonList organizationList) {
-        this.organizationList = organizationList;
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#extractPart(org.nuxeo.ecm.core.api.DocumentModel, java.lang.String, org.collectionspace.services.common.service.ObjectPartType)
-     */
-    @Override
-    protected Map<String, Object> extractPart(DocumentModel docModel, String schema, ObjectPartType partMeta)
-            throws Exception {
-    	Map<String, Object> unQObjectProperties = super.extractPart(docModel, schema, partMeta);
-    	
-    	// Add the CSID to the common part
-    	if (partMeta.getLabel().equalsIgnoreCase(COMMON_PART_LABEL)) {
-	    	String csid = NuxeoUtils.extractId(docModel.getPathAsString());
-	    	unQObjectProperties.put("csid", csid);
-    	}
-    	
-    	return unQObjectProperties;
-    }
-    
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
-     */
-    @Override
-    public OrganizationsCommon extractCommonPart(DocumentWrapper wrapDoc)
-            throws Exception {
-        throw new UnsupportedOperationException();
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#fillCommonPart(java.lang.Object, org.collectionspace.services.common.document.DocumentWrapper)
-     */
-    @Override
-    public void fillCommonPart(OrganizationsCommon organizationObject, DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-        throw new UnsupportedOperationException();
-    }
-
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
      */

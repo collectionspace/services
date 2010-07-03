@@ -330,6 +330,9 @@
             <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /vocabularies/*/items/
             </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /vocabularies/*/items/*/refObjs
+            </service:uriPath>
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -1501,6 +1504,9 @@
             <!-- other URI paths using which this service could be accessed -->
             <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /personauthorities/*/items/
+            </service:uriPath>
+            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+                /personauthorities/*/items/*/authorityrefs/
             </service:uriPath>
             <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /personauthorities/*/items/*/refObjs

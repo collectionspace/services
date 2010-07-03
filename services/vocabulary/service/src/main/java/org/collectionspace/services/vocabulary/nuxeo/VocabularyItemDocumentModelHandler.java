@@ -25,13 +25,9 @@ package org.collectionspace.services.vocabulary.nuxeo;
 
 import java.util.Iterator;
 import java.util.List;
-//import java.util.Map;
 
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
-//import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
-//import org.collectionspace.services.common.service.ObjectPartType;
-//import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommon;
@@ -52,6 +48,13 @@ public class VocabularyItemDocumentModelHandler
 		extends AuthorityItemDocumentModelHandler<VocabularyitemsCommon, VocabularyitemsCommonList> {
 
     private final Logger logger = LoggerFactory.getLogger(VocabularyItemDocumentModelHandler.class);
+    
+    private static final String COMMON_PART_LABEL = "vocabularyitems_common";   
+    
+    public VocabularyItemDocumentModelHandler() {
+    	super(COMMON_PART_LABEL);
+    }
+	
     
     @Override
 	public VocabularyitemsCommonList extractCommonPartList(

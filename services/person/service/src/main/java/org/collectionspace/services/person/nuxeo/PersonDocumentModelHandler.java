@@ -24,17 +24,14 @@
 package org.collectionspace.services.person.nuxeo;
 
 import java.util.Iterator;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.PersonJAXBSchema;
-import org.collectionspace.services.common.document.InvalidDocumentException;
-import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.service.ObjectPartType;
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonsCommonList;
@@ -43,8 +40,8 @@ import org.collectionspace.services.person.PersonsCommonList.PersonListItem;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 /**
  * PersonDocumentModelHandler
@@ -57,49 +54,18 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class PersonDocumentModelHandler
-        extends RemoteDocumentModelHandlerImpl<PersonsCommon, PersonsCommonList> {
+	extends AuthorityItemDocumentModelHandler<PersonsCommon, PersonsCommonList> {
 
     /** The logger. */
-    private final Logger logger = LoggerFactory.getLogger(PersonDocumentModelHandler.class);
+    //private final Logger logger = LoggerFactory.getLogger(PersonDocumentModelHandler.class);
     /**
      * Common part schema label
      */
     private static final String COMMON_PART_LABEL = "persons_common";
     
-    /**
-     * person is used to stash JAXB object to use when handle is called
-     * for Action.CREATE, Action.UPDATE or Action.GET
-     */
-    private PersonsCommon person;
-    /**
-     * personList is stashed when handle is called
-     * for ACTION.GET_ALL
-     */
-    private PersonsCommonList personList;
-    
-    /**
-     * inAuthority is the parent OrgAuthority for this context
-     */
-    private String inAuthority;
-
-    /**
-     * Gets the in authority.
-     *
-     * @return the in authority
-     */
-    public String getInAuthority() {
-		return inAuthority;
-	}
-
-	/**
-	 * Sets the in authority.
-	 *
-	 * @param inAuthority the new in authority
-	 */
-	public void setInAuthority(String inAuthority) {
-		this.inAuthority = inAuthority;
-	}
-
+    public PersonDocumentModelHandler() {
+    	super(COMMON_PART_LABEL);
+    }
 	
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleCreate(org.collectionspace.services.common.document.DocumentWrapper)
@@ -197,40 +163,6 @@ public class PersonDocumentModelHandler
 		return newStr.toString();
     }
     
-    /**
-     * getCommonPart get associated person
-     * @return
-     */
-    @Override
-    public PersonsCommon getCommonPart() {
-        return person;
-    }
-
-    /**
-     * setCommonPart set associated person
-     * @param person
-     */
-    @Override
-    public void setCommonPart(PersonsCommon person) {
-        this.person = person;
-    }
-
-    /**
-     * getCommonPartList get associated person (for index/GET_ALL)
-     * @return
-     */
-    @Override
-    public PersonsCommonList getCommonPartList() {
-        return personList;
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#setCommonPartList(java.lang.Object)
-     */
-    @Override
-    public void setCommonPartList(PersonsCommonList personList) {
-        this.personList = personList;
-    }
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#extractPart(org.nuxeo.ecm.core.api.DocumentModel, java.lang.String, org.collectionspace.services.common.service.ObjectPartType)
@@ -249,23 +181,6 @@ public class PersonDocumentModelHandler
     	return unQObjectProperties;
     }
     
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
-     */
-    @Override
-    public PersonsCommon extractCommonPart(DocumentWrapper wrapDoc)
-            throws Exception {
-        throw new UnsupportedOperationException();
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#fillCommonPart(java.lang.Object, org.collectionspace.services.common.document.DocumentWrapper)
-     */
-    @Override
-    public void fillCommonPart(PersonsCommon personObject, DocumentWrapper wrapDoc) throws Exception {
-        throw new UnsupportedOperationException();
-    }
-
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
      */

@@ -26,20 +26,18 @@ package org.collectionspace.services.organization.nuxeo;
 import java.util.Iterator;
 import java.util.List;
 
-import org.collectionspace.services.OrgAuthorityJAXBSchema;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
-import org.collectionspace.services.common.document.DocumentFilter;
+import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.organization.OrgauthoritiesCommon;
 import org.collectionspace.services.organization.OrgauthoritiesCommonList;
 import org.collectionspace.services.organization.OrgauthoritiesCommonList.OrgauthorityListItem;
 
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
+import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 /**
  * OrgAuthorityDocumentModelHandler
@@ -48,75 +46,10 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class OrgAuthorityDocumentModelHandler
-        extends RemoteDocumentModelHandlerImpl<OrgauthoritiesCommon, OrgauthoritiesCommonList> {
+        extends AuthorityDocumentModelHandler<OrgauthoritiesCommon, OrgauthoritiesCommonList> {
 
-    /** The logger. */
-    private final Logger logger = LoggerFactory.getLogger(OrgAuthorityDocumentModelHandler.class);
-    /**
-     * orgAuthority is used to stash JAXB object to use when handle is called
-     * for Action.CREATE, Action.UPDATE or Action.GET
-     */
-    private OrgauthoritiesCommon orgAuthority;
-    /**
-     * orgAuthorityList is stashed when handle is called
-     * for ACTION.GET_ALL
-     */
-    private OrgauthoritiesCommonList orgAuthorityList;
-
-
-    /**
-     * getCommonPart get associated orgAuthority
-     * @return
-     */
-    @Override
-    public OrgauthoritiesCommon getCommonPart() {
-        return orgAuthority;
-    }
-
-    /**
-     * setCommonPart set associated orgAuthority
-     * @param orgAuthority
-     */
-    @Override
-    public void setCommonPart(OrgauthoritiesCommon orgAuthority) {
-        this.orgAuthority = orgAuthority;
-    }
-
-    /**
-     * getCommonPartList get associated orgAuthority (for index/GET_ALL)
-     * @return
-     */
-    @Override
-    public OrgauthoritiesCommonList getCommonPartList() {
-        return orgAuthorityList;
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#setCommonPartList(java.lang.Object)
-     */
-    @Override
-    public void setCommonPartList(OrgauthoritiesCommonList orgAuthorityList) {
-        this.orgAuthorityList = orgAuthorityList;
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPart(org.collectionspace.services.common.document.DocumentWrapper)
-     */
-    @Override
-    public OrgauthoritiesCommon extractCommonPart(DocumentWrapper<DocumentModel> wrapDoc)
-            throws Exception {
-        throw new UnsupportedOperationException();
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#fillCommonPart(java.lang.Object, org.collectionspace.services.common.document.DocumentWrapper)
-     */
-    @Override
-    public void fillCommonPart(OrgauthoritiesCommon orgAuthorityObject, 
-    		DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
-        throw new UnsupportedOperationException();
-    }
-
+    //private final Logger logger = LoggerFactory.getLogger(OrgAuthorityDocumentModelHandler.class);
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
      */
@@ -125,17 +58,18 @@ public class OrgAuthorityDocumentModelHandler
         OrgauthoritiesCommonList coList = this.extractPagingInfo(new OrgauthoritiesCommonList(), wrapDoc);
     	List<OrgauthoritiesCommonList.OrgauthorityListItem> list = coList.getOrgauthorityListItem();
     	Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
+        String label = getServiceContext().getCommonPartLabel();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
             OrgauthorityListItem ilistItem = new OrgauthorityListItem();
-            ilistItem.setDisplayName((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-                    OrgAuthorityJAXBSchema.DISPLAY_NAME));
-            ilistItem.setRefName((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-                    OrgAuthorityJAXBSchema.REF_NAME));
-            ilistItem.setShortIdentifier((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-                    OrgAuthorityJAXBSchema.SHORT_IDENTIFIER));
-            ilistItem.setVocabType((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-                    OrgAuthorityJAXBSchema.VOCAB_TYPE));
+            ilistItem.setDisplayName((String) docModel.getProperty(label,
+                    AuthorityJAXBSchema.DISPLAY_NAME));
+            ilistItem.setRefName((String) docModel.getProperty(label,
+                    AuthorityJAXBSchema.REF_NAME));
+            ilistItem.setShortIdentifier((String) docModel.getProperty(label,
+                    AuthorityJAXBSchema.SHORT_IDENTIFIER));
+            ilistItem.setVocabType((String) docModel.getProperty(label,
+                    AuthorityJAXBSchema.VOCAB_TYPE));
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);
             ilistItem.setCsid(id);
