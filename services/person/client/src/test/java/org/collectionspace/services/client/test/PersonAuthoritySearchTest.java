@@ -72,6 +72,10 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     //
     // shortId
     final String TEST_SHORT_ID = "lechWalesa";
+    
+    final String TEST_KWD_BIRTH_PLACE = "Gdansk"; // Probably wrong on facts
+
+    final String TEST_KWD_NO_MATCH = "Foobar";
 
     // Non-existent partial term name (first letters of each of the words
     // in a pangram for the English alphabet).
@@ -143,6 +147,14 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         }
     }
 
+    private String getKwdTerm() {
+        return TEST_KWD_BIRTH_PLACE;
+    }
+
+    private String getKwdTermNonExistent() {
+        return TEST_KWD_NO_MATCH;
+    }
+
     @BeforeClass
     public void setup() {
         try {
@@ -177,7 +189,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         if (logger.isDebugEnabled()) {
             logger.debug("Attempting match on partial term '" + partialTerm + "' ...");
         }
-        numMatchesFound = readItemListByPartialTerm(knownResourceId, partialTerm);
+        numMatchesFound = readItemListWithFilters(testName, knownResourceId, partialTerm, null);
         if (logger.isDebugEnabled()) {
             logger.debug("Found " + numMatchesFound + " match(es), expected " +
                 NUM_MATCHES_EXPECTED + " match(es).");
@@ -203,7 +215,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
             logger.debug("Attempting match on partial term '" + partialTerm + "' ...");
         }
         numMatchesFound =
-            readItemListByPartialTerm(knownResourceId, partialTerm);
+        	readItemListWithFilters(testName, knownResourceId, partialTerm, null);
                 if (logger.isDebugEnabled()) {
         logger.debug("Found " + numMatchesFound + " match(es), expected " +
                 NUM_MATCHES_EXPECTED + " match(es).");
@@ -229,7 +241,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
             logger.debug("Attempting match on partial term '" + partialTerm + "' ...");
         }
         numMatchesFound =
-            readItemListByPartialTerm(knownResourceId, partialTerm);
+        	readItemListWithFilters(testName, knownResourceId, partialTerm, null);
         if (logger.isDebugEnabled()) {
             logger.debug("Found " + numMatchesFound + " match(es), expected " +
                 NUM_MATCHES_EXPECTED + " match(es).");
@@ -252,7 +264,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         if (logger.isDebugEnabled()) {
             logger.debug("Attempting match on partial term '" + partialTerm + "' ...");
         }
-        numMatchesFound = readItemListByPartialTerm(knownResourceId, partialTerm);
+        numMatchesFound = readItemListWithFilters(testName, knownResourceId, partialTerm, null);
         // Zero matches are expected on a non-existent term.
         if (logger.isDebugEnabled()) {
             logger.debug("Found " + numMatchesFound + " match(es), expected " +
@@ -288,6 +300,28 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         Assert.assertEquals(numMatchesFound, NUM_MATCHES_EXPECTED);
     }
 */
+    /**
+     * Reads an item list by partial term.
+     */
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        groups = {"readListByKwdTerm"}, dependsOnGroups = {"readListByPartialTerm"})
+    public void keywordTermMatch(String testName) {
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        int numMatchesFound = 0;
+        String kwdTerm = getKwdTerm();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Attempting match on kwd term '" + kwdTerm + "' ...");
+        }
+        numMatchesFound = readItemListWithFilters(testName, knownResourceId, null, kwdTerm);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Found " + numMatchesFound + " match(es), expected " +
+                NUM_MATCHES_EXPECTED + " match(es).");
+        }
+        Assert.assertEquals(numMatchesFound, NUM_MATCHES_EXPECTED);
+    }
+
     
     // Failure outcomes
 
@@ -307,7 +341,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         if (logger.isDebugEnabled()) {
             logger.debug("Attempting match on partial term '" + partialTerm + "' ...");
         }
-        numMatchesFound = readItemListByPartialTerm(knownResourceId, partialTerm);
+        numMatchesFound = readItemListWithFilters(testName, knownResourceId, partialTerm, null);
         // Zero matches are expected on a non-existent term.
         if (logger.isDebugEnabled()) {
             logger.debug("Found " + numMatchesFound + " match(es), expected " +
@@ -317,16 +351,44 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     }
 
     /**
-     * Reads an item list by partial term, given an authority and a term.
-     *
+     * Reads an item list by partial term, with a partial term that is not
+     * expected to be matched by any term in any resource.
+     */
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        groups = {"readListByKwdTerm"}, dependsOnMethods = {"keywordTermMatch"})
+    public void keywordTermMatchOnNonexistentTerm(String testName) {
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        int numMatchesFound = 0;
+        int ZERO_MATCHES_EXPECTED = 0;
+        String kwdTerm = getKwdTermNonExistent();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Attempting match on kwd term '" + kwdTerm + "' ...");
+        }
+        numMatchesFound = readItemListWithFilters(testName, knownResourceId, null, kwdTerm);
+        // Zero matches are expected on a non-existent term.
+        if (logger.isDebugEnabled()) {
+            logger.debug("Found " + numMatchesFound + " match(es), expected " +
+                ZERO_MATCHES_EXPECTED + " match(es).");
+        }
+        Assert.assertEquals(numMatchesFound, ZERO_MATCHES_EXPECTED);
+    }
+
+    /**
+     * Reads an item list by partial term or keywords, given an authority and a term.
+     * Only one of partialTerm or keywords should be specified. 
+     * If both are specified, keywords will be ignored.
+     * 
+     * @param testName Calling test name
      * @param authorityCsid The CSID of the authority within which partial term matching
      *     will be performed.
      * @param partialTerm A partial term to match item resources.
+     * @param partialTerm A keyword list to match item resources.
      * @return The number of item resources matched by the partial term.
      */
-    private int readItemListByPartialTerm(String authorityCsid, String partialTerm) {
-
-        String testName = "readItemListByPartialTerm";
+    private int readItemListWithFilters(String testName, 
+    		String authorityCsid, String partialTerm, String keywords) {
 
         // Perform setup.
         int expectedStatusCode = Response.Status.OK.getStatusCode();
@@ -337,7 +399,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<PersonsCommonList> res = null;
         if (authorityCsid != null) {
-	    res = client.readItemList(authorityCsid, partialTerm);
+        	res = client.readItemList(authorityCsid, partialTerm, keywords);
         } else {
             Assert.fail("readItemListByPartialTerm passed null csid!");
         }
@@ -502,6 +564,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         partialTermPersonMap.put(PersonJAXBSchema.DISPLAY_NAME, TEST_PARTIAL_TERM_DISPLAY_NAME);
         partialTermPersonMap.put(PersonJAXBSchema.FORE_NAME, TEST_PARTIAL_TERM_FORE_NAME);
         partialTermPersonMap.put(PersonJAXBSchema.SUR_NAME, TEST_PARTIAL_TERM_SUR_NAME);
+        partialTermPersonMap.put(PersonJAXBSchema.BIRTH_PLACE, TEST_KWD_BIRTH_PLACE);
         partialTermPersonMap.put(PersonJAXBSchema.GENDER, "male");
         MultipartOutput multipart =
             PersonAuthorityClientUtils.createPersonInstance(authorityCsid, authRefName, partialTermPersonMap,

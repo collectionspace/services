@@ -60,6 +60,7 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.query.IQueryManager;
+import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -684,6 +685,7 @@ AbstractMultiPartCollectionSpaceResourceImpl {
 	public AuthItemCommonList getAuthorityItemList(
 			@PathParam("csid") String parentcsid,
 			@QueryParam(IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
+			@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
 			@Context UriInfo ui) {
 		try {
 			MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
@@ -704,6 +706,9 @@ AbstractMultiPartCollectionSpaceResourceImpl {
 				+ IQueryManager.SEARCH_LIKE
 				+ "'%" + partialTerm + "%'";
 				myFilter.appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
+			} else if (keywords != null) {
+				String kwdClause = QueryManager.createWhereClauseFromKeywords(keywords);
+				myFilter.appendWhereClause(kwdClause, IQueryManager.SEARCH_QUALIFIER_AND);
 			}
 			if (logger.isDebugEnabled()) {
 				logger.debug("getAuthorityItemList filtered WHERE clause: "
@@ -741,6 +746,7 @@ AbstractMultiPartCollectionSpaceResourceImpl {
 	public AuthItemCommonList getAuthorityItemListByAuthName(
 			@PathParam("specifier") String specifier,
 			@QueryParam(IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
+			@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords,
 			@Context UriInfo ui) {
 		try {
 			MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
@@ -751,7 +757,7 @@ AbstractMultiPartCollectionSpaceResourceImpl {
 			// Need to get an Authority by name
 			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
 			String parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
-			return getAuthorityItemList(parentcsid, partialTerm, ui);
+			return getAuthorityItemList(parentcsid, partialTerm, keywords, ui);
 		} catch (UnauthorizedException ue) {
 			Response response = Response.status(
 					Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();

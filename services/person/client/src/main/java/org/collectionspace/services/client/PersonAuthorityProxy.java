@@ -69,7 +69,8 @@ public interface PersonAuthorityProxy extends CollectionSpaceProxy {
     @Path("/{csid}/items/")
     ClientResponse<PersonsCommonList>readItemList(
             @PathParam("csid") String parentcsid,
-            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm);
+            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
+            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
 
     /**
      * @param parentcsid 

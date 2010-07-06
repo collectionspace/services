@@ -83,7 +83,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	 */
 	public String createWhereClauseFromKeywords(String keywords) {
 		String result = null;
-		StringBuffer whereClause = new StringBuffer();
+		StringBuffer whereClause = new StringBuffer(SEARCH_GROUP_OPEN);
 		StringTokenizer stringTokenizer = new StringTokenizer(keywords);
 		while (stringTokenizer.hasMoreElements() == true) {
 			whereClause.append(ECM_FULLTEXT_LIKE + "'" +
@@ -98,7 +98,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 			}
 		}            	
 		
-		result = whereClause.toString();
+		result = whereClause.append(SEARCH_GROUP_CLOSE).toString();
 	    if (logger.isDebugEnabled()) {
 	    	logger.debug("Final built WHERE clause is: " + result);
 	    }

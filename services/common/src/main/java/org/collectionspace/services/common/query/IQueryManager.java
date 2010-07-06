@@ -28,6 +28,8 @@ package org.collectionspace.services.common.query;
 
 public interface IQueryManager {
 	
+	final static String SEARCH_GROUP_OPEN = "(";
+	final static String SEARCH_GROUP_CLOSE = ")";
 	final static String SEARCH_TERM_SEPARATOR = " ";
 	final static String SEARCH_LIKE = " LIKE ";
     final static String SEARCH_TYPE_KEYWORDS = "keywords";

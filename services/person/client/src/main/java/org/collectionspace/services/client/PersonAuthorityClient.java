@@ -194,15 +194,19 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
     }
 
     /**
-     * Read item list, filtering by partial term match.
+     * Read item list, filtering by partial term match, or keywords. Only one of
+     * partialTerm or keywords should be specified. If both are specified, keywords
+     * will be ignored.
      *
      * @param vcsid the vcsid
      * @param partialTerm A partial term on which to match,
      *     which will filter list results to return only matched resources.
+     * @param keywords A set of keywords on which to match,
+     *     which will filter list results to return only matched resources.
      * @return the client response
      */
-    public ClientResponse<PersonsCommonList> readItemList(String vcsid, String partialTerm) {
-        return personAuthorityProxy.readItemList(vcsid, partialTerm);
+    public ClientResponse<PersonsCommonList> readItemList(String vcsid, String partialTerm, String keywords) {
+        return personAuthorityProxy.readItemList(vcsid, partialTerm, keywords);
     }
 
     /**
