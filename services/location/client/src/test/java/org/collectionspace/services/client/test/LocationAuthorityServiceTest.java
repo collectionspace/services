@@ -807,9 +807,9 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         LocationAuthorityClient client = new LocationAuthorityClient();
         ClientResponse<LocationsCommonList> res = null;
         if(vcsid!= null) {
-	        res = client.readItemList(vcsid);
+	        res = client.readItemList(vcsid, null, null);
         } else if(shortId!= null) {
-   	        res = client.readItemListForNamedAuthority(shortId);
+   	        res = client.readItemListForNamedAuthority(shortId, null, null);
         } else {
         	Assert.fail("readItemList passed null csid and name!");
         }

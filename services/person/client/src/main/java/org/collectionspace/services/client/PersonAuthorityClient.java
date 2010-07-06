@@ -184,39 +184,37 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
     }
 
     /**
-     * Read item list.
-     *
-     * @param vcsid the vcsid
-     * @return the client response
-     */
-    public ClientResponse<PersonsCommonList> readItemList(String vcsid) {
-        return personAuthorityProxy.readItemList(vcsid);
-    }
-
-    /**
      * Read item list, filtering by partial term match, or keywords. Only one of
      * partialTerm or keywords should be specified. If both are specified, keywords
      * will be ignored.
      *
-     * @param vcsid the vcsid
+     * @param inAuthority the parent authority
      * @param partialTerm A partial term on which to match,
      *     which will filter list results to return only matched resources.
      * @param keywords A set of keywords on which to match,
      *     which will filter list results to return only matched resources.
      * @return the client response
      */
-    public ClientResponse<PersonsCommonList> readItemList(String vcsid, String partialTerm, String keywords) {
-        return personAuthorityProxy.readItemList(vcsid, partialTerm, keywords);
+    public ClientResponse<PersonsCommonList> 
+    		readItemList(String inAuthority, String partialTerm, String keywords) {
+        return personAuthorityProxy.readItemList(inAuthority, partialTerm, keywords);
     }
 
     /**
-     * Read item list for named authority.
+     * Read item list for named vocabulary, filtering by partial term match, or keywords. Only one of
+     * partialTerm or keywords should be specified. If both are specified, keywords
+     * will be ignored.
      *
      * @param specifier the specifier
+     * @param partialTerm A partial term on which to match,
+     *     which will filter list results to return only matched resources.
+     * @param keywords A set of keywords on which to match,
+     *     which will filter list results to return only matched resources.
      * @return the client response
      */
-    public ClientResponse<PersonsCommonList> readItemListForNamedAuthority(String specifier) {
-        return personAuthorityProxy.readItemListForNamedAuthority(specifier);
+    public ClientResponse<PersonsCommonList> 
+    		readItemListForNamedAuthority(String specifier, String partialTerm, String keywords) {
+        return personAuthorityProxy.readItemListForNamedAuthority(specifier, partialTerm, keywords);
     }
 
     /**

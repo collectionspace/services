@@ -13,6 +13,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.vocabulary.VocabulariesCommonList;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
@@ -56,17 +57,23 @@ public interface VocabularyProxy extends CollectionSpaceProxy {
     @Path("/{csid}")
     ClientResponse<Response> delete(@PathParam("csid") String csid);
 
-    // List Items
+    // List Items matching a partial term or keywords.
     @GET
     @Produces({"application/xml"})
     @Path("/{vcsid}/items/")
-    ClientResponse<VocabularyitemsCommonList> readItemList(@PathParam("vcsid") String vcsid);
+    ClientResponse<VocabularyitemsCommonList> readItemList(
+    		@PathParam("vcsid") String vcsid,
+            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
+            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
     
-    // List Items using the name of the Vocab
+    // List Items for a named authority matching a partial term or keywords.
     @GET
     @Produces({"application/xml"})
     @Path("/urn:cspace:name({specifier})/items")
-    ClientResponse<VocabularyitemsCommonList> readItemListForNamedVocabulary(@PathParam("specifier") String specifier);
+    ClientResponse<VocabularyitemsCommonList> readItemListForNamedVocabulary(
+    		@PathParam("specifier") String specifier,
+            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
+            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
 
     //(C)reate Item
     @POST

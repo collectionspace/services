@@ -17,6 +17,7 @@ import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.organization.OrgauthoritiesCommonList;
 import org.collectionspace.services.organization.OrganizationsCommonList;
+import org.collectionspace.services.person.PersonsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -58,12 +59,15 @@ public interface OrgAuthorityProxy extends CollectionSpaceProxy {
     @Path("/{csid}")
     ClientResponse<Response> delete(@PathParam("csid") String csid);
 
-    // List Items
+    // List Items with options for matching a partial term or keywords.
     @GET
-    @Produces({"application/xml"})
-    @Path("/{vcsid}/items/")
-    ClientResponse<OrganizationsCommonList> readItemList(@PathParam("vcsid") String vcsid);
-    
+    @Produces("application/xml")
+    @Path("/{csid}/items/")
+    ClientResponse<OrganizationsCommonList>readItemList(
+            @PathParam("csid") String parentcsid,
+            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
+            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
+
     /**
      * @param parentcsid 
      * @param itemcsid 
@@ -78,20 +82,14 @@ public interface OrgAuthorityProxy extends CollectionSpaceProxy {
             @PathParam("csid") String parentcsid,
             @PathParam("itemcsid") String itemcsid);    
 
-    // List Items for a named authority
-    @GET
-    @Produces({"application/xml"})
-    @Path("/urn:cspace:name({specifier})/items/")
-    ClientResponse<OrganizationsCommonList> readItemListForNamedAuthority(
-    		@PathParam("specifier") String specifier);
-
-    // List Items for a named authority matching a partial term.
+    // List Items for a named authority matching a partial term or keywords.
     @GET
     @Produces({"application/xml"})
     @Path("/urn:cspace:name({specifier})/items/")
     ClientResponse<OrganizationsCommonList> readItemListForNamedAuthority(
     		@PathParam("specifier") String specifier,
-            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm);
+            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
+            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
 
     // List Item Authority References
     @GET

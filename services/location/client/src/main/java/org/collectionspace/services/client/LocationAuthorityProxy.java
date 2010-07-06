@@ -8,8 +8,10 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.location.LocationauthoritiesCommonList;
@@ -55,11 +57,14 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
     @Path("/{csid}")
     ClientResponse<Response> delete(@PathParam("csid") String csid);
 
-    // List Items
+    // List Items matching a partial term or keywords.
     @GET
     @Produces({"application/xml"})
     @Path("/{vcsid}/items/")
-    ClientResponse<LocationsCommonList> readItemList(@PathParam("vcsid") String vcsid);
+    ClientResponse<LocationsCommonList> readItemList(
+    		@PathParam("vcsid") String vcsid,
+            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
+            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
 
     /**
      * @param csid
@@ -73,11 +78,14 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
             @PathParam("csid") String parentcsid,
             @PathParam("itemcsid") String itemcsid);
 
-    // List Items for a named authority
+    // List Items for a named authority matching a partial term or keywords.
     @GET
     @Produces({"application/xml"})
     @Path("/urn:cspace:name({specifier})/items/")
-    ClientResponse<LocationsCommonList> readItemListForNamedAuthority(@PathParam("specifier") String specifier);
+    ClientResponse<LocationsCommonList> readItemListForNamedAuthority(
+    		@PathParam("specifier") String specifier,
+            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
+            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
 
     //(C)reate Item
     @POST

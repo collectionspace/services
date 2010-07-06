@@ -1163,9 +1163,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         PersonAuthorityClient client = new PersonAuthorityClient();
         ClientResponse<PersonsCommonList> res = null;
         if (vcsid!= null) {
-	        res = client.readItemList(vcsid);
+	        res = client.readItemList(vcsid, null, null);
         } else if (name!= null) {
-   	        res = client.readItemListForNamedAuthority(name);
+   	        res = client.readItemListForNamedAuthority(name, null, null);
         } else {
         	Assert.fail("readItemList passed null csid and name!");
         }

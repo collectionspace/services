@@ -57,13 +57,7 @@ public interface PersonAuthorityProxy extends CollectionSpaceProxy {
     @Path("/{csid}")
     ClientResponse<Response> delete(@PathParam("csid") String csid);
 
-    // List Items
-    @GET
-    @Produces({"application/xml"})
-    @Path("/{vcsid}/items/")
-    ClientResponse<PersonsCommonList> readItemList(@PathParam("vcsid") String vcsid);
-
-    // List Items matching a partial term.
+    // List Items with options for matching a partial term or keywords.
     @GET
     @Produces("application/xml")
     @Path("/{csid}/items/")
@@ -86,20 +80,14 @@ public interface PersonAuthorityProxy extends CollectionSpaceProxy {
             @PathParam("csid") String parentcsid,
             @PathParam("itemcsid") String itemcsid);
 
-    // List Items for a named authority
-    @GET
-    @Produces({"application/xml"})
-    @Path("/urn:cspace:name({specifier})/items/")
-    ClientResponse<PersonsCommonList> readItemListForNamedAuthority(
-    		@PathParam("specifier") String specifier);
-
-    // List Items for a named authority matching a partial term.
+    // List Items for a named authority matching a partial term or keywords.
     @GET
     @Produces({"application/xml"})
     @Path("/urn:cspace:name({specifier})/items/")
     ClientResponse<PersonsCommonList> readItemListForNamedAuthority(
     		@PathParam("specifier") String specifier,
-            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm);
+            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
+            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
 
     //(C)reate Item
     @POST

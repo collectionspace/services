@@ -173,13 +173,20 @@ public class LocationAuthorityClient extends AbstractServiceClientImpl {
     }
 
     /**
-     * Read item list.
+     * Read item list, filtering by partial term match, or keywords. Only one of
+     * partialTerm or keywords should be specified. If both are specified, keywords
+     * will be ignored.
      *
-     * @param vcsid the vcsid
+     * @param inAuthority the parent authority
+     * @param partialTerm A partial term on which to match,
+     *     which will filter list results to return only matched resources.
+     * @param keywords A set of keywords on which to match,
+     *     which will filter list results to return only matched resources.
      * @return the client response
      */
-    public ClientResponse<LocationsCommonList> readItemList(String vcsid) {
-        return locationAuthorityProxy.readItemList(vcsid);
+    public ClientResponse<LocationsCommonList> 
+    		readItemList(String inAuthority, String partialTerm, String keywords) {
+        return locationAuthorityProxy.readItemList(inAuthority, partialTerm, keywords);
     }
 
     /**
@@ -194,13 +201,20 @@ public class LocationAuthorityClient extends AbstractServiceClientImpl {
     }
 
     /**
-     * Read item list for named authority.
+     * Read item list for named vocabulary, filtering by partial term match, or keywords. Only one of
+     * partialTerm or keywords should be specified. If both are specified, keywords
+     * will be ignored.
      *
      * @param specifier the specifier
+     * @param partialTerm A partial term on which to match,
+     *     which will filter list results to return only matched resources.
+     * @param keywords A set of keywords on which to match,
+     *     which will filter list results to return only matched resources.
      * @return the client response
      */
-    public ClientResponse<LocationsCommonList> readItemListForNamedAuthority(String specifier) {
-        return locationAuthorityProxy.readItemListForNamedAuthority(specifier);
+    public ClientResponse<LocationsCommonList> 
+    		readItemListForNamedAuthority(String specifier, String partialTerm, String keywords) {
+        return locationAuthorityProxy.readItemListForNamedAuthority(specifier, partialTerm, keywords);
     }
 
     /**

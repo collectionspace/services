@@ -710,9 +710,9 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         VocabularyClient client = new VocabularyClient();
         ClientResponse<VocabularyitemsCommonList> res = null;
         if(vcsid!=null) {
-            res = client.readItemList(vcsid);
+            res = client.readItemList(vcsid, null, null);
         } else if(shortId!=null) {
-            res = client.readItemListForNamedVocabulary(shortId);
+            res = client.readItemListForNamedVocabulary(shortId, null, null);
         } else {
         	Assert.fail("Internal Error: readItemList both vcsid and shortId are null!");
         }

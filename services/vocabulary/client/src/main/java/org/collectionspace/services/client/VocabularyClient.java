@@ -166,23 +166,37 @@ public class VocabularyClient extends AbstractServiceClientImpl {
     }
 
     /**
-     * Read item list.
+     * Read item list, filtering by partial term match, or keywords. Only one of
+     * partialTerm or keywords should be specified. If both are specified, keywords
+     * will be ignored.
      *
-     * @param vcsid the vcsid
+     * @param inAuthority the parent authority
+     * @param partialTerm A partial term on which to match,
+     *     which will filter list results to return only matched resources.
+     * @param keywords A set of keywords on which to match,
+     *     which will filter list results to return only matched resources.
      * @return the client response
      */
-    public ClientResponse<VocabularyitemsCommonList> readItemList(String vcsid) {
-        return vocabularyProxy.readItemList(vcsid);
+    public ClientResponse<VocabularyitemsCommonList> 
+    		readItemList(String inAuthority, String partialTerm, String keywords) {
+        return vocabularyProxy.readItemList(inAuthority, partialTerm, keywords);
     }
 
     /**
-     * Read item list for named vocabulary.
+     * Read item list for named vocabulary, filtering by partial term match, or keywords. Only one of
+     * partialTerm or keywords should be specified. If both are specified, keywords
+     * will be ignored.
      *
      * @param specifier the specifier
+     * @param partialTerm A partial term on which to match,
+     *     which will filter list results to return only matched resources.
+     * @param keywords A set of keywords on which to match,
+     *     which will filter list results to return only matched resources.
      * @return the client response
      */
-    public ClientResponse<VocabularyitemsCommonList> readItemListForNamedVocabulary(String specifier) {
-        return vocabularyProxy.readItemListForNamedVocabulary(specifier);
+    public ClientResponse<VocabularyitemsCommonList> 
+    		readItemListForNamedVocabulary(String specifier, String partialTerm, String keywords) {
+        return vocabularyProxy.readItemListForNamedVocabulary(specifier, partialTerm, keywords);
     }
 
     /**
