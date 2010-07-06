@@ -231,9 +231,7 @@ public class OrgAuthorityResource extends
                 IQueryManager.SEARCH_QUALIFIER_AND +
                 ContactJAXBSchema.CONTACTS_COMMON + ":" +
                 ContactJAXBSchema.IN_ITEM +
-                "='" + itemcsid + "'" +
-                IQueryManager.SEARCH_QUALIFIER_AND +
-                "ecm:isProxy = 0");
+                "='" + itemcsid + "'" );
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             contactObjectList = (ContactsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
