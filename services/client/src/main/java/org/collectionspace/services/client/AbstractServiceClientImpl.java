@@ -53,7 +53,7 @@ public abstract class AbstractServiceClientImpl implements
     /**
      * The character used to separate the words in a part label
      */
-    public static final String PART_LABEL_SEPERATOR = "_";
+    public static final String PART_LABEL_SEPARATOR = "_";
     /** The Constant PART_COMMON_LABEL. */
     public static final String PART_COMMON_LABEL = "common";
     /** The properties. */
@@ -80,7 +80,7 @@ public abstract class AbstractServiceClientImpl implements
      * @return the common part name
      */
     public String getCommonPartName(String servicePathComponent) {
-        return servicePathComponent + PART_LABEL_SEPERATOR + PART_COMMON_LABEL;
+        return servicePathComponent + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
     }
 
     /**
