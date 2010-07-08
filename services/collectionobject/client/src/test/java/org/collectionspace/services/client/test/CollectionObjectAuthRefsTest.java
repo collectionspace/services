@@ -30,14 +30,16 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.OrgAuthorityClient;
+import org.collectionspace.services.client.OrgAuthorityClientUtils;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
-import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -71,6 +73,9 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     
     /** The person authority name. */
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
+
+    /** The organization authority name. */
+    final String ORG_AUTHORITY_NAME = "TestOrgAuth";
     
     /** The known resource id. */
     private String knownResourceId = null;
@@ -81,24 +86,36 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     /** The person ids created. */
     private List<String> personIdsCreated = new ArrayList<String>();
     
-    /** The person auth csid. */
+    /** The person authority csid and refName. */
     private String personAuthCSID = null; 
     private String personAuthRefName = null;
     
+    /** The organization ids created. */
+    private List<String> orgIdsCreated = new ArrayList<String>();
+
+    /** The org authority csid and refName. */
+    private String orgAuthCSID = null;
+    private String orgAuthRefName = null;
+    
     /** The content organization ref name. */
     private String contentOrganizationRefName = null;
-    
-    /** The content people ref name. */
-    private String contentPeopleRefName = null;
-    
+        
     /** The content person ref name. */
     private String contentPersonRefName = null;
     
-    /** The inscriber ref name. */
+    /** The inscriber ref names. */
     private String contentInscriberRefName = null;
-    
+    private String descriptionInscriberRefName = null;
+
+    /** The object history and association ref names. */
+    private String associatedEventOrganizationRefName = null;
+    private String associatedEventPersonRefName = null;
+    private String associatedOrganizationRefName = null;
+    private String associatedPersonRefName = null;
+    private String ownerRefName = null;
+
     /** The number of authority references expected. */
-    private final int NUM_AUTH_REFS_EXPECTED = 4;
+    private final int NUM_AUTH_REFS_EXPECTED = 9;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -134,22 +151,33 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
-
-        // Submit the request to the service and store the response.
-        String identifier = createIdentifier();
         
         // Create all the person refs and entities
         createPersonRefs();
-        
-        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        MultipartOutput multipart = createCollectionObjectInstance(
-        						"Obj Title",
-        						"ObjNum-1234",
-								contentOrganizationRefName,
-								contentPeopleRefName,
-								contentPersonRefName,
-								contentInscriberRefName );
 
+        // Create all the organization refs and entities
+        createOrganizationRefs();
+
+        // Create an object record payload, containing
+        // authority reference values in a number of its fields
+        String identifier = createIdentifier();
+        MultipartOutput multipart =
+            createCollectionObjectInstance(
+                "Obj Title",
+                "ObjNum" + "-" + identifier,
+                contentOrganizationRefName,
+                contentPersonRefName,
+                contentInscriberRefName,
+                descriptionInscriberRefName,
+                associatedEventOrganizationRefName,
+                associatedEventPersonRefName,
+                associatedOrganizationRefName,
+                associatedPersonRefName,
+                ownerRefName
+            );
+
+        // Submit the request to the service and store the response.
+        CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
 
         int statusCode = res.getStatus();
@@ -180,14 +208,18 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         // so they can be deleted after tests have been run.
         collectionObjectIdsCreated.add(extractId(res));
     }
-    
+
     /**
-     * Creates the person refs.
+     * Creates a Person Authority.
+     *
+     * @param displayName the display name of the authority
+     * @param shortIdentifier the short identifier for the authority
      */
-    protected void createPersonRefs(){
+    private void createPersonAuthority(String displayName, String shortIdentifier) {
+        testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
-    			PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
+    			displayName, shortIdentifier, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
 
@@ -195,33 +227,16 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, STATUS_CREATED);
         personAuthCSID = extractId(res);
-        // TODO Test that we can reuse the client above.
         personAuthRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
-        
-        String csid = createPerson("Omni", "Org", "omniOrg");
-        contentOrganizationRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
-        personIdsCreated.add(csid);
-        
-        csid = createPerson("Pushy", "People", "pushyPeople");
-        contentPeopleRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
-        personIdsCreated.add(csid);
-        
-        csid = createPerson("Connie", "ContactPerson", "connieContactPerson");
-        contentPersonRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
-        personIdsCreated.add(csid);
-        
-        csid = createPerson("Ingrid", "Inscriber", "ingridInscriber");
-        contentInscriberRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
-        personIdsCreated.add(csid);
     }
-    
+
     /**
-     * Creates the person.
+     * Creates a person item.
      *
-     * @param firstName the first name
-     * @param surName the sur name
-     * @param refName the ref name
-     * @return the string
+     * @param firstName the person's first name
+     * @param surName the person's surname
+     * @param shortIdentifier the short identifier for the item
+     * @return the CSID of the newly-created person record
      */
     protected String createPerson(String firstName, String surName, String shortIdentifier ) {
         Map<String, String> personInfo = new HashMap<String,String>();
@@ -229,8 +244,8 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortIdentifier);
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-    	MultipartOutput multipart = 
-    		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
+    	MultipartOutput multipart =
+    		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
     				personAuthRefName, personInfo, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         int statusCode = res.getStatus();
@@ -240,6 +255,112 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         Assert.assertEquals(statusCode, STATUS_CREATED);
     	return extractId(res);
     }
+
+    /**
+     * Creates multiple Person items within a Person Authority,
+     * and stores the refNames referring to each.
+     */
+    protected void createPersonRefs(){
+
+        createPersonAuthority(PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME);
+
+        String csid = "";
+        
+        csid = createPerson("Connie", "ContactPerson", "connieContactPerson");
+        contentPersonRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        personIdsCreated.add(csid);
+        
+        csid = createPerson("Ingrid", "ContentInscriber", "ingridContentInscriber");
+        contentInscriberRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        personIdsCreated.add(csid);
+
+        csid = createPerson("Dessie", "DescriptionInscriber", "dessieDescriptionInscriber");
+        descriptionInscriberRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        personIdsCreated.add(csid);
+
+        csid = createPerson("Asok", "AssociatedEventPerson", "asokAssociatedEventPerson");
+        associatedEventPersonRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        personIdsCreated.add(csid);
+        
+        csid = createPerson("Andrew", "AssociatedPerson", "andrewAssociatedPerson");
+        associatedPersonRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        personIdsCreated.add(csid);
+
+        csid = createPerson("Owen", "Owner", "owenOwner");
+        ownerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        personIdsCreated.add(csid);
+    }
+    
+    /**
+     * Creates an organization authority.
+     *
+     * @param displayName the display name of the authority
+     * @param shortIdentifier the short identifier for the authority
+     */
+    private void createOrgAuthority(String displayName, String shortIdentifier) {
+        testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
+        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
+        MultipartOutput multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
+    			displayName, shortIdentifier, orgAuthClient.getCommonPartName());
+        ClientResponse<Response> res = orgAuthClient.create(multipart);
+        int statusCode = res.getStatus();
+
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, STATUS_CREATED);
+        orgAuthCSID = extractId(res);
+        orgAuthRefName = OrgAuthorityClientUtils.getAuthorityRefName(orgAuthCSID, null);
+    }
+
+    /**
+     * Creates an organization item.
+     *
+     * @param shortName the organization's short name
+     * @param foundingPlace the organization's founding place
+     * @param shortIdentifier the short identifier for the item
+     * @return the CSID of the newly-created organization record
+     */
+    protected String createOrganization(String shortName, String foundingPlace, String shortIdentifier ) {
+        Map<String, String> orgInfo = new HashMap<String,String>();
+        orgInfo.put(OrganizationJAXBSchema.SHORT_NAME, shortName);
+        orgInfo.put(OrganizationJAXBSchema.FOUNDING_PLACE, foundingPlace);
+        orgInfo.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortIdentifier);
+        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
+    	MultipartOutput multipart =
+    		OrgAuthorityClientUtils.createOrganizationInstance(orgAuthCSID,
+    				orgAuthRefName, orgInfo, orgAuthClient.getItemCommonPartName());
+        ClientResponse<Response> res = orgAuthClient.createItem(orgAuthCSID, multipart);
+        int statusCode = res.getStatus();
+
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, STATUS_CREATED);
+    	return extractId(res);
+    }
+    
+   /**
+     * Creates multiple Organization items within an Organization Authority,
+     * and stores the refNames referring to each.
+     */
+    private void createOrganizationRefs() {
+
+        createOrgAuthority(ORG_AUTHORITY_NAME, ORG_AUTHORITY_NAME);
+
+        String csid = "";
+
+        csid = createOrganization("Content Org", "Content Org Town", "contentOrg");
+        contentOrganizationRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, csid, null);
+        orgIdsCreated.add(csid);
+
+        csid = createOrganization("Associated Event Org", "Associated Event Org City", "associatedEventOrg");
+        associatedEventOrganizationRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, csid, null);
+        orgIdsCreated.add(csid);
+
+        csid = createOrganization("Associated Org", "Associated Org City", "associatedOrg");
+        associatedOrganizationRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, csid, null);
+        orgIdsCreated.add(csid);
+    }
+
 
     // Success outcomes
     /**
@@ -276,11 +397,17 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         CollectionobjectsCommon collectionObject = (CollectionobjectsCommon) extractPart(input,
         		collectionObjectClient.getCommonPartName(), CollectionobjectsCommon.class);
         Assert.assertNotNull(collectionObject);
-        // Check a couple of fields
-        Assert.assertEquals(collectionObject.getContentOrganization(), contentOrganizationRefName);
+
+        // Check a sample of one or more person authority ref fields
         Assert.assertEquals(collectionObject.getInscriptionContentInscriber(), contentInscriberRefName);
-        
-        // Get the auth refs and check them
+        Assert.assertEquals(collectionObject.getAssociatedPerson(), associatedPersonRefName);
+        Assert.assertEquals(collectionObject.getOwner(), ownerRefName);
+
+        // Check a sample of one or more organization authority ref fields
+        Assert.assertEquals(collectionObject.getContentOrganization(), contentOrganizationRefName);
+        Assert.assertEquals(collectionObject.getAssociatedEventOrganization(), associatedEventOrganizationRefName);
+
+        // Get all of the auth refs and check that the expected number is returned
         ClientResponse<AuthorityRefList> res2 = collectionObjectClient.getAuthorityRefs(knownResourceId);
         statusCode = res2.getStatus();
 
@@ -308,9 +435,9 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
             int i = 0;
             for(AuthorityRefList.AuthorityRefItem item : items){
                 logger.debug(testName + ": list-item[" + i + "] Field:" +
-                		item.getSourceField() + "= " +
-                        item.getAuthDisplayName() +
-                        item.getItemDisplayName());
+                		item.getSourceField() + " =" +
+                        " item display name = " + item.getAuthDisplayName() +
+                        " auth display name = " + item.getItemDisplayName());
                 logger.debug(testName + ": list-item[" + i + "] refName=" +
                         item.getRefName());
                 logger.debug(testName + ": list-item[" + i + "] URI=" +
@@ -358,6 +485,14 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
             personAuthClient.deleteItem(personAuthCSID, resourceId).releaseConnection();
         }
         personAuthClient.delete(personAuthCSID).releaseConnection();
+        // Note: Any non-success response is ignored and not reported.
+        OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
+        // Delete organizations before OrgAuth
+        for (String resourceId : orgIdsCreated) {
+            // Note: Any non-success responses are ignored and not reported.
+            orgAuthClient.deleteItem(orgAuthCSID, resourceId).releaseConnection();
+        }
+        orgAuthClient.delete(orgAuthCSID).releaseConnection();
     }
 
     // ---------------------------------------------------------------
@@ -383,19 +518,29 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     * @return the multipart output
     */
    private MultipartOutput createCollectionObjectInstance(
-		   		String title,
-		   		String objNum,
-				String contentOrganization,
-				String contentPeople,
-				String contentPerson,
-				String inscriber ) {
+                String title,
+                String objNum,
+                String contentOrganization,
+                String contentPerson,
+                String contentInscriber,
+                String descriptionInscriber,
+                String associatedEventOrganization,
+                String associatedEventPerson,
+                String associatedOrganization,
+                String associatedPerson,
+                String owner ) {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
         collectionObject.setTitle(title);
         collectionObject.setObjectNumber(objNum);
         collectionObject.setContentOrganization(contentOrganization);
-        collectionObject.setContentPeople(contentPeople);
         collectionObject.setContentPerson(contentPerson);
-        collectionObject.setInscriptionContentInscriber(inscriber);
+        collectionObject.setInscriptionContentInscriber(contentInscriber);
+        collectionObject.setInscriptionDescriptionInscriber(descriptionInscriber);
+        collectionObject.setAssociatedEventOrganization(associatedEventOrganization);
+        collectionObject.setAssociatedEventPerson(associatedEventPerson);
+        collectionObject.setAssociatedOrganization(associatedOrganization);
+        collectionObject.setAssociatedPerson(associatedPerson);
+        collectionObject.setOwner(owner);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(collectionObject, MediaType.APPLICATION_XML_TYPE);
@@ -408,4 +553,5 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
 
         return multipart;
     }
+
 }
