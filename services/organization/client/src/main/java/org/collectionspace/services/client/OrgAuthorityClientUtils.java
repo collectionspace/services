@@ -90,7 +90,8 @@ public class OrgAuthorityClientUtils {
     }
 
     /**
-     * @param csid the id of the PersonAuthority
+     * @param inAuthority the ID of the parent OrgAuthority
+     * @param csid the ID of the Organization
      * @param client if null, creates a new client
      * @return
      */
@@ -136,6 +137,7 @@ public class OrgAuthorityClientUtils {
         orgAuthority.setDisplayName(displayName);
         orgAuthority.setShortIdentifier(shortIdentifier);
         String refName = createOrgAuthRefName(shortIdentifier, displayName);
+        orgAuthority.setRefName(refName);
         orgAuthority.setVocabType("OrgAuthority");
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(orgAuthority, MediaType.APPLICATION_XML_TYPE);

@@ -508,7 +508,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
             groups = {"read"}, dependsOnGroups = {"create"})
         public void readByName(String testName) throws Exception {
-    	readInternal(testName, null, knownResourceShortIdentifer);
+    	    readInternal(testName, null, knownResourceShortIdentifer);
     }
     
     protected void readInternal(String testName, String CSID, String shortId) {
