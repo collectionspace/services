@@ -22,7 +22,12 @@
  */
 package org.collectionspace.services.client.test;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -365,7 +370,7 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = false;
+        boolean iterateThroughList = true;
         if(iterateThroughList && logger.isDebugEnabled()){
             List<MovementsCommonList.MovementListItem> items =
                     list.getMovementListItem();
@@ -375,6 +380,8 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
                         item.getCsid());
                 logger.debug(testName + ": list-item[" + i + "] movementReferenceNumber=" +
                         item.getMovementReferenceNumber());
+                logger.debug(testName + ": list-item[" + i + "] locationDate=" +
+                        item.getLocationDate());
                 logger.debug(testName + ": list-item[" + i + "] URI=" +
                         item.getUri());
                 i++;
@@ -422,7 +429,7 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
 
         // Update the content of this resource.
         movement.setMovementReferenceNumber("updated-" + movement.getMovementReferenceNumber());
-        movement.setLocationDate("updated-" + movement.getLocationDate());
+        movement.setMovementNote("updated movement note-" + movement.getMovementNote());
         if(logger.isDebugEnabled()){
             logger.debug("to be updated object");
             logger.debug(objectAsXmlString(movement, MovementsCommon.class));
@@ -449,8 +456,8 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
                         client.getCommonPartName(), MovementsCommon.class);
         Assert.assertNotNull(updatedMovement);
 
-        Assert.assertEquals(updatedMovement.getLocationDate(),
-                movement.getLocationDate(),
+        Assert.assertEquals(updatedMovement.getMovementNote(),
+                movement.getMovementNote(),
                 "Data in updated object did not match submitted data.");
 
     }
@@ -713,28 +720,24 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
      * @return the multipart output
      */
     private MultipartOutput createMovementInstance(String identifier) {
-        return createMovementInstance(
-                "movementReferenceNumber-" + identifier,
-                "locationDate-" + identifier);
+        return createInstance("movementReferenceNumber-" + identifier);
     }
 
     /**
      * Creates an instance of a Movement record for testing.
      *
      * @param movementReferenceNumber A movement reference number.
-     * @param locationDate A location date.
      * @return Multipart output suitable for use as a payload
      *     in a create or update request.
      */
-    private MultipartOutput createMovementInstance(String movementReferenceNumber,
-    		String locationDate) {
+    private MultipartOutput createInstance(String movementReferenceNumber) {
         MovementsCommon movement = new MovementsCommon();
         // FIXME: Values of currentLocation, normalLocation,
         // and movementContact should be refNames.
         movement.setCurrentLocation("currentLocation value");
         movement.setCurrentLocationFitness("currentLocationFitness value");
         movement.setCurrentLocationNote("currentLocationNote value");
-        movement.setLocationDate(locationDate);
+        movement.setLocationDate(timestampUTC());
         movement.setNormalLocation("normalLocation value");
         movement.setMovementContact("movementContact value");
         MovementMethodsList movementMethodsList = new MovementMethodsList();
@@ -762,4 +765,71 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
 
         return multipart;
     }
+
+    // FIXME Should be moved to a common class, as these are general utilities.
+    // FIXME Should be refactored to become a convenience variant of a
+    // general method to return a current datestamp or timestamp in any
+    // provided time zone.
+
+   /**
+    * Returns an ISO 8601 formatted timestamp of the
+    * current time instance in the UTC time zone.
+    */
+    public String datestampUTC() {
+        final String ISO_8601_DATE_FORMAT_PATTERN = "yyyy-MM-dd";
+        final DateFormat ISO_8601_DATE_FORMAT =
+            new SimpleDateFormat(ISO_8601_DATE_FORMAT_PATTERN);
+
+        final String UTC_TIMEZONE_IDENTIFIER = "UTC";
+        final TimeZone UTC_TIMEZONE = TimeZone.getTimeZone(UTC_TIMEZONE_IDENTIFIER);
+
+        Date timestamp = new Date();
+        return formatDate(timestamp, UTC_TIMEZONE, ISO_8601_DATE_FORMAT);
+    }
+
+   /**
+    * Returns an ISO 8601 formatted timestamp of the
+    * current time instance in the UTC time zone.
+    */
+    public String timestampUTC() {
+        final String ISO_8601_FORMAT_PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+        final DateFormat ISO_8601_FORMAT =
+            new SimpleDateFormat(ISO_8601_FORMAT_PATTERN);
+
+        final String UTC_TIMEZONE_IDENTIFIER = "UTC";
+        final TimeZone UTC_TIMEZONE = TimeZone.getTimeZone(UTC_TIMEZONE_IDENTIFIER);
+
+        Date timestamp = new Date();
+        return formatDate(timestamp, UTC_TIMEZONE, ISO_8601_FORMAT);
+    }
+
+   /**
+    * Formats a provided date using a provided date formatter,
+    * in the default system time zone.
+    *
+    * @param date  A date to format.
+    * @param df    A date formatter to apply.
+    * @return      A formatted date string.
+    */
+    public String formatDate(Date date, DateFormat df) {
+        return formatDate(date, TimeZone.getDefault(), df);
+    }
+
+    // FIXME Add error handling.
+
+   /**
+    * Formats a provided date using a provided date formatter,
+    * in a provided time zone.
+    *
+    * @param date  A date to format.
+    * @param tz    The time zone qualifier for the date to format.
+    * @param df    A date formatter to apply.
+    *
+    * @return      A formatted date string.
+    */
+    public String formatDate(Date date, TimeZone tz, DateFormat df) {
+        df.setTimeZone(tz);
+        return df.format(date);
+    }
+
 }
