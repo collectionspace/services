@@ -33,6 +33,7 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.MovementClient;
+import org.collectionspace.services.client.MovementClientDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.movement.MovementsCommon;
 import org.collectionspace.services.movement.MovementsCommonList;
@@ -732,12 +733,13 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
      */
     private MultipartOutput createInstance(String movementReferenceNumber) {
         MovementsCommon movement = new MovementsCommon();
+        String timestampUTC = MovementClientDateTimeUtils.timestampUTC();
         // FIXME: Values of currentLocation, normalLocation,
         // and movementContact should be refNames.
         movement.setCurrentLocation("currentLocation value");
         movement.setCurrentLocationFitness("currentLocationFitness value");
         movement.setCurrentLocationNote("currentLocationNote value");
-        movement.setLocationDate(timestampUTC());
+        movement.setLocationDate(timestampUTC);
         movement.setNormalLocation("normalLocation value");
         movement.setMovementContact("movementContact value");
         MovementMethodsList movementMethodsList = new MovementMethodsList();
@@ -750,8 +752,8 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         movement.setMovementMethods(movementMethodsList);
         movement.setMovementNote("movementNote value");
         movement.setMovementReferenceNumber(movementReferenceNumber);
-        movement.setPlannedRemovalDate("plannedRemovalDate value");
-        movement.setRemovalDate("removalDate value");
+        movement.setPlannedRemovalDate(timestampUTC);
+        movement.setRemovalDate(timestampUTC);
         movement.setReasonForMove("reasonForMove value");
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
