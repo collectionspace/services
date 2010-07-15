@@ -24,6 +24,7 @@
 package org.collectionspace.services.nuxeo.client.java;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -299,31 +300,63 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
     public AuthorityRefList getAuthorityRefs(
     		DocumentWrapper<DocumentModel> docWrapper,
     		List<String> authRefFields) throws PropertyException {
+        final String FIELD_REFNAME_DELIMITER = "|";
+        final String FIELD_REFNAME_DELIMITER_REGEX = "\\" + FIELD_REFNAME_DELIMITER;
     	AuthorityRefList authRefList = new AuthorityRefList();
     	try {
     		DocumentModel docModel = docWrapper.getWrappedObject();
     		List<AuthorityRefList.AuthorityRefItem> list = authRefList.getAuthorityRefItem();
 
     		for (String field : authRefFields) {
-    			String refName = (String) docModel.getPropertyValue(field);
-    			if (refName == null)
-    				continue;
-    			try {
-    				RefNameUtils.AuthorityTermInfo termInfo = RefNameUtils
-    				.parseAuthorityTermInfo(refName);
-    				AuthorityRefList.AuthorityRefItem ilistItem = new AuthorityRefList.AuthorityRefItem();
-    				ilistItem.setRefName(refName);
-    				ilistItem.setAuthDisplayName(termInfo.inAuthority.displayName);
-    				ilistItem.setItemDisplayName(termInfo.displayName);
-    				ilistItem.setSourceField(field);
-    				ilistItem.setUri(termInfo.getRelativeUri());
-    				list.add(ilistItem);
-    			} catch (Exception e) {
-    				// FIXME: Do we need to throw this Exception here?
-    				if (logger.isDebugEnabled()) {
-    					logger.debug("Caught exception in getAuthorityRefs", e);
-    				}
-    			}
+                        // FIXME If the code used below doesn't support
+                        // arbitrary levels of nesting; e.g. "get all authrefs
+                        // in any children of a parent," then we might use
+                        // docModel.getProperties() instead,
+                        List<String> refNames = new ArrayList<String>();
+                        Object val = docModel.getPropertyValue(field);
+                        if (val instanceof String)
+    			  refNames.add((String) val);
+                        else if (val instanceof List) {
+                          refNames = (List<String>) val;
+                        }
+                        for (String refName : refNames) {
+                            if (refName == null || refName.trim().isEmpty())
+                                    continue;
+                            try {
+                                    // If the refName is prefixed by a field name
+                                    // and a delimiter, this means that it was
+                                    // found in a child of the specified authref field.
+                                    //
+                                    // Store the child field's name as the field name.
+                                    // Then strip off the child's name and the delimiter
+                                    // from the refName.
+                                    //
+                                    // FIXME: Move this 'split' code to its own utility method.
+                                    // FIXME: Verify that the behavior description above
+                                    // is accurate for arbitrary levels of nesting.
+                                    if (refName.indexOf(FIELD_REFNAME_DELIMITER) > 0) {
+                                        String[] refNameParts =
+                                            refName.split(FIELD_REFNAME_DELIMITER_REGEX);
+                                        field = refNameParts[0];
+                                        refName = refNameParts[1];
+                                    }
+                                    
+                                    RefNameUtils.AuthorityTermInfo termInfo = RefNameUtils
+                                    .parseAuthorityTermInfo(refName);
+                                    AuthorityRefList.AuthorityRefItem ilistItem = new AuthorityRefList.AuthorityRefItem();
+                                    ilistItem.setRefName(refName);
+                                    ilistItem.setAuthDisplayName(termInfo.inAuthority.displayName);
+                                    ilistItem.setItemDisplayName(termInfo.displayName);
+                                    ilistItem.setSourceField(field);
+                                    ilistItem.setUri(termInfo.getRelativeUri());
+                                    list.add(ilistItem);
+                            } catch (Exception e) {
+                                    // FIXME: Do we need to throw this Exception here?
+                                    if (logger.isDebugEnabled()) {
+                                            logger.debug("Caught exception in getAuthorityRefs", e);
+                                    }
+                            }
+                        }
     		}
     	} catch (PropertyException pe) {
     		String msg = "Attempted to retrieve value for invalid or missing authority field. "
