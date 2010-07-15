@@ -81,7 +81,7 @@ $LastChangedDate: $
                 </properties>
             </widget>
             
-            <widget name="locationDate" type="text">
+            <widget name="locationDate" type="datetime">
                 <labels>
                     <label mode="any">locationDate</label>
                 </labels>
@@ -90,7 +90,8 @@ $LastChangedDate: $
                     <field schema="movements_common">locationDate</field>
                 </fields>
                 <properties widgetMode="edit">
-                    <property name="styleClass">dataInputText</property>
+                    <!-- Note spelling of "Formater" in method name. -->
+                    <property name="pattern">#{nxu:basicDateAndTimeFormater()}</property>
                 </properties>
             </widget>
             
@@ -149,7 +150,7 @@ $LastChangedDate: $
                 </properties>
             </widget>
             
-            <widget name="plannedRemovalDate" type="text">
+            <widget name="plannedRemovalDate" type="datetime">
                 <labels>
                     <label mode="any">plannedRemovalDate</label>
                 </labels>
@@ -158,11 +159,12 @@ $LastChangedDate: $
                     <field schema="movements_common">plannedRemovalDate</field>
                 </fields>
                 <properties widgetMode="edit">
-                    <property name="styleClass">dataInputText</property>
+                    <!-- Note spelling of "Formater" in method name. -->
+                    <property name="pattern">#{nxu:basicDateAndTimeFormater()}</property>
                 </properties>
             </widget>
             
-            <widget name="removalDate" type="text">
+            <widget name="removalDate" type="datetime">
                 <labels>
                     <label mode="any">removalDate</label>
                 </labels>
@@ -171,7 +173,8 @@ $LastChangedDate: $
                     <field schema="movements_common">removalDate</field>
                 </fields>
                 <properties widgetMode="edit">
-                    <property name="styleClass">dataInputText</property>
+                    <!-- Note spelling of "Formater" in method name. -->
+                    <property name="pattern">#{nxu:basicDateAndTimeFormater()}</property>
                 </properties>
             </widget>
             
