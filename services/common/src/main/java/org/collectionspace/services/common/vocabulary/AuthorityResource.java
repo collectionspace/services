@@ -555,7 +555,10 @@ AbstractMultiPartCollectionSpaceResourceImpl {
         String whereClause =
         	authorityItemCommonSchemaName+
         	":"+AuthorityJAXBSchema.SHORT_IDENTIFIER+
-        	"='"+itemspecifier+"'";
+        	"='"+itemspecifier+"' AND "
+			+ authorityItemCommonSchemaName + ":"
+			+ AuthorityItemJAXBSchema.IN_AUTHORITY + "="
+			+ "'" + parentcsid + "'";
                 
         if (logger.isDebugEnabled()) {
             logger.debug("getAuthorityItemByName with parentcsid=" + parentcsid + " and itemspecifier=" + itemspecifier);
@@ -621,22 +624,29 @@ AbstractMultiPartCollectionSpaceResourceImpl {
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        // TODO REWRITE to get the CSID for the parent by name, and then call getAuthorityItemByName 
-        String whereClause =
-        	authorityItemCommonSchemaName+
-        	":"+AuthorityJAXBSchema.SHORT_IDENTIFIER+
-        	"='"+itemspecifier+"'";
+		String authWhereClause =
+			authorityCommonSchemaName+
+			":"+AuthorityJAXBSchema.SHORT_IDENTIFIER+
+			"='"+parentspecifier+"'";
         if (logger.isDebugEnabled()) {
             logger.debug("getAuthorityItemByNameInNamedAuthority with parentspecifier=" 
             		+ parentspecifier + " and itemspecifier=" + itemspecifier);
         }
         MultipartOutput result = null;
         try {
-            // Note that we have to create the service context for the Items, not the main service
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getItemServiceName());
-        	// HACK HACK Since we do not use the parent CSID yet this should work.
-            DocumentHandler handler = createItemDocumentHandler(ctx, parentspecifier);
-            DocumentFilter myFilter = new DocumentFilter(whereClause, 0, 1);
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getServiceName());
+        	String parentcsid = getRepositoryClient(ctx).findDocCSID(ctx, authWhereClause);
+            String itemWhereClause =
+            	authorityItemCommonSchemaName+
+            	":"+AuthorityJAXBSchema.SHORT_IDENTIFIER+
+            	"='"+itemspecifier+"' AND "
+    			+ authorityItemCommonSchemaName + ":"
+    			+ AuthorityItemJAXBSchema.IN_AUTHORITY + "="
+    			+ "'" + parentcsid + "'";
+            // Now that we have to create the service context for the Items, not the main service
+        	ctx = createServiceContext(getItemServiceName());
+            DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
+            DocumentFilter myFilter = new DocumentFilter(itemWhereClause, 0, 1);
             handler.setDocumentFilter(myFilter);
             getRepositoryClient(ctx).get(ctx, handler);
             // TODO should we assert that the item is in the passed personAuthority?

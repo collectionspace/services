@@ -258,7 +258,7 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @return the client response
      */
     public ClientResponse<MultipartInput> readNamedItemInNamedAuthority(String authShortId, String itemShortId) {
-        return personAuthorityProxy.readNamedItem(authShortId, itemShortId);
+        return personAuthorityProxy.readNamedItemInNamedAuthority(authShortId, itemShortId);
     }
 
     /**

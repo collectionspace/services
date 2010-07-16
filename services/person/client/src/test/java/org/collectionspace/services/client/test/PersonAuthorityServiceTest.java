@@ -232,7 +232,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         final String testName = "createItemInAuthority";
         if(logger.isDebugEnabled()){
-            logger.debug(testName + ":...");
+            logger.debug(testName + ":"+vcsid+"...");
         }
 
         // Submit the request to the service and store the response.
@@ -288,6 +288,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownItemResourceId=" + knownItemResourceId);                
             }
+        }
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + " (created):"+vcsid+"/("+newID+","+shortId+")");
         }
 
         // Store the IDs from any item resources created
@@ -662,6 +665,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
+            logger.debug("Reading:"+((authCSID!=null)?authCSID:authShortId)+"/"+
+            		((itemCSID!=null)?authCSID:itemShortId));
         }
         // Perform setup.
         setupRead();
