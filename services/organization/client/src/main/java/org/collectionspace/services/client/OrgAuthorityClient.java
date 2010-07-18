@@ -269,7 +269,7 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
      * @return the client response
      */
     public ClientResponse<MultipartInput> readNamedItemInNamedAuthority(String authShortId, String itemShortId) {
-        return orgAuthorityProxy.readNamedItem(authShortId, itemShortId);
+        return orgAuthorityProxy.readNamedItemInNamedAuthority(authShortId, itemShortId);
     }
 
     /**
