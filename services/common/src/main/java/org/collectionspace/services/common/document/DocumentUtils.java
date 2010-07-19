@@ -205,12 +205,14 @@ public class DocumentUtils {
             //
             // Create the builder and parse the file
             //
-            result = factory.newDocumentBuilder().parse(payload);
+            DocumentBuilder db = factory.newDocumentBuilder();
+            db.setErrorHandler(null);
+            result = db.parse(payload);
             
             // Write it to the log so we can see what we've created.
             if (logger.isDebugEnabled() == true) {
             	logger.debug(xmlToString(result));
-            	System.out.println(xmlToString(result)); //FIXME: REM - Need this until we figure out why messages are not showing up in logger.
+            	//System.out.println(xmlToString(result)); //FIXME: REM - Need this until we figure out why messages are not showing up in logger.
             }
         } finally {
             if (payload != null) {

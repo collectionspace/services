@@ -42,6 +42,7 @@
         <module>loanout</module>
         <module>location</module>
         <module>movement</module>
+        <module>report</module>
         <module>dimension</module>
         <module>contact</module>
         <module>JaxRsServiceProvider</module>
