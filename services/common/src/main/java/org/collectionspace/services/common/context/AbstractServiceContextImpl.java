@@ -449,12 +449,19 @@ public abstract class AbstractServiceContextImpl<IT, OT>
                     + DocumentHandler.class.getCanonicalName());
         }
         //
-        // create a default document filter with pagination if the context
-        // was created with query params
+        // Create a default document filter
         //
         docHandler.setServiceContext(this);
         DocumentFilter docFilter = docHandler.createDocumentFilter();
-        docFilter.setPagination(this.getQueryParams());
+        //
+        // If the context was created with query parameters,
+        // reflect the values of those parameters in the document filter
+        // to specify sort ordering, pagination, etc.
+        //
+        if (this.getQueryParams() != null) {
+          docFilter.setSortOrder(this.getQueryParams());
+          docFilter.setPagination(this.getQueryParams());
+        }
         docHandler.setDocumentFilter(docFilter);
 
         return docHandler;

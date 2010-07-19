@@ -40,6 +40,9 @@ public class DocumentFilter {
     public static int defaultPageSize = DEFAULT_PAGE_SIZE_INIT;
     /** The where clause. */
     protected String whereClause;	// Filtering clause. Omit the "WHERE".
+    /** The order by clause. */
+    protected String orderByClause;	// Filtering clause. Omit the "ORDER BY".
+    public static final String EMPTY_ORDER_BY_CLAUSE = "";
     /** The start page. */
     protected int startPage;		// Pagination offset for list results
     /** The page size. */
@@ -128,12 +131,25 @@ public class DocumentFilter {
     /**
      * Instantiates a new document filter.
      *
-     * @param theWhereClause the the where clause
-     * @param theStartPage the the start page
-     * @param thePageSize the the page size
+     * @param theWhereClause the where clause
+     * @param theStartPage the start page
+     * @param thePageSize the page size
      */
     public DocumentFilter(String theWhereClause, int theStartPage, int thePageSize) {
+        this(theWhereClause, EMPTY_ORDER_BY_CLAUSE, theStartPage, thePageSize);
+    }
+
+    /**
+     * Instantiates a new document filter.
+     *
+     * @param theWhereClause the where clause
+     * @param theOrderByClause the order by clause
+     * @param theStartPage the start page
+     * @param thePageSize the page size
+     */
+    public DocumentFilter(String theWhereClause, String theOrderByClause, int theStartPage, int thePageSize) {
         this.whereClause = theWhereClause;
+        this.orderByClause = theOrderByClause;
         this.startPage = (theStartPage > 0) ? theStartPage : 0;
         this.pageSize = (thePageSize > 0) ? thePageSize : defaultPageSize;
     }
@@ -209,11 +225,12 @@ public class DocumentFilter {
     /**
      * Append where clause.
      *
-     * @param theWhereClause the the where clause
-     * @param conjunction the conjunction
+     * @param theWhereClause the where clause
+     * @param conjunction the conjunction to insert between the current
+     *        where clause, if any, and the additional where clause to be appended
      */
     public void appendWhereClause(String theWhereClause, String conjunction) {
-        if (theWhereClause != null && theWhereClause.length() > 0) {
+        if (theWhereClause != null && ! theWhereClause.trim().isEmpty()) {
             String currentClause = getWhereClause();
             if (currentClause != null) {
                 String newClause = currentClause.concat(conjunction + theWhereClause);
@@ -242,6 +259,47 @@ public class DocumentFilter {
      */
     public List<ParamBinding> buildWhere(StringBuilder queryStrBldr) {
         return new ArrayList<ParamBinding>();
+    }
+
+    /**
+     * Sets the sort ordering.
+     *
+     * @param theQueryParams the query params
+     */
+    public void setSortOrder(MultivaluedMap<String, String> theQueryParams) {
+        // Bail if there are no params
+        if (theQueryParams == null) {
+            return;
+        }
+        // Set the order by clause
+        String orderByStr = null;
+        List<String> list = theQueryParams.get(IClientQueryParams.SORT_BY_PARAM);
+        if (list != null) {
+            orderByStr = list.get(0);
+        }
+
+        // FIXME: Verify the format of the value(s) in the 'sort by'
+        // query param.
+
+        setOrderByClause(orderByStr);
+    }
+
+    /**
+     * Gets the order by clause.
+     *
+     * @return the order by clause
+     */
+    public String getOrderByClause() {
+        return orderByClause;
+    }
+
+    /**
+     * Sets the order by clause.
+     *
+     * @param theOrderByClause the new order by clause
+     */
+    public void setOrderByClause(String theOrderByClause) {
+        this.orderByClause = theOrderByClause;
     }
 
     /**

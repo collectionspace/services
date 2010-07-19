@@ -63,6 +63,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
 
     /* Use this to keep track of resources to delete */
     protected List<String> allResourceIdsCreated = new ArrayList<String>();
+    private String EMPTY_SORT_BY_ORDER = "";
 
     /**
      * Gets the logger.
@@ -388,8 +389,26 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
     private AbstractCommonList readList(String testName,
                     CollectionSpaceClient client,
                     long pageSize, long pageNumber) throws Exception {
+
+        return readList(testName, client, EMPTY_SORT_BY_ORDER, pageSize, pageNumber);
+
+    }
+    /**
+     * Read list.
+     *
+     * @param testName the test name
+     * @param client the client
+     * @param sortBy the sort order
+     * @param pageSize the page size
+     * @param pageNumber the page number
+     * @return the abstract common list
+     * @throws Exception the exception
+     */
+    private AbstractCommonList readList(String testName,
+                    CollectionSpaceClient client, String sortBy,
+                    long pageSize, long pageNumber) throws Exception {
         ClientResponse<AbstractCommonList> response =
-                client.readList(Long.toString(pageSize), Long.toString(pageNumber));
+                client.readList(sortBy, Long.toString(pageSize), Long.toString(pageNumber));
         AbstractCommonList result = null;
         try {
             int statusCode = response.getStatus();

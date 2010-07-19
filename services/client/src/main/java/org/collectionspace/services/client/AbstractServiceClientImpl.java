@@ -312,6 +312,19 @@ public abstract class AbstractServiceClientImpl implements
         return getProxy().readList(pageSize, pageNumber);
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * org.collectionspace.services.client.CollectionSpaceClient#readList(java
+     * .lang.String, java.lang.String)
+     */
+    @Override
+    public ClientResponse<AbstractCommonList> readList(String sortBy, String pageSize,
+            String pageNumber) {
+        return getProxy().readList(sortBy, pageSize, pageNumber);
+    }
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.CollectionSpaceClient#delete(java.lang.String)
      */

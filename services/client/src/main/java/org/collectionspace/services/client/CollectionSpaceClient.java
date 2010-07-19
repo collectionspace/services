@@ -148,7 +148,21 @@ public interface CollectionSpaceClient {
      * @param pageNumber the page number
      * @return the client response
      */
-    public ClientResponse<AbstractCommonList> readList(String pageSize,
+    public ClientResponse<AbstractCommonList> readList(
+            String pageSize,
+            String pageNumber);
+
+    /**
+     * Read list.
+     *
+     * @param sortBy the sort order
+     * @param pageSize the page size
+     * @param pageNumber the page number
+     * @return the client response
+     */
+    public ClientResponse<AbstractCommonList> readList(
+            String sortBy,
+            String pageSize,
             String pageNumber);
 
     /**

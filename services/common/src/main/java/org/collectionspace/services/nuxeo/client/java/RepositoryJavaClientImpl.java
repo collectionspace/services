@@ -72,6 +72,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         DocumentFilter docFilter;
         /** The where clause. */
         String whereClause;
+        /** The order by clause. */
+        String orderByClause;
         /** The domain. */
         String domain;
         /** The tenant id. */
@@ -106,7 +108,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
          * Instantiates a new query context.
          *
          * @param ctx the ctx
-         * @param theWhereClause the the where clause
+         * @param theWhereClause the where clause
          * @throws DocumentNotFoundException the document not found exception
          * @throws DocumentException the document exception
          */
@@ -137,6 +139,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
                         "Document handler has no Filter specified.");
             }
             whereClause = docFilter.getWhereClause();
+            orderByClause = docFilter.getOrderByClause();
         }
     }
     /** The logger. */
@@ -621,6 +624,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
     @Override
     public void getFiltered(ServiceContext ctx, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
+
         QueryContext queryContext = new QueryContext(ctx, handler);
 
         RepositoryInstance repoSession = null;
@@ -899,11 +903,10 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
     }
 
     /**
-     * Append nxql where.
+     * Append a WHERE clause to the NXQL query.
      *
-     * @param query the query
-     * @param where the where
-     * @param domain the domain
+     * @param query         The NXQL query to which the WHERE clause will be appended.
+     * @param querycontext  The query context, which provides the WHERE clause to append.
      */
     private final void appendNXQLWhere(StringBuilder query, QueryContext queryContext) {
         //
@@ -923,7 +926,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         // Finally, append the incoming where clause
         //
         String whereClause = queryContext.whereClause;
-        if (whereClause != null && whereClause.length() > 0) {
+        if (whereClause != null && ! whereClause.trim().isEmpty()) {
             // Due to an apparent bug/issue in how Nuxeo translates the NXQL query string
             // into SQL, we need to parenthesize our 'where' clause
             query.append(IQueryManager.SEARCH_QUALIFIER_AND + "(" + whereClause + ")");
@@ -935,28 +938,50 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
     }
 
     /**
-     * Builds the nxql query.
+     * Append an ORDER BY clause to the NXQL query.
      *
-     * @param docType the doc type
-     * @param where the where
-     * @param domain the domain
-     * @param tenantId the tenant id
-     * @return the string
+     * @param query         The NXQL query to which the ORDER BY clause will be appended.
+     * @param querycontext  The query context, which provides the ORDER BY clause to append.
+     */
+    private final void appendNXQLOrderBy(StringBuilder query, QueryContext queryContext) {
+        // Append the incoming ORDER BY clause
+        String orderByClause = queryContext.orderByClause;
+        if (orderByClause != null && ! orderByClause.trim().isEmpty()) {
+            // FIXME Verify whether enclosing parentheses may be required, and add
+            // them if so, as is being done in appendNXQLWhere.
+            query.append(" ORDER BY ");
+            query.append(orderByClause);
+        }
+
+        // FIXME Determine where and how to handle ASC[ending] and DESC[ending] qualifiers:
+        //
+        // Will these be included in the value of the relevant 'order by' query param?
+        //
+        // Will the format of the order by clause be verified, including placement of
+        // the 'order by' qualifiers?
+    }
+
+
+    /**
+     * Builds an NXQL SELECT query for a single document type.
+     *
+     * @param queryContext The query context
+     * @return an NXQL query
      */
     private final String buildNXQLQuery(QueryContext queryContext) {
         StringBuilder query = new StringBuilder("SELECT * FROM ");
         query.append(queryContext.docType);
         appendNXQLWhere(query, queryContext);
+        appendNXQLOrderBy(query, queryContext);
         return query.toString();
     }
 
     /**
-     * Builds the nxql query.
+     * Builds an NXQL SELECT query across multiple document types.
      *
-     * @param docTypes the doc types
-     * @param where the where
-     * @param domain the domain
-     * @return the string
+     * @param docTypes     a list of document types to be queried
+     * @param queryContext the query context
+     * @return an NXQL query
      */
     private final String buildNXQLQuery(List<String> docTypes, QueryContext queryContext) {
         StringBuilder query = new StringBuilder("SELECT * FROM ");
@@ -970,6 +995,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
             query.append(docType);
         }
         appendNXQLWhere(query, queryContext);
+        // FIXME add 'order by' clause here, if appropriate
         return query.toString();
     }
 

@@ -38,6 +38,19 @@ import org.jboss.resteasy.client.ClientResponse;
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
 public interface CollectionSpaceProxy {
+
+    /**
+     * Read list.
+     *
+     * @param pageSize the page size
+     * @param pageNumber the page number
+     * @return the client response
+     */
+    @GET
+    @Produces({"application/xml"})
+    ClientResponse<AbstractCommonList> readList(
+            @QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) String pageSize,
+    	    @QueryParam(IClientQueryParams.START_PAGE_PARAM) String pageNumber);
 	
     /**
      * Read list.
@@ -49,6 +62,7 @@ public interface CollectionSpaceProxy {
     @GET
     @Produces({"application/xml"})
     ClientResponse<AbstractCommonList> readList(
-    		@QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) String pageSize,
-    		@QueryParam(IClientQueryParams.START_PAGE_PARAM) String pageNumber);
+            @QueryParam(IClientQueryParams.SORT_BY_PARAM) String sortBy,
+            @QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) String pageSize,
+    	    @QueryParam(IClientQueryParams.START_PAGE_PARAM) String pageNumber);
 }
