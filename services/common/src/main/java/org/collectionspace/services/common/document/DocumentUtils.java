@@ -24,6 +24,7 @@
 package org.collectionspace.services.common.document;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.ByteArrayInputStream;
@@ -31,6 +32,8 @@ import java.io.StringWriter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -50,6 +53,20 @@ import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.service.ObjectPartContentType;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.service.XmlContentType;
+
+import org.nuxeo.common.collections.PrimitiveArrays;
+import org.nuxeo.ecm.core.schema.SchemaManager;
+import org.nuxeo.ecm.core.schema.TypeConstants;
+import org.nuxeo.ecm.core.schema.types.ComplexType;
+import org.nuxeo.ecm.core.schema.types.Field;
+import org.nuxeo.ecm.core.schema.types.ListType;
+import org.nuxeo.ecm.core.schema.types.Schema;
+import org.nuxeo.ecm.core.schema.types.Type;
+import org.nuxeo.ecm.core.schema.types.primitives.StringType;
+import org.nuxeo.ecm.core.schema.types.FieldImpl;
+import org.nuxeo.ecm.core.schema.types.QName;
+import org.nuxeo.runtime.api.Framework;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -387,6 +404,7 @@ public class DocumentUtils {
      * @return
      */
     private static String qualify(String name, String value) {
+    	/*
         String result = null;
         if (isQualified(name, value)) {
             result = value;
@@ -394,6 +412,8 @@ public class DocumentUtils {
         	result = name + NAME_VALUE_SEPARATOR + value;
         }
         return result;
+        */
+    	return value;
     }
 
     /**
@@ -432,8 +452,11 @@ public class DocumentUtils {
         root.setAttribute("xsi:schemaLocation", xc.getSchemaLocation());
         root.setAttribute("xmlns:" + ns, xc.getNamespaceURI());
         document.appendChild(root);
+        
+        SchemaManager schemaManager = Framework.getLocalService(SchemaManager.class);
+        Schema schema = schemaManager.getSchema(partMeta.getLabel());
 
-        buildDocument(document, root, objectProps);
+        buildDocument(document, root, objectProps, schema);
         
         return document;
     }
@@ -446,24 +469,74 @@ public class DocumentUtils {
      * @param objectProps the object props
      * @throws Exception the exception
      */
-    public static void buildDocument(Document document, Element e,
-            Map<String, Object> objectProps) throws Exception {
+    public static void buildDocument(Document document, Element parent,
+            Map<String, Object> objectProps, Schema schema) throws Exception {
         for (String prop : objectProps.keySet()) {
             Object value = objectProps.get(prop);
             if (value != null) {
-                //no need to qualify each element name as namespace is already added
-                Element newElement = document.createElement(prop);
-                e.appendChild(newElement);
-                if (value instanceof ArrayList<?>) {
-                    //multi-value element
-                    insertMultiValues(document, newElement, (ArrayList<String>) value);
-                } else {
-                    String strValue = objectProps.get(prop).toString();
-                    insertTextNode(document, newElement, strValue);
-                }
+            	Field field = schema.getField(prop);
+            	// If there is no field, then we added this property to the properties, 
+            	// and it must be a String (e.g., CSID)
+            	// TODO - infer the type from the type of Object, if we need more than String
+            	if(field==null) {
+            		field = new FieldImpl(new QName(prop), schema, StringType.INSTANCE);
+            	}
+            	buildProperty(document, parent, field, value);
             }
         }
     }
+
+    private static void buildProperty(Document document, Element parent, 
+    		Field field, Object value) throws IOException {
+    	Type type = field.getType();
+    	//no need to qualify each element name as namespace is already added
+    	String propName = field.getName().getLocalName();
+    	Element element = document.createElement(propName);
+    	parent.appendChild(element);
+    	// extract the element content
+    	if (type.isSimpleType()) {
+    		element.setTextContent(type.encode(value));
+    	} else if (type.isComplexType()) {
+    		ComplexType ctype = (ComplexType) type;
+    		if (ctype.getName().equals(TypeConstants.CONTENT)) {
+    			throw new RuntimeException(
+    					"Unexpected schema type: BLOB for field: "+propName);
+    		} else {
+    			buildComplex(document, element, ctype, (Map) value);
+    		}
+    	} else if (type.isListType()) {
+    		if (value instanceof List) {
+    			buildList(document, element, (ListType) type, (List) value);
+    		} else if (value.getClass().getComponentType() != null) {
+    			buildList(document, element, (ListType) type,
+    					PrimitiveArrays.toList(value));
+    		} else {
+    			throw new IllegalArgumentException(
+    					"A value of list type is neither list neither array: "
+    					+ value);
+    		}
+    	}
+    }
+    
+    private static void buildComplex(Document document, Element element, 
+    		ComplexType ctype, Map map) throws IOException {
+    	Iterator<Map.Entry> it = map.entrySet().iterator();
+    	while (it.hasNext()) {
+    		Map.Entry entry = it.next();
+    		String propName = entry.getKey().toString();
+    		buildProperty(document, element, 
+    				ctype.getField(propName), entry.getValue());
+    	}
+    }
+
+    private static void buildList(Document document, Element element, 
+    		ListType ltype, List list) throws IOException {
+    	Field field = ltype.getField();
+    	for (Object obj : list) {
+    		buildProperty(document, element, field, obj);
+    	}
+    }
+
 
     /**
      * Insert multi values.
@@ -471,7 +544,6 @@ public class DocumentUtils {
      * @param document the document
      * @param e the e
      * @param vals the vals
-     */
     private static void insertMultiStringValues(Document document, Element e, ArrayList<String> vals) {
         String parentName = e.getNodeName();
         
@@ -483,6 +555,7 @@ public class DocumentUtils {
             insertTextNode(document, c, nv.value);
         }
     }
+     */
     
     /**
      * Create a set of complex/structured elements from an array of Maps.
@@ -491,7 +564,6 @@ public class DocumentUtils {
      * @param e the e
      * @param vals the vals
      * @throws Exception the exception
-     */
     private static void insertMultiHashMapValues(Document document, Element e, ArrayList<Map<String, Object>> vals)
     		throws Exception {
         String parentName = e.getNodeName();
@@ -520,6 +592,7 @@ public class DocumentUtils {
             buildDocument(document, newNode, map);
         }
     }
+     */
 
     /**
      * Create a set of elements for an array of values.  Currently, we're assuming the
@@ -529,7 +602,6 @@ public class DocumentUtils {
      * @param e the e
      * @param vals the vals
      * @throws Exception the exception
-     */
     private static void insertMultiValues(Document document, Element e, ArrayList<?> vals)
     		throws Exception {
     	if (vals != null && vals.size() > 0) {
@@ -548,6 +620,7 @@ public class DocumentUtils {
 	    	}
     	}
     }
+     */
 
     /**
      * Insert text node.
@@ -555,11 +628,11 @@ public class DocumentUtils {
      * @param document the document
      * @param e the e
      * @param strValue the str value
-     */
     private static void insertTextNode(Document document, Element e, String strValue) {
         Text tNode = document.createTextNode(strValue);
         e.appendChild(tNode);
     }
+     */
 
     /**
      * unqualify given value.
@@ -568,7 +641,6 @@ public class DocumentUtils {
      * @param input
      * @return name and value
      * @exception IllegalStateException
-     */
     private static NameValue unqualify(String input) {
         NameValue nv = new NameValue();
         StringTokenizer stz = new StringTokenizer(input, NAME_VALUE_SEPARATOR);
@@ -585,6 +657,7 @@ public class DocumentUtils {
         }
         return nv;
     }
+     */
 
     /**
      * writeDocument streams out given document to given output stream
