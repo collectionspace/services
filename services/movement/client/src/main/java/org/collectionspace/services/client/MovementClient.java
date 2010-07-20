@@ -94,10 +94,19 @@ public class MovementClient extends AbstractServiceClientImpl {
 
     /**
      * @return
-     * @see org.collectionspace.services.client.MovementProxy#getMovement()
+     * @see org.collectionspace.services.client.MovementProxy#readList()
      */
     public ClientResponse<MovementsCommonList> readList() {
         return movementProxy.readList();
+    }
+
+    /**
+     * @param sortFieldName
+     * @return
+     * @see org.collectionspace.services.client.MovementProxy#readList(java.lang.String)
+     */
+    public ClientResponse<MovementsCommonList> readListSortedBy(String sortFieldName) {
+        return movementProxy.readListSortedBy(sortFieldName);
     }
     
     /**

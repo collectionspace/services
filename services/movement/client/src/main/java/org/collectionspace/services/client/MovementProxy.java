@@ -8,6 +8,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
@@ -47,6 +48,12 @@ public interface MovementProxy extends CollectionSpaceProxy {
     @GET
     @Produces({"application/xml"})
     ClientResponse<MovementsCommonList> readList();
+    
+    // Sorted list
+    @GET
+    @Produces({"application/xml"})
+    ClientResponse<MovementsCommonList> readListSortedBy(
+        @QueryParam("sortBy") String sortFieldName);
 
     // List Authority References
     @GET
