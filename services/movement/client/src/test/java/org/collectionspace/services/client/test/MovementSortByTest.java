@@ -61,10 +61,12 @@ public class MovementSortByTest extends BaseServiceTest {
 
     private final String CLASS_NAME = MovementSortByTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+
+    // Instance variables specific to this test.
     final String DELIMITER_SCHEMA_AND_FIELD = ":";
     final String KEYWORD_DESCENDING_SEARCH = "DESC";
-    // Instance variables specific to this test.
     final String SERVICE_PATH_COMPONENT = "movements";
+    final String TEST_SPECIFIC_KEYWORD = "msotebstpfscn";
     private List<String> movementIdsCreated = new ArrayList<String>();
 
     /* (non-Javadoc)
@@ -107,6 +109,59 @@ public class MovementSortByTest extends BaseServiceTest {
             logger.debug("Sorting on field name=" + sortFieldName);
         }
         MovementsCommonList list = readSortedList(sortFieldName);
+        List<MovementsCommonList.MovementListItem> items =
+                list.getMovementListItem();
+
+        String[] values = new String[100];
+        Collator usEnglishCollator = Collator.getInstance(Locale.US);
+        int i = 0;
+        for (MovementsCommonList.MovementListItem item : items) {
+            // Because movementNote is not currently a summary field
+            // (returned in summary list items), we will need to verify
+            // sort order by retrieving full records, using the
+            // IDs provided in the summary list items. amd then retriving
+            // the value of that field from each of those records.
+            MovementsCommon movement = read(item.getCsid());
+            values[i] = movement.getMovementNote();
+            if (logger.isDebugEnabled()) {
+                logger.debug("list-item[" + i + "] movementNote=" + values[i]);
+            }
+            // Verify that the value of the specified field in the current record
+            // is equal to or greater than its value in the previous record,
+            // using a locale-specific collator.
+            //
+            // (Note: when used with certain text, this test case could potentially
+            // reflect inconsistencies, if any, between Java's collator and the
+            // collator used for ordering by the database.  To help avoid this,
+            // it might be useful to keep test strings fairly generic.)
+            if (i > 0) {
+                Assert.assertTrue(usEnglishCollator.compare(values[i], values[i - 1]) >= 0);
+            }
+            i++;
+        }
+
+    }
+
+    /*
+     * Tests whether a list of records, obtained by a keyword search, and
+     * sorted by a String field in ascending order, is returned in the expected order.
+     *
+     * This verifies that summary list results from keyword searches, in
+     * addition to 'read list' requests, can be returned in sorted order.
+     */
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"createList"})
+    public void sortKeywordSearchResultsByStringFieldAscending(String testName) throws Exception {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+
+        String sortFieldName = qualifySortFieldName(MovementJAXBSchema.MOVEMENT_NOTE);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Sorting on field name=" + sortFieldName);
+        }
+        MovementsCommonList list = keywordSearchSortedBy(TEST_SPECIFIC_KEYWORD, sortFieldName);
         List<MovementsCommonList.MovementListItem> items =
                 list.getMovementListItem();
 
@@ -419,7 +474,7 @@ public class MovementSortByTest extends BaseServiceTest {
     public Object[][] unsortedValues() {
         // Add a test record-specific string so we have the option of
         // constraining tests to only test records, in list or search results.
-        final String TEST_RECORD_SPECIFIC_STRING = CLASS_NAME + " " + "jlmbsoq";
+        final String TEST_RECORD_SPECIFIC_STRING = CLASS_NAME + " " + TEST_SPECIFIC_KEYWORD;
         return new Object[][]{
                     {1, "Aardvark and plumeria. " + TEST_RECORD_SPECIFIC_STRING, "2009-01-29T00:00:05Z"},
                     {4, "Bat fling off wall. " + TEST_RECORD_SPECIFIC_STRING, "2010-08-30T00:00:00Z"},
@@ -531,6 +586,33 @@ public class MovementSortByTest extends BaseServiceTest {
 
         ClientResponse<MovementsCommonList> res =
                 client.readListSortedBy(sortFieldName);
+        MovementsCommonList list = res.getEntity();
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        return list;
+
+    }
+
+    private MovementsCommonList keywordSearchSortedBy(String keywords,
+            String sortFieldName) throws Exception {
+
+        String testName = "keywordSearchSortedBy";
+        testSetup(STATUS_OK, ServiceRequestType.READ);
+
+        // Submit the request to the service and store the response.
+        MovementClient client = new MovementClient();
+
+        ClientResponse<MovementsCommonList> res =
+                client.keywordSearchSortedBy(keywords, sortFieldName);
         MovementsCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 

@@ -6,7 +6,7 @@
  * http://www.collectionspace.org
  * http://wiki.collectionspace.org
  *
- * Copyright (c) 2009 Regents of the University of California
+ * Copyright © 2009 Regents of the University of California
  *
  * Licensed under the Educational Community License (ECL), Version 2.0.
  * You may not use this file except in compliance with this License.
@@ -14,13 +14,12 @@
  * You may obtain a copy of the ECL 2.0 License at
  * https://source.collectionspace.org/collection-space/LICENSE.txt
  */
+
 package org.collectionspace.services.client;
 
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-//import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.movement.MovementsCommonList;
 
 import org.jboss.resteasy.client.ProxyFactory;
@@ -42,6 +41,7 @@ public class MovementClient extends AbstractServiceClientImpl {
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */
+    @Override
     public String getServicePathComponent() {
         return "movements";
     }
@@ -73,6 +73,7 @@ public class MovementClient extends AbstractServiceClientImpl {
     /**
      * allow to reset proxy as per security needs
      */
+    @Override
     public void setProxy() {
         if (useAuth()) {
             movementProxy = ProxyFactory.create(MovementProxy.class,
@@ -107,6 +108,16 @@ public class MovementClient extends AbstractServiceClientImpl {
      */
     public ClientResponse<MovementsCommonList> readListSortedBy(String sortFieldName) {
         return movementProxy.readListSortedBy(sortFieldName);
+    }
+
+    /**
+     * @param sortFieldName
+     * @param keywords
+     * @return
+     * @see org.collectionspace.services.client.MovementProxy#keywordSearchSortedBy(java.lang.String, java.lang.String)
+     */
+    public ClientResponse<MovementsCommonList> keywordSearchSortedBy(String keywords, String sortFieldName) {
+        return movementProxy.keywordSearchSortedBy(keywords, sortFieldName);
     }
     
     /**
