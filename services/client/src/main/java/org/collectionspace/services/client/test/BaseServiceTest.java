@@ -105,6 +105,8 @@ public abstract class BaseServiceTest {
         Response.Status.BAD_REQUEST.getStatusCode();
     protected static final int STATUS_CREATED =
         Response.Status.CREATED.getStatusCode();
+    protected static final int STATUS_INTERNAL_SERVER_ERROR =
+        Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
     protected static final int STATUS_NOT_FOUND =
         Response.Status.NOT_FOUND.getStatusCode();
     protected static final int STATUS_OK =
