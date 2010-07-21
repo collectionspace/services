@@ -386,6 +386,38 @@ public class MovementSortByTest extends BaseServiceTest {
     }
 
     /*
+     * Tests whether a request to sort by an invalid identifier for the
+     * sort order (ascending or descending) is handled as expected.
+     */
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
+    public void sortWithInvalidSortOrderIdentifier(String testName) throws Exception {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // FIXME: Ultimately, this should return a BAD_REQUEST status.
+        testSetup(STATUS_INTERNAL_SERVER_ERROR, ServiceRequestType.READ);
+
+        // Submit the request to the service and store the response.
+        MovementClient client = new MovementClient();
+        final String INVALID_SORT_ORDER_IDENTIFIER = "NO_DIRECTION";
+        ClientResponse<MovementsCommonList> res =
+                client.readListSortedBy(MovementJAXBSchema.LOCATION_DATE
+                + " " + INVALID_SORT_ORDER_IDENTIFIER);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+    }
+
+    /*
      * Tests whether a request to sort by a malformed field name is
      * handled as expected.
      */
@@ -450,6 +482,9 @@ public class MovementSortByTest extends BaseServiceTest {
         // FIXME: While this convention - appending a suffix to the name of
         // the service's first unique URL path component - works, it would
         // be preferable to get the common schema name from configuration.
+        //
+        // Such configuration is provided for example, on the services side, in
+        // org.collectionspace.services.common.context.AbstractServiceContextImpl
         return getServicePathComponent() + "_" + "common";
     }
 
@@ -484,6 +519,10 @@ public class MovementSortByTest extends BaseServiceTest {
                 };
     }
 
+    /*
+     * Create multiple test records, initially in unsorted order,
+     * using values for various fields obtained from the data provider.
+     */
     @Test(dataProvider = "unsortedValues")
     public void createList(int expectedSortOrder, String movementNote,
             String locationDate) throws Exception {
@@ -494,7 +533,8 @@ public class MovementSortByTest extends BaseServiceTest {
         }
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
-        // Create each unsorted record provided by the data provider.
+        // Iterates through the sets of values returned by the data provider,
+        // and creates a corresponding test record for each set of values.
         create(movementNote, locationDate);
     }
 
