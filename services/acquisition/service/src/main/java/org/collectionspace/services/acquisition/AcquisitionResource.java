@@ -2,19 +2,19 @@
  *  This document is a part of the source code and related artifacts
  *  for CollectionSpace, an open source collections management system
  *  for museums and related institutions:
-
+ *
  *  http://www.collectionspace.org
  *  http://wiki.collectionspace.org
-
- *  Copyright 2009 University of California at Berkeley
-
+ *
+ *  Copyright © 2009 Regents of the University of California
+ *
  *  Licensed under the Educational Community License (ECL), Version 2.0.
  *  You may not use this file except in compliance with this License.
-
+ *
  *  You may obtain a copy of the ECL 2.0 License at
-
+ *
  *  https://source.collectionspace.org/collection-space/LICENSE.txt
-
+ *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,6 +43,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -62,7 +63,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The Class AcquisitionResource.
+ * AcquisitionResource.java
+ *
+ * Handles requests to the Acquisition service, orchestrates the retrieval
+ * of relevant resources, and returns responses to the client.
  */
 @Path("/acquisitions")
 @Consumes("multipart/mixed")
@@ -72,7 +76,6 @@ public class AcquisitionResource
 
     /** The service name. */
     final private String serviceName = "acquisitions";
-    
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(AcquisitionResource.class);
 
@@ -81,11 +84,11 @@ public class AcquisitionResource
      */
     @Override
     protected String getVersionString() {
-    	/** The last change revision. */
-    	final String lastChangeRevision = "$LastChangedRevision$";
-    	return lastChangeRevision;
+        /** The last change revision. */
+        final String lastChangeRevision = "$LastChangedRevision$";
+        return lastChangeRevision;
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getServiceName()
      */
@@ -93,11 +96,11 @@ public class AcquisitionResource
     public String getServiceName() {
         return serviceName;
     }
-    
+
     @Override
     public Class<AcquisitionsCommon> getCommonPartClass() {
-    	return AcquisitionsCommon.class;
-    }    
+        return AcquisitionsCommon.class;
+    }
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#createDocumentHandler(org.collectionspace.services.common.context.ServiceContext)
@@ -113,7 +116,6 @@ public class AcquisitionResource
 //        }
 //        return docHandler;
 //    }
-
     /**
      * Instantiates a new acquisition resource.
      */
@@ -141,14 +143,16 @@ public class AcquisitionResource
             return response;
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Create failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(
+                    ServiceMessages.CREATE_FAILED + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in createAcquisition", e);
             }
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Create failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.CREATE_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
     }
@@ -168,10 +172,9 @@ public class AcquisitionResource
             logger.debug("getAcquisition with csid=" + csid);
         }
         if (csid == null || "".equals(csid)) {
-            logger.error("getAcquisition: missing csid!");
+            logger.error("getAcquisition:" + ServiceMessages.MISSING_CSID);
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "get failed on Acquisition csid=" + csid).type(
-                    "text/plain").build();
+                    ServiceMessages.READ_FAILED + ServiceMessages.MISSING_CSID).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         MultipartOutput result = null;
@@ -182,29 +185,29 @@ public class AcquisitionResource
             result = (MultipartOutput) ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(
+                    ServiceMessages.READ_FAILED + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getAcquisition", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed on Acquisition csid=" + csid).type(
-                    "text/plain").build();
+                    ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getAcquisition", e);
             }
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.READ_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
 
         if (result == null) {
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed, the requested Acquisition CSID:" + csid + ": was not found.").type(
-                    "text/plain").build();
+                    ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return result;
@@ -221,18 +224,18 @@ public class AcquisitionResource
     @GET
     @Produces("application/xml")
     public AcquisitionsCommonList getAcquisitionList(@Context UriInfo ui,
-    		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
-    	AcquisitionsCommonList result = null;
-    	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-    	if (keywords != null) {
-    		result = searchAcquisitions(queryParams, keywords);
-    	} else {
-    		result = getAcquisitionsList(queryParams);
-    	}
-    	
-    	return result;
+            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
+        AcquisitionsCommonList result = null;
+        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+        if (keywords != null) {
+            result = searchAcquisitions(queryParams, keywords);
+        } else {
+            result = getAcquisitionsList(queryParams);
+        }
+
+        return result;
     }
-    
+
     /**
      * Gets the acquisitions list.
      * 
@@ -247,14 +250,16 @@ public class AcquisitionResource
             acquisitionObjectList = (AcquisitionsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(
+                    ServiceMessages.LIST_FAILED + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in getAcquisitionList", e);
             }
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.LIST_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return acquisitionObjectList;
@@ -279,8 +284,7 @@ public class AcquisitionResource
         if (csid == null || "".equals(csid)) {
             logger.error("updateAcquisition: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "update failed on Acquisition csid=" + csid).type(
-                    "text/plain").build();
+                    ServiceMessages.UPDATE_FAILED + ServiceMessages.MISSING_CSID).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         if (logger.isDebugEnabled()) {
@@ -294,19 +298,20 @@ public class AcquisitionResource
             result = (MultipartOutput) ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(
+                    ServiceMessages.UPDATE_FAILED + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
-                logger.debug("caugth exception in updateAcquisition", dnfe);
+                logger.debug("caught exception in updateAcquisition", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Update failed on Acquisition csid=" + csid).type(
-                    "text/plain").build();
+                    ServiceMessages.UPDATE_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.UPDATE_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return result;
@@ -329,8 +334,7 @@ public class AcquisitionResource
         if (csid == null || "".equals(csid)) {
             logger.error("deleteAcquisition: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "delete failed on Acquisition csid=" + csid).type(
-                    "text/plain").build();
+                    ServiceMessages.DELETE_FAILED + ServiceMessages.MISSING_CSID).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         try {
@@ -339,23 +343,24 @@ public class AcquisitionResource
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Delete failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(
+                    ServiceMessages.DELETE_FAILED + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("caught exception in deleteAcquisition", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Delete failed on Acquisition csid=" + csid).type(
-                    "text/plain").build();
+                    ServiceMessages.DELETE_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Delete failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.DELETE_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
     }
-    
+
     /**
      * Keywords search acquisitions.
      * 
@@ -365,15 +370,15 @@ public class AcquisitionResource
      * @return the acquisitions common list
      */
     @GET
-    @Path("/search")    
+    @Path("/search")
     @Produces("application/xml")
-    @Deprecated    
+    @Deprecated
     public AcquisitionsCommonList keywordsSearchAcquisitions(@Context UriInfo ui,
-    		@QueryParam (IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
-    	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-    	return searchAcquisitions(queryParams, keywords);
+            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
+        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+        return searchAcquisitions(queryParams, keywords);
     }
-    
+
     /**
      * Search acquisitions.
      * 
@@ -382,39 +387,41 @@ public class AcquisitionResource
      * @return the acquisitions common list
      */
     private AcquisitionsCommonList searchAcquisitions(
-    		MultivaluedMap<String, String> queryParams,
-    		String keywords) {
-    	AcquisitionsCommonList acquisitionObjectList;    	
+            MultivaluedMap<String, String> queryParams,
+            String keywords) {
+        AcquisitionsCommonList acquisitionObjectList;
         try {
             ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
 
             // perform a keyword search
             if (keywords != null && !keywords.isEmpty()) {
-            	String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
-	            DocumentFilter documentFilter = handler.getDocumentFilter();
-	            documentFilter.setWhereClause(whereClause);
-	            if (logger.isDebugEnabled()) {
-	            	logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
-	            }
+                String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
+                DocumentFilter documentFilter = handler.getDocumentFilter();
+                documentFilter.setWhereClause(whereClause);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+                }
             }
             getRepositoryClient(ctx).getFiltered(ctx, handler);
-            acquisitionObjectList = (AcquisitionsCommonList) handler.getCommonPartList();            
+            acquisitionObjectList = (AcquisitionsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(
+                    ServiceMessages.SEARCH_FAILED + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in search for Acquisitions", e);
             }
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.SEARCH_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return acquisitionObjectList;
-    }   
-    
+    }
+
     /**
      * Gets the authority refs.
      * 
@@ -427,33 +434,32 @@ public class AcquisitionResource
     @Path("{csid}/authorityrefs")
     @Produces("application/xml")
     public AuthorityRefList getAuthorityRefs(
-    		@PathParam("csid") String csid, 
-    		@Context UriInfo ui) {
-    	AuthorityRefList authRefList = null;
+            @PathParam("csid") String csid,
+            @Context UriInfo ui) {
+        AuthorityRefList authRefList = null;
         try {
             ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
-            DocumentWrapper<DocumentModel> docWrapper = 
-            	getRepositoryClient(ctx).getDoc(ctx, csid);
-            DocumentModelHandler<MultipartInput, MultipartOutput> handler 
-            	= (DocumentModelHandler<MultipartInput, MultipartOutput>)createDocumentHandler(ctx);
-            List<String> authRefFields = 
-            	((MultipartServiceContextImpl)ctx).getCommonPartPropertyValues(
-            			ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
+            DocumentWrapper<DocumentModel> docWrapper =
+                    getRepositoryClient(ctx).getDoc(ctx, csid);
+            DocumentModelHandler<MultipartInput, MultipartOutput> handler = (DocumentModelHandler<MultipartInput, MultipartOutput>) createDocumentHandler(ctx);
+            List<String> authRefFields =
+                    ((MultipartServiceContextImpl) ctx).getCommonPartPropertyValues(
+                    ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
             authRefList = handler.getAuthorityRefs(docWrapper, authRefFields);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(
+                    ServiceMessages.AUTH_REFS_FAILED + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in getAuthorityRefs", e);
             }
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.AUTH_REFS_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return authRefList;
     }
-    
-    
 }

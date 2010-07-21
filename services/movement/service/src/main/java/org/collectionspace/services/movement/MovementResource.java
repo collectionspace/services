@@ -2,19 +2,19 @@
  *  This document is a part of the source code and related artifacts
  *  for CollectionSpace, an open source collections management system
  *  for museums and related institutions:
-
+ *
  *  http://www.collectionspace.org
  *  http://wiki.collectionspace.org
-
- *  Copyright 2009 University of California at Berkeley
-
+ *
+ *  Copyright © 2009 Regents of the University of California
+ *
  *  Licensed under the Educational Community License (ECL), Version 2.0.
  *  You may not use this file except in compliance with this License.
-
+ *
  *  You may obtain a copy of the ECL 2.0 License at
-
+ *
  *  https://source.collectionspace.org/collection-space/LICENSE.txt
-
+ *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,6 +44,7 @@ import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.MultipartServiceContextImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
@@ -67,17 +68,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The Class MovementResource.
+ * MovementResource.java
+ *
+ * Handles requests to the Movement service, orchestrates the retrieval
+ * of relevant resources, and returns responses to the client.
+ *
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
 @Path("/movements")
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
-public class MovementResource extends
-		AbstractMultiPartCollectionSpaceResourceImpl {
+public class MovementResource extends AbstractMultiPartCollectionSpaceResourceImpl {
 
     /** The Constant serviceName. */
     private final static String serviceName = "movements";
-    
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(MovementResource.class);
     //FIXME retrieve client type from configuration
@@ -96,11 +101,11 @@ public class MovementResource extends
      */
     @Override
     protected String getVersionString() {
-    	/** The last change revision. */
-    	final String lastChangeRevision = "$LastChangedRevision$";
-    	return lastChangeRevision;
+        /** The last change revision. */
+        final String lastChangeRevision = "$LastChangedRevision$";
+        return lastChangeRevision;
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getServiceName()
      */
@@ -114,9 +119,9 @@ public class MovementResource extends
      */
     @Override
     public Class<MovementsCommon> getCommonPartClass() {
-    	return MovementsCommon.class;
+        return MovementsCommon.class;
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#createDocumentHandler(org.collectionspace.services.common.context.ServiceContext)
      */
@@ -131,7 +136,6 @@ public class MovementResource extends
 //        }
 //        return docHandler;
 //    }
-
     /**
      * Creates the movement.
      * 
@@ -142,7 +146,7 @@ public class MovementResource extends
     @POST
     public Response createMovement(MultipartInput input) {
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             //movementObject.setCsid(csid);
@@ -152,14 +156,16 @@ public class MovementResource extends
             return response;
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Create failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(
+                    ServiceMessages.CREATE_FAILED + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in createMovement", e);
             }
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Create failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.CREATE_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
     }
@@ -179,42 +185,41 @@ public class MovementResource extends
             logger.debug("getMovement with csid=" + csid);
         }
         if (csid == null || "".equals(csid)) {
-            logger.error("getMovement: missing csid!");
+            logger.error("getMovement:" + ServiceMessages.MISSING_CSID);
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "get failed on Movement csid=" + csid).type(
-                    "text/plain").build();
+                    ServiceMessages.READ_FAILED + ServiceMessages.MISSING_CSID).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         MultipartOutput result = null;
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(
+                    ServiceMessages.READ_FAILED + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getMovement", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed on Movement csid=" + csid).type(
-                    "text/plain").build();
+                    ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getMovement", e);
             }
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Get failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.READ_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         if (result == null) {
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Get failed, the requested Movement CSID:" + csid + ": was not found.").type(
-                    "text/plain").build();
+                    ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return result;
@@ -231,18 +236,18 @@ public class MovementResource extends
     @GET
     @Produces("application/xml")
     public MovementsCommonList getMovementList(@Context UriInfo ui,
-    		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
-    	MovementsCommonList result = null;
-    	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-    	if (keywords != null) {
-    		result = searchMovements(queryParams, keywords);
-    	} else {
-    		result = getMovementList(queryParams);
-    	}
- 
-    	return result;
+            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
+        MovementsCommonList result = null;
+        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+        if (keywords != null) {
+            result = searchMovements(queryParams, keywords);
+        } else {
+            result = getMovementList(queryParams);
+        }
+
+        return result;
     }
-    
+
     /**
      * Gets the movement list.
      * 
@@ -251,20 +256,22 @@ public class MovementResource extends
     private MovementsCommonList getMovementList(MultivaluedMap<String, String> queryParams) {
         MovementsCommonList movementObjectList;
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             movementObjectList = (MovementsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(
+                    ServiceMessages.LIST_FAILED + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in getMovementList", e);
             }
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.LIST_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return movementObjectList;
@@ -282,30 +289,31 @@ public class MovementResource extends
     @Path("{csid}/authorityrefs")
     @Produces("application/xml")
     public AuthorityRefList getAuthorityRefs(
-    		@PathParam("csid") String csid, 
-    		@Context UriInfo ui) {
-    	AuthorityRefList authRefList = null;
+            @PathParam("csid") String csid,
+            @Context UriInfo ui) {
+        AuthorityRefList authRefList = null;
         try {
-        	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
-            DocumentWrapper<DocumentModel> docWrapper = 
-            	getRepositoryClient(ctx).getDoc(ctx, csid);
-            DocumentModelHandler<MultipartInput, MultipartOutput> handler 
-            	= (DocumentModelHandler<MultipartInput, MultipartOutput>)createDocumentHandler(ctx);
-            List<String> authRefFields = 
-            	((MultipartServiceContextImpl)ctx).getCommonPartPropertyValues(
-        			ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
+            MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+            DocumentWrapper<DocumentModel> docWrapper =
+                    getRepositoryClient(ctx).getDoc(ctx, csid);
+            DocumentModelHandler<MultipartInput, MultipartOutput> handler = (DocumentModelHandler<MultipartInput, MultipartOutput>) createDocumentHandler(ctx);
+            List<String> authRefFields =
+                    ((MultipartServiceContextImpl) ctx).getCommonPartPropertyValues(
+                    ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
             authRefList = handler.getAuthorityRefs(docWrapper, authRefFields);
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Failed to retrieve authority references: reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(
+                    ServiceMessages.AUTH_REFS_FAILED + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in getAuthorityRefs", e);
             }
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to retrieve authority references").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.AUTH_REFS_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return authRefList;
@@ -322,25 +330,27 @@ public class MovementResource extends
     public MovementsCommonList getMovementList(List<String> csidList) {
         MovementsCommonList movementObjectList = new MovementsCommonList();
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csidList, handler);
             movementObjectList = (MovementsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(
+                    ServiceMessages.LIST_FAILED + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in getMovementList", e);
             }
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.LIST_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return movementObjectList;
     }
-    
+
     /**
      * Update movement.
      * 
@@ -360,31 +370,33 @@ public class MovementResource extends
         if (csid == null || "".equals(csid)) {
             logger.error("updateMovement: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
-                    "update failed on Movement csid=" + csid).type(
+                    ServiceMessages.UPDATE_FAILED + ServiceMessages.MISSING_CSID).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
         MultipartOutput result = null;
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = (MultipartOutput) ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(
+                    ServiceMessages.UPDATE_FAILED + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("caught exception in updateMovement", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Update failed on Movement csid=" + csid).type(
+                    ServiceMessages.UPDATE_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.UPDATE_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return result;
@@ -412,28 +424,30 @@ public class MovementResource extends
             throw new WebApplicationException(response);
         }
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Delete failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(
+                    ServiceMessages.DELETE_FAILED + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("caught exception in deleteMovement", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Delete failed on Movement csid=" + csid).type(
+                    ServiceMessages.DELETE_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type(
                     "text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Delete failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.DELETE_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
     }
-        	
+
     /**
      * Search movements.
      * 
@@ -442,33 +456,35 @@ public class MovementResource extends
      * @return the movements common list
      */
     private MovementsCommonList searchMovements(MultivaluedMap<String, String> queryParams,
-    		String keywords) {
-    	MovementsCommonList movementsObjectList;
+            String keywords) {
+        MovementsCommonList movementsObjectList;
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
 
             // perform a keyword search
             if (keywords != null && !keywords.isEmpty()) {
-            	String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
-	            DocumentFilter documentFilter = handler.getDocumentFilter();
-	            documentFilter.setWhereClause(whereClause);
-	            if (logger.isDebugEnabled()) {
-	            	logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
-	            }
+                String whereClause = QueryManager.createWhereClauseFromKeywords(keywords);
+                DocumentFilter documentFilter = handler.getDocumentFilter();
+                documentFilter.setWhereClause(whereClause);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
+                }
             }
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             movementsObjectList = (MovementsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
-                    Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+                    Response.Status.UNAUTHORIZED).entity(
+                    ServiceMessages.SEARCH_FAILED + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in search for Movements", e);
             }
             Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.SEARCH_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
         return movementsObjectList;

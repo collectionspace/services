@@ -33,16 +33,28 @@ package org.collectionspace.services.common;
  */
 public class ServiceMessages {
 
-    private static final String FAILED = "failed : ";
+    private static final String FAILED = "failed: ";
+
     public static final String POST_FAILED = "POST " + FAILED;
     public static final String GET_FAILED = "GET " + FAILED;
     public static final String PUT_FAILED = "PUT " + FAILED;
-    public static final String DELETE_FAILED = "DELETE " + FAILED;
-    public static final String LIST_FAILED = "LIST " + FAILED;
-    public static final String SEARCH_FAILED = "GET (query) " + FAILED;
+    
+    public static final String CREATE_FAILED = "Create request " + FAILED;
+    public static final String READ_FAILED = "Read request " + FAILED;
+    public static final String UPDATE_FAILED = "Update request " + FAILED;
+
+    public static final String DELETE_FAILED = "Delete request " + FAILED;
+    public static final String LIST_FAILED = "List request " + FAILED;
+    public static final String SEARCH_FAILED = "Search request " + FAILED;
+    public static final String AUTH_REFS_FAILED = "Authority references request " + FAILED;
     
     public static final String UNKNOWN_ERROR_MSG = "Unknown error ";
     public static final String VALIDATION_FAILURE = "Validation failure ";
+    public static final String MISSING_CSID = "missing csid";
     public static final String MISSING_INVALID_CSID = "missing/invalid csid=";
+
+    public static String resourceNotFoundMsg(String csid) {
+        return "resource identified by CSID '" + csid + "' was not found.";
+    }
 
 }
