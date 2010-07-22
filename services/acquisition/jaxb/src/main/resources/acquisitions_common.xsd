@@ -36,7 +36,7 @@
                 <xs:element name="accessionDate" type="xs:string"/>
                 <xs:element name="acquisitionAuthorizer" type="xs:string"/>
                 <xs:element name="acquisitionAuthorizerDate" type="xs:string"/>
-                <xs:element name="acquisitionDate" type="xs:string"/>
+                <xs:element name="acquisitionDates" type="acquisitionDateList"/>
                 <xs:element name="acquisitionFundingCurrency" type="xs:string"/>
                 <xs:element name="acquisitionFundingValue" type="xs:string"/>
                 <xs:element name="acquisitionFundingSource" type="xs:string"/>
@@ -68,6 +68,12 @@
     <xs:complexType name="acquisitionSourceList">
         <xs:sequence>
             <xs:element name="acquisitionSource" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="acquisitionDateList">
+        <xs:sequence>
+            <xs:element name="acquisitionDate" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
     

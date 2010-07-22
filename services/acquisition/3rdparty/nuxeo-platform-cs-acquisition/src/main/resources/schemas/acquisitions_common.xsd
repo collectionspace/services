@@ -24,7 +24,13 @@
     <xs:element name="accessionDate" type="xs:string"/>
     <xs:element name="acquisitionAuthorizer" type="xs:string"/>
     <xs:element name="acquisitionAuthorizerDate" type="xs:string"/>
-    <xs:element name="acquisitionDate" type="xs:string"/>
+    <xs:element name="acquisitionDates">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="acquisitionDate" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="acquisitionFundingCurrency" type="xs:string"/>
     <xs:element name="acquisitionFundingValue" type="xs:string"/>
     <xs:element name="acquisitionFundingSource" type="xs:string"/>

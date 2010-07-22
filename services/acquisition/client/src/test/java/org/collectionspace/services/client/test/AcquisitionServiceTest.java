@@ -32,6 +32,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
 import org.collectionspace.services.acquisition.AcquisitionsCommonList;
+import org.collectionspace.services.acquisition.AcquisitionDateList;
 import org.collectionspace.services.acquisition.AcquisitionSourceList;
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -91,7 +92,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
 
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
-        };
+        }
         
         // Perform setup, such as initializing the type of service request
         // (e.g. CREATE, DELETE), its valid and expected status codes, and
@@ -247,7 +248,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
 
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
-        };
+        }
         
         // Perform setup.
         setupRead();
@@ -272,6 +273,18 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
                 client.getCommonPartName(), AcquisitionsCommon.class);
         Assert.assertNotNull(acquisitionObject);
 
+        // Verify the number and contents of values in repeatable fields,
+        // as created in the instance record used for testing.
+        List<String> acqSources =
+                acquisitionObject.getAcquisitionSources().getAcquisitionSource();
+        Assert.assertTrue(acqSources.size() > 0);
+        Assert.assertNotNull(acqSources.get(0));
+
+        List<String> acqDates =
+                acquisitionObject.getAcquisitionDates().getAcquisitionDate();
+        Assert.assertTrue(acqDates.size() > 0);
+        Assert.assertNotNull(acqDates.get(0));
+
     }
 
     // Failure outcomes
@@ -285,7 +298,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
 
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
-        };
+        }
 
         // Perform setup.
         setupReadNonExistent();
@@ -319,7 +332,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
 
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
-        };
+        }
         
         // Perform setup.
         setupReadList();
@@ -381,7 +394,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
 
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
-        };
+        }
         
         // Perform setup.
         setupUpdate();
@@ -592,7 +605,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
 
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
-        };
+        }
         
         // Perform setup.
         setupUpdateNonExistent();
@@ -661,7 +674,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
 
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
-        };
+        }
         
         // Perform setup.
         setupDeleteNonExistent();
@@ -733,12 +746,19 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         AcquisitionsCommon acquisition = new AcquisitionsCommon();
         acquisition.setAcquisitionReferenceNumber("acquisitionReferenceNumber-"  + identifier);
         AcquisitionSourceList acqSourcesList = new AcquisitionSourceList();
-        List<String> sources = acqSourcesList.getAcquisitionSource();
-        // @TODO Use properly formatted refNames for representative acquisition
+        List<String> acqSources = acqSourcesList.getAcquisitionSource();
+        // FIXME Use properly formatted refNames for representative acquisition
         // sources in this example test record. The following are mere placeholders.
-        sources.add("Donor Acquisition Source-" + identifier);
-        sources.add("Museum Acquisition Source-" + identifier);
+        acqSources.add("Donor Acquisition Source-" + identifier);
+        acqSources.add("Museum Acquisition Source-" + identifier);
         acquisition.setAcquisitionSources(acqSourcesList);
+        AcquisitionDateList acqDatesList = new AcquisitionDateList();
+        List<String> acqDates = acqDatesList.getAcquisitionDate();
+        // FIXME Use properly timestamps for representative acquisition
+        // dates in this example test record. The following are mere placeholders.
+        acqDates.add("First Acquisition Date -" + identifier);
+        acqDates.add("Second Acquisition Date-" + identifier);
+        acquisition.setAcquisitionDates(acqDatesList);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(acquisition,
             MediaType.APPLICATION_XML_TYPE);
