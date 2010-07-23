@@ -234,10 +234,10 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, TEST_ORG_FOUNDING_PLACE);
         
         Map<String, List<String>> testOrgRepeatablesMap = new HashMap<String,List<String>>();
-        List<String> testOrgContacts = new ArrayList<String>();
-        testOrgContacts.add("joe@example.org");
-        testOrgContacts.add("sally@example.org");
-        testOrgRepeatablesMap.put(OrganizationJAXBSchema.CONTACT_NAMES, testOrgContacts);
+        List<String> testOrgContactNames = new ArrayList<String>();
+        testOrgContactNames.add("joe@example.org");
+        testOrgContactNames.add("sally@example.org");
+        testOrgRepeatablesMap.put(OrganizationJAXBSchema.CONTACT_NAMES, testOrgContactNames);
 
         String newID = OrgAuthorityClientUtils.createItemInAuthority(
         		vcsid, authRefName, testOrgMap, testOrgRepeatablesMap, client);
