@@ -566,9 +566,12 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         partialTermPersonMap.put(PersonJAXBSchema.SUR_NAME, TEST_PARTIAL_TERM_SUR_NAME);
         partialTermPersonMap.put(PersonJAXBSchema.BIRTH_PLACE, TEST_KWD_BIRTH_PLACE);
         partialTermPersonMap.put(PersonJAXBSchema.GENDER, "male");
+
+        Map<String, List<String>> partialTermRepeatablesMap = new HashMap<String, List<String>>();
+
         MultipartOutput multipart =
-            PersonAuthorityClientUtils.createPersonInstance(authorityCsid, authRefName, partialTermPersonMap,
-                client.getItemCommonPartName() );
+            PersonAuthorityClientUtils.createPersonInstance(authorityCsid, authRefName, 
+                partialTermPersonMap, partialTermRepeatablesMap, client.getItemCommonPartName() );
 
         String newID = null;
         ClientResponse<Response> res = client.createItem(authorityCsid, multipart);

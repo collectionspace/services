@@ -22,11 +22,11 @@ public interface PersonJAXBSchema extends AuthorityJAXBSchema {
 	final static String DEATH_DATE = "deathDate";
 	final static String BIRTH_PLACE = "birthPlace";
 	final static String DEATH_PLACE = "deathPlace";
-	final static String GROUP = "group";
-	final static String NATIONALITY = "nationality";
+	final static String GROUPS = "groups";
+	final static String NATIONALITIES = "nationalities";
 	final static String GENDER = "gender";
-	final static String OCCUPATION = "occupation";
-	final static String SCHOOL_OR_STYLE = "schoolOrStyle";
+	final static String OCCUPATIONS = "occupations";
+	final static String SCHOOLS_OR_STYLES = "schoolsOrStyles";
 	final static String BIO_NOTE = "bioNote";
 	final static String NAME_NOTE = "nameNote";
 }

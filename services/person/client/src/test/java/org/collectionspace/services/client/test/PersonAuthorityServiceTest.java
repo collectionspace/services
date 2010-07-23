@@ -22,6 +22,7 @@
  */
 package org.collectionspace.services.client.test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -259,9 +260,16 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
             "American icon. He is famous for his distinctive voice, walk and height. " +
             "He was also known for his conservative political views and his support in " +
             "the 1950s for anti-communist positions.");
+
+        Map<String, List<String>> johnWayneRepeatablesMap = new HashMap<String,List<String>>();
+        List<String> johnWayneGroups = new ArrayList<String>();
+        johnWayneGroups.add("Irish");
+        johnWayneGroups.add("Scottish");
+        johnWayneRepeatablesMap.put(PersonJAXBSchema.GROUPS, johnWayneGroups);
+
         MultipartOutput multipart = 
             PersonAuthorityClientUtils.createPersonInstance(vcsid, authRefName, johnWayneMap,
-                client.getItemCommonPartName() );
+                johnWayneRepeatablesMap, client.getItemCommonPartName() );
 
         String newID = null;
         ClientResponse<Response> res = client.createItem(vcsid, multipart);
@@ -715,7 +723,16 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	            logger.debug(testName + ": returned payload:");
 	            logger.debug(objectAsXmlString(person, PersonsCommon.class));
 	        }
+
+                // Check that the person item is within the expected Person Authority.
 	        Assert.assertEquals(person.getInAuthority(), knownResourceId);
+
+                // Verify the number and contents of values in a repeatable field,
+                // as created in the instance record used for testing.
+                List<String> groups = person.getGroups().getGroup();
+                Assert.assertTrue(groups.size() > 0);
+                Assert.assertNotNull(groups.get(0));
+
         } finally {
         	res.releaseConnection();
         }
@@ -1742,10 +1759,11 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         nonexMap.put(PersonJAXBSchema.FORE_NAME, "John");
         nonexMap.put(PersonJAXBSchema.SUR_NAME, "Wayne");
         nonexMap.put(PersonJAXBSchema.GENDER, "male");
+        Map<String, List<String>> nonexRepeatablesMap = new HashMap<String, List<String>>();
         MultipartOutput multipart = 
     	PersonAuthorityClientUtils.createPersonInstance(NON_EXISTENT_ID, 
     			PersonAuthorityClientUtils.createPersonAuthRefName(NON_EXISTENT_ID, null),
-    			nonexMap, client.getItemCommonPartName() );
+    			nonexMap, nonexRepeatablesMap, client.getItemCommonPartName() );
         ClientResponse<MultipartInput> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
         try {

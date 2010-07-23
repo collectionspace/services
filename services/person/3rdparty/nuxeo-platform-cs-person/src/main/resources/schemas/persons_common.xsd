@@ -23,7 +23,7 @@
     <!--  Person Information Group -->
     <!--  inAuthority is the csid of the owning PersonAuthority -->
     <xs:element name="inAuthority" type="xs:string" />
-		<xs:element name="shortIdentifier" type="xs:string"/>
+    <xs:element name="shortIdentifier" type="xs:string"/>
     <xs:element name="refName" type="xs:string"/>
     <xs:element name="termStatus" type="xs:string"/>
     <xs:element name="displayName" type="xs:string"/>
@@ -39,11 +39,35 @@
     <xs:element name="deathDate" type="xs:string"/>
     <xs:element name="birthPlace" type="xs:string"/>
     <xs:element name="deathPlace" type="xs:string"/>
-    <xs:element name="group" type="xs:string"/>
-    <xs:element name="nationality" type="xs:string"/>
+    <xs:element name="groups">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="group" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="nationalities">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="nationality" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="gender" type="xs:string"/>
-    <xs:element name="occupation" type="xs:string"/>
-    <xs:element name="schoolOrStyle" type="xs:string"/>
+    <xs:element name="occupations">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="occupation" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="schoolsOrStyles">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="schoolOrStyle" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="bioNote" type="xs:string"/>
     <xs:element name="nameNote" type="xs:string"/>
 

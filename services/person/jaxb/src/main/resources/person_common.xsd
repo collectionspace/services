@@ -33,7 +33,7 @@
                 
                 <!--  Person Information Group -->
                 <xs:element name="inAuthority" type="xs:string" />
-								<xs:element name="shortIdentifier" type="xs:string"/>
+		<xs:element name="shortIdentifier" type="xs:string"/>
                 <xs:element name="refName" type="xs:string" />
                 <xs:element name="termStatus" type="xs:string"/>
                 <xs:element name="displayName" type="xs:string"/>
@@ -49,16 +49,40 @@
                 <xs:element name="deathDate" type="xs:string"/>
                 <xs:element name="birthPlace" type="xs:string"/>
                 <xs:element name="deathPlace" type="xs:string"/>
-                <xs:element name="group" type="xs:string"/>
-                <xs:element name="nationality" type="xs:string"/>
+                <xs:element name="groups" type="groupList"/>
+                <xs:element name="nationalities" type="nationalityList"/>
                 <xs:element name="gender" type="xs:string"/>
-                <xs:element name="occupation" type="xs:string"/>
-                <xs:element name="schoolOrStyle" type="xs:string"/>
+                <xs:element name="occupations" type="occupationList"/>
+                <xs:element name="schoolsOrStyles" type="schoolOrStyleList"/>
                 <xs:element name="bioNote" type="xs:string"/>
                 <xs:element name="nameNote" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <xs:complexType name="groupList">
+        <xs:sequence>
+            <xs:element name="group" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="nationalityList">
+        <xs:sequence>
+            <xs:element name="nationality" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="occupationList">
+        <xs:sequence>
+            <xs:element name="occupation" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="schoolOrStyleList">
+        <xs:sequence>
+            <xs:element name="schoolOrStyle" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
     
     <!-- This is the base class for paginated lists -->
     <xs:complexType name="abstractCommonListItem">

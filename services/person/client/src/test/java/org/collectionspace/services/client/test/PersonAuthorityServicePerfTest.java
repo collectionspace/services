@@ -200,9 +200,10 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
         personMap.put(PersonJAXBSchema.DISPLAY_NAME_COMPUTED, "true");
         personMap.put(PersonJAXBSchema.FORE_NAME, firstName);
         personMap.put(PersonJAXBSchema.SUR_NAME, lastName);
+        Map<String, List<String>> personRepeatablesMap = new HashMap<String, List<String>>();
         MultipartOutput multipart =
             PersonAuthorityClientUtils.createPersonInstance(authId, authRefName, 
-            		personMap, client.getItemCommonPartName() );
+            		personMap, personRepeatablesMap, client.getItemCommonPartName() );
 
         String newID = null;
         ClientResponse<Response> res = client.createItem(authId, multipart);

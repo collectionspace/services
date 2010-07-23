@@ -28,6 +28,7 @@ package org.collectionspace.services.client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,8 +38,12 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
+import org.collectionspace.services.person.GroupList;
+import org.collectionspace.services.person.NationalityList;
+import org.collectionspace.services.person.OccupationList;
 import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
+import org.collectionspace.services.person.SchoolOrStyleList;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -151,7 +156,7 @@ public class PersonAuthorityClientUtils {
     }
 
     /**
-     * Creates the person instance.
+     * Creates a person instance.
      *
      * @param inAuthority the owning authority
      * @param personAuthRefName the owning Authority ref name
@@ -159,8 +164,28 @@ public class PersonAuthorityClientUtils {
      * @param headerLabel the header label
      * @return the multipart output
      */
+    public static MultipartOutput createPersonInstance(String inAuthority,
+    		String personAuthRefName, Map<String, String> personInfo,
+                String headerLabel){
+        final Map<String, List<String>> EMPTY_PERSON_REPEATABLES_INFO =
+                new HashMap<String, List<String>>();
+        return createPersonInstance(inAuthority, personAuthRefName, personInfo,
+                EMPTY_PERSON_REPEATABLES_INFO, headerLabel);
+    }
+
+    /**
+     * Creates a person instance.
+     *
+     * @param inAuthority the owning authority
+     * @param personAuthRefName the owning Authority ref name
+     * @param personInfo the person info
+     * @param personRepeatablesInfo names and values of repeatable scalar fields in the Person record
+     * @param headerLabel the header label
+     * @return the multipart output
+     */
     public static MultipartOutput createPersonInstance(String inAuthority, 
-    		String personAuthRefName, Map<String, String> personInfo, String headerLabel){
+    		String personAuthRefName, Map<String, String> personInfo,
+                Map<String, List<String>> personRepeatablesInfo, String headerLabel){
         PersonsCommon person = new PersonsCommon();
         person.setInAuthority(inAuthority);
     	String shortId = personInfo.get(PersonJAXBSchema.SHORT_IDENTIFIER);
@@ -190,6 +215,7 @@ public class PersonAuthorityClientUtils {
        	person.setRefName(refName);
     	
     	String value;
+        List<String> values = null;
         if((value = (String)personInfo.get(PersonJAXBSchema.FORE_NAME))!=null) //FIXME: REM - I don't think we need to check for null -null is a valid value and won't cause any problems. 
         	person.setForeName(value);
         if((value = (String)personInfo.get(PersonJAXBSchema.MIDDLE_NAME))!=null)
@@ -212,16 +238,32 @@ public class PersonAuthorityClientUtils {
         	person.setBirthPlace(value);
         if((value = (String)personInfo.get(PersonJAXBSchema.DEATH_PLACE))!=null)
         	person.setDeathPlace(value);
-        if((value = (String)personInfo.get(PersonJAXBSchema.GROUP))!=null)
-        	person.setGroup(value);
-        if((value = (String)personInfo.get(PersonJAXBSchema.NATIONALITY))!=null)
-        	person.setNationality(value);
+        if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.GROUPS))!=null) {
+                GroupList groupsList = new GroupList();
+                List<String> groups = groupsList.getGroup();
+        	groups.addAll(values);
+                person.setGroups(groupsList);
+        }
+        if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.NATIONALITIES))!=null) {
+                NationalityList nationalitiesList = new NationalityList();
+                List<String> nationalities = nationalitiesList.getNationality();
+        	nationalities.addAll(values);
+                person.setNationalities(nationalitiesList);
+        }
         if((value = (String)personInfo.get(PersonJAXBSchema.GENDER))!=null)
         	person.setGender(value);
-        if((value = (String)personInfo.get(PersonJAXBSchema.OCCUPATION))!=null)
-        	person.setOccupation(value);
-        if((value = (String)personInfo.get(PersonJAXBSchema.SCHOOL_OR_STYLE))!=null)
-        	person.setSchoolOrStyle(value);
+        if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.OCCUPATIONS))!=null) {
+                OccupationList occupationsList = new OccupationList();
+                List<String> occupations = occupationsList.getOccupation();
+        	occupations.addAll(values);
+                person.setOccupations(occupationsList);
+        }
+        if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.SCHOOLS_OR_STYLES))!=null) {
+                SchoolOrStyleList schoolOrStyleList = new SchoolOrStyleList();
+                List<String> schoolsOrStyles = schoolOrStyleList.getSchoolOrStyle();
+        	schoolsOrStyles.addAll(values);
+                person.setSchoolsOrStyles(schoolOrStyleList);
+        }
         if((value = (String)personInfo.get(PersonJAXBSchema.BIO_NOTE))!=null)
         	person.setBioNote(value);
         if((value = (String)personInfo.get(PersonJAXBSchema.NAME_NOTE))!=null)
@@ -250,7 +292,7 @@ public class PersonAuthorityClientUtils {
      */
     public static String createItemInAuthority(String vcsid, 
     		String personAuthorityRefName, Map<String,String> personMap,
-    		PersonAuthorityClient client ) {
+    		Map<String, List<String>> personRepeatablesMap, PersonAuthorityClient client ) {
     	// Expected status code: 201 Created
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
     	// Type of service request being tested
@@ -280,7 +322,7 @@ public class PersonAuthorityClientUtils {
     	}
     	MultipartOutput multipart = 
     		createPersonInstance(vcsid, personAuthorityRefName,
-    			personMap, client.getItemCommonPartName());
+    			personMap, personRepeatablesMap, client.getItemCommonPartName());
     	
     	String result = null;
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
