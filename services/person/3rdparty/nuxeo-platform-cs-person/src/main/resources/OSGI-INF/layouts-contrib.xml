@@ -93,11 +93,13 @@
         <row><widget>deathDate</widget></row>
         <row><widget>birthPlace</widget></row>
         <row><widget>deathPlace</widget></row>
-        <row><widget>group</widget></row>
-        <row><widget>nationality</widget></row>
+        <!-- Repeatable fields are commented out for now until we -->
+        <!-- identify how to represent these complex types in layouts. -->
+        <!-- <row><widget>group</widget></row> -->
+        <!-- <row><widget>nationality</widget></row> -->
         <row><widget>gender</widget></row>
-        <row><widget>occupation</widget></row>
-        <row><widget>schoolOrStyle</widget></row>
+        <!-- <row><widget>occupation</widget></row> -->
+        <!-- <row><widget>schoolOrStyle</widget></row> -->
         <row><widget>bioNote</widget></row>
         <row><widget>nameNote</widget></row>
         <row><widget>termStatus</widget></row>
@@ -297,7 +299,8 @@
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
-      
+
+<!--
       <widget name="group" type="text">
         <labels>
           <label mode="any">group</label>
@@ -323,7 +326,8 @@
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
-      
+-->
+
       <widget name="gender" type="text">
         <labels>
           <label mode="any">gender</label>
@@ -336,7 +340,8 @@
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
-      
+
+<!--
       <widget name="occupation" type="text">
         <labels>
           <label mode="any">occupation</label>
@@ -363,6 +368,8 @@
         </properties>
       </widget>
       
+-->
+
       <widget name="bioNote" type="text">
         <labels>
           <label mode="any">bioNote</label>
