@@ -27,6 +27,8 @@
 package org.collectionspace.services.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
@@ -34,9 +36,15 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.OrganizationJAXBSchema;
+import org.collectionspace.services.client.test.BaseServiceTest;
 import org.collectionspace.services.client.test.ServiceRequestType;
+import org.collectionspace.services.organization.ContactNameList;
+import org.collectionspace.services.organization.FunctionList;
+import org.collectionspace.services.organization.GroupList;
+import org.collectionspace.services.organization.HistoryNoteList;
 import org.collectionspace.services.organization.OrganizationsCommon;
 import org.collectionspace.services.organization.OrgauthoritiesCommon;
+import org.collectionspace.services.organization.SubBodyList;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonsCommon;
 import org.jboss.resteasy.client.ClientResponse;
@@ -144,8 +152,8 @@ public class OrgAuthorityClientUtils {
         commonPart.getHeaders().add("label", headerLabel);
 
         if(logger.isDebugEnabled()){
-        	logger.debug("to be created, orgAuthority common ", 
-        				orgAuthority, OrgauthoritiesCommon.class);
+        	logger.debug("to be created, orgAuthority common ",
+                        orgAuthority, OrgauthoritiesCommon.class);
         }
 
         return multipart;
@@ -162,7 +170,7 @@ public class OrgAuthorityClientUtils {
      */
     public static String createItemInAuthority(String inAuthority, 
     		String orgAuthorityRefName, Map<String, String> orgInfo,
-    		OrgAuthorityClient client) {
+                Map<String, List<String>> orgRepeatablesInfo, OrgAuthorityClient client) {
     	// Expected status code: 201 Created
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
     	// Type of service request being tested
@@ -175,7 +183,8 @@ public class OrgAuthorityClientUtils {
     	}
     	MultipartOutput multipart =
     		createOrganizationInstance(inAuthority, orgAuthorityRefName, 
-    				orgInfo, client.getItemCommonPartName());
+    				orgInfo, orgRepeatablesInfo, client.getItemCommonPartName());
+
     	ClientResponse<Response> res = client.createItem(inAuthority, multipart);
     	String result;
     	try {	
@@ -210,6 +219,27 @@ public class OrgAuthorityClientUtils {
      */
     public static MultipartOutput createOrganizationInstance(String inAuthority, 
     		String orgAuthRefName, Map<String, String> orgInfo, String headerLabel){
+            final Map<String, List<String>> EMPTY_ORG_REPEATABLES_INFO =
+                new HashMap<String, List<String>>();
+            return createOrganizationInstance(inAuthority, orgAuthRefName,
+                    orgInfo, EMPTY_ORG_REPEATABLES_INFO, headerLabel);
+    }
+
+
+    /**
+     * Creates the organization instance.
+     *
+     * @param inAuthority the in authority
+     * @param orgAuthRefName the owning Authority ref name
+     * @param orgInfo the org info
+     * @param orgRepeatablesInfo names and values of repeatable scalar
+     *        fields in the Organization record
+     * @param headerLabel the header label
+     * @return the multipart output
+     */
+    public static MultipartOutput createOrganizationInstance(String inAuthority, 
+    		String orgAuthRefName, Map<String, String> orgInfo,
+                Map<String, List<String>> orgRepeatablesInfo, String headerLabel){
         OrganizationsCommon organization = new OrganizationsCommon();
         organization.setInAuthority(inAuthority);
     	String shortId = orgInfo.get(OrganizationJAXBSchema.SHORT_IDENTIFIER);
@@ -218,6 +248,7 @@ public class OrgAuthorityClientUtils {
     	}      	
     	organization.setShortIdentifier(shortId);
        	String value = null;
+        List<String> values = null;
     	value = orgInfo.get(OrganizationJAXBSchema.DISPLAY_NAME_COMPUTED);
     	boolean displayNameComputed = (value==null) || value.equalsIgnoreCase("true"); 
    		organization.setDisplayNameComputed(displayNameComputed);
@@ -233,22 +264,42 @@ public class OrgAuthorityClientUtils {
         	organization.setLongName(value);
         if((value = (String)orgInfo.get(OrganizationJAXBSchema.NAME_ADDITIONS))!=null)
         	organization.setNameAdditions(value);
-        if((value = (String)orgInfo.get(OrganizationJAXBSchema.CONTACT_NAME))!=null)
-        	organization.setContactName(value);
+        if((values = (List<String>)orgRepeatablesInfo.get(OrganizationJAXBSchema.CONTACT_NAMES))!=null) {
+                ContactNameList contactsList = new ContactNameList();
+                List<String> contactNames = contactsList.getContactName();
+        	contactNames.addAll(values);
+                organization.setContactNames(contactsList);
+        }
         if((value = (String)orgInfo.get(OrganizationJAXBSchema.FOUNDING_DATE))!=null)
         	organization.setFoundingDate(value);
         if((value = (String)orgInfo.get(OrganizationJAXBSchema.DISSOLUTION_DATE))!=null)
         	organization.setDissolutionDate(value);
         if((value = (String)orgInfo.get(OrganizationJAXBSchema.FOUNDING_PLACE))!=null)
         	organization.setFoundingPlace(value);
-        if((value = (String)orgInfo.get(OrganizationJAXBSchema.GROUP))!=null)
-        	organization.setGroup(value);
-        if((value = (String)orgInfo.get(OrganizationJAXBSchema.FUNCTION))!=null)
-        	organization.setFunction(value);
-        if((value = (String)orgInfo.get(OrganizationJAXBSchema.SUB_BODY))!=null)
-        	organization.setSubBody(value);
-        if((value = (String)orgInfo.get(OrganizationJAXBSchema.HISTORY))!=null)
-        	organization.setHistory(value);
+        if((values = (List<String>)orgRepeatablesInfo.get(OrganizationJAXBSchema.GROUPS))!=null) {
+                GroupList groupsList = new GroupList();
+                List<String> groups = groupsList.getGroup();
+        	groups.addAll(values);
+                organization.setGroups(groupsList);
+        }
+        if((values = (List<String>)orgRepeatablesInfo.get(OrganizationJAXBSchema.FUNCTIONS))!=null) {
+                FunctionList functionsList = new FunctionList();
+                List<String> functions = functionsList.getFunction();
+        	functions.addAll(values);
+                organization.setFunctions(functionsList);
+        }
+        if((values = (List<String>)orgRepeatablesInfo.get(OrganizationJAXBSchema.SUB_BODIES))!=null) {
+                SubBodyList subBodiesList = new SubBodyList();
+                List<String> subbodies = subBodiesList.getSubBody();
+        	subbodies.addAll(values);
+                organization.setSubBodies(subBodiesList);
+        }
+        if((values = (List<String>)orgRepeatablesInfo.get(OrganizationJAXBSchema.HISTORY_NOTES))!=null) {
+                HistoryNoteList historyNotesList = new HistoryNoteList();
+                List<String> historyNotes = historyNotesList.getHistoryNote();
+        	historyNotes.addAll(values);
+                organization.setHistoryNotes(historyNotesList);
+        }
         if((value = (String)orgInfo.get(OrganizationJAXBSchema.TERM_STATUS))!=null)
         	organization.setTermStatus(value);
         MultipartOutput multipart = new MultipartOutput();

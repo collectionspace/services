@@ -86,14 +86,16 @@
         <row><widget>shortName</widget></row>
         <row><widget>longName</widget></row>
         <row><widget>nameAdditions</widget></row>
-        <row><widget>contactName</widget></row>
+        <!-- Repeatable fields are commented out for now until we -->
+        <!-- identify how to represent these complex types in layouts. -->
+<!--        <row><widget>contactName</widget></row>-->
         <row><widget>foundingDate</widget></row>
         <row><widget>dissolutionDate</widget></row>
         <row><widget>foundingPlace</widget></row>
-        <row><widget>group</widget></row>
-        <row><widget>function</widget></row>
-        <row><widget>subBody</widget></row>
-        <row><widget>history</widget></row>
+<!--        <row><widget>group</widget></row> -->
+<!--        <row><widget>function</widget></row> -->
+<!--        <row><widget>subBody</widget></row> -->
+<!--        <row><widget>historyNote</widget></row>-->
         <row><widget>termStatus</widget></row>
       </rows>
 
@@ -149,7 +151,8 @@
         </properties>
       </widget>
       
-<!--      <widget name="displayNameComputed" type="text">
+<!--
+      <widget name="displayNameComputed" type="text">
         <labels>
           <label mode="any">displayNameComputed</label>
         </labels>
@@ -201,6 +204,7 @@
         </properties>
       </widget>
       
+<!--
       <widget name="contactName" type="text">
         <labels>
           <label mode="any">contactName</label>
@@ -213,6 +217,7 @@
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
+-->
       
       <widget name="foundingDate" type="text">
         <labels>
@@ -253,6 +258,7 @@
         </properties>
       </widget>
 
+<!--
       <widget name="group" type="text">
         <labels>
           <label mode="any">group</label>
@@ -304,6 +310,7 @@
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
+-->
 
       <widget name="termStatus" type="text">
         <labels>

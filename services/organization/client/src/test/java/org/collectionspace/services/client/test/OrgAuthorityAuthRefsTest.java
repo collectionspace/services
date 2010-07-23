@@ -195,13 +195,20 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
             "Test Organization-" + shortId);
         testOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "Test Organization Name");
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, "Anytown, USA");
-        testOrgMap.put(OrganizationJAXBSchema.CONTACT_NAME, organizationContactPersonRefName);
-        testOrgMap.put(OrganizationJAXBSchema.SUB_BODY, subBodyRefName);
+
+        Map<String, List<String>> testOrgRepeatablesMap = new HashMap<String,List<String>>();
+        List<String> testOrgContactNames = new ArrayList<String>();
+        testOrgContactNames.add(organizationContactPersonRefName);
+        testOrgRepeatablesMap.put(OrganizationJAXBSchema.CONTACT_NAMES, testOrgContactNames);
+        List<String> testOrgSubBodies = new ArrayList<String>();
+        testOrgSubBodies.add(subBodyRefName);
+        testOrgRepeatablesMap.put(OrganizationJAXBSchema.SUB_BODIES, testOrgSubBodies);
 
         // Finishing creating the new Organization item, then
         // submit the request to the service and store the response.
         knownItemResourceId = OrgAuthorityClientUtils.createItemInAuthority(
-        		knownResourceId, knownResourceRefName, testOrgMap, orgAuthClient);
+        		knownResourceId, knownResourceRefName, testOrgMap,
+                        testOrgRepeatablesMap, orgAuthClient);
 
         // Store the IDs from every item created by tests,
         // so they can be deleted after tests have been run.
@@ -353,8 +360,10 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
             logger.debug(objectAsXmlString(organization, OrganizationsCommon.class));
         }
         // Check one or more of the authority fields in the Organization item
-        Assert.assertEquals(organization.getContactName(), organizationContactPersonRefName);
-        Assert.assertEquals(organization.getSubBody(), subBodyRefName);
+        Assert.assertEquals(organization.getContactNames().getContactName().get(0),
+                organizationContactPersonRefName);
+        Assert.assertEquals(organization.getSubBodies().getSubBody().get(0),
+                subBodyRefName);
 
         // Get the auth refs and check them
         // FIXME - need to create this method in the client

@@ -22,6 +22,7 @@
  */
 package org.collectionspace.services.client.test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -229,12 +230,18 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         testOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
         testOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, TEST_ORG_SHORTNAME);
         testOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "The real official test organization");
-        testOrgMap.put(OrganizationJAXBSchema.CONTACT_NAME, "joe@test.org");
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "May 26, 1907");
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, TEST_ORG_FOUNDING_PLACE);
-        testOrgMap.put(OrganizationJAXBSchema.FUNCTION, "For testing");
+        
+        Map<String, List<String>> testOrgRepeatablesMap = new HashMap<String,List<String>>();
+        List<String> testOrgContacts = new ArrayList<String>();
+        testOrgContacts.add("joe@example.org");
+        testOrgContacts.add("sally@example.org");
+        testOrgRepeatablesMap.put(OrganizationJAXBSchema.CONTACT_NAMES, testOrgContacts);
+
         String newID = OrgAuthorityClientUtils.createItemInAuthority(
-        		vcsid, authRefName, testOrgMap, client);
+        		vcsid, authRefName, testOrgMap, testOrgRepeatablesMap, client);
+        
         // Store the ID returned from the first item resource created
         // for additional tests below.
         if (knownItemResourceId == null){
@@ -659,7 +666,16 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	            logger.debug(testName + ": returned payload:");
 	            logger.debug(objectAsXmlString(organization, OrganizationsCommon.class));
 	        }
+
+                // Check that the organization item is within the expected OrgAuthority.
 	        Assert.assertEquals(organization.getInAuthority(), knownResourceId);
+
+                // Verify the number and contents of values in a repeatable field,
+                // as created in the instance record used for testing.
+                List<String> contactNames = organization.getContactNames().getContactName();
+                Assert.assertTrue(contactNames.size() > 0);
+                Assert.assertNotNull(contactNames.get(0));
+
         } finally {
         	res.releaseConnection();
         }

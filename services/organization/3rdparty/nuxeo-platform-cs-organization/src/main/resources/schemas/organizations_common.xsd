@@ -32,14 +32,44 @@
     <xs:element name="shortName" type="xs:string"/>
     <xs:element name="longName" type="xs:string"/>
     <xs:element name="nameAdditions" type="xs:string"/>
-    <xs:element name="contactName" type="xs:string"/>
+    <xs:element name="contactNames">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="contactName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="foundingDate" type="xs:string"/>
     <xs:element name="dissolutionDate" type="xs:string"/>
     <xs:element name="foundingPlace" type="xs:string"/>
-    <xs:element name="group" type="xs:string"/>
-    <xs:element name="function" type="xs:string"/>
-    <xs:element name="subBody" type="xs:string"/>
-    <xs:element name="history" type="xs:string"/>
+    <xs:element name="groups">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="group" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="functions">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="function" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="subBodies">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="subBody" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="historyNotes">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="historyNote" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
 
 </xs:schema>
 
