@@ -36,8 +36,9 @@ import org.collectionspace.services.client.IntakeClient;
 import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.client.OrgAuthorityClientUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
+import org.collectionspace.services.intake.ConditionCheckerOrAssessorList;
 import org.collectionspace.services.intake.IntakesCommon;
-//import org.collectionspace.services.intake.IntakesCommonList;
+import org.collectionspace.services.intake.InsurerList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -331,9 +332,18 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
         intake.setEntryDate(entryDate);
         intake.setCurrentOwner(currentOwner);
         intake.setDepositor(depositor);
-        intake.setConditionCheckerAssessor(conditionCheckerAssessor);
-        intake.setInsurer(insurer);
         intake.setValuer(Valuer);
+
+        ConditionCheckerOrAssessorList checkerOrAssessorList = new ConditionCheckerOrAssessorList();
+        List<String> checkersOrAssessors = checkerOrAssessorList.getConditionCheckerOrAssessor();
+        checkersOrAssessors.add(conditionCheckerAssessor);
+        intake.setConditionCheckersOrAssessors(checkerOrAssessorList);
+
+        InsurerList insurerList = new InsurerList();
+        List<String> insurers = insurerList.getInsurer();
+        insurers.add(insurer);
+        intake.setInsurers(insurerList);
+
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);

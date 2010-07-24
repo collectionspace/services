@@ -38,7 +38,7 @@
                 <xs:element name="depositor" type="xs:string"/>
                 <xs:element name="depositorsRequirements" type="xs:string"/>
                 <xs:element name="entryDate" type="xs:string"/>
-                <xs:element name="entryMethod" type="xs:string"/>
+                <xs:element name="entryMethods" type="entryMethodList"/>
                 <xs:element name="entryNote" type="xs:string"/>
                 <xs:element name="entryNumber" type="xs:string"/>
                 <xs:element name="entryReason" type="xs:string"/>
@@ -46,6 +46,13 @@
                 <xs:element name="returnDate" type="xs:string"/>
 
                 <!--  Object Collection Information Group -->
+                <xs:element name="fieldCollectionDate" type="xs:string"/>
+                <xs:element name="fieldCollectionMethods" type="fieldCollectionMethodList"/>
+                <xs:element name="fieldCollectionNote" type="xs:string"/>
+                <xs:element name="fieldCollectionNumber" type="xs:string"/>
+                <xs:element name="fieldCollectionPlace" type="xs:string"/>
+                <xs:element name="fieldCollectionSources" type="fieldCollectionSourceList"/>
+                <xs:element name="fieldCollectors" type="fieldCollectorList"/>
                 <xs:element name="fieldCollectionEventName" type="xs:string"/>
 
                 <!-- Valuation Information Group -->
@@ -57,7 +64,7 @@
                 <xs:element name="insurancePolicyNumber" type="xs:string"/>
                 <xs:element name="insuranceReferenceNumber" type="xs:string"/>
                 <xs:element name="insuranceRenewalDate" type="xs:string"/>
-                <xs:element name="insurer" type="xs:string"/>
+                <xs:element name="insurers" type="insurerList"/>
 
                 <!-- Object Location Information Group -->
                 <xs:element name="currentLocation" type="xs:string"/>
@@ -68,15 +75,63 @@
 
                 <!-- Condition Check/Technical Assessment Information Group -->
                 <xs:element name="conditionCheckDate" type="xs:string"/>
-                <xs:element name="conditionCheckMethod" type="xs:string"/>
+                <xs:element name="conditionCheckMethods" type="conditionCheckMethodList"/>
                 <xs:element name="conditionCheckNote" type="xs:string"/>
-                <xs:element name="conditionCheckReason" type="xs:string"/>
+                <xs:element name="conditionCheckReasons" type="conditionCheckReasonList"/>
                 <xs:element name="conditionCheckReferenceNumber" type="xs:string"/>
-                <xs:element name="conditionCheckerAssessor" type="xs:string"/>
+                <xs:element name="conditionCheckersOrAssessors" type="conditionCheckerOrAssessorList"/>
 
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <xs:complexType name="entryMethodList">
+        <xs:sequence>
+            <xs:element name="entryMethod" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="fieldCollectionMethodList">
+        <xs:sequence>
+            <xs:element name="fieldCollectionMethod" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="fieldCollectionSourceList">
+        <xs:sequence>
+            <xs:element name="fieldCollectionSource" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="fieldCollectorList">
+        <xs:sequence>
+            <xs:element name="fieldCollector" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="insurerList">
+        <xs:sequence>
+            <xs:element name="insurer" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="conditionCheckMethodList">
+        <xs:sequence>
+            <xs:element name="conditionCheckMethod" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="conditionCheckReasonList">
+        <xs:sequence>
+            <xs:element name="conditionCheckReason" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="conditionCheckerOrAssessorList">
+        <xs:sequence>
+            <xs:element name="conditionCheckerOrAssessor" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
     
     <!-- This is the base class for paginated lists -->
     <xs:complexType name="abstractCommonList">

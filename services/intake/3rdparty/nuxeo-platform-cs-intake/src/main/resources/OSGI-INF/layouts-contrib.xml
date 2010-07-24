@@ -14,7 +14,9 @@
         <row><widget>depositor</widget></row>
         <row><widget>depositorsRequirements</widget></row>
         <row><widget>entryDate</widget></row>
-        <row><widget>entryMethod</widget></row>
+        <!-- Repeatable fields are commented out for now until we -->
+        <!-- identify how to represent these complex types in layouts. -->
+        <!-- <row><widget>entryMethod</widget></row> -->
         <row><widget>entryNote</widget></row>
         <row><widget>entryNumber</widget></row>
         <row><widget>entryReason</widget></row>
@@ -74,6 +76,7 @@
         </properties>
       </widget>
 
+<!--
       <widget name="entryMethod" type="text">
         <labels>
           <label mode="any">entryMethod</label>
@@ -86,6 +89,8 @@
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
+
+-->
 
       <widget name="entryNote" type="text">
         <labels>

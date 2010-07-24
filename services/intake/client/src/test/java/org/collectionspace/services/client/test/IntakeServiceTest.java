@@ -28,6 +28,7 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IntakeClient;
+import org.collectionspace.services.intake.EntryMethodList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.IntakesCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -299,6 +300,13 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         IntakesCommon intake = (IntakesCommon) extractPart(input,
                 client.getCommonPartName(), IntakesCommon.class);
         Assert.assertNotNull(intake);
+
+        // Verify the number and contents of values in repeatable fields,
+        // as created in the instance record used for testing.
+        List<String> entryMethods =
+                intake.getEntryMethods().getEntryMethod();
+        Assert.assertTrue(entryMethods.size() > 0);
+        Assert.assertNotNull(entryMethods.get(0));
     }
 
     // Failure outcomes
@@ -735,6 +743,13 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         intake.setEntryNumber(entryNumber);
         intake.setEntryDate(entryDate);
         intake.setDepositor(depositor);
+
+        EntryMethodList entryMethodsList = new EntryMethodList();
+        List<String> entryMethods = entryMethodsList.getEntryMethod();
+        entryMethods.add("Left at doorstep");
+        entryMethods.add("Received via post");
+        intake.setEntryMethods(entryMethodsList);
+
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);

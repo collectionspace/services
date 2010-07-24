@@ -36,7 +36,9 @@ import org.collectionspace.services.client.IntakeClient;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.intake.ConditionCheckerOrAssessorList;
 import org.collectionspace.services.intake.IntakesCommon;
+import org.collectionspace.services.intake.InsurerList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -72,7 +74,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
     private String personAuthCSID = null; 
     private String currentOwnerRefName = null;
     private String depositorRefName = null;
-    private String conditionCheckerAssessorRefName = null;
+    private String conditionCheckerOrAssessorRefName = null;
     private String insurerRefName = null;
     private String valuerRefName = null;
     private final int NUM_AUTH_REFS_EXPECTED = 5;
@@ -119,7 +121,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
                 "entryDate-" + identifier,
                 currentOwnerRefName,
                 depositorRefName,
-                conditionCheckerAssessorRefName,
+                conditionCheckerOrAssessorRefName,
                 insurerRefName,
                 valuerRefName );
         ClientResponse<Response> res = intakeClient.create(multipart);
@@ -176,7 +178,7 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
         personIdsCreated.add(csid);
         
         csid = createPerson("Andrew", "Assessor", "andrewAssessor", authRefName);
-        conditionCheckerAssessorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        conditionCheckerOrAssessorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         personIdsCreated.add(csid);
         
         csid = createPerson("Ingrid", "Insurer", "ingridInsurer", authRefName);
@@ -237,7 +239,8 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
         Assert.assertNotNull(intake);
         // Check a couple of fields
         Assert.assertEquals(intake.getCurrentOwner(), currentOwnerRefName);
-        Assert.assertEquals(intake.getInsurer(), insurerRefName);
+        Assert.assertEquals(intake.getConditionCheckersOrAssessors().getConditionCheckerOrAssessor().get(0), conditionCheckerOrAssessorRefName);
+        Assert.assertEquals(intake.getInsurers().getInsurer().get(0), insurerRefName);
         
         // Get the auth refs and check them
         ClientResponse<AuthorityRefList> res2 = intakeClient.getAuthorityRefs(knownResourceId);
@@ -337,9 +340,18 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
         intake.setEntryDate(entryDate);
         intake.setCurrentOwner(currentOwner);
         intake.setDepositor(depositor);
-        intake.setConditionCheckerAssessor(conditionCheckerAssessor);
-        intake.setInsurer(insurer);
         intake.setValuer(Valuer);
+
+        ConditionCheckerOrAssessorList checkerOrAssessorList = new ConditionCheckerOrAssessorList();
+        List<String> checkersOrAssessors = checkerOrAssessorList.getConditionCheckerOrAssessor();
+        checkersOrAssessors.add(conditionCheckerAssessor);
+        intake.setConditionCheckersOrAssessors(checkerOrAssessorList);
+
+        InsurerList insurerList = new InsurerList();
+        List<String> insurers = insurerList.getInsurer();
+        insurers.add(insurer);
+        intake.setInsurers(insurerList);
+
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
