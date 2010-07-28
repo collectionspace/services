@@ -22,7 +22,7 @@
 
     <xs:complexType name="otherNumberList">
         <xs:sequence>
-            <xs:element name="otherNumber" type="ns:otherNumber" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="otherNumber" type="ns:otherNumber" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
     
@@ -43,11 +43,11 @@
     <xs:element name="collectionobjects_common">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="csid" type="xs:string" />
+                <xs:element name="csid" type="xs:string"/>
                 
                 <!-- Object Identification Information -->
                 <xs:element name="objectNumber" type="xs:string"/>
-                <xs:element name="otherNumberList" type="ns:otherNumberList" />
+                <xs:element name="otherNumberList" type="ns:otherNumberList"/>
                 
                 <!-- Remove these two elements when the App/UI layer is -->
                 <!-- using the new repeatable 'otherNumbers' field -->
@@ -56,7 +56,7 @@
 
                 <xs:element name="briefDescriptions" type="briefDescriptionList"/>
 
-                <xs:element name="comments" type="xs:string"/>
+                <xs:element name="comments" type="commentList"/>
                 <xs:element name="distinguishingFeatures" type="xs:string"/>
                 <xs:element name="numberOfObjects" type="xs:string"/>
                 <xs:element name="objectName" type="xs:string"/>
@@ -75,162 +75,177 @@
                 <xs:element name="recordStatus" type="xs:string"/>
 
                 <!-- Object Description Information -->
-                <xs:element name="age" type="xs:string" />
-                <xs:element name="ageQualifier" type="xs:string" />
-                <xs:element name="ageUnit" type="xs:string" />
-                <xs:element name="color" type="xs:string" />
+                <xs:element name="age" type="xs:string"/>
+                <xs:element name="ageQualifier" type="xs:string"/>
+                <xs:element name="ageUnit" type="xs:string"/>
+                <xs:element name="colors" type="colorList"/>
 
                 <!-- Object Description - Content Information -->
-                <xs:element name="contentActivity" type="xs:string" />
-                <xs:element name="contentConcept" type="xs:string" />
-                <xs:element name="contentDate" type="xs:string" />
-                <xs:element name="contentDescription" type="xs:string" />
-                <xs:element name="contentEventName" type="xs:string" />
-                <xs:element name="contentEventNameType" type="xs:string" />
-                <xs:element name="contentNote" type="xs:string" />
-                <xs:element name="contentLanguage" type="xs:string" />
-                <xs:element name="contentObject" type="xs:string" />
-                <xs:element name="contentObjectType" type="xs:string" />
-                <xs:element name="contentOrganization" type="xs:string" />
-                <xs:element name="contentOther" type="xs:string" />
-                <xs:element name="contentOtherType" type="xs:string" />
-                <xs:element name="contentPeople" type="xs:string" />
-                <xs:element name="contentPerson" type="xs:string" />
-                <xs:element name="contentPlace" type="xs:string" />
-                <xs:element name="contentPosition" type="xs:string" />
-                <xs:element name="contentScript" type="xs:string" />
+                <xs:element name="contentActivities" type="contentActivityList"/>
+                <xs:element name="contentConcepts" type="contentConceptList"/>
+                <xs:element name="contentDate" type="xs:string"/>
+                <xs:element name="contentDescription" type="xs:string"/>
+                <xs:element name="contentEventName" type="xs:string"/>
+                <xs:element name="contentEventNameType" type="xs:string"/>
+                <xs:element name="contentNote" type="xs:string"/>
+                <xs:element name="contentLanguages" type="contentLanguageList"/>
+                <xs:element name="contentObject" type="xs:string"/>
+                <xs:element name="contentObjectType" type="xs:string"/>
+                <xs:element name="contentOrganizations" type="contentOrganizationList"/>
+                <xs:element name="contentOther" type="xs:string"/>
+                <xs:element name="contentOtherType" type="xs:string"/>
+                <xs:element name="contentPeoples" type="contentPeopleList"/>
+                <xs:element name="contentPersons" type="contentPersonList"/>
+                <xs:element name="contentPlaces" type="contentPlaceList"/>
+                <xs:element name="contentPosition" type="xs:string"/>
+                <xs:element name="contentScripts" type="contentScriptList"/>
 
-                <xs:element name="copyNumber" type="xs:string" />
+                <xs:element name="copyNumber" type="xs:string"/>
 
                 <!-- Object Description - Dimension Information -->
-                <xs:element name="dimension" type="xs:string" />
-                <xs:element name="dimensionMeasuredPart" type="xs:string" />
-                <xs:element name="dimensionMeasurementUnit" type="xs:string" />
-                <xs:element name="dimensionValue" type="xs:string" />
-                <xs:element name="dimensionValueDate" type="xs:string" />
-                <xs:element name="dimensionValueQualifier" type="xs:string" />
+                <xs:element name="dimension" type="xs:string"/>
+                <xs:element name="dimensionMeasuredPart" type="xs:string"/>
+                <xs:element name="dimensionMeasurementUnit" type="xs:string"/>
+                <xs:element name="dimensionValue" type="xs:string"/>
+                <xs:element name="dimensionValueDate" type="xs:string"/>
+                <xs:element name="dimensionValueQualifier" type="xs:string"/>
                 
-                <xs:element name="editionNumber" type="xs:string" />
-                <xs:element name="form" type="xs:string" />
+                <xs:element name="editionNumber" type="xs:string"/>
+                <xs:element name="forms" type="formList"/>
 
                 <!-- Object description Inscription - Content Information -->
-                <xs:element name="inscriptionContent" type="xs:string" />
-                <xs:element name="inscriptionContentInscriber" type="xs:string" />
-                <xs:element name="inscriptionContentDate" type="xs:string" />
-                <xs:element name="inscriptionContentInterpretation" type="xs:string" />
-                <xs:element name="inscriptionContentLanguage" type="xs:string" />
-                <xs:element name="inscriptionContentMethod" type="xs:string" />
-                <xs:element name="inscriptionContentPosition" type="xs:string" />
-                <xs:element name="inscriptionContentScript" type="xs:string" />
-                <xs:element name="inscriptionContentTranslation" type="xs:string" />
-                <xs:element name="inscriptionContentTransliteration" type="xs:string" />
-                <xs:element name="inscriptionContentType" type="xs:string" />
+                <xs:element name="inscriptionContent" type="xs:string"/>
+                <xs:element name="inscriptionContentInscriber" type="xs:string"/>
+                <xs:element name="inscriptionContentDate" type="xs:string"/>
+                <xs:element name="inscriptionContentInterpretation" type="xs:string"/>
+                <xs:element name="inscriptionContentLanguage" type="xs:string"/>
+                <xs:element name="inscriptionContentMethod" type="xs:string"/>
+                <xs:element name="inscriptionContentPosition" type="xs:string"/>
+                <xs:element name="inscriptionContentScript" type="xs:string"/>
+                <xs:element name="inscriptionContentTranslation" type="xs:string"/>
+                <xs:element name="inscriptionContentTransliteration" type="xs:string"/>
+                <xs:element name="inscriptionContentType" type="xs:string"/>
                 
                 <!-- Object Description Inscription - Description Information -->
-                <xs:element name="inscriptionDescription" type="xs:string" />
-                <xs:element name="inscriptionDescriptionInscriber" type="xs:string" />
-                <xs:element name="inscriptionDescriptionDate" type="xs:string" />
-                <xs:element name="inscriptionDescriptionInterpretation" type="xs:string" />
-                <xs:element name="inscriptionDescriptionMethod" type="xs:string" />
-                <xs:element name="inscriptionDescriptionPosition" type="xs:string" />
-                <xs:element name="inscriptionDescriptionType" type="xs:string" />
+                <xs:element name="inscriptionDescription" type="xs:string"/>
+                <xs:element name="inscriptionDescriptionInscriber" type="xs:string"/>
+                <xs:element name="inscriptionDescriptionDate" type="xs:string"/>
+                <xs:element name="inscriptionDescriptionInterpretation" type="xs:string"/>
+                <xs:element name="inscriptionDescriptionMethod" type="xs:string"/>
+                <xs:element name="inscriptionDescriptionPosition" type="xs:string"/>
+                <xs:element name="inscriptionDescriptionType" type="xs:string"/>
 
                 <!-- Object Description Material Information -->
-                <xs:element name="material" type="xs:string" />
-                <xs:element name="materialComponent" type="xs:string" />
-                <xs:element name="materialComponentNote" type="xs:string" />
-                <xs:element name="materialName" type="xs:string" />
-                <xs:element name="materialSource" type="xs:string" />
+                <xs:element name="material" type="xs:string"/>
+                <xs:element name="materialComponent" type="xs:string"/>
+                <xs:element name="materialComponentNote" type="xs:string"/>
+                <xs:element name="materialName" type="xs:string"/>
+                <xs:element name="materialSource" type="xs:string"/>
 
                 <!-- Misc Object Description Information -->
-                <xs:element name="objectStatus" type="xs:string" />
-                <xs:element name="phase" type="xs:string" />
-                <xs:element name="physicalDescription" type="xs:string" />
-                <xs:element name="sex" type="xs:string" />
-                <xs:element name="style" type="xs:string" />
-                <xs:element name="technicalAttribute" type="xs:string" />
-                <xs:element name="technicalAttributeMeasurement" type="xs:string" />
-                <xs:element name="technicalAttributeMeasurementUnit" type="xs:string" />
-                <xs:element name="objectComponentName" type="xs:string" />
-                <xs:element name="objectComponentInformation" type="xs:string" />
+                <xs:element name="objectStatus" type="xs:string"/>
+                <xs:element name="phase" type="xs:string"/>
+                <xs:element name="physicalDescription" type="xs:string"/>
+                <xs:element name="sex" type="xs:string"/>
+                <xs:element name="styles" type="styleList"/>
+                <xs:element name="technicalAttribute" type="xs:string"/>
+                <xs:element name="technicalAttributeMeasurement" type="xs:string"/>
+                <xs:element name="technicalAttributeMeasurementUnit" type="xs:string"/>
+                <xs:element name="objectComponentName" type="xs:string"/>
+                <xs:element name="objectComponentInformation" type="xs:string"/>
 
                 <!-- Object Production Information -->
-                <xs:element name="objectProductionDate" type="xs:string" />
-                <xs:element name="objectProductionNote" type="xs:string" />
-                <xs:element name="objectProductionOrganization" type="xs:string" />
-                <xs:element name="objectProductionPeople" type="xs:string" />
-                <xs:element name="objectProductionPerson" type="xs:string" />
-                <xs:element name="objectProductionPlace" type="xs:string" />
-                <xs:element name="objectProductionReason" type="xs:string" />
-                <xs:element name="technique" type="xs:string" />
-                <xs:element name="techniqueType" type="xs:string" />
+                <xs:element name="objectProductionDate" type="xs:string"/>
+                <xs:element name="objectProductionNote" type="xs:string"/>
+                <xs:element name="objectProductionOrganization" type="xs:string"/>
+                <xs:element name="objectProductionOrganizationRole" type="xs:string"/>
+                <xs:element name="objectProductionPeople" type="xs:string"/>
+                <xs:element name="objectProductionPeopleRole" type="xs:string"/>
+                <xs:element name="objectProductionPerson" type="xs:string"/>
+                <xs:element name="objectProductionPersonRole" type="xs:string"/>
+                <xs:element name="objectProductionPlace" type="xs:string"/>
+                <xs:element name="objectProductionPlaceRole" type="xs:string"/>
+                <xs:element name="objectProductionReason" type="xs:string"/>
+                <xs:element name="technique" type="xs:string"/>
+                <xs:element name="techniqueType" type="xs:string"/>
 
                 <!-- Object History and Association Information - Association -->
-                <xs:element name="associatedActivity" type="xs:string" />
-                <xs:element name="associatedActivityNote" type="xs:string" />
-                <xs:element name="associatedConcept" type="xs:string" />
-                <xs:element name="associatedCulturalAffinity" type="xs:string" />
-                <xs:element name="associatedDate" type="xs:string" />
-                <xs:element name="associatedEventName" type="xs:string" />
-                <xs:element name="associatedEventNameType" type="xs:string" />
-                <xs:element name="associatedEventOrganization" type="xs:string" />
-                <xs:element name="associatedEventPeople" type="xs:string" />
-                <xs:element name="associatedEventPerson" type="xs:string" />
-                <xs:element name="associatedEventPlace" type="xs:string" />
-                <xs:element name="associatedObject" type="xs:string" />
-                <xs:element name="associatedObjectType" type="xs:string" />
-                <xs:element name="associatedOrganization" type="xs:string" />
-                <xs:element name="associatedPeople" type="xs:string" />
-                <xs:element name="associatedPerson" type="xs:string" />
-                <xs:element name="associatedPlace" type="xs:string" />
-                <xs:element name="associationNote" type="xs:string" />
-                <xs:element name="associationType" type="xs:string" />
+
+                <!-- In the following field names, "assoc" is an abbreviation for "association". -->
+                <!-- See the comments to CSPACE-2501 for a discussion of the database identifier -->
+                <!-- length limit that made this abbreviation necessary. -->
+                <xs:element name="assocActivity" type="xs:string"/>
+                <xs:element name="assocActivityNote" type="xs:string"/>
+                <xs:element name="assocConcepts" type="assocConceptList"/>
+                <xs:element name="assocCulturalContexts" type="assocCulturalContextList"/>
+                <xs:element name="assocDate" type="xs:string"/>
+                <xs:element name="assocEventName" type="xs:string"/>
+                <xs:element name="assocEventNameType" type="xs:string"/>
+                <xs:element name="assocEventOrganizations" type="assocEventOrganizationList"/>
+                <xs:element name="assocEventPeoples" type="assocEventPeopleList"/>
+                <xs:element name="assocEventPersons" type="assocEventPersonList"/>
+                <xs:element name="assocEventPlaces" type="assocEventPlaceList"/>
+                <xs:element name="assocObject" type="xs:string"/>
+                <xs:element name="assocObjectType" type="xs:string"/>
+                <xs:element name="assocOrganizations" type="assocOrganizationList"/>
+                <xs:element name="assocPeoples" type="assocPeopleList"/>
+                <xs:element name="assocPersons" type="assocPersonList"/>
+                <xs:element name="assocPlaces" type="assocPlaceList"/>
+                <xs:element name="associationNote" type="xs:string"/>
+                <xs:element name="associationType" type="xs:string"/>
 
                 <!-- Object History and Association Information - History -->
-                <xs:element name="objectHistoryNote" type="xs:string" />
-                <xs:element name="owner" type="xs:string" />
-                <xs:element name="ownershipAccess" type="xs:string" />
-                <xs:element name="ownershipCategory" type="xs:string" />
-                <xs:element name="ownershipDates" type="xs:string" />
-                <xs:element name="ownershipExchangeMethod" type="xs:string" />
-                <xs:element name="ownershipExchangeNote" type="xs:string" />
-                <xs:element name="ownershipExchangePriceCurrency" type="xs:string" />
-                <xs:element name="ownershipExchangePriceValue" type="xs:string" />
-                <xs:element name="ownershipPlace" type="xs:string" />
-                <xs:element name="usage" type="xs:string" />
-                <xs:element name="usageNote" type="xs:string" />
+                <xs:element name="objectHistoryNote" type="xs:string"/>
+                <xs:element name="owners" type="ownerList"/>
+                <xs:element name="ownershipAccess" type="xs:string"/>
+                <xs:element name="ownershipCategory" type="xs:string"/>
+                <xs:element name="ownershipDates" type="xs:string"/>
+                <xs:element name="ownershipExchangeMethod" type="xs:string"/>
+                <xs:element name="ownershipExchangeNote" type="xs:string"/>
+                <xs:element name="ownershipExchangePriceCurrency" type="xs:string"/>
+                <xs:element name="ownershipExchangePriceValue" type="xs:string"/>
+                <xs:element name="ownershipPlace" type="xs:string"/>
+                <xs:element name="usage" type="xs:string"/>
+                <xs:element name="usageNote" type="xs:string"/>
 
                 <!-- Object Owner's Contribution Information -->
-                <xs:element name="ownersPersonalExperience" type="xs:string" />
-                <xs:element name="ownersPersonalResponse" type="xs:string" />
-                <xs:element name="ownersReference" type="xs:string" />
-                <xs:element name="ownersContributionNote" type="xs:string" />
+                <xs:element name="ownersPersonalExperience" type="xs:string"/>
+                <xs:element name="ownersPersonalResponse" type="xs:string"/>
+                <xs:element name="ownersReference" type="xs:string"/>
+                <xs:element name="ownersContributionNote" type="xs:string"/>
 
                 <!-- Object Viewers Contribution Information -->
-                <xs:element name="viewersRole" type="xs:string" />
-                <xs:element name="viewersPersonalExperience" type="xs:string" />
-                <xs:element name="viewersPersonalResponse" type="xs:string" />
-                <xs:element name="viewersReference" type="xs:string" />
-                <xs:element name="viewersContributionNote" type="xs:string" />
+                <xs:element name="viewersRole" type="xs:string"/>
+                <xs:element name="viewersPersonalExperience" type="xs:string"/>
+                <xs:element name="viewersPersonalResponse" type="xs:string"/>
+                <xs:element name="viewersReference" type="xs:string"/>
+                <xs:element name="viewersContributionNote" type="xs:string"/>
 
                 <!-- Reference Information -->
-                <xs:element name="reference" type="xs:string" />
-                <xs:element name="catalogNumber" type="xs:string" />
+                <xs:element name="reference" type="xs:string"/>
+                <xs:element name="catalogNumber" type="xs:string"/>
 
-                <!-- Object Collection Information -->
-                <xs:element name="fieldCollectionEventName" type="xs:string" />
+                <!--  Object Collection Information Group -->
+                <xs:element name="fieldCollectionDate" type="xs:string"/>
+                <xs:element name="fieldCollectionMethods" type="fieldCollectionMethodList"/>
+                <xs:element name="fieldCollectionNote" type="xs:string"/>
+                <xs:element name="fieldCollectionNumber" type="xs:string"/>
+                <xs:element name="fieldCollectionPlace" type="xs:string"/>
+                <xs:element name="fieldCollectionSources" type="fieldCollectionSourceList"/>
+                <xs:element name="fieldCollectors" type="fieldCollectorList"/>
+                <xs:element name="fieldCollectionEventName" type="xs:string"/>
 				
                 <!-- Object Description Date Information -->
                 <!-- This appears to be a placeholder structured date -->
-                <xs:element name="dateAssociation" type="xs:string" />
-                <xs:element name="dateEarliestSingle" type="xs:string" />
-                <xs:element name="dateEarliestSingleCertainty" type="xs:string" />
-                <xs:element name="dateEarliestSingleQualifier" type="xs:string" />
-                <xs:element name="dateLatest" type="xs:string" />
-                <xs:element name="dateLatestCertainty" type="xs:string" />
-                <xs:element name="dateLatestQualifier" type="xs:string" />
-                <xs:element name="datePeriod" type="xs:string" />
-                <xs:element name="dateText" type="xs:string" />
+                <xs:element name="dateAssociation" type="xs:string"/>
+                <xs:element name="dateEarliestSingle" type="xs:string"/>
+                <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
+                <xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
+                <xs:element name="dateLatest" type="xs:string"/>
+                <xs:element name="dateLatestCertainty" type="xs:string"/>
+                <xs:element name="dateLatestQualifier" type="xs:string"/>
+                <xs:element name="datePeriod" type="xs:string"/>
+                <xs:element name="dateText" type="xs:string"/>
                 
             </xs:sequence>
         </xs:complexType>
@@ -242,12 +257,168 @@
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="briefDescriptionList">
+    <xs:complexType name="commentList">
         <xs:sequence>
-            <xs:element name="briefDescription" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="comment" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
     
+    <xs:complexType name="briefDescriptionList">
+        <xs:sequence>
+            <xs:element name="briefDescription" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="colorList">
+        <xs:sequence>
+            <xs:element name="color" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="contentActivityList">
+        <xs:sequence>
+            <xs:element name="contentActivity" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="contentConceptList">
+        <xs:sequence>
+            <xs:element name="contentConcept" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="contentLanguageList">
+        <xs:sequence>
+            <xs:element name="contentLanguage" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="contentOrganizationList">
+        <xs:sequence>
+            <xs:element name="contentOrganization" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="contentPeopleList">
+        <xs:sequence>
+            <xs:element name="contentPeople" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="contentPersonList">
+        <xs:sequence>
+            <xs:element name="contentPerson" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="contentPlaceList">
+        <xs:sequence>
+            <xs:element name="contentPlace" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="contentScriptList">
+        <xs:sequence>
+            <xs:element name="contentScript" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="formList">
+        <xs:sequence>
+            <xs:element name="form" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="styleList">
+        <xs:sequence>
+            <xs:element name="style" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="assocConceptList">
+        <xs:sequence>
+            <xs:element name="assocConcept" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="assocCulturalContextList">
+        <xs:sequence>
+            <xs:element name="assocCulturalContext" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="assocEventOrganizationList">
+        <xs:sequence>
+            <xs:element name="assocEventOrganization" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="assocEventPeopleList">
+        <xs:sequence>
+            <xs:element name="assocEventPeople" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="assocEventPersonList">
+        <xs:sequence>
+            <xs:element name="assocEventPerson" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="assocEventPlaceList">
+        <xs:sequence>
+            <xs:element name="assocEventPlace" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="assocOrganizationList">
+        <xs:sequence>
+            <xs:element name="assocOrganization" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="assocPeopleList">
+        <xs:sequence>
+            <xs:element name="assocPeople" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="assocPersonList">
+        <xs:sequence>
+            <xs:element name="assocPerson" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="assocPlaceList">
+        <xs:sequence>
+            <xs:element name="assocPlace" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ownerList">
+        <xs:sequence>
+            <xs:element name="owner" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="fieldCollectionMethodList">
+        <xs:sequence>
+            <xs:element name="fieldCollectionMethod" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="fieldCollectionSourceList">
+        <xs:sequence>
+            <xs:element name="fieldCollectionSource" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="fieldCollectorList">
+        <xs:sequence>
+            <xs:element name="fieldCollector" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
     <!-- This is the base class for paginated lists -->
     <xs:complexType name="abstractCommonList">
         <xs:annotation>
@@ -266,14 +437,14 @@
                             <xs:complexType>
                                 <xs:sequence>
                                     <xs:element name="objectNumber" type="xs:string"
-                                        minOccurs="1" />
+                                        minOccurs="1"/>
                                     <xs:element name="title" type="xs:string"
-                                        minOccurs="1" />
+                                        minOccurs="1"/>
                                     <!-- uri to retrive collection object details -->
                                     <xs:element name="uri" type="xs:anyURI"
-                                        minOccurs="1" />
+                                        minOccurs="1"/>
                                     <xs:element name="csid" type="xs:string"
-                                        minOccurs="1" />
+                                        minOccurs="1"/>
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>

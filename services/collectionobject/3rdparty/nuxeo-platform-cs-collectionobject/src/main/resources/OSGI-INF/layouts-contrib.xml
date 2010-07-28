@@ -13,8 +13,11 @@
         <row><widget>objectNumber</widget></row>
         <row><widget>otherNumber</widget></row>
         <row><widget>otherNumberType</widget></row>
-        <row><widget>briefDescription</widget></row>
-        <row><widget>comments</widget></row>
+        <!-- Repeatable fields are commented out for now until we -->
+        <!-- identify how to represent these complex types in layouts. -->
+        <!-- <row><widget>entryMethod</widget></row> -->
+        <!--<row><widget>briefDescription</widget></row>-->
+        <!--<row><widget>comments</widget></row>-->
         <row><widget>distinguishingFeatures</widget></row>
         <row><widget>numberOfObjects</widget></row>
         
@@ -26,7 +29,7 @@
         <row><widget>objectNameType</widget></row>
         <row><widget>objectNameLanguage</widget></row>
         
-        <row><widget>responsibleDepartment</widget></row>
+        <!--<row><widget>responsibleDepartment</widget></row>-->
         <row><widget>title</widget></row>
         <row><widget>objectTitleLanguage</widget></row>
         <row><widget>titleTranslation</widget></row>
@@ -71,7 +74,7 @@
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
-      
+<!--
       <widget name="briefDescription" type="text">
         <labels>
           <label mode="any">briefDescription</label>
@@ -84,8 +87,8 @@
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
-      
-      <widget name="comments" type="text">
+
+     <widget name="comments" type="text">
         <labels>
           <label mode="any">comments</label>
         </labels>
@@ -97,6 +100,7 @@
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
+-->
 
       <widget name="distinguishingFeatures" type="text">
         <labels>
@@ -123,7 +127,7 @@
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
-
+<!--
       <widget name="responsibleDepartment" type="text">
         <labels>
           <label mode="any">responsibleDepartment</label>
@@ -136,6 +140,8 @@
           <property name="styleClass">dataInputText</property>
         </properties>
       </widget>
+
+-->
 
       <widget name="title" type="text">
         <labels>

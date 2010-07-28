@@ -39,7 +39,16 @@ import org.collectionspace.services.client.OrgAuthorityClientUtils;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.collectionobject.AssocEventOrganizationList;
+import org.collectionspace.services.collectionobject.AssocEventPersonList;
+import org.collectionspace.services.collectionobject.AssocOrganizationList;
+import org.collectionspace.services.collectionobject.AssocPersonList;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
+import org.collectionspace.services.collectionobject.ContentOrganizationList;
+import org.collectionspace.services.collectionobject.ContentPersonList;
+import org.collectionspace.services.collectionobject.FieldCollectionSourceList;
+import org.collectionspace.services.collectionobject.FieldCollectorList;
+import org.collectionspace.services.collectionobject.OwnerList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -97,25 +106,20 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     private String orgAuthCSID = null;
     private String orgAuthRefName = null;
     
-    /** The content organization ref name. */
     private String contentOrganizationRefName = null;
-        
-    /** The content person ref name. */
     private String contentPersonRefName = null;
-    
-    /** The inscriber ref names. */
     private String contentInscriberRefName = null;
     private String descriptionInscriberRefName = null;
-
-    /** The object history and association ref names. */
-    private String associatedEventOrganizationRefName = null;
-    private String associatedEventPersonRefName = null;
-    private String associatedOrganizationRefName = null;
-    private String associatedPersonRefName = null;
+    private String assocEventOrganizationRefName = null;
+    private String assocEventPersonRefName = null;
+    private String assocOrganizationRefName = null;
+    private String assocPersonRefName = null;
     private String ownerRefName = null;
+    private String fieldCollectionSourceRefName = null;
+    private String fieldCollectorRefName = null;
 
     /** The number of authority references expected. */
-    private final int NUM_AUTH_REFS_EXPECTED = 9;
+    private final int NUM_AUTH_REFS_EXPECTED = 11;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -169,11 +173,13 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
                 contentPersonRefName,
                 contentInscriberRefName,
                 descriptionInscriberRefName,
-                associatedEventOrganizationRefName,
-                associatedEventPersonRefName,
-                associatedOrganizationRefName,
-                associatedPersonRefName,
-                ownerRefName
+                assocEventOrganizationRefName,
+                assocEventPersonRefName,
+                assocOrganizationRefName,
+                assocPersonRefName,
+                ownerRefName,
+                fieldCollectionSourceRefName,
+                fieldCollectorRefName
             );
 
         // Submit the request to the service and store the response.
@@ -279,15 +285,23 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         personIdsCreated.add(csid);
 
         csid = createPerson("Asok", "AssociatedEventPerson", "asokAssociatedEventPerson");
-        associatedEventPersonRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        assocEventPersonRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         personIdsCreated.add(csid);
         
         csid = createPerson("Andrew", "AssociatedPerson", "andrewAssociatedPerson");
-        associatedPersonRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        assocPersonRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         personIdsCreated.add(csid);
 
         csid = createPerson("Owen", "Owner", "owenOwner");
         ownerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        personIdsCreated.add(csid);
+
+        csid = createPerson("Sally", "Field-CollectionSource", "sallyFieldCollectionSource");
+        fieldCollectionSourceRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        personIdsCreated.add(csid);
+
+        csid = createPerson("Fred", "Lector", "fredLector");
+        fieldCollectorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         personIdsCreated.add(csid);
     }
     
@@ -353,11 +367,11 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         orgIdsCreated.add(csid);
 
         csid = createOrganization("Associated Event Org", "Associated Event Org City", "associatedEventOrg");
-        associatedEventOrganizationRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, csid, null);
+        assocEventOrganizationRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, csid, null);
         orgIdsCreated.add(csid);
 
         csid = createOrganization("Associated Org", "Associated Org City", "associatedOrg");
-        associatedOrganizationRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, csid, null);
+        assocOrganizationRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, csid, null);
         orgIdsCreated.add(csid);
     }
 
@@ -400,12 +414,13 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
 
         // Check a sample of one or more person authority ref fields
         Assert.assertEquals(collectionObject.getInscriptionContentInscriber(), contentInscriberRefName);
-        Assert.assertEquals(collectionObject.getAssociatedPerson(), associatedPersonRefName);
-        Assert.assertEquals(collectionObject.getOwner(), ownerRefName);
+        Assert.assertEquals(collectionObject.getAssocPersons().getAssocPerson().get(0), assocPersonRefName);
+        Assert.assertEquals(collectionObject.getOwners().getOwner().get(0), ownerRefName);
+        Assert.assertEquals(collectionObject.getFieldCollectionSources().getFieldCollectionSource().get(0), fieldCollectionSourceRefName);
 
         // Check a sample of one or more organization authority ref fields
-        Assert.assertEquals(collectionObject.getContentOrganization(), contentOrganizationRefName);
-        Assert.assertEquals(collectionObject.getAssociatedEventOrganization(), associatedEventOrganizationRefName);
+        Assert.assertEquals(collectionObject.getContentOrganizations().getContentOrganization().get(0), contentOrganizationRefName);
+        Assert.assertEquals(collectionObject.getAssocEventOrganizations().getAssocEventOrganization().get(0), assocEventOrganizationRefName);
 
         // Get all of the auth refs and check that the expected number is returned
         ClientResponse<AuthorityRefList> res2 = collectionObjectClient.getAuthorityRefs(knownResourceId);
@@ -524,23 +539,64 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
                 String contentPerson,
                 String contentInscriber,
                 String descriptionInscriber,
-                String associatedEventOrganization,
-                String associatedEventPerson,
-                String associatedOrganization,
-                String associatedPerson,
-                String owner ) {
+                String assocEventOrganization,
+                String assocEventPerson,
+                String assocOrganization,
+                String assocPerson,
+                String owner,
+                String fieldCollectionSource,
+                String fieldCollector ) {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
         collectionObject.setTitle(title);
         collectionObject.setObjectNumber(objNum);
-        collectionObject.setContentOrganization(contentOrganization);
-        collectionObject.setContentPerson(contentPerson);
         collectionObject.setInscriptionContentInscriber(contentInscriber);
         collectionObject.setInscriptionDescriptionInscriber(descriptionInscriber);
-        collectionObject.setAssociatedEventOrganization(associatedEventOrganization);
-        collectionObject.setAssociatedEventPerson(associatedEventPerson);
-        collectionObject.setAssociatedOrganization(associatedOrganization);
-        collectionObject.setAssociatedPerson(associatedPerson);
-        collectionObject.setOwner(owner);
+
+        ContentOrganizationList contentOrganizationList = new ContentOrganizationList();
+        List<String> contentOrganizations = contentOrganizationList.getContentOrganization();
+        contentOrganizations.add(contentOrganization);
+        collectionObject.setContentOrganizations(contentOrganizationList);
+
+        ContentPersonList contentPersonList = new ContentPersonList();
+        List<String> contentPersons = contentPersonList.getContentPerson();
+        contentPersons.add(contentPerson);
+        collectionObject.setContentPersons(contentPersonList);
+
+        AssocEventOrganizationList assocEventOrganizationList = new AssocEventOrganizationList();
+        List<String> assocEventOrganizations = assocEventOrganizationList.getAssocEventOrganization();
+        assocEventOrganizations.add(assocEventOrganization);
+        collectionObject.setAssocEventOrganizations(assocEventOrganizationList);
+
+        AssocEventPersonList assocEventPersonList = new AssocEventPersonList();
+        List<String> assocEventPersons = assocEventPersonList.getAssocEventPerson();
+        assocEventPersons.add(assocEventPerson);
+        collectionObject.setAssocEventPersons(assocEventPersonList);
+
+        AssocOrganizationList assocOrganizationList = new AssocOrganizationList();
+        List<String> assocOrganizations = assocOrganizationList.getAssocOrganization();
+        assocOrganizations.add(assocOrganization);
+        collectionObject.setAssocOrganizations(assocOrganizationList);
+
+        AssocPersonList assocPersonList = new AssocPersonList();
+        List<String> assocPersons = assocPersonList.getAssocPerson();
+        assocPersons.add(assocPerson);
+        collectionObject.setAssocPersons(assocPersonList);
+        
+        OwnerList ownerList = new OwnerList();
+        List<String> owners = ownerList.getOwner();
+        owners.add(owner);
+        collectionObject.setOwners(ownerList);
+        
+        FieldCollectionSourceList fieldCollectionSourceList = new FieldCollectionSourceList();
+        List<String> fieldCollectionSources = fieldCollectionSourceList.getFieldCollectionSource();
+        fieldCollectionSources.add(fieldCollectionSource);
+        collectionObject.setFieldCollectionSources(fieldCollectionSourceList);
+        
+        FieldCollectorList FieldCollectorList = new FieldCollectorList();
+        List<String> fieldCollectors = FieldCollectorList.getFieldCollector();
+        fieldCollectors.add(fieldCollector);
+        collectionObject.setFieldCollectors(FieldCollectorList);
+
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(collectionObject, MediaType.APPLICATION_XML_TYPE);

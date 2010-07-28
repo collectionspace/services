@@ -63,17 +63,17 @@
                               versionable="true" auditable="false"
                               label="collectionobjects_common" updated="" order="1">
                     <service:properties>
-                        <types:item><types:key>authRef</types:key><types:value>contentOrganization</types:value></types:item>
-                        <!-- Not a Person field, but a People field, not yet implemented -->
-                        <!-- <types:item><types:key>authRef</types:key><types:value>contentPeople</types:value></types:item -->
-                        <types:item><types:key>authRef</types:key><types:value>contentPerson</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>contentOrganizations</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>contentPersons</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>inscriptionContentInscriber</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>inscriptionDescriptionInscriber</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>associatedEventOrganization</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>associatedEventPerson</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>associatedOrganization</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>associatedPerson</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>owner</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>assocEventOrganizations</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>assocEventPersons</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>assocOrganizations</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>assocPersons</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>owners</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>fieldCollectionSources</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>fieldCollectors</types:value></types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
@@ -1162,16 +1162,17 @@
                               versionable="true" auditable="false"
                               label="collectionobjects_common" updated="" order="1">
                     <service:properties>
-                        <types:item><types:key>authRef</types:key><types:value>contentOrganization</types:value></types:item>
-                        <!-- Not a Person field, but a People field, not yet implemented -->
-                        <!-- <types:item><types:key>authRef</types:key><types:value>contentPeople</types:value></types:item -->                        <types:item><types:key>authRef</types:key><types:value>contentPerson</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>contentOrganizations</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>contentPersons</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>inscriptionContentInscriber</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>inscriptionDescriptionInscriber</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>associatedEventOrganization</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>associatedEventPerson</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>associatedOrganization</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>associatedPerson</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>owner</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>assocEventOrganizations</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>assocEventPersons</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>assocOrganizations</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>assocPersons</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>owners</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>fieldCollectionSources</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>fieldCollectors</types:value></types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
