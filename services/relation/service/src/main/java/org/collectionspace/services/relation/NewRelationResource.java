@@ -34,6 +34,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
@@ -42,6 +43,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.query.IQueryManager;
+import org.collectionspace.services.common.relation.IRelationsManager;
 import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -200,14 +202,20 @@ public class NewRelationResource extends
 	 * Gets the relation list.
 	 * 
 	 * @param ui the ui
+	 * @param subjectCsid 
+	 * @param predicate 
+	 * @param objectCsid 
 	 * 
 	 * @return the relation list
 	 */
 	@GET
 	@Produces("application/xml")
-	public RelationsCommonList getRelationList(@Context UriInfo ui) {
+	public RelationsCommonList getRelationList(@Context UriInfo ui,
+			@QueryParam(IRelationsManager.SUBJECT_QP) String subjectCsid,
+			@QueryParam(IRelationsManager.PREDICATE_QP) String predicate,
+			@QueryParam(IRelationsManager.OBJECT_QP) String objectCsid) {
 		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-		return this.getRelationList(queryParams, null, null, null);
+		return this.getRelationList(queryParams, subjectCsid, predicate, objectCsid);
 	}
 
 	/**
@@ -498,7 +506,7 @@ public class NewRelationResource extends
 		RelationsCommonList relationList = new RelationsCommonList();
 		try {
 			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
-			DocumentHandler handler = createDocumentHandler(ctx);			
+			DocumentHandler handler = createDocumentHandler(ctx);
 			String relationClause = RelationsUtils.buildWhereClause(subjectCsid, predicate, objectCsid);
 			handler.getDocumentFilter().appendWhereClause(relationClause, IQueryManager.SEARCH_QUALIFIER_AND);			
 			getRepositoryClient(ctx).getFiltered(ctx, handler);

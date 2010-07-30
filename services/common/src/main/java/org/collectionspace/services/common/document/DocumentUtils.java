@@ -132,7 +132,6 @@ public class DocumentUtils {
 	    		
 	    	String s = new String(buff);
 	    	logger.debug(s);
-	    	System.out.println(s); //FIXME: REM - Remove this when we figure out why the logger.debug() call is not working.
 	    	//
 	    	// Essentially, reset the stream and return it in its original state
 	    	//
@@ -143,18 +142,52 @@ public class DocumentUtils {
     }
     
     /**
+     * Gets the xML schema.
+     *
+     * @param partMeta the part meta
+     * @return the xML schema
+     * @throws Exception the exception
+     */
+    private static File getXMLSchema(ObjectPartType partMeta)
+    		throws Exception {
+    	final String FILE_SEPARATOR = System.getProperty("file.separator");
+    	final String XML_SCHEMA_EXTENSION = ".xsd";
+    	final String SCHEMAS_DIR = "schemas";
+    	
+    	File schemaFile = null;
+    	
+    	//
+    	// Look for an XML Schema (.xsd) file for the incoming part payload
+    	//
+    	String serverRoot = ServiceMain.getInstance().getServerRootDir();
+    	String schemasDir = serverRoot + FILE_SEPARATOR + 
+    		SCHEMAS_DIR + FILE_SEPARATOR;    	
+    	//
+    	// Send a warning to the log file if the XML Schema file is missing
+    	//
+    	String schemaName = schemasDir + partMeta.getLabel() + XML_SCHEMA_EXTENSION;
+    	try {
+    		schemaFile = new File(schemaName);
+    	} catch (Exception e) {
+    		if (logger.isWarnEnabled() == true) {
+    			logger.warn("Missing schema file for incoming payload: " + schemaName);
+    		}
+    	}
+    	
+    	return schemaFile;
+    }
+    
+    /**
      * parseProperties given payload to create XML document. this
      * method also closes given stream after parsing.
      * @param payload stream
      * @param partMeta 
+     * @param validate - whether or not to validate the payload with an XML Schema
      * @return parsed Document
      * @throws Exception
      */
-    public static Document parseDocument(InputStream payload, ObjectPartType partMeta)
+    public static Document parseDocument(InputStream payload, ObjectPartType partMeta, Boolean validate)
             throws Exception {
-    	final String FILE_SEPARATOR = System.getProperty("file.separator");
-    	final String XML_SCHEMA_EXTENSION = ".xsd";
-    	final String SCHEMAS_DIR = "schemas";
     	final String JAXP_SCHEMA_SOURCE =
             "http://java.sun.com/xml/jaxp/properties/schemaSource";
     	final String JAXP_SCHEMA_LANGUAGE =
@@ -169,23 +202,10 @@ public class DocumentUtils {
     			payload = logByteArrayInputStream((ByteArrayInputStream)payload);
     		}
     	}    	
-    	//
-    	// Look for an XML Schema (.xsd) file for the incoming part payload
-    	//
-    	String serverRoot = ServiceMain.getInstance().getServerRootDir();
-    	String schemasDir = serverRoot + FILE_SEPARATOR + 
-    		SCHEMAS_DIR + FILE_SEPARATOR;    	
-    	//
-    	// Send a warning to the log file if the XML Schema file is missing
-    	//
-    	String schemaName = schemasDir + partMeta.getLabel() + XML_SCHEMA_EXTENSION;
+    	
     	File schemaFile = null;
-    	try {
-    		schemaFile = new File(schemaName);
-    	} catch (Exception e) {
-    		if (logger.isWarnEnabled() == true) {
-    			logger.warn("Missing schema file for incoming payload: " + schemaName);
-    		}
+    	if (validate == true) {
+    		schemaFile = getXMLSchema(partMeta);
     	}
     	
     	//
@@ -202,13 +222,13 @@ public class DocumentUtils {
             factory.setIgnoringComments(true);
             factory.setIgnoringElementContentWhitespace(true);            
             //
-            // Enable XML validation
+            // Enable XML validation if we found an XML Schema for the payload
             //
-            factory.setNamespaceAware(true);
-            factory.setValidating(true);
             try {
-            	factory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
             	if (schemaFile != null) {
+                    factory.setValidating(true);
+                    factory.setNamespaceAware(true);
+                	factory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
             		factory.setAttribute(JAXP_SCHEMA_SOURCE, schemaFile);
             	}
             } catch (IllegalArgumentException e) {
@@ -452,10 +472,10 @@ public class DocumentUtils {
         root.setAttribute("xsi:schemaLocation", xc.getSchemaLocation());
         root.setAttribute("xmlns:" + ns, xc.getNamespaceURI());
         document.appendChild(root);
-        
+
         SchemaManager schemaManager = Framework.getLocalService(SchemaManager.class);
         Schema schema = schemaManager.getSchema(partMeta.getLabel());
-
+        
         buildDocument(document, root, objectProps, schema);
         
         return document;
@@ -489,7 +509,7 @@ public class DocumentUtils {
     private static void buildProperty(Document document, Element parent, 
     		Field field, Object value) throws IOException {
     	Type type = field.getType();
-    	//no need to qualify each element name as namespace is already added
+                //no need to qualify each element name as namespace is already added
     	String propName = field.getName().getLocalName();
     	Element element = document.createElement(propName);
     	parent.appendChild(element);
@@ -501,9 +521,9 @@ public class DocumentUtils {
     		if (ctype.getName().equals(TypeConstants.CONTENT)) {
     			throw new RuntimeException(
     					"Unexpected schema type: BLOB for field: "+propName);
-    		} else {
+                } else {
     			buildComplex(document, element, ctype, (Map) value);
-    		}
+                }
     	} else if (type.isListType()) {
     		if (value instanceof List) {
     			buildList(document, element, (ListType) type, (List) value);
@@ -514,10 +534,10 @@ public class DocumentUtils {
     			throw new IllegalArgumentException(
     					"A value of list type is neither list neither array: "
     					+ value);
-    		}
-    	}
+            }
+        }
     }
-    
+
     private static void buildComplex(Document document, Element element, 
     		ComplexType ctype, Map map) throws IOException {
     	Iterator<Map.Entry> it = map.entrySet().iterator();

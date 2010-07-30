@@ -66,19 +66,20 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 	// Get clients for the CollectionSpace services
 	//
 	/** The MA x_ records. */
-	private static int MAX_RECORDS = 1;
+	private static int MAX_RECORDS = 1000;
 
 	/**
 	 * Performance test.
 	 */
 	@Test
 	public void performanceTest() {
-//		roundTripOverhead(MAX_RECORDS);
-//		deleteCollectionObjects();
+		roundTripOverhead(10);
+		deleteCollectionObjects();
 		String[] coList = this.createCollectionObjects(MAX_RECORDS);
-//		this.searchCollectionObjects(MAX_RECORDS);
-//		this.deleteCollectionObjects(coList);
-//		roundTripOverhead(10);
+		this.searchCollectionObjects(MAX_RECORDS);
+		this.readCollectionObjects(coList);
+		this.deleteCollectionObjects(coList);
+		roundTripOverhead(10);
 	}
 	
 	/**
@@ -173,18 +174,8 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 	 * @return the string
 	 */
 	private String createCollectionObject(CollectionObjectClient collectionObjectClient,
-			int identifier) {
+			MultipartOutput multipart) {
 		String result = null;
-		//
-		// First create a CollectionObject
-		//
-		CollectionobjectsCommon co = new CollectionobjectsCommon();
-		fillCollectionObject(co, Integer.toString(identifier));
-		
-		// Next, create a part object
-		MultipartOutput multipart = new MultipartOutput();
-		OutputPart commonPart = multipart.addPart(co, MediaType.APPLICATION_XML_TYPE);
-		commonPart.getHeaders().add("label", collectionObjectClient.getCommonPartName());
 		// Make the create call and check the response
 		ClientResponse<Response> response = collectionObjectClient.create(multipart);
 		try {
@@ -213,15 +204,29 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 	public String[] createCollectionObjects(int numberOfObjects) {
 		Random randomGenerator = new Random(System.currentTimeMillis());
 		CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-		String[] coList = new String[numberOfObjects];		
+		String[] coList = new String[numberOfObjects];
+		
+		//
+		// First create a CollectionObject
+		//
+		CollectionobjectsCommon co = new CollectionobjectsCommon();
+		fillCollectionObject(co, Long.toString(System.currentTimeMillis()));
+		
+		// Next, create a part object
+		MultipartOutput multipart = new MultipartOutput();
+		OutputPart commonPart = multipart.addPart(co, MediaType.APPLICATION_XML_TYPE);
+		commonPart.getHeaders().add("label", collectionObjectClient.getCommonPartName());		
 		
 		int createdObjects = 0;
 		try {
 			Date startTime = new Date();
 			for (int i = 0; i < numberOfObjects; i++, createdObjects++) {
-				coList[i] = createCollectionObject(collectionObjectClient, i + 1);
+				coList[i] = createCollectionObject(collectionObjectClient, multipart);
 				if (logger.isDebugEnabled() == true) {
-					logger.debug("Created CollectionObject #: " + i);
+					//
+					// Print out a status every 10 operations
+					if (i % 10 == 0)
+						logger.debug("Created CollectionObject #: " + i);
 				}
 			}
 			Date stopTime = new Date();
@@ -237,7 +242,78 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 		
 		return coList;
 	}
+	//
+	//
+	//
 	
+	/**
+	 * Delete collection object.
+	 *
+	 * @param collectionObjectClient the collection object client
+	 * @param resourceId the resource id
+	 */
+	private void readCollectionObject(CollectionObjectClient collectionObjectClient,
+			String resourceId) {
+		ClientResponse<Response> res = collectionObjectClient.delete(resourceId);
+		res.releaseConnection();
+	}
+
+	/**
+	 * Delete collection objects.
+	 *
+	 * @param arrayOfObjects the array of objects
+	 */
+	public void readCollectionObjects(String[] arrayOfObjects) {
+		CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+
+		Date startTime = new Date();		
+		for (int i = 0; i < arrayOfObjects.length; i++) {
+			deleteCollectionObject(collectionObjectClient, arrayOfObjects[i]);
+		}		
+		Date stopTime = new Date();
+		
+		if (logger.isDebugEnabled()) {
+			System.out.println("Read " + arrayOfObjects.length + " CollectionObjects" +
+					" in " + (stopTime.getTime() - startTime.getTime())/1000.0 + " seconds.");
+		}
+	}
+	
+	/**
+	 * Delete collection objects.
+	 * FIXME: Deletes a page at a time until there are no more CollectionObjects.
+	 */
+	public void readCollectionObjects() {
+		CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
+		ClientResponse<AbstractCommonList> response;
+		
+		List<CollectionObjectListItem> coListItems = null;		
+		do {
+			response = collectionObjectClient.readList(new Long(MAX_RECORDS),
+					new Long(0));
+			try {
+				CollectionobjectsCommonList commonListElement = 
+					(CollectionobjectsCommonList)response.getEntity(CollectionobjectsCommonList.class);
+				coListItems = commonListElement.getCollectionObjectListItem();
+			} finally {
+				response.releaseConnection();
+			}
+			
+			Date startTime = new Date();
+			for (CollectionObjectListItem i:coListItems) {
+				readCollectionObject(collectionObjectClient, i.getCsid());
+			}
+			Date stopTime = new Date();
+			
+			if (logger.isDebugEnabled()) {
+				System.out.println("Read " + coListItems.size() + " CollectionObjects" +
+						" in " + (stopTime.getTime() - startTime.getTime())/1000.0 + " seconds.");
+			}
+		} while (coListItems.size() > 0);
+	}
+	
+	//
+	//
+	//
 	/**
 	 * Delete collection object.
 	 *
@@ -280,8 +356,8 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 		
 		List<CollectionObjectListItem> coListItems = null;		
 		do {
-			response = collectionObjectClient.readList(Integer.toString(MAX_RECORDS),
-					Integer.toString(0));
+			response = collectionObjectClient.readList(new Long(MAX_RECORDS),
+					new Long(0));
 			try {
 				CollectionobjectsCommonList commonListElement = 
 					(CollectionobjectsCommonList)response.getEntity(CollectionobjectsCommonList.class);

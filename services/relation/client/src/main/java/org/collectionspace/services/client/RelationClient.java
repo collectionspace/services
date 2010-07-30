@@ -102,17 +102,32 @@ public class RelationClient extends AbstractServiceClientImpl {
 	}
 
 	/**
-	 * Read list_ spo.
+	 * Read list.
 	 *
 	 * @param subjectCsid the subject csid
 	 * @param predicate the predicate
 	 * @param objectCsid the object csid
 	 * @return the client response
 	 */
-	public ClientResponse<RelationsCommonList> readList_SPO(String subjectCsid,
-			String predicate, String objectCsid) {
-		return relationProxy.readList_SPO(subjectCsid, predicate, objectCsid);
+	public ClientResponse<RelationsCommonList> readList(String subjectCsid,
+			String predicate,
+			String objectCsid) {
+		return relationProxy.readList(subjectCsid, predicate, objectCsid);
 	}
+
+//	/**
+//	 * Read list_ spo.
+//	 *
+//	 * @param subjectCsid the subject csid
+//	 * @param predicate the predicate
+//	 * @param objectCsid the object csid
+//	 * @return the client response
+//	 */
+//	@Deprecated
+//	public ClientResponse<RelationsCommonList> readList_SPO(String subjectCsid,
+//			String predicate, String objectCsid) {
+//		return relationProxy.readList_SP0(subjectCsid, predicate, objectCsid);
+//	}
 
 	/**
 	 * Read.

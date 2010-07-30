@@ -75,7 +75,8 @@ public abstract class RemoteSubItemDocumentModelHandlerImpl<T, TL> extends
         // and then check that here, so skip other parts.
         if(part.getMediaType().equals(MediaType.APPLICATION_XML_TYPE)){
             if(payload != null){
-                Document document = DocumentUtils.parseDocument(payload, partMeta);
+                Document document = DocumentUtils.parseDocument(payload, partMeta,
+                		false /*don't validate*/);
                 //TODO: callback to handler if registered to validate the
                 //document
                 Map<String, Object> objectProps = DocumentUtils.parseProperties(document.getFirstChild());

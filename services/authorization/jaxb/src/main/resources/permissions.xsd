@@ -52,6 +52,8 @@
                 no need to give slash at the beginning or end
                 - attributeName could be an attribute of the service schema
                 e.g. otherNumber from collectionobjects_common
+                - actionGroup is label that can be used by a client to "group" sets of actions for operations
+                like searching for permissions by a specific actionGroup label.
                 - action describes the actions that could be taken on given resource (and attribute)
                 - effect describes the effect of the access control for the action
                 performed on the given resource (and attribute)
@@ -87,6 +89,15 @@
                     <xs:appinfo>
                         <hj:basic>
                             <orm:column name="attribute_name" length="128"  nullable="true"/>
+                        </hj:basic>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="actionGroup" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>
+                        <hj:basic>
+                            <orm:column name="action_group" length="128"  nullable="true"/>
                         </hj:basic>
                     </xs:appinfo>
                 </xs:annotation>

@@ -11,9 +11,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.relation.RelationsCommonList;
+import org.collectionspace.services.common.relation.IRelationsManager;
+
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import javax.ws.rs.QueryParam;
 
 /**
  * @version $Revision:$
@@ -26,13 +29,22 @@ public interface RelationProxy extends CollectionSpaceProxy {
     @GET
     @Produces({"application/xml"})
     ClientResponse<RelationsCommonList> readList();
-
+    
     @GET
     @Produces({"application/xml"})
-    @Path("subject/{subjectCsid}/type/{predicate}/object/{objectCsid}")
-    ClientResponse<RelationsCommonList> readList_SPO(@PathParam("subjectCsid") String subjectCsid,
-            @PathParam("predicate") String predicate,
-            @PathParam("objectCsid") String objectCsid);
+    ClientResponse<RelationsCommonList> readList(
+    		@QueryParam(IRelationsManager.SUBJECT_QP) String subjectCsid,
+    		@QueryParam(IRelationsManager.PREDICATE_QP) String predicate,
+    		@QueryParam(IRelationsManager.OBJECT_QP) String objectCsid);
+    
+//    @GET
+//    @Produces({"application/xml"})
+//    @Path("subject/{subjectCsid}/type/{predicate}/object/{objectCsid}")
+//    @Deprecated
+//    ClientResponse<RelationsCommonList> readList_SPO(
+//    		@PathParam("subjectCsid") String subjectCsid,
+//            @PathParam("predicate") String predicate,
+//            @PathParam("objectCsid") String objectCsid);
 
     //(C)reate
     @POST

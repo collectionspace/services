@@ -408,7 +408,7 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
                     CollectionSpaceClient client, String sortBy,
                     long pageSize, long pageNumber) throws Exception {
         ClientResponse<AbstractCommonList> response =
-                client.readList(sortBy, Long.toString(pageSize), Long.toString(pageNumber));
+                client.readList(sortBy, pageSize, pageNumber);
         AbstractCommonList result = null;
         try {
             int statusCode = response.getStatus();

@@ -55,7 +55,7 @@ public class AuthZ {
     public final static AuthZ get() {
         return self;
     }
-
+    
     private void setupProvider() {
         String beanConfig = "applicationContext-authorization.xml";
         //system property is only set in test environment

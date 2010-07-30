@@ -133,7 +133,8 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    // Now try to retrieve the Intake record of the CollectionObject.
 	    //
 	    String predicate = RelationshipType.COLLECTIONOBJECT_INTAKE.value();
-	    ClientResponse<RelationsCommonList> resultResponse = relationClient.readList_SPO(collectionObjectCsid,
+	    ClientResponse<RelationsCommonList> resultResponse = relationClient.readList(
+	    		collectionObjectCsid,
 	    		predicate,
 	    		intakeCsid);
         RelationsCommonList relationList = null;

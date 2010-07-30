@@ -48,6 +48,7 @@ import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.tenant.TenantBindingType;
+import org.collectionspace.services.common.security.SecurityUtils;
 
 /**
  * AuthorizationGen generates authorizations (permissions and roles)
@@ -111,21 +112,26 @@ public class AuthorizationGen {
         for (ServiceBindingType sbinding : tbinding.getServiceBindings()) {
 
             //add permissions for the main path
+        	String resourceName = sbinding.getName().toLowerCase().trim();
+        	if (SecurityUtils.isEntityProxy() == true) {
+        		resourceName = SecurityUtils.getResourceEntity(resourceName);
+        	}
             Permission perm = buildAdminPermission(tbinding.getId(),
-                    sbinding.getName().toLowerCase());
+                    resourceName);
             apcList.add(perm);
 
             //add permissions for alternate paths
-            List<String> uriPaths = sbinding.getUriPath();
-            for (String uriPath : uriPaths) {
-                perm = buildAdminPermission(tbinding.getId(),
-                        uriPath.toLowerCase());
-                apcList.add(perm);
+            if (SecurityUtils.isEntityProxy() == false) {
+	            List<String> uriPaths = sbinding.getUriPath();
+	            for (String uriPath : uriPaths) {
+	                perm = buildAdminPermission(tbinding.getId(),
+	                        uriPath.toLowerCase());
+	                apcList.add(perm);
+	            }
             }
-
         }
+        
         return apcList;
-
     }
 
     private Permission buildAdminPermission(String tenantId, String resourceName) {
@@ -134,7 +140,7 @@ public class AuthorizationGen {
         perm.setCsid(id);
         perm.setDescription("generated admin permission");
         perm.setCreatedAtItem(new Date());
-        perm.setResourceName(resourceName.toLowerCase());
+        perm.setResourceName(resourceName.toLowerCase().trim());
         perm.setEffect(EffectType.PERMIT);
         perm.setTenantId(tenantId);
         ArrayList<PermissionAction> pas = new ArrayList<PermissionAction>();
@@ -168,20 +174,24 @@ public class AuthorizationGen {
         ArrayList<Permission> apcList = new ArrayList<Permission>();
         TenantBindingType tbinding = tenantBindings.get(tenantId);
         for (ServiceBindingType sbinding : tbinding.getServiceBindings()) {
-
             //add permissions for the main path
+        	String resourceName = sbinding.getName().toLowerCase().trim();
+        	if (SecurityUtils.isEntityProxy() == true) {
+        		resourceName = SecurityUtils.getResourceEntity(resourceName);
+        	}        	
             Permission perm = buildReaderPermission(tbinding.getId(),
-                    sbinding.getName().toLowerCase());
+                    resourceName);
             apcList.add(perm);
 
             //add permissions for alternate paths
-            List<String> uriPaths = sbinding.getUriPath();
-            for (String uriPath : uriPaths) {
-                perm = buildReaderPermission(tbinding.getId(),
-                        uriPath.toLowerCase());
-                apcList.add(perm);
+            if (SecurityUtils.isEntityProxy() == false) {
+	            List<String> uriPaths = sbinding.getUriPath();
+	            for (String uriPath : uriPaths) {
+	                perm = buildReaderPermission(tbinding.getId(),
+	                        uriPath.toLowerCase());
+	                apcList.add(perm);
+	            }
             }
-
         }
         return apcList;
 
@@ -193,7 +203,7 @@ public class AuthorizationGen {
         perm.setCsid(id);
         perm.setCreatedAtItem(new Date());
         perm.setDescription("generated readonly permission");
-        perm.setResourceName(resourceName.toLowerCase());
+        perm.setResourceName(resourceName.toLowerCase().trim());
         perm.setEffect(EffectType.PERMIT);
         perm.setTenantId(tenantId);
         ArrayList<PermissionAction> pas = new ArrayList<PermissionAction>();

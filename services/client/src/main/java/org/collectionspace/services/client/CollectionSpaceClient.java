@@ -149,8 +149,8 @@ public interface CollectionSpaceClient {
      * @return the client response
      */
     public ClientResponse<AbstractCommonList> readList(
-            String pageSize,
-            String pageNumber);
+    		Long pageSize,
+    		Long pageNumber);
 
     /**
      * Read list.
@@ -162,8 +162,8 @@ public interface CollectionSpaceClient {
      */
     public ClientResponse<AbstractCommonList> readList(
             String sortBy,
-            String pageSize,
-            String pageNumber);
+            Long pageSize,
+            Long pageNumber);
 
     /**
      * Delete.

@@ -44,6 +44,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.ServiceContextFactory;
@@ -489,6 +490,25 @@ public class CollectionObjectResource
 		
 		return result;
     }
+    
+    @GET
+    @Path("/picture")
+    @Produces("application/xml")
+    public Response createPictureDocument() {
+    	Response result = null;
+    	
+		if (logger.isDebugEnabled()) {
+			logger.debug("------------------------------------------------------------------------------");
+			logger.debug("Prototype to create a Picture document in Nuxeo");
+			logger.debug("------------------------------------------------------------------------------");
+			logger.debug("");
+		}
+		
+		NuxeoImageUtils.createPicture();
+		result = Response.status(HttpResponseCodes.SC_OK).build();
+		
+		return result;
+    }    
 
     /**
      * This method is deprecated.  Use kwSearchCollectionObjects() method instead.

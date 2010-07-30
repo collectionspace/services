@@ -22,6 +22,14 @@
  */
 package org.collectionspace.services.common.security;
 
+import java.util.List;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.StringTokenizer;
+
+import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.UriInfo;
+
 import org.collectionspace.authentication.AuthN;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +41,7 @@ import org.slf4j.LoggerFactory;
 public class SecurityUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityUtils.class);
+    public static final String URI_PATH_SEPARATOR = "/";
 
     /**
      * createPasswordHash creates password has using configured digest algorithm
@@ -68,6 +77,66 @@ public class SecurityUtils {
         }
     }
 
+	/**
+	 * Gets the resource name.
+	 *
+	 * @param uriInfo the uri info
+	 * @return the resource name
+	 */
+	public static String getResourceEntity(UriInfo uriInfo) {
+		String result = null;
+		
+		result = getResourceEntity(uriInfo.getPath());
+//		List<PathSegment> pathSegmentList = uriInfo.getPathSegments();
+//		if (pathSegmentList.isEmpty() == false) {
+//			result = pathSegmentList.get(0).getPath();
+//		}
+		
+		return result;
+	}
+	
+	/**
+	 * Gets the resource entity by returning the first segment of the resource path
+	 *
+	 * @param relativePath the relative path
+	 * @return the resource entity
+	 * @throws URISyntaxException the uRI syntax exception
+	 */
+	public static String getResourceEntity(String relativePath)
+	{
+		String result = "";
+		
+	    StringTokenizer strTok = new StringTokenizer(relativePath, URI_PATH_SEPARATOR);
+	    String pathSegment = null;
+	    while (strTok.hasMoreTokens() == true) {
+	    	pathSegment = strTok.nextToken();
+	    	if (pathSegment.equals("*") == true) {
+	    		//
+	    		// leave the loop if we hit a wildcard character
+	    		//
+	    		break;
+	    	}
+	    	if (result.length() > 0) {
+	    		result = result.concat(URI_PATH_SEPARATOR);
+	    	}
+	    	result = result.concat(pathSegment);
+	    }
+		
+		return result;
+	}
+    
+    /**
+     * Checks if is entity is action as a proxy for all sub-resources.
+     *
+     * @return true, if is entity proxy is acting as a proxy for all sub-resources
+     */
+    public static final boolean isEntityProxy() {
+    	//
+    	// should be getting this information from  the cspace config settings (tenent bindings file).
+    	return true;
+    }
+
+    
     /**
      * isCSpaceAdmin check if authenticated user is a CSpace administrator
      * @param tenantId

@@ -307,8 +307,8 @@ public abstract class AbstractServiceClientImpl implements
      * .lang.String, java.lang.String)
      */
     @Override
-    public ClientResponse<AbstractCommonList> readList(String pageSize,
-            String pageNumber) {
+    public ClientResponse<AbstractCommonList> readList(Long pageSize,
+    		Long pageNumber) {
         return getProxy().readList(pageSize, pageNumber);
     }
 
@@ -320,8 +320,8 @@ public abstract class AbstractServiceClientImpl implements
      * .lang.String, java.lang.String)
      */
     @Override
-    public ClientResponse<AbstractCommonList> readList(String sortBy, String pageSize,
-            String pageNumber) {
+    public ClientResponse<AbstractCommonList> readList(String sortBy, Long pageSize,
+            Long pageNumber) {
         return getProxy().readList(sortBy, pageSize, pageNumber);
     }
 

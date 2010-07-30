@@ -49,11 +49,12 @@ public interface CollectionSpaceProxy {
     @GET
     @Produces({"application/xml"})
     ClientResponse<AbstractCommonList> readList(
-            @QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) String pageSize,
-    	    @QueryParam(IClientQueryParams.START_PAGE_PARAM) String pageNumber);
+            @QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) Long pageSize,
+    	    @QueryParam(IClientQueryParams.START_PAGE_PARAM) Long pageNumber);
 	
     /**
      * Read list.
+     * @param sortBy 
      *
      * @param pageSize the page size
      * @param pageNumber the page number
@@ -63,6 +64,6 @@ public interface CollectionSpaceProxy {
     @Produces({"application/xml"})
     ClientResponse<AbstractCommonList> readList(
             @QueryParam(IClientQueryParams.SORT_BY_PARAM) String sortBy,
-            @QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) String pageSize,
-    	    @QueryParam(IClientQueryParams.START_PAGE_PARAM) String pageNumber);
+            @QueryParam(IClientQueryParams.PAGE_SIZE_PARAM) Long pageSize,
+    	    @QueryParam(IClientQueryParams.START_PAGE_PARAM) Long pageNumber);
 }
