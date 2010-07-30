@@ -473,8 +473,7 @@ public class DocumentUtils {
         root.setAttribute("xmlns:" + ns, xc.getNamespaceURI());
         document.appendChild(root);
 
-        SchemaManager schemaManager = Framework.getLocalService(SchemaManager.class);
-        Schema schema = schemaManager.getSchema(partMeta.getLabel());
+        Schema schema = getSchema(partMeta.getLabel());
         
         buildDocument(document, root, objectProps, schema);
         
@@ -555,6 +554,11 @@ public class DocumentUtils {
     	for (Object obj : list) {
     		buildProperty(document, element, field, obj);
     	}
+    }
+
+    public static Schema getSchema(String label) {
+        SchemaManager schemaManager = Framework.getLocalService(SchemaManager.class);
+        return schemaManager.getSchema(label);
     }
 
 

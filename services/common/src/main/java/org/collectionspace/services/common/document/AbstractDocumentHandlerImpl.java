@@ -373,7 +373,9 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
     @Override
     public abstract String getQProperty(String prop);
 
-    /* (non-Javadoc)
+    /* 
+     * Strip Nuxeo's schema name from the start of the field / element name.
+     * (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#getUnQProperty(java.lang.String)
      */
     @Override
