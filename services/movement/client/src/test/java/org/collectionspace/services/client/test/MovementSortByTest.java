@@ -112,7 +112,7 @@ public class MovementSortByTest extends BaseServiceTest {
         List<MovementsCommonList.MovementListItem> items =
                 list.getMovementListItem();
 
-        String[] values = new String[100];
+        ArrayList<String> values = new ArrayList<String>();
         Collator usEnglishCollator = Collator.getInstance(Locale.US);
         int i = 0;
         for (MovementsCommonList.MovementListItem item : items) {
@@ -122,9 +122,9 @@ public class MovementSortByTest extends BaseServiceTest {
             // IDs provided in the summary list items. amd then retriving
             // the value of that field from each of those records.
             MovementsCommon movement = read(item.getCsid());
-            values[i] = movement.getMovementNote();
+            values.add(i, movement.getMovementNote());
             if (logger.isDebugEnabled()) {
-                logger.debug("list-item[" + i + "] movementNote=" + values[i]);
+                logger.debug("list-item[" + i + "] movementNote=" + values.get(i));
             }
             // Verify that the value of the specified field in the current record
             // is equal to or greater than its value in the previous record,
@@ -134,8 +134,8 @@ public class MovementSortByTest extends BaseServiceTest {
             // reflect inconsistencies, if any, between Java's collator and the
             // collator used for ordering by the database.  To help avoid this,
             // it might be useful to keep test strings fairly generic.)
-            if (i > 0) {
-                Assert.assertTrue(usEnglishCollator.compare(values[i], values[i - 1]) >= 0);
+            if (i > 0 && values.get(i) != null && values.get(i - 1) != null) {
+                Assert.assertTrue(usEnglishCollator.compare(values.get(i), values.get(i - 1)) >= 0);
             }
             i++;
         }
@@ -165,7 +165,7 @@ public class MovementSortByTest extends BaseServiceTest {
         List<MovementsCommonList.MovementListItem> items =
                 list.getMovementListItem();
 
-        String[] values = new String[100];
+        ArrayList<String> values = new ArrayList<String>();
         Collator usEnglishCollator = Collator.getInstance(Locale.US);
         int i = 0;
         for (MovementsCommonList.MovementListItem item : items) {
@@ -175,9 +175,9 @@ public class MovementSortByTest extends BaseServiceTest {
             // IDs provided in the summary list items. amd then retriving
             // the value of that field from each of those records.
             MovementsCommon movement = read(item.getCsid());
-            values[i] = movement.getMovementNote();
+            values.add(i, movement.getMovementNote());
             if (logger.isDebugEnabled()) {
-                logger.debug("list-item[" + i + "] movementNote=" + values[i]);
+                logger.debug("list-item[" + i + "] movementNote=" + values.get(i));
             }
             // Verify that the value of the specified field in the current record
             // is equal to or greater than its value in the previous record,
@@ -187,8 +187,8 @@ public class MovementSortByTest extends BaseServiceTest {
             // reflect inconsistencies, if any, between Java's collator and the
             // collator used for ordering by the database.  To help avoid this,
             // it might be useful to keep test strings fairly generic.)
-            if (i > 0) {
-                Assert.assertTrue(usEnglishCollator.compare(values[i], values[i - 1]) >= 0);
+            if (i > 0 && values.get(i) != null && values.get(i - 1) != null) {
+                Assert.assertTrue(usEnglishCollator.compare(values.get(i), values.get(i - 1)) >= 0);
             }
             i++;
         }
@@ -216,7 +216,7 @@ public class MovementSortByTest extends BaseServiceTest {
         List<MovementsCommonList.MovementListItem> items =
                 list.getMovementListItem();
 
-        String[] values = new String[100];
+        ArrayList<String> values = new ArrayList<String>();
         Collator usEnglishCollator = Collator.getInstance(Locale.US);
         int i = 0;
         for (MovementsCommonList.MovementListItem item : items) {
@@ -226,9 +226,9 @@ public class MovementSortByTest extends BaseServiceTest {
             // IDs provided in the summary list items. amd then retriving
             // the value of that field from each of those records.
             MovementsCommon movement = read(item.getCsid());
-            values[i] = movement.getMovementNote();
+            values.add(i, movement.getMovementNote());
             if (logger.isDebugEnabled()) {
-                logger.debug("list-item[" + i + "] movementNote=" + values[i]);
+                logger.debug("list-item[" + i + "] movementNote=" + values.get(i));
             }
             // Verify that the value of the specified field in the current record
             // is less than or equal to than its value in the previous record,
@@ -238,8 +238,8 @@ public class MovementSortByTest extends BaseServiceTest {
             // reflect inconsistencies, if any, between Java's collator and the
             // collator used for ordering by the database.  To help avoid this,
             // it might be useful to keep test strings fairly generic.)
-            if (i > 0) {
-                Assert.assertTrue(usEnglishCollator.compare(values[i], values[i - 1]) <= 0);
+            if (i > 0 && values.get(i) != null && values.get(i - 1) != null) {
+                Assert.assertTrue(usEnglishCollator.compare(values.get(i), values.get(i - 1)) <= 0);
             }
             i++;
         }
@@ -266,18 +266,18 @@ public class MovementSortByTest extends BaseServiceTest {
         List<MovementsCommonList.MovementListItem> items =
                 list.getMovementListItem();
 
-        String[] values = new String[100];
+        ArrayList<String> values = new ArrayList<String>();
         Comparator<String> comparator = String.CASE_INSENSITIVE_ORDER;
         int i = 0;
         for (MovementsCommonList.MovementListItem item : items) {
-            values[i] = item.getLocationDate();
+            values.add(i, item.getLocationDate());
             if (logger.isDebugEnabled()) {
-                logger.debug("list-item[" + i + "] locationDate=" + values[i]);
+                logger.debug("list-item[" + i + "] locationDate=" + values.get(i));
             }
             // Verify that the value of the specified field in the current record
             // is equal to or greater than its value in the previous record.
-            if (i > 0) {
-                Assert.assertTrue(comparator.compare(values[i], values[i - 1]) >= 0);
+            if (i > 0 && values.get(i) != null && values.get(i - 1) != null) {
+                Assert.assertTrue(comparator.compare(values.get(i), values.get(i - 1)) >= 0);
             }
             i++;
         }
@@ -304,18 +304,18 @@ public class MovementSortByTest extends BaseServiceTest {
         List<MovementsCommonList.MovementListItem> items =
                 list.getMovementListItem();
 
-        String[] values = new String[100];
+        ArrayList<String> values = new ArrayList<String>();
         Comparator<String> comparator = String.CASE_INSENSITIVE_ORDER;
         int i = 0;
         for (MovementsCommonList.MovementListItem item : items) {
-            values[i] = item.getLocationDate();
+            values.add(i, item.getLocationDate());
             if (logger.isDebugEnabled()) {
-                logger.debug("list-item[" + i + "] locationDate=" + values[i]);
+                logger.debug("list-item[" + i + "] locationDate=" + values.get(i));
             }
             // Verify that the value of the specified field in the current record
             // is less than or equal to its value in the previous record.
-            if (i > 0) {
-                Assert.assertTrue(comparator.compare(values[i], values[i - 1]) <= 1);
+            if (i > 0 && values.get(i) != null && values.get(i - 1) != null) {
+                Assert.assertTrue(comparator.compare(values.get(i), values.get(i - 1)) <= 1);
             }
             i++;
         }
