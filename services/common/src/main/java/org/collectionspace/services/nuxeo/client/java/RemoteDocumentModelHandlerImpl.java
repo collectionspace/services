@@ -315,7 +315,6 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
             DocumentWrapper<DocumentModel> docWrapper,
             List<String> authRefFieldNames) throws PropertyException {
 
-        final String SCHEMA_FIELD_DELIMITER = ":";
         AuthorityRefList authRefList = new AuthorityRefList();
         List<AuthorityRefList.AuthorityRefItem> list = authRefList.getAuthorityRefItem();
         String refName = "";
@@ -325,18 +324,8 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
 
             for (String authRefFieldName : authRefFieldNames) {
 
-                String schemaName = "";
-                // FIXME: Replacing the following by an existing utility
-                // method or, if not already present, create a new utility
-                // method for this task in the common package.
-                if (authRefFieldName.indexOf(SCHEMA_FIELD_DELIMITER) > 0) {
-                    String[] authRefFieldNameParts =
-                            authRefFieldName.split(SCHEMA_FIELD_DELIMITER);
-                    schemaName = authRefFieldNameParts[0];
-                    authRefFieldName = authRefFieldNameParts[1];
-                }
-
-                Schema schema = DocumentUtils.getSchema(schemaName);
+                String schemaName = DocumentUtils.getSchemaNamePart(authRefFieldName);
+                Schema schema = DocumentUtils.getSchemaFromName(schemaName);
                 Field field = schema.getField(authRefFieldName);
                 Type type = field.getType();
 
@@ -350,9 +339,9 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
                     }
                 // FIXME: The following assumes a very simple structure
                 // for repeatable single scalar fields: a parent (continer)
-                // element, containing 0-n child elements, each of the same
-                // name and type, with values capable of being meaningfully
-                // cast to String.
+                // element, containing 0-n child elements, each of them
+                // of identical  name and type, with values capable of being
+                // meaningfully cast to String.
                 //
                 // Past release 1.0a, repeatability may consist
                 // of arbitrary nesting and complexity, rather than
@@ -372,7 +361,9 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
                         if (obj != null) {
                             refName = (String) obj;
                             if (refName != null || ! refName.trim().isEmpty()) {
-                                list.add(authorityRefListItem(childAuthRefFieldName, refName));
+                                String schemaQualifiedChildFieldName =
+                                    DocumentUtils.appendSchemaName(schemaName, childAuthRefFieldName);
+                                list.add(authorityRefListItem(schemaQualifiedChildFieldName, refName));
                             }
                         }
                     }

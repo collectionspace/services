@@ -88,8 +88,12 @@ public class DocumentUtils {
     private static final Logger logger =
         LoggerFactory.getLogger(DocumentUtils.class);
 
-    /** The NAM e_ valu e_ separator. */
+    /** The name value separator. */
     private static String NAME_VALUE_SEPARATOR = "|";
+
+    // The delimiter in a schema-qualified field name,
+    // between its schema name and field name components.
+    private static String SCHEMA_FIELD_DELIMITER = ":";
     
     /** The XML elements with this suffix will indicate. */
     private static String STRUCTURED_TYPE_SUFFIX = "List";
@@ -473,7 +477,7 @@ public class DocumentUtils {
         root.setAttribute("xmlns:" + ns, xc.getNamespaceURI());
         document.appendChild(root);
 
-        Schema schema = getSchema(partMeta.getLabel());
+        Schema schema = getSchemaFromName(partMeta.getLabel());
         
         buildDocument(document, root, objectProps, schema);
         
@@ -556,9 +560,53 @@ public class DocumentUtils {
     	}
     }
 
-    public static Schema getSchema(String label) {
+    /*
+     * Returns a schema, given the name of a schema.
+     *
+     * @param schemaName  a schema name.
+     * @return  a schema.
+     */
+    public static Schema getSchemaFromName(String schemaName) {
         SchemaManager schemaManager = Framework.getLocalService(SchemaManager.class);
-        return schemaManager.getSchema(label);
+        return schemaManager.getSchema(schemaName);
+    }
+
+    /*
+     * Returns the schema part of a presumably schema-qualified field name.
+     *
+     * If the schema part is null or empty, returns the supplied field name.
+     *
+     * @param schemaQualifiedFieldName  a schema-qualified field name.
+     * @return  the schema part of the field name.
+     */
+    public static String getSchemaNamePart(String schemaQualifiedFieldName) {
+        if (schemaQualifiedFieldName == null || schemaQualifiedFieldName.trim().isEmpty()) {
+            return schemaQualifiedFieldName;
+        }
+        if (schemaQualifiedFieldName.indexOf(SCHEMA_FIELD_DELIMITER) > 0) {
+            String[] schemaQualifiedFieldNameParts =
+                    schemaQualifiedFieldName.split(SCHEMA_FIELD_DELIMITER);
+            String schemaName = schemaQualifiedFieldNameParts[0];
+            return schemaName;
+        } else {
+            return schemaQualifiedFieldName;
+        }
+    }
+
+    /*
+     * Returns a schema-qualified field name, given a schema name and field name.
+     *
+     * If the schema name is null or empty, returns the supplied field name.
+     *
+     * @param schemaName  a schema name.
+     * @param fieldName  a field name.
+     * @return  a schema-qualified field name.
+     */
+    public static String appendSchemaName(String schemaName, String fieldName) {
+        if (schemaName == null || schemaName.trim().isEmpty()) {
+            return fieldName;
+        }
+        return schemaName + SCHEMA_FIELD_DELIMITER + fieldName;
     }
 
 
