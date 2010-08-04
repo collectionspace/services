@@ -33,6 +33,8 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
 import org.collectionspace.services.acquisition.AcquisitionsCommonList;
 import org.collectionspace.services.acquisition.AcquisitionDateList;
+import org.collectionspace.services.acquisition.AcquisitionFunding;
+import org.collectionspace.services.acquisition.AcquisitionFundingList;
 import org.collectionspace.services.acquisition.AcquisitionSourceList;
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -147,7 +149,51 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         }
     }
 
+    /*
+    * Tests to diagnose and fix CSPACE-2578.
+    *
+    * This is a bug identified in release 1.0 alpha, after first implementing an
+    * Acquisition Funding repeatable group of fields, in which record creation
+    * fails if there is whitespace (or more generally, a text node) between
+    * the acquisitionFunding container element and its first child field.
+    */
+
+    // Verify that record creation occurs successfully when there is NO whitespace
+    // between the acquisitionFunding tag and its first child element tag
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+        dependsOnMethods = {"create", "testSubmitRequest"}, groups = {"cspace2578group"})
+    public void createFromXmlNoWhitespaceAfterRepeatableGroupTag(String testName) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        String testDataDir = System.getProperty("test-data.fileName");
+        String newId =
+            createFromXmlFile(testName, testDataDir + "/cspace-2578-no-whitespace.xml", false);
+        testSubmitRequest(newId);
+    }
+
+    // Verify that record creation occurs successfully when there is whitespace
+    // between the acquisitionFunding tag and its first child element tag
+
+    // FIXME: This test currently fails.  @Test annotation is currently commented
+    // out for check-in, to prevent service tests from failing.  Can uncomment to test
+    // fixes, and also after the issue is resolved, to help detect any regressions.
+
+    // @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    //    dependsOnMethods = {"create", "testSubmitRequest"}, groups = {"cspace2578group"})
+    public void createFromXmlWhitespaceAfterRepeatableGroupTag(String testName) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        String testDataDir = System.getProperty("test-data.fileName");
+        String newId =
+            createFromXmlFile(testName, testDataDir + "/cspace-2578-whitespace.xml", false);
+        AcquisitionsCommon acquisition = readAcquisitionCommonPart(newId);
+        testSubmitRequest(newId);
+    }
+
     // Failure outcomes
+
     // Placeholders until the three tests below can be uncommented.
     // See Issue CSPACE-401.
     /* (non-Javadoc)
@@ -700,27 +746,37 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
     /**
      * Tests the code for manually submitting data that is used by several
      * of the methods above.
-     * 
-     * @throws Exception 
+     * @throws Exception
      */
+
     @Test(dependsOnMethods = {"create", "read"})
     public void testSubmitRequest() throws Exception {
+        testSubmitRequest(knownResourceId);
+    }
 
-        // Perform setup.
-        setupRead();
+    /**
+     * Test submit request.
+     *
+     * @param resourceId the resource id
+     * @throws Exception the exception
+     */
+    private void testSubmitRequest(String resourceId) throws Exception {
+
+        // Expected status code: 200 OK
+        final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();
 
         // Submit the request to the service and store the response.
         String method = ServiceRequestType.READ.httpMethodName();
-        String url = getResourceURL(knownResourceId);
+        String url = getResourceURL(resourceId);
         int statusCode = submitRequest(method, url);
 
         // Check the status code of the response: does it match
         // the expected response(s)?
-        if(logger.isDebugEnabled()){
-            logger.debug("testSubmitRequest: url=" + url +
-                " status=" + statusCode);
+        if (logger.isDebugEnabled()) {
+            logger.debug("testSubmitRequest: url=" + url
+                    + " status=" + statusCode);
         }
-        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        Assert.assertEquals(statusCode, EXPECTED_STATUS);
 
     }
 
@@ -770,5 +826,140 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         }
         return multipart;
     }
+
+    // FIXME: The following methods might be made generic and moved to a common package.
+
+    /**
+     * Retrives an XML document from the given file, and uses
+     * the JAXB unmarshaller to create a Java object representation
+     * and ultimately a multipart payload that can be submitted in
+     * a create or update request.
+     *
+     * @param commonPartName
+     * @param commonPartFileName
+     * @return
+     * @throws Exception
+     */
+    private MultipartOutput createAcquisitionInstanceFromXml(String testName, String commonPartName,
+            String commonPartFileName) throws Exception {
+
+        AcquisitionsCommon acquisition =
+                (AcquisitionsCommon) getObjectFromFile(AcquisitionsCommon.class,
+                commonPartFileName);
+        MultipartOutput multipart = new MultipartOutput();
+        OutputPart commonPart = multipart.addPart(acquisition,
+                MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", commonPartName);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + " to be created, acquisitions common");
+            logger.debug(objectAsXmlString(acquisition,
+                    AcquisitionsCommon.class));
+        }
+        return multipart;
+
+    }
+
+    /**
+     * Creates a record / resource from the data in an XML file.
+     *
+     * @param testName the test name
+     * @param fileName the file name
+     * @param useJaxb the use jaxb
+     * @return the string
+     * @throws Exception the exception
+     */
+    private String createFromXmlFile(String testName, String fileName, boolean useJaxb) throws Exception {
+
+        // Perform setup.
+        setupCreate();
+
+        MultipartOutput multipart = null;
+
+        AcquisitionClient client = new AcquisitionClient();
+        if (useJaxb) {
+            multipart = createAcquisitionInstanceFromXml(testName,
+                    client.getCommonPartName(), fileName);
+        } else {
+
+            multipart = createAcquisitionInstanceFromRawXml(testName,
+                    client.getCommonPartName(), fileName);
+        }
+        ClientResponse<Response> res = client.create(multipart);
+        int statusCode = res.getStatus();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        String newId = extractId(res);
+        allResourceIdsCreated.add(newId);
+        return newId;
+    }
+
+     /**
+     * Returns a multipart payload that can be submitted with a
+     * create or update request, by reading from an XML file.
+     *
+     * @param commonPartName
+     * @param commonPartFileName
+     * @return
+     * @throws Exception
+     */
+    private MultipartOutput createAcquisitionInstanceFromRawXml(String testName, String commonPartName,
+            String commonPartFileName) throws Exception {
+
+        MultipartOutput multipart = new MultipartOutput();
+        String stringObject = getXmlDocumentAsString(commonPartFileName);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + " to be created, acquisition common " + "\n" + stringObject);
+        }
+        OutputPart commonPart = multipart.addPart(stringObject,
+                MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", commonPartName);
+
+        return multipart;
+
+    }
+
+    // FIXME: This duplicates code in read(), and should be consolidated.
+    // This is an expedient to support reading and verifying the contents
+    // of resources that have been created from test data XML files.
+    private AcquisitionsCommon readAcquisitionCommonPart(String csid)
+        throws Exception {
+
+        String testName = "readAcquisitionCommonPart";
+
+        setupRead();
+
+        // Submit the request to the service and store the response.
+        AcquisitionClient client = new AcquisitionClient();
+        ClientResponse<MultipartInput> res = client.read(csid);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        MultipartInput input = (MultipartInput) res.getEntity();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": Reading Common part ...");
+        }
+        AcquisitionsCommon acquisition =
+                (AcquisitionsCommon) extractPart(input,
+                client.getCommonPartName(), AcquisitionsCommon.class);
+        Assert.assertNotNull(acquisition);
+
+        return acquisition;
+     }
+
 }
 
