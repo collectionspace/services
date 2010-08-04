@@ -63,17 +63,17 @@
                               versionable="true" auditable="false"
                               label="collectionobjects_common" updated="" order="1">
                     <service:properties>
-                        <types:item><types:key>authRef</types:key><types:value>contentOrganizations</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>contentPersons</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>contentOrganizations|contentOrganization</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>contentPersons|contentPerson</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>inscriptionContentInscriber</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>inscriptionDescriptionInscriber</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>assocEventOrganizations</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>assocEventPersons</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>assocOrganizations</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>assocPersons</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>owners</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>fieldCollectionSources</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>fieldCollectors</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>assocEventOrganizations|assocEventOrganization</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>assocEventPersons|assocEventPerson</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>assocOrganizations|assocOrganization</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>assocPersons|assocPerson</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>owners|owner</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>fieldCollectionSources|fieldCollectionSource</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>fieldCollectors|fieldCollector</types:value></types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
@@ -133,11 +133,11 @@
                     <service:properties>
                         <types:item><types:key>authRef</types:key><types:value>currentOwner</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>depositor</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>fieldCollectionSources</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>fieldCollectors</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>fieldCollectionSources|fieldCollectionSource</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>fieldCollectors|fieldCollector</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>valuer</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>insurers</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>conditionCheckersOrAssessors</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>insurers|insurer</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>conditionCheckersOrAssessors|conditionCheckerOrAssessor</types:value></types:item>
                    </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
@@ -490,8 +490,8 @@
                               versionable="true" auditable="false"
                               label="organizations_common" updated="" order="1">
                     <service:properties>
-                        <types:item><types:key>authRef</types:key><types:value>contactNames</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>subBodies</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>contactNames|contactName</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>subBodies|subBody</types:value></types:item>
                     </service:properties>
 
                     <service:content contentType="application/xml">
@@ -700,8 +700,8 @@
                               label="acquisitions_common" updated="" order="1">
                     <service:properties>
                         <types:item><types:key>authRef</types:key><types:value>acquisitionAuthorizer</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>acquisitionFundingSource</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>acquisitionSources</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>acquisitionFundingList|acquisitionFundingSource</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>acquisitionSources|acquisitionSource</types:value></types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
@@ -1162,17 +1162,17 @@
                               versionable="true" auditable="false"
                               label="collectionobjects_common" updated="" order="1">
                     <service:properties>
-                        <types:item><types:key>authRef</types:key><types:value>contentOrganizations</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>contentPersons</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>contentOrganizations|contentOrganization</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>contentPersons|contentPerson</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>inscriptionContentInscriber</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>inscriptionDescriptionInscriber</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>assocEventOrganizations</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>assocEventPersons</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>assocOrganizations</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>assocPersons</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>owners</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>fieldCollectionSources</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>fieldCollectors</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>assocEventOrganizations|assocEventOrganization</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>assocEventPersons|assocEventPerson</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>assocOrganizations|assocOrganization</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>assocPersons|assocPerson</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>owners|owner</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>fieldCollectionSources|fieldCollectionSource</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>fieldCollectors|fieldCollector</types:value></types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
@@ -1232,11 +1232,11 @@
                     <service:properties>
                         <types:item><types:key>authRef</types:key><types:value>currentOwner</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>depositor</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>fieldCollectionSources</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>fieldCollectors</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>fieldCollectionSources|fieldCollectionSource</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>fieldCollectors|fieldCollector</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>valuer</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>insurers</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>conditionCheckersOrAssessors</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>insurers|insurer</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>conditionCheckersOrAssessors|conditionCheckerOrAssessor</types:value></types:item>
                    </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
@@ -1543,8 +1543,8 @@
                               versionable="true" auditable="false"
                               label="organizations_common" updated="" order="1">
                     <service:properties>
-                        <types:item><types:key>authRef</types:key><types:value>contactNames</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>subBodies</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>contactNames|contactName</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>subBodies|subBody</types:value></types:item>
                     </service:properties>
 
                     <service:content contentType="application/xml">
@@ -1756,8 +1756,8 @@
                               label="acquisitions_common" updated="" order="1">
                     <service:properties>
                         <types:item><types:key>authRef</types:key><types:value>acquisitionAuthorizer</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>acquisitionFundingSource</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>acquisitionSources</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>acquisitionFundingList|acquisitionFundingSource</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>acquisitionSources|acquisitionSource</types:value></types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent

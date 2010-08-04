@@ -38,6 +38,8 @@ import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
+import org.collectionspace.services.acquisition.AcquisitionFunding;
+import org.collectionspace.services.acquisition.AcquisitionFundingList;
 import org.collectionspace.services.acquisition.AcquisitionSourceList;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -72,9 +74,9 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null; 
     private String acquisitionAuthorizerRefName = null;
-    private String acquisitionFundingSourceRefName = null;
+    private List<String> acquisitionFundingSourcesRefNames = new ArrayList<String>();
     private List<String> acquisitionSourcesRefNames = new ArrayList<String>();
-    private final int NUM_AUTH_REFS_EXPECTED = 4;
+    private final int NUM_AUTH_REFS_EXPECTED = 5;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -116,7 +118,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         MultipartOutput multipart = createAcquisitionInstance(
             "April 1, 2010",
 	    acquisitionAuthorizerRefName,
-	    acquisitionFundingSourceRefName,
+            acquisitionFundingSourcesRefNames,
             acquisitionSourcesRefNames);
 
         AcquisitionClient acquisitionClient = new AcquisitionClient();
@@ -169,8 +171,12 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         acquisitionAuthorizerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         personIdsCreated.add(csid);
         
-        csid = createPerson("Fran", "Funding-Source", "franFundingSource", authRefName);
-        acquisitionFundingSourceRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        csid = createPerson("Fran", "Funding-SourceOne", "franFundingSourceOne", authRefName);
+        acquisitionFundingSourcesRefNames.add(PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null));
+        personIdsCreated.add(csid);
+
+        csid = createPerson("Fahd", "Funding-SourceTwo", "fahdFundingSourceTwo", authRefName);
+        acquisitionFundingSourcesRefNames.add(PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null));
         personIdsCreated.add(csid);
 
         csid = createPerson("Sammy", "SourceOne", "sammySourceOne", authRefName);
@@ -230,9 +236,22 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         AcquisitionsCommon acquisition = (AcquisitionsCommon) extractPart(input,
         		acquisitionClient.getCommonPartName(), AcquisitionsCommon.class);
         Assert.assertNotNull(acquisition);
+
         // Check a couple of fields
+        // Scalar fields
         Assert.assertEquals(acquisition.getAcquisitionAuthorizer(), acquisitionAuthorizerRefName);
-        Assert.assertEquals(acquisition.getAcquisitionFundingSource(), acquisitionFundingSourceRefName);
+        
+        // In repeatable groups of fields
+        AcquisitionFundingList acqFundingList = acquisition.getAcquisitionFundingList();
+        List<AcquisitionFunding> acqFundings = acqFundingList.getAcquisitionFunding();
+        List<String> acqFundingSourceRefNamesFound = new ArrayList();
+        for (AcquisitionFunding acqFunding : acqFundings) {
+            String acqFundingSourceRefName = acqFunding.getAcquisitionFundingSource();
+            acqFundingSourceRefNamesFound.add(acqFundingSourceRefName);
+        }
+        Assert.assertTrue(acqFundingSourceRefNamesFound.containsAll(acquisitionFundingSourcesRefNames));
+
+        // In scalar repeatable fields
         AcquisitionSourceList acquisitionSources = acquisition.getAcquisitionSources();
         List<String> sources = acquisitionSources.getAcquisitionSource();
         for (String refName : sources) {
@@ -334,19 +353,35 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
    private MultipartOutput createAcquisitionInstance(
     	String accessionDate,
 	String acquisitionAuthorizer,
-	String acquisitionFundingSource,
+	List<String> acquisitionFundingSources,
         List<String> acquisitionSources) {
        
         AcquisitionsCommon acquisition = new AcquisitionsCommon();
         acquisition.setAccessionDate(accessionDate);
         acquisition.setAcquisitionAuthorizer(acquisitionAuthorizer);
-        acquisition.setAcquisitionFundingSource(acquisitionFundingSource);
+        
+        AcquisitionFundingList acqFundingsList = new AcquisitionFundingList();
+        List<AcquisitionFunding> acqFundings = acqFundingsList.getAcquisitionFunding();
+        int i = 0;
+        for (String acqFundingSource: acquisitionFundingSources) {
+            i++;
+            AcquisitionFunding acqFunding = new AcquisitionFunding();
+            acqFunding.setAcquisitionFundingSource(acqFundingSource);
+            acqFunding.setAcquisitionFundingSourceProvisos("funding source provisos-" + i);
+            acqFundings.add(acqFunding);
+        }
+        AcquisitionFunding addtlAcqFunding = new AcquisitionFunding();
+        addtlAcqFunding.setAcquisitionFundingCurrency("USD");
+        acqFundings.add(addtlAcqFunding);
+        acquisition.setAcquisitionFundingList(acqFundingsList);
+
         AcquisitionSourceList acqSourcesList = new AcquisitionSourceList();
-        List<String> sources = acqSourcesList.getAcquisitionSource();
-        for (String source: acquisitionSources) {
-          sources.add(source);
+        List<String> acqSources = acqSourcesList.getAcquisitionSource();
+        for (String acqSource: acquisitionSources) {
+          acqSources.add(acqSource);
         }
         acquisition.setAcquisitionSources(acqSourcesList);
+
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(acquisition, MediaType.APPLICATION_XML_TYPE);

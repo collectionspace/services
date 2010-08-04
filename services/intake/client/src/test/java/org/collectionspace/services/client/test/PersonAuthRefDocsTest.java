@@ -228,8 +228,11 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
     }
 
     // Success outcomes
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"createIntakeWithAuthRefs"})
+    
+    // FIXME: Uncomment @Test annotation after CSPACE-2577 is fixed.
+
+    // @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    //    dependsOnMethods = {"createIntakeWithAuthRefs"})
     public void readAndCheckAuthRefDocs(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {

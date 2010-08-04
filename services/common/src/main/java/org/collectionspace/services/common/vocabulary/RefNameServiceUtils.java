@@ -42,6 +42,7 @@ import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.service.ServiceBindingType;
@@ -86,6 +87,13 @@ public class RefNameServiceUtils {
     				ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
     		if(authRefFields.isEmpty())
     			continue;
+                String fieldName = "";
+                for (int i = 0; i < authRefFields.size(); i++) {
+                    // fieldName = DocumentUtils.getDescendantOrAncestor(authRefFields.get(i));
+                    fieldName = DocumentUtils.getAncestorAuthRefFieldName(authRefFields.get(i));
+                    authRefFields.set(i, fieldName);
+                }
+                
     		String docType = sb.getObject().getName();
     		queriedServiceBindings.put(docType, sb);
     		authRefFieldsByService.put(docType, authRefFields);
@@ -108,7 +116,7 @@ public class RefNameServiceUtils {
     				whereClause.append(" OR ");
     			}
     			//whereClause.append(prefix);
-    			whereClause.append(field);
+                        whereClause.append(field);
     			whereClause.append("='");
     			whereClause.append(escapedRefName);
     			whereClause.append("'");

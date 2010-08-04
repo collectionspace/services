@@ -97,7 +97,7 @@ public class PropertyItemUtils {
     		if(propName.equals(propItem.getKey())) {
     			String value = propItem.getValue();
     			if(value!=null) {
-    				values.add((qualPrefix!=null)?(qualPrefix+value):value);
+    				values.add((qualPrefix!=null)?(qualPrefix+value):value.trim());
     			}
     		}
     	}

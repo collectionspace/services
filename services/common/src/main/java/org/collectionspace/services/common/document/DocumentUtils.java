@@ -55,6 +55,7 @@ import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.service.XmlContentType;
 
 import org.nuxeo.common.collections.PrimitiveArrays;
+import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.schema.TypeConstants;
 import org.nuxeo.ecm.core.schema.types.ComplexType;
@@ -94,6 +95,10 @@ public class DocumentUtils {
     // The delimiter in a schema-qualified field name,
     // between its schema name and field name components.
     private static String SCHEMA_FIELD_DELIMITER = ":";
+
+    // The delimiter between a parent authRef field name and
+    // child authRef field name, if any.
+    private static String AUTHREF_FIELD_NAME_DELIMITER = "|";
     
     /** The XML elements with this suffix will indicate. */
     private static String STRUCTURED_TYPE_SUFFIX = "List";
@@ -574,14 +579,16 @@ public class DocumentUtils {
     /*
      * Returns the schema part of a presumably schema-qualified field name.
      *
-     * If the schema part is null or empty, returns the supplied field name.
+     * If the schema part is null or empty, returns an empty string.
      *
      * @param schemaQualifiedFieldName  a schema-qualified field name.
      * @return  the schema part of the field name.
      */
+
+    //FIXME: Might instead use Nuxeo's built-in QName class.
     public static String getSchemaNamePart(String schemaQualifiedFieldName) {
         if (schemaQualifiedFieldName == null || schemaQualifiedFieldName.trim().isEmpty()) {
-            return schemaQualifiedFieldName;
+            return "";
         }
         if (schemaQualifiedFieldName.indexOf(SCHEMA_FIELD_DELIMITER) > 0) {
             String[] schemaQualifiedFieldNameParts =
@@ -589,9 +596,93 @@ public class DocumentUtils {
             String schemaName = schemaQualifiedFieldNameParts[0];
             return schemaName;
         } else {
-            return schemaQualifiedFieldName;
+            return "";
         }
     }
+
+    /*
+     * Returns a list of delimited strings, by splitting the supplied string
+     * on a supplied delimiter.
+     *
+     * @param str  A string to split on a delimiter.
+     * @param delmiter  A delimiter on which the string will be split into parts.
+     * 
+     * @return  A list of delimited strings.  Returns an empty list if either
+     * the string or delimiter are null or empty, or if the delimiter cannot
+     * be found in the string.
+     */
+    public static List<String> getDelimitedParts(String str, String delimiter) {
+        List<String> parts = new ArrayList<String>();
+        if (str == null || str.trim().isEmpty()) {
+            return parts;
+        }
+        if (delimiter == null || delimiter.trim().isEmpty()) {
+            return parts;
+        }
+        StringTokenizer stz = new StringTokenizer(str, delimiter);
+        while (stz.hasMoreTokens()) {
+            parts.add(stz.nextToken());
+        }
+        return parts;
+    }
+
+    public static String getAncestorAuthRefFieldName(String str) {
+        List<String> parts = getDelimitedParts(str, AUTHREF_FIELD_NAME_DELIMITER);
+        if (parts.size() > 0) {
+            return parts.get(0).trim();
+        } else {
+            return str;
+        }
+    }
+
+    public static String getDescendantAuthRefFieldName(String str) {
+        List<String> parts = getDelimitedParts(str, AUTHREF_FIELD_NAME_DELIMITER);
+        if (parts.size() > 1) {
+            return parts.get(1).trim();
+        } else {
+            return str;
+        }
+    }
+
+    /*
+     * Returns the relevant authRef field name from a fieldName, which may
+     * potentially be in the form of a single field name, or a delimited pair
+     * of field names, that in turn consists of an ancestor field name and a
+     * descendant field name.
+     *
+     * If a delimited pair of names is provided, will return the descendant
+     * field name from that pair, if present.  Otherwise, will return the
+     * ancestor name from that pair.
+     *
+     * Will return the relevant authRef field name as schema-qualified
+     * (i.e. schema prefixed), if the schema name was present, either in
+     * the supplied simple field name or in the ancestor name in the
+     * delimited pair of names.
+     *
+     * @param fieldNameOrNames  A field name or delimited pair of field names.
+     *
+     * @return The relevant authRef field name, as described.
+     */
+    public static String getDescendantOrAncestor(String fieldNameOrNames) {
+        String fName = "";
+        if (fieldNameOrNames == null || fieldNameOrNames.trim().isEmpty()) {
+            return fName;
+        }
+        String descendantAuthRefFieldName = getDescendantAuthRefFieldName(fieldNameOrNames);
+        if (descendantAuthRefFieldName != null && !descendantAuthRefFieldName.trim().isEmpty()) {
+            fName = descendantAuthRefFieldName;
+        } else {
+            fName = getAncestorAuthRefFieldName(fieldNameOrNames);
+        }
+        if (getSchemaNamePart(fName).isEmpty()) {
+            String schemaName = getSchemaNamePart(getAncestorAuthRefFieldName(fieldNameOrNames));
+            if (! schemaName.trim().isEmpty()) {
+                fName = appendSchemaName(schemaName, fName);
+            }
+        }
+        return fName;
+    }
+
 
     /*
      * Returns a schema-qualified field name, given a schema name and field name.
@@ -607,6 +698,39 @@ public class DocumentUtils {
             return fieldName;
         }
         return schemaName + SCHEMA_FIELD_DELIMITER + fieldName;
+    }
+
+    public static boolean isSimpleType(Property prop) {
+        boolean isSimple = false;
+        if (prop == null) {
+            return isSimple;
+        }
+        if (prop.getType().isSimpleType()) {
+            isSimple = true;
+        }
+        return isSimple;
+    }
+
+    public static boolean isListType(Property prop) {
+        boolean isList = false;
+        if (prop == null) {
+            return isList;
+        }
+        if (prop.getType().isListType()) {
+            isList = true;
+        }
+        return isList;
+    }
+
+    public static boolean isComplexType(Property prop) {
+        boolean isComplex = false;
+        if (prop == null) {
+            return isComplex;
+        }
+        if (prop.getType().isComplexType()) {
+            isComplex = true;
+        }
+        return isComplex;
     }
 
 

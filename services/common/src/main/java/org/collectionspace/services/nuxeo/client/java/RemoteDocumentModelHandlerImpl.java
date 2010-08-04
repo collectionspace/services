@@ -24,7 +24,8 @@
 package org.collectionspace.services.nuxeo.client.java;
 
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,23 +50,17 @@ import org.collectionspace.services.common.vocabulary.RefNameUtils;
 
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 
-import org.nuxeo.ecm.core.schema.SchemaManager;
-import org.nuxeo.ecm.core.schema.TypeConstants;
 import org.nuxeo.ecm.core.schema.types.ComplexType;
 import org.nuxeo.ecm.core.schema.types.Field;
 import org.nuxeo.ecm.core.schema.types.ListType;
 import org.nuxeo.ecm.core.schema.types.Schema;
 import org.nuxeo.ecm.core.schema.types.Type;
-import org.nuxeo.ecm.core.schema.types.primitives.StringType;
-import org.nuxeo.ecm.core.schema.types.FieldImpl;
-import org.nuxeo.ecm.core.schema.types.QName;
-import org.nuxeo.runtime.api.Framework;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -317,61 +312,64 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
 
         AuthorityRefList authRefList = new AuthorityRefList();
         List<AuthorityRefList.AuthorityRefItem> list = authRefList.getAuthorityRefItem();
-        String refName = "";
+        DocumentModel docModel = docWrapper.getWrappedObject();
 
         try {
-            DocumentModel docModel = docWrapper.getWrappedObject();
-
             for (String authRefFieldName : authRefFieldNames) {
 
+                // FIXME: Can use the schema to validate field existence,
+                // to help avoid encountering PropertyExceptions.
                 String schemaName = DocumentUtils.getSchemaNamePart(authRefFieldName);
                 Schema schema = DocumentUtils.getSchemaFromName(schemaName);
-                Field field = schema.getField(authRefFieldName);
-                Type type = field.getType();
 
-                if (type.isSimpleType()) {
-                    Object obj = docModel.getPropertyValue(authRefFieldName);
-                    if (obj != null) {
-                        refName = (String) obj;
-                        if (refName != null || ! refName.trim().isEmpty()) {
-                            list.add(authorityRefListItem(authRefFieldName, refName));
-                        }
-                    }
-                // FIXME: The following assumes a very simple structure
-                // for repeatable single scalar fields: a parent (continer)
-                // element, containing 0-n child elements, each of them
-                // of identical  name and type, with values capable of being
-                // meaningfully cast to String.
-                //
-                // Past release 1.0a, repeatability may consist
-                // of arbitrary nesting and complexity, rather than
-                // scalars and single-level lists.  When needed, that
-                // might be implemented here via recursion through
-                // nested listTypes and/or complexTypes.
-                } else if (type.isListType()) {
-                    // Get the name of the child field that comprises
-                    // value instances of the parent (container) field.
-                    ListType ltype = (ListType) type;
-                    field = ltype.getField();
-                    String childAuthRefFieldName = field.getName().getLocalName();
-                    // For each value instance, add its refName to the authRefs list,
-                    // with its source field name set to the child field's name.
-                    List<Object> valuesList = (List<Object>) docModel.getPropertyValue(authRefFieldName);
-    	            for (Object obj : valuesList) {
-                        if (obj != null) {
-                            refName = (String) obj;
-                            if (refName != null || ! refName.trim().isEmpty()) {
-                                String schemaQualifiedChildFieldName =
-                                    DocumentUtils.appendSchemaName(schemaName, childAuthRefFieldName);
-                                list.add(authorityRefListItem(schemaQualifiedChildFieldName, refName));
+                String descendantAuthRefFieldName = DocumentUtils.getDescendantAuthRefFieldName(authRefFieldName);
+                if (descendantAuthRefFieldName != null && !descendantAuthRefFieldName.trim().isEmpty()) {
+                    authRefFieldName = DocumentUtils.getAncestorAuthRefFieldName(authRefFieldName);
+                }
+
+                String xpath = "//" + authRefFieldName;
+                Property prop = docModel.getProperty(xpath);
+                if (prop == null) {
+                    continue;
+                }
+
+                // If this is a single scalar field, with no children,
+                // add an item with its values to the authRefs list.
+                if (DocumentUtils.isSimpleType(prop)) {
+                    appendToAuthRefsList(prop.getValue(String.class), schemaName, authRefFieldName, list);
+
+                    // Otherwise, if this field has children, cycle through each child.
+                    //
+                    // Whenever we find instances of the descendant field among
+                    // these children, add an item with its values to the authRefs list.
+                    //
+                    // FIXME: When we increase maximum repeatability depth, that is, the depth
+                    // between ancestor and descendant, we'll need to use recursion here,
+                    // rather than making fixed assumptions about hierarchical depth.
+                } else if ((DocumentUtils.isListType(prop) || DocumentUtils.isComplexType(prop))
+                        && prop.size() > 0) {
+                    
+                    Collection<Property> childProp = prop.getChildren();
+                    for (Property cProp : childProp) {
+                        if (DocumentUtils.isSimpleType(cProp) && cProp.getName().equals(descendantAuthRefFieldName)) {
+                            appendToAuthRefsList(cProp.getValue(String.class), schemaName, descendantAuthRefFieldName, list);
+                        } else if ((DocumentUtils.isListType(cProp) || DocumentUtils.isComplexType(cProp))
+                            && prop.size() > 0) {
+                            Collection<Property> grandChildProp = cProp.getChildren();
+                            for (Property gProp : grandChildProp) {
+                                if (DocumentUtils.isSimpleType(gProp) && gProp.getName().equals(descendantAuthRefFieldName)) {
+                                    appendToAuthRefsList(gProp.getValue(String.class), schemaName, descendantAuthRefFieldName, list);
+                                }
                             }
                         }
                     }
+
                 }
 
             }
 
-        } catch  (PropertyException pe) {
+            
+        } catch (PropertyException pe) {
             String msg = "Attempted to retrieve value for invalid or missing authority field. "
                     + "Check authority field properties in tenant bindings.";
             logger.warn(msg, pe);
@@ -386,21 +384,36 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
+
         return authRefList;
     }
 
-        public AuthorityRefList.AuthorityRefItem authorityRefListItem(String authRefFieldName, String refName) {
-
-            AuthorityRefList.AuthorityRefItem ilistItem = new AuthorityRefList.AuthorityRefItem();
-            try {
-                RefNameUtils.AuthorityTermInfo termInfo = RefNameUtils.parseAuthorityTermInfo(refName);
-                ilistItem.setRefName(refName);
-                ilistItem.setAuthDisplayName(termInfo.inAuthority.displayName);
-                ilistItem.setItemDisplayName(termInfo.displayName);
-                ilistItem.setSourceField(authRefFieldName);
-                ilistItem.setUri(termInfo.getRelativeUri());
-            } catch (Exception e) {
-            }
-            return ilistItem;
+    private void appendToAuthRefsList(String refName, String schemaName,
+            String fieldName, List<AuthorityRefList.AuthorityRefItem> list)
+            throws Exception {
+        if (refName == null || refName.trim().isEmpty()) {
+            return;
         }
+        if (DocumentUtils.getSchemaNamePart(fieldName).isEmpty()) {
+            fieldName = DocumentUtils.appendSchemaName(schemaName, fieldName);
+        }
+        list.add(authorityRefListItem(fieldName, refName));
+    }
+
+    private AuthorityRefList.AuthorityRefItem authorityRefListItem(String authRefFieldName, String refName) {
+
+        AuthorityRefList.AuthorityRefItem ilistItem = new AuthorityRefList.AuthorityRefItem();
+        try {
+            RefNameUtils.AuthorityTermInfo termInfo = RefNameUtils.parseAuthorityTermInfo(refName);
+            ilistItem.setRefName(refName);
+            ilistItem.setAuthDisplayName(termInfo.inAuthority.displayName);
+            ilistItem.setItemDisplayName(termInfo.displayName);
+            ilistItem.setSourceField(authRefFieldName);
+            ilistItem.setUri(termInfo.getRelativeUri());
+        } catch (Exception e) {
+            // Do nothing upon encountering an Exception here.
+        }
+        return ilistItem;
+    }
+
 }

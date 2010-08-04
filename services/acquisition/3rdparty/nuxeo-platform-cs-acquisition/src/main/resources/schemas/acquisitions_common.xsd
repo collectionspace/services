@@ -31,10 +31,7 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="acquisitionFundingCurrency" type="xs:string"/>
-    <xs:element name="acquisitionFundingValue" type="xs:string"/>
-    <xs:element name="acquisitionFundingSource" type="xs:string"/>
-    <xs:element name="acquisitionFundingSourceProvisos" type="xs:string"/>
+    <xs:element name="acquisitionFundingList" type="acquisitionFundingList"/>
     <xs:element name="acquisitionMethod" type="xs:string"/>
     <xs:element name="acquisitionNote" type="xs:string"/>
     <xs:element name="acquisitionProvisos" type="xs:string"/>
@@ -62,5 +59,21 @@
 
     <!-- Object Collection Information Group -->
     <xs:element name="fieldCollectionEventName" type="xs:string"/>
+
+    <xs:complexType name="acquisitionFundingList">
+        <xs:sequence>
+            <xs:element name="acquisitionFunding" type="acquisitionFunding" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="acquisitionFunding">
+        <xs:sequence>
+                <xs:element name="acquisitionFundingCurrency" type="xs:string"/>
+                <xs:element name="acquisitionFundingValue" type="xs:string"/>
+                <xs:element name="acquisitionFundingSource" type="xs:string"/>
+                <xs:element name="acquisitionFundingSourceProvisos" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
 
 </xs:schema>
