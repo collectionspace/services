@@ -76,7 +76,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
     private String acquisitionAuthorizerRefName = null;
     private List<String> acquisitionFundingSourcesRefNames = new ArrayList<String>();
     private List<String> acquisitionSourcesRefNames = new ArrayList<String>();
-    private final int NUM_AUTH_REFS_EXPECTED = 5;
+    private final int NUM_AUTH_REFS_EXPECTED = 3;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -170,7 +170,8 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         String csid = createPerson("Annie", "Authorizer", "annieAuth", authRefName);
         acquisitionAuthorizerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         personIdsCreated.add(csid);
-        
+
+        /*
         csid = createPerson("Fran", "Funding-SourceOne", "franFundingSourceOne", authRefName);
         acquisitionFundingSourcesRefNames.add(PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null));
         personIdsCreated.add(csid);
@@ -178,6 +179,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         csid = createPerson("Fahd", "Funding-SourceTwo", "fahdFundingSourceTwo", authRefName);
         acquisitionFundingSourcesRefNames.add(PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null));
         personIdsCreated.add(csid);
+         */
 
         csid = createPerson("Sammy", "SourceOne", "sammySourceOne", authRefName);
         acquisitionSourcesRefNames.add(PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null));
@@ -242,6 +244,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         Assert.assertEquals(acquisition.getAcquisitionAuthorizer(), acquisitionAuthorizerRefName);
         
         // In repeatable groups of fields
+        /*
         AcquisitionFundingList acqFundingList = acquisition.getAcquisitionFundingList();
         List<AcquisitionFunding> acqFundings = acqFundingList.getAcquisitionFunding();
         List<String> acqFundingSourceRefNamesFound = new ArrayList();
@@ -250,6 +253,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
             acqFundingSourceRefNamesFound.add(acqFundingSourceRefName);
         }
         Assert.assertTrue(acqFundingSourceRefNamesFound.containsAll(acquisitionFundingSourcesRefNames));
+        */
 
         // In scalar repeatable fields
         AcquisitionSourceList acquisitionSources = acquisition.getAcquisitionSources();
@@ -359,7 +363,8 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         AcquisitionsCommon acquisition = new AcquisitionsCommon();
         acquisition.setAccessionDate(accessionDate);
         acquisition.setAcquisitionAuthorizer(acquisitionAuthorizer);
-        
+
+        /*
         AcquisitionFundingList acqFundingsList = new AcquisitionFundingList();
         List<AcquisitionFunding> acqFundings = acqFundingsList.getAcquisitionFunding();
         int i = 0;
@@ -374,6 +379,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         addtlAcqFunding.setAcquisitionFundingCurrency("USD");
         acqFundings.add(addtlAcqFunding);
         acquisition.setAcquisitionFundingList(acqFundingsList);
+        */
 
         AcquisitionSourceList acqSourcesList = new AcquisitionSourceList();
         List<String> acqSources = acqSourcesList.getAcquisitionSource();

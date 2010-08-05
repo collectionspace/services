@@ -229,10 +229,8 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
 
     // Success outcomes
     
-    // FIXME: Uncomment @Test annotation after CSPACE-2577 is fixed.
-
-    // @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-    //    dependsOnMethods = {"createIntakeWithAuthRefs"})
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        dependsOnMethods = {"createIntakeWithAuthRefs"})
     public void readAndCheckAuthRefDocs(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -242,6 +240,8 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         testSetup(STATUS_OK, ServiceRequestType.READ);
         
         // Get the auth ref docs and check them
+
+        // Single scalar field
        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
        ClientResponse<AuthorityRefDocList> refDocListResp =
         	personAuthClient.getReferencingObjects(personAuthCSID, currentOwnerPersonCSID);
@@ -255,6 +255,10 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         AuthorityRefDocList list = refDocListResp.getEntity();
+
+        // Repeatable scalar field
+
+        // FIXME: Add an appropriate test here, or preferably a new test case.
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
