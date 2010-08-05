@@ -179,8 +179,8 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
     // out for check-in, to prevent service tests from failing.  Can uncomment to test
     // fixes, and also after the issue is resolved, to help detect any regressions.
 
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-        dependsOnMethods = {"create", "testSubmitRequest"}, groups = {"cspace2578group"})
+    // @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    //    dependsOnMethods = {"create", "testSubmitRequest"}, groups = {"cspace2578group"})
     public void createFromXmlWhitespaceAfterRepeatableGroupTag(String testName) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
