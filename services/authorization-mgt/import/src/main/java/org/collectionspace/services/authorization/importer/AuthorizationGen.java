@@ -61,6 +61,12 @@ public class AuthorizationGen {
     final public static String ROLE_TENANT_ADMINISTRATOR = "ROLE_TENANT_ADMINISTRATOR";
     final public static String ROLE_TENANT_READER = "ROLE_TENANT_READER";
     final public static String ROLE_ADMINISTRATOR_ID = "0";
+    //
+    // ActionGroup labels/constants
+    //
+    final public static String ACTIONGROUP_CRUDL = "CRUDL";
+    final public static String ACTIONGROUP_RL = "RL";
+    
     final Logger logger = LoggerFactory.getLogger(AuthorizationGen.class);
     private List<Permission> adminPermList = new ArrayList<Permission>();
     private List<PermissionRole> adminPermRoleList = new ArrayList<PermissionRole>();
@@ -143,6 +149,8 @@ public class AuthorizationGen {
         perm.setResourceName(resourceName.toLowerCase().trim());
         perm.setEffect(EffectType.PERMIT);
         perm.setTenantId(tenantId);
+        
+        perm.setActionGroup(ACTIONGROUP_CRUDL);
         ArrayList<PermissionAction> pas = new ArrayList<PermissionAction>();
         perm.setActions(pas);
 
@@ -161,6 +169,7 @@ public class AuthorizationGen {
         PermissionAction pa4 = new PermissionAction();
         pa4.setName(ActionType.SEARCH);
         pas.add(pa4);
+        
         return perm;
     }
 
@@ -206,6 +215,8 @@ public class AuthorizationGen {
         perm.setResourceName(resourceName.toLowerCase().trim());
         perm.setEffect(EffectType.PERMIT);
         perm.setTenantId(tenantId);
+        
+        perm.setActionGroup(ACTIONGROUP_RL);
         ArrayList<PermissionAction> pas = new ArrayList<PermissionAction>();
         perm.setActions(pas);
 
