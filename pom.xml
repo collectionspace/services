@@ -43,6 +43,9 @@
             <id>collectionspace-remote-repos</id>
             <name>collectionspace-remote-repos</name>
             <url>http://source.collectionspace.org:8081/artifactory/remote-repos</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>            
         </repository>
         <repository>
             <id>repo1</id>

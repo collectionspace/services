@@ -151,7 +151,21 @@
  
    </appender>
 
-
+   <!-- collectionspace appender -->
+   <appender name="CSLOG_PERF" class="org.jboss.logging.appender.DailyRollingFileAppender">
+      <errorHandler  class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
+     <param name="Append" value="false"/>
+     <param name="DatePattern" value="'.'yyyy-MM-dd"/>
+      <param name="File" value="${jboss.server.log.dir}/collectionspace-perf.log"/>
+      <layout class="org.apache.log4j.PatternLayout">
+         <param name="ConversionPattern" value="%d %-5p [%t] [%c:%L] %m%n"/>
+      </layout>
+            <!--filter class="org.jboss.logging.filter.TCLFilter">
+         <param name="AcceptOnMatch" value="true"/>
+         <param name="DeployURL" value="cspace-services.war"/>
+      </filter> 
+      <filter class="org.apache.log4j.varia.DenyAllFilter"></filter-->
+   </appender>
    
    <!-- ================ -->
    <!-- Limit categories -->
@@ -359,6 +373,10 @@
      <appender-ref ref="CSLOG"/>
    </category>
 
+   <category name="perf.collectionspace">
+     <priority value="DEBUG" />
+     <appender-ref ref="CSLOG_PERF"/>
+   </category>
    
    <!-- ======================= -->
    <!-- Setup the Root category -->
@@ -367,7 +385,6 @@
    <root>
       <appender-ref ref="CONSOLE"/>
       <appender-ref ref="FILE"/>
-      <appender-ref ref="CSLOG"/>
    </root>
 
 </log4j:configuration>

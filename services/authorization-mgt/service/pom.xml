@@ -24,7 +24,7 @@
 
         <!-- utilities -->
 
-        <!-- slf4j not available due to classloading issues running in system classpath -->
+        <!-- slf4j not available due to classloading issues running in system classpath 
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
@@ -35,7 +35,7 @@
             <artifactId>log4j</artifactId>
             <version>1.2.14</version>
             <scope>provided</scope>
-        </dependency>
+        </dependency> -->
 
         <!-- slf4j used for testing only -->
         <dependency>
