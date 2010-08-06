@@ -33,7 +33,7 @@
     <xs:complexType name="ServiceBindingType">
         <xs:sequence>
             <!-- other URI paths using which this service binding could be accessed -->
-            <xs:element name="uriPath" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+            <xs:element name="uriPath" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             <!-- object representation served by the service -->
             <xs:element name="object" type="ServiceObjectType" minOccurs="1" maxOccurs="1"/>
             <!-- document handler to be used to process the content (need to be in classpath) -->

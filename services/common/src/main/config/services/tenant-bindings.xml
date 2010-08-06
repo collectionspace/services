@@ -23,16 +23,16 @@
             <!-- begin id service meta-data -->
         <tenant:serviceBindings name="id" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /idgenerators/*/ids
-            </service:uriPath>
+            </service:uriPath> -->
         </tenant:serviceBindings>
         <tenant:serviceBindings name="CollectionObjects" type="object" version="0.1">
             <!-- begin collectionobject service meta-data -->
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /collectionobjects/*/authorityrefs/
-            </service:uriPath>
+            </service:uriPath> -->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -98,9 +98,9 @@
         <!-- begin intake service meta-data -->
         <tenant:serviceBindings name="Intakes" type="procedure" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /intakes/*/authorityrefs/
-            </service:uriPath>
+            </service:uriPath> -->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -152,9 +152,9 @@
         <!-- begin loanin service meta-data -->
         <tenant:serviceBindings name="Loansin" type="procedure" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /loansin/*/authorityrefs/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -203,9 +203,9 @@
         <!-- begin loanout service meta-data -->
         <tenant:serviceBindings name="Loansout" type="procedure" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /loansout/*/authorityrefs/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -249,9 +249,9 @@
         <!-- begin movement service meta-data -->
         <tenant:serviceBindings name="Movements" type="procedure" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /movements/*/authorityrefs/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -294,9 +294,9 @@
         <!-- begin report service meta-data -->
         <tenant:serviceBindings name="Reports" type="procedure" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /reports/*/output/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -376,12 +376,12 @@
         -->
         <tenant:serviceBindings name="Vocabularyitems" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /vocabularies/*/items/
             </service:uriPath>
             <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /vocabularies/*/items/*/refObjs
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -419,9 +419,9 @@
         <!-- begin orgauthority service meta-data -->
         <tenant:serviceBindings name="Orgauthorities" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /orgauthorities/*/items/*/authorityrefs/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -459,12 +459,12 @@
         -->
         <tenant:serviceBindings name="Organizations" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /orgauthorities/*/items/
             </service:uriPath>
             <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /orgauthorities/*/items/*/refObjs
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -507,12 +507,12 @@
         <!-- begin personauthority service meta-data -->
         <tenant:serviceBindings name="Personauthorities" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /personauthorities/*/items/
             </service:uriPath>
             <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /personauthorities/*/items/*/refObjs
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -550,9 +550,9 @@
         -->
         <tenant:serviceBindings name="Persons" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /personauthorities/*/items/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -590,9 +590,9 @@
         <!-- begin locationauthority service meta-data -->
         <tenant:serviceBindings name="Locationauthorities" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /locationauthorities/*/items/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -666,9 +666,9 @@
         <!-- begin acquisition service meta-data -->
         <tenant:serviceBindings name="Acquisitions" type="procedure" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /acquisitions/*/authorityrefs/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -717,33 +717,6 @@
         <!-- begin relation service meta-data -->
         <tenant:serviceBindings name="Relations" version="0.1">
             <!-- other URI paths using which this service could be accessed -->'
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                /relations/object/*
-            </service:uriPath>
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                /relations/object/*/type/*
-            </service:uriPath>
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                /relations/subject/*
-            </service:uriPath>
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                /relations/subject/*/type/*
-            </service:uriPath>
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                /relations/subject/*/type/*/object/*
-            </service:uriPath>
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                /relations/type/*
-            </service:uriPath>
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                /relations/type/*/object/*
-            </service:uriPath>
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                /relations/type/*/subject/*
-            </service:uriPath>
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                /relations/type/*/subject/*/object/*
-            </service:uriPath>
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -851,12 +824,12 @@
         <!-- begin contact service meta-data -->
         <tenant:serviceBindings name="Contacts" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /personauthorities/*/items/*/contacts
             </service:uriPath>
             <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /orgauthorities/*/items/*/contacts
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -996,9 +969,9 @@
         <!-- except that it is available as a sub resource of the permission service -->
         <tenant:serviceBindings name="authorization/permissions/permroles" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /authorization/permissions/*/permroles/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.authorization.storage.PermissionRoleDocumentHandler
             </service:documentHandler>
@@ -1033,9 +1006,9 @@
         <!-- begin account-role service meta-data -->
         <tenant:serviceBindings name="accounts/accountroles" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /accounts/*/accountroles/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.account.storage.AccountRoleDocumentHandler
             </service:documentHandler>
@@ -1072,9 +1045,9 @@
         <!-- except that it is available as a sub resource of the role service -->
         <tenant:serviceBindings name="authorization/roles/permroles" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /authorization/roles/*/permroles/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.authorization.storage.PermissionRoleDocumentHandler
             </service:documentHandler>
@@ -1123,16 +1096,16 @@
             <!-- begin id service meta-data -->
         <tenant:serviceBindings name="id" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /idgenerators/*/ids
-            </service:uriPath>
+            </service:uriPath>-->
         </tenant:serviceBindings>
         <tenant:serviceBindings name="CollectionObjects" type="object" version="0.1">
             <!-- begin collectionobject service meta-data -->
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /collectionobjects/*/authorityrefs/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 pahma-domain
             </service:repositoryDomain>
@@ -1198,9 +1171,9 @@
         <!-- begin intake service meta-data -->
         <tenant:serviceBindings name="Intakes" type="procedure" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /intakes/*/authorityrefs/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 pahma-domain
             </service:repositoryDomain>
@@ -1252,9 +1225,9 @@
         <!-- begin loanin service meta-data -->
         <tenant:serviceBindings name="Loansin" type="procedure" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /loansin/*/authorityrefs/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 pahma-domain
             </service:repositoryDomain>
@@ -1303,9 +1276,9 @@
         <!-- begin loanout service meta-data -->
         <tenant:serviceBindings name="Loansout" type="procedure" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /loansout/*/authorityrefs/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 pahma-domain
             </service:repositoryDomain>
@@ -1349,9 +1322,9 @@
         <!-- begin movement service meta-data -->
         <tenant:serviceBindings name="Movements" type="procedure" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /movements/*/authorityrefs/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 pahma-domain
             </service:repositoryDomain>
@@ -1433,9 +1406,9 @@
         -->
         <tenant:serviceBindings name="Vocabularyitems" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /vocabularies/*/items/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 pahma-domain
             </service:repositoryDomain>
@@ -1473,9 +1446,9 @@
         <!-- begin orgauthority service meta-data -->
         <tenant:serviceBindings name="Orgauthorities" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /orgauthorities/*/items/*/authorityrefs/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 pahma-domain
             </service:repositoryDomain>
@@ -1513,12 +1486,12 @@
         -->
         <tenant:serviceBindings name="Organizations" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /orgauthorities/*/items/
             </service:uriPath>
             <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /orgauthorities/*/items/*/refObjs
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 pahma-domain
             </service:repositoryDomain>
@@ -1561,7 +1534,7 @@
         <!-- begin personauthority service meta-data -->
         <tenant:serviceBindings name="Personauthorities" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /personauthorities/*/items/
             </service:uriPath>
             <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
@@ -1569,7 +1542,7 @@
             </service:uriPath>
             <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /personauthorities/*/items/*/refObjs
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 pahma-domain
             </service:repositoryDomain>
@@ -1607,9 +1580,9 @@
         -->
         <tenant:serviceBindings name="Persons" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /personauthorities/*/items/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 pahma-domain
             </service:repositoryDomain>
@@ -1647,9 +1620,9 @@
         <!-- begin locationauthority service meta-data -->
         <tenant:serviceBindings name="Locationauthorities" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /locationauthorities/*/items/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 pahma-domain
             </service:repositoryDomain>
@@ -1723,9 +1696,9 @@
         <!-- begin acquisition service meta-data -->
         <tenant:serviceBindings name="Acquisitions" type="procedure" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /acquisitions/*/authorityrefs/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 pahma-domain
             </service:repositoryDomain>
@@ -1774,33 +1747,6 @@
         <!-- begin relation service meta-data -->
         <tenant:serviceBindings name="Relations" version="0.1">
             <!-- other URI paths using which this service could be accessed -->'
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                /relations/object/*
-            </service:uriPath>
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                /relations/object/*/type/*
-            </service:uriPath>
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                /relations/subject/*
-            </service:uriPath>
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                /relations/subject/*/type/*
-            </service:uriPath>
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                /relations/subject/*/type/*/object/*
-            </service:uriPath>
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                /relations/type/*
-            </service:uriPath>
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                /relations/type/*/object/*
-            </service:uriPath>
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                /relations/type/*/subject/*
-            </service:uriPath>
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
-                /relations/type/*/subject/*/object/*
-            </service:uriPath>
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 pahma-domain
             </service:repositoryDomain>
@@ -1908,12 +1854,12 @@
         <!-- begin contact service meta-data -->
         <tenant:serviceBindings name="Contacts" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /personauthorities/*/items/*/contacts
             </service:uriPath>
             <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /orgauthorities/*/items/*/contacts
-            </service:uriPath>
+            </service:uriPath>-->
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 pahma-domain
             </service:repositoryDomain>
@@ -2053,9 +1999,9 @@
         <!-- except that it is available as a sub resource of the permission service -->
         <tenant:serviceBindings name="authorization/permissions/permroles" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /authorization/permissions/*/permroles/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.authorization.storage.PermissionRoleDocumentHandler
             </service:documentHandler>
@@ -2090,9 +2036,9 @@
         <!-- begin account-role service meta-data -->
         <tenant:serviceBindings name="accounts/accountroles" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /accounts/*/accountroles/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.account.storage.AccountRoleDocumentHandler
             </service:documentHandler>
@@ -2129,9 +2075,9 @@
         <!-- except that it is available as a sub resource of the role service -->
         <tenant:serviceBindings name="authorization/roles/permroles" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
-            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
+<!--            <service:uriPath xmlns:service='http://collectionspace.org/services/common/service'>
                 /authorization/roles/*/permroles/
-            </service:uriPath>
+            </service:uriPath>-->
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.authorization.storage.PermissionRoleDocumentHandler
             </service:documentHandler>

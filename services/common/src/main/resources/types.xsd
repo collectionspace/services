@@ -36,6 +36,7 @@
 
     <xs:simpleType name="VersionType">
         <xs:restriction base="xs:string">
+            <xs:enumeration value="0.1"/>
             <xs:enumeration value="1.0"/>
         </xs:restriction>
     </xs:simpleType>
