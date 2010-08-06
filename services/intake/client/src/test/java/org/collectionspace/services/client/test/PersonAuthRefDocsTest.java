@@ -64,15 +64,16 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
 
     private final String CLASS_NAME = PersonAuthRefDocsTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-
     // Instance variables specific to this test.
     final String SERVICE_PATH_COMPONENT = "intakes";
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     private String knownIntakeId = null;
     private List<String> intakeIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();
-    private String personAuthCSID = null; 
-    private String currentOwnerPersonCSID = null; 
+    private String personAuthCSID = null;
+    private String currentOwnerPersonCSID = null;
+    private String depositorPersonCSID = null;
+    private String insurerPersonCSID = null;
     private String currentOwnerRefName = null;
     private String depositorRefName = null;
     private String conditionCheckerAssessorRefName = null;
@@ -85,23 +86,23 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
      */
     @Override
     protected CollectionSpaceClient getClientInstance() {
-    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+        throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
-    
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
     @Override
-	protected AbstractCommonList getAbstractCommonList(
-			ClientResponse<AbstractCommonList> response) {
-    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+    protected AbstractCommonList getAbstractCommonList(
+            ClientResponse<AbstractCommonList> response) {
+        throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createIntakeWithAuthRefs(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -111,7 +112,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
 
         // Submit the request to the service and store the response.
         String identifier = createIdentifier();
-        
+
         // Create all the person refs and entities
         createPersonRefs();
 
@@ -119,53 +120,53 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         MultipartOutput multipart = createIntakeInstance(
                 "entryNumber-" + identifier,
                 "entryDate-" + identifier,
-								currentOwnerRefName,
-								depositorRefName,
-								conditionCheckerAssessorRefName,
-								insurerRefName,
-								valuerRefName );
+                currentOwnerRefName,
+                depositorRefName,
+                conditionCheckerAssessorRefName,
+                insurerRefName,
+                valuerRefName);
 
         ClientResponse<Response> res = intakeClient.create(multipart);
         try {
-	        int statusCode = res.getStatus();
-	
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        //
-	        // Specifically:
-	        // Does it fall within the set of valid status codes?
-	        // Does it exactly match the expected status code?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
-	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+            int statusCode = res.getStatus();
+
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            //
+            // Specifically:
+            // Does it fall within the set of valid status codes?
+            // Does it exactly match the expected status code?
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         } finally {
-        	res.releaseConnection();
+            res.releaseConnection();
         }
 
         // Store the ID returned from the first resource created
         // for additional tests below.
-        if (knownIntakeId == null){
+        if (knownIntakeId == null) {
             knownIntakeId = extractId(res);
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownIntakeId=" + knownIntakeId);
             }
         }
-        
+
         // Store the IDs from every resource created by tests,
         // so they can be deleted after tests have been run.
         intakeIdsCreated.add(extractId(res));
     }
-    
+
     /**
      * Creates the person refs.
      */
-    protected void createPersonRefs(){
+    protected void createPersonRefs() {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-    	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
-    			PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
+        MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
+                PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
 
@@ -173,64 +174,65 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, STATUS_CREATED);
         personAuthCSID = extractId(res);
-        
+
         String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
-        
+
         String csid = createPerson("Olivier", "Owner", "olivierOwner", authRefName);
         Assert.assertNotNull(csid);
         currentOwnerPersonCSID = csid;
         currentOwnerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         Assert.assertNotNull(currentOwnerRefName);
         personIdsCreated.add(csid);
-        
+
         csid = createPerson("Debbie", "Depositor", "debbieDepositor", authRefName);
         Assert.assertNotNull(csid);
         depositorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        depositorPersonCSID = csid;
         Assert.assertNotNull(depositorRefName);
         personIdsCreated.add(csid);
-        
+
         csid = createPerson("Andrew", "Assessor", "andrewAssessor", authRefName);
         Assert.assertNotNull(csid);
         conditionCheckerAssessorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         Assert.assertNotNull(conditionCheckerAssessorRefName);
         personIdsCreated.add(csid);
-        
+
         csid = createPerson("Ingrid", "Insurer", "ingridInsurer", authRefName);
         Assert.assertNotNull(csid);
+        insurerPersonCSID = csid;
         insurerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         Assert.assertNotNull(insurerRefName);
         personIdsCreated.add(csid);
-        
+
         csid = createPerson("Vince", "Valuer", "vinceValuer", authRefName);
         Assert.assertNotNull(csid);
         valuerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         Assert.assertNotNull(valuerRefName);
         personIdsCreated.add(csid);
-        
+
     }
-    
-    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) {
+
+    protected String createPerson(String firstName, String surName, String shortId, String authRefName) {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-        Map<String, String> personInfo = new HashMap<String,String>();
+        Map<String, String> personInfo = new HashMap<String, String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
-    	MultipartOutput multipart = 
-    		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
-    				authRefName, personInfo, personAuthClient.getItemCommonPartName());
+        MultipartOutput multipart =
+                PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
+                authRefName, personInfo, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         int statusCode = res.getStatus();
 
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, STATUS_CREATED);
-    	return extractId(res);
+        return extractId(res);
     }
 
     // Success outcomes
-    
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"createIntakeWithAuthRefs"})
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"createIntakeWithAuthRefs"})
     public void readAndCheckAuthRefDocs(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -238,17 +240,16 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         }
         // Perform setup.
         testSetup(STATUS_OK, ServiceRequestType.READ);
-        
+
         // Get the auth ref docs and check them
 
-        // Single scalar field
-       PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-       ClientResponse<AuthorityRefDocList> refDocListResp =
-        	personAuthClient.getReferencingObjects(personAuthCSID, currentOwnerPersonCSID);
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        ClientResponse<AuthorityRefDocList> refDocListResp =
+                personAuthClient.getReferencingObjects(personAuthCSID, currentOwnerPersonCSID);
 
         int statusCode = refDocListResp.getStatus();
 
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug(testName + ".getReferencingObjects: status = " + statusCode);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
@@ -256,27 +257,60 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         AuthorityRefDocList list = refDocListResp.getEntity();
 
-        // Repeatable scalar field
-
-        // FIXME: Add an appropriate test here, or preferably a new test case.
-
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
         boolean fFoundIntake = false;
-        if(iterateThroughList && logger.isDebugEnabled()){
+        if (iterateThroughList && logger.isDebugEnabled()) {
             List<AuthorityRefDocList.AuthorityRefDocItem> items =
                     list.getAuthorityRefDocItem();
             int i = 0;
             logger.debug(testName + ": Docs that use: " + currentOwnerRefName);
-            for(AuthorityRefDocList.AuthorityRefDocItem item : items){
-                logger.debug(testName + ": list-item[" + i + "] " +
-                		item.getDocType() + "(" +
-                		item.getDocId() + ") Name:[" +
-                		item.getDocName() + "] Number:[" +
-                		item.getDocNumber() + "] in field:[" +
-                		item.getSourceField() + "]");
-                if(!fFoundIntake && knownIntakeId.equalsIgnoreCase(item.getDocId())) {
-               		fFoundIntake = true;
+            for (AuthorityRefDocList.AuthorityRefDocItem item : items) {
+                logger.debug(testName + ": list-item[" + i + "] "
+                        + item.getDocType() + "("
+                        + item.getDocId() + ") Name:["
+                        + item.getDocName() + "] Number:["
+                        + item.getDocNumber() + "] in field:["
+                        + item.getSourceField() + "]");
+                if (!fFoundIntake && knownIntakeId.equalsIgnoreCase(item.getDocId())) {
+                    fFoundIntake = true;
+                }
+                i++;
+            }
+            Assert.assertTrue(fFoundIntake, "Did not find Intake with authref!");
+        }
+
+        personAuthClient = new PersonAuthorityClient();
+        refDocListResp =
+                personAuthClient.getReferencingObjects(personAuthCSID, depositorPersonCSID);
+
+        statusCode = refDocListResp.getStatus();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ".getReferencingObjects: status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        list = refDocListResp.getEntity();
+
+        // Optionally output additional data about list members for debugging.
+        iterateThroughList = true;
+        fFoundIntake = false;
+        if (iterateThroughList && logger.isDebugEnabled()) {
+            List<AuthorityRefDocList.AuthorityRefDocItem> items =
+                    list.getAuthorityRefDocItem();
+            int i = 0;
+            logger.debug(testName + ": Docs that use: " + depositorRefName);
+            for (AuthorityRefDocList.AuthorityRefDocItem item : items) {
+                logger.debug(testName + ": list-item[" + i + "] "
+                        + item.getDocType() + "("
+                        + item.getDocId() + ") Name:["
+                        + item.getDocName() + "] Number:["
+                        + item.getDocNumber() + "] in field:["
+                        + item.getSourceField() + "]");
+                if (!fFoundIntake && knownIntakeId.equalsIgnoreCase(item.getDocId())) {
+                    fFoundIntake = true;
                 }
                 i++;
             }
@@ -284,11 +318,64 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         }
     }
 
+    /*
+     * Read and check the list of referencing objects, where the authRef field
+     * is a value instance of a repeatable scalar field.
+     */
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"createIntakeWithAuthRefs"}, groups = {"repeatableScalar"})
+    public void readAndCheckAuthRefDocsRepeatableScalar(String testName) throws Exception {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        testSetup(STATUS_OK, ServiceRequestType.READ);
+
+        // Get the auth ref docs and check them
+
+        // Single scalar field
+        PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
+        ClientResponse<AuthorityRefDocList> refDocListResp =
+                personAuthClient.getReferencingObjects(personAuthCSID, insurerPersonCSID);
+
+        int statusCode = refDocListResp.getStatus();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ".getReferencingObjects: status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        AuthorityRefDocList list = refDocListResp.getEntity();
+
+        // Optionally output additional data about list members for debugging.
+        boolean iterateThroughList = true;
+        boolean fFoundIntake = false;
+        if (iterateThroughList && logger.isDebugEnabled()) {
+            List<AuthorityRefDocList.AuthorityRefDocItem> items =
+                    list.getAuthorityRefDocItem();
+            int i = 0;
+            logger.debug(testName + ": Docs that use: " + insurerRefName);
+            for (AuthorityRefDocList.AuthorityRefDocItem item : items) {
+                logger.debug(testName + ": list-item[" + i + "] "
+                        + item.getDocType() + "("
+                        + item.getDocId() + ") Name:["
+                        + item.getDocName() + "] Number:["
+                        + item.getDocNumber() + "] in field:["
+                        + item.getSourceField() + "]");
+                if (!fFoundIntake && knownIntakeId.equalsIgnoreCase(item.getDocId())) {
+                    fFoundIntake = true;
+                }
+                i++;
+            }
+            Assert.assertTrue(fFoundIntake, "Did not find Intake with authref!");
+        }
+    }
 
     // ---------------------------------------------------------------
     // Cleanup of resources created during testing
     // ---------------------------------------------------------------
-
     /**
      * Deletes all resources created by tests, after all tests have been run.
      *
@@ -297,15 +384,15 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
      */
-    @AfterClass(alwaysRun=true)
+    @AfterClass(alwaysRun = true)
     public void cleanUp() {
         String noTest = System.getProperty("noTestCleanup");
-    	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+        if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Skipping Cleanup phase ...");
             }
             return;
-    	}
+        }
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
@@ -322,7 +409,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
             res.releaseConnection();
         }
         if (personAuthCSID != null) {
-        	personAuthClient.delete(personAuthCSID).releaseConnection();
+            personAuthClient.delete(personAuthCSID).releaseConnection();
         }
     }
 
@@ -334,13 +421,13 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         return SERVICE_PATH_COMPONENT;
     }
 
-   private MultipartOutput createIntakeInstance(String entryNumber,
-    		String entryDate,
-				String currentOwner,
-				String depositor,
-				String conditionCheckerAssessor,
-				String insurer,
-				String Valuer ) {
+    private MultipartOutput createIntakeInstance(String entryNumber,
+            String entryDate,
+            String currentOwner,
+            String depositor,
+            String conditionCheckerAssessor,
+            String insurer,
+            String Valuer) {
         IntakesCommon intake = new IntakesCommon();
         intake.setEntryNumber(entryNumber);
         intake.setEntryDate(entryDate);
@@ -360,10 +447,10 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
 
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
-            multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
+                multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", new IntakeClient().getCommonPartName());
 
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("to be created, intake common");
             logger.debug(objectAsXmlString(intake, IntakesCommon.class));
         }
