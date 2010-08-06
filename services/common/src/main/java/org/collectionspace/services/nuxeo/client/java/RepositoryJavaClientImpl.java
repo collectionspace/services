@@ -35,6 +35,7 @@ import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.repository.RepositoryClient;
+import org.collectionspace.services.common.profile.Profiler;
 
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -144,12 +145,14 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
     }
     /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(RepositoryJavaClientImpl.class);
-
+//    private final Logger profilerLogger = LoggerFactory.getLogger("remperf");
+//    private String foo = Profiler.createLogger();
     /**
      * Instantiates a new repository java client impl.
      */
     public RepositoryJavaClientImpl() {
         //Empty constructor
+    	
     }
 
     /**
@@ -640,12 +643,16 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
 
             // If we have limit and/or offset, then pass true to get totalSize
             // in returned DocumentModelList.
+        	Profiler profiler = new Profiler(this);
+        	profiler.log("Executing NXQL query: " + query.toString());
+        	profiler.start();
             if ((queryContext.docFilter.getOffset() > 0) || (queryContext.docFilter.getPageSize() > 0)) {
                 docList = repoSession.query(query, null,
                         queryContext.docFilter.getPageSize(), queryContext.docFilter.getOffset(), true);
             } else {
                 docList = repoSession.query(query);
             }
+            profiler.stop();
 
             //set repoSession to handle the document
             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
@@ -914,12 +921,12 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         // TODO This is a slow method for tenant-filter
         // We should make this a property that is indexed.
         //
-        query.append(" WHERE ecm:path STARTSWITH '/" + queryContext.domain + "'");
+//        query.append(" WHERE ecm:path STARTSWITH '/" + queryContext.domain + "'");
 
         //
         // Restrict search to the current tenant ID.  Is the domain path filter (above) still needed?
         //
-        query.append(IQueryManager.SEARCH_QUALIFIER_AND + DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA + ":"
+        query.append(/*IQueryManager.SEARCH_QUALIFIER_AND +*/ " WHERE " + DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA + ":"
                 + DocumentModelHandler.COLLECTIONSPACE_CORE_TENANTID
                 + " = " + queryContext.tenantId);
         //

@@ -211,9 +211,9 @@ public class Sample {
        depts.add("urn:org.collectionspace.services.department:Registrar");
        depts.add("urn:org.walkerart.department:Fine Art");
        collectionObject.setAge(""); // Test using an empty String.
-       collectionObject.setBriefDescription("Papier mache bird mask with horns, " +
-               "painted red with black and yellow spots. " +
-               "Puerto Rico. ca. 8&quot; high, 6&quot; wide, projects 10&quot; (with horns).");
+//       collectionObject.setBriefDescription("Papier mache bird mask with horns, " +
+//               "painted red with black and yellow spots. " +
+//               "Puerto Rico. ca. 8&quot; high, 6&quot; wide, projects 10&quot; (with horns).");
 
        MultipartOutput multipart = new MultipartOutput();
        OutputPart commonPart = multipart.addPart(collectionObject,

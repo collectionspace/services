@@ -49,6 +49,7 @@ import java.util.Set;
 import org.collectionspace.services.authorization.PermissionResource;
 import org.collectionspace.services.authorization.RoleResource;
 import org.collectionspace.services.common.security.SecurityInterceptor;
+import org.collectionspace.services.common.profile.Profiler;
 
 /**
  * CollectionSpaceJaxRsApplication, the root application
@@ -61,9 +62,16 @@ import org.collectionspace.services.common.security.SecurityInterceptor;
 public class CollectionSpaceJaxRsApplication extends Application {
 
     private Set<Object> singletons = new HashSet<Object>();
-    private Set<Class<?>> empty = new HashSet<Class<?>>();
+    private Set<Class<?>> empty = new HashSet<Class<?>>();    
 
     public CollectionSpaceJaxRsApplication() {
+    	//
+    	// Setup the profiler logger
+    	//
+    	Profiler.setup();
+    	//
+    	// Instantiate all our JaxRS resources
+    	//
         singletons.add(new SecurityInterceptor());
         singletons.add(new AccountResource());
         singletons.add(new RoleResource());

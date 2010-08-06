@@ -1,5 +1,5 @@
 /**
- * Copyright 2009 University of California at Berkeley
+ * Copyright 2009-2010 University of California at Berkeley
  */
 package org.collectionspace.services.common;
 
@@ -35,7 +35,7 @@ public class ServiceMain {
 
     private ServiceMain() {
     }
-
+    
     /**
      * getInstance returns the ServiceMain singleton instance after proper
      * initialization in a thread-safe manner
