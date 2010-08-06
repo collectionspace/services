@@ -48,7 +48,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 public abstract class CollectionSpacePerformanceTest {
 
 	protected final static String OBJECT_NUMBER = "objectNumber_";
-	protected final static String OBJECT_NAME = "objectName_";
+	protected final static String OBJECT_TITLE = "objectTitle_";
 	
 	/*
 	 * Package scoped methods.
@@ -61,7 +61,7 @@ public abstract class CollectionSpacePerformanceTest {
 	 * @param identifier the identifier
 	 */
 	void fillCollectionObject(CollectionobjectsCommon co, String identifier) {
-		fillCollectionObject(co, OBJECT_NUMBER + identifier, OBJECT_NAME + identifier);
+		fillCollectionObject(co, OBJECT_NUMBER + identifier, OBJECT_TITLE + identifier);
 	}
 
 	/**
@@ -69,12 +69,12 @@ public abstract class CollectionSpacePerformanceTest {
 	 * 
 	 * @param co the co
 	 * @param objectNumber the object number
-	 * @param objectName the object name
+	 * @param title the object title
 	 */
 	void fillCollectionObject(CollectionobjectsCommon co, String objectNumber,
-			String objectName) {
+			String title) {
 		co.setObjectNumber(objectNumber);
-		co.setObjectName(objectName);
+		co.setTitle(title);
 	}
 
 	/**

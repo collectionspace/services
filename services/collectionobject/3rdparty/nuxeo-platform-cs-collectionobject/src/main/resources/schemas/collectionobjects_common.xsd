@@ -17,20 +17,6 @@
     xmlns="http://collectionspace.org/collectionobject/"
     targetNamespace="http://collectionspace.org/collectionobject/" version="0.1">
 
-    <xs:complexType name="otherNumberList">
-        <xs:sequence>
-            <xs:element name="otherNumber" type="ns:otherNumber" minOccurs="0"
-                maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
-
-    <xs:complexType name="otherNumber">
-        <xs:sequence>
-            <xs:element name="numberValue" type="xs:string"/>
-            <xs:element name="numberType" type="xs:string"/>
-        </xs:sequence>
-    </xs:complexType>
-
     <!-- Object identification information -->
     <xs:element name="objectNumber" type="xs:string"/>
     <xs:element name="otherNumberList" type="ns:otherNumberList"/>
@@ -56,13 +42,8 @@
     </xs:element>
     <xs:element name="distinguishingFeatures" type="xs:string"/>
     <xs:element name="numberOfObjects" type="xs:string"/>
-    <xs:element name="objectName" type="xs:string"/>
-    <xs:element name="objectNameCurrency" type="xs:string"/>
-    <xs:element name="objectNameLevel" type="xs:string"/>
-    <xs:element name="objectNameNote" type="xs:string"/>
-    <xs:element name="objectNameSystem" type="xs:string"/>
-    <xs:element name="objectNameType" type="xs:string"/>
-    <xs:element name="objectNameLanguage" type="xs:string"/>
+    <xs:element name="objectNameList" type="ns:objectNameList"/>
+
     <xs:element name="responsibleDepartments">
         <xs:complexType>
             <xs:sequence>
@@ -388,6 +369,39 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="fieldCollectionEventName" type="xs:string"/>
+
+    <xs:complexType name="otherNumberList">
+        <xs:sequence>
+            <xs:element name="otherNumber" type="ns:otherNumber" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="otherNumber">
+        <xs:sequence>
+            <xs:element name="numberValue" type="xs:string"/>
+            <xs:element name="numberType" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="objectNameList">
+        <xs:sequence>
+            <xs:element name="objectNameGroup" type="objectNameGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="objectNameGroup">
+        <xs:sequence>
+                <xs:element name="objectName" type="xs:string"/>
+                <xs:element name="objectNameCurrency" type="xs:string"/>
+                <xs:element name="objectNameLevel" type="xs:string"/>
+                <xs:element name="objectNameNote" type="xs:string"/>
+                <xs:element name="objectNameSystem" type="xs:string"/>
+                <xs:element name="objectNameType" type="xs:string"/>
+                <xs:element name="objectNameLanguage" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
 
     <!-- Object Description Date Information -->
     <!-- This appears to be a placeholder structured date -->

@@ -57,7 +57,7 @@ public abstract class CollectionSpaceIntegrationTest {
 	 * @param identifier the identifier
 	 */
 	void fillCollectionObject(CollectionobjectsCommon co, String identifier) {
-		fillCollectionObject(co, "objectNumber-" + identifier, "objectName-"
+		fillCollectionObject(co, "objectNumber-" + identifier, "title-"
 				+ identifier);
 	}
 
@@ -66,12 +66,12 @@ public abstract class CollectionSpaceIntegrationTest {
 	 * 
 	 * @param co the co
 	 * @param objectNumber the object number
-	 * @param objectName the object name
+	 * @param title the object title
 	 */
 	void fillCollectionObject(CollectionobjectsCommon co, String objectNumber,
-			String objectName) {
+			String title) {
 		co.setObjectNumber(objectNumber);
-		co.setObjectName(objectName);
+		co.setTitle(title);
 	}
 
 	/**

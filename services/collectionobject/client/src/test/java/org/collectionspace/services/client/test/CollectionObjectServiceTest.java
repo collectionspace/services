@@ -35,6 +35,8 @@ import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.domain.naturalhistory.CollectionobjectsNaturalhistory;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.collectionspace.services.collectionobject.ResponsibleDepartmentList;
+import org.collectionspace.services.collectionobject.ObjectNameGroup;
+import org.collectionspace.services.collectionobject.ObjectNameList;
 import org.collectionspace.services.collectionobject.OtherNumber;
 import org.collectionspace.services.collectionobject.OtherNumberList;
 
@@ -66,6 +68,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     // Instance variables specific to this test.
     /** The known resource id. */
     private String knownResourceId = null;
+
+    private final String OBJECT_NAME_VALUE = "an object name";
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
@@ -456,8 +460,14 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         // a non-empty value is required, as enforced by the service's
         // validation routine(s).
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
-        collectionObject.setTitle("atitle");
-        collectionObject.setObjectName("some name");
+        collectionObject.setTitle("a title");
+
+        ObjectNameList objNameList = new ObjectNameList();
+        List<ObjectNameGroup> objNameGroups = objNameList.getObjectNameGroup();
+        ObjectNameGroup objectNameGroup = new ObjectNameGroup();
+        objectNameGroup.setObjectName("an object name");
+        objNameGroups.add(objectNameGroup);
+        collectionObject.setObjectNameList(objNameList);
 
         // Submit the request to the service and store the response.
         CollectionObjectClient client = new CollectionObjectClient();
@@ -480,9 +490,14 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         // empty String, in a field that requires a non-empty value,
         // as enforced by the service's validation routine(s).
         collectionObject = new CollectionobjectsCommon();
-        collectionObject.setTitle("atitle");
-        collectionObject.setObjectName("some name");
         collectionObject.setObjectNumber("");
+        collectionObject.setTitle("a title");
+        objNameList = new ObjectNameList();
+        objNameGroups = objNameList.getObjectNameGroup();
+        objectNameGroup = new ObjectNameGroup();
+        objectNameGroup.setObjectName(OBJECT_NAME_VALUE);
+        objNameGroups.add(objectNameGroup);
+        collectionObject.setObjectNameList(objNameList);
 
         // Submit the request to the service and store the response.
         multipart =
@@ -669,7 +684,17 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
         // Change the content of one or more fields in the common part.
         collectionObject.setObjectNumber("updated-" + collectionObject.getObjectNumber());
-        collectionObject.setObjectName("updated-" + collectionObject.getObjectName());
+        
+        ObjectNameList objNameList = collectionObject.getObjectNameList();
+        List<ObjectNameGroup> objNameGroups = objNameList.getObjectNameGroup();
+        Assert.assertNotNull(objNameGroups);
+        Assert.assertTrue(objNameGroups.size() >= 1);
+        String objectName = objNameGroups.get(0).getObjectName();
+        Assert.assertEquals(objectName, OBJECT_NAME_VALUE);
+        String updatedObjectName = "updated-" + objectName;
+        objNameGroups.get(0).setObjectName(updatedObjectName);
+        collectionObject.setObjectNameList(objNameList);
+
         if (logger.isDebugEnabled()) {
             logger.debug("sparse update that will be sent in update request:");
             logger.debug(objectAsXmlString(collectionObject,
@@ -693,8 +718,13 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
                 (CollectionobjectsCommon) extractPart(input,
                 client.getCommonPartName(), CollectionobjectsCommon.class);
         Assert.assertNotNull(updatedCollectionObject);
-        Assert.assertEquals(updatedCollectionObject.getObjectName(),
-                collectionObject.getObjectName(),
+
+        objNameList = collectionObject.getObjectNameList();
+        objNameGroups = objNameList.getObjectNameGroup();
+        Assert.assertNotNull(objNameGroups);
+        Assert.assertTrue(objNameGroups.size() >= 1);
+        Assert.assertEquals(updatedObjectName,
+                objNameGroups.get(0).getObjectName(),
                 "Data in updated object did not match submitted data.");
 
     }
@@ -1132,7 +1162,13 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         // is supported by the application layers
         collectionObject.setOtherNumber("urn:org.walkerart.id:123");
         
-        collectionObject.setObjectName(objectName);
+        ObjectNameList objNameList = new ObjectNameList();
+        List<ObjectNameGroup> objNameGroups = objNameList.getObjectNameGroup();
+        ObjectNameGroup objectNameGroup = new ObjectNameGroup();
+        objectNameGroup.setObjectName(OBJECT_NAME_VALUE);
+        objNameGroups.add(objectNameGroup);
+        collectionObject.setObjectNameList(objNameList);
+
         collectionObject.setAge(""); //test for null string
         collectionObject.setBriefDescriptions(descriptionList);
 

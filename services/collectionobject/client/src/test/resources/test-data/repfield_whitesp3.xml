@@ -12,14 +12,6 @@
 
 <distinguishingFeatures>distFeatures</distinguishingFeatures>
 <numberOfObjects>numberOfObjects</numberOfObjects>
-<objectName>objectName</objectName>
-<objectNameCurrency>objectNameCurrency</objectNameCurrency>
-<objectNameLevel>XXX</objectNameLevel>
-<objectNameNote>objectNameNote</objectNameNote>
-<objectNameSystem>objectNameSystem</objectNameSystem>
-<objectNameType>objectNameType</objectNameType>
-
-<objectNameLanguage>objectNameLanguage</objectNameLanguage>
 <!-- test newline whitespace -->
 <responsibleDepartments>
 <!-- test childnode as whitespace -->

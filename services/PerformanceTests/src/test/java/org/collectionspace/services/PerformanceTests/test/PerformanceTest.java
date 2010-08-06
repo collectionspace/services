@@ -131,7 +131,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 		String times = "";
 		for (int numOfKeywords = 0; numOfKeywords < MAX_KEYWORDS;
 				numOfKeywords++, totalTime = 0, totalSearchResults = 0, times = "") {
-			keywords = keywords + " " + OBJECT_NAME + randomGenerator.nextInt(numberOfObjects);
+			keywords = keywords + " " + OBJECT_TITLE + randomGenerator.nextInt(numberOfObjects);
 			for (int i = 0; i < MAX_SEARCHES; i++) {
 				//sandwich the call with timestamps
 				Date startTime = new Date();

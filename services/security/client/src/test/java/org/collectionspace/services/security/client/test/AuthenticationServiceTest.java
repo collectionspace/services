@@ -431,7 +431,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     private MultipartOutput createCollectionObjectInstance(
             String commonPartName, String identifier) {
         return createCollectionObjectInstance(commonPartName, "objectNumber-"
-                + identifier, "objectName-" + identifier);
+                + identifier, "title-" + identifier);
     }
 
     /**
@@ -439,16 +439,16 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      *
      * @param commonPartName the common part name
      * @param objectNumber the object number
-     * @param objectName the object name
+     * @param title the object title
      *
      * @return the multipart output
      */
     private MultipartOutput createCollectionObjectInstance(
-            String commonPartName, String objectNumber, String objectName) {
+            String commonPartName, String objectNumber, String title) {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
 
         collectionObject.setObjectNumber(objectNumber);
-        collectionObject.setObjectName(objectName);
+        collectionObject.setTitle(title);
         MultipartOutput multipart =
                 CollectionObjectFactory.createCollectionObjectInstance(
                 commonPartName, collectionObject, null, null);
