@@ -67,21 +67,15 @@ public class RelationClient extends AbstractServiceClientImpl {
 		setProxy();
 	}
 
-//	/* (non-Javadoc)
-//	 * @see org.collectionspace.services.client.CollectionSpaceClient#getProxy()
-//	 */
-//	@Override
-//	public CollectionSpaceProxy getProxy() {
-//		return this.relationProxy;
-//	}
-
-    public CollectionSpaceProxy getProxy() {
+    @Override
+	public CollectionSpaceProxy getProxy() {
     	return this.relationProxy;
     }
 
     /**
 	 * Sets the proxy.
 	 */
+	@Override
 	public void setProxy() {
 		if (useAuth()) {
 			relationProxy = ProxyFactory.create(RelationProxy.class,
@@ -105,29 +99,19 @@ public class RelationClient extends AbstractServiceClientImpl {
 	 * Read list.
 	 *
 	 * @param subjectCsid the subject csid
+	 * @param subjectType 
 	 * @param predicate the predicate
 	 * @param objectCsid the object csid
+	 * @param objectType 
 	 * @return the client response
 	 */
 	public ClientResponse<RelationsCommonList> readList(String subjectCsid,
+			String subjectType,
 			String predicate,
-			String objectCsid) {
-		return relationProxy.readList(subjectCsid, predicate, objectCsid);
+			String objectCsid,
+			String objectType) {
+		return relationProxy.readList(subjectCsid, subjectType, predicate, objectCsid, objectType);
 	}
-
-//	/**
-//	 * Read list_ spo.
-//	 *
-//	 * @param subjectCsid the subject csid
-//	 * @param predicate the predicate
-//	 * @param objectCsid the object csid
-//	 * @return the client response
-//	 */
-//	@Deprecated
-//	public ClientResponse<RelationsCommonList> readList_SPO(String subjectCsid,
-//			String predicate, String objectCsid) {
-//		return relationProxy.readList_SP0(subjectCsid, predicate, objectCsid);
-//	}
 
 	/**
 	 * Read.

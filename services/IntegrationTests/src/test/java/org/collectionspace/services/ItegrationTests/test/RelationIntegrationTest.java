@@ -135,8 +135,10 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    String predicate = RelationshipType.COLLECTIONOBJECT_INTAKE.value();
 	    ClientResponse<RelationsCommonList> resultResponse = relationClient.readList(
 	    		collectionObjectCsid,
+	    		CollectionobjectsCommon.class.getSimpleName(),
 	    		predicate,
-	    		intakeCsid);
+	    		intakeCsid,
+	    		IntakesCommon.class.getSimpleName());
         RelationsCommonList relationList = null;
 	    try {
 	    	Assert.assertEquals(resultResponse.getStatus(), Response.Status.OK.getStatusCode());

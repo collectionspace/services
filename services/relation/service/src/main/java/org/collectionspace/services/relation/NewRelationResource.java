@@ -195,9 +195,6 @@ public class NewRelationResource extends
 		return result;
 	}
 
-	/*
-	 * BEGIN OF GET LIST
-	 */
 	/**
 	 * Gets the relation list.
 	 * 
@@ -212,184 +209,15 @@ public class NewRelationResource extends
 	@Produces("application/xml")
 	public RelationsCommonList getRelationList(@Context UriInfo ui,
 			@QueryParam(IRelationsManager.SUBJECT_QP) String subjectCsid,
+			@QueryParam(IRelationsManager.SUBJECT_TYPE_QP) String subjectType,
 			@QueryParam(IRelationsManager.PREDICATE_QP) String predicate,
-			@QueryParam(IRelationsManager.OBJECT_QP) String objectCsid) {
+			@QueryParam(IRelationsManager.OBJECT_QP) String objectCsid,
+			@QueryParam(IRelationsManager.OBJECT_TYPE_QP) String objectType) {
 		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-		return this.getRelationList(queryParams, subjectCsid, predicate, objectCsid);
+		return this.getRelationList(queryParams, subjectCsid, subjectType,
+				predicate,
+				objectCsid, objectType);
 	}
-
-	/**
-	 * Gets the relation list_ s.
-	 * 
-	 * @param ui the ui
-	 * @param subjectCsid the subject csid
-	 * 
-	 * @return the relation list_ s
-	 */
-	@GET
-	@Path("subject/{subjectCsid}")
-	@Produces("application/xml")
-	public RelationsCommonList getRelationList_S(@Context UriInfo ui,
-			@PathParam("subjectCsid") String subjectCsid) {
-		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-		return this.getRelationList(queryParams, subjectCsid, null, null);
-	}
-
-	/**
-	 * Gets the relation list_ p.
-	 * 
-	 * @param ui the ui
-	 * @param predicate the predicate
-	 * 
-	 * @return the relation list_ p
-	 */
-	@GET
-	@Path("type/{predicate}")
-	@Produces("application/xml")
-	public RelationsCommonList getRelationList_P(@Context UriInfo ui,
-			@PathParam("predicate") String predicate) {
-		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-		return this.getRelationList(queryParams, null, predicate, null);
-	}
-
-	/**
-	 * Gets the relation list_ o.
-	 * 
-	 * @param ui the ui
-	 * @param objectCsid the object csid
-	 * 
-	 * @return the relation list_ o
-	 */
-	@GET
-	@Path("object/{objectCsid}")
-	@Produces("application/xml")
-	public RelationsCommonList getRelationList_O(@Context UriInfo ui,
-			@PathParam("objectCsid") String objectCsid) {
-		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-		return this.getRelationList(queryParams, null, null, objectCsid);
-	}
-
-	/**
-	 * Gets the relation list_ ps.
-	 * 
-	 * @param ui the ui
-	 * @param predicate the predicate
-	 * @param subjectCsid the subject csid
-	 * 
-	 * @return the relation list_ ps
-	 */
-	@GET
-	@Path("type/{predicate}/subject/{subjectCsid}")
-	@Produces("application/xml")
-	public RelationsCommonList getRelationList_PS(@Context UriInfo ui,
-			@PathParam("predicate") String predicate,
-			@PathParam("subjectCsid") String subjectCsid) {
-		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-		return this.getRelationList(queryParams, subjectCsid, predicate, null);
-	}
-
-	/**
-	 * Gets the relation list_ sp.
-	 * 
-	 * @param ui the ui
-	 * @param subjectCsid the subject csid
-	 * @param predicate the predicate
-	 * 
-	 * @return the relation list_ sp
-	 */
-	@GET
-	@Path("subject/{subjectCsid}/type/{predicate}")
-	@Produces("application/xml")
-	public RelationsCommonList getRelationList_SP(@Context UriInfo ui,
-			@PathParam("subjectCsid") String subjectCsid,
-			@PathParam("predicate") String predicate) {
-		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-		return this.getRelationList(queryParams, subjectCsid, predicate, null);
-	}
-
-	/**
-	 * Gets the relation list_ po.
-	 * 
-	 * @param ui the ui
-	 * @param predicate the predicate
-	 * @param objectCsid the object csid
-	 * 
-	 * @return the relation list_ po
-	 */
-	@GET
-	@Path("type/{predicate}/object/{objectCsid}")
-	@Produces("application/xml")
-	public RelationsCommonList getRelationList_PO(@Context UriInfo ui,
-			@PathParam("predicate") String predicate,
-			@PathParam("objectCsid") String objectCsid) {
-		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-		return this.getRelationList(queryParams, null, predicate, objectCsid);
-	}
-
-	/**
-	 * Gets the relation list_ op.
-	 * 
-	 * @param ui the ui
-	 * @param objectCsid the object csid
-	 * @param predicate the predicate
-	 * 
-	 * @return the relation list_ op
-	 */
-	@GET
-	@Path("object/{objectCsid}/type/{predicate}")
-	@Produces("application/xml")
-	public RelationsCommonList getRelationList_OP(@Context UriInfo ui,
-			@PathParam("objectCsid") String objectCsid,
-			@PathParam("predicate") String predicate) {
-		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-		return this.getRelationList(queryParams, null, predicate, objectCsid);
-	}
-
-	/**
-	 * Gets the relation list_ pso.
-	 * 
-	 * @param ui the ui
-	 * @param predicate the predicate
-	 * @param subjectCsid the subject csid
-	 * @param objectCsid the object csid
-	 * 
-	 * @return the relation list_ pso
-	 */
-	@GET
-	@Path("type/{predicate}/subject/{subjectCsid}/object/{objectCsid}")
-	@Produces("application/xml")
-	public RelationsCommonList getRelationList_PSO(@Context UriInfo ui,
-			@PathParam("predicate") String predicate,
-			@PathParam("subjectCsid") String subjectCsid,
-			@PathParam("objectCsid") String objectCsid) {
-		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-		return this.getRelationList(queryParams, subjectCsid, predicate, objectCsid);
-	}
-
-	/**
-	 * Gets the relation list_ spo.
-	 * 
-	 * @param ui the ui
-	 * @param subjectCsid the subject csid
-	 * @param predicate the predicate
-	 * @param objectCsid the object csid
-	 * 
-	 * @return the relation list_ spo
-	 */
-	@GET
-	@Path("subject/{subjectCsid}/type/{predicate}/object/{objectCsid}")
-	@Produces("application/xml")
-	public RelationsCommonList getRelationList_SPO(@Context UriInfo ui,
-			@PathParam("subjectCsid") String subjectCsid,
-			@PathParam("predicate") String predicate,
-			@PathParam("objectCsid") String objectCsid) {
-		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-		return this.getRelationList(queryParams, subjectCsid, predicate, objectCsid);
-	}
-
-	/*
-	 * END OF GET LIST
-	 */
 
 	/**
 	 * Update relation.
@@ -501,13 +329,16 @@ public class NewRelationResource extends
 	public RelationsCommonList getRelationList(
 			MultivaluedMap<String, String> queryParams,
 			String subjectCsid,
+			String subjectType,
 			String predicate, 
-			String objectCsid) throws WebApplicationException {
+			String objectCsid,
+			String objectType) throws WebApplicationException {
 		RelationsCommonList relationList = new RelationsCommonList();
 		try {
 			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
 			DocumentHandler handler = createDocumentHandler(ctx);
-			String relationClause = RelationsUtils.buildWhereClause(subjectCsid, predicate, objectCsid);
+			String relationClause = RelationsUtils.buildWhereClause(subjectCsid, subjectType, predicate,
+					objectCsid, objectType);
 			handler.getDocumentFilter().appendWhereClause(relationClause, IQueryManager.SEARCH_QUALIFIER_AND);			
 			getRepositoryClient(ctx).getFiltered(ctx, handler);
 			relationList = (RelationsCommonList)handler.getCommonPartList();

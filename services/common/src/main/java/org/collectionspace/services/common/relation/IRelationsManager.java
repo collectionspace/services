@@ -41,6 +41,8 @@ public interface IRelationsManager {
     /** The Constant SUBJECT. */
     static public final String SUBJECT = "subjectCsid";
     static public final String SUBJECT_QP = "sbj";
+    static public final String SUBJECT_TYPE = "subjectType";
+    static public final String SUBJECT_TYPE_QP = SUBJECT_QP + "Type";
     
     /** The Constant PREDICATE. */
     static public final String PREDICATE = "predicate";
@@ -49,6 +51,8 @@ public interface IRelationsManager {
     /** The Constant OBJECT. */
     static public final String OBJECT = "objectCsid";
     static public final String OBJECT_QP = "obj";
+    static public final String OBJECT_TYPE = "objectType";
+    static public final String OBJECT_TYPE_QP = OBJECT_QP + "Type";
 
     /**
      * Gets the relationships for the entity corresponding to the CSID=csid.

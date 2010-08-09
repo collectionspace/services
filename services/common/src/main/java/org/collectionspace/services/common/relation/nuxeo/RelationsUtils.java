@@ -50,13 +50,23 @@ public class RelationsUtils {
      * @param object the object
      * @return the string
      */
-    public static String buildWhereClause(String subject, String predicate, String object) {
+    public static String buildWhereClause(String subject, String subjectType,
+    		String predicate,
+    		String object, String objectType) {
     	String result = null;
     	
     	StringBuilder stringBuilder = new StringBuilder();
     	if (subject != null) {
     		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
     				RelationJAXBSchema.DOCUMENT_ID_1 + " = " + "'" + subject + "'");
+    	}
+    	
+    	if (subjectType != null) {
+    		if (stringBuilder.length() > 0) {
+    			stringBuilder.append(IQueryManager.SEARCH_QUALIFIER_AND);
+    		}
+    		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
+    				RelationJAXBSchema.DOCUMENT_TYPE_1 + " = " + "'" + subjectType + "'");
     	}
     	
     	if (predicate != null) {
@@ -73,6 +83,14 @@ public class RelationsUtils {
     		}
     		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
     				RelationJAXBSchema.DOCUMENT_ID_2 + " = " + "'" + object + "'");
+    	}
+    	
+    	if (objectType != null) {
+    		if (stringBuilder.length() > 0) {
+    			stringBuilder.append(IQueryManager.SEARCH_QUALIFIER_AND);
+    		}
+    		stringBuilder.append(RelationConstants.NUXEO_SCHEMA_NAME + ":" +
+    				RelationJAXBSchema.DOCUMENT_TYPE_2 + " = " + "'" + objectType + "'");
     	}
     	
     	if (stringBuilder.length() > 0) {
