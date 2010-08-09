@@ -380,6 +380,7 @@ public class CollectionObjectResource
      * 
      * @return the intakes common list
      */
+    /*
     @GET
     @Path("{csid}/intakes")
     @Produces("application/xml")
@@ -424,6 +425,8 @@ public class CollectionObjectResource
         
         return result;
     }
+     *
+     */
 
     /**
      * Gets the authority refs.
