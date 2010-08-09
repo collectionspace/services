@@ -30,7 +30,7 @@
         <module>account</module> <!-- relies on authorization-mgt.import -->
         <module>note</module>
         <module>relation</module>
-        <!--        <module>query</module> -->
+        <module>query</module>
         <module>acquisition</module>
         <module>vocabulary</module>
         <module>organization</module>

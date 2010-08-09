@@ -12,6 +12,14 @@
     <name>services.query</name>
     <packaging>pom</packaging>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
     <modules>
         <module>service</module>
     </modules>
