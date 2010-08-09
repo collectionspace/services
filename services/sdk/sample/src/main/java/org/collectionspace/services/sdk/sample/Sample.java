@@ -35,6 +35,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.collectionobject.ObjectNameGroup;
+import org.collectionspace.services.collectionobject.ObjectNameList;
 import org.testng.Assert;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -82,7 +84,10 @@ public class Sample {
 		String result = null;
 
 		CollectionobjectsCommon co = new CollectionobjectsCommon();
-		co.setObjectName("Keiko CollectionobjectsCommon");
+        ObjectNameList onl = co.getObjectNameList();
+        ObjectNameGroup ong = new ObjectNameGroup();
+        ong.setObjectName("Keiko CollectionobjectsCommon");
+        onl.getObjectNameGroup().add(ong);
 
 		MultipartOutput multipart = new MultipartOutput();
 		OutputPart commonPart = multipart.addPart(co,
@@ -144,8 +149,8 @@ public class Sample {
 		// Update the content of this resource.
 		collectionObject.setObjectNumber("updated-"
 				+ collectionObject.getObjectNumber());
-		collectionObject.setObjectName("updated-"
-				+ collectionObject.getObjectName());
+        String name = collectionObject.getObjectNameList().getObjectNameGroup().get(0).getObjectName();
+		collectionObject.getObjectNameList().getObjectNameGroup().get(0).setObjectName("updated-"+ name);
 
 		// Submit the request to the service and store the response.
 		MultipartOutput output = new MultipartOutput();

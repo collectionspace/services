@@ -93,10 +93,17 @@ public class OrgAuthorityBaseImport {
     		logger.debug("Import: Created orgAuthorityulary: \"" + orgAuthorityShortId +"\" ID:"
     				+newOrgAuthorityId );
     	}
-    	for(Map<String,String> orgInfo : orgInfos){
-            OrgAuthorityClientUtils.createItemInAuthority(
-            		newOrgAuthorityId, baseOrgAuthRefName, orgInfo, client);
-    	}
+
+        
+        /*
+        *TODO: Laramie20100728  this code is out of date, and needs to use the new API.  Commenting out for now.
+        *
+        *orgRepeatablesInfo is undefined;
+    	*for(Map<String,String> orgInfo : orgInfos){
+        *    OrgAuthorityClientUtils.createItemInAuthority(newOrgAuthorityId, baseOrgAuthRefName, orgInfo, orgRepeatablesInfo, client);
+    	*}
+    	*/
+         logger.error("MethodcreateOrgAuthority(String orgAuthorityDisplayName, String orgAuthorityShortId,List<Map<String,String>> orgInfos ) not implemented properly.");
     }
     
     // ---------------------------------------------------------------
@@ -116,7 +123,7 @@ public class OrgAuthorityBaseImport {
         mmiOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, "mmi");
         mmiOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "MMI");
         mmiOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "Museum of the Moving Image");
-        mmiOrgMap.put(OrganizationJAXBSchema.CONTACT_NAME, "Megan Forbes");
+        //TODO: CONTACT_NAME is not in API any more.  mmiOrgMap.put(OrganizationJAXBSchema.CONTACT_NAME, "Megan Forbes");
         mmiOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "1984");
         mmiOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, "Astoria, NY");
         Map<String, String> pahmaOrgMap = new HashMap<String,String>();
@@ -124,7 +131,7 @@ public class OrgAuthorityBaseImport {
         pahmaOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "PAHMA");
         pahmaOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "Phoebe A. Hearst Museum of Anthropology");
         pahmaOrgMap.put(OrganizationJAXBSchema.NAME_ADDITIONS, "University of California, Berkeley");
-        pahmaOrgMap.put(OrganizationJAXBSchema.CONTACT_NAME, "Michael Black");
+        //TODO: CONTACT_NAME is not in API any more.   pahmaOrgMap.put(OrganizationJAXBSchema.CONTACT_NAME, "Michael Black");
         pahmaOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "1901");
         pahmaOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, "Berkeley, CA");
         Map<String, String> savoyOrgMap = new HashMap<String,String>();

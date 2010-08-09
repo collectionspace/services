@@ -98,10 +98,17 @@ public class PersonAuthorityBaseImport {
     		logger.debug("Import: Created personAuthorityulary: \"" + displayName +"\" ID:"
     				+newPersonAuthorityId );
     	}
-    	for(Map<String,String> personMap : personMaps){
-    		PersonAuthorityClientUtils.createItemInAuthority(
-   				newPersonAuthorityId, basePersonRefName, personMap, client);
-    	}
+
+       /*
+        *TODO: Laramie20100728  this code is out of date, and needs to use the new API.  Commenting out for now.
+        *
+        *for(Map<String,String> personMap : personMaps){
+    	*	PersonAuthorityClientUtils.createItemInAuthority(
+   		*		newPersonAuthorityId, basePersonRefName, personMap, client);
+    	*}
+    	*/
+        logger.error("Method PersonAuthorityBaseImport.createPersonAuthority not implemented properly.");
+
     }
     
 	public static void main(String[] args) {

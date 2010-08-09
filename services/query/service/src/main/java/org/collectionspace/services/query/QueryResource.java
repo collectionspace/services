@@ -41,12 +41,13 @@ import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.query.QueryManager;
 //import org.collectionspace.services.common.NuxeoClientType;
-import org.collectionspace.services.common.ServiceMain;
+/*import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.jboss.resteasy.util.HttpResponseCodes;
+*/
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

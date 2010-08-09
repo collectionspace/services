@@ -235,8 +235,11 @@ public class Sample {
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.READ;
 
         // Submit the request to the service and store the response.
-        ClientResponse<OrganizationsCommonList> res =
-                client.readItemList(orgAuthId);
+
+        //was: ClientResponse<OrganizationsCommonList> res = client.readItemList(orgAuthId);
+        //new API: readItemList(String inAuthority, String partialTerm, String keywords)
+        ClientResponse<OrganizationsCommonList> res = client.readItemList(orgAuthId, "", "");//TODO:   .New call, most certainly wrong.  Just trying to get this to compile. Laramie20100728
+
         OrganizationsCommonList list = res.getEntity();
 
         int statusCode = res.getStatus();
@@ -442,14 +445,14 @@ public class Sample {
         Map<String, String> mmiOrgMap = new HashMap<String,String>();
         mmiOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "MMI");
         mmiOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "Museum of the Moving Image");
-        mmiOrgMap.put(OrganizationJAXBSchema.CONTACT_NAME, "Megan Forbes");
+        //mmiOrgMap.put(OrganizationJAXBSchema.CONTACT_NAME, "Megan Forbes");
         mmiOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "1984");
         mmiOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, "Astoria, NY");
         Map<String, String> pahmaOrgMap = new HashMap<String,String>();
         pahmaOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "PAHMA");
         pahmaOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "Phoebe A. Hearst Museum of Anthropology");
         pahmaOrgMap.put(OrganizationJAXBSchema.NAME_ADDITIONS, "University of California, Berkeley");
-        pahmaOrgMap.put(OrganizationJAXBSchema.CONTACT_NAME, "Michael Black");
+        //pahmaOrgMap.put(OrganizationJAXBSchema.CONTACT_NAME, "Michael Black");
         pahmaOrgMap.put(OrganizationJAXBSchema.FOUNDING_DATE, "1901");
         pahmaOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, "Berkeley, CA");
         Map<String, String> savoyOrgMap = new HashMap<String,String>();

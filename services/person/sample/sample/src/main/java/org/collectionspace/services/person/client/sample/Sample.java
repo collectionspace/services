@@ -80,8 +80,11 @@ public class Sample {
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
 
     	logger.info("Import: Create personAuthority: \"" + personAuthorityName +"\"");
-    	String basePersonRefName = PersonAuthorityClientUtils.createPersonAuthRefName(personAuthorityName, false);
-    	String fullPersonRefName = PersonAuthorityClientUtils.createPersonAuthRefName(personAuthorityName, true);
+
+
+        String displaySuffix = "displayName-" + System.currentTimeMillis(); //TODO: Laramie20100728 temp fix, made-up displaySuffix.
+        String basePersonRefName = PersonAuthorityClientUtils.createPersonAuthRefName(personAuthorityName, displaySuffix);//TODO: Laramie20100728 temp fix  was personAuthorityName, false
+    	String fullPersonRefName = PersonAuthorityClientUtils.createPersonAuthRefName(personAuthorityName, displaySuffix); //TODO: Laramie20100728 temp fix  was personAuthorityName, true
     	MultipartOutput multipart = 
     		PersonAuthorityClientUtils.createPersonAuthorityInstance(
   				personAuthorityName, fullPersonRefName, client.getCommonPartName() );
@@ -134,7 +137,10 @@ public class Sample {
 		builtName.append("-");
     	if(deathDate!=null)
     		builtName.append(deathDate);
-    	String refName = PersonAuthorityClientUtils.createPersonRefName(personAuthorityRefName, builtName.toString(), true);
+
+        String displaySuffix = "displayName-" + System.currentTimeMillis(); //TODO: Laramie20100728 temp fix, made-up displaySuffix.
+
+    	String refName = PersonAuthorityClientUtils.createPersonRefName(personAuthorityRefName, builtName.toString(), displaySuffix); //TODO was ...,true);
     	logger.info("Import: Create Item: \""+refName+"\" in personAuthority: \"" + personAuthorityRefName +"\"");
 
     	if(logger.isDebugEnabled()){
@@ -238,8 +244,7 @@ public class Sample {
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.READ;
 
         // Submit the request to the service and store the response.
-        ClientResponse<PersonsCommonList> res =
-                client.readItemList(personAuthId);
+        ClientResponse<PersonsCommonList> res = client.readItemList(personAuthId, "", ""); //TODO: Laramie201007289  added empty strings to satisfy api
         PersonsCommonList list = res.getEntity();
 
         int statusCode = res.getStatus();
@@ -375,16 +380,20 @@ public class Sample {
             	person.setBirthPlace(value);
             if((value = (String)personInfo.get(PersonJAXBSchema.DEATH_PLACE))!=null)
             	person.setDeathPlace(value);
+
+            /* TODO: Laramie20100728  removed missing member calls
             if((value = (String)personInfo.get(PersonJAXBSchema.GROUP))!=null)
             	person.setGroup(value);
             if((value = (String)personInfo.get(PersonJAXBSchema.NATIONALITY))!=null)
             	person.setNationality(value);
-            if((value = (String)personInfo.get(PersonJAXBSchema.GENDER))!=null)
-            	person.setGender(value);
             if((value = (String)personInfo.get(PersonJAXBSchema.OCCUPATION))!=null)
             	person.setOccupation(value);
             if((value = (String)personInfo.get(PersonJAXBSchema.SCHOOL_OR_STYLE))!=null)
             	person.setSchoolOrStyle(value);
+            */
+        
+            if((value = (String)personInfo.get(PersonJAXBSchema.GENDER))!=null)
+                        person.setGender(value);
             if((value = (String)personInfo.get(PersonJAXBSchema.BIO_NOTE))!=null)
             	person.setBioNote(value);
             if((value = (String)personInfo.get(PersonJAXBSchema.NAME_NOTE))!=null)

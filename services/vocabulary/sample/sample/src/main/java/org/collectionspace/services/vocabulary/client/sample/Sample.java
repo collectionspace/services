@@ -33,7 +33,9 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.BasicConfigurator;
-import org.collectionspace.services.VocabularyItemJAXBSchema;
+//import org.collectionspace.services.VocabularyItemJAXBSchema; 
+import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
+
 import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.client.VocabularyClientUtils;
 import org.collectionspace.services.client.test.ServiceRequestType;
@@ -80,8 +82,10 @@ public class Sample {
     	if(logger.isDebugEnabled()){
     		logger.debug("Import: Create vocabulary: \"" + vocabName +"\"");
     	}
-    	String baseVocabRefName = VocabularyClientUtils.createVocabularyRefName(vocabName, false);
-    	String fullVocabRefName = VocabularyClientUtils.createVocabularyRefName(vocabName, true);
+
+        String displaySuffix = "displayName-" + System.currentTimeMillis(); //TODO: Laramie20100728 temp fix, made-up displaySuffix.
+        String baseVocabRefName = VocabularyClientUtils.createVocabularyRefName(vocabName, displaySuffix);   //TODO: Laramie20100728 temp fix  was vocabName, false
+    	String fullVocabRefName = VocabularyClientUtils.createVocabularyRefName(vocabName, displaySuffix);   //TODO: Laramie20100728 temp fix  was vocabName, true
     	MultipartOutput multipart = VocabularyClientUtils.createEnumerationInstance(
     			vocabName, fullVocabRefName, client.getCommonPartName());
     	ClientResponse<Response> res = client.create(multipart);
@@ -106,7 +110,7 @@ public class Sample {
     	}
     	for(String itemName : enumValues){
             HashMap<String, String> itemInfo = new HashMap<String, String>();
-            itemInfo.put(VocabularyItemJAXBSchema.DISPLAY_NAME, itemName);
+            itemInfo.put(AuthorityItemJAXBSchema.DISPLAY_NAME, itemName);
     		VocabularyClientUtils.createItemInVocabulary(newVocabId, 
     				baseVocabRefName, itemInfo, client);
     	}
@@ -189,8 +193,8 @@ public class Sample {
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.READ;
 
         // Submit the request to the service and store the response.
-        ClientResponse<VocabularyitemsCommonList> res =
-                client.readItemList(vocabId);
+                          //  readItemList(String inAuthority, String partialTerm, String keywords)
+        ClientResponse<VocabularyitemsCommonList> res =  client.readItemList(vocabId, "", ""); //TODO: figure out these params.  I just put in empty string to make it recompile after refactoring.  Laramie20100728
         VocabularyitemsCommonList list = res.getEntity();
 
         int statusCode = res.getStatus();
