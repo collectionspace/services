@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PermissionJpaFilter extends JpaDocumentFilter {
 
+    /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(PermissionJpaFilter.class);
 
     /**
@@ -49,32 +50,93 @@ public class PermissionJpaFilter extends JpaDocumentFilter {
         super(ctx);
     }
 
+    /**
+     * Append where clause.
+     *
+     * @param csAdmin the cs admin
+     * @param paramList the param list
+     * @param queryStrBldr the query str bldr
+     * @param fieldName the field name
+     * @param queryParam the query param
+     * @return the string builder
+     */
+    private StringBuilder appendWhereClause(boolean whereOpNeeded,
+    		StringBuilder queryStrBldr,
+    		String fieldName,
+    		String queryParamName,
+    		List<ParamBinding> paramList,
+    		String queryParamValue) {
+    	String op = whereOpNeeded ? " WHERE " : " AND ";
+        if (queryParamValue != null && !queryParamValue.isEmpty()) {
+        	queryStrBldr.append(op);
+            queryStrBldr.append("UPPER(a." + fieldName + ")");
+            queryStrBldr.append(" LIKE");
+            queryStrBldr.append(" :" + queryParamName);            
+            paramList.add(new ParamBinding(queryParamName, "%"
+                    + queryParamValue.toUpperCase() + "%"));            
+        }
+        
+        return queryStrBldr;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentFilter#buildWhereForSearch(java.lang.StringBuilder)
+     */
     @Override
     public List<ParamBinding> buildWhereForSearch(StringBuilder queryStrBldr) {
 
         List<ParamBinding> paramList = new ArrayList<ParamBinding>();
+        boolean whereOpNeeded = true;
 
-        String resName = null;
-        List<String> rn = getQueryParam(PermissionStorageConstants.Q_RESOURCE_NAME);
-        if (null != rn && rn.size() > 0) {
-            resName = rn.get(0);
-        }
         boolean csAdmin = SecurityUtils.isCSpaceAdmin();
         if (!csAdmin) {
-            queryStrBldr.append(addTenant(false, paramList));
+            queryStrBldr.append(addTenant(false /* add WHERE or AND */,
+            		paramList));
+            whereOpNeeded = false;
         }
-        if (null != resName && !resName.isEmpty()) {
-            if (!csAdmin) {
-                queryStrBldr.append(" AND");
-            } else {
-                queryStrBldr.append(" WHERE");
-            }
-            queryStrBldr.append(" UPPER(a." + PermissionStorageConstants.RESOURCE_NAME + ")");
-            queryStrBldr.append(" LIKE");
-            queryStrBldr.append(" :" + PermissionStorageConstants.Q_RESOURCE_NAME);
-            paramList.add(new ParamBinding(PermissionStorageConstants.Q_RESOURCE_NAME, "%"
-                    + resName.toUpperCase() + "%"));
+
+        // get the resource query param
+        String resName = null;
+        List<String> resNames = getQueryParam(PermissionStorageConstants.Q_RESOURCE_NAME);
+        if (resNames != null && resNames.size() > 0) {
+        	// grab just the first instance
+            resName = resNames.get(0);
+            appendWhereClause(whereOpNeeded,
+            		queryStrBldr,
+            		PermissionStorageConstants.RESOURCE_NAME,
+            		PermissionStorageConstants.Q_RESOURCE_NAME,
+            		paramList,
+            		resName);
+            whereOpNeeded = false;
         }
+        
+        
+        // get the actiongroup query param
+        String actionGroup = null;
+        List<String> actionGroups = getQueryParam(PermissionStorageConstants.Q_ACTION_GROUP);
+        if (actionGroups != null && actionGroups.size() > 0) {
+        	actionGroup = actionGroups.get(0);
+            appendWhereClause(whereOpNeeded,
+            		queryStrBldr,
+            		PermissionStorageConstants.ACTION_GROUP,
+            		PermissionStorageConstants.Q_ACTION_GROUP,
+            		paramList,
+            		actionGroup);
+            whereOpNeeded = false;
+        }        
+        
+//        if (null != resName && !resName.isEmpty()) {
+//            if (!csAdmin) {
+//                queryStrBldr.append(" AND");
+//            } else {
+//                queryStrBldr.append(" WHERE");
+//            }
+//            queryStrBldr.append(" UPPER(a." + PermissionStorageConstants.RESOURCE_NAME + ")");
+//            queryStrBldr.append(" LIKE");
+//            queryStrBldr.append(" :" + PermissionStorageConstants.Q_RESOURCE_NAME);
+//            paramList.add(new ParamBinding(PermissionStorageConstants.Q_RESOURCE_NAME, "%"
+//                    + resName.toUpperCase() + "%"));
+//        }
 
         if (logger.isDebugEnabled()) {
             String query = queryStrBldr.toString();
@@ -84,6 +146,9 @@ public class PermissionJpaFilter extends JpaDocumentFilter {
         return paramList;
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.document.DocumentFilter#buildWhere(java.lang.StringBuilder)
+     */
     @Override
     public List<ParamBinding> buildWhere(StringBuilder queryStrBldr) {
         return new ArrayList<ParamBinding>();

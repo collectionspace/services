@@ -32,7 +32,9 @@ package org.collectionspace.services.authorization.storage;
 public class PermissionStorageConstants {
 
     final public static String Q_RESOURCE_NAME = "res";
+    final public static String Q_ACTION_GROUP = "actGrp";
 
     final public static String RESOURCE_NAME = "resourceName";
+    final public static String ACTION_GROUP = "actionGroup";
 
 }
