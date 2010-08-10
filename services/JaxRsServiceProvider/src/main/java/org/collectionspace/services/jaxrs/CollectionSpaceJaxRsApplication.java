@@ -49,6 +49,7 @@ import java.util.Set;
 import org.collectionspace.services.authorization.PermissionResource;
 import org.collectionspace.services.authorization.RoleResource;
 import org.collectionspace.services.common.security.SecurityInterceptor;
+import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.profile.Profiler;
 
 /**
@@ -69,6 +70,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
     	// Setup the profiler logger
     	//
     	Profiler.setup();
+    	DocumentUtils.loggerSetup();
     	//
     	// Instantiate all our JaxRS resources
     	//

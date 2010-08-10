@@ -23,6 +23,8 @@
  */
 package org.collectionspace.services.common.document;
 
+import java.lang.reflect.Array;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,6 +56,7 @@ import org.collectionspace.services.common.service.ObjectPartContentType;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.service.XmlContentType;
 
+import org.nuxeo.ecm.core.io.ExportConstants;
 import org.nuxeo.common.collections.PrimitiveArrays;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.schema.SchemaManager;
@@ -63,6 +66,7 @@ import org.nuxeo.ecm.core.schema.types.Field;
 import org.nuxeo.ecm.core.schema.types.ListType;
 import org.nuxeo.ecm.core.schema.types.Schema;
 import org.nuxeo.ecm.core.schema.types.Type;
+import org.nuxeo.ecm.core.schema.types.JavaTypes;
 import org.nuxeo.ecm.core.schema.types.primitives.StringType;
 import org.nuxeo.ecm.core.schema.types.FieldImpl;
 import org.nuxeo.ecm.core.schema.types.QName;
@@ -78,6 +82,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
+//import org.dom4j.Document;
+//import org.dom4j.Element;
+//import org.dom4j.*;
+
+
 /**
  * DocumentUtils is a collection of utilities related to document management
  *
@@ -85,52 +94,54 @@ import org.w3c.dom.Text;
  * $LastChangedDate: $
  */
 public class DocumentUtils {
-    /** The Constant logger. */
-    private static final Logger logger =
-        LoggerFactory.getLogger(DocumentUtils.class);
+	/** The Constant logger. */
+	private static final Logger logger =
+		LoggerFactory.getLogger(DocumentUtils.class);
 
-    /** The name value separator. */
-    private static String NAME_VALUE_SEPARATOR = "|";
+	/** The name value separator. */
+	private static String NAME_VALUE_SEPARATOR = "|";
 
-    // The delimiter in a schema-qualified field name,
-    // between its schema name and field name components.
-    private static String SCHEMA_FIELD_DELIMITER = ":";
+	// The delimiter in a schema-qualified field name,
+	// between its schema name and field name components.
+	/** The SCHEM a_ fiel d_ delimiter. */
+	private static String SCHEMA_FIELD_DELIMITER = ":";
 
-    // The delimiter between a parent authRef field name and
-    // child authRef field name, if any.
-    private static String AUTHREF_FIELD_NAME_DELIMITER = "|";
-    
-    /** The XML elements with this suffix will indicate. */
-    private static String STRUCTURED_TYPE_SUFFIX = "List";
+	// The delimiter between a parent authRef field name and
+	// child authRef field name, if any.
+	/** The AUTHRE f_ fiel d_ nam e_ delimiter. */
+	private static String AUTHREF_FIELD_NAME_DELIMITER = "|";
 
-    /**
-     * The Class NameValue.
-     */
-    private static class NameValue {    	
-	    /**
-	     * Instantiates a new name value.
-	     */
-	    NameValue() {
-    		// default scoped constructor to removed "synthetic accessor" warning
-    	}        
-        /** The name. */
-        String name;        
-        /** The value. */
-        String value;
-    };
-    
-    /**
-     * Log byte array input stream.  After logging this method resets the stream and returns it in its original state.
-     *
-     * @param inputStream the input stream
-     * @return the byte array input stream
-     */
-    private static ByteArrayInputStream logByteArrayInputStream(ByteArrayInputStream inputStream) {
-    	ByteArrayInputStream result = null;
-    	
-    	if (logger.isDebugEnabled() == true) {
-	    	ByteArrayInputStream bais = (ByteArrayInputStream)inputStream;
-	
+	/** The XML elements with this suffix will indicate. */
+	private static String STRUCTURED_TYPE_SUFFIX = "List";
+
+	/**
+	 * The Class NameValue.
+	 */
+	private static class NameValue {    	
+		/**
+		 * Instantiates a new name value.
+		 */
+		NameValue() {
+			// default scoped constructor to removed "synthetic accessor" warning
+		}        
+		/** The name. */
+		String name;        
+		/** The value. */
+		String value;
+	};
+
+	/**
+	 * Log byte array input stream.  After logging this method resets the stream and returns it in its original state.
+	 *
+	 * @param inputStream the input stream
+	 * @return the byte array input stream
+	 */
+	private static ByteArrayInputStream logByteArrayInputStream(ByteArrayInputStream inputStream) {
+		ByteArrayInputStream result = null;
+
+		if (logger.isTraceEnabled() == true) {
+			ByteArrayInputStream bais = (ByteArrayInputStream)inputStream;
+
 			int length = bais.available();
 			byte [] buff = new byte[length];
 			try {
@@ -138,302 +149,309 @@ public class DocumentUtils {
 			} catch (Exception e) {
 				logger.debug("Could not read input stream", e);
 			}
-	    		
-	    	String s = new String(buff);
-	    	logger.debug(s);
-	    	//
-	    	// Essentially, reset the stream and return it in its original state
-	    	//
-	    	result = new ByteArrayInputStream(buff);
-    	}
-    	
-    	return result;
-    }
-    
-    /**
-     * Gets the xML schema.
-     *
-     * @param partMeta the part meta
-     * @return the xML schema
-     * @throws Exception the exception
-     */
-    private static File getXMLSchema(ObjectPartType partMeta)
-    		throws Exception {
-    	final String FILE_SEPARATOR = System.getProperty("file.separator");
-    	final String XML_SCHEMA_EXTENSION = ".xsd";
-    	final String SCHEMAS_DIR = "schemas";
-    	
-    	File schemaFile = null;
-    	
-    	//
-    	// Look for an XML Schema (.xsd) file for the incoming part payload
-    	//
-    	String serverRoot = ServiceMain.getInstance().getServerRootDir();
-    	String schemasDir = serverRoot + FILE_SEPARATOR + 
-    		SCHEMAS_DIR + FILE_SEPARATOR;    	
-    	//
-    	// Send a warning to the log file if the XML Schema file is missing
-    	//
-    	String schemaName = schemasDir + partMeta.getLabel() + XML_SCHEMA_EXTENSION;
-    	try {
-    		schemaFile = new File(schemaName);
-    	} catch (Exception e) {
-    		if (logger.isWarnEnabled() == true) {
-    			logger.warn("Missing schema file for incoming payload: " + schemaName);
-    		}
-    	}
-    	
-    	return schemaFile;
-    }
-    
-    /**
-     * parseProperties given payload to create XML document. this
-     * method also closes given stream after parsing.
-     * @param payload stream
-     * @param partMeta 
-     * @param validate - whether or not to validate the payload with an XML Schema
-     * @return parsed Document
-     * @throws Exception
-     */
-    public static Document parseDocument(InputStream payload, ObjectPartType partMeta, Boolean validate)
-            throws Exception {
-    	final String JAXP_SCHEMA_SOURCE =
-            "http://java.sun.com/xml/jaxp/properties/schemaSource";
-    	final String JAXP_SCHEMA_LANGUAGE =
-            "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
-        final String W3C_XML_SCHEMA =
-            "http://www.w3.org/2001/XMLSchema";    	
-    	
-        Document result = null;
-        // Log the incoming unprocessed payload
-    	if (logger.isDebugEnabled() == true) {
-    		if (payload instanceof ByteArrayInputStream) {
-    			payload = logByteArrayInputStream((ByteArrayInputStream)payload);
-    		}
-    	}    	
-    	
-    	File schemaFile = null;
-    	if (validate == true) {
-    		schemaFile = getXMLSchema(partMeta);
-    	}
-    	
-    	//
-    	// Create and setup a DOMBuilder factory.
-    	//
-        try {
-            // Create a builder factory
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            //
-            // Lexical Control Settings that focus on content
-            //
-            factory.setCoalescing(true);
-            factory.setExpandEntityReferences(true);
-            factory.setIgnoringComments(true);
-            factory.setIgnoringElementContentWhitespace(true);            
-            //
-            // Enable XML validation if we found an XML Schema for the payload
-            //
-            try {
-            	if (schemaFile != null) {
-                    factory.setValidating(true);
-                    factory.setNamespaceAware(true);
-                	factory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
-            		factory.setAttribute(JAXP_SCHEMA_SOURCE, schemaFile);
-            	}
-            } catch (IllegalArgumentException e) {
-                String msg = "Error: JAXP DocumentBuilderFactory attribute not recognized: " +
-                        JAXP_SCHEMA_LANGUAGE + ". Check to see if parser conforms to JAXP 1.2 spec.";
-                if (logger.isWarnEnabled() == true) {
-                	logger.warn(msg);
-                }
-                throw e;
-            }
-            //
-            // Create the builder and parse the file
-            //
-            DocumentBuilder db = factory.newDocumentBuilder();
-            db.setErrorHandler(null);
-            result = db.parse(payload);
-            
-            // Write it to the log so we can see what we've created.
-            if (logger.isDebugEnabled() == true) {
-            	logger.debug(xmlToString(result));
-            	//System.out.println(xmlToString(result)); //FIXME: REM - Need this until we figure out why messages are not showing up in logger.
-            }
-        } finally {
-            if (payload != null) {
-                payload.close();
-            }
-        }
-        
-        return result;
-    }
 
-    /**
-     * parseProperties extract given payload (XML) into Name-Value properties. this
-     * @param document to parse
-     * @return map key=property name, value=property value
-     * @throws Exception
-     */
-    public static Map<String, Object> parseProperties(Node document)
-            throws Exception {
-        HashMap<String, Object> objectProps = new HashMap<String, Object>();
-        // Get a list of all elements in the document
-        Node root = document;//.getFirstChild();
-        NodeList rootChildren = root.getChildNodes();
-        for (int i = 0; i < rootChildren.getLength(); i++) {
-            Node node = rootChildren.item(i);
-            String name = node.getNodeName();
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                NodeList nodeChildren = node.getChildNodes();
-                int nodeChildrenLen = nodeChildren.getLength();
-                Node firstChild = nodeChildren.item(0);
-                Object value = null;
-                if (firstChild != null) {
-                    //first child node could be a whitespace char CSPACE-1026
-                    //so, check for number of children too
-                    if (firstChild.getNodeType() == Node.TEXT_NODE
-                            && nodeChildrenLen == 1) {
-                        value = getTextNodeValue(node);
-                    } else {
-                        value = getMultiValues(node);
-                    }                    
-                }
-                //
-                // Set the value even if it's null.
-                // A null value implies a clear/delete of the property
-                //
-                objectProps.put(name, value);
-            }
-        }
-        return objectProps;
-    }
+			String s = new String(buff);
+			logger.debug(s);
+			//
+			// Essentially, reset the stream and return it in its original state
+			//
+			result = new ByteArrayInputStream(buff);
+		}
 
-    /**
-     * getMultiStringValues retrieve multi-value element values
-     * assumption: backend does not support more than 1 level deep hierarchy
-     * @param node
-     * @return
-     */
-    private static String[] getMultiStringValues(Node node) {
-        ArrayList<String> vals = new ArrayList<String>();
-        NodeList nodeChildren = node.getChildNodes();
-        for (int i = 0; i < nodeChildren.getLength(); i++) {
-            Node child = nodeChildren.item(i);
-            String name = child.getNodeName();
-            //assumption: backend does not support more than 2 levels deep
-            //hierarchy
-            String value = null;
-            if (child.getNodeType() == Node.ELEMENT_NODE) {
-                value = getTextNodeValue(child);
-                vals.add(qualify(name, value));
-            }
-        }
-        return vals.toArray(new String[0]);
-    }
-    
-    /**
-     * Removes all the immediate child text nodes.
-     *
-     * @param parent the parent
-     * @return the element
-     */
-    private static Node removeTextNodes(Node parent) {
-    	Node result = parent;
-    	
-    	NodeList nodeList = parent.getChildNodes();
-    	int nodeListSize = nodeList.getLength();
-    	for (int i = 0; i < nodeListSize; i++) {
-    		Node child = nodeList.item(i);
-    		if (child != null && child.getNodeType() == Node.TEXT_NODE) {
-    			parent.removeChild(child);
-    		}
-    	}
-    	
-    	return result;
-    }
+		return result;
+	}
 
-    /**
-     * getMultiValues retrieve multi-value element values
-     * assumption: backend does not support more than 1 level deep hierarchy
-     * @param node
-     * @return
-     */
-    private static Object getMultiValues(Node node) throws Exception {
-    	Object result = null;    	
-    	
-        Node nodeWithoutTextNodes = removeTextNodes(node);
-        NodeList children = nodeWithoutTextNodes.getChildNodes();
-        for (int j = 0; j < children.getLength(); j++) {
+	/**
+	 * Gets the xML schema.
+	 *
+	 * @param partMeta the part meta
+	 * @return the xML schema
+	 * @throws Exception the exception
+	 */
+	private static File getXMLSchema(ObjectPartType partMeta)
+	throws Exception {
+		final String FILE_SEPARATOR = System.getProperty("file.separator");
+		final String XML_SCHEMA_EXTENSION = ".xsd";
+		final String SCHEMAS_DIR = "schemas";
 
-            Node grandChild = children.item(j).getFirstChild();
+		File schemaFile = null;
 
-            // If any grandchild is non-null, return values for all grandchildren.
-            if (grandChild != null) {
-                if (grandChild.getNodeType() == Node.TEXT_NODE) {
-                        result = getMultiStringValues(node);
-                } else {
-                    ArrayList<Map<String, Object>> values = new ArrayList<Map<String, Object>>();
-                    NodeList nodeChildren = node.getChildNodes();
-                    for (int i = 0; i < nodeChildren.getLength(); i++) {
-                        Node nodeChild = nodeChildren.item(i);
-                        Map<String, Object> hashMap = parseProperties(nodeChild);
-                        values.add(hashMap);
-                    }
-                    result = values;
-                }
-                break;
-            }
+		//
+		// Look for an XML Schema (.xsd) file for the incoming part payload
+		//
+		String serverRoot = ServiceMain.getInstance().getServerRootDir();
+		String schemasDir = serverRoot + FILE_SEPARATOR + 
+		SCHEMAS_DIR + FILE_SEPARATOR;    	
+		//
+		// Send a warning to the log file if the XML Schema file is missing
+		//
+		String schemaName = schemasDir + partMeta.getLabel() + XML_SCHEMA_EXTENSION;
+		try {
+			schemaFile = new File(schemaName);
+		} catch (Exception e) {
+			if (logger.isWarnEnabled() == true) {
+				logger.warn("Missing schema file for incoming payload: " + schemaName);
+			}
+		}
 
-        }
-        
-        return result;
-    }
+		return schemaFile;
+	}
+	
+	/**
+	 * Logger setup.
+	 */
+	public static void loggerSetup() {
+		//empty method
+	}
 
-    /**
-     * getTextNodeValue retrieves text node value
-     * @param cnode
-     * @return
-     */
-    private static String getTextNodeValue(Node cnode) {
-        String value = "";
-        Node ccnode = cnode.getFirstChild();
-        if (ccnode != null && ccnode.getNodeType() == Node.TEXT_NODE) {
-            value = ccnode.getNodeValue();
-        }
-        return value.trim();
-    }
+	/**
+	 * parseProperties given payload to create XML document. this
+	 * method also closes given stream after parsing.
+	 * @param payload stream
+	 * @param partMeta 
+	 * @param validate - whether or not to validate the payload with an XML Schema
+	 * @return parsed Document
+	 * @throws Exception
+	 */
+	public static Document parseDocument(InputStream payload, ObjectPartType partMeta, Boolean validate)
+	throws Exception {
+		final String JAXP_SCHEMA_SOURCE =
+			"http://java.sun.com/xml/jaxp/properties/schemaSource";
+		final String JAXP_SCHEMA_LANGUAGE =
+			"http://java.sun.com/xml/jaxp/properties/schemaLanguage";
+		final String W3C_XML_SCHEMA =
+			"http://www.w3.org/2001/XMLSchema";    	
 
-    /**
-     * isQualified check if the given value is already qualified with given property name
-     * e.g.  otherNumber|urn:org.collectionspace.id:24082390 is qualified with otherNumber
-     * but urn:org.walkerart.id:123 is not qualified
-     * @param name of the property, e.g. otherNumber
-     * @param value of the property e.g. otherNumber
-     * @return
-     */
-    private static boolean isQualified(String name, String value) {
-        StringTokenizer stz = new StringTokenizer(value, NAME_VALUE_SEPARATOR);
-        int tokens = stz.countTokens();
-        if (tokens == 2) {
-            String n = stz.nextToken();
-            return name.equals(n);
-        }
-        return false;
-    }
+		Document result = null;
+		// Log the incoming unprocessed payload
+		if (logger.isDebugEnabled() == true) {
+			if (payload instanceof ByteArrayInputStream) {
+				payload = logByteArrayInputStream((ByteArrayInputStream)payload);
+			}
+		}    	
 
-    /**
-     * qualify qualifies given property value with given property name, e.g.
-     * name=otherNumber and value=urn:org.collectionspace.id:24082390 would be
-     * qualified as otherNumber|urn:org.collectionspace.id:24082390. however,
-     * name=otherNumber and value=otherNumber|urn:org.collectionspace.id:24082390
-     * would be ignored as the given value is already qualified once.
-     * @param name
-     * @param value
-     * @return
-     */
-    private static String qualify(String name, String value) {
-    	/*
+		File schemaFile = null;
+		if (validate == true) {
+			schemaFile = getXMLSchema(partMeta);
+		}
+
+		//
+		// Create and setup a DOMBuilder factory.
+		//
+		try {
+			// Create a builder factory
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			//
+			// Lexical Control Settings that focus on content
+			//
+			factory.setCoalescing(true);
+			factory.setExpandEntityReferences(true);
+			factory.setIgnoringComments(true);
+			factory.setIgnoringElementContentWhitespace(true);            
+			//
+			// Enable XML validation if we found an XML Schema for the payload
+			//
+			try {
+				if (schemaFile != null) {
+					factory.setValidating(true);
+					factory.setNamespaceAware(true);
+					factory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
+					factory.setAttribute(JAXP_SCHEMA_SOURCE, schemaFile);
+				}
+			} catch (IllegalArgumentException e) {
+				String msg = "Error: JAXP DocumentBuilderFactory attribute not recognized: " +
+				JAXP_SCHEMA_LANGUAGE + ". Check to see if parser conforms to JAXP 1.2 spec.";
+				if (logger.isWarnEnabled() == true) {
+					logger.warn(msg);
+				}
+				throw e;
+			}
+			//
+			// Create the builder and parse the file
+			//
+			DocumentBuilder db = factory.newDocumentBuilder();
+			db.setErrorHandler(null);
+			result = db.parse(payload);
+
+			// Write it to the log so we can see what we've created.
+			if (logger.isDebugEnabled() == true) {
+				logger.debug(xmlToString(result));
+				//System.out.println(xmlToString(result)); //FIXME: REM - Need this until we figure out why messages are not showing up in logger.
+			}
+		} finally {
+			if (payload != null) {
+				payload.close();
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * parseProperties extract given payload (XML) into Name-Value properties. this
+	 * @param document to parse
+	 * @return map key=property name, value=property value
+	 * @throws Exception
+	 */
+	public static Map<String, Object> parseProperties(Node document)
+	throws Exception {
+		HashMap<String, Object> objectProps = new HashMap<String, Object>();
+		// Get a list of all elements in the document
+		Node root = document;//.getFirstChild();
+		NodeList rootChildren = root.getChildNodes();
+		for (int i = 0; i < rootChildren.getLength(); i++) {
+			Node node = rootChildren.item(i);
+			String name = node.getNodeName();
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				NodeList nodeChildren = node.getChildNodes();
+				int nodeChildrenLen = nodeChildren.getLength();
+				Node firstChild = nodeChildren.item(0);
+				Object value = null;
+				if (firstChild != null) {
+					//first child node could be a whitespace char CSPACE-1026
+					//so, check for number of children too
+					if (firstChild.getNodeType() == Node.TEXT_NODE
+							&& nodeChildrenLen == 1) {
+						value = getTextNodeValue(node);
+					} else {
+						value = getMultiValues(node);
+					}                    
+				}
+				//
+				// Set the value even if it's null.
+				// A null value implies a clear/delete of the property
+				//
+				objectProps.put(name, value);
+			}
+		}
+		return objectProps;
+	}
+
+	/**
+	 * getMultiStringValues retrieve multi-value element values
+	 * assumption: backend does not support more than 1 level deep hierarchy
+	 * @param node
+	 * @return
+	 */
+	private static String[] getMultiStringValues(Node node) {
+		ArrayList<String> vals = new ArrayList<String>();
+		NodeList nodeChildren = node.getChildNodes();
+		for (int i = 0; i < nodeChildren.getLength(); i++) {
+			Node child = nodeChildren.item(i);
+			String name = child.getNodeName();
+			//assumption: backend does not support more than 2 levels deep
+			//hierarchy
+			String value = null;
+			if (child.getNodeType() == Node.ELEMENT_NODE) {
+				value = getTextNodeValue(child);
+				vals.add(qualify(name, value));
+			}
+		}
+		return vals.toArray(new String[0]);
+	}
+
+	/**
+	 * Removes all the immediate child text nodes.
+	 *
+	 * @param parent the parent
+	 * @return the element
+	 */
+	private static Node removeTextNodes(Node parent) {
+		Node result = parent;
+
+		NodeList nodeList = parent.getChildNodes();
+		int nodeListSize = nodeList.getLength();
+		for (int i = 0; i < nodeListSize; i++) {
+			Node child = nodeList.item(i);
+			if (child != null && child.getNodeType() == Node.TEXT_NODE) {
+				parent.removeChild(child);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * getMultiValues retrieve multi-value element values
+	 * assumption: backend does not support more than 1 level deep hierarchy
+	 * @param node
+	 * @return
+	 */
+	private static Object getMultiValues(Node node) throws Exception {
+		Object result = null;    	
+
+		Node nodeWithoutTextNodes = removeTextNodes(node);
+		NodeList children = nodeWithoutTextNodes.getChildNodes();
+		for (int j = 0; j < children.getLength(); j++) {
+
+			Node grandChild = children.item(j).getFirstChild();
+
+			// If any grandchild is non-null, return values for all grandchildren.
+			if (grandChild != null) {
+				if (grandChild.getNodeType() == Node.TEXT_NODE) {
+					result = getMultiStringValues(node);
+				} else {
+					ArrayList<Map<String, Object>> values = new ArrayList<Map<String, Object>>();
+					NodeList nodeChildren = node.getChildNodes();
+					for (int i = 0; i < nodeChildren.getLength(); i++) {
+						Node nodeChild = nodeChildren.item(i);
+						Map<String, Object> hashMap = parseProperties(nodeChild);
+						values.add(hashMap);
+					}
+					result = values;
+				}
+				break;
+			}
+
+		}
+
+		return result;
+	}
+
+	/**
+	 * getTextNodeValue retrieves text node value
+	 * @param cnode
+	 * @return
+	 */
+	private static String getTextNodeValue(Node cnode) {
+		String value = "";
+		Node ccnode = cnode.getFirstChild();
+		if (ccnode != null && ccnode.getNodeType() == Node.TEXT_NODE) {
+			value = ccnode.getNodeValue();
+		}
+		return value.trim();
+	}
+
+	/**
+	 * isQualified check if the given value is already qualified with given property name
+	 * e.g.  otherNumber|urn:org.collectionspace.id:24082390 is qualified with otherNumber
+	 * but urn:org.walkerart.id:123 is not qualified
+	 * @param name of the property, e.g. otherNumber
+	 * @param value of the property e.g. otherNumber
+	 * @return
+	 */
+	private static boolean isQualified(String name, String value) {
+		StringTokenizer stz = new StringTokenizer(value, NAME_VALUE_SEPARATOR);
+		int tokens = stz.countTokens();
+		if (tokens == 2) {
+			String n = stz.nextToken();
+			return name.equals(n);
+		}
+		return false;
+	}
+
+	/**
+	 * qualify qualifies given property value with given property name, e.g.
+	 * name=otherNumber and value=urn:org.collectionspace.id:24082390 would be
+	 * qualified as otherNumber|urn:org.collectionspace.id:24082390. however,
+	 * name=otherNumber and value=otherNumber|urn:org.collectionspace.id:24082390
+	 * would be ignored as the given value is already qualified once.
+	 * @param name
+	 * @param value
+	 * @return
+	 */
+	private static String qualify(String name, String value) {
+		/*
         String result = null;
         if (isQualified(name, value)) {
             result = value;
@@ -441,308 +459,397 @@ public class DocumentUtils {
         	result = name + NAME_VALUE_SEPARATOR + value;
         }
         return result;
-        */
-    	return value;
-    }
+		 */
+		return value;
+	}
 
-    /**
-     * buildDocument builds org.w3c.dom.Document from given properties using
-     * given metadata for a part
-     * @param partMeta
-     * @param rootElementName
-     * @param objectProps
-     * @return Document
-     * @throws Exception
-     */
-    public static Document buildDocument(ObjectPartType partMeta, String rootElementName,
-            Map<String, Object> objectProps)
-            throws Exception {
-        ObjectPartContentType partContentMeta = partMeta.getContent();
-        XmlContentType xc = partContentMeta.getXmlContent();
-        if (xc == null) {
-            return null;
-        }
+	/**
+	 * buildDocument builds org.w3c.dom.Document from given properties using
+	 * given metadata for a part
+	 * @param partMeta
+	 * @param rootElementName
+	 * @param objectProps
+	 * @return Document
+	 * @throws Exception
+	 */
+	public static Document buildDocument(ObjectPartType partMeta, String rootElementName,
+			Map<String, Object> objectProps)
+	throws Exception {
+		ObjectPartContentType partContentMeta = partMeta.getContent();
+		XmlContentType xc = partContentMeta.getXmlContent();
+		if (xc == null) {
+			return null;
+		}
 
-        //FIXME: We support XML validation on the way in, so we should add it here (on the way out) as well.
-        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document document = builder.newDocument();
-        document.setXmlStandalone(true);
-        //JAXB unmarshaller recognizes the following kind of namespace qualification
-        //only. More investigation is needed to use other prefix
+		//FIXME: We support XML validation on the way in, so we should add it here (on the way out) as well.
+		DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		Document document = builder.newDocument();
+		document.setXmlStandalone(true);
+		//JAXB unmarshaller recognizes the following kind of namespace qualification
+		//only. More investigation is needed to use other prefix
 		// <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 		// <ns2:collectionobjects-common xmlns:ns2="http://collectionspace.org/services/collectionobject">
 		// <objectNumber>objectNumber-1252960222412</objectNumber>
 		// <objectName>objectName-1252960222412</objectName>
 		// </ns2:collectionobjects-common>
 
-        String ns = "ns2";
-        Element root = document.createElementNS(xc.getNamespaceURI(), ns + ":" + rootElementName);
-        root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-        root.setAttribute("xsi:schemaLocation", xc.getSchemaLocation());
-        root.setAttribute("xmlns:" + ns, xc.getNamespaceURI());
-        document.appendChild(root);
+		String ns = "ns2";
+		Element root = document.createElementNS(xc.getNamespaceURI(), ns + ":" + rootElementName);
+		root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+		root.setAttribute("xsi:schemaLocation", xc.getSchemaLocation());
+		root.setAttribute("xmlns:" + ns, xc.getNamespaceURI());
+		document.appendChild(root);
 
-        Schema schema = getSchemaFromName(partMeta.getLabel());
-        
-        buildDocument(document, root, objectProps, schema);
-        
-        return document;
-    }
-    
-    /**
-     * Builds the document.
-     *
-     * @param document the document
-     * @param e the e
-     * @param objectProps the object props
-     * @throws Exception the exception
-     */
-    public static void buildDocument(Document document, Element parent,
-            Map<String, Object> objectProps, Schema schema) throws Exception {
-        for (String prop : objectProps.keySet()) {
-            Object value = objectProps.get(prop);
-            if (value != null) {
-            	Field field = schema.getField(prop);
-            	// If there is no field, then we added this property to the properties, 
-            	// and it must be a String (e.g., CSID)
-            	// TODO - infer the type from the type of Object, if we need more than String
-            	if(field==null) {
-            		field = new FieldImpl(new QName(prop), schema, StringType.INSTANCE);
-            	}
-            	buildProperty(document, parent, field, value);
-            }
-        }
-    }
+		Schema schema = getSchemaFromName(partMeta.getLabel());
 
-    private static void buildProperty(Document document, Element parent, 
-    		Field field, Object value) throws IOException {
-    	Type type = field.getType();
-                //no need to qualify each element name as namespace is already added
-    	String propName = field.getName().getLocalName();
-    	Element element = document.createElement(propName);
-    	parent.appendChild(element);
-    	// extract the element content
-    	if (type.isSimpleType()) {
-    		element.setTextContent(type.encode(value));
-    	} else if (type.isComplexType()) {
-    		ComplexType ctype = (ComplexType) type;
-    		if (ctype.getName().equals(TypeConstants.CONTENT)) {
-    			throw new RuntimeException(
-    					"Unexpected schema type: BLOB for field: "+propName);
-                } else {
-    			buildComplex(document, element, ctype, (Map) value);
-                }
-    	} else if (type.isListType()) {
-    		if (value instanceof List) {
-    			buildList(document, element, (ListType) type, (List) value);
-    		} else if (value.getClass().getComponentType() != null) {
-    			buildList(document, element, (ListType) type,
-    					PrimitiveArrays.toList(value));
-    		} else {
-    			throw new IllegalArgumentException(
-    					"A value of list type is neither list neither array: "
-    					+ value);
-            }
-        }
-    }
+		buildDocument(document, root, objectProps, schema);
 
-    private static void buildComplex(Document document, Element element, 
-    		ComplexType ctype, Map map) throws IOException {
-    	Iterator<Map.Entry> it = map.entrySet().iterator();
-    	while (it.hasNext()) {
-    		Map.Entry entry = it.next();
-    		String propName = entry.getKey().toString();
-    		buildProperty(document, element, 
-    				ctype.getField(propName), entry.getValue());
-    	}
-    }
+		return document;
+	}
 
-    private static void buildList(Document document, Element element, 
-    		ListType ltype, List list) throws IOException {
-    	Field field = ltype.getField();
-    	for (Object obj : list) {
-    		buildProperty(document, element, field, obj);
-    	}
-    }
+	/**
+	 * Builds the document.
+	 *
+	 * @param document the document
+	 * @param e the e
+	 * @param objectProps the object props
+	 * @throws Exception the exception
+	 */
+	public static void buildDocument(Document document, Element parent,
+			Map<String, Object> objectProps, Schema schema) throws Exception {
+		for (String prop : objectProps.keySet()) {
+			Object value = objectProps.get(prop);
+			if (value != null) {
+				Field field = schema.getField(prop);
+				// If there is no field, then we added this property to the properties, 
+				// and it must be a String (e.g., CSID)
+				// TODO - infer the type from the type of Object, if we need more than String
+				if(field==null) {
+					field = new FieldImpl(new QName(prop), schema, StringType.INSTANCE);
+				}
+				buildProperty(document, parent, field, value);
+			}
+		}
+	}
 
-    /*
-     * Returns a schema, given the name of a schema.
-     *
-     * @param schemaName  a schema name.
-     * @return  a schema.
-     */
-    public static Schema getSchemaFromName(String schemaName) {
-        SchemaManager schemaManager = Framework.getLocalService(SchemaManager.class);
-        return schemaManager.getSchema(schemaName);
-    }
+	/**
+	 * Builds the property.
+	 *
+	 * @param document the document
+	 * @param parent the parent
+	 * @param field the field
+	 * @param value the value
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	private static void buildProperty(Document document, Element parent, 
+			Field field, Object value) throws IOException {
+		Type type = field.getType();
+		//no need to qualify each element name as namespace is already added
+		String propName = field.getName().getLocalName();
+		Element element = document.createElement(propName);
+		parent.appendChild(element);
+		// extract the element content
+		if (type.isSimpleType()) {
+			element.setTextContent(type.encode(value));
+		} else if (type.isComplexType()) {
+			ComplexType ctype = (ComplexType) type;
+			if (ctype.getName().equals(TypeConstants.CONTENT)) {
+				throw new RuntimeException(
+						"Unexpected schema type: BLOB for field: "+propName);
+			} else {
+				buildComplex(document, element, ctype, (Map) value);
+			}
+		} else if (type.isListType()) {
+			if (value instanceof List) {
+				buildList(document, element, (ListType) type, (List) value);
+			} else if (value.getClass().getComponentType() != null) {
+				buildList(document, element, (ListType) type,
+						PrimitiveArrays.toList(value));
+			} else {
+				throw new IllegalArgumentException(
+						"A value of list type is neither list neither array: "
+						+ value);
+			}
+		}
+	}
 
-    /*
-     * Returns the schema part of a presumably schema-qualified field name.
-     *
-     * If the schema part is null or empty, returns an empty string.
-     *
-     * @param schemaQualifiedFieldName  a schema-qualified field name.
-     * @return  the schema part of the field name.
-     */
+	/**
+	 * Builds the complex.
+	 *
+	 * @param document the document
+	 * @param element the element
+	 * @param ctype the ctype
+	 * @param map the map
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	private static void buildComplex(Document document, Element element, 
+			ComplexType ctype, Map map) throws IOException {
+		Iterator<Map.Entry> it = map.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry entry = it.next();
+			String propName = entry.getKey().toString();
+			buildProperty(document, element, 
+					ctype.getField(propName), entry.getValue());
+		}
+	}
 
-    //FIXME: Might instead use Nuxeo's built-in QName class.
-    public static String getSchemaNamePart(String schemaQualifiedFieldName) {
-        if (schemaQualifiedFieldName == null || schemaQualifiedFieldName.trim().isEmpty()) {
-            return "";
-        }
-        if (schemaQualifiedFieldName.indexOf(SCHEMA_FIELD_DELIMITER) > 0) {
-            String[] schemaQualifiedFieldNameParts =
-                    schemaQualifiedFieldName.split(SCHEMA_FIELD_DELIMITER);
-            String schemaName = schemaQualifiedFieldNameParts[0];
-            return schemaName;
-        } else {
-            return "";
-        }
-    }
+	/**
+	 * Builds the list.
+	 *
+	 * @param document the document
+	 * @param element the element
+	 * @param ltype the ltype
+	 * @param list the list
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	private static void buildList(Document document, Element element, 
+			ListType ltype, List list) throws IOException {
+		Field field = ltype.getField();
+		for (Object obj : list) {
+			buildProperty(document, element, field, obj);
+		}
+	}
 
-    /*
-     * Returns a list of delimited strings, by splitting the supplied string
-     * on a supplied delimiter.
-     *
-     * @param str  A string to split on a delimiter.
-     * @param delmiter  A delimiter on which the string will be split into parts.
-     * 
-     * @return  A list of delimited strings.  Returns an empty list if either
-     * the string or delimiter are null or empty, or if the delimiter cannot
-     * be found in the string.
-     */
-    public static List<String> getDelimitedParts(String str, String delimiter) {
-        List<String> parts = new ArrayList<String>();
-        if (str == null || str.trim().isEmpty()) {
-            return parts;
-        }
-        if (delimiter == null || delimiter.trim().isEmpty()) {
-            return parts;
-        }
-        StringTokenizer stz = new StringTokenizer(str, delimiter);
-        while (stz.hasMoreTokens()) {
-            parts.add(stz.nextToken());
-        }
-        return parts;
-    }
+	/*
+	 * Returns a schema, given the name of a schema.
+	 *
+	 * @param schemaName  a schema name.
+	 * @return  a schema.
+	 */
+	/**
+	 * Gets the schema from name.
+	 *
+	 * @param schemaName the schema name
+	 * @return the schema from name
+	 */
+	public static Schema getSchemaFromName(String schemaName) {
+		SchemaManager schemaManager = Framework.getLocalService(SchemaManager.class);
+		return schemaManager.getSchema(schemaName);
+	}
 
-    public static String getAncestorAuthRefFieldName(String str) {
-        List<String> parts = getDelimitedParts(str, AUTHREF_FIELD_NAME_DELIMITER);
-        if (parts.size() > 0) {
-            return parts.get(0).trim();
-        } else {
-            return str;
-        }
-    }
+	/*
+	 * Returns the schema part of a presumably schema-qualified field name.
+	 *
+	 * If the schema part is null or empty, returns an empty string.
+	 *
+	 * @param schemaQualifiedFieldName  a schema-qualified field name.
+	 * @return  the schema part of the field name.
+	 */
 
-    public static String getDescendantAuthRefFieldName(String str) {
-        List<String> parts = getDelimitedParts(str, AUTHREF_FIELD_NAME_DELIMITER);
-        if (parts.size() > 1) {
-            return parts.get(1).trim();
-        } else {
-            return str;
-        }
-    }
+	//FIXME: Might instead use Nuxeo's built-in QName class.
+	/**
+	 * Gets the schema name part.
+	 *
+	 * @param schemaQualifiedFieldName the schema qualified field name
+	 * @return the schema name part
+	 */
+	public static String getSchemaNamePart(String schemaQualifiedFieldName) {
+		if (schemaQualifiedFieldName == null || schemaQualifiedFieldName.trim().isEmpty()) {
+			return "";
+		}
+		if (schemaQualifiedFieldName.indexOf(SCHEMA_FIELD_DELIMITER) > 0) {
+			String[] schemaQualifiedFieldNameParts =
+				schemaQualifiedFieldName.split(SCHEMA_FIELD_DELIMITER);
+			String schemaName = schemaQualifiedFieldNameParts[0];
+			return schemaName;
+		} else {
+			return "";
+		}
+	}
 
-    /*
-     * Returns the relevant authRef field name from a fieldName, which may
-     * potentially be in the form of a single field name, or a delimited pair
-     * of field names, that in turn consists of an ancestor field name and a
-     * descendant field name.
-     *
-     * If a delimited pair of names is provided, will return the descendant
-     * field name from that pair, if present.  Otherwise, will return the
-     * ancestor name from that pair.
-     *
-     * Will return the relevant authRef field name as schema-qualified
-     * (i.e. schema prefixed), if the schema name was present, either in
-     * the supplied simple field name or in the ancestor name in the
-     * delimited pair of names.
-     *
-     * @param fieldNameOrNames  A field name or delimited pair of field names.
-     *
-     * @return The relevant authRef field name, as described.
-     */
-    public static String getDescendantOrAncestor(String fieldNameOrNames) {
-        String fName = "";
-        if (fieldNameOrNames == null || fieldNameOrNames.trim().isEmpty()) {
-            return fName;
-        }
-        String descendantAuthRefFieldName = getDescendantAuthRefFieldName(fieldNameOrNames);
-        if (descendantAuthRefFieldName != null && !descendantAuthRefFieldName.trim().isEmpty()) {
-            fName = descendantAuthRefFieldName;
-        } else {
-            fName = getAncestorAuthRefFieldName(fieldNameOrNames);
-        }
-        if (getSchemaNamePart(fName).isEmpty()) {
-            String schemaName = getSchemaNamePart(getAncestorAuthRefFieldName(fieldNameOrNames));
-            if (! schemaName.trim().isEmpty()) {
-                fName = appendSchemaName(schemaName, fName);
-            }
-        }
-        return fName;
-    }
+	/*
+	 * Returns a list of delimited strings, by splitting the supplied string
+	 * on a supplied delimiter.
+	 *
+	 * @param str  A string to split on a delimiter.
+	 * @param delmiter  A delimiter on which the string will be split into parts.
+	 * 
+	 * @return  A list of delimited strings.  Returns an empty list if either
+	 * the string or delimiter are null or empty, or if the delimiter cannot
+	 * be found in the string.
+	 */
+	/**
+	 * Gets the delimited parts.
+	 *
+	 * @param str the str
+	 * @param delimiter the delimiter
+	 * @return the delimited parts
+	 */
+	public static List<String> getDelimitedParts(String str, String delimiter) {
+		List<String> parts = new ArrayList<String>();
+		if (str == null || str.trim().isEmpty()) {
+			return parts;
+		}
+		if (delimiter == null || delimiter.trim().isEmpty()) {
+			return parts;
+		}
+		StringTokenizer stz = new StringTokenizer(str, delimiter);
+		while (stz.hasMoreTokens()) {
+			parts.add(stz.nextToken());
+		}
+		return parts;
+	}
+
+	/**
+	 * Gets the ancestor auth ref field name.
+	 *
+	 * @param str the str
+	 * @return the ancestor auth ref field name
+	 */
+	public static String getAncestorAuthRefFieldName(String str) {
+		List<String> parts = getDelimitedParts(str, AUTHREF_FIELD_NAME_DELIMITER);
+		if (parts.size() > 0) {
+			return parts.get(0).trim();
+		} else {
+			return str;
+		}
+	}
+
+	/**
+	 * Gets the descendant auth ref field name.
+	 *
+	 * @param str the str
+	 * @return the descendant auth ref field name
+	 */
+	public static String getDescendantAuthRefFieldName(String str) {
+		List<String> parts = getDelimitedParts(str, AUTHREF_FIELD_NAME_DELIMITER);
+		if (parts.size() > 1) {
+			return parts.get(1).trim();
+		} else {
+			return str;
+		}
+	}
+
+	/*
+	 * Returns the relevant authRef field name from a fieldName, which may
+	 * potentially be in the form of a single field name, or a delimited pair
+	 * of field names, that in turn consists of an ancestor field name and a
+	 * descendant field name.
+	 *
+	 * If a delimited pair of names is provided, will return the descendant
+	 * field name from that pair, if present.  Otherwise, will return the
+	 * ancestor name from that pair.
+	 *
+	 * Will return the relevant authRef field name as schema-qualified
+	 * (i.e. schema prefixed), if the schema name was present, either in
+	 * the supplied simple field name or in the ancestor name in the
+	 * delimited pair of names.
+	 *
+	 * @param fieldNameOrNames  A field name or delimited pair of field names.
+	 *
+	 * @return The relevant authRef field name, as described.
+	 */
+	/**
+	 * Gets the descendant or ancestor.
+	 *
+	 * @param fieldNameOrNames the field name or names
+	 * @return the descendant or ancestor
+	 */
+	public static String getDescendantOrAncestor(String fieldNameOrNames) {
+		String fName = "";
+		if (fieldNameOrNames == null || fieldNameOrNames.trim().isEmpty()) {
+			return fName;
+		}
+		String descendantAuthRefFieldName = getDescendantAuthRefFieldName(fieldNameOrNames);
+		if (descendantAuthRefFieldName != null && !descendantAuthRefFieldName.trim().isEmpty()) {
+			fName = descendantAuthRefFieldName;
+		} else {
+			fName = getAncestorAuthRefFieldName(fieldNameOrNames);
+		}
+		if (getSchemaNamePart(fName).isEmpty()) {
+			String schemaName = getSchemaNamePart(getAncestorAuthRefFieldName(fieldNameOrNames));
+			if (! schemaName.trim().isEmpty()) {
+				fName = appendSchemaName(schemaName, fName);
+			}
+		}
+		return fName;
+	}
 
 
-    /*
-     * Returns a schema-qualified field name, given a schema name and field name.
-     *
-     * If the schema name is null or empty, returns the supplied field name.
-     *
-     * @param schemaName  a schema name.
-     * @param fieldName  a field name.
-     * @return  a schema-qualified field name.
-     */
-    public static String appendSchemaName(String schemaName, String fieldName) {
-        if (schemaName == null || schemaName.trim().isEmpty()) {
-            return fieldName;
-        }
-        return schemaName + SCHEMA_FIELD_DELIMITER + fieldName;
-    }
+	/*
+	 * Returns a schema-qualified field name, given a schema name and field name.
+	 *
+	 * If the schema name is null or empty, returns the supplied field name.
+	 *
+	 * @param schemaName  a schema name.
+	 * @param fieldName  a field name.
+	 * @return  a schema-qualified field name.
+	 */
+	/**
+	 * Append schema name.
+	 *
+	 * @param schemaName the schema name
+	 * @param fieldName the field name
+	 * @return the string
+	 */
+	public static String appendSchemaName(String schemaName, String fieldName) {
+		if (schemaName == null || schemaName.trim().isEmpty()) {
+			return fieldName;
+		}
+		return schemaName + SCHEMA_FIELD_DELIMITER + fieldName;
+	}
 
-    public static boolean isSimpleType(Property prop) {
-        boolean isSimple = false;
-        if (prop == null) {
-            return isSimple;
-        }
-        if (prop.getType().isSimpleType()) {
-            isSimple = true;
-        }
-        return isSimple;
-    }
+	/**
+	 * Checks if is simple type.
+	 *
+	 * @param prop the prop
+	 * @return true, if is simple type
+	 */
+	public static boolean isSimpleType(Property prop) {
+		boolean isSimple = false;
+		if (prop == null) {
+			return isSimple;
+		}
+		if (prop.getType().isSimpleType()) {
+			isSimple = true;
+		}
+		return isSimple;
+	}
 
-    public static boolean isListType(Property prop) {
-        boolean isList = false;
-        if (prop == null) {
-            return isList;
-        }
-        if (prop.getType().isListType()) {
-            isList = true;
-        }
-        return isList;
-    }
+	/**
+	 * Checks if is list type.
+	 *
+	 * @param prop the prop
+	 * @return true, if is list type
+	 */
+	public static boolean isListType(Property prop) {
+		boolean isList = false;
+		if (prop == null) {
+			return isList;
+		}
+		if (prop.getType().isListType()) {
+			isList = true;
+		}
+		return isList;
+	}
 
-    public static boolean isComplexType(Property prop) {
-        boolean isComplex = false;
-        if (prop == null) {
-            return isComplex;
-        }
-        if (prop.getType().isComplexType()) {
-            isComplex = true;
-        }
-        return isComplex;
-    }
+	/**
+	 * Checks if is complex type.
+	 *
+	 * @param prop the prop
+	 * @return true, if is complex type
+	 */
+	public static boolean isComplexType(Property prop) {
+		boolean isComplex = false;
+		if (prop == null) {
+			return isComplex;
+		}
+		if (prop.getType().isComplexType()) {
+			isComplex = true;
+		}
+		return isComplex;
+	}
 
 
-    /**
-     * Insert multi values.
-     *
-     * @param document the document
-     * @param e the e
-     * @param vals the vals
+	/**
+	 * Insert multi values.
+	 *
+	 * @param document the document
+	 * @param e the e
+	 * @param vals the vals
     private static void insertMultiStringValues(Document document, Element e, ArrayList<String> vals) {
         String parentName = e.getNodeName();
-        
+
         for (String o : vals) {
             String val = o;
             NameValue nv = unqualify(val);
@@ -751,15 +858,15 @@ public class DocumentUtils {
             insertTextNode(document, c, nv.value);
         }
     }
-     */
-    
-    /**
-     * Create a set of complex/structured elements from an array of Maps.
-     *
-     * @param document the document
-     * @param e the e
-     * @param vals the vals
-     * @throws Exception the exception
+	 */
+
+	/**
+	 * Create a set of complex/structured elements from an array of Maps.
+	 *
+	 * @param document the document
+	 * @param e the e
+	 * @param vals the vals
+	 * @throws Exception the exception
     private static void insertMultiHashMapValues(Document document, Element e, ArrayList<Map<String, Object>> vals)
     		throws Exception {
         String parentName = e.getNodeName();
@@ -781,23 +888,23 @@ public class DocumentUtils {
         	}
         	throw new Exception(msg);
         }
-                
+
         for (Map<String, Object> map : vals) {
             Element newNode = document.createElement(childName);
             e.appendChild(newNode);
             buildDocument(document, newNode, map);
         }
     }
-     */
+	 */
 
-    /**
-     * Create a set of elements for an array of values.  Currently, we're assuming the
-     * values can be only of type Map or String.
-     *
-     * @param document the document
-     * @param e the e
-     * @param vals the vals
-     * @throws Exception the exception
+	/**
+	 * Create a set of elements for an array of values.  Currently, we're assuming the
+	 * values can be only of type Map or String.
+	 *
+	 * @param document the document
+	 * @param e the e
+	 * @param vals the vals
+	 * @throws Exception the exception
     private static void insertMultiValues(Document document, Element e, ArrayList<?> vals)
     		throws Exception {
     	if (vals != null && vals.size() > 0) {
@@ -816,27 +923,27 @@ public class DocumentUtils {
 	    	}
     	}
     }
-     */
+	 */
 
-    /**
-     * Insert text node.
-     *
-     * @param document the document
-     * @param e the e
-     * @param strValue the str value
+	/**
+	 * Insert text node.
+	 *
+	 * @param document the document
+	 * @param e the e
+	 * @param strValue the str value
     private static void insertTextNode(Document document, Element e, String strValue) {
         Text tNode = document.createTextNode(strValue);
         e.appendChild(tNode);
     }
-     */
+	 */
 
-    /**
-     * unqualify given value.
-     * input of otherNumber|urn:org.collectionspace.id:24082390 would be unqualified
-     * as name=otherNumber and value=urn:org.collectionspace.id:24082390
-     * @param input
-     * @return name and value
-     * @exception IllegalStateException
+	/**
+	 * unqualify given value.
+	 * input of otherNumber|urn:org.collectionspace.id:24082390 would be unqualified
+	 * as name=otherNumber and value=urn:org.collectionspace.id:24082390
+	 * @param input
+	 * @return name and value
+	 * @exception IllegalStateException
     private static NameValue unqualify(String input) {
         NameValue nv = new NameValue();
         StringTokenizer stz = new StringTokenizer(input, NAME_VALUE_SEPARATOR);
@@ -853,63 +960,195 @@ public class DocumentUtils {
         }
         return nv;
     }
-     */
+	 */
 
-    /**
-     * writeDocument streams out given document to given output stream
-     * @param document
-     * @param os
-     * @throws Exception
-     */
-    public static void writeDocument(Document document, OutputStream os) throws Exception {
-        TransformerFactory tFactory =
-                TransformerFactory.newInstance();
-        Transformer transformer = tFactory.newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        DOMSource source = new DOMSource(document);
-        StreamResult result = new StreamResult(os);
-        transformer.transform(source, result);
-    }
+	/**
+	 * writeDocument streams out given document to given output stream
+	 * @param document
+	 * @param os
+	 * @throws Exception
+	 */
+	public static void writeDocument(Document document, OutputStream os) throws Exception {
+		TransformerFactory tFactory =
+			TransformerFactory.newInstance();
+		Transformer transformer = tFactory.newTransformer();
+		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		DOMSource source = new DOMSource(document);
+		StreamResult result = new StreamResult(os);
+		transformer.transform(source, result);
+	}
 
-    /**
-     * Xml to string.
-     *
-     * @param node the node
-     * @return the string
-     */
-    public static String xmlToString(Node node) {
-    	String result = null;
-    	
-        try {
-            Source source = new DOMSource(node);
-            StringWriter stringWriter = new StringWriter();
-            Result streamResult = new StreamResult(stringWriter);
-            TransformerFactory factory = TransformerFactory.newInstance();
-            Transformer transformer = factory.newTransformer();
-            transformer.transform(source, streamResult);
-            result = stringWriter.getBuffer().toString();
-        } catch (TransformerConfigurationException e) {
-            e.printStackTrace();
-        } catch (TransformerException e) {
-            e.printStackTrace();
-        }
-        
-        return result;
-    }    
+	/**
+	 * Xml to string.
+	 *
+	 * @param node the node
+	 * @return the string
+	 */
+	public static String xmlToString(Node node) {
+		String result = null;
 
-    /**
-     * getXmlDocoument retrieve w3c.Document from given file
-     * @param fileName
-     * @return Document
-     * @throws Exception
-     */
-    public static Document getXmlDocument(String fileName) throws Exception {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        File f = new File(fileName);
-        if (!f.exists()) {
-            throw new IllegalArgumentException("Test data file " + fileName + " not found!");
-        }
-        // Create the builder and parse the file
-        return factory.newDocumentBuilder().parse(f);
-    }
+		try {
+			Source source = new DOMSource(node);
+			StringWriter stringWriter = new StringWriter();
+			Result streamResult = new StreamResult(stringWriter);
+			TransformerFactory factory = TransformerFactory.newInstance();
+			Transformer transformer = factory.newTransformer();
+			transformer.transform(source, streamResult);
+			result = stringWriter.getBuffer().toString();
+		} catch (TransformerConfigurationException e) {
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			e.printStackTrace();
+		}
+
+		return result;
+	}    
+
+	/**
+	 * getXmlDocoument retrieve w3c.Document from given file
+	 * @param fileName
+	 * @return Document
+	 * @throws Exception
+	 */
+	public static Document getXmlDocument(String fileName) throws Exception {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		File f = new File(fileName);
+		if (!f.exists()) {
+			throw new IllegalArgumentException("Test data file " + fileName + " not found!");
+		}
+		// Create the builder and parse the file
+		return factory.newDocumentBuilder().parse(f);
+	}
+	
+	//
+	// Added from Nuxeo sources for creating new DocumentModel from an XML payload
+	//
+	
+	/**
+	 * Parses the properties.
+	 *
+	 * @param partMeta the part meta
+	 * @param document the document
+	 * @return the map
+	 */
+	public static Map<String, Object> parseProperties(ObjectPartType partMeta,
+			Document document) {
+		Map<String, Object> result = null;
+		String schemaName = partMeta.getLabel();
+		Schema schema = getSchemaFromName(schemaName);
+		
+		org.dom4j.io.DOMReader xmlReader = new org.dom4j.io.DOMReader();
+		org.dom4j.Document dom4jDocument = xmlReader.read(document);
+		try {
+			result = loadSchema(schema, dom4jDocument.getRootElement());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Load schema.
+	 *
+	 * @param schema the schema
+	 * @param schemaElement the schema element
+	 * @return the map
+	 * @throws Exception the exception
+	 */
+	@SuppressWarnings("unchecked")
+	static private Map<String, Object> loadSchema(Schema schema, org.dom4j.Element schemaElement)
+	throws Exception {
+		String schemaName1 = schemaElement.attributeValue(ExportConstants.NAME_ATTR);
+		String schemaName = schema.getName();
+
+		Map<String, Object> data = new HashMap<String, Object>();
+		Iterator<org.dom4j.Element> it = schemaElement.elementIterator();
+		while (it.hasNext()) {
+			org.dom4j.Element element = it.next();
+			String name = element.getName();
+			Field field = schema.getField(name);
+			if (field != null) {
+				Object value = getElementData(element, field.getType());
+				data.put(name, value);
+			} else	{
+				if (logger.isDebugEnabled() == true) {
+					logger.debug("Invalid input document. No such property was found " +
+							name + " in schema " + schemaName);
+				}
+			}
+		}
+
+		return data;
+	}
+
+	/**
+	 * Gets the element data.
+	 *
+	 * @param element the element
+	 * @param type the type
+	 * @return the element data
+	 */
+	@SuppressWarnings("unchecked")
+	static private Object getElementData(org.dom4j.Element element, Type type) {
+		Object result = null;
+		
+		if (type.isSimpleType()) {
+			result = type.decode(element.getText());
+		} else if (type.isListType()) {
+			ListType ltype = (ListType) type;
+			List<Object> list = new ArrayList<Object>();
+			Iterator<org.dom4j.Element> it = element.elementIterator();
+			while (it.hasNext()) {
+				org.dom4j.Element el = it.next();
+				list.add(getElementData(el, ltype.getFieldType()));
+			}
+			Type ftype = ltype.getFieldType();
+			if (ftype.isSimpleType()) { // these are stored as arrays
+				Class klass = JavaTypes.getClass(ftype);
+				if (klass.isPrimitive()) {
+					return PrimitiveArrays.toPrimitiveArray(list, klass);
+				} else {
+					return list.toArray((Object[])Array.newInstance(klass, list.size()));
+				}
+			}
+			result = list;
+		} else {
+			ComplexType ctype = (ComplexType) type;
+			if (ctype.getName().equals(TypeConstants.CONTENT)) {
+//				String mimeType = element.elementText(ExportConstants.BLOB_MIME_TYPE);
+//				String encoding = element.elementText(ExportConstants.BLOB_ENCODING);
+//				String content = element.elementTextTrim(ExportConstants.BLOB_DATA);
+//				if ((content == null || content.length() == 0)
+//						&& (mimeType == null || mimeType.length() == 0)) {
+//					return null; // remove blob
+//				}
+//				Blob blob = null;
+//				if (xdoc.hasExternalBlobs()) {
+//					blob = xdoc.getBlob(content);
+//				}
+//				if (blob == null) { // may be the blob is embedded like a Base64
+//					// encoded data
+//					byte[] bytes = Base64.decode(content);
+//					blob = new StreamingBlob(new ByteArraySource(bytes));
+//				}
+//				blob.setMimeType(mimeType);
+//				blob.setEncoding(encoding);
+//				return blob;
+			} else { // a complex type
+				Map<String, Object> map = new HashMap<String, Object>();
+				Iterator<org.dom4j.Element> it = element.elementIterator();
+				while (it.hasNext()) {
+					org.dom4j.Element el = it.next();
+					String name = el.getName();
+					Object value = getElementData(el, ctype.getField(
+							el.getName()).getType());
+					map.put(name, value);
+				}
+				result = map;
+			}
+		}		
+		return result;
+	}	
 }

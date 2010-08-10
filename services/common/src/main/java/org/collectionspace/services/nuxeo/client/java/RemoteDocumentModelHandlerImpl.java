@@ -239,7 +239,8 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
                         false /*don't validate*/);
                 //TODO: callback to handler if registered to validate the
                 //document
-                Map<String, Object> objectProps = DocumentUtils.parseProperties(document.getFirstChild());
+//                Map<String, Object> objectProps = DocumentUtils.parseProperties(document.getFirstChild());
+                Map<String, Object> objectProps = DocumentUtils.parseProperties(partMeta, document);
                 if (action == Action.UPDATE) {
                     this.filterReadOnlyPropertiesForPart(objectProps, partMeta);
                 }
