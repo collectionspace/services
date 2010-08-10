@@ -31,9 +31,9 @@ import java.util.TimeZone;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.MovementClient;
-import org.collectionspace.services.client.MovementClientDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.movement.MovementsCommon;
 import org.collectionspace.services.movement.MovementsCommonList;
@@ -733,7 +733,7 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
      */
     private MultipartOutput createInstance(String movementReferenceNumber) {
         MovementsCommon movement = new MovementsCommon();
-        String timestampUTC = MovementClientDateTimeUtils.timestampUTC();
+        String timestampUTC = GregorianCalendarDateTimeUtils.timestampUTC();
         // FIXME: Values of currentLocation, normalLocation,
         // and movementContact should be refNames.
         movement.setCurrentLocation("currentLocation value");

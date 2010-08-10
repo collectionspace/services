@@ -23,7 +23,6 @@
  */
 package org.collectionspace.services.movement.nuxeo;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
@@ -32,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.collectionspace.services.MovementJAXBSchema;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.movement.MovementsCommon;
@@ -54,8 +54,6 @@ public class MovementDocumentModelHandler
     private final Logger logger = LoggerFactory.getLogger(MovementDocumentModelHandler.class);
 
     private static final String COMMON_PART_LABEL = "movements_common";
-
-    private static final ArrayList<String> DATE_TIME_FIELDS = dateTimeFields();
     
     /** The Movement. */
     private MovementsCommon Movement;
@@ -118,7 +116,7 @@ public class MovementDocumentModelHandler
             for(Entry<String, Object> entry : unQObjectProperties.entrySet()){
                 if (isDateTimeType(entry)) {
                     entry.setValue(
-                        MovementServiceDateTimeUtils.formatAsISO8601Timestamp(
+                        GregorianCalendarDateTimeUtils.formatAsISO8601Timestamp(
                             (GregorianCalendar) entry.getValue()));
                 }
             }
@@ -171,7 +169,7 @@ public class MovementDocumentModelHandler
                     MovementJAXBSchema.MOVEMENT_REFERENCE_NUMBER));
             GregorianCalendar gcal = (GregorianCalendar) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     MovementJAXBSchema.LOCATION_DATE);
-            ilistItem.setLocationDate(MovementServiceDateTimeUtils.formatAsISO8601Timestamp(gcal));
+            ilistItem.setLocationDate(GregorianCalendarDateTimeUtils.formatAsISO8601Timestamp(gcal));
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);
             ilistItem.setCsid(id);
@@ -195,41 +193,11 @@ public class MovementDocumentModelHandler
     private boolean isDateTimeType(Entry<String, Object> entry) {
         boolean isDateTimeType = false;
 
-        // Approach 1: Check the name of this property against a list of
-        // dateTime field names.
-        if (DATE_TIME_FIELDS.contains(entry.getKey())){
-           isDateTimeType = true;
-        }
-
-        // Approach 2: Check the data type of this property's value.
-        /*
         if (entry.getValue() instanceof Calendar) {
             isDateTimeType = true;
         }
-         *
-         */
 
         return isDateTimeType;
-    }
-
-    /**
-     * Returns a list of the names of dateTime fields (e.g. fields whose
-     * XML Schema datatype is xs:dateTime).
-     *
-     * @return A list of names of dateTime fields.
-     */
-    private static ArrayList<String> dateTimeFields() {
-        // FIXME Rather than hard-coding directly here,
-        // identify these fields from configuration, such as:
-        // * Metadata returned from Nuxeo, if available.
-        // * Examination of the XSD schema for this document type.
-        // * External configuration (e.g. date fields as tenant bindings props, via
-        //   org.collectionspace.services.common.context.ServiceBindingUtils)
-        ArrayList<String> dateTimeTypeFields = new ArrayList();
-        dateTimeTypeFields.add(MovementJAXBSchema.LOCATION_DATE);
-        dateTimeTypeFields.add(MovementJAXBSchema.PLANNED_REMOVAL_DATE);
-        dateTimeTypeFields.add(MovementJAXBSchema.REMOVAL_DATE);
-        return dateTimeTypeFields;
     }
  
 }
