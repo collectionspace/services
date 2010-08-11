@@ -137,7 +137,7 @@ public class DocumentUtils {
 	 * @return the byte array input stream
 	 */
 	private static ByteArrayInputStream logByteArrayInputStream(ByteArrayInputStream inputStream) {
-		ByteArrayInputStream result = null;
+		ByteArrayInputStream result = inputStream;
 
 		if (logger.isTraceEnabled() == true) {
 			ByteArrayInputStream bais = (ByteArrayInputStream)inputStream;
