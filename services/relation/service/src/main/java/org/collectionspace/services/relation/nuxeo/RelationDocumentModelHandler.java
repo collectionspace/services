@@ -170,6 +170,8 @@ public class RelationDocumentModelHandler
         //
         relationListItem.setRelationshipType((String) docModel.getProperty(ctx.getCommonPartLabel(),
         		RelationJAXBSchema.RELATIONSHIP_TYPE));
+        relationListItem.setPredicateDisplayName((String) docModel.getProperty(ctx.getCommonPartLabel(),
+        		RelationJAXBSchema.RELATIONSHIP_TYPE_DISPLAYNAME));
         //
         // Object
         //

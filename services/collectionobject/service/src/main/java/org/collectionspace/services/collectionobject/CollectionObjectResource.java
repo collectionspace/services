@@ -380,7 +380,6 @@ public class CollectionObjectResource
      * 
      * @return the intakes common list
      */
-    /*
     @GET
     @Path("{csid}/intakes")
     @Produces("application/xml")
@@ -398,7 +397,11 @@ public class CollectionObjectResource
         	String objectCsid = null;
         	NewRelationResource relationResource = new NewRelationResource();
         	RelationsCommonList relationsCommonList = relationResource.getRelationList(queryParams,
-        			subjectCsid, predicate, objectCsid);
+        			subjectCsid,
+        			null, /*subjectType*/
+        			predicate,
+        			objectCsid,
+        			null /*objectType*/);
         	
         	//
         	// Create an array of Intake csid's
@@ -425,8 +428,6 @@ public class CollectionObjectResource
         
         return result;
     }
-     *
-     */
 
     /**
      * Gets the authority refs.

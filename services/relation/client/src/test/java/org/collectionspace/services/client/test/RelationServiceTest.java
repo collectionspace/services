@@ -423,6 +423,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         relation.setDocumentType1("updated-" + relation.getDocumentType1());
         relation.setDocumentId2("updated-" + relation.getDocumentId2());
         relation.setDocumentType2("updated-" + relation.getDocumentType2());
+        relation.setPredicateDisplayName("updated-" + relation.getPredicateDisplayName());
         if(logger.isDebugEnabled()){
             logger.debug("updated object");
             logger.debug(objectAsXmlString(relation, RelationsCommon.class));
@@ -459,6 +460,8 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
                 updatedObject.getDocumentId2(), relation.getDocumentId2(), msg);
         Assert.assertEquals(
                 updatedObject.getDocumentType2(), relation.getDocumentType2(), msg);
+        Assert.assertEquals(
+                updatedObject.getPredicateDisplayName(), relation.getPredicateDisplayName(), msg);
 
     }
 
@@ -754,7 +757,8 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
                 "SubjectType-" + identifier + "-type",
                 "Object-" + identifier,
                 "ObjectType-" + identifier + "-type",
-                RelationshipType.COLLECTIONOBJECT_INTAKE);
+                RelationshipType.COLLECTIONOBJECT_INTAKE,
+                RelationshipType.COLLECTIONOBJECT_INTAKE + ".displayName");
     }
 
     /**
@@ -770,12 +774,14 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
     private void fillRelation(RelationsCommon relation,
             String documentId1, String documentType1,
             String documentId2, String documentType2,
-            RelationshipType rt) {
+            RelationshipType rt,
+            String rtDisplayName) {
         relation.setDocumentId1(documentId1);
         relation.setDocumentType1(documentType1);
         relation.setDocumentId2(documentId2);
         relation.setDocumentType2(documentType2);
 
         relation.setRelationshipType(rt);
+        relation.setPredicateDisplayName(rtDisplayName);
     }
 }

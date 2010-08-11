@@ -41,8 +41,7 @@
 
             <!-- type of relatinoship between two entities -->
     <xs:element name="relationshipType" type="rel:RelationshipType" minOccurs="1" maxOccurs="1"/>
-
-
+    <xs:element name="predicateDisplayName" type="xs:string" minOccurs="1"/>
 
     <!-- enumeration defining the type of relationship between two entities -->
     <xs:simpleType name="RelationshipType">

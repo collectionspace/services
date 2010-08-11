@@ -30,6 +30,7 @@
                 <xs:element name="documentType2" type="xs:string" minOccurs="1"/>
                 <!-- type of relationship between two entities -->
                 <xs:element name="relationshipType" type="rel:RelationshipType" minOccurs="1"/>
+                <xs:element name="predicateDisplayName" type="xs:string" minOccurs="1"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -72,6 +73,7 @@
                                     <xs:element name="csid" type="xs:string" minOccurs="1"/>
                                     <xs:element name="subjectCsid" type="xs:string" minOccurs="1"/>
                                     <xs:element name="relationshipType" type="xs:string" minOccurs="1"/>
+                                    <xs:element name="predicateDisplayName" type="xs:string" minOccurs="1"/>
                                     <xs:element name="objectCsid" type="xs:string" minOccurs="1"/>
                                 </xs:sequence>
                             </xs:complexType>

@@ -321,8 +321,10 @@ public class NewRelationResource extends
 	 *
 	 * @param queryParams the query params
 	 * @param subjectCsid the subject csid
+	 * @param subjectType 
 	 * @param predicate the predicate
 	 * @param objectCsid the object csid
+	 * @param objectType 
 	 * @return the relation list
 	 * @throws WebApplicationException the web application exception
 	 */

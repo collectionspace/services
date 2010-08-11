@@ -41,6 +41,9 @@ public interface RelationListItemJAXBSchema {
 	final static String RELATIONSHIP_TYPE = "relationshipType";
 	final static String OBJECT_CSID = "objectCsid";
 	
+	/** The Constant RELATIONSHIP_TYPE_DISPLAYNAME. */
+	final static String RELATIONSHIP_TYPE_DISPLAYNAME = "predicateDisplayName";
+
 	/** The Constant URI. */
 	final static String URI = "url";
 }
