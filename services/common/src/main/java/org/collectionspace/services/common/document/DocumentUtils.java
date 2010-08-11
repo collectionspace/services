@@ -610,24 +610,18 @@ public class DocumentUtils {
 		}
 	}
 
-	/*
+	/**
 	 * Returns a schema, given the name of a schema.
 	 *
 	 * @param schemaName  a schema name.
 	 * @return  a schema.
-	 */
-	/**
-	 * Gets the schema from name.
-	 *
-	 * @param schemaName the schema name
-	 * @return the schema from name
 	 */
 	public static Schema getSchemaFromName(String schemaName) {
 		SchemaManager schemaManager = Framework.getLocalService(SchemaManager.class);
 		return schemaManager.getSchema(schemaName);
 	}
 
-	/*
+	/**
 	 * Returns the schema part of a presumably schema-qualified field name.
 	 *
 	 * If the schema part is null or empty, returns an empty string.
@@ -635,14 +629,7 @@ public class DocumentUtils {
 	 * @param schemaQualifiedFieldName  a schema-qualified field name.
 	 * @return  the schema part of the field name.
 	 */
-
 	//FIXME: Might instead use Nuxeo's built-in QName class.
-	/**
-	 * Gets the schema name part.
-	 *
-	 * @param schemaQualifiedFieldName the schema qualified field name
-	 * @return the schema name part
-	 */
 	public static String getSchemaNamePart(String schemaQualifiedFieldName) {
 		if (schemaQualifiedFieldName == null || schemaQualifiedFieldName.trim().isEmpty()) {
 			return "";
@@ -657,7 +644,7 @@ public class DocumentUtils {
 		}
 	}
 
-	/*
+	/**
 	 * Returns a list of delimited strings, by splitting the supplied string
 	 * on a supplied delimiter.
 	 *
@@ -667,13 +654,6 @@ public class DocumentUtils {
 	 * @return  A list of delimited strings.  Returns an empty list if either
 	 * the string or delimiter are null or empty, or if the delimiter cannot
 	 * be found in the string.
-	 */
-	/**
-	 * Gets the delimited parts.
-	 *
-	 * @param str the str
-	 * @param delimiter the delimiter
-	 * @return the delimited parts
 	 */
 	public static List<String> getDelimitedParts(String str, String delimiter) {
 		List<String> parts = new ArrayList<String>();
@@ -720,7 +700,7 @@ public class DocumentUtils {
 		}
 	}
 
-	/*
+	/**
 	 * Returns the relevant authRef field name from a fieldName, which may
 	 * potentially be in the form of a single field name, or a delimited pair
 	 * of field names, that in turn consists of an ancestor field name and a
@@ -738,12 +718,6 @@ public class DocumentUtils {
 	 * @param fieldNameOrNames  A field name or delimited pair of field names.
 	 *
 	 * @return The relevant authRef field name, as described.
-	 */
-	/**
-	 * Gets the descendant or ancestor.
-	 *
-	 * @param fieldNameOrNames the field name or names
-	 * @return the descendant or ancestor
 	 */
 	public static String getDescendantOrAncestor(String fieldNameOrNames) {
 		String fName = "";
@@ -766,7 +740,7 @@ public class DocumentUtils {
 	}
 
 
-	/*
+	/**
 	 * Returns a schema-qualified field name, given a schema name and field name.
 	 *
 	 * If the schema name is null or empty, returns the supplied field name.
@@ -774,13 +748,6 @@ public class DocumentUtils {
 	 * @param schemaName  a schema name.
 	 * @param fieldName  a field name.
 	 * @return  a schema-qualified field name.
-	 */
-	/**
-	 * Append schema name.
-	 *
-	 * @param schemaName the schema name
-	 * @param fieldName the field name
-	 * @return the string
 	 */
 	public static String appendSchemaName(String schemaName, String fieldName) {
 		if (schemaName == null || schemaName.trim().isEmpty()) {
