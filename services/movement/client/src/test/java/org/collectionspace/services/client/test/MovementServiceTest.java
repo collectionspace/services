@@ -69,6 +69,8 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
     
     /** The known resource id. */
     private String knownResourceId = null;
+
+    private final static String TIMESTAMP_UTC = GregorianCalendarDateTimeUtils.timestampUTC();
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -305,6 +307,15 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         MovementsCommon movement = (MovementsCommon) extractPart(input,
                 client.getCommonPartName(), MovementsCommon.class);
         Assert.assertNotNull(movement);
+
+        // Check the values of one or more date/time fields
+        if (logger.isDebugEnabled()) {
+            logger.debug("locationDate=" + movement.getLocationDate());
+            logger.debug("TIMESTAMP_UTC=" + TIMESTAMP_UTC);
+        }
+        Assert.assertTrue(movement.getLocationDate().equals(TIMESTAMP_UTC));
+        Assert.assertTrue(movement.getPlannedRemovalDate().equals(TIMESTAMP_UTC));
+        Assert.assertTrue(movement.getRemovalDate().equals(TIMESTAMP_UTC));
     }
 
     // Failure outcomes
@@ -733,13 +744,12 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
      */
     private MultipartOutput createInstance(String movementReferenceNumber) {
         MovementsCommon movement = new MovementsCommon();
-        String timestampUTC = GregorianCalendarDateTimeUtils.timestampUTC();
         // FIXME: Values of currentLocation, normalLocation,
         // and movementContact should be refNames.
         movement.setCurrentLocation("currentLocation value");
         movement.setCurrentLocationFitness("currentLocationFitness value");
         movement.setCurrentLocationNote("currentLocationNote value");
-        movement.setLocationDate(timestampUTC);
+        movement.setLocationDate(TIMESTAMP_UTC);
         movement.setNormalLocation("normalLocation value");
         movement.setMovementContact("movementContact value");
         MovementMethodsList movementMethodsList = new MovementMethodsList();
@@ -752,8 +762,8 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         movement.setMovementMethods(movementMethodsList);
         movement.setMovementNote("movementNote value");
         movement.setMovementReferenceNumber(movementReferenceNumber);
-        movement.setPlannedRemovalDate(timestampUTC);
-        movement.setRemovalDate(timestampUTC);
+        movement.setPlannedRemovalDate(TIMESTAMP_UTC);
+        movement.setRemovalDate(TIMESTAMP_UTC);
         movement.setReasonForMove("reasonForMove value");
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =

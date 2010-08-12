@@ -61,7 +61,6 @@ public class MovementDocumentModelHandler
     /** The Movement list. */
     private MovementsCommonList MovementList;
 
-
     /**
      * Gets the common part.
      *
@@ -100,29 +99,6 @@ public class MovementDocumentModelHandler
     @Override
     public void setCommonPartList(MovementsCommonList MovementList) {
         this.MovementList = MovementList;
-    }
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#extractPart(org.nuxeo.ecm.core.api.DocumentModel, java.lang.String, org.collectionspace.services.common.service.ObjectPartType)
-     */
-    @Override
-    protected Map<String, Object> extractPart(DocumentModel docModel, String schema, ObjectPartType partMeta)
-            throws Exception {
-    	Map<String, Object> unQObjectProperties = super.extractPart(docModel, schema, partMeta);
-
-    	// For each dateTime field in the common part, return an
-        // appropriately formatted representation of its value.
-    	if (partMeta.getLabel().equalsIgnoreCase(COMMON_PART_LABEL)) {
-            for(Entry<String, Object> entry : unQObjectProperties.entrySet()){
-                if (isDateTimeType(entry)) {
-                    entry.setValue(
-                        GregorianCalendarDateTimeUtils.formatAsISO8601Timestamp(
-                            (GregorianCalendar) entry.getValue()));
-                }
-            }
-    	}
-
-        return unQObjectProperties;
     }
 
     /**
@@ -190,15 +166,15 @@ public class MovementDocumentModelHandler
         return MovementConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
 
-    private boolean isDateTimeType(Entry<String, Object> entry) {
+    private boolean isDateTimeType(Object obj) {
         boolean isDateTimeType = false;
 
-        if (entry.getValue() instanceof Calendar) {
+        if (obj != null && obj instanceof Calendar) {
             isDateTimeType = true;
         }
 
         return isDateTimeType;
     }
- 
+
 }
 
