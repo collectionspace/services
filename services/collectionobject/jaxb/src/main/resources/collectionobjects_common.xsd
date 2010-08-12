@@ -32,6 +32,7 @@
             <xs:sequence>
                 <xs:element name="csid" type="xs:string"/>
                 
+                <xs:element name="remNumber" type="ns:otherNumber"/>
                 <!-- Object Identification Information -->
                 <xs:element name="objectNumber" type="xs:string"/>
                 <xs:element name="otherNumberList" type="otherNumberList"/>

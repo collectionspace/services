@@ -32,6 +32,8 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.nuxeo.client.*;
+import org.collectionspace.services.common.profile.Profiler;
+
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
@@ -98,7 +100,10 @@ public abstract class DocumentModelHandler<T, TL>
 
     @Override
     public void handleGetAll(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
+    	Profiler profiler = new Profiler(this, 2);
+    	profiler.start();
         setCommonPartList(extractCommonPartList(wrapDoc));
+        profiler.stop();
     }
 
     @Override

@@ -160,6 +160,10 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 		for (String pathParamName : pathParams.keySet()) {
 			//assumption : path params for csid for any entity has substring csid in name
 			String pathParamValue = pathParams.get(pathParamName).get(0);
+			if ((pathParamName.toLowerCase().indexOf("ms") > -1)) {
+				//replace csids with wildcard
+				uriPath = uriPath.replace(pathParamValue, "*");
+			}
 			if ((pathParamName.toLowerCase().indexOf("csid") > -1)) {
 				//replace csids with wildcard
 				uriPath = uriPath.replace(pathParamValue, "*");

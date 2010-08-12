@@ -1122,6 +1122,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
             String objectNumber, String objectName) {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
 
+        //REM
+        OtherNumber remNumber = new OtherNumber();
+        remNumber.setNumberType("remNumber");
+        remNumber.setNumberValue("2271966-" + System.currentTimeMillis());
+        collectionObject.setRemNumber(remNumber);
+        
         BriefDescriptionList descriptionList = new BriefDescriptionList();
         List<String> descriptions = descriptionList.getBriefDescription();
         descriptions.add("Papier mache bird cow mask with horns, "

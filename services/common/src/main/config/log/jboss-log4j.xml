@@ -158,7 +158,7 @@
      <param name="DatePattern" value="'.'yyyy-MM-dd"/>
       <param name="File" value="${jboss.server.log.dir}/collectionspace-perf.log"/>
       <layout class="org.apache.log4j.PatternLayout">
-         <param name="ConversionPattern" value="%d %-5p [%t] [%c:%L] %m%n"/>
+         <param name="ConversionPattern" value="%d [%t] %m%n"/>
       </layout>
             <!--filter class="org.jboss.logging.filter.TCLFilter">
          <param name="AcceptOnMatch" value="true"/>

@@ -643,7 +643,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
 
             // If we have limit and/or offset, then pass true to get totalSize
             // in returned DocumentModelList.
-        	Profiler profiler = new Profiler(this);
+        	Profiler profiler = new Profiler(this, 2);
         	profiler.log("Executing NXQL query: " + query.toString());
         	profiler.start();
             if ((queryContext.docFilter.getOffset() > 0) || (queryContext.docFilter.getPageSize() > 0)) {

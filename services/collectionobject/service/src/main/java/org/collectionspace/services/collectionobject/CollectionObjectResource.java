@@ -69,10 +69,14 @@ import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.relation.NewRelationResource;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationshipType;
+import org.collectionspace.services.common.profile.Profiler;
+
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
+
 import org.nuxeo.ecm.core.api.DocumentModel;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -254,6 +258,9 @@ public class CollectionObjectResource
      */
     private CollectionobjectsCommonList getCollectionObjectList(MultivaluedMap<String, String> queryParams) {
         CollectionobjectsCommonList collectionObjectList;
+        Profiler profiler = new Profiler(this, 1);
+        profiler.start();
+        
         try {
             ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
@@ -271,6 +278,8 @@ public class CollectionObjectResource
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
+        
+        profiler.stop();
         return collectionObjectList;
     }
 
@@ -475,21 +484,17 @@ public class CollectionObjectResource
      * 
      * This is an intentionally empty method used for getting a rough time estimate
      * of the overhead required for a client->server request/response cycle.
+     * @param ms - milliseconds to delay
      * 
      * @return the response
      */
     @GET
-    @Path("/roundtrip")
+    @Path("/{ms}/roundtrip")
     @Produces("application/xml")
-    public Response roundtrip() {
+    public Response roundtrip(
+    		@PathParam("ms") String ms) {
     	Response result = null;
     	
-		if (logger.isDebugEnabled()) {
-			logger.debug("------------------------------------------------------------------------------");
-			logger.debug("Client to server roundtrip called.");
-			logger.debug("------------------------------------------------------------------------------");
-			logger.debug("");
-		}
 		result = Response.status(HttpResponseCodes.SC_OK).build();
 		
 		return result;

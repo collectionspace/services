@@ -35,6 +35,8 @@ import org.slf4j.LoggerFactory;
  */
 public class Profiler {
 	
+	private int messageIndent = 0;
+	
 	/** The start time. */
 	private long startTime = 0;
 	
@@ -63,8 +65,14 @@ public class Profiler {
      *
      * @param theMessagePrefix the new message prefix
      */
-    protected void setMessagePrefix(String theMessagePrefix) {
-    	messagePrefix = theMessagePrefix + ":";
+    protected void setMessagePrefix(String theMessagePrefix, int indent) {
+    	StringBuffer stringBuffer = new StringBuffer();
+    	for (int i = 0; i < indent; i++) {
+    		stringBuffer.append('\t');
+    	}
+    	stringBuffer.append(theMessagePrefix);
+    	stringBuffer.append(':');
+    	messagePrefix = stringBuffer.toString();
     }
     
     protected StringBuffer getMessagePrefix() {
@@ -74,21 +82,23 @@ public class Profiler {
     /**
      * Instantiates a new profiler.
      * @param theObject 
+     * @param indent 
      *
      * @param theClass the the class
      */
-    public Profiler(Object theObject) {
+    public Profiler(Object theObject, int indent) {
     	if (theObject != null) {
-    		this.setMessagePrefix(theObject.getClass().getSimpleName());
+    		this.setMessagePrefix(theObject.getClass().getSimpleName(), indent);
     	}
     }
 	/**
 	 * Instantiates a new profiler.
 	 *
 	 * @param theMessagePrefix the the message prefix
+	 * @param indent 
 	 */
-	public Profiler(String theMessagePrefix) {
-		this.setMessagePrefix(theMessagePrefix);
+	public Profiler(String theMessagePrefix, int indent) {
+		this.setMessagePrefix(theMessagePrefix, indent);
 	}
 	
 	/*
@@ -149,7 +159,6 @@ public class Profiler {
 			message.append("<<<< Stopped <<<< [");
 			message.append(finalTime);
 			message.append("ms]");
-			message.append('\n');
 			getLogger().debug(message.toString());
 		}		
 	}
