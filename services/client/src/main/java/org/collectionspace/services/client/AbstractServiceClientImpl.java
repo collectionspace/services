@@ -34,8 +34,10 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope; //import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
+
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse; //import org.collectionspace.services.common.context.ServiceContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +65,15 @@ public abstract class AbstractServiceClientImpl implements
     /** The http client. */
     private HttpClient httpClient;
 
+    /**
+     * Gets the logger.
+     *
+     * @return the logger
+     */
+    public Logger getLogger() {
+    	return logger;
+    }
+    
     /**
      * Gets the common part name.
      *

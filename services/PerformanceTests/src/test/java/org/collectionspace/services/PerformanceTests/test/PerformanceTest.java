@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.jboss.resteasy.util.HttpResponseCodes;
 
@@ -66,7 +67,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 	// Get clients for the CollectionSpace services
 	//
 	/** The MA x_ records. */
-	private static int MAX_RECORDS = 1000;
+	private static int MAX_RECORDS = 100;
 
 	/**
 	 * Performance test.
@@ -78,7 +79,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 		String[] coList = this.createCollectionObjects(MAX_RECORDS);
 		this.searchCollectionObjects(MAX_RECORDS);
 		this.readCollectionObjects(coList);
-		this.deleteCollectionObjects(coList);
+		//this.deleteCollectionObjects(coList);
 		roundTripOverhead(10);
 	}
 	
@@ -96,7 +97,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 		ClientResponse<Response> response;
 		for (int i = 0; i < numOfCalls; i++) {
 			Date startTime = new Date();			
-			response = collectionObjectClient.roundtrip();
+			response = collectionObjectClient.roundtrip(0);
 			try {
 				Assert.assertEquals(response.getStatus(), HttpResponseCodes.SC_OK);
 			} finally {
@@ -254,7 +255,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 	 */
 	private void readCollectionObject(CollectionObjectClient collectionObjectClient,
 			String resourceId) {
-		ClientResponse<Response> res = collectionObjectClient.delete(resourceId);
+		ClientResponse<MultipartInput> res = collectionObjectClient.read(resourceId);
 		res.releaseConnection();
 	}
 
@@ -268,7 +269,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 
 		Date startTime = new Date();		
 		for (int i = 0; i < arrayOfObjects.length; i++) {
-			deleteCollectionObject(collectionObjectClient, arrayOfObjects[i]);
+			readCollectionObject(collectionObjectClient, arrayOfObjects[i]);
 		}		
 		Date stopTime = new Date();
 		
@@ -331,7 +332,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 	 *
 	 * @param arrayOfObjects the array of objects
 	 */
-	public void deleteCollectionObjects(String[] arrayOfObjects) {
+	private void deleteCollectionObjects(String[] arrayOfObjects) {
 		CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
 
 		Date startTime = new Date();		
@@ -350,7 +351,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 	 * Delete collection objects.
 	 * FIXME: Deletes a page at a time until there are no more CollectionObjects.
 	 */
-	public void deleteCollectionObjects() {
+	private void deleteCollectionObjects() {
 		CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
 		ClientResponse<AbstractCommonList> response;
 		

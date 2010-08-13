@@ -242,6 +242,8 @@ public class CollectionObjectResource
     @Produces("application/xml")
     public CollectionobjectsCommonList getCollectionObjectList(@Context UriInfo ui,
     		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
+    	Profiler profiler = new Profiler("getCollectionObjectList():", 1);
+    	profiler.start();
     	CollectionobjectsCommonList result = null;
     	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
     	if (keywords != null) {
@@ -249,7 +251,7 @@ public class CollectionObjectResource
     	} else {
     		result = getCollectionObjectList(queryParams);
     	}
-    	
+    	profiler.stop();
     	return result;
     }
     
@@ -495,7 +497,10 @@ public class CollectionObjectResource
     		@PathParam("ms") String ms) {
     	Response result = null;
     	
+    	Profiler profiler = new Profiler("roundtrip():", 1);
+    	profiler.start();
 		result = Response.status(HttpResponseCodes.SC_OK).build();
+		profiler.stop();
 		
 		return result;
     }
@@ -549,6 +554,8 @@ public class CollectionObjectResource
     		String keywords) {
         CollectionobjectsCommonList collectionObjectList;
         try {
+        	Profiler profiler = new Profiler("searchCollectionObjects():", 1);
+        	profiler.start();
             ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
 
@@ -561,6 +568,7 @@ public class CollectionObjectResource
                     logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
                 }
             }
+            profiler.stop();
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             collectionObjectList = (CollectionobjectsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {

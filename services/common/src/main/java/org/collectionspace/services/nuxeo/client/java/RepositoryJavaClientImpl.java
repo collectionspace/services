@@ -1015,11 +1015,14 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
     private RepositoryInstance getRepositorySession() throws Exception {
         // FIXME: is it possible to reuse repository session?
         // Authentication failures happen while trying to reuse the session
+    	Profiler profiler = new Profiler("getRepositorySession():", 2);
+    	profiler.start();
         NuxeoClient client = NuxeoConnector.getInstance().getClient();
         RepositoryInstance repoSession = client.openRepository();
-        if (logger.isDebugEnabled()) {
+        if (logger.isTraceEnabled()) {
             logger.debug("getRepository() repository root: " + repoSession.getRootDocument());
         }
+        profiler.stop();
         return repoSession;
     }
 

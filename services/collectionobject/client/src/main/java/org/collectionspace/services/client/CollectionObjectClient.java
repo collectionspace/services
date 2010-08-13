@@ -39,6 +39,8 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
+import org.slf4j.Logger;
+
 /**
  * The Class CollectionObjectClient.
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
@@ -109,8 +111,11 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.services.client.CollectionObjectProxy#roundtrip()
      * @return the client response< response>
      */
-    public ClientResponse<Response> roundtrip() {
-        return collectionObjectProxy.roundtrip();
+    public ClientResponse<Response> roundtrip(int ms) {
+    	getLogger().debug(">>>>Roundtrip start.");
+    	ClientResponse<Response> result = collectionObjectProxy.roundtrip(ms);
+    	getLogger().debug("<<<<Roundtrip stop.");
+    	return result;
     }
     
     /**

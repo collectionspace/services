@@ -60,8 +60,11 @@ public class CSpaceFilter implements Filter {
 			FilterChain chain) throws IOException, ServletException {		
 		if (request != null) {
 			HttpServletRequest httpRequest = (HttpServletRequest)request;
-			String uri = httpRequest.getRequestURI();
-			Profiler profiler = new Profiler(uri, 0);
+			StringBuffer uri = new StringBuffer(httpRequest.getRequestURI());
+			uri.append(':');
+			uri.append(httpRequest.getMethod());
+			Profiler profiler = new Profiler(uri.toString(),
+					0);
 			profiler.start();
 			chain.doFilter(request, response);
 //			profiler.log(httpRequest.getRequestURI());

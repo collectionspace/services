@@ -86,13 +86,14 @@ public interface CollectionObjectProxy extends CollectionSpaceProxy {
 
     /**
      * Roundtrip.
+     * @param ms 
      *
      * @return the client response
      */
     @GET
-    @Path("/roundtrip")
+    @Path("/{ms}/roundtrip")
     @Produces({"application/xml"})
-    ClientResponse<Response> roundtrip();
+    ClientResponse<Response> roundtrip(@PathParam("ms") int ms);
 
     /**
      * Keyword search.

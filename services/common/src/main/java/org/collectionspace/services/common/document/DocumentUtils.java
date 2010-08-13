@@ -56,6 +56,10 @@ import org.collectionspace.services.common.service.ObjectPartContentType;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.service.XmlContentType;
 
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+
 import org.nuxeo.ecm.core.io.ExportConstants;
 import org.nuxeo.common.collections.PrimitiveArrays;
 import org.nuxeo.ecm.core.api.model.Property;
@@ -71,7 +75,6 @@ import org.nuxeo.ecm.core.schema.types.primitives.StringType;
 import org.nuxeo.ecm.core.schema.types.FieldImpl;
 import org.nuxeo.ecm.core.schema.types.QName;
 import org.nuxeo.runtime.api.Framework;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,6 +133,25 @@ public class DocumentUtils {
 		String value;
 	};
 
+	/**
+	 * Log multipart input.
+	 *
+	 * @param multipartInput the multipart input
+	 */
+	public static void logMultipartInput(MultipartInput multipartInput) {
+		if (logger.isDebugEnabled() == true) {			
+			List<InputPart> parts = multipartInput.getParts();
+			for (InputPart part : parts) {
+				try {
+					logger.debug(part.getBodyAsString());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Log byte array input stream.  After logging this method resets the stream and returns it in its original state.
 	 *
