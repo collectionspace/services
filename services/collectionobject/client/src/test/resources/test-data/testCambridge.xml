@@ -47,14 +47,6 @@
   <contentPosition>contentPosition</contentPosition>
   <contentScript>XXX</contentScript>
   <copyNumber>copyNumber</copyNumber>
-  <dimension>dimension</dimension>
-  <dimensionMeasuredPart>dimensionMeasuredPart</dimensionMeasuredPart>
-
-<dimensionMeasurementUnit>dimensionMeasurementUnit</dimensionMeasurementUnit>
-  <dimensionValue>dimensionValue</dimensionValue>
-  <dimensionValueDate>XXX</dimensionValueDate>
-
-<dimensionValueQualifier>dimensionValueQualifier</dimensionValueQualifier>
   <editionNumber>editionNumber</editionNumber>
   <form>form</form>
  <inscriptionContent>inscriptionContent</inscriptionContent>

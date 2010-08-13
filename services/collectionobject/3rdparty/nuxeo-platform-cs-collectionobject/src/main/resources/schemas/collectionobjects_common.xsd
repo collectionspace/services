@@ -18,11 +18,13 @@
     targetNamespace="http://collectionspace.org/collectionobject/" version="0.1">
 
     <xs:element name="remNumber" type="ns:otherNumber"/>
+
     <!-- Object identification information -->
     <xs:element name="objectNumber" type="xs:string"/>
     <xs:element name="otherNumberList" type="ns:otherNumberList"/>
 
-    <!-- Remove these two elements when the App/UI layer is using the new repeatable 'otherNumbers' field -->
+    <!-- Remove these two elements when the App/UI layer is using -->
+    <!-- the new repeatable 'otherNumbers' field: -->
     <xs:element name="otherNumber" type="xs:string"/>
     <xs:element name="otherNumberType" type="xs:string"/>
 
@@ -71,8 +73,6 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-
-    <!-- Object Description - Content Information -->
     <xs:element name="contentActivities">
         <xs:complexType>
             <xs:sequence>
@@ -139,10 +139,11 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-
     <xs:element name="copyNumber" type="xs:string"/>
+    <xs:element name="dimensions" type="ns:dimensionList"/>
 
-    <!-- Object Description - Dimension Information -->
+    <!-- Remove these six elements when the App/UI layer is -->
+    <!-- using the new repeatable 'dimensions' field: -->
     <xs:element name="dimension" type="xs:string"/>
     <xs:element name="dimensionMeasuredPart" type="xs:string"/>
     <xs:element name="dimensionMeasurementUnit" type="xs:string"/>
@@ -223,7 +224,7 @@
 
     <!-- Object History and Association Information - Association -->
 
-    <!-- In the following field names, "assoc" is an abbreviation for "association". -->
+    <!-- In the following field names, "assoc" is an abbreviation for "associated". -->
     <!-- See the comments to CSPACE-2501 for a discussion of the database identifier -->
     <!-- length limit that made this abbreviation necessary. -->
     <xs:element name="assocActivity" type="xs:string"/>
@@ -401,6 +402,24 @@
                 <xs:element name="objectNameSystem" type="xs:string"/>
                 <xs:element name="objectNameType" type="xs:string"/>
                 <xs:element name="objectNameLanguage" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="dimensionList">
+        <xs:sequence>
+            <xs:element name="dimensionGroup" type="dimensionGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="dimensionGroup">
+        <xs:sequence>
+            <xs:element name="dimension" type="xs:string"/>
+            <xs:element name="measuredPart" type="xs:string"/>
+            <xs:element name="measurementUnit" type="xs:string"/>
+            <xs:element name="value" type="xs:string"/>
+            <xs:element name="valueDate" type="xs:string"/>
+            <xs:element name="valueQualifier" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 

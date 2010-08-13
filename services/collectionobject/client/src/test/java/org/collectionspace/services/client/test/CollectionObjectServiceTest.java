@@ -35,6 +35,8 @@ import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.domain.naturalhistory.CollectionobjectsNaturalhistory;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.collectionspace.services.collectionobject.ResponsibleDepartmentList;
+import org.collectionspace.services.collectionobject.DimensionGroup;
+import org.collectionspace.services.collectionobject.DimensionList;
 import org.collectionspace.services.collectionobject.ObjectNameGroup;
 import org.collectionspace.services.collectionobject.ObjectNameList;
 import org.collectionspace.services.collectionobject.OtherNumber;
@@ -70,6 +72,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     private String knownResourceId = null;
 
     private final String OBJECT_NAME_VALUE = "an object name";
+    private final String UPDATED_MEASURED_PART_VALUE = "updated measured part value";
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
@@ -558,6 +561,16 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
                 client.getCommonPartName(), CollectionobjectsCommon.class);
         Assert.assertNotNull(collectionObject);
 
+        // Verify the number and contents of values in repeatable fields,
+        // as created in the instance record used for testing.
+        DimensionList dimensionList = collectionObject.getDimensions();
+        Assert.assertNotNull(dimensionList);
+        List<DimensionGroup> dimensionsGroups = dimensionList.getDimensionGroup();
+        Assert.assertNotNull(dimensionsGroups);
+        Assert.assertTrue(dimensionsGroups.size() > 0);
+        Assert.assertNotNull(dimensionsGroups.get(0));
+        Assert.assertNotNull(dimensionsGroups.get(0).getMeasuredPart());
+
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": Reading Natural History part ...");
         }
@@ -683,8 +696,11 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(collectionObject);
 
         // Change the content of one or more fields in the common part.
+
         collectionObject.setObjectNumber("updated-" + collectionObject.getObjectNumber());
-        
+
+        // Change the object name in the first value instance in the
+        // object name repeatable group.
         ObjectNameList objNameList = collectionObject.getObjectNameList();
         List<ObjectNameGroup> objNameGroups = objNameList.getObjectNameGroup();
         Assert.assertNotNull(objNameGroups);
@@ -694,6 +710,24 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         String updatedObjectName = "updated-" + objectName;
         objNameGroups.get(0).setObjectName(updatedObjectName);
         collectionObject.setObjectNameList(objNameList);
+
+        // Replace the existing value instances in the dimensions repeatable group
+        // with entirely new value instances, also changing the number of such instances.
+        DimensionList dimensionList = collectionObject.getDimensions();
+        Assert.assertNotNull(dimensionList);
+        List<DimensionGroup> dimensionGroups = dimensionList.getDimensionGroup();
+        Assert.assertNotNull(dimensionGroups);
+        int originalDimensionGroupSize = dimensionGroups.size();
+        Assert.assertTrue(originalDimensionGroupSize >= 1);
+
+        DimensionGroup updatedDimensionGroup = new DimensionGroup();
+        updatedDimensionGroup.setMeasuredPart(UPDATED_MEASURED_PART_VALUE);
+        dimensionGroups.clear();
+        dimensionGroups.add(updatedDimensionGroup);
+        int updatedDimensionGroupSize = dimensionGroups.size();
+        Assert.assertTrue(updatedDimensionGroupSize >= 1);
+        Assert.assertTrue(updatedDimensionGroupSize != originalDimensionGroupSize);
+        collectionObject.setDimensions(dimensionList);
 
         if (logger.isDebugEnabled()) {
             logger.debug("sparse update that will be sent in update request:");
@@ -725,6 +759,15 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(objNameGroups.size() >= 1);
         Assert.assertEquals(updatedObjectName,
                 objNameGroups.get(0).getObjectName(),
+                "Data in updated object did not match submitted data.");
+        
+        dimensionList = collectionObject.getDimensions();
+        Assert.assertNotNull(dimensionList);
+        dimensionGroups = dimensionList.getDimensionGroup();
+        Assert.assertNotNull(dimensionGroups);
+        Assert.assertTrue(dimensionGroups.size() == updatedDimensionGroupSize);
+        Assert.assertEquals(UPDATED_MEASURED_PART_VALUE,
+                dimensionGroups.get(0).getMeasuredPart(),
                 "Data in updated object did not match submitted data.");
 
     }
@@ -1128,46 +1171,17 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         remNumber.setNumberValue("2271966-" + System.currentTimeMillis());
         collectionObject.setRemNumber(remNumber);
         
-        BriefDescriptionList descriptionList = new BriefDescriptionList();
-        List<String> descriptions = descriptionList.getBriefDescription();
-        descriptions.add("Papier mache bird cow mask with horns, "
-                + "painted red with black and yellow spots. "
-                + "Puerto Rico. ca. 8&quot; high, 6&quot; wide, projects 10&quot; (with horns).");
-        descriptions.add("Papier mache bird cow mask with horns, "
-                + "painted red with black and yellow spots. "
-                + "Puerto Rico. ca. 8&quot; high, 6&quot; wide, projects 10&quot; (with horns).");
-
-        ResponsibleDepartmentList deptList = new ResponsibleDepartmentList();
-        List<String> depts = deptList.getResponsibleDepartment();
-        // @TODO Use properly formatted refNames for representative departments
-        // in this example test record. The following are mere placeholders.
-        depts.add("urn:org.collectionspace.services.department:Registrar");
-        depts.add("urn:org.walkerart.department:Fine Art");
-
-        OtherNumberList otherNumList = new OtherNumberList();
-        List<OtherNumber> otherNumbers = otherNumList.getOtherNumber();
-        
-        OtherNumber otherNumber1 = new OtherNumber();        
-        otherNumber1.setNumberValue("101." + objectName);
-        otherNumber1.setNumberType("integer");
-        otherNumbers.add(otherNumber1);
-        
-        OtherNumber otherNumber2 = new OtherNumber();
-        otherNumber2.setNumberValue("101.502.23.456." + objectName);
-        otherNumber2.setNumberType("ipaddress");
-        otherNumbers.add(otherNumber2);        
-        
-        //FIXME: Title does not need to be set.
+        // Scalar fields
         collectionObject.setTitle("atitle");
-        collectionObject.setResponsibleDepartments(deptList);
         collectionObject.setObjectNumber(objectNumber);
+        collectionObject.setAge(""); //test for null string
         
-        collectionObject.setOtherNumberList(otherNumList);
-
         // FIXME this can be removed when the repeatable other number list
         // is supported by the application layers
         collectionObject.setOtherNumber("urn:org.walkerart.id:123");
-        
+
+        // Repeatable structured groups
+
         ObjectNameList objNameList = new ObjectNameList();
         List<ObjectNameGroup> objNameGroups = objNameList.getObjectNameGroup();
         ObjectNameGroup objectNameGroup = new ObjectNameGroup();
@@ -1175,14 +1189,61 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         objNameGroups.add(objectNameGroup);
         collectionObject.setObjectNameList(objNameList);
 
-        collectionObject.setAge(""); //test for null string
+        DimensionList dimensionList = new DimensionList();
+        List<DimensionGroup> dimensionGroups = dimensionList.getDimensionGroup();
+        DimensionGroup dimensionGroup1 = new DimensionGroup();
+        dimensionGroup1.setMeasuredPart("head");
+        dimensionGroup1.setDimension("length");
+        dimensionGroup1.setValue("30");
+        dimensionGroup1.setMeasurementUnit("cm");
+        DimensionGroup dimensionGroup2 = new DimensionGroup();
+        dimensionGroup2.setMeasuredPart("leg");
+        dimensionGroup2.setDimension("width");
+        dimensionGroup2.setValue("2.57");
+        dimensionGroup2.setMeasurementUnit("m");
+        dimensionGroup2.setValueQualifier("");  // test null string
+        dimensionGroups.add(dimensionGroup1);
+        dimensionGroups.add(dimensionGroup2);
+        collectionObject.setDimensions(dimensionList);
+
+        // Repeatable scalar fields
+        
+        BriefDescriptionList descriptionList = new BriefDescriptionList();
+        List<String> descriptions = descriptionList.getBriefDescription();
+        descriptions.add("Papier mache bird cow mask with horns, "
+                + "painted red with black and yellow spots. "
+                + "Puerto Rico. ca. 8&quot; high, 6&quot; wide, projects 10&quot; (with horns).");
+        descriptions.add("Acrylic rabbit mask with wings, "
+                + "painted red with green and aquamarine spots. "
+                + "Puerto Rico. ca. 8&quot; high, 6&quot; wide, projects 10&quot; (with wings).");
         collectionObject.setBriefDescriptions(descriptionList);
+
+        ResponsibleDepartmentList deptList = new ResponsibleDepartmentList();
+        List<String> depts = deptList.getResponsibleDepartment();
+        // @TODO Use properly formatted refNames for representative departments
+        // in this example test record. The following are mere placeholders.
+        depts.add("urn:org.collectionspace.services.department:Registrar");
+        depts.add("urn:org.walkerart.department:Fine Art");
+        collectionObject.setResponsibleDepartments(deptList);
+
+        OtherNumberList otherNumList = new OtherNumberList();
+        List<OtherNumber> otherNumbers = otherNumList.getOtherNumber();
+        OtherNumber otherNumber1 = new OtherNumber();        
+        otherNumber1.setNumberValue("101." + objectName);
+        otherNumber1.setNumberType("integer");
+        otherNumbers.add(otherNumber1);
+        OtherNumber otherNumber2 = new OtherNumber();
+        otherNumber2.setNumberValue("101.502.23.456." + objectName);
+        otherNumber2.setNumberType("ipaddress");
+        otherNumbers.add(otherNumber2);
+        collectionObject.setOtherNumberList(otherNumList);
+
+        // Add instances of fields from an extension schema
 
         CollectionobjectsNaturalhistory conh = new CollectionobjectsNaturalhistory();
         conh.setNhString("test-string");
         conh.setNhInt(999);
         conh.setNhLong(9999);
-
 
         MultipartOutput multipart = createCollectionObjectInstance(commonPartName, collectionObject, conh);
         return multipart;
