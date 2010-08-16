@@ -67,6 +67,8 @@
                         <types:item><types:key>authRef</types:key><types:value>contentPersons|contentPerson</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>inscriptionContentInscriber</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>inscriptionDescriptionInscriber</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>objectProductionPerson</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>objectProductionOrganization</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>assocEventOrganizations|assocEventOrganization</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>assocEventPersons|assocEventPerson</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>assocOrganizations|assocOrganization</types:value></types:item>
@@ -1140,6 +1142,8 @@
                         <types:item><types:key>authRef</types:key><types:value>contentPersons|contentPerson</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>inscriptionContentInscriber</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>inscriptionDescriptionInscriber</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>objectProductionPerson</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>objectProductionOrganization</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>assocEventOrganizations|assocEventOrganization</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>assocEventPersons|assocEventPerson</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>assocOrganizations|assocOrganization</types:value></types:item>

@@ -110,6 +110,8 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     private String contentPersonRefName = null;
     private String contentInscriberRefName = null;
     private String descriptionInscriberRefName = null;
+    private String objectProductionPersonRefName = null;
+    private String objectProductionOrganizationRefName = null;
     private String assocEventOrganizationRefName = null;
     private String assocEventPersonRefName = null;
     private String assocOrganizationRefName = null;
@@ -119,7 +121,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     private String fieldCollectorRefName = null;
 
     /** The number of authority references expected. */
-    private final int NUM_AUTH_REFS_EXPECTED = 11;
+    private final int NUM_AUTH_REFS_EXPECTED = 13;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -173,6 +175,8 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
                 contentPersonRefName,
                 contentInscriberRefName,
                 descriptionInscriberRefName,
+                objectProductionPersonRefName,
+                objectProductionOrganizationRefName,
                 assocEventOrganizationRefName,
                 assocEventPersonRefName,
                 assocOrganizationRefName,
@@ -280,6 +284,10 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         contentInscriberRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         personIdsCreated.add(csid);
 
+        csid = createPerson("Pacifico", "ProductionPerson", "pacificoProductionPerson");
+        objectProductionPersonRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        personIdsCreated.add(csid);
+
         csid = createPerson("Dessie", "DescriptionInscriber", "dessieDescriptionInscriber");
         descriptionInscriberRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         personIdsCreated.add(csid);
@@ -366,6 +374,10 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         contentOrganizationRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, csid, null);
         orgIdsCreated.add(csid);
 
+        csid = createOrganization("Production Org", "Production Org Town", "productionOrg");
+        objectProductionOrganizationRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, csid, null);
+        orgIdsCreated.add(csid);
+
         csid = createOrganization("Associated Event Org", "Associated Event Org City", "associatedEventOrg");
         assocEventOrganizationRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, csid, null);
         orgIdsCreated.add(csid);
@@ -412,20 +424,10 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         		collectionObjectClient.getCommonPartName(), CollectionobjectsCommon.class);
         Assert.assertNotNull(collectionObject);
 
-        // Check a sample of one or more person authority ref fields
-        Assert.assertEquals(collectionObject.getInscriptionContentInscriber(), contentInscriberRefName);
-        Assert.assertEquals(collectionObject.getAssocPersons().getAssocPerson().get(0), assocPersonRefName);
-        Assert.assertEquals(collectionObject.getOwners().getOwner().get(0), ownerRefName);
-        Assert.assertEquals(collectionObject.getFieldCollectionSources().getFieldCollectionSource().get(0), fieldCollectionSourceRefName);
-
-        // Check a sample of one or more organization authority ref fields
-        Assert.assertEquals(collectionObject.getContentOrganizations().getContentOrganization().get(0), contentOrganizationRefName);
-        Assert.assertEquals(collectionObject.getAssocEventOrganizations().getAssocEventOrganization().get(0), assocEventOrganizationRefName);
-
         // Get all of the auth refs and check that the expected number is returned
         ClientResponse<AuthorityRefList> res2 = collectionObjectClient.getAuthorityRefs(knownResourceId);
         statusCode = res2.getStatus();
-
+        
         if(logger.isDebugEnabled()){
             logger.debug(testName + ".getAuthorityRefs: status = " + statusCode);
         }
@@ -443,6 +445,16 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         Assert.assertEquals(numAuthRefsFound, NUM_AUTH_REFS_EXPECTED,
             "Did not find all expected authority references! " +
             "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
+               
+        // Check a sample of one or more person authority ref fields
+        Assert.assertEquals(collectionObject.getInscriptionContentInscriber(), contentInscriberRefName);
+        Assert.assertEquals(collectionObject.getAssocPersons().getAssocPerson().get(0), assocPersonRefName);
+        Assert.assertEquals(collectionObject.getOwners().getOwner().get(0), ownerRefName);
+        Assert.assertEquals(collectionObject.getFieldCollectionSources().getFieldCollectionSource().get(0), fieldCollectionSourceRefName);
+
+        // Check a sample of one or more organization authority ref fields
+        Assert.assertEquals(collectionObject.getContentOrganizations().getContentOrganization().get(0), contentOrganizationRefName);
+        Assert.assertEquals(collectionObject.getAssocEventOrganizations().getAssocEventOrganization().get(0), assocEventOrganizationRefName);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
@@ -539,6 +551,8 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
                 String contentPerson,
                 String contentInscriber,
                 String descriptionInscriber,
+                String objectProductionPerson,
+                String objectProductionOrganization,
                 String assocEventOrganization,
                 String assocEventPerson,
                 String assocOrganization,
@@ -551,6 +565,8 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         collectionObject.setObjectNumber(objNum);
         collectionObject.setInscriptionContentInscriber(contentInscriber);
         collectionObject.setInscriptionDescriptionInscriber(descriptionInscriber);
+        collectionObject.setObjectProductionPerson(objectProductionPerson);
+        collectionObject.setObjectProductionOrganization(objectProductionOrganization);
 
         ContentOrganizationList contentOrganizationList = new ContentOrganizationList();
         List<String> contentOrganizations = contentOrganizationList.getContentOrganization();
