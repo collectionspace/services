@@ -23,17 +23,13 @@
  */
 package org.collectionspace.services.movement.nuxeo;
 
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.collectionspace.services.MovementJAXBSchema;
-import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
+import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.movement.MovementsCommon;
 import org.collectionspace.services.movement.MovementsCommonList;
 import org.collectionspace.services.movement.MovementsCommonList.MovementListItem;
@@ -46,14 +42,15 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The Class MovementDocumentModelHandler.
+ *
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
 public class MovementDocumentModelHandler
         extends RemoteDocumentModelHandlerImpl<MovementsCommon, MovementsCommonList> {
 
     /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(MovementDocumentModelHandler.class);
-
-    private static final String COMMON_PART_LABEL = "movements_common";
     
     /** The Movement. */
     private MovementsCommon Movement;
@@ -145,7 +142,7 @@ public class MovementDocumentModelHandler
                     MovementJAXBSchema.MOVEMENT_REFERENCE_NUMBER));
             GregorianCalendar gcal = (GregorianCalendar) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     MovementJAXBSchema.LOCATION_DATE);
-            ilistItem.setLocationDate(GregorianCalendarDateTimeUtils.formatAsISO8601Timestamp(gcal));
+            ilistItem.setLocationDate(DateTimeFormatUtils.formatAsISO8601Timestamp(gcal));
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);
             ilistItem.setCsid(id);
@@ -164,16 +161,6 @@ public class MovementDocumentModelHandler
     @Override
     public String getQProperty(String prop) {
         return MovementConstants.NUXEO_SCHEMA_NAME + ":" + prop;
-    }
-
-    private boolean isDateTimeType(Object obj) {
-        boolean isDateTimeType = false;
-
-        if (obj != null && obj instanceof Calendar) {
-            isDateTimeType = true;
-        }
-
-        return isDateTimeType;
     }
 
 }

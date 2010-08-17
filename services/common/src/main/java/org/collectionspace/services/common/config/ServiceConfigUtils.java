@@ -40,9 +40,11 @@ public class ServiceConfigUtils {
 
 
     /**
-     * @param serviceConfig
-     * @param propName the property to fetch (allows multiple property values)
-     * @return
+     * Gets the values of a configured property for a service.
+     *
+     * @param serviceConfiga tenant binding
+     * @param propName the property to fetch (can return multiple values for this property).
+     * @return a list of values for the supplied property.
      */
     public static List<String> getPropertyValues(ServiceConfig serviceConfig,
     		String propName) {
