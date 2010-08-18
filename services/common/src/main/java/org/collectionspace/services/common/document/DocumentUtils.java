@@ -23,6 +23,8 @@
  */
 package org.collectionspace.services.common.document;
 
+import java.util.Calendar;
+
 import java.lang.reflect.Array;
 
 import java.io.File;
@@ -52,6 +54,8 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException; 
 
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.service.ObjectPartContentType;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.service.XmlContentType;
@@ -69,8 +73,10 @@ import org.nuxeo.ecm.core.schema.types.ComplexType;
 import org.nuxeo.ecm.core.schema.types.Field;
 import org.nuxeo.ecm.core.schema.types.ListType;
 import org.nuxeo.ecm.core.schema.types.Schema;
+import org.nuxeo.ecm.core.schema.types.SimpleType;
 import org.nuxeo.ecm.core.schema.types.Type;
 import org.nuxeo.ecm.core.schema.types.JavaTypes;
+import org.nuxeo.ecm.core.schema.types.primitives.DateType;
 import org.nuxeo.ecm.core.schema.types.primitives.StringType;
 import org.nuxeo.ecm.core.schema.types.FieldImpl;
 import org.nuxeo.ecm.core.schema.types.QName;
@@ -572,7 +578,7 @@ public class DocumentUtils {
 		parent.appendChild(element);
 		// extract the element content
 		if (type.isSimpleType()) {
-			element.setTextContent(type.encode(value));
+                        element.setTextContent(type.encode(value));
 		} else if (type.isComplexType()) {
 			ComplexType ctype = (ComplexType) type;
 			if (ctype.getName().equals(TypeConstants.CONTENT)) {
@@ -830,6 +836,22 @@ public class DocumentUtils {
 	}
 
 
+        /*
+         * Identifies whether a property type is a date type.
+         *
+         * @param type   a type.
+	 * @return       true, if is a date type;
+         *               false, if it is not a date type.
+         */
+        private static boolean isDateType(Type type) {
+            SimpleType st = (SimpleType) type;
+            if (st.getPrimitiveType() instanceof DateType) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
 	/**
 	 * Insert multi values.
 	 *
@@ -1021,7 +1043,7 @@ public class DocumentUtils {
 	 * @return the map
 	 */
 	public static Map<String, Object> parseProperties(ObjectPartType partMeta,
-			Document document) {
+			Document document, ServiceContext ctx) {
 		Map<String, Object> result = null;
 		String schemaName = partMeta.getLabel();
 		Schema schema = getSchemaFromName(schemaName);
@@ -1029,7 +1051,7 @@ public class DocumentUtils {
 		org.dom4j.io.DOMReader xmlReader = new org.dom4j.io.DOMReader();
 		org.dom4j.Document dom4jDocument = xmlReader.read(document);
 		try {
-			result = loadSchema(schema, dom4jDocument.getRootElement());
+			result = loadSchema(schema, dom4jDocument.getRootElement(), ctx);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1047,7 +1069,7 @@ public class DocumentUtils {
 	 * @throws Exception the exception
 	 */
 	@SuppressWarnings("unchecked")
-	static private Map<String, Object> loadSchema(Schema schema, org.dom4j.Element schemaElement)
+	static private Map<String, Object> loadSchema(Schema schema, org.dom4j.Element schemaElement, ServiceContext ctx)
 	throws Exception {
 		String schemaName1 = schemaElement.attributeValue(ExportConstants.NAME_ATTR);
 		String schemaName = schema.getName();
@@ -1059,7 +1081,7 @@ public class DocumentUtils {
 			String name = element.getName();
 			Field field = schema.getField(name);
 			if (field != null) {
-				Object value = getElementData(element, field.getType());
+				Object value = getElementData(element, field.getType(), ctx);
 				data.put(name, value);
 			} else	{
 				if (logger.isDebugEnabled() == true) {
@@ -1080,18 +1102,25 @@ public class DocumentUtils {
 	 * @return the element data
 	 */
 	@SuppressWarnings("unchecked")
-	static private Object getElementData(org.dom4j.Element element, Type type) {
+	static private Object getElementData(org.dom4j.Element element, Type type,
+                ServiceContext ctx) {
 		Object result = null;
 		
 		if (type.isSimpleType()) {
-			result = type.decode(element.getText());
+                        // Convert incoming date values to a canonical date representation,
+                        if (isDateType(type)) {
+                            result = DateTimeFormatUtils.toIso8601Timestamp((String) element.getText(),
+                                    ctx.getTenantId());
+                        } else {
+			    result = type.decode(element.getText());
+                        }
 		} else if (type.isListType()) {
 			ListType ltype = (ListType) type;
 			List<Object> list = new ArrayList<Object>();
 			Iterator<org.dom4j.Element> it = element.elementIterator();
 			while (it.hasNext()) {
 				org.dom4j.Element el = it.next();
-				list.add(getElementData(el, ltype.getFieldType()));
+				list.add(getElementData(el, ltype.getFieldType(), ctx));
 			}
 			Type ftype = ltype.getFieldType();
 			if (ftype.isSimpleType()) { // these are stored as arrays
@@ -1132,7 +1161,7 @@ public class DocumentUtils {
 					org.dom4j.Element el = it.next();
 					String name = el.getName();
 					Object value = getElementData(el, ctype.getField(
-							el.getName()).getType());
+							el.getName()).getType(), ctx);
 					map.put(name, value);
 				}
 				result = map;

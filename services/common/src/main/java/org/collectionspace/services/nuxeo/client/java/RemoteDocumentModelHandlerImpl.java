@@ -25,7 +25,6 @@ package org.collectionspace.services.nuxeo.client.java;
 
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,11 +55,7 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 
-import org.nuxeo.ecm.core.schema.types.ComplexType;
-import org.nuxeo.ecm.core.schema.types.Field;
-import org.nuxeo.ecm.core.schema.types.ListType;
 import org.nuxeo.ecm.core.schema.types.Schema;
-import org.nuxeo.ecm.core.schema.types.Type;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -213,7 +208,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
             if (partMeta == null) {
                 continue;
             }
-            fillPart(part, docModel, partMeta, action);
+            fillPart(part, docModel, partMeta, action, ctx);
         }//rof
 
     }
@@ -225,7 +220,8 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
      * @param partMeta metadata for the object to fill
      * @throws Exception
      */
-    protected void fillPart(InputPart part, DocumentModel docModel, ObjectPartType partMeta, Action action)
+    protected void fillPart(InputPart part, DocumentModel docModel,
+            ObjectPartType partMeta, Action action, ServiceContext ctx)
             throws Exception {
         InputStream payload = part.getBody(InputStream.class, null);
 
@@ -240,7 +236,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
                 //TODO: callback to handler if registered to validate the
                 //document
 //                Map<String, Object> objectProps = DocumentUtils.parseProperties(document.getFirstChild());
-                Map<String, Object> objectProps = DocumentUtils.parseProperties(partMeta, document);
+                Map<String, Object> objectProps = DocumentUtils.parseProperties(partMeta, document, ctx);
                 if (action == Action.UPDATE) {
                     this.filterReadOnlyPropertiesForPart(objectProps, partMeta);
                 }

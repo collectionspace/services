@@ -24,7 +24,10 @@ public class MovementValidatorHandler implements ValidatorHandler {
                 if(logger.isDebugEnabled()) {
                     logger.debug("validate() action=" + action.name());
                 }
+
+                /*
                 try {
+
                     MultipartServiceContext mctx = (MultipartServiceContext) ctx;
                     MovementsCommon mc = (MovementsCommon) mctx.getInputPart(mctx.getCommonPartLabel(),
                             MovementsCommon.class);
@@ -39,8 +42,9 @@ public class MovementValidatorHandler implements ValidatorHandler {
                     // in the incoming payload are date fields whose values we
                     // might wish to validate, and of extracting their values,
                     // than hard-coding them here.
+                    //
+                    // See DocumentUtils.parseProperties() for one possible approach.
 
-                    /*
                     boolean validDateFormat = false;
                     String locDate = mc.getLocationDate();
                     for (String pattern : patterns) {
@@ -52,8 +56,6 @@ public class MovementValidatorHandler implements ValidatorHandler {
                         invalid = true;
                         msgBldr.append("\nlocationDate : unrecognized date format '" + locDate + "'");
                     }
-                    *
-                    */
 
                     if(action.equals(Action.CREATE)) {
                         //create specific validation here
@@ -71,6 +73,8 @@ public class MovementValidatorHandler implements ValidatorHandler {
                 } catch (Exception e) {
                     throw new InvalidDocumentException(e);
                 }
+                 *
+                 */
 
 	}
 
