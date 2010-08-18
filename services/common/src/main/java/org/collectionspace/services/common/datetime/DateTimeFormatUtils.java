@@ -208,12 +208,11 @@ public class DateTimeFormatUtils {
      *
      * @return          an ISO 8601 timestamp representation of that String.
      *                  If the String cannot be parsed by the date formatters
-     *                  for the supplied tenant, return the original string.
+     *                  for the supplied tenant, return null;
      */
     public static String toIso8601Timestamp(String dateStr, String tenantId) {
         Date date = null;
         List<DateFormat> formatters = getDateFormattersForTenant(tenantId);
-//        for (DateFormat formatter : getDateFormattersForTenant(tenantId)) {
         for (DateFormat formatter : formatters) {
             date = parseDate(dateStr, formatter);
             if (date != null) {
@@ -221,7 +220,7 @@ public class DateTimeFormatUtils {
             }
         }
         if (date == null) {
-            return dateStr;
+            return null;
         } else {
             GregorianCalendar gcal = new GregorianCalendar();
             gcal.setTime(date);

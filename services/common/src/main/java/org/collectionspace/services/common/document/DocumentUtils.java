@@ -1043,7 +1043,7 @@ public class DocumentUtils {
 	 * @return the map
 	 */
 	public static Map<String, Object> parseProperties(ObjectPartType partMeta,
-			Document document, ServiceContext ctx) {
+			Document document, ServiceContext ctx) throws Exception {
 		Map<String, Object> result = null;
 		String schemaName = partMeta.getLabel();
 		Schema schema = getSchemaFromName(schemaName);
@@ -1051,7 +1051,9 @@ public class DocumentUtils {
 		org.dom4j.io.DOMReader xmlReader = new org.dom4j.io.DOMReader();
 		org.dom4j.Document dom4jDocument = xmlReader.read(document);
 		try {
-			result = loadSchema(schema, dom4jDocument.getRootElement(), ctx);
+                    result = loadSchema(schema, dom4jDocument.getRootElement(), ctx);
+                } catch (IllegalArgumentException iae) {
+                    throw iae;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1103,14 +1105,27 @@ public class DocumentUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	static private Object getElementData(org.dom4j.Element element, Type type,
-                ServiceContext ctx) {
+                ServiceContext ctx) throws Exception {
 		Object result = null;
+                String dateStr = "";
 		
 		if (type.isSimpleType()) {
-                        // Convert incoming date values to a canonical date representation,
                         if (isDateType(type)) {
-                            result = DateTimeFormatUtils.toIso8601Timestamp((String) element.getText(),
-                                    ctx.getTenantId());
+                            // Dates or date/times in ISO 8601-based representations
+                            // directly supported by Nuxeo will be successfully decoded.
+                            result = type.decode(element.getText());
+                            // All other date or date/time values must first be converted
+                            // to a supported ISO 8601-based representation.
+                            if (result == null) {
+                                dateStr = DateTimeFormatUtils.toIso8601Timestamp(element.getText(),
+                                        ctx.getTenantId());
+                                if (dateStr != null) {
+                                    result = type.decode(dateStr);
+                                } else {
+                                    throw new IllegalArgumentException("Unrecognized date value '"
+                                            + element.getText() + "' in field '" + element.getName() + "'");
+                                }
+                            }
                         } else {
 			    result = type.decode(element.getText());
                         }

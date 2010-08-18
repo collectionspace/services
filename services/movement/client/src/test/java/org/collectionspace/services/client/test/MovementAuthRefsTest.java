@@ -36,10 +36,9 @@ import org.collectionspace.services.client.MovementClient;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-//import org.collectionspace.services.common.authorityref.AuthorityRefList.AuthorityRefItem;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.movement.MovementsCommon;
-//import org.collectionspace.services.movement.MovementsCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -121,7 +120,7 @@ public class MovementAuthRefsTest extends BaseServiceTest {
         MovementClient movementClient = new MovementClient();
         MultipartOutput multipart = createMovementInstance(
                 "movementReferenceNumber-" + identifier,
-                "locationDate-" + identifier,
+                GregorianCalendarDateTimeUtils.timestampUTC(),
                 movementContactRefName);
         ClientResponse<Response> res = movementClient.create(multipart);
         int statusCode = res.getStatus();
