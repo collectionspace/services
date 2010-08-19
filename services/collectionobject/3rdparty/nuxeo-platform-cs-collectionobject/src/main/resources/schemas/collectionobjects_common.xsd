@@ -56,10 +56,15 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="collection" type="xs:string"/>
+
+    <!-- FIXME Start of Title repeatable group -->
     <xs:element name="title" type="xs:string"/>
     <xs:element name="titleLanguage" type="xs:string"/>
     <xs:element name="titleTranslation" type="xs:string"/>
+    <!-- FIXME [1.0 alpha] Need to add titleTranslationLanguage field here -->
     <xs:element name="titleType" type="xs:string"/>
+    <!-- FIXME End of Title repeatable group -->
+
     <xs:element name="recordStatus" type="xs:string"/>
 
     <!-- Object Description Information -->
@@ -88,9 +93,16 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="contentDate" type="xs:string"/>
+    <!-- FIXME [1.0 alpha] Penelope's repeatability spreadsheet describes a Content Date -->
+    <!-- repeatable field, with contentDate and dateAssociation fields.  Did not -->
+    <!-- find the latter in the wiki schemas, however.  contentDate is a structured date field. -->
     <xs:element name="contentDescription" type="xs:string"/>
+
+    <!-- FIXME Start of Content event name repeatable group -->
     <xs:element name="contentEventName" type="xs:string"/>
     <xs:element name="contentEventNameType" type="xs:string"/>
+    <!-- FIXME End of Content event name repeatable group -->
+
     <xs:element name="contentNote" type="xs:string"/>
     <xs:element name="contentLanguages">
         <xs:complexType>
@@ -99,8 +111,12 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <!-- FIXME Start of Content event name repeatable group -->
     <xs:element name="contentObject" type="xs:string"/>
     <xs:element name="contentObjectType" type="xs:string"/>
+    <!-- FIXME End of Content event name repeatable group -->
+
     <xs:element name="contentOrganizations">
         <xs:complexType>
             <xs:sequence>
@@ -108,8 +124,12 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <!-- FIXME Start of Content other group -->
     <xs:element name="contentOther" type="xs:string"/>
     <xs:element name="contentOtherType" type="xs:string"/>
+    <!-- FIXME End of Content other group -->
+
     <xs:element name="contentPeoples">
         <xs:complexType>
             <xs:sequence>
@@ -131,7 +151,10 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <!-- FIXME [1.0 alpha] contentPosition field must be made repeatable. -->
     <xs:element name="contentPosition" type="xs:string"/>
+    
     <xs:element name="contentScripts">
         <xs:complexType>
             <xs:sequence>
@@ -140,9 +163,11 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="copyNumber" type="xs:string"/>
+    
+    <!-- FIXME [1.0 alpha] Need to add dimensionSummary field here -->
     <xs:element name="dimensions" type="ns:dimensionList"/>
 
-    <!-- Remove these six elements when the App/UI layer is -->
+    <!-- FIXME Remove these six elements when the App/UI layer is -->
     <!-- using the new repeatable 'dimensions' field: -->
     <xs:element name="dimension" type="xs:string"/>
     <xs:element name="dimensionMeasuredPart" type="xs:string"/>
@@ -161,6 +186,10 @@
     </xs:element>
 
     <!-- Object description Inscription - Content Information -->
+
+    <!-- FIXME Start of Inscription content (or Textual inscription) repeatable group -->
+    <!-- FIXME Consider whether changes to field names below are required -->
+    <!-- in response to the renaming of this group to Textual inscription -->
     <xs:element name="inscriptionContent" type="xs:string"/>
     <xs:element name="inscriptionContentInscriber" type="xs:string"/>
     <xs:element name="inscriptionContentDate" type="xs:string"/>
@@ -172,8 +201,13 @@
     <xs:element name="inscriptionContentTranslation" type="xs:string"/>
     <xs:element name="inscriptionContentTransliteration" type="xs:string"/>
     <xs:element name="inscriptionContentType" type="xs:string"/>
+    <!-- FIXME End of Inscription content (or Textual inscription) repeatable group -->
 
     <!-- Object Description Inscription - Description Information -->
+
+    <!-- FIXME Start of Inscription description (or Non-textual inscription) repeatable group -->
+    <!-- FIXME Consider whether changes to field names below are required -->
+    <!-- in response to the renaming of this group to Non-textual inscription -->
     <xs:element name="inscriptionDescription" type="xs:string"/>
     <xs:element name="inscriptionDescriptionInscriber" type="xs:string"/>
     <xs:element name="inscriptionDescriptionDate" type="xs:string"/>
@@ -181,13 +215,17 @@
     <xs:element name="inscriptionDescriptionMethod" type="xs:string"/>
     <xs:element name="inscriptionDescriptionPosition" type="xs:string"/>
     <xs:element name="inscriptionDescriptionType" type="xs:string"/>
+    <!-- FIXME End of Inscription description (or Non-textual inscription) repeatable group -->
 
     <!-- Object Description Material Information -->
+
+    <!-- FIXME Start of Material repeatable group -->
     <xs:element name="material" type="xs:string"/>
     <xs:element name="materialComponent" type="xs:string"/>
     <xs:element name="materialComponentNote" type="xs:string"/>
     <xs:element name="materialName" type="xs:string"/>
     <xs:element name="materialSource" type="xs:string"/>
+    <!-- FIXME End of Material repeatable group -->
 
     <!-- Misc Object Description Information -->
     <xs:element name="objectStatus" type="xs:string"/>
@@ -201,51 +239,97 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <!-- FIXME Start of Technical attribute repeatable group -->
     <xs:element name="technicalAttribute" type="xs:string"/>
     <xs:element name="technicalAttributeMeasurement" type="xs:string"/>
     <xs:element name="technicalAttributeMeasurementUnit" type="xs:string"/>
+    <!-- FIXME End of Technical attribute repeatable group -->
+
+    <!-- FIXME Start of Object component repeatable group -->
     <xs:element name="objectComponentName" type="xs:string"/>
     <xs:element name="objectComponentInformation" type="xs:string"/>
+    <!-- FIXME End of Object component repeatable group -->
 
     <!-- Object Production Information -->
+
+    <!-- FIXME [1.0 alpha] objectProductionDate field must be made repeatable -->
     <xs:element name="objectProductionDate" type="xs:string"/>
+
     <xs:element name="objectProductionNote" type="xs:string"/>
+
+    <!-- FIXME Start of Object production organization repeatable group -->
     <xs:element name="objectProductionOrganization" type="xs:string"/>
     <xs:element name="objectProductionOrganizationRole" type="xs:string"/>
+    <!-- FIXME End of Object production organization repeatable group -->
+
+    <!-- FIXME Start of Object production people repeatable group -->
     <xs:element name="objectProductionPeople" type="xs:string"/>
     <xs:element name="objectProductionPeopleRole" type="xs:string"/>
+    <!-- FIXME End of Object production people repeatable group -->
+
+    <!-- FIXME Start of Object production person repeatable group -->
     <xs:element name="objectProductionPerson" type="xs:string"/>
     <xs:element name="objectProductionPersonRole" type="xs:string"/>
+    <!-- FIXME End of Object production person repeatable group -->
+
+    <!-- FIXME Start of Object production place repeatable group -->
     <xs:element name="objectProductionPlace" type="xs:string"/>
     <xs:element name="objectProductionPlaceRole" type="xs:string"/>
+    <!-- FIXME End of Object production place repeatable group -->
+
+    <!-- FIXME [1.0 alpha] objectProductionDate field must be made repeatable -->
     <xs:element name="objectProductionReason" type="xs:string"/>
+
+    <!-- FIXME Start of Technique repeatable group -->
     <xs:element name="technique" type="xs:string"/>
     <xs:element name="techniqueType" type="xs:string"/>
+    <!-- FIXME End of Technique repeatable group -->
 
     <!-- Object History and Association Information - Association -->
 
     <!-- In the following field names, "assoc" is an abbreviation for "associated". -->
     <!-- See the comments to CSPACE-2501 for a discussion of the database identifier -->
     <!-- length limit that made this abbreviation necessary. -->
+
+    <!-- FIXME Start of Associated activity repeatable group -->
     <xs:element name="assocActivity" type="xs:string"/>
     <xs:element name="assocActivityNote" type="xs:string"/>
+    <!-- FIXME End of Associated activity repeatable group -->
+
+    <!-- FIXME [1.0 alpha] Need to add assocConceptNote field here. -->
+    <!-- FIXME Convert to Associated concept repeatable group -->
     <xs:element name="assocConcepts">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="assocConcept" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <!-- FIXME Need to move assocConceptNote field here, after conversion. -->
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <!-- FIXME [1.0 Alpha] Need to add assocCulturalContextNote field here. -->
+    <!-- FIXME rename fields, if not over CSPACE-2501 length limit, -->
+    <!-- to assocCulturalAffinities, assocCulturalAffinity -->
+    <!-- FIXME Convert to Associated cultural contexts repeatable group -->
     <xs:element name="assocCulturalContexts">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="assocCulturalContext" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <!-- FIXME Need to move assocCulturalContextNote field here, after conversion. -->
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <!-- FIXME [1.0 alpha] Need to add assocDateNote field here. -->
+    <!-- FIXME Convert to Associated date repeatable group -->
     <xs:element name="assocDate" type="xs:string"/>
+        <!-- FIXME Need to move assocDateNote field here, after conversion. -->
+
+    <!-- FIXME Start of Associated event repeatable group -->
     <xs:element name="assocEventName" type="xs:string"/>
     <xs:element name="assocEventNameType" type="xs:string"/>
+    <!-- FIXME [1.0 alpha] Need to add assocEventNote field here. -->
     <xs:element name="assocEventOrganizations">
         <xs:complexType>
             <xs:sequence>
@@ -274,22 +358,37 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <!-- FIXME End of Associated event repeatable group -->
+
+    <!-- FIXME Start of Associated object repeatable group -->
     <xs:element name="assocObject" type="xs:string"/>
     <xs:element name="assocObjectType" type="xs:string"/>
+    <!-- FIXME End of Associated object repeatable group -->
+
+    <!-- FIXME [1.0 alpha] Need to add assocOrganizationNote field here. -->
+    <!-- FIXME Convert to Associated organizations repeatable group -->
     <xs:element name="assocOrganizations">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="assocOrganization" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <!-- FIXME Need to move assocOrganizationNote field here, after conversion. -->
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <!-- FIXME [1.0 alpha] Need to add assocPeopleNote field here. -->
+    <!-- FIXME Convert to Associated people repeatable group -->
     <xs:element name="assocPeoples">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="assocPeople" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <!-- FIXME Need to move assocPeopleNote field here, after conversion. -->
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <!-- FIXME [1.0 alpha] Need to add assocPersonNote field here. -->
+    <!-- FIXME Convert to Associated person repeatable group -->
     <xs:element name="assocPersons">
         <xs:complexType>
             <xs:sequence>
@@ -297,6 +396,8 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+        <!-- FIXME Need to move assocPersonNote field here, after conversion. -->
+
     <xs:element name="assocPlaces">
         <xs:complexType>
             <xs:sequence>
@@ -304,11 +405,17 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <!-- FIXME [1.0 alpha] Remove the associationNote field. -->
     <xs:element name="associationNote" type="xs:string"/>
+    <!-- FIXME [1.0 alpha] Remove the associationType field. -->
     <xs:element name="associationType" type="xs:string"/>
 
     <!-- Object History and Association Information - History -->
     <xs:element name="objectHistoryNote" type="xs:string"/>
+
+    <!-- Note: Erin has proposed the creation of a repeatable Ownership group -->
+    <!-- that may wrap multiple fields below, TBD -->
     <xs:element name="owners">
         <xs:complexType>
             <xs:sequence>
@@ -316,20 +423,29 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
     <xs:element name="ownershipAccess" type="xs:string"/>
     <xs:element name="ownershipCategory" type="xs:string"/>
+
+    <!-- FIXME Make into a repeatable, structured date ("date units of information") -->
+    <!-- field, when structured dates are introduced -->
     <xs:element name="ownershipDates" type="xs:string"/>
+
     <xs:element name="ownershipExchangeMethod" type="xs:string"/>
     <xs:element name="ownershipExchangeNote" type="xs:string"/>
     <xs:element name="ownershipExchangePriceCurrency" type="xs:string"/>
     <xs:element name="ownershipExchangePriceValue" type="xs:string"/>
     <xs:element name="ownershipPlace" type="xs:string"/>
+
+    <!-- FIXME Start of Usage repeatable group -->
     <xs:element name="usage" type="xs:string"/>
     <xs:element name="usageNote" type="xs:string"/>
+    <!-- FIXME End of Usage repeatable group -->
 
     <!-- Object Owner's Contribution Information -->
     <xs:element name="ownersPersonalExperience" type="xs:string"/>
     <xs:element name="ownersPersonalResponse" type="xs:string"/>
+    <!-- FIXME [1.0 alpha] ownersReference field must be made repeatable. -->
     <xs:element name="ownersReference" type="xs:string"/>
     <xs:element name="ownersContributionNote" type="xs:string"/>
 
@@ -337,11 +453,15 @@
     <xs:element name="viewersRole" type="xs:string"/>
     <xs:element name="viewersPersonalExperience" type="xs:string"/>
     <xs:element name="viewersPersonalResponse" type="xs:string"/>
+    <!-- FIXME [1.0 alpha] viewersReference field must be made repeatable. -->
     <xs:element name="viewersReference" type="xs:string"/>
     <xs:element name="viewersContributionNote" type="xs:string"/>
 
     <!-- Reference Information -->
+
+    <!-- FIXME [1.0 alpha] reference field must be made repeatable. -->
     <xs:element name="reference" type="xs:string"/>
+
     <xs:element name="catalogNumber" type="xs:string"/>
 
     <!--  Object Collection Information Group -->
