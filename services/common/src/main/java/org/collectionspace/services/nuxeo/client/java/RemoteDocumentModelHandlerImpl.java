@@ -133,7 +133,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
      * @return the tL
      * @throws Exception the exception
      */
-    protected TL extractPagingInfo(TL theCommonList, DocumentWrapper<DocumentModelList> wrapDoc)
+    public TL extractPagingInfo(TL theCommonList, DocumentWrapper<DocumentModelList> wrapDoc)
             throws Exception {
         AbstractCommonList commonList = (AbstractCommonList) theCommonList;
 

@@ -30,12 +30,13 @@ import java.util.UUID;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RolesList;
 
-import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.security.SecurityUtils;
+import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,8 +45,7 @@ import org.slf4j.LoggerFactory;
  * @author 
  */
 public class RoleDocumentHandler
-        extends AbstractDocumentHandlerImpl<Role, RolesList, Role, List> {
-
+		extends JpaDocumentHandler<Role, RolesList, Role, List> {
     private final Logger logger = LoggerFactory.getLogger(RoleDocumentHandler.class);
     private Role role;
     private RolesList rolesList;

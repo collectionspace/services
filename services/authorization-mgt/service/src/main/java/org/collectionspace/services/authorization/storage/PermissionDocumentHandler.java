@@ -27,9 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.collectionspace.services.authorization.AccountRole;
+import org.collectionspace.services.authorization.AccountRoleRel;
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.PermissionAction;
 import org.collectionspace.services.authorization.PermissionsList;
+import org.collectionspace.services.authorization.PermissionsRolesList;
 
 import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
 import org.collectionspace.services.common.document.BadRequestException;
@@ -37,6 +40,7 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.security.SecurityUtils;
+import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * @author 
  */
 public class PermissionDocumentHandler
-        extends AbstractDocumentHandlerImpl<Permission, PermissionsList, Permission, List> {
+		extends JpaDocumentHandler<Permission, PermissionsList, Permission, List> {
 
     private final Logger logger = LoggerFactory.getLogger(PermissionDocumentHandler.class);
     private Permission permission;

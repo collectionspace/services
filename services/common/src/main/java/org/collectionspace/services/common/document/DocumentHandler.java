@@ -221,6 +221,16 @@ public interface DocumentHandler<T, TL, WT, WTL> {
      * @throws Exception
      */
     public TL extractCommonPartList(DocumentWrapper<WTL> docWrap) throws Exception;
+    
+    /**
+     * Extract paging info.
+     *
+     * @param theCommonList the the common list
+     * @param wrapDoc the wrap doc
+     * @return the tL
+     * @throws Exception the exception
+     */
+    public TL extractPagingInfo(TL theCommonList, DocumentWrapper<WTL> wrapDoc)	throws Exception;    
 
     /**
      * fillCommonPartList sets list common part of CS object into given document

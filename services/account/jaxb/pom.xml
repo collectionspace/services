@@ -39,6 +39,11 @@
             <groupId>org.jvnet.hyperjaxb3</groupId>
             <artifactId>hyperjaxb3-ejb-runtime</artifactId>
         </dependency>
+        <dependency>
+			<groupId>org.collectionspace.services</groupId>
+			<artifactId>org.collectionspace.services.hyperjaxb</artifactId>
+			<version>${project.version}</version>
+        </dependency>        
     </dependencies>
 
     <build>

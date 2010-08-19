@@ -22,6 +22,11 @@ import java.util.UUID;
 import java.util.List;
 
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.query.IQueryManager;
+import org.collectionspace.services.common.query.QueryContext;
+import org.collectionspace.services.common.repository.RepositoryClient;
+import org.collectionspace.services.common.profile.Profiler;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
@@ -32,13 +37,9 @@ import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
 
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-import org.collectionspace.services.common.query.IQueryManager;
-import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.common.profile.Profiler;
-
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+
 import org.nuxeo.common.utils.IdUtils;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -62,87 +63,6 @@ import org.slf4j.LoggerFactory;
  */
 public class RepositoryJavaClientImpl implements RepositoryClient {
 
-    /**
-     * The Class QueryContext.
-     */
-    private class QueryContext {
-
-        /** The doc type. */
-        String docType;
-        /** The doc filter. */
-        DocumentFilter docFilter;
-        /** The where clause. */
-        String whereClause;
-        /** The order by clause. */
-        String orderByClause;
-        /** The domain. */
-        String domain;
-        /** The tenant id. */
-        String tenantId;
-
-        /**
-         * Instantiates a new query context.
-         *
-         * @param ctx the ctx
-         * @throws DocumentNotFoundException the document not found exception
-         * @throws DocumentException the document exception
-         */
-        QueryContext(ServiceContext<MultipartInput, MultipartOutput> ctx) throws DocumentNotFoundException, DocumentException {
-            docType = ctx.getDocumentType();
-            if (docType == null) {
-                throw new DocumentNotFoundException(
-                        "Unable to find DocumentType for service " + ctx.getServiceName());
-            }
-            domain = ctx.getRepositoryDomainName();
-            if (domain == null) {
-                throw new DocumentNotFoundException(
-                        "Unable to find Domain for service " + ctx.getServiceName());
-            }
-            tenantId = ctx.getTenantId();
-            if (tenantId == null) {
-                throw new IllegalArgumentException(
-                        "Service context has no Tenant ID specified.");
-            }
-        }
-
-        /**
-         * Instantiates a new query context.
-         *
-         * @param ctx the ctx
-         * @param theWhereClause the where clause
-         * @throws DocumentNotFoundException the document not found exception
-         * @throws DocumentException the document exception
-         */
-        QueryContext(ServiceContext<MultipartInput, MultipartOutput> ctx,
-                String theWhereClause) throws DocumentNotFoundException, DocumentException {
-            this(ctx);
-            whereClause = theWhereClause;
-        }
-
-        /**
-         * Instantiates a new query context.
-         *
-         * @param ctx the ctx
-         * @param handler the handler
-         * @throws DocumentNotFoundException the document not found exception
-         * @throws DocumentException the document exception
-         */
-        QueryContext(ServiceContext<MultipartInput, MultipartOutput> ctx,
-                DocumentHandler handler) throws DocumentNotFoundException, DocumentException {
-            this(ctx);
-            if (handler == null) {
-                throw new IllegalArgumentException(
-                        "Document handler is missing.");
-            }
-            docFilter = handler.getDocumentFilter();
-            if (docFilter == null) {
-                throw new IllegalArgumentException(
-                        "Document handler has no Filter specified.");
-            }
-            whereClause = docFilter.getWhereClause();
-            orderByClause = docFilter.getOrderByClause();
-        }
-    }
     /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(RepositoryJavaClientImpl.class);
 //    private final Logger profilerLogger = LoggerFactory.getLogger("remperf");
@@ -627,7 +547,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
     @Override
     public void getFiltered(ServiceContext ctx, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
-
         QueryContext queryContext = new QueryContext(ctx, handler);
 
         RepositoryInstance repoSession = null;
@@ -646,9 +565,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         	Profiler profiler = new Profiler(this, 2);
         	profiler.log("Executing NXQL query: " + query.toString());
         	profiler.start();
-            if ((queryContext.docFilter.getOffset() > 0) || (queryContext.docFilter.getPageSize() > 0)) {
+            if ((queryContext.getDocFilter().getOffset() > 0) || (queryContext.getDocFilter().getPageSize() > 0)) {
                 docList = repoSession.query(query, null,
-                        queryContext.docFilter.getPageSize(), queryContext.docFilter.getOffset(), true);
+                        queryContext.getDocFilter().getPageSize(), queryContext.getDocFilter().getOffset(), true);
             } else {
                 docList = repoSession.query(query);
             }
@@ -928,11 +847,11 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         //
         query.append(/*IQueryManager.SEARCH_QUALIFIER_AND +*/ " WHERE " + DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA + ":"
                 + DocumentModelHandler.COLLECTIONSPACE_CORE_TENANTID
-                + " = " + queryContext.tenantId);
+                + " = " + queryContext.getTenantId());
         //
         // Finally, append the incoming where clause
         //
-        String whereClause = queryContext.whereClause;
+        String whereClause = queryContext.getWhereClause();
         if (whereClause != null && ! whereClause.trim().isEmpty()) {
             // Due to an apparent bug/issue in how Nuxeo translates the NXQL query string
             // into SQL, we need to parenthesize our 'where' clause
@@ -952,7 +871,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
      */
     private final void appendNXQLOrderBy(StringBuilder query, QueryContext queryContext) {
         // Append the incoming ORDER BY clause
-        String orderByClause = queryContext.orderByClause;
+        String orderByClause = queryContext.getOrderByClause();
         if (orderByClause != null && ! orderByClause.trim().isEmpty()) {
             // FIXME Verify whether enclosing parentheses may be required, and add
             // them if so, as is being done in appendNXQLWhere.
@@ -977,7 +896,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
      */
     private final String buildNXQLQuery(QueryContext queryContext) {
         StringBuilder query = new StringBuilder("SELECT * FROM ");
-        query.append(queryContext.docType);
+        query.append(queryContext.getDocType());
         appendNXQLWhere(query, queryContext);
         appendNXQLOrderBy(query, queryContext);
         return query.toString();

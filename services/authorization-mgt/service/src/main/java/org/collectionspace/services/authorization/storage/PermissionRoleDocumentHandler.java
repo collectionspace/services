@@ -26,9 +26,11 @@ package org.collectionspace.services.authorization.storage;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionRoleRel;
 import org.collectionspace.services.authorization.PermissionValue;
+import org.collectionspace.services.authorization.PermissionsList;
 import org.collectionspace.services.authorization.PermissionsRolesList;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
@@ -36,6 +38,7 @@ import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * @author 
  */
 public class PermissionRoleDocumentHandler
-        extends AbstractDocumentHandlerImpl<PermissionRole, PermissionsRolesList, List<PermissionRoleRel>, List<PermissionRoleRel>> {
+		extends JpaDocumentHandler<PermissionRole, PermissionsRolesList, List<PermissionRoleRel>, List<PermissionRoleRel>> {
 
     private final Logger logger = LoggerFactory.getLogger(PermissionRoleDocumentHandler.class);
     private PermissionRole permissionRole;

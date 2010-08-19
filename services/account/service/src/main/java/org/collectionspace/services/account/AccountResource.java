@@ -239,13 +239,15 @@ public class AccountResource
             @Context UriInfo ui) {
         AccountsCommonList accountList = new AccountsCommonList();
         try {
-            ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext((AccountsCommon) null, AccountsCommon.class);
-            DocumentHandler handler = createDocumentHandler(ctx);
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            DocumentFilter myFilter = handler.createDocumentFilter();
-            myFilter.setPagination(queryParams);
-            myFilter.setQueryParams(queryParams);
-            handler.setDocumentFilter(myFilter);
+            ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext((AccountsCommon) null,
+            		queryParams, AccountsCommon.class);
+            DocumentHandler handler = createDocumentHandler(ctx);
+            handler.getDocumentFilter().setQueryParams(queryParams);
+//            DocumentFilter myFilter = handler.createDocumentFilter();
+//            myFilter.setPagination(queryParams);
+//            myFilter.setQueryParams(queryParams);
+//            handler.setDocumentFilter(myFilter);
             getStorageClient(ctx).getFiltered(ctx, handler);
             accountList = (AccountsCommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {

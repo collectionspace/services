@@ -27,17 +27,20 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
 import org.collectionspace.services.account.AccountTenant;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
 import org.collectionspace.services.account.AccountsCommonList.AccountListItem;
 import org.collectionspace.services.account.Status;
+
+import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.security.SecurityUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * @author 
  */
 public class AccountDocumentHandler
-        extends AbstractDocumentHandlerImpl<AccountsCommon, AccountsCommonList, AccountsCommon, List> {
+        extends JpaDocumentHandler<AccountsCommon, AccountsCommonList, AccountsCommon, List> {
 
     private final Logger logger = LoggerFactory.getLogger(AccountDocumentHandler.class);
     private AccountsCommon account;
@@ -144,7 +147,8 @@ public class AccountDocumentHandler
             DocumentWrapper<List> wrapDoc)
             throws Exception {
 
-        AccountsCommonList accList = new AccountsCommonList();
+    	AccountsCommonList accList = this.extractPagingInfo(new AccountsCommonList(), wrapDoc);
+//        AccountsCommonList accList = new AccountsCommonList();
         List<AccountsCommonList.AccountListItem> list = accList.getAccountListItem();
 
         for (Object obj : wrapDoc.getWrappedObject()) {

@@ -25,6 +25,7 @@ package org.collectionspace.services.common.document;
 
 
 
+import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,6 +83,10 @@ public abstract class AbstractMultipartDocumentHandlerImpl<T, TL, WT, WTL>
     @Override
     public abstract TL extractCommonPartList(DocumentWrapper<WTL> wrapDoc)
             throws Exception;
+    
+    @Override
+    public abstract TL extractPagingInfo(TL theCommonList, DocumentWrapper<WTL> wrapDoc)
+    		throws Exception;
 
     @Override
     public abstract T getCommonPart();

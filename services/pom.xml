@@ -24,6 +24,7 @@
         <module>authorization</module>
         <module>client</module>
         <module>jaxb</module>
+        <module>hyperjaxb</module>
         <module>common</module>
         <module>authorization-mgt</module> <!-- relies on authorization -->
         <module>common-test</module>

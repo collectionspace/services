@@ -33,11 +33,13 @@ import org.collectionspace.services.authorization.PermissionsRolesList;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
 
 import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.context.ServiceContextProperties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * @author 
  */
 public class AccountRoleDocumentHandler
-        extends AbstractDocumentHandlerImpl<AccountRole, PermissionsRolesList, List<AccountRoleRel>, List<AccountRoleRel>> {
+        extends JpaDocumentHandler<AccountRole, PermissionsRolesList, List<AccountRoleRel>, List<AccountRoleRel>> {
 
     private final Logger logger = LoggerFactory.getLogger(AccountRoleDocumentHandler.class);
     private AccountRole accountRole;

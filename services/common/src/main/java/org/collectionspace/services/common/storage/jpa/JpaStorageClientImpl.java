@@ -19,10 +19,11 @@ package org.collectionspace.services.common.storage.jpa;
 
 import java.util.Date;
 import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
-import org.collectionspace.services.common.context.ServiceContext;
+
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -32,8 +33,12 @@ import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.common.document.JaxbUtils;
+
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.context.ServiceContextProperties;
+import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.query.QueryContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -212,15 +217,8 @@ public class JpaStorageClientImpl implements StorageClient {
     @Override
     public void getFiltered(ServiceContext ctx, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
-        if (ctx == null) {
-            throw new IllegalArgumentException(
-                    "getFiltered: ctx is missing");
-        }
-        if (handler == null) {
-            throw new IllegalArgumentException(
-                    "getFiltered: handler is missing");
-        }
-
+    	QueryContext queryContext = new QueryContext(ctx, handler);
+    	
         DocumentFilter docFilter = handler.getDocumentFilter();
         if (docFilter == null) {
             docFilter = handler.createDocumentFilter();
@@ -229,10 +227,10 @@ public class JpaStorageClientImpl implements StorageClient {
         EntityManager em = null;
         try {
             handler.prepare(Action.GET_ALL);
-
             StringBuilder queryStrBldr = new StringBuilder("SELECT a FROM ");
             queryStrBldr.append(getEntityName(ctx));
             queryStrBldr.append(" a");
+            
             List<DocumentFilter.ParamBinding> params = docFilter.buildWhereForSearch(queryStrBldr);
             emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
