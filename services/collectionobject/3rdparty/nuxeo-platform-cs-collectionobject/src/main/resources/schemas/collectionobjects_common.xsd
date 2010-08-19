@@ -92,10 +92,12 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <!-- Note: Penelope's repeatability spreadsheet identifies a Content Date -->
+    <!-- repeatable group, containing contentDate and dateAssociation fields. -->
+    <!-- Did not find the dateAssociation field in the wiki schemas, however.  -->
+    <!-- contentDate is itself a structured date field, containing a dateAssociation -->
+    <!-- field, so perhaps this may merely be a product of some confusion. -->
     <xs:element name="contentDate" type="xs:string"/>
-    <!-- FIXME [1.0 alpha] Penelope's repeatability spreadsheet describes a Content Date -->
-    <!-- repeatable field, with contentDate and dateAssociation fields.  Did not -->
-    <!-- find the latter in the wiki schemas, however.  contentDate is a structured date field. -->
     <xs:element name="contentDescription" type="xs:string"/>
 
     <!-- FIXME Start of Content event name repeatable group -->
