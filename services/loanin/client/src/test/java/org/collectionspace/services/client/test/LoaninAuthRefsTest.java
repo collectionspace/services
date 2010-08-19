@@ -76,9 +76,10 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
     private String lendersAuthorizerRefName = null;
     private String lendersContactRefName = null;
     private String loanInContactRefName = null;
+    private String borrowersAuthorizerRefName = null;
     // FIXME: May change when repeatable / multivalue 'lenders' field is added
     // to tenant-bindings.xml
-    private final int NUM_AUTH_REFS_EXPECTED = 4;
+    private final int NUM_AUTH_REFS_EXPECTED = 5;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -123,10 +124,11 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         MultipartOutput multipart = createLoaninInstance(
                 "loanInNumber-" + identifier,
                 "returnDate-" + identifier,
-								lenderRefName,
+		lenderRefName,
                 lendersAuthorizerRefName,
                 lendersContactRefName,
-                loanInContactRefName);
+                loanInContactRefName,
+                borrowersAuthorizerRefName);
         ClientResponse<Response> response = loaninClient.create(multipart);
         int statusCode = response.getStatus();
         try {
@@ -195,6 +197,10 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         personIdsCreated.add(csid);
         loanInContactRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
 
+        csid = createPerson("Bonnie", "Borrowersauthorizer", "bonnieBorrowersauthorizer", authRefName);
+        personIdsCreated.add(csid);
+        borrowersAuthorizerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+
         // FIXME: Add instance(s) of 'lenders' field when we can work with
         // repeatable / multivalued authority reference fields.  Be sure to
         // change the NUM_AUTH_REFS_EXPECTED constant accordingly, or otherwise
@@ -256,6 +262,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         Assert.assertEquals(loanin.getLendersAuthorizer(), lendersAuthorizerRefName);
         Assert.assertEquals(loanin.getLendersContact(), lendersContactRefName);
         Assert.assertEquals(loanin.getLoanInContact(), loanInContactRefName);
+        Assert.assertEquals(loanin.getBorrowersAuthorizer(), borrowersAuthorizerRefName);
         
         // Get the auth refs and check them
         ClientResponse<AuthorityRefList> res2 =
@@ -363,7 +370,8 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
                 String lender,
                 String lendersAuthorizer,
                 String lendersContact,
-                String loaninContact) {
+                String loaninContact,
+                String borrowersAuthorizer) {
         LoansinCommon loanin = new LoansinCommon();
         loanin.setLoanInNumber(loaninNumber);
         loanin.setLoanInNumber(returnDate);
@@ -371,6 +379,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         loanin.setLendersAuthorizer(lendersAuthorizer);
         loanin.setLendersContact(lendersContact);
         loanin.setLoanInContact(loaninContact);
+        loanin.setBorrowersAuthorizer(borrowersAuthorizer);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(loanin, MediaType.APPLICATION_XML_TYPE);

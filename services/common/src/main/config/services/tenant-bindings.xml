@@ -206,6 +206,7 @@
                         <types:item><types:key>authRef</types:key><types:value>lendersAuthorizer</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>lendersContact</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>loanInContact</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>borrowersAuthorizer</types:value></types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
@@ -1312,6 +1313,7 @@
                         <types:item><types:key>authRef</types:key><types:value>lendersAuthorizer</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>lendersContact</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>loanInContact</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>borrowersAuthorizer</types:value></types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent

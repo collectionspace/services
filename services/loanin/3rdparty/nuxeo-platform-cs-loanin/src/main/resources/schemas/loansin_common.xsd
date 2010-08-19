@@ -27,6 +27,7 @@
     <xs:element name="lendersAuthorizationDate" type="xs:string"/>
     <xs:element name="lendersContact" type="xs:string"/>
     <xs:element name="loanInContact" type="xs:string"/>
+    <xs:element name="borrowersAuthorizer" type="xs:string"/>
     <xs:element name="loanInConditions" type="xs:string"/>
     <xs:element name="loanInDate" type="xs:string"/>
     <xs:element name="loanReturnDate" type="xs:string"/>
