@@ -54,6 +54,7 @@
                 <xs:element name="title" type="xs:string"/>
                 <xs:element name="titleLanguage" type="xs:string"/>
                 <xs:element name="titleTranslation" type="xs:string"/>
+                <xs:element name="titleTranslationLanguage" type="xs:string"/>
                 <xs:element name="titleType" type="xs:string"/>
                 <xs:element name="recordStatus" type="xs:string"/>
 
@@ -80,9 +81,10 @@
                 <xs:element name="contentPeoples" type="contentPeopleList"/>
                 <xs:element name="contentPersons" type="contentPersonList"/>
                 <xs:element name="contentPlaces" type="contentPlaceList"/>
-                <xs:element name="contentPosition" type="xs:string"/>
+                <xs:element name="contentPositions" type="contentPositionList"/>
                 <xs:element name="contentScripts" type="contentScriptList"/>
                 <xs:element name="copyNumber" type="xs:string"/>
+                <xs:element name="dimensionSummary" type="xs:string"/>
                 <xs:element name="dimensions" type="ns:dimensionList"/>
 
                 <!-- Remove these six elements when the App/UI layer is -->
@@ -139,7 +141,7 @@
                 <xs:element name="objectComponentInformation" type="xs:string"/>
 
                 <!-- Object Production Information -->
-                <xs:element name="objectProductionDate" type="xs:string"/>
+                <xs:element name="objectProductionDates" type="objectProductionDateList"/>
                 <xs:element name="objectProductionNote" type="xs:string"/>
                 <xs:element name="objectProductionOrganization" type="xs:string"/>
                 <xs:element name="objectProductionOrganizationRole" type="xs:string"/>
@@ -149,7 +151,7 @@
                 <xs:element name="objectProductionPersonRole" type="xs:string"/>
                 <xs:element name="objectProductionPlace" type="xs:string"/>
                 <xs:element name="objectProductionPlaceRole" type="xs:string"/>
-                <xs:element name="objectProductionReason" type="xs:string"/>
+                <xs:element name="objectProductionReasons" type="objectProductionReasonList"/>
                 <xs:element name="technique" type="xs:string"/>
                 <xs:element name="techniqueType" type="xs:string"/>
 
@@ -160,23 +162,29 @@
                 <!-- length limit that made this abbreviation necessary. -->
                 <xs:element name="assocActivity" type="xs:string"/>
                 <xs:element name="assocActivityNote" type="xs:string"/>
+                <xs:element name="assocConceptNote" type="xs:string"/>
                 <xs:element name="assocConcepts" type="assocConceptList"/>
+                <xs:element name="assocCulturalContextNote" type="xs:string"/>
                 <xs:element name="assocCulturalContexts" type="assocCulturalContextList"/>
+                <xs:element name="assocDateNote" type="xs:string"/>
                 <xs:element name="assocDate" type="xs:string"/>
                 <xs:element name="assocEventName" type="xs:string"/>
                 <xs:element name="assocEventNameType" type="xs:string"/>
+                <xs:element name="assocEventNote" type="xs:string"/>
                 <xs:element name="assocEventOrganizations" type="assocEventOrganizationList"/>
                 <xs:element name="assocEventPeoples" type="assocEventPeopleList"/>
                 <xs:element name="assocEventPersons" type="assocEventPersonList"/>
                 <xs:element name="assocEventPlaces" type="assocEventPlaceList"/>
                 <xs:element name="assocObject" type="xs:string"/>
                 <xs:element name="assocObjectType" type="xs:string"/>
+                <xs:element name="assocOrganizationNote" type="xs:string"/>
                 <xs:element name="assocOrganizations" type="assocOrganizationList"/>
+                <xs:element name="assocPeopleNote" type="xs:string"/>
                 <xs:element name="assocPeoples" type="assocPeopleList"/>
+                <xs:element name="assocPersonNote" type="xs:string"/>
                 <xs:element name="assocPersons" type="assocPersonList"/>
+                <xs:element name="assocPlaceNote" type="xs:string"/>
                 <xs:element name="assocPlaces" type="assocPlaceList"/>
-                <xs:element name="associationNote" type="xs:string"/>
-                <xs:element name="associationType" type="xs:string"/>
 
                 <!-- Object History and Association Information - History -->
                 <xs:element name="objectHistoryNote" type="xs:string"/>
@@ -195,18 +203,18 @@
                 <!-- Object Owner's Contribution Information -->
                 <xs:element name="ownersPersonalExperience" type="xs:string"/>
                 <xs:element name="ownersPersonalResponse" type="xs:string"/>
-                <xs:element name="ownersReference" type="xs:string"/>
+                <xs:element name="ownersReferences" type="ownersReferenceList"/>
                 <xs:element name="ownersContributionNote" type="xs:string"/>
 
                 <!-- Object Viewers Contribution Information -->
                 <xs:element name="viewersRole" type="xs:string"/>
                 <xs:element name="viewersPersonalExperience" type="xs:string"/>
                 <xs:element name="viewersPersonalResponse" type="xs:string"/>
-                <xs:element name="viewersReference" type="xs:string"/>
+                <xs:element name="viewersReferences" type="viewersReferenceList"/>
                 <xs:element name="viewersContributionNote" type="xs:string"/>
 
                 <!-- Reference Information -->
-                <xs:element name="reference" type="xs:string"/>
+                <xs:element name="references" type="referenceList"/>
                 <xs:element name="catalogNumber" type="xs:string"/>
 
                 <!--  Object Collection Information Group -->
@@ -333,6 +341,12 @@
         </xs:sequence>
     </xs:complexType>
 
+    <xs:complexType name="contentPositionList">
+        <xs:sequence>
+            <xs:element name="contentPosition" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
     <xs:complexType name="contentScriptList">
         <xs:sequence>
             <xs:element name="contentScript" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
@@ -366,6 +380,18 @@
     <xs:complexType name="styleList">
         <xs:sequence>
             <xs:element name="style" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="objectProductionDateList">
+        <xs:sequence>
+            <xs:element name="objectProductionDate" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="objectProductionReasonList">
+        <xs:sequence>
+            <xs:element name="objectProductionReason" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -432,6 +458,24 @@
     <xs:complexType name="ownerList">
         <xs:sequence>
             <xs:element name="owner" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ownersReferenceList">
+        <xs:sequence>
+            <xs:element name="ownersReference" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="viewersReferenceList">
+        <xs:sequence>
+            <xs:element name="viewersReference" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="referenceList">
+        <xs:sequence>
+            <xs:element name="reference" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 

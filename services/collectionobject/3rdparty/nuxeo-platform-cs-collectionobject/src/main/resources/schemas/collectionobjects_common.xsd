@@ -61,7 +61,8 @@
     <xs:element name="title" type="xs:string"/>
     <xs:element name="titleLanguage" type="xs:string"/>
     <xs:element name="titleTranslation" type="xs:string"/>
-    <!-- FIXME [1.0 alpha] Need to add titleTranslationLanguage field here -->
+    <!-- FIXME [1.0 alpha] Need to add titleTranslationLanguage field here. DONE -->
+    <xs:element name="titleTranslationLanguage" type="xs:string"/>
     <xs:element name="titleType" type="xs:string"/>
     <!-- FIXME End of Title repeatable group -->
 
@@ -154,8 +155,14 @@
         </xs:complexType>
     </xs:element>
 
-    <!-- FIXME [1.0 alpha] contentPosition field must be made repeatable. -->
-    <xs:element name="contentPosition" type="xs:string"/>
+    <!-- FIXME [1.0 alpha] contentPosition field must be made repeatable. DONE -->
+    <xs:element name="contentPositions">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="contentPosition" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
     
     <xs:element name="contentScripts">
         <xs:complexType>
@@ -166,7 +173,8 @@
     </xs:element>
     <xs:element name="copyNumber" type="xs:string"/>
     
-    <!-- FIXME [1.0 alpha] Need to add dimensionSummary field here -->
+    <!-- FIXME [1.0 alpha] Need to add dimensionSummary field here. DONE -->
+    <xs:element name="dimensionSummary" type="xs:string"/>
     <xs:element name="dimensions" type="ns:dimensionList"/>
 
     <!-- FIXME Remove these six elements when the App/UI layer is -->
@@ -255,8 +263,14 @@
 
     <!-- Object Production Information -->
 
-    <!-- FIXME [1.0 alpha] objectProductionDate field must be made repeatable -->
-    <xs:element name="objectProductionDate" type="xs:string"/>
+    <!-- FIXME [1.0 alpha] objectProductionDate field must be made repeatable. DONE -->
+    <xs:element name="objectProductionDates">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="objectProductionDate" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
 
     <xs:element name="objectProductionNote" type="xs:string"/>
 
@@ -280,8 +294,14 @@
     <xs:element name="objectProductionPlaceRole" type="xs:string"/>
     <!-- FIXME End of Object production place repeatable group -->
 
-    <!-- FIXME [1.0 alpha] objectProductionDate field must be made repeatable -->
-    <xs:element name="objectProductionReason" type="xs:string"/>
+    <!-- FIXME [1.0 alpha] objectProductionReason field must be made repeatable. DONE -->
+    <xs:element name="objectProductionReasons">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="objectProductionReason" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
 
     <!-- FIXME Start of Technique repeatable group -->
     <xs:element name="technique" type="xs:string"/>
@@ -299,8 +319,9 @@
     <xs:element name="assocActivityNote" type="xs:string"/>
     <!-- FIXME End of Associated activity repeatable group -->
 
-    <!-- FIXME [1.0 alpha] Need to add assocConceptNote field here. -->
     <!-- FIXME Convert to Associated concept repeatable group -->
+    <!-- FIXME [1.0 alpha] Need to add assocConceptNote field here. DONE -->
+    <xs:element name="assocConceptNote" type="xs:string"/>
     <xs:element name="assocConcepts">
         <xs:complexType>
             <xs:sequence>
@@ -310,10 +331,11 @@
         </xs:complexType>
     </xs:element>
 
-    <!-- FIXME [1.0 Alpha] Need to add assocCulturalContextNote field here. -->
     <!-- FIXME rename fields, if not over CSPACE-2501 length limit, -->
     <!-- to assocCulturalAffinities, assocCulturalAffinity -->
     <!-- FIXME Convert to Associated cultural contexts repeatable group -->
+    <!-- FIXME [1.0 Alpha] Need to add assocCulturalContextNote field here. DONE -->
+    <xs:element name="assocCulturalContextNote" type="xs:string"/>
     <xs:element name="assocCulturalContexts">
         <xs:complexType>
             <xs:sequence>
@@ -323,15 +345,17 @@
         </xs:complexType>
     </xs:element>
 
-    <!-- FIXME [1.0 alpha] Need to add assocDateNote field here. -->
     <!-- FIXME Convert to Associated date repeatable group -->
+    <!-- FIXME [1.0 alpha] Need to add assocDateNote field here. DONE -->
+    <xs:element name="assocDateNote" type="xs:string"/>
     <xs:element name="assocDate" type="xs:string"/>
         <!-- FIXME Need to move assocDateNote field here, after conversion. -->
 
     <!-- FIXME Start of Associated event repeatable group -->
     <xs:element name="assocEventName" type="xs:string"/>
     <xs:element name="assocEventNameType" type="xs:string"/>
-    <!-- FIXME [1.0 alpha] Need to add assocEventNote field here. -->
+    <!-- FIXME [1.0 alpha] Need to add assocEventNote field here. DONE -->
+    <xs:element name="assocEventNote" type="xs:string"/>
     <xs:element name="assocEventOrganizations">
         <xs:complexType>
             <xs:sequence>
@@ -364,11 +388,18 @@
 
     <!-- FIXME Start of Associated object repeatable group -->
     <xs:element name="assocObject" type="xs:string"/>
+    <!-- Note: the Cataloging Schema - Limited for Release 1.0 shows -->
+    <!-- an Associated object note field, but no Associated object -->
+    <!-- type field. This is currently believed to be a typo, as the -->
+    <!-- main Cataloging Schema page and the repeatability spreadsheets -->
+    <!-- all show this as Associated object type. -->
     <xs:element name="assocObjectType" type="xs:string"/>
+
     <!-- FIXME End of Associated object repeatable group -->
 
-    <!-- FIXME [1.0 alpha] Need to add assocOrganizationNote field here. -->
     <!-- FIXME Convert to Associated organizations repeatable group -->
+    <!-- FIXME [1.0 alpha] Need to add assocOrganizationNote field here. DONE -->
+    <xs:element name="assocOrganizationNote" type="xs:string"/>
     <xs:element name="assocOrganizations">
         <xs:complexType>
             <xs:sequence>
@@ -378,8 +409,9 @@
         </xs:complexType>
     </xs:element>
 
-    <!-- FIXME [1.0 alpha] Need to add assocPeopleNote field here. -->
     <!-- FIXME Convert to Associated people repeatable group -->
+    <!-- FIXME [1.0 alpha] Need to add assocPeopleNote field here. DONE -->
+    <xs:element name="assocPeopleNote" type="xs:string"/>
     <xs:element name="assocPeoples">
         <xs:complexType>
             <xs:sequence>
@@ -389,29 +421,32 @@
         </xs:complexType>
     </xs:element>
 
-    <!-- FIXME [1.0 alpha] Need to add assocPersonNote field here. -->
     <!-- FIXME Convert to Associated person repeatable group -->
+    <!-- FIXME [1.0 alpha] Need to add assocPersonNote field here. DONE -->
+    <xs:element name="assocPersonNote" type="xs:string"/>
     <xs:element name="assocPersons">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="assocPerson" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <!-- FIXME Need to move assocPersonNote field here, after conversion. -->
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-        <!-- FIXME Need to move assocPersonNote field here, after conversion. -->
 
+    <!-- FIXME Convert to Associated place repeatable group -->
+    <!-- FIXME [1.0 alpha] Need to add assocPlaceNote field here. DONE -->
+    <xs:element name="assocPlaceNote" type="xs:string"/>
     <xs:element name="assocPlaces">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="assocPlace" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <!-- FIXME Need to move assocPlaceNote field here, after conversion. -->
             </xs:sequence>
         </xs:complexType>
     </xs:element>
 
-    <!-- FIXME [1.0 alpha] Remove the associationNote field. -->
-    <xs:element name="associationNote" type="xs:string"/>
-    <!-- FIXME [1.0 alpha] Remove the associationType field. -->
-    <xs:element name="associationType" type="xs:string"/>
+    <!-- FIXME [1.0 alpha] Remove the associationNote field. DONE -->
+    <!-- FIXME [1.0 alpha] Remove the associationType field. DONE -->
 
     <!-- Object History and Association Information - History -->
     <xs:element name="objectHistoryNote" type="xs:string"/>
@@ -447,23 +482,40 @@
     <!-- Object Owner's Contribution Information -->
     <xs:element name="ownersPersonalExperience" type="xs:string"/>
     <xs:element name="ownersPersonalResponse" type="xs:string"/>
-    <!-- FIXME [1.0 alpha] ownersReference field must be made repeatable. -->
-    <xs:element name="ownersReference" type="xs:string"/>
+    <!-- FIXME [1.0 alpha] ownersReference field must be made repeatable. DONE -->
+    <xs:element name="ownersReferences">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="ownersReference" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="ownersContributionNote" type="xs:string"/>
 
     <!-- Object Viewers Contribution Information -->
     <xs:element name="viewersRole" type="xs:string"/>
     <xs:element name="viewersPersonalExperience" type="xs:string"/>
     <xs:element name="viewersPersonalResponse" type="xs:string"/>
-    <!-- FIXME [1.0 alpha] viewersReference field must be made repeatable. -->
-    <xs:element name="viewersReference" type="xs:string"/>
+    <!-- FIXME [1.0 alpha] viewersReference field must be made repeatable. DONE -->
+    <xs:element name="viewersReferences">
+            <xs:complexType>
+            <xs:sequence>
+                <xs:element name="viewersReference" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="viewersContributionNote" type="xs:string"/>
 
     <!-- Reference Information -->
 
-    <!-- FIXME [1.0 alpha] reference field must be made repeatable. -->
-    <xs:element name="reference" type="xs:string"/>
-
+    <!-- FIXME [1.0 alpha] reference field must be made repeatable. DONE -->
+    <xs:element name="references">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="reference" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="catalogNumber" type="xs:string"/>
 
     <!--  Object Collection Information Group -->
