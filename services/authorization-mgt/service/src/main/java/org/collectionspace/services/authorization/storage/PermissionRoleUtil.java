@@ -89,6 +89,7 @@ public class PermissionRoleUtil {
         PermissionRoleRel prr = new PermissionRoleRel();
         prr.setPermissionId(pv.getPermissionId());
         prr.setPermissionResource(pv.getResourceName());
+        prr.setActionGroup(pv.getActionGroup());
         prr.setRoleId(rv.getRoleId());
         prr.setRoleName(rv.getRoleName());
         return prr;

@@ -19,3 +19,4 @@ insert into `accounts_roles`(`account_id`, `user_id`, `role_id`, `role_name`, `c
 -- todo: barney is created in security test but accountrole is not yet created there, so add fake account id
 insert into `accounts_roles`(`account_id`, `user_id`, `role_id`, `role_name`, `created_at`) values ('1', 'barney', '2', 'ROLE_USERS', now());
 
+

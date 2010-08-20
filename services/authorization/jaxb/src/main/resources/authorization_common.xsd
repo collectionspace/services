@@ -83,6 +83,7 @@
         <xs:sequence>
             <xs:element name="permissionId" type="xs:string" minOccurs="1" maxOccurs="1"/>
             <xs:element name="resourceName" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="actionGroup" type="xs:string" minOccurs="1" maxOccurs="1"/>
         </xs:sequence>
     </xs:complexType>
 

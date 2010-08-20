@@ -6,3 +6,4 @@ create table accounts_common (csid varchar(128) not null, created_at datetime no
 create table accounts_tenants (HJID bigint not null auto_increment, tenant_id varchar(128) not null, TENANTS_ACCOUNTSCOMMON_CSID varchar(128), primary key (HJID));
 create table tenants (id varchar(128) not null, created_at datetime not null, name varchar(255) not null, updated_at datetime, primary key (id));
 alter table accounts_tenants add index FKFDA649B05A9CEEB5 (TENANTS_ACCOUNTSCOMMON_CSID), add constraint FKFDA649B05A9CEEB5 foreign key (TENANTS_ACCOUNTSCOMMON_CSID) references accounts_common (csid);
+

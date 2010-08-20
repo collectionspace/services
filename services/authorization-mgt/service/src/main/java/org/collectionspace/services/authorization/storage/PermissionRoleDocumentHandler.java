@@ -196,6 +196,7 @@ public class PermissionRoleDocumentHandler
         PermissionValue pv = new PermissionValue();
         pv.setPermissionId(prr.getPermissionId());
         pv.setResourceName(prr.getPermissionResource());
+        pv.setActionGroup(prr.getActionGroup());
         return pv;
     }
 

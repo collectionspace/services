@@ -14,3 +14,4 @@ CREATE INDEX index_role_id ON accounts_roles (role_id);
 
 CREATE INDEX index_permission_id ON permissions_roles (permission_id);
 CREATE INDEX index_role_id ON permissions_roles (role_id);
+

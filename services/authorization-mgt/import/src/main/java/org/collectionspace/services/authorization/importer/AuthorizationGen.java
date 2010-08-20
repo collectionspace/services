@@ -327,6 +327,7 @@ public class AuthorizationGen {
         PermissionValue permValue = new PermissionValue();
         permValue.setPermissionId(perm.getCsid());
         permValue.setResourceName(perm.getResourceName().toLowerCase());
+        permValue.setActionGroup(perm.getActionGroup());
         permValues.add(permValue);
 
         List<RoleValue> roleValues = new ArrayList<RoleValue>();

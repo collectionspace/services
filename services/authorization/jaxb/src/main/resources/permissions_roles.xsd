@@ -107,6 +107,15 @@
                     </xs:appinfo>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="actionGroup" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>
+                        <hj:basic>
+                            <orm:column name="actionGroup" nullable="true"/>
+                        </hj:basic>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:element>
             <xs:element name="roleId" type="xs:string" minOccurs="1" maxOccurs="1">
                 <xs:annotation>
                     <xs:appinfo>
