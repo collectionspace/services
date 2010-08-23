@@ -225,17 +225,11 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
             throws Exception {
         InputStream payload = part.getBody(InputStream.class, null);
 
-// TODO for sub-docs - after we parse the doc, we need to look for elements that are configured as 
-// subitem lists, for this part (schema), pull them out, and set them aside for later processing.
-
         //check if this is an xml part
         if (part.getMediaType().equals(MediaType.APPLICATION_XML_TYPE)) {
             if (payload != null) {
                 Document document = DocumentUtils.parseDocument(payload, partMeta,
                         false /*don't validate*/);
-                //TODO: callback to handler if registered to validate the
-                //document
-//                Map<String, Object> objectProps = DocumentUtils.parseProperties(document.getFirstChild());
                 Map<String, Object> objectProps = DocumentUtils.parseProperties(partMeta, document, ctx);
                 if (action == Action.UPDATE) {
                     this.filterReadOnlyPropertiesForPart(objectProps, partMeta);
