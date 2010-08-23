@@ -1111,19 +1111,24 @@ public class DocumentUtils {
 		
 		if (type.isSimpleType()) {
                         if (isDateType(type)) {
-                            // Dates or date/times in ISO 8601-based representations
-                            // directly supported by Nuxeo will be successfully decoded.
-                            result = type.decode(element.getText());
-                            // All other date or date/time values must first be converted
-                            // to a supported ISO 8601-based representation.
-                            if (result == null) {
-                                dateStr = DateTimeFormatUtils.toIso8601Timestamp(element.getText(),
-                                        ctx.getTenantId());
-                                if (dateStr != null) {
-                                    result = type.decode(dateStr);
-                                } else {
-                                    throw new IllegalArgumentException("Unrecognized date value '"
-                                            + element.getText() + "' in field '" + element.getName() + "'");
+                            String value = element.getText();
+                            if (value == null || value.trim().isEmpty()) {
+                                result = type.decode("");
+                            } else {
+                                // Dates or date/times in ISO 8601-based representations
+                                // directly supported by Nuxeo will be successfully decoded.
+                                result = type.decode(element.getText());
+                                // All other date or date/time values must first be converted
+                                // to a supported ISO 8601-based representation.
+                                if (result == null) {
+                                    dateStr = DateTimeFormatUtils.toIso8601Timestamp(element.getText(),
+                                            ctx.getTenantId());
+                                    if (dateStr != null) {
+                                        result = type.decode(dateStr);
+                                    } else {
+                                        throw new IllegalArgumentException("Unrecognized date value '"
+                                                + element.getText() + "' in field '" + element.getName() + "'");
+                                    }
                                 }
                             }
                         } else {

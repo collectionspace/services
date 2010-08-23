@@ -315,7 +315,7 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         }
         Assert.assertTrue(movement.getLocationDate().equals(TIMESTAMP_UTC));
         Assert.assertTrue(movement.getPlannedRemovalDate().equals(TIMESTAMP_UTC));
-        Assert.assertTrue(movement.getRemovalDate().equals(TIMESTAMP_UTC));
+        Assert.assertNull(movement.getRemovalDate());
     }
 
     // Failure outcomes
@@ -446,6 +446,10 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
             logger.debug("to be updated object");
             logger.debug(objectAsXmlString(movement, MovementsCommon.class));
         }
+        String currentTimestamp = GregorianCalendarDateTimeUtils.timestampUTC();
+        movement.setPlannedRemovalDate(""); // Test deletion of existing date or date/time value
+        movement.setRemovalDate(currentTimestamp);
+
         // Submit the request to the service and store the response.
         MultipartOutput output = new MultipartOutput();
         OutputPart commonPart = output.addPart(movement, MediaType.APPLICATION_XML_TYPE);
@@ -461,16 +465,27 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-
         input = (MultipartInput) res.getEntity();
         MovementsCommon updatedMovement =
                 (MovementsCommon) extractPart(input,
                         client.getCommonPartName(), MovementsCommon.class);
         Assert.assertNotNull(updatedMovement);
 
+        if(logger.isDebugEnabled()){
+            logger.debug("updated object");
+            logger.debug(objectAsXmlString(movement, MovementsCommon.class));
+        }
+
+        Assert.assertEquals(updatedMovement.getMovementReferenceNumber(),
+            movement.getMovementReferenceNumber(),
+            "Data in updated object did not match submitted data.");
         Assert.assertEquals(updatedMovement.getMovementNote(),
-                movement.getMovementNote(),
-                "Data in updated object did not match submitted data.");
+            movement.getMovementNote(),
+            "Data in updated object did not match submitted data.");
+        Assert.assertNull(updatedMovement.getPlannedRemovalDate());
+        Assert.assertEquals(updatedMovement.getRemovalDate(),
+            movement.getRemovalDate(),
+            "Data in updated object did not match submitted data.");
 
     }
 
@@ -763,7 +778,7 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         movement.setMovementNote("movementNote value");
         movement.setMovementReferenceNumber(movementReferenceNumber);
         movement.setPlannedRemovalDate(TIMESTAMP_UTC);
-        movement.setRemovalDate(TIMESTAMP_UTC);
+        movement.setRemovalDate(""); // Test empty date value
         movement.setReasonForMove("reasonForMove value");
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
