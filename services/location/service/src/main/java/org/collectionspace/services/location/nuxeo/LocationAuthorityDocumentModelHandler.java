@@ -51,6 +51,15 @@ import org.slf4j.LoggerFactory;
 public class LocationAuthorityDocumentModelHandler
         extends AuthorityDocumentModelHandler<LocationauthoritiesCommon, LocationauthoritiesCommonList> {
 
+    /**
+     * Common part schema label
+     */
+    private static final String COMMON_PART_LABEL = "locationauthorities_common";   
+    
+    public LocationAuthorityDocumentModelHandler() {
+    	super(COMMON_PART_LABEL);
+    }
+	
     @Override
     public LocationauthoritiesCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         LocationauthoritiesCommonList coList = extractPagingInfo(new LocationauthoritiesCommonList(),

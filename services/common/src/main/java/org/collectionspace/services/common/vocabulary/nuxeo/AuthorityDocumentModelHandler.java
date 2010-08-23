@@ -23,9 +23,13 @@
  */
 package org.collectionspace.services.common.vocabulary.nuxeo;
 
+import java.util.Map;
+
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.service.ObjectPartType;
 
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
 /**
@@ -37,6 +41,8 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 public abstract class AuthorityDocumentModelHandler<AuthCommon, AuthCommonList>
         extends RemoteDocumentModelHandlerImpl<AuthCommon, AuthCommonList> {
 
+	private String authorityCommonSchemaName;
+	
     /**
      * authority is used to stash JAXB object to use when handle is called
      * for Action.CREATE, Action.UPDATE or Action.GET
@@ -48,6 +54,10 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon, AuthCommonList>
      */
     private AuthCommonList authorityList;
 
+
+    public AuthorityDocumentModelHandler(String authorityCommonSchemaName) {
+    	this.authorityCommonSchemaName = authorityCommonSchemaName;
+    }
 
     /**
      * getCommonPart get associated authority
@@ -101,5 +111,22 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon, AuthCommonList>
         throw new UnsupportedOperationException();
     }
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#extractPart(org.nuxeo.ecm.core.api.DocumentModel, java.lang.String, org.collectionspace.services.common.service.ObjectPartType)
+     */
+    @Override
+    protected Map<String, Object> extractPart(DocumentModel docModel, String schema, ObjectPartType partMeta)
+            throws Exception {
+    	Map<String, Object> unQObjectProperties = super.extractPart(docModel, schema, partMeta);
+    	
+    	// Add the CSID to the common part
+    	if (partMeta.getLabel().equalsIgnoreCase(authorityCommonSchemaName)) {
+	    	String csid = NuxeoUtils.extractId(docModel.getPathAsString());
+	    	unQObjectProperties.put("csid", csid);
+    	}
+    	
+    	return unQObjectProperties;
+    }
+    
 }
 

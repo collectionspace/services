@@ -48,8 +48,15 @@ import org.slf4j.LoggerFactory;
 public class PersonAuthorityDocumentModelHandler
 		extends AuthorityDocumentModelHandler<PersonauthoritiesCommon, PersonauthoritiesCommonList> {
 
-    private final Logger logger = LoggerFactory.getLogger(PersonAuthorityDocumentModelHandler.class);
-
+    /**
+     * Common part schema label
+     */
+    private static final String COMMON_PART_LABEL = "personauthorities_common";   
+    
+    public PersonAuthorityDocumentModelHandler() {
+    	super(COMMON_PART_LABEL);
+    }
+	
     @Override
     public PersonauthoritiesCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         PersonauthoritiesCommonList coList = extractPagingInfo(new PersonauthoritiesCommonList(),

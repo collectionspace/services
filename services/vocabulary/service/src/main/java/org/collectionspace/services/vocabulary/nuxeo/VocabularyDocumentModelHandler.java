@@ -48,9 +48,15 @@ import org.slf4j.LoggerFactory;
 public class VocabularyDocumentModelHandler
 		extends AuthorityDocumentModelHandler<VocabulariesCommon, VocabulariesCommonList> {
 
-    /** The logger. */
-    private final Logger logger = LoggerFactory.getLogger(VocabularyDocumentModelHandler.class);
-
+    /**
+     * Common part schema label
+     */
+    private static final String COMMON_PART_LABEL = "vocabularies_common";   
+    
+    public VocabularyDocumentModelHandler() {
+    	super(COMMON_PART_LABEL);
+    }
+	
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
      */

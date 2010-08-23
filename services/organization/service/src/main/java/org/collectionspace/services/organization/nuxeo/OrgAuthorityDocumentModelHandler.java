@@ -48,8 +48,15 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
 public class OrgAuthorityDocumentModelHandler
         extends AuthorityDocumentModelHandler<OrgauthoritiesCommon, OrgauthoritiesCommonList> {
 
-    //private final Logger logger = LoggerFactory.getLogger(OrgAuthorityDocumentModelHandler.class);
+    /**
+     * Common part schema label
+     */
+    private static final String COMMON_PART_LABEL = "orgauthorities_common";   
     
+    public OrgAuthorityDocumentModelHandler() {
+    	super(COMMON_PART_LABEL);
+    }
+	
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#extractCommonPartList(org.collectionspace.services.common.document.DocumentWrapper)
      */
