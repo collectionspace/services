@@ -135,12 +135,15 @@ public class MovementDocumentModelHandler
         MovementsCommonList coList = extractPagingInfo(new MovementsCommonList(), wrapDoc);
         List<MovementsCommonList.MovementListItem> list = coList.getMovementListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
+        String label = getServiceContext().getCommonPartLabel();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
             MovementListItem ilistItem = new MovementListItem();
-            ilistItem.setMovementReferenceNumber((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+            ilistItem.setMovementReferenceNumber((String) docModel.getProperty(label,
                     MovementJAXBSchema.MOVEMENT_REFERENCE_NUMBER));
-            GregorianCalendar gcal = (GregorianCalendar) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+            ilistItem.setCurrentLocation((String) docModel.getProperty(label,
+                    MovementJAXBSchema.CURRENT_LOCATION));
+            GregorianCalendar gcal = (GregorianCalendar) docModel.getProperty(label,
                     MovementJAXBSchema.LOCATION_DATE);
             ilistItem.setLocationDate(DateTimeFormatUtils.formatAsISO8601Timestamp(gcal));
             String id = NuxeoUtils.extractId(docModel.getPathAsString());

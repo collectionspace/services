@@ -74,6 +74,8 @@
                                 <xs:sequence>
                                     <xs:element name="movementReferenceNumber" type="xs:string"
                                         minOccurs="1" />
+                                    <xs:element name="currentLocation" type="xs:string"
+                                        minOccurs="1" />
                                     <xs:element name="locationDate" type="xs:string"
                                         minOccurs="1" />
                                     <!-- uri to retrive details -->
