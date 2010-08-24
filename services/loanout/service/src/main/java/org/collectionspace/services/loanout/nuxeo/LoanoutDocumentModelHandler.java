@@ -131,12 +131,15 @@ public class LoanoutDocumentModelHandler
         LoansoutCommonList coList = extractPagingInfo(new LoansoutCommonList(), wrapDoc);
         List<LoansoutCommonList.LoanoutListItem> list = coList.getLoanoutListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
+        String label = getServiceContext().getCommonPartLabel();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
             LoanoutListItem ilistItem = new LoanoutListItem();
-            ilistItem.setLoanOutNumber((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+            ilistItem.setLoanOutNumber((String) docModel.getProperty(label,
                     LoanoutJAXBSchema.LOAN_OUT_NUMBER));
-            ilistItem.setLoanReturnDate((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+            ilistItem.setBorrower((String) docModel.getProperty(label,
+                    LoanoutJAXBSchema.BORROWER));
+            ilistItem.setLoanReturnDate((String) docModel.getProperty(label,
                     LoanoutJAXBSchema.LOAN_RETURN_DATE));
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);

@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.collectionspace.services.LoaninJAXBSchema;
+import org.collectionspace.services.LoaninListItemJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.loanin.LoansinCommon;
 import org.collectionspace.services.loanin.LoansinCommonList;
@@ -120,12 +121,15 @@ public class LoaninDocumentModelHandler
         LoansinCommonList coList = extractPagingInfo(new LoansinCommonList(), wrapDoc);
         List<LoansinCommonList.LoaninListItem> list = coList.getLoaninListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
+        String label = getServiceContext().getCommonPartLabel();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
             LoaninListItem ilistItem = new LoaninListItem();
-            ilistItem.setLoanInNumber((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+            ilistItem.setLoanInNumber((String) docModel.getProperty(label,
                     LoaninJAXBSchema.LOAN_IN_NUMBER));
-            ilistItem.setLoanReturnDate((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+            ilistItem.setLender((String) docModel.getProperty(label,
+                    LoaninListItemJAXBSchema.LENDER));
+            ilistItem.setLoanReturnDate((String) docModel.getProperty(label,
                     LoaninJAXBSchema.LOAN_RETURN_DATE));
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);

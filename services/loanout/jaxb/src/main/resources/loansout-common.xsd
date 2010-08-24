@@ -75,6 +75,8 @@
                                 <xs:sequence>
                                     <xs:element name="loanOutNumber" type="xs:string"
                                         minOccurs="1" />
+                                    <xs:element name="borrower" type="xs:string"
+                                        minOccurs="1" />
                                     <xs:element name="loanReturnDate" type="xs:string"
                                         minOccurs="1" />
                                     <!-- uri to retrive details -->
