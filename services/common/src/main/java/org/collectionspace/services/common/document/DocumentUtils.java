@@ -972,6 +972,46 @@ public class DocumentUtils {
         return nv;
     }
 	 */
+        
+    public static String getFirstString(Object list) {
+    	if (list==null) {
+    		return null;
+    	}
+    	if (list instanceof List) {
+			return ((List)list).size()==0?null:(String)((List)list).get(0);
+		}
+    	Class<?> arrType = list.getClass().getComponentType();
+    	if ((arrType != null) && arrType.isPrimitive()) {
+            if (arrType == Integer.TYPE) {
+                int[] ar = (int[]) list;
+                return ar.length==0?null:String.valueOf(ar[0]);
+            } else if (arrType == Long.TYPE) {
+                long[] ar = (long[]) list;
+                return ar.length==0?null:String.valueOf(ar[0]);
+            } else if (arrType == Double.TYPE) {
+                double[] ar = (double[]) list;
+                return ar.length==0?null:String.valueOf(ar[0]);
+            } else if (arrType == Float.TYPE) {
+                float[] ar = (float[]) list;
+                return ar.length==0?null:String.valueOf(ar[0]);
+            } else if (arrType == Character.TYPE) {
+                char[] ar = (char[]) list;
+                return ar.length==0?null:String.valueOf(ar[0]);
+            } else if (arrType == Byte.TYPE) {
+                byte[] ar = (byte[]) list;
+                return ar.length==0?null:String.valueOf(ar[0]);
+            } else if (arrType == Short.TYPE) {
+                short[] ar = (short[]) list;
+                return ar.length==0?null:String.valueOf(ar[0]);
+            }
+    		throw new IllegalArgumentException(
+    				"Primitive list of unsupported type: "
+    				+ list);
+		}
+		throw new IllegalArgumentException(
+				"A value of list type is neither list neither array: "
+				+ list);
+    }
 
 	/**
 	 * writeDocument streams out given document to given output stream

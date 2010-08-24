@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.collectionobject.nuxeo;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -32,11 +33,13 @@ import org.collectionspace.services.CollectionObjectListItemJAXBSchema;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList.CollectionObjectListItem;
+import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.schema.types.ComplexType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,16 +126,34 @@ public class CollectionObjectDocumentModelHandler
         		wrapDoc);
         List<CollectionobjectsCommonList.CollectionObjectListItem> list = coList.getCollectionObjectListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
+        String label = getServiceContext().getCommonPartLabel();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
             CollectionObjectListItem coListItem = new CollectionObjectListItem();
-            coListItem.setObjectNumber((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-            		CollectionObjectListItemJAXBSchema.OBJECT_NUMBER));
-            coListItem.setTitle((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
-            		CollectionObjectListItemJAXBSchema.TITLE));
-            String id = NuxeoUtils.extractId(docModel.getPathAsString());
-            coListItem.setUri(getServiceContextPath() + id);
-            coListItem.setCsid(id);
+            try {
+	            coListItem.setObjectNumber((String) docModel.getProperty(label,
+	            		CollectionObjectListItemJAXBSchema.OBJECT_NUMBER));
+	            List names = (List) docModel.getProperty(label,
+	            		CollectionObjectListItemJAXBSchema.OBJECT_NAME_LIST);
+	            if(names!=null && !names.isEmpty()) {
+	            	HashMap<String,Object> firstNameInfo = (HashMap<String,Object>)names.get(0);
+		            coListItem.setObjectName((String)firstNameInfo.get(
+		            		CollectionObjectListItemJAXBSchema.OBJECT_NAME) );
+	            }
+	            coListItem.setTitle((String) docModel.getProperty(label,
+	            		CollectionObjectListItemJAXBSchema.TITLE));
+	            Object respDepts = docModel.getProperty(label,
+	            		CollectionObjectListItemJAXBSchema.RESPONSIBLE_DEPARTMENTS);
+		        coListItem.setResponsibleDepartment(DocumentUtils.getFirstString(respDepts));
+	            
+	            String id = NuxeoUtils.extractId(docModel.getPathAsString());
+	            coListItem.setUri(getServiceContextPath() + id);
+	            coListItem.setCsid(id);
+            } catch (ClassCastException cce) {
+            	throw new RuntimeException("Unexpected schema structure encountered", cce);
+            } catch (Exception e) {
+            	throw new RuntimeException("Problem encountered retrieving values", e);
+            }
             list.add(coListItem);
         }
 
