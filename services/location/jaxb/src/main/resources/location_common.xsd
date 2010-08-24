@@ -31,6 +31,8 @@
 								<xs:element name="conditionNote" type="xs:string"/>
 								<xs:element name="conditionNoteDate" type="xs:string"/>
 								<xs:element name="securityNote" type="xs:string"/>
+								<xs:element name="accessNote" type="xs:string"/>
+								<xs:element name="address" type="xs:string"/>
 								<xs:element name="locationType" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>

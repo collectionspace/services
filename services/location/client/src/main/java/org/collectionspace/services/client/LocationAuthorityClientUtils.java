@@ -81,8 +81,12 @@ public class LocationAuthorityClientUtils {
         	location.setConditionNoteDate(value);
         if((value = (String)locationInfo.get(LocationJAXBSchema.SECURITY_NOTE))!=null)
         	location.setSecurityNote(value);
+        if((value = (String)locationInfo.get(LocationJAXBSchema.ACCESS_NOTE))!=null)
+        	location.setAccessNote(value);
         if((value = (String)locationInfo.get(LocationJAXBSchema.LOCATION_TYPE))!=null)
         	location.setLocationType(value);
+        if((value = (String)locationInfo.get(LocationJAXBSchema.ADDRESS))!=null)
+        	location.setAddress(value);
         if((value = (String)locationInfo.get(LocationJAXBSchema.TERM_STATUS))!=null)
         	location.setTermStatus(value);
         MultipartOutput multipart = new MultipartOutput();

@@ -81,6 +81,8 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
     final String TEST_CONDITION_NOTE = "Basically clean";
     final String TEST_CONDITION_NOTE_DATE = "June 11, 1979";
     final String TEST_SECURITY_NOTE = "Kind of safe";
+    final String TEST_ACCESS_NOTE = "Only right-thinkers may see";
+    final String TEST_ADDRESS = "123 Main Street, Anytown USA";
     // TODO Make loc type be a controlled vocab term.
     final String TEST_LOCATION_TYPE = "Shelf";
     // TODO Make status type be a controlled vocab term.
@@ -235,6 +237,8 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         shelf1Map.put(LocationJAXBSchema.CONDITION_NOTE, TEST_CONDITION_NOTE);
         shelf1Map.put(LocationJAXBSchema.CONDITION_NOTE_DATE, TEST_CONDITION_NOTE_DATE);
         shelf1Map.put(LocationJAXBSchema.SECURITY_NOTE, TEST_SECURITY_NOTE);
+        shelf1Map.put(LocationJAXBSchema.ACCESS_NOTE, TEST_ACCESS_NOTE);
+        shelf1Map.put(LocationJAXBSchema.ADDRESS, TEST_ADDRESS);
         shelf1Map.put(LocationJAXBSchema.LOCATION_TYPE, TEST_LOCATION_TYPE);
         shelf1Map.put(LocationJAXBSchema.TERM_STATUS, TEST_STATUS);
         
