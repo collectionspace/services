@@ -107,7 +107,7 @@ public class DocumentUtils {
 	private static final Logger logger =
 		LoggerFactory.getLogger(DocumentUtils.class);
 
-	/** The name value separator. */
+	/** The name dateVal separator. */
 	private static String NAME_VALUE_SEPARATOR = "|";
 
 	// The delimiter in a schema-qualified field name,
@@ -128,14 +128,14 @@ public class DocumentUtils {
 	 */
 	private static class NameValue {    	
 		/**
-		 * Instantiates a new name value.
+		 * Instantiates a new name dateVal.
 		 */
 		NameValue() {
 			// default scoped constructor to removed "synthetic accessor" warning
 		}        
 		/** The name. */
 		String name;        
-		/** The value. */
+		/** The dateVal. */
 		String value;
 	};
 
@@ -318,7 +318,7 @@ public class DocumentUtils {
 	/**
 	 * parseProperties extract given payload (XML) into Name-Value properties. this
 	 * @param document to parse
-	 * @return map key=property name, value=property value
+	 * @return map key=property name, dateVal=property dateVal
 	 * @throws Exception
 	 */
 	public static Map<String, Object> parseProperties(Node document)
@@ -346,8 +346,8 @@ public class DocumentUtils {
 					}                    
 				}
 				//
-				// Set the value even if it's null.
-				// A null value implies a clear/delete of the property
+				// Set the dateVal even if it's null.
+				// A null dateVal implies a clear/delete of the property
 				//
 				objectProps.put(name, value);
 			}
@@ -356,7 +356,7 @@ public class DocumentUtils {
 	}
 
 	/**
-	 * getMultiStringValues retrieve multi-value element values
+	 * getMultiStringValues retrieve multi-dateVal element values
 	 * assumption: backend does not support more than 1 level deep hierarchy
 	 * @param node
 	 * @return
@@ -400,7 +400,7 @@ public class DocumentUtils {
 	}
 
 	/**
-	 * getMultiValues retrieve multi-value element values
+	 * getMultiValues retrieve multi-dateVal element values
 	 * assumption: backend does not support more than 1 level deep hierarchy
 	 * @param node
 	 * @return
@@ -437,7 +437,7 @@ public class DocumentUtils {
 	}
 
 	/**
-	 * getTextNodeValue retrieves text node value
+	 * getTextNodeValue retrieves text node dateVal
 	 * @param cnode
 	 * @return
 	 */
@@ -451,11 +451,11 @@ public class DocumentUtils {
 	}
 
 	/**
-	 * isQualified check if the given value is already qualified with given property name
+	 * isQualified check if the given dateVal is already qualified with given property name
 	 * e.g.  otherNumber|urn:org.collectionspace.id:24082390 is qualified with otherNumber
 	 * but urn:org.walkerart.id:123 is not qualified
 	 * @param name of the property, e.g. otherNumber
-	 * @param value of the property e.g. otherNumber
+	 * @param dateVal of the property e.g. otherNumber
 	 * @return
 	 */
 	private static boolean isQualified(String name, String value) {
@@ -469,22 +469,22 @@ public class DocumentUtils {
 	}
 
 	/**
-	 * qualify qualifies given property value with given property name, e.g.
-	 * name=otherNumber and value=urn:org.collectionspace.id:24082390 would be
+	 * qualify qualifies given property dateVal with given property name, e.g.
+	 * name=otherNumber and dateVal=urn:org.collectionspace.id:24082390 would be
 	 * qualified as otherNumber|urn:org.collectionspace.id:24082390. however,
-	 * name=otherNumber and value=otherNumber|urn:org.collectionspace.id:24082390
-	 * would be ignored as the given value is already qualified once.
+	 * name=otherNumber and dateVal=otherNumber|urn:org.collectionspace.id:24082390
+	 * would be ignored as the given dateVal is already qualified once.
 	 * @param name
-	 * @param value
+	 * @param dateVal
 	 * @return
 	 */
 	private static String qualify(String name, String value) {
 		/*
         String result = null;
-        if (isQualified(name, value)) {
-            result = value;
+        if (isQualified(name, dateVal)) {
+            result = dateVal;
         } else {
-        	result = name + NAME_VALUE_SEPARATOR + value;
+        	result = name + NAME_VALUE_SEPARATOR + dateVal;
         }
         return result;
 		 */
@@ -566,7 +566,7 @@ public class DocumentUtils {
 	 * @param document the document
 	 * @param parent the parent
 	 * @param field the field
-	 * @param value the value
+	 * @param dateVal the dateVal
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	private static void buildProperty(Document document, Element parent, 
@@ -866,7 +866,7 @@ public class DocumentUtils {
             NameValue nv = unqualify(val);
             Element c = document.createElement(nv.name);
             e.appendChild(c);
-            insertTextNode(document, c, nv.value);
+            insertTextNode(document, c, nv.dateVal);
         }
     }
 	 */
@@ -941,7 +941,7 @@ public class DocumentUtils {
 	 *
 	 * @param document the document
 	 * @param e the e
-	 * @param strValue the str value
+	 * @param strValue the str dateVal
     private static void insertTextNode(Document document, Element e, String strValue) {
         Text tNode = document.createTextNode(strValue);
         e.appendChild(tNode);
@@ -949,11 +949,11 @@ public class DocumentUtils {
 	 */
 
 	/**
-	 * unqualify given value.
+	 * unqualify given dateVal.
 	 * input of otherNumber|urn:org.collectionspace.id:24082390 would be unqualified
-	 * as name=otherNumber and value=urn:org.collectionspace.id:24082390
+	 * as name=otherNumber and dateVal=urn:org.collectionspace.id:24082390
 	 * @param input
-	 * @return name and value
+	 * @return name and dateVal
 	 * @exception IllegalStateException
     private static NameValue unqualify(String input) {
         NameValue nv = new NameValue();
@@ -961,11 +961,11 @@ public class DocumentUtils {
         int tokens = stz.countTokens();
         if (tokens == 2) {
             nv.name = stz.nextToken();
-            nv.value = stz.nextToken();
+            nv.dateVal = stz.nextToken();
             // Allow null or empty values
         } else if (tokens == 1) {
             nv.name = stz.nextToken();
-            nv.value = "";
+            nv.dateVal = "";
         } else {
             throw new IllegalStateException("Unexpected format for multi valued element: " + input);
         }
@@ -1151,23 +1151,23 @@ public class DocumentUtils {
 		
 		if (type.isSimpleType()) {
                         if (isDateType(type)) {
-                            String value = element.getText();
-                            if (value == null || value.trim().isEmpty()) {
+                            String dateVal = element.getText();
+                            if (dateVal == null || dateVal.trim().isEmpty()) {
                                 result = type.decode("");
                             } else {
-                                // Dates or date/times in ISO 8601-based representations
+                                // Dates or date/times in any ISO 8601-based representations
                                 // directly supported by Nuxeo will be successfully decoded.
-                                result = type.decode(element.getText());
+                                result = type.decode(dateVal);
                                 // All other date or date/time values must first be converted
                                 // to a supported ISO 8601-based representation.
                                 if (result == null) {
-                                    dateStr = DateTimeFormatUtils.toIso8601Timestamp(element.getText(),
+                                    dateStr = DateTimeFormatUtils.toIso8601Timestamp(dateVal,
                                             ctx.getTenantId());
                                     if (dateStr != null) {
                                         result = type.decode(dateStr);
                                     } else {
                                         throw new IllegalArgumentException("Unrecognized date value '"
-                                                + element.getText() + "' in field '" + element.getName() + "'");
+                                                + dateVal + "' in field '" + element.getName() + "'");
                                     }
                                 }
                             }

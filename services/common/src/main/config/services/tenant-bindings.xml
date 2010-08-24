@@ -20,9 +20,10 @@
 
         <tenant:properties>
             <types:item><types:key>datePattern</types:key><types:value>MM/dd/yyyy</types:value></types:item>
+            <types:item><types:key>datePattern</types:key><types:value>MMM dd, yyyy</types:value></types:item>
             <types:item><types:key>datePattern</types:key><types:value>dd.MM.yyyy</types:value></types:item>
             <!-- <types:item><types:key>datePattern</types:key><types:value>dd/MM/yyyy</types:value></types:item> -->
-            <!-- <types:item><types:key>localeLanguage</types:key><types:value>en</types:value></types:item> -->
+            <types:item><types:key>localeLanguage</types:key><types:value>en</types:value></types:item>
             <!-- <types:item><types:key>localeLanguage</types:key><types:value>da</types:value></types:item> -->
         </tenant:properties>
 

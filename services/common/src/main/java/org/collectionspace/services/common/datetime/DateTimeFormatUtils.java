@@ -6,7 +6,7 @@
  *  http://www.collectionspace.org
  *  http://wiki.collectionspace.org
 
- *  Copyright 2009 University of California at Berkeley
+ *  Copyright © 2009 University of California at Berkeley
 
  *  Licensed under the Educational Community License (ECL), Version 2.0.
  *  You may not use this file except in compliance with this License.
@@ -20,10 +20,12 @@ package org.collectionspace.services.common.datetime;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -49,10 +51,14 @@ public class DateTimeFormatUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(DateTimeFormatUtils.class);
     final static String DATE_FORMAT_PATTERN_PROPERTY_NAME = "datePattern";
+    final static String LOCALE_LANGUAGE_CODE_PROPERTY_NAME = "localeLanguage";
+    final static Locale NULL_LOCALE = null;
+    final static List<String> isoLanguageCodes = new ArrayList(Arrays.asList(Locale.getISOLanguages()));
     final static String ISO_8601_FLOATING_DATE_PATTERN = "yyyy-MM-dd";
     final static String ISO_8601_UTC_TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     static Map<String,List<DateFormat>> dateFormatters = new HashMap<String,List<DateFormat>>();
     static Map<String,List<String>> datePatterns = new HashMap<String,List<String>>();
+    static Map<String,List<String>> localeLanguageCodes = new HashMap<String,List<String>>();
 
 
     // FIXME:
@@ -102,11 +108,31 @@ public class DateTimeFormatUtils {
         }
         // Otherwise, generate that list and cache it for re-use.
         List<String> patterns = getDateFormatPatternsForTenant(tenantId);
+        List<String> languageCodes = getLanguageCodesForTenant(tenantId);
+        Locale locale = null;
         DateFormat df = null;
-        for (String pattern : patterns) {
-            df = getDateFormatter(pattern);
-            if (df != null)  {
-                formatters.add(df);
+        boolean hasLanguageCodes = languageCodes != null && languageCodes.size() > 0;
+        // FIXME: this code pairs every locale language code with every date or
+        // date/time pattern.  This is a quick and dirty expedient, and must
+        // necessarily be replaced by date pattern/language code pairs.
+        if (hasLanguageCodes) {
+            for (String languageCode : languageCodes) {
+                if (languageCode != null && ! languageCode.trim().isEmpty()) {
+                    locale = getLocale(languageCode);
+                    for (String pattern : patterns) {
+                        df = getDateFormatter(pattern, locale);
+                        if (df != null)  {
+                            formatters.add(df);
+                        }
+                    }
+                }
+            }
+        } else {
+            for (String pattern : patterns) {
+                df = getDateFormatter(pattern, locale);
+                if (df != null)  {
+                    formatters.add(df);
+                }
             }
         }
         if (dateFormatters != null) {
@@ -198,10 +224,88 @@ public class DateTimeFormatUtils {
         return validPatterns;
     }
 
+    // FIXME: Routines specific to Locales, including their constituent language
+    // and country codes, should be moved to their own utility class, and likely
+    // to their own common package.
+
+    /**
+     * Returns a list of the locale language codes permitted in a service context.
+     *
+     * @param ctx a service context.
+     *
+     * @return    a list of locale language codes permitted in the service context.
+     *            Returns an empty list of language codes if the service context is null.
+     */
+    public static List<String> getLanguageCodesForTenant(ServiceContext ctx) {
+        if (ctx == null) {
+            return new ArrayList<String>();
+        }
+        return getLanguageCodesForTenant(ctx.getTenantId());
+    }
+
+    /**
+     * Returns a list of the locale language codes permitted for a tenant, specified
+     * by tenant ID.
+     *
+     * The values of these codes must be valid ISO 639-1 language codes.
+     *
+     * @param tenantId  a tenant ID.
+     *
+     * @return          a list of locale language codes permitted for the tenant.
+     *                  Returns an empty list of language codes if the tenant ID is null or empty.
+     */
+    public static List<String> getLanguageCodesForTenant(String tenantId) {
+        List<String> languageCodes = new ArrayList<String>();
+        if (tenantId == null || tenantId.trim().isEmpty()) {
+            return languageCodes;
+        }
+        // If a list of language codes for this tenant already exists, return it.
+        if (localeLanguageCodes != null && localeLanguageCodes.containsKey(tenantId)) {
+            languageCodes = localeLanguageCodes.get(tenantId);
+            if (languageCodes != null && languageCodes.size() > 0) {
+                return languageCodes;
+            }
+        }
+        // Otherwise, generate that list and cache it for re-use.
+        TenantBindingConfigReaderImpl tReader =
+                ServiceMain.getInstance().getTenantBindingConfigReader();
+        TenantBindingType tenantBinding = tReader.getTenantBinding(tenantId);
+        languageCodes = TenantBindingUtils.getPropertyValues(tenantBinding,
+                LOCALE_LANGUAGE_CODE_PROPERTY_NAME);
+        languageCodes = validateLanguageCodes(languageCodes);
+        if (localeLanguageCodes != null) {
+            localeLanguageCodes.put(tenantId, languageCodes);
+        }
+        return languageCodes;
+    }
+
+    /**
+     * Validates a list of language codes, verifying codes against a
+     * list of valid ISO 639-1 language codes.
+     *
+     * @param patterns  a list of language codes.
+     *
+     * @return          a list of valid language codes, excluding any codes
+     *                  that are not valid ISO 639-1 language codes.
+     */
+    public static List<String> validateLanguageCodes(List<String> languageCodes) {
+        if (languageCodes == null) {
+            return new ArrayList<String>();
+        }
+        List<String> validLanguageCodes = new ArrayList<String>();
+        for (String code : languageCodes) {
+            if (code != null && isoLanguageCodes.contains(code.trim())) {
+                validLanguageCodes.add(code);
+            }
+        }
+        return validLanguageCodes;
+    }
+
     /**
      * Returns an ISO 8601 timestamp representation of a presumptive date or
-     * date/time string.  Applies the set of date formatters for a supplied tenant
-     * to attempt to parse the string.
+     * date/time string.  Applies the set of date formatters for a supplied tenant,
+     * in sequence, to attempt to parse the string, and returns the timestamp
+     * resulting from the first successful parse attempt.
      *
      * @param str       a String, possibly a date or date/time String.
      * @param tenantId  a tenant ID.
@@ -244,7 +348,7 @@ public class DateTimeFormatUtils {
     }
 
     /**
-     * Formats a provided calendar date using a provided date formatter,
+     * Formats a provided calendar date using a supplied date formatter,
      * in the default system time zone.
      *
      * @param date  A calendar date to format.
@@ -373,6 +477,26 @@ public class DateTimeFormatUtils {
     }
 
     /**
+     * Returns the locale associated with a supplied ISO 639-1 language code.
+     *
+     * @param lang     A language code.
+     *
+     * @return         A locale based on that language code; or null
+     *                 if the code was null, empty, or invalid.
+     */
+    public static Locale getLocale(String lang) {
+        if (lang == null || lang.trim().isEmpty()) {
+            logger.warn("Null or empty date language code was provided when getting locale.");
+            return NULL_LOCALE;
+        }
+        if (! isoLanguageCodes.contains(lang.trim())) {
+            logger.warn("Invalid language code '" + lang + "'");
+            return NULL_LOCALE;
+        }
+        return new Locale(lang);
+    }
+
+    /**
      * Returns a date formatter for a provided date or date/time pattern.
      *
      * @param pattern  A date or date/time pattern.
@@ -381,13 +505,31 @@ public class DateTimeFormatUtils {
      *                 if the pattern was null, empty, or invalid.
      */
     public static DateFormat getDateFormatter(String pattern) {
+        return getDateFormatter(pattern, NULL_LOCALE);
+    }
+
+    /**
+     * Returns a date formatter for a supplied date or date/time pattern,
+     * in the supplied locale (if any).
+     *
+     * @param pattern  A date or date/time pattern.
+     * @param locale   A locale.
+     *
+     * @return         A date formatter using that pattern and locale (if any), or null
+     *                 if the pattern was null, empty, or invalid.
+     */
+    public static DateFormat getDateFormatter(String pattern, Locale locale) {
         DateFormat df = null;
         if (pattern == null || pattern.trim().isEmpty()) {
             logger.warn("Null or empty date pattern string was provided when getting date formatter.");
             return df;
         }
         try {
-            df = new SimpleDateFormat(pattern);
+            if (locale == null) {
+                df = new SimpleDateFormat(pattern);
+            } else {
+                df = new SimpleDateFormat(pattern, locale);
+            }
             df.setLenient(false);
         } catch (IllegalArgumentException iae) {
             logger.warn("Invalid date pattern string '" + pattern + "': " + iae.getMessage());
