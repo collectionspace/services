@@ -815,6 +815,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         acqDates.add("First Acquisition Date -" + identifier);
         acqDates.add("Second Acquisition Date-" + identifier);
         acquisition.setAcquisitionDates(acqDatesList);
+        acquisition.setOwner("DummyOwner");
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(acquisition,
             MediaType.APPLICATION_XML_TYPE);

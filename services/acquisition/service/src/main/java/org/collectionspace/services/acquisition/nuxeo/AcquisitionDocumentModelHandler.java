@@ -111,20 +111,23 @@ public class AcquisitionDocumentModelHandler
         AcquisitionsCommonList coList = this.extractPagingInfo(new AcquisitionsCommonList(), wrapDoc);
         List<AcquisitionsCommonList.AcquisitionListItem> list = coList.getAcquisitionListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
+        String label = getServiceContext().getCommonPartLabel();
         while (iter.hasNext()) {
             DocumentModel docModel = iter.next();
             AcquisitionListItem listItem = new AcquisitionListItem();
-            listItem.setAcquisitionReferenceNumber((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+            listItem.setAcquisitionReferenceNumber((String) docModel.getProperty(label,
                     AcquisitionListItemJAXBSchema.ACQUISITION_REFERENCE_NUMBER));
             // docModel.getProperty returns an ArrayList here.
             List<String> acquisitionSources =
-                 (List<String>) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+                 (List<String>) docModel.getProperty(label,
                      AcquisitionListItemJAXBSchema.ACQUISITION_SOURCES);
             AcquisitionSourceList acquisitionSourceList = new AcquisitionSourceList();
             for (String acquisitionSource : acquisitionSources) {
                   acquisitionSourceList.getAcquisitionSource().add(acquisitionSource);
             }
             listItem.setAcquisitionSources(acquisitionSourceList);
+            listItem.setOwner((String) docModel.getProperty(label,
+            		AcquisitionListItemJAXBSchema.OWNER));
             //need fully qualified context for URI
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
             listItem.setUri(getServiceContextPath() + id);

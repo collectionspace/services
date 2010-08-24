@@ -112,6 +112,8 @@
                                         minOccurs="1" />
                                     <xs:element name="acquisitionSources" type="acquisitionSourceList"
                                         minOccurs="1" />
+                                    <xs:element name="owner" type="xs:string"
+                                        minOccurs="1" />
                                     <!-- uri to retrive acquisition details -->
                                     <xs:element name="uri" type="xs:anyURI"
                                         minOccurs="1" />

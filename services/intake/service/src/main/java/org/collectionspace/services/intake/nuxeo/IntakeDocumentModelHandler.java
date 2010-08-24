@@ -121,13 +121,16 @@ public class IntakeDocumentModelHandler
         IntakesCommonList coList = this.extractPagingInfo(new IntakesCommonList(), wrapDoc);
         List<IntakesCommonList.IntakeListItem> list = coList.getIntakeListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
+        String label = getServiceContext().getCommonPartLabel();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
             IntakeListItem ilistItem = new IntakeListItem();
-            ilistItem.setEntryNumber((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+            ilistItem.setEntryNumber((String) docModel.getProperty(label,
                     IntakeJAXBSchema.ENTRY_NUMBER));
-            ilistItem.setDepositor((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
+            ilistItem.setDepositor((String) docModel.getProperty(label,
                     IntakeJAXBSchema.DEPOSITOR));
+            ilistItem.setCurrentOwner((String) docModel.getProperty(label,
+                    IntakeJAXBSchema.CURRENT_OWNER));
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);
             ilistItem.setCsid(id);
