@@ -36,6 +36,7 @@ import org.collectionspace.services.acquisition.AcquisitionDateList;
 import org.collectionspace.services.acquisition.AcquisitionFunding;
 import org.collectionspace.services.acquisition.AcquisitionFundingList;
 import org.collectionspace.services.acquisition.AcquisitionSourceList;
+import org.collectionspace.services.acquisition.OwnerList;
 import org.jboss.resteasy.client.ClientResponse;
 
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -331,6 +332,10 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(acqDates.size() > 0);
         Assert.assertNotNull(acqDates.get(0));
 
+        List<String> owners =
+                acquisitionObject.getOwners().getOwner();
+        Assert.assertTrue(owners.size() > 0);
+        Assert.assertNotNull(owners.get(0));
     }
 
     // Failure outcomes
@@ -801,6 +806,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
     private MultipartOutput createAcquisitionInstance(String identifier) {
         AcquisitionsCommon acquisition = new AcquisitionsCommon();
         acquisition.setAcquisitionReferenceNumber("acquisitionReferenceNumber-"  + identifier);
+
         AcquisitionSourceList acqSourcesList = new AcquisitionSourceList();
         List<String> acqSources = acqSourcesList.getAcquisitionSource();
         // FIXME Use properly formatted refNames for representative acquisition
@@ -808,6 +814,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         acqSources.add("Donor Acquisition Source-" + identifier);
         acqSources.add("Museum Acquisition Source-" + identifier);
         acquisition.setAcquisitionSources(acqSourcesList);
+
         AcquisitionDateList acqDatesList = new AcquisitionDateList();
         List<String> acqDates = acqDatesList.getAcquisitionDate();
         // FIXME Use properly timestamps for representative acquisition
@@ -815,7 +822,15 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         acqDates.add("First Acquisition Date -" + identifier);
         acqDates.add("Second Acquisition Date-" + identifier);
         acquisition.setAcquisitionDates(acqDatesList);
-        acquisition.setOwner("DummyOwner");
+
+        OwnerList ownersList = new OwnerList();
+        List<String> owners = ownersList.getOwner();
+        // FIXME Use properly formatted refNames for representative owners
+        // in this example test record. The following are mere placeholders.
+        owners.add("First Owner -" + identifier);
+        owners.add("Second Owner-" + identifier);
+        acquisition.setOwners(ownersList);
+
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(acquisition,
             MediaType.APPLICATION_XML_TYPE);

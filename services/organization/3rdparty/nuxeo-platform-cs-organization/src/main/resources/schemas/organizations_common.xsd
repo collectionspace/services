@@ -24,14 +24,18 @@
     <!--  Organization Information Group -->
     <!--  inAuthority is the csid of the owning OrgAuthority -->
     <xs:element name="inAuthority" type="xs:string" />
-		<xs:element name="shortIdentifier" type="xs:string"/>
+    <xs:element name="shortIdentifier" type="xs:string"/>
     <xs:element name="refName" type="xs:string"/>
     <xs:element name="termStatus" type="xs:string"/>
     <xs:element name="displayName" type="xs:string"/>
     <xs:element name="displayNameComputed" type="xs:boolean"/>
+
+    <!-- FIXME Start of main body (represented by 'longName' element) repeatable group -->
     <xs:element name="shortName" type="xs:string"/>
     <xs:element name="longName" type="xs:string"/>
     <xs:element name="nameAdditions" type="xs:string"/>
+    <!-- FIXME End of main body repeatable group -->
+
     <xs:element name="contactNames">
         <xs:complexType>
             <xs:sequence>

@@ -37,7 +37,14 @@
     <xs:element name="acquisitionProvisos" type="xs:string"/>
     <xs:element name="acquisitionReason" type="xs:string"/>
     <xs:element name="acquisitionReferenceNumber" type="xs:string"/>
-    <xs:element name="owner" type="xs:string"/>
+    <!-- FIXME [1.0 alpha] Make owner a repeatable scalar field. DONE -->
+    <xs:element name="owners">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="owner" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="acquisitionSources">
         <xs:complexType>
             <xs:sequence>
@@ -58,7 +65,15 @@
     <xs:element name="transferOfTitleNumber" type="xs:string"/>
 
     <!-- Object Collection Information Group -->
-    <xs:element name="fieldCollectionEventName" type="xs:string"/>
+
+    <!-- FIXME [1.0 alpha] Make fieldCollectionEventName a repeatable scalar field. DONE -->
+    <xs:element name="fieldCollectionEventNames">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="fieldCollectionEventName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
 
     <xs:complexType name="acquisitionFundingList">
         <xs:sequence>

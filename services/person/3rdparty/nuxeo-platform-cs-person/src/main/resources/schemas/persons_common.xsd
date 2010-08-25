@@ -28,6 +28,10 @@
     <xs:element name="termStatus" type="xs:string"/>
     <xs:element name="displayName" type="xs:string"/>
     <xs:element name="displayNameComputed" type="xs:boolean"/>
+
+    <!-- FIXME: Currently marked in repeatability spreadsheet as a -->
+    <!-- repeatable group.  However, multiple personal names for the -->
+    <!-- same individual may ultimately be handled using a different approach. -->
     <xs:element name="foreName" type="xs:string"/>
     <xs:element name="middleName" type="xs:string"/>
     <xs:element name="surName" type="xs:string"/>
@@ -35,6 +39,8 @@
     <xs:element name="salutation" type="xs:string"/>
     <xs:element name="title" type="xs:string"/>
     <xs:element name="nameAdditions" type="xs:string"/>
+    <!-- FIXME: End of provisional repeatable group. -->
+
     <xs:element name="birthDate" type="xs:string"/>
     <xs:element name="deathDate" type="xs:string"/>
     <xs:element name="birthPlace" type="xs:string"/>

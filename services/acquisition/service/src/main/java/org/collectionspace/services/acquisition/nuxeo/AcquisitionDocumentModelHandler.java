@@ -33,6 +33,7 @@ import org.collectionspace.services.acquisition.AcquisitionsCommon;
 import org.collectionspace.services.acquisition.AcquisitionsCommonList;
 import org.collectionspace.services.acquisition.AcquisitionsCommonList.AcquisitionListItem;
 import org.collectionspace.services.acquisition.AcquisitionSourceList;
+import org.collectionspace.services.acquisition.OwnerList;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
@@ -117,6 +118,7 @@ public class AcquisitionDocumentModelHandler
             AcquisitionListItem listItem = new AcquisitionListItem();
             listItem.setAcquisitionReferenceNumber((String) docModel.getProperty(label,
                     AcquisitionListItemJAXBSchema.ACQUISITION_REFERENCE_NUMBER));
+            
             // docModel.getProperty returns an ArrayList here.
             List<String> acquisitionSources =
                  (List<String>) docModel.getProperty(label,
@@ -126,8 +128,17 @@ public class AcquisitionDocumentModelHandler
                   acquisitionSourceList.getAcquisitionSource().add(acquisitionSource);
             }
             listItem.setAcquisitionSources(acquisitionSourceList);
-            listItem.setOwner((String) docModel.getProperty(label,
-            		AcquisitionListItemJAXBSchema.OWNER));
+
+            // and here ...
+            List<String> owners = 
+                 (List<String>) docModel.getProperty(label,
+                     AcquisitionListItemJAXBSchema.OWNERS);
+            OwnerList ownerList = new OwnerList();
+            for (String owner : owners) {
+                  acquisitionSourceList.getAcquisitionSource().add(owner);
+            }
+            listItem.setOwners(ownerList);
+
             //need fully qualified context for URI
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
             listItem.setUri(getServiceContextPath() + id);

@@ -53,7 +53,7 @@
                 <xs:element name="fieldCollectionPlace" type="xs:string"/>
                 <xs:element name="fieldCollectionSources" type="fieldCollectionSourceList"/>
                 <xs:element name="fieldCollectors" type="fieldCollectorList"/>
-                <xs:element name="fieldCollectionEventName" type="xs:string"/>
+                <xs:element name="fieldCollectionEventNames" type="fieldCollectionEventNameList"/>
 
                 <!-- Valuation Information Group -->
                 <xs:element name="valuationReferenceNumber" type="xs:string"/>
@@ -106,6 +106,12 @@
     <xs:complexType name="fieldCollectorList">
         <xs:sequence>
             <xs:element name="fieldCollector" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="fieldCollectionEventNameList">
+        <xs:sequence>
+            <xs:element name="fieldCollectionEventName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 

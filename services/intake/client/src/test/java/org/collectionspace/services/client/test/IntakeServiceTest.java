@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IntakeClient;
 import org.collectionspace.services.intake.EntryMethodList;
+import org.collectionspace.services.intake.FieldCollectionEventNameList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.IntakesCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -307,6 +308,11 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
                 intake.getEntryMethods().getEntryMethod();
         Assert.assertTrue(entryMethods.size() > 0);
         Assert.assertNotNull(entryMethods.get(0));
+
+        List<String> fieldCollectionEventNames =
+                intake.getFieldCollectionEventNames().getFieldCollectionEventName();
+        Assert.assertTrue(fieldCollectionEventNames.size() > 0);
+        Assert.assertNotNull(fieldCollectionEventNames.get(0));
     }
 
     // Failure outcomes
@@ -749,6 +755,14 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         entryMethods.add("Left at doorstep");
         entryMethods.add("Received via post");
         intake.setEntryMethods(entryMethodsList);
+
+        FieldCollectionEventNameList eventNamesList = new FieldCollectionEventNameList();
+        List<String> eventNames = eventNamesList.getFieldCollectionEventName();
+        // FIXME Use properly formatted refNames for representative event names
+        // in this example test record. The following are mere placeholders.
+        eventNames.add("Field Collection Event Name-1");
+        eventNames.add("Field Collection Event Name-2");
+        intake.setFieldCollectionEventNames(eventNamesList);
 
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =

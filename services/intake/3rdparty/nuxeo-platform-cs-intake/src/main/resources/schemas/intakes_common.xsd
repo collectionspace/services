@@ -64,7 +64,14 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="fieldCollectionEventName" type="xs:string"/>
+    <!-- FIXME [1.0 alpha] Make fieldCollectionEventName a repeatable scalar field. DONE -->
+    <xs:element name="fieldCollectionEventNames">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="fieldCollectionEventName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
 
     <!-- Valuation Information Group -->
     <xs:element name="valuationReferenceNumber" type="xs:string"/>
@@ -84,9 +91,13 @@
     </xs:element>
     
     <!-- Object Location Information Group -->
+
+    <!-- FIXME Start of Current location repeatable group -->
     <xs:element name="currentLocation" type="xs:string"/>
     <xs:element name="currentLocationFitness" type="xs:string"/>
     <xs:element name="currentLocationNote" type="xs:string"/>
+    <!-- FIXME End of Current location repeatable group -->
+
     <xs:element name="locationDate" type="xs:string"/>
     <xs:element name="normalLocation" type="xs:string"/>
     

@@ -43,7 +43,7 @@
                 <xs:element name="acquisitionProvisos" type="xs:string"/>
                 <xs:element name="acquisitionReason" type="xs:string"/>
                 <xs:element name="acquisitionReferenceNumber" type="xs:string"/>
-                <xs:element name="owner" type="xs:string"/>
+                <xs:element name="owners" type="ownerList"/>
                 <xs:element name="acquisitionSources" type="acquisitionSourceList"/>
                 <xs:element name="groupPurchasePriceCurrency" type="xs:string"/>
                 <xs:element name="groupPurchasePriceValue" type="xs:string"/>
@@ -57,16 +57,10 @@
                 <xs:element name="originalObjectPurchasePriceValue" type="xs:string"/>
                 <xs:element name="transferOfTitleNumber" type="xs:string"/>
                 <!-- Object Collection Information Group -->
-                <xs:element name="fieldCollectionEventName" type="xs:string"/>
+                <xs:element name="fieldCollectionEventNames" type="fieldCollectionEventNameList"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-
-    <xs:complexType name="acquisitionSourceList">
-        <xs:sequence>
-            <xs:element name="acquisitionSource" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
-    </xs:complexType>
 
     <xs:complexType name="acquisitionDateList">
         <xs:sequence>
@@ -87,6 +81,25 @@
                 <xs:element name="acquisitionFundingValue" type="xs:string"/>
                 <xs:element name="acquisitionFundingSource" type="xs:string"/>
                 <xs:element name="acquisitionFundingSourceProvisos" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+
+    <xs:complexType name="acquisitionSourceList">
+        <xs:sequence>
+            <xs:element name="acquisitionSource" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ownerList">
+        <xs:sequence>
+            <xs:element name="owner" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="fieldCollectionEventNameList">
+        <xs:sequence>
+            <xs:element name="fieldCollectionEventName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
     
@@ -112,7 +125,7 @@
                                         minOccurs="1" />
                                     <xs:element name="acquisitionSources" type="acquisitionSourceList"
                                         minOccurs="1" />
-                                    <xs:element name="owner" type="xs:string"
+                                    <xs:element name="owners" type="ownerList"
                                         minOccurs="1" />
                                     <!-- uri to retrive acquisition details -->
                                     <xs:element name="uri" type="xs:anyURI"

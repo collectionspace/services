@@ -544,7 +544,14 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="fieldCollectionEventName" type="xs:string"/>
+    <!-- FIXME [1.0 alpha] Make fieldCollectionEventName a repeatable scalar field. DONE -->
+    <xs:element name="fieldCollectionEventNames">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="fieldCollectionEventName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
 
     <xs:complexType name="otherNumberList">
         <xs:sequence>
