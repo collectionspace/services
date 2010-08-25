@@ -298,8 +298,6 @@
                               versionable="true" auditable="false"
                               label="movements_common" updated="" order="1">
                     <service:properties>
-                        <types:item><types:key>authRef</types:key><types:value>currentLocation</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>normalLocation</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>movementContact</types:value></types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
@@ -1405,8 +1403,6 @@
                               versionable="true" auditable="false"
                               label="movements_common" updated="" order="1">
                     <service:properties>
-                        <types:item><types:key>authRef</types:key><types:value>currentLocation</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>normalLocation</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>movementContact</types:value></types:item>
                     </service:properties>
                     <service:content contentType="application/xml">
