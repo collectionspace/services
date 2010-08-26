@@ -830,7 +830,7 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
         AccountRole accRole = AccountRoleFactory.createAccountRoleInstance(
                 av, rvs, true, true);
         ClientResponse<Response> res = client.delete(
-                av.getAccountId(), accRole);
+                av.getAccountId());
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -878,7 +878,7 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
         client.setAuth(true, ui.userName, true, ui.password, true);
         PermissionRole permRole = PermissionRoleFactory.createPermissionRoleInstance(
                 pv, rvls, true, true);
-        ClientResponse<Response> res = client.delete(pv.getPermissionId(), permRole);
+        ClientResponse<Response> res = client.delete(pv.getPermissionId());
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match

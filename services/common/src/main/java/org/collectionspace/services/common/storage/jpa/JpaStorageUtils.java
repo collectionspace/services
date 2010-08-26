@@ -66,6 +66,23 @@ public class JpaStorageUtils {
         return entityFound;
     }
 
+    public static Object getEntity(long id, Class entityClazz) {
+        EntityManagerFactory emf = null;
+        EntityManager em = null;
+        Object entityFound = null;
+        try {
+            emf = getEntityManagerFactory();
+            em = emf.createEntityManager();
+            //FIXME: it would be nice to verify tenantid as well
+            entityFound = em.find(entityClazz, id);
+        } finally {
+            if (em != null) {
+                releaseEntityManagerFactory(emf);
+            }
+        }
+        return entityFound;
+    }
+
     /**
      * getEntity with given id and class using given entity manager
      * 

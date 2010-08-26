@@ -30,7 +30,7 @@
     -->
     <!--xs:annotation>
     Note that roles.xsd already defines global bindings for the authorization namespace
-    so, it is not necessary to give the bindingings here because all the xsds are compiled
+    so, it is not necessary to give the bindings here because all the xsds are compiled
     at once for this namespace
         <xs:appinfo>
             <jaxb:globalBindings>
@@ -38,7 +38,6 @@
             </jaxb:globalBindings>
         </xs:appinfo>
     </xs:annotation-->
-
 
     <xs:complexType name="account_value" >
         <xs:annotation>
@@ -66,6 +65,7 @@
             </xs:appinfo>
         </xs:annotation>
         <xs:sequence>
+        	<xs:element name="roleRelationshipId" type="xs:string" minOccurs="0" maxOccurs="1"/>
             <xs:element name="roleId" type="xs:string" minOccurs="1" maxOccurs="1"/>
             <xs:element name="roleName" type="xs:string" minOccurs="1" maxOccurs="1"/>
         </xs:sequence>
@@ -81,6 +81,7 @@
             </xs:appinfo>
         </xs:annotation>
         <xs:sequence>
+            <xs:element name="permRelationshipId" type="xs:string" minOccurs="0" maxOccurs="1"/>        
             <xs:element name="permissionId" type="xs:string" minOccurs="1" maxOccurs="1"/>
             <xs:element name="resourceName" type="xs:string" minOccurs="1" maxOccurs="1"/>
             <xs:element name="actionGroup" type="xs:string" minOccurs="1" maxOccurs="1"/>

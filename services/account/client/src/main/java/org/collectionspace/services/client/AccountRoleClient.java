@@ -28,7 +28,7 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
-
+//import org.collectionspace.services.authorization.AccountRolesList;
 import org.collectionspace.services.authorization.AccountRole;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
@@ -95,6 +95,17 @@ public class AccountRoleClient extends AbstractServiceClientImpl {
     }
 
     /**
+     * Read.
+     *
+     * @param csid the csid
+     * @param arcsid the arcsid
+     * @return the client response
+     */
+    public ClientResponse<AccountRole> read(String csid) {
+        return accountRoleProxy.read(csid);
+    }
+
+    /**
      * @param csid
      * @param accRole relationships to create
      * @return
@@ -113,5 +124,12 @@ public class AccountRoleClient extends AbstractServiceClientImpl {
      */
     public ClientResponse<Response> delete(String csid, AccountRole accRole) {
         return accountRoleProxy.delete(csid, "delete", accRole);
+    }
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.AbstractServiceClientImpl#delete(java.lang.String)
+     */
+    public ClientResponse<Response> delete(String csid) {
+        return accountRoleProxy.delete(csid);
     }
 }

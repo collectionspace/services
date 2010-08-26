@@ -29,13 +29,14 @@ package org.collectionspace.services.client;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-
+//import org.collectionspace.services.authorization.AccountRolesList;
 import org.collectionspace.services.authorization.AccountRole;
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -54,6 +55,11 @@ public interface AccountRoleProxy extends CollectionSpaceProxy {
 
     //(R)ead
     @GET
+    @Path("/{csid}/accountroles")
+    ClientResponse<AccountRole> read(@PathParam("csid") String csid);
+
+    //(R)ead
+    @GET
     @Path("/{csid}/accountroles/{arcsid}")
     ClientResponse<AccountRole> read(@PathParam("csid") String csid,
             @PathParam("arcsid") String arcsid);
@@ -64,4 +70,9 @@ public interface AccountRoleProxy extends CollectionSpaceProxy {
     ClientResponse<Response> delete(@PathParam("csid") String csid,
             @QueryParam("_method") String method,
             AccountRole accRole);
+
+    //(D)elete
+    @DELETE
+    @Path("/{csid}/accountroles")
+    ClientResponse<Response> delete(@PathParam("csid") String csid);
 }

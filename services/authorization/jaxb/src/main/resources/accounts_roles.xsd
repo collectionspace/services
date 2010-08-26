@@ -13,6 +13,7 @@
 <xs:schema
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    jaxb:version="1.0" elementFormDefault="unqualified"
     xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
     xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
     xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
@@ -20,7 +21,6 @@
     xmlns="http://collectionspace.org/services/authorization"
     targetNamespace="http://collectionspace.org/services/authorization"
     version="0.1"
-    jaxb:version="1.0"
     jaxb:extensionBindingPrefixes="hj orm xjc"
     >
 
@@ -68,8 +68,15 @@
         </xs:sequence>
     </xs:complexType>
 
+    <xs:complexType name="AuthorizationRoleRel">
+        <xs:annotation>
+            <xs:appinfo>
+                <jaxb:class ref="org.collectionspace.services.authorization.AuthorizationRoleRel"/>
+            </xs:appinfo>
+        </xs:annotation>
+    </xs:complexType>
 
-    <xs:complexType name="account_role_rel">
+    <xs:complexType name="account_role_rel">        
         <xs:annotation>
             <xs:documentation>AccountRole defines association between account and role in CollectionSpace</xs:documentation>
             <xs:appinfo>
@@ -142,7 +149,44 @@
         </xs:sequence>
     </xs:complexType>
 
-
+<!--
+	AccountRolesList will eventually replace the above structures/classes as it is the more
+	common format for result lists in CollectionSpace. 
+ -->
+    <xs:element name="x_account-roles-list">
+	    <xs:complexType>
+	        <xs:annotation>
+	            <xs:documentation>
+	                AccountRoleList defines 1-n association between
+	                either account and role or role and account.
+	            </xs:documentation>
+	            <xs:appinfo>
+	                <hj:ignored/>
+	            </xs:appinfo>
+	        </xs:annotation>
+	        <xs:sequence>
+	            <xs:element name="x_account-role-list-item" minOccurs="0" maxOccurs="unbounded">
+				    <xs:complexType>
+				        <xs:annotation>
+				            <xs:documentation>
+				            </xs:documentation>
+				            <xs:appinfo>
+				                <hj:ignored/>
+				            </xs:appinfo>
+				        </xs:annotation>
+				        <xs:sequence>
+                            <xs:element name="csid" type="xs:string"
+                                minOccurs="1"/>				        
+				            <xs:element name="roleName" type="xs:string"
+				            	minOccurs="1" maxOccurs="1"/>
+				            <xs:element name="roleId" type="xs:string"
+				            	minOccurs="1" maxOccurs="1"/>
+				        </xs:sequence>
+				    </xs:complexType>
+	            </xs:element>
+	        </xs:sequence>
+	    </xs:complexType>
+    </xs:element>
 
 </xs:schema>
 

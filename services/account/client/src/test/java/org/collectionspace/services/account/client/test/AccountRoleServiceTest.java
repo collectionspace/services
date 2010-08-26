@@ -28,6 +28,7 @@ import java.util.Hashtable;
 import java.util.List;
 import javax.ws.rs.core.Response;
 
+//import org.collectionspace.services.authorization.AccountRolesList;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.AccountValue;
@@ -257,7 +258,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         AccountRoleClient client = new AccountRoleClient();
         ClientResponse<AccountRole> res = client.read(
-                accValues.get("acc-role-user1").getAccountId(), "123");
+                accValues.get("acc-role-user1").getAccountId());
         int statusCode = res.getStatus();
         try {
             // Check the status code of the response: does it match
@@ -269,7 +270,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
                     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
             Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-            AccountRole output = (AccountRole) res.getEntity();
+            AccountRole output = res.getEntity();
             Assert.assertNotNull(output);
         } finally {
             res.releaseConnection();
@@ -293,7 +294,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         AccountRoleClient client = new AccountRoleClient();
-        ClientResponse<AccountRole> res = client.read(this.NON_EXISTENT_ID, "123");
+        ClientResponse<AccountRole> res = client.read(this.NON_EXISTENT_ID);
         int statusCode = res.getStatus();
         try {
             // Check the status code of the response: does it match
@@ -323,7 +324,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         AccountRoleClient client = new AccountRoleClient();
         ClientResponse<AccountRole> res = client.read(
-                accValues.get("acc-role-user2").getAccountId(), "123");
+                accValues.get("acc-role-user2").getAccountId());
         int statusCode = res.getStatus();
         try {
             // Check the status code of the response: does it match
@@ -334,7 +335,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
             Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
             Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
-            AccountRole output = (AccountRole) res.getEntity();
+            AccountRole output = res.getEntity();
 
             String sOutput = objectAsXmlString(output, AccountRole.class);
             if(logger.isDebugEnabled()) {
@@ -430,27 +431,59 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
 
         // Perform setup.
         setupDelete();
-
-        // Submit the request to the service and store the response.
+        
+        //
+        // Lookup a know account, and delete all of its role relationships
+        //
         AccountRoleClient client = new AccountRoleClient();
-                AccountValue av = accValues.get("acc-role-user1");
-        AccountRole accRole = createAccountRoleInstance(av,
-                roleValues.values(), true, true);
-        ClientResponse<Response> res = client.delete(
-                accValues.get("acc-role-user1").getAccountId(), accRole);
-        int statusCode = res.getStatus();
+        ClientResponse<AccountRole> readResponse = client.read(
+                accValues.get("acc-role-user1").getAccountId());
+        AccountRole toDelete = null;
         try {
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
+        	toDelete = readResponse.getEntity();
+        } finally {
+        	readResponse.releaseConnection();
+        }
+
+        ClientResponse<Response> res = client.delete(
+                toDelete.getAccounts().get(0).getAccountId(), toDelete);
+        try {
+            int statusCode = res.getStatus();
             Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
             Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         } finally {
             res.releaseConnection();
         }
+        
+        //
+        // recreate 'acc-role-user1' account and roles
+        //
+        create(testName);
+        setupDelete();
+        
+        //
+        // Lookup a know account, and delete all of its role relationships
+        //
+        readResponse = client.read(
+                accValues.get("acc-role-user1").getAccountId());
+        toDelete = null;
+        try {
+        	toDelete = readResponse.getEntity();
+        } finally {
+        	readResponse.releaseConnection();
+        }
+
+        res = client.delete(toDelete.getAccounts().get(0).getAccountId());
+        try {
+            int statusCode = res.getStatus();
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        } finally {
+            res.releaseConnection();
+        }
+        
     }
 
     // Failure outcomes

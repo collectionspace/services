@@ -34,12 +34,20 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextProperties;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class PermissionRoleUtil.
  *
- * @author 
+ * @author
  */
 public class PermissionRoleUtil {
 
+    /**
+     * Gets the relation subject.
+     *
+     * @param ctx the ctx
+     * @return the relation subject
+     */
     static SubjectType getRelationSubject(ServiceContext ctx) {
         Object o = ctx.getProperty(ServiceContextProperties.SUBJECT);
         if (o == null) {
@@ -50,6 +58,13 @@ public class PermissionRoleUtil {
         return (SubjectType) o;
     }
 
+    /**
+     * Gets the relation subject.
+     *
+     * @param ctx the ctx
+     * @param pr the pr
+     * @return the relation subject
+     */
     static SubjectType getRelationSubject(ServiceContext ctx, PermissionRole pr) {
         SubjectType subject = pr.getSubject();
         if (subject == null) {
@@ -61,40 +76,72 @@ public class PermissionRoleUtil {
 
     /**
      * buildPermissionRoleRel builds persistent relationship entities from given
-     * permissionrole
+     * permissionrole.
+     *
      * @param pr permissionrole
-     * @param subject
+     * @param subject the subject
      * @param prrl persistent entities built are inserted into this list
+     * @param toDelete the to delete
      */
-    static public void buildPermissionRoleRel(PermissionRole pr, SubjectType subject, List<PermissionRoleRel> prrl) {
-
+    static public void buildPermissionRoleRel(PermissionRole pr,
+    		SubjectType subject,
+    		List<PermissionRoleRel> prrl,
+    		boolean handleDelete) {
         if (subject.equals(SubjectType.ROLE)) {
             //FIXME: potential index out of bounds exception...negative test needed
             PermissionValue pv = pr.getPermissions().get(0);
             for (RoleValue rv : pr.getRoles()) {
-                PermissionRoleRel prr = buildPermissonRoleRel(pv, rv);
+                PermissionRoleRel prr = buildPermissonRoleRel(pv, rv, subject, handleDelete);
                 prrl.add(prr);
             }
         } else if (SubjectType.PERMISSION.equals(subject)) {
             //FIXME: potential index out of bounds exception...negative test needed
             RoleValue rv = pr.getRoles().get(0);
             for (PermissionValue pv : pr.getPermissions()) {
-                PermissionRoleRel prr = buildPermissonRoleRel(pv, rv);
+                PermissionRoleRel prr = buildPermissonRoleRel(pv, rv, subject, handleDelete);
                 prrl.add(prr);
             }
         }
     }
 
-    static private PermissionRoleRel buildPermissonRoleRel(PermissionValue pv, RoleValue rv) {
+    /**
+     * Builds the permisson role rel.
+     *
+     * @param pv the pv
+     * @param rv the rv
+     * @param handleDelete the handle delete
+     * @return the permission role rel
+     */
+    static private PermissionRoleRel buildPermissonRoleRel(PermissionValue pv,
+    		RoleValue rv,
+    		SubjectType subject,
+    		boolean handleDelete) {
         PermissionRoleRel prr = new PermissionRoleRel();
         prr.setPermissionId(pv.getPermissionId());
         prr.setPermissionResource(pv.getResourceName());
         prr.setActionGroup(pv.getActionGroup());
         prr.setRoleId(rv.getRoleId());
         prr.setRoleName(rv.getRoleName());
+        
+        String relationshipId = null;
+        if (subject.equals(SubjectType.ROLE) == true) {
+        	relationshipId = rv.getRoleRelationshipId();
+        } else if (subject.equals(SubjectType.PERMISSION) == true) {
+        	relationshipId = pv.getPermRelationshipId();
+        }
+        if (relationshipId != null && handleDelete == true) {
+        	prr.setHjid(Long.parseLong(relationshipId));  // set this so we can convince JPA to del the relation
+        }        
         return prr;
     }
 
+    /**
+     * Checks if is invalid tenant.
+     *
+     * @param tenantId the tenant id
+     * @param msgBldr the msg bldr
+     * @return true, if is invalid tenant
+     */
     static boolean isInvalidTenant(String tenantId, StringBuilder msgBldr) {
         boolean invalid = false;
 

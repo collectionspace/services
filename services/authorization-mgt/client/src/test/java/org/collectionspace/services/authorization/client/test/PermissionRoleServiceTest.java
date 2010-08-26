@@ -27,14 +27,16 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 import javax.ws.rs.core.Response;
-import org.collectionspace.services.authorization.EffectType;
 
+import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.authorization.EffectType;
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.PermissionAction;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
+
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PermissionClient;
 import org.collectionspace.services.client.PermissionFactory;
@@ -42,9 +44,10 @@ import org.collectionspace.services.client.PermissionRoleClient;
 import org.collectionspace.services.client.PermissionRoleFactory;
 import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.RoleFactory;
+
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.ServiceRequestType;
-import org.collectionspace.services.jaxb.AbstractCommonList;
+
 import org.jboss.resteasy.client.ClientResponse;
 
 import org.testng.Assert;
@@ -271,7 +274,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         ClientResponse<PermissionRole> res = null;
         try {
             res = client.read(
-                    permValues.get(TEST_SERVICE_NAME + TEST_MARKER).getPermissionId(), "123");
+                    permValues.get(TEST_SERVICE_NAME + TEST_MARKER).getPermissionId());
             int statusCode = res.getStatus();
 
             // Check the status code of the response: does it match
@@ -311,7 +314,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         PermissionRoleClient client = new PermissionRoleClient();
         ClientResponse<PermissionRole> res = null;
         try {
-            res = client.read(NON_EXISTENT_ID, "123");
+            res = client.read(NON_EXISTENT_ID);
             int statusCode = res.getStatus();
 
             // Check the status code of the response: does it match
@@ -344,7 +347,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         ClientResponse<PermissionRole> res = null;
         try {
             res = client.read(
-                    permValues.get(TEST_SERVICE_NAME + TEST_MARKER + NO_REL_SUFFIX).getPermissionId(), "123");
+                    permValues.get(TEST_SERVICE_NAME + TEST_MARKER + NO_REL_SUFFIX).getPermissionId());
             int statusCode = res.getStatus();
 
             // Check the status code of the response: does it match
@@ -455,21 +458,23 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupDelete();
 
-        // Submit the request to the service and store the response.
+        //
+        //
+        //
         PermissionRoleClient client = new PermissionRoleClient();
-        ClientResponse<Response> res = null;
+        ClientResponse<PermissionRole> readResponse = client.read(
+        		permValues.get(TEST_SERVICE_NAME + TEST_MARKER).getPermissionId());
+        PermissionRole toDelete = null;
         try {
-            PermissionValue pv = permValues.get(TEST_SERVICE_NAME + TEST_MARKER);
-        PermissionRole permRole = createPermissionRoleInstance(pv,
-                roleValues.values(), true, true);
-            res = client.delete(pv.getPermissionId(), permRole);
-            int statusCode = res.getStatus();
+        	toDelete = readResponse.getEntity();
+        } finally {
+        	readResponse.releaseConnection();
+        }        
 
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
+        ClientResponse<Response> res = client.delete(
+        		toDelete.getPermissions().get(0).getPermissionId(), toDelete);
+        try {
+            int statusCode = res.getStatus();
             Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
             Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
@@ -478,6 +483,35 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
                 res.releaseConnection();
             }
         }
+        
+        //
+        // recreate 'TEST_SERVICE_NAME + TEST_MARKER' account and roles
+        //
+        create(testName);
+        setupDelete();
+     
+        //
+        // Lookup a know permission, and delete all of its role relationships
+        //
+        readResponse = client.read(
+        		permValues.get(TEST_SERVICE_NAME + TEST_MARKER).getPermissionId());
+        toDelete = null;
+        try {
+        	toDelete = readResponse.getEntity();
+        } finally {
+        	readResponse.releaseConnection();
+        }
+
+        res = client.delete(toDelete.getPermissions().get(0).getPermissionId());
+        try {
+            int statusCode = res.getStatus();
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        } finally {
+            res.releaseConnection();
+        }
+        
     }
 
     // Failure outcomes

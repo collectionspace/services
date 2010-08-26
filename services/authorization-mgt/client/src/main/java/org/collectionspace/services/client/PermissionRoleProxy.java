@@ -27,6 +27,7 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -54,14 +55,25 @@ public interface PermissionRoleProxy extends CollectionSpaceProxy {
 
     //(R)ead
     @GET
+    @Path("/{csid}/permroles")
+    ClientResponse<PermissionRole> read(@PathParam("csid") String csid);
+
+    //(R)ead
+    @GET
     @Path("/{csid}/permroles/{prcsid}")
     ClientResponse<PermissionRole> read(@PathParam("csid") String csid,
             @PathParam("prcsid") String prcsid);
 
-
+    //(D)elete
     @POST
     @Path("/{csid}/permroles")
     ClientResponse<Response> delete(@PathParam("csid") String csid,
             @QueryParam("_method") String method,
             PermissionRole permRole);
+    
+    //(D)elete
+    @DELETE
+    @Path("/{csid}/permroles")
+    ClientResponse<Response> delete(@PathParam("csid") String csid);
+    
 }

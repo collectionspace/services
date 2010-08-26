@@ -709,7 +709,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         AccountRole accRole = AccountRoleFactory.createAccountRoleInstance(
                 av, rvs, true, true);
         ClientResponse<Response> res = client.delete(
-                av.getAccountId(), accRole);
+                av.getAccountId());
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -756,7 +756,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         PermissionRoleClient client = new PermissionRoleClient();
         PermissionRole permRole = PermissionRoleFactory.createPermissionRoleInstance(
                 pv, rvls, true, true);
-        ClientResponse<Response> res = client.delete(pv.getPermissionId(), permRole);
+        ClientResponse<Response> res = client.delete(pv.getPermissionId());
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match

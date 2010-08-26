@@ -193,7 +193,7 @@ public class AuthorizationSeedDriver {
 
         List<PermissionRoleRel> permRoleRels = new ArrayList<PermissionRoleRel>();
         for (PermissionRole pr : authzGen.getDefaultPermissionRoles()) {
-            PermissionRoleUtil.buildPermissionRoleRel(pr, SubjectType.ROLE, permRoleRels);
+            PermissionRoleUtil.buildPermissionRoleRel(pr, SubjectType.ROLE, permRoleRels, false /*not for delete*/);
         }
         for (PermissionRoleRel permRoleRel : permRoleRels) {
             authzStore.store(permRoleRel);

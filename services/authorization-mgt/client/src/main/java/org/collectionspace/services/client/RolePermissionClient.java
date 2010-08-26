@@ -35,6 +35,7 @@ import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
+// TODO: Auto-generated Javadoc
 /**
  * A RolePermissionClient.
 
@@ -88,9 +89,19 @@ public class RolePermissionClient extends AbstractServiceClientImpl {
      * Read.
      *
      * @param csid the csid
-     * @param prcsid relationship does not have an id, junk is fine
      * @return the client response
      * @see
+     */
+    public ClientResponse<PermissionRole> read(String csid) {
+        return rolePermissionProxy.read(csid);
+    }
+
+    /**
+     * Read.
+     *
+     * @param csid the csid
+     * @param prcsid the prcsid
+     * @return the client response
      */
     public ClientResponse<PermissionRole> read(String csid, String prcsid) {
         return rolePermissionProxy.read(csid, prcsid);
@@ -109,12 +120,24 @@ public class RolePermissionClient extends AbstractServiceClientImpl {
     }
 
     /**
-     * delete given relationships between given role and permission(s)
-     * @param csid
-     * @param permRole
-     * @return
+     * delete given relationships between given role and permission(s).
+     *
+     * @param csid the csid
+     * @param permRole the perm role
+     * @return the client response
      */
     public ClientResponse<Response> delete(String csid, PermissionRole permRole) {
         return rolePermissionProxy.delete(csid, "delete", permRole);
+    }
+    
+    /**
+     * delete given relationships between given role and permission(s).
+     *
+     * @param csid the csid
+     * @return the client response
+     */
+    @Override
+    public ClientResponse<Response> delete(String csid) {
+        return rolePermissionProxy.delete(csid);
     }
 }

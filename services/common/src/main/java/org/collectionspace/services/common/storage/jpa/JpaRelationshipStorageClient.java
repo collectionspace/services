@@ -24,14 +24,20 @@
 package org.collectionspace.services.common.storage.jpa;
 
 import org.collectionspace.services.common.context.ServiceContextProperties;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+
+import org.collectionspace.services.authorization.AccountRoleRel;
+import org.collectionspace.services.authorization.PermissionRoleRel;
+
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
@@ -225,6 +231,51 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             }
         }
     }
+    
+    /**
+     * Gets the id.
+     *
+     * @param relationship the relationship
+     * @return the id
+     */
+    private Long getId(T relationship) {
+    	Long result = null;
+    	
+    	if (relationship != null) {
+	    	if (relationship instanceof AccountRoleRel) {
+	    		AccountRoleRel accountRoleRel = (AccountRoleRel)relationship;
+	    		result = accountRoleRel.getHjid();
+	    	} else if (relationship instanceof PermissionRoleRel) {
+	    		PermissionRoleRel permissionRoleRel = (PermissionRoleRel)relationship;
+	    		result = permissionRoleRel.getHjid();
+	    	}
+    	}
+    	
+    	return result;
+    }
+    
+    /**
+     * Gets the relationship.
+     *
+     * @param em the em
+     * @param relationship the relationship
+     * @return the relationship
+     * @throws DocumentNotFoundException the document not found exception
+     */
+    private T getRelationship(EntityManager em, T relationship)
+    		throws DocumentNotFoundException {
+    	Long id = getId(relationship);
+    	
+        T relationshipFound = (T)em.find(relationship.getClass(), id);
+        if (relationshipFound == null) {
+            String msg = "Could not find relationship with id=" + id;
+            if (logger.isErrorEnabled() == true) {
+            	logger.error(msg);
+            }
+            throw new DocumentNotFoundException(msg);
+        }
+        return relationshipFound;
+    }
 
     /**
      * delete removes all the relationships for the object in the relationship
@@ -332,7 +383,7 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             //the following could be much more efficient if done with a single
             //sql/jql
             for (T r : rl) {
-                em.remove(r);
+            	em.remove(getRelationship(em, r));
             }
             em.getTransaction().commit();
             handler.complete(Action.DELETE, wrapDoc);

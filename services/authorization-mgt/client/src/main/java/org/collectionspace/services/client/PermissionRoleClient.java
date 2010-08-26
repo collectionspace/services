@@ -97,6 +97,18 @@ public class PermissionRoleClient extends AbstractServiceClientImpl {
     }
 
     /**
+     * Read.
+     *
+     * @param csid the csid
+     * @param prcsid relationship does not have an id, junk is fine
+     * @return the client response
+     * @see
+     */
+    public ClientResponse<PermissionRole> read(String csid) {
+        return permissionRoleProxy.read(csid);
+    }
+
+    /**
      * Creates the.
      *
      * @param csid the csid
@@ -120,4 +132,10 @@ public class PermissionRoleClient extends AbstractServiceClientImpl {
     public ClientResponse<Response> delete(String csid, PermissionRole permRole) {
         return permissionRoleProxy.delete(csid, "delete", permRole);
     }
+    
+    @Override
+    public ClientResponse<Response> delete(String csid) {
+        return permissionRoleProxy.delete(csid);
+    }
+    
 }

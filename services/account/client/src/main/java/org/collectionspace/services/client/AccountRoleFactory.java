@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.AccountValue;
+import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.authorization.RoleValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +57,7 @@ public class AccountRoleFactory {
         AccountRole accRole = new AccountRole();
         //service consume is not required to provide subject as it is determined
         //from URI used
-//        accRole.setSubject(SubjectType.ROLE);
+        accRole.setSubject(SubjectType.ROLE);
         if (usePermId) {
             ArrayList<AccountValue> pvs = new ArrayList<AccountValue>();
             pvs.add(pv);

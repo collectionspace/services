@@ -38,10 +38,13 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+
+import org.collectionspace.services.authorization.storage.PermissionRoleDocumentHandler;
 import org.collectionspace.services.authorization.storage.AuthorizationDelegate;
 
+import org.collectionspace.services.common.storage.StorageClient;
+import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
-//import org.collectionspace.services.common.context.RemoteServiceContextImpl;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
@@ -51,8 +54,7 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.security.UnauthorizedException;
-import org.collectionspace.services.common.storage.StorageClient;
-import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
+
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -442,9 +444,64 @@ public class PermissionResource
 
     @GET
     @Path("{csid}/permroles/{permrolecsid}")
-    public PermissionRole getPermissionRole(
+    public PermissionRoleRel getPermissionRole(
             @PathParam("csid") String permCsid,
             @PathParam("permrolecsid") String permrolecsid) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("getPermissionRole with permCsid=" + permCsid);
+        }
+        if (permCsid == null || "".equals(permCsid)) {
+            logger.error("getPermissionRole: missing permCsid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    ServiceMessages.GET_FAILED + "permroles permission "
+                    + ServiceMessages.MISSING_INVALID_CSID + permCsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        PermissionRoleRel result = null;
+        try {
+            PermissionRoleSubResource subResource =
+                    new PermissionRoleSubResource(PermissionRoleSubResource.PERMISSION_PERMROLE_SERVICE);
+            //get relationships for a permission
+            result = subResource.getPermissionRoleRel(permCsid, SubjectType.ROLE, permrolecsid);
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.GET_FAILED
+                    + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getPermissionRole", dnfe);
+            }
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    ServiceMessages.GET_FAILED + "permroles permission csid=" + permCsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getPermissionRole", e);
+            }
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.GET_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        if (result == null) {
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    ServiceMessages.GET_FAILED + "permroles permisison csid=" + permCsid
+                    + ": was not found.").type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return result;
+    }
+
+    @GET
+    @Path("{csid}/permroles")
+    public PermissionRole getPermissionRole(
+            @PathParam("csid") String permCsid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getPermissionRole with permCsid=" + permCsid);
         }
@@ -496,11 +553,16 @@ public class PermissionResource
         return result;
     }
 
-    public Response deletePermissionRole(
-            @PathParam("csid") String permCsid,
-            PermissionRole input) {
+    /**
+     * Delete permission role.
+     *
+     * @param permCsid the perm csid
+     * @param input the input
+     * @return the response
+     */
+    public Response deletePermissionRole(String permCsid, PermissionRole input) {
         if (logger.isDebugEnabled()) {
-            logger.debug("deletePermissionRole with permCsid=" + permCsid);
+            logger.debug("Delete payload of permrole relationships with permission permCsid=" + permCsid);
         }
         if (permCsid == null || "".equals(permCsid)) {
             logger.error("deletePermissionRole: missing permCsid!");
@@ -539,4 +601,55 @@ public class PermissionResource
         }
 
     }
+    
+    /**
+     * Delete permission role.
+     *
+     * @param permCsid the perm csid
+     * @return the response
+     */
+    @DELETE
+    @Path("{csid}/permroles")    
+    public Response deletePermissionRole(
+            @PathParam("csid") String permCsid) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Delete all the role relationships of the permissions with permCsid=" + permCsid);
+        }
+        if (permCsid == null || "".equals(permCsid)) {
+            logger.error("deletePermissionRole: missing permCsid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    ServiceMessages.DELETE_FAILED + "permroles permission "
+                    + ServiceMessages.MISSING_INVALID_CSID + permCsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        try {
+            PermissionRoleSubResource subResource =
+                    new PermissionRoleSubResource(PermissionRoleSubResource.PERMISSION_PERMROLE_SERVICE);
+            //delete all relationships for a permission
+            subResource.deletePermissionRole(permCsid, SubjectType.ROLE);
+            return Response.status(HttpResponseCodes.SC_OK).build();
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(
+                    Response.Status.UNAUTHORIZED).entity(ServiceMessages.DELETE_FAILED
+                    + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("caught exception in deletePermissionRole", dnfe);
+            }
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    ServiceMessages.DELETE_FAILED + "permisison csid=" + permCsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
+            Response response = Response.status(
+                    Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.DELETE_FAILED
+                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+    }
+    
 }

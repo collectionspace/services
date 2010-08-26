@@ -269,8 +269,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
         RolePermissionClient client = new RolePermissionClient();
         ClientResponse<PermissionRole> res = null;
         try {
-            res = client.read(
-                    roleValues.get(getRoleName()).getRoleId(), "123");
+            res = client.read(roleValues.get(getRoleName()).getRoleId());
             int statusCode = res.getStatus();
 
             // Check the status code of the response: does it match
@@ -311,7 +310,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
         ClientResponse<PermissionRole> res = null;
         try {
 
-            res = client.read(NON_EXISTENT_ID, "123");
+            res = client.read(NON_EXISTENT_ID);
             int statusCode = res.getStatus();
 
             // Check the status code of the response: does it match
@@ -342,7 +341,7 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
         ClientResponse<PermissionRole> res = null;
         try {
 
-            res = client.read(roleValues.get(getRoleName() + NO_REL_SUFFIX).getRoleId(), "123");
+            res = client.read(roleValues.get(getRoleName() + NO_REL_SUFFIX).getRoleId());
             int statusCode = res.getStatus();
 
             // Check the status code of the response: does it match
@@ -448,26 +447,41 @@ public class RolePermissionServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
-        ;
+        
         // Perform setup.
         setupDelete();
-
+                
         // Submit the request to the service and store the response.
         RolePermissionClient client = new RolePermissionClient();
+        RoleValue rv = roleValues.get(getRoleName());
+        ClientResponse<Response> delRes = null;
+        try {
+        	delRes = client.delete(rv.getRoleId());
+            int statusCode = delRes.getStatus();
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        } finally {
+            if (delRes != null) {
+            	delRes.releaseConnection();
+            }
+        }
+
+        // reset for next delete
+        create(testName);
+        setupDelete();
+        
+        rv = roleValues.get(getRoleName());
+        ClientResponse<PermissionRole> readResponse = client.read(rv.getRoleId());
+        PermissionRole toDelete = readResponse.getEntity();
+        readResponse.releaseConnection();        
+        
+        rv = toDelete.getRoles().get(0);
         ClientResponse<Response> res = null;
         try {
-            RoleValue rv = roleValues.get(getRoleName());
-            PermissionRole permRole = createPermissionRoleInstance(rv,
-                    permValues.values(), true, true);
             res = client.delete(
-                    roleValues.get(getRoleName()).getRoleId(), permRole);
+                    rv.getRoleId(), toDelete);
             int statusCode = res.getStatus();
-
-            // Check the status code of the response: does it match
-            // the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
             Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                     invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
             Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);

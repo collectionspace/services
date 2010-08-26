@@ -23,6 +23,8 @@
  */
 package org.collectionspace.services.authorization;
 
+import org.collectionspace.services.authorization.storage.PermissionRoleDocumentHandler;
+
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -30,7 +32,9 @@ import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaRelationshipStorageClient;
+import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.common.context.ServiceContextProperties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,14 +55,21 @@ public class PermissionRoleSubResource
     final Logger logger = LoggerFactory.getLogger(PermissionRoleSubResource.class);
     /** The storage client. */
     final StorageClient storageClient = new JpaRelationshipStorageClient<PermissionRole>();
+    //
+    private String permissionRoleCsid = null;
 
+    /**
+     * Instantiates a new permission role sub resource.
+     *
+     * @param serviceName the service name
+     */
     public PermissionRoleSubResource(String serviceName) {
         this.serviceName = serviceName;
     }
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#getVersionString()
      */
-
     @Override
     protected String getVersionString() {
         /** The last change revision. */
@@ -150,6 +161,41 @@ public class PermissionRoleSubResource
         return getStorageClient(ctx).create(ctx, handler);
     }
 
+    /**
+     * Gets the permission role rel.
+     *
+     * @param csid the csid
+     * @param subject the subject
+     * @param permissionRoleCsid the permission role csid
+     * @return the permission role rel
+     * @throws Exception the exception
+     */
+    public PermissionRoleRel getPermissionRoleRel(String csid,
+    		SubjectType subject,
+    		String permissionRoleCsid) throws Exception {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("getAccountRole with csid=" + csid);
+        }
+//        AccountRolesList result = new AccountRolesList();
+        ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext((PermissionRole) null, subject);
+        PermissionRoleDocumentHandler handler = (PermissionRoleDocumentHandler)createDocumentHandler(ctx);
+        handler.setPermissionRoleCsid(permissionRoleCsid);
+        //getStorageClient(ctx).get(ctx, csid, handler);
+        PermissionRoleRel permissionRoleRel = (PermissionRoleRel)JpaStorageUtils.getEntity(
+        		new Long(permissionRoleCsid).longValue(), PermissionRoleRel.class);
+//        List<AccountRoleListItem> accountRoleList = result.getAccountRoleListItems();
+//        AccountRoleListItem listItem = new AccountRoleListItem();
+//        // fill the item
+//        listItem.setCsid(accountRoleRel.getHjid().toString());
+//        listItem.setRoleId(accountRoleRel.getRoleId());
+//        listItem.setRoleName(accountRoleRel.getRoleName());
+        // add item to result list
+//        result = (AccountRolesList) ctx.getOutput();
+        
+        return permissionRoleRel;
+    }
+    
     /**
      * getPermissionRole retrieves permission-role relationships using given
      * csid of object (permission/role) and subject (role/permission)

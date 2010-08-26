@@ -225,7 +225,7 @@
                 <xs:element name="fieldCollectionPlace" type="xs:string"/>
                 <xs:element name="fieldCollectionSources" type="fieldCollectionSourceList"/>
                 <xs:element name="fieldCollectors" type="fieldCollectorList"/>
-                <xs:element name="fieldCollectionEventNames" type="fieldCollectionEventNameList"/>
+                <xs:element name="fieldColEventNames" type="fieldColEventNameList"/>
 				
                 <!-- Object Description Date Information -->
                 <!-- This appears to be a placeholder structured date -->
@@ -497,9 +497,9 @@
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="fieldCollectionEventNameList">
+    <xs:complexType name="fieldColEventNameList">
         <xs:sequence>
-            <xs:element name="fieldCollectionEventName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="fieldColEventName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 

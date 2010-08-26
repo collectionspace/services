@@ -23,7 +23,13 @@
  */
 package org.collectionspace.services.account;
 
+import java.util.List;
+
+import org.collectionspace.services.account.storage.AccountRoleDocumentHandler;
+//import org.collectionspace.services.authorization.AccountRolesList;
+//import org.collectionspace.services.authorization.AccountRolesList.AccountRoleListItem;
 import org.collectionspace.services.authorization.AccountRole;
+import org.collectionspace.services.authorization.AccountValue;
 import org.collectionspace.services.authorization.AccountRoleRel;
 import org.collectionspace.services.authorization.SubjectType;
 
@@ -34,6 +40,7 @@ import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaRelationshipStorageClient;
+import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.common.context.ServiceContextProperties;
 
 import org.slf4j.Logger;
@@ -44,7 +51,8 @@ import org.slf4j.LoggerFactory;
  * @author
  */
 public class AccountRoleSubResource
-        extends AbstractCollectionSpaceResourceImpl<AccountRole, AccountRole> {
+//        extends AbstractCollectionSpaceResourceImpl<AccountRole, AccountRolesList> {
+    	extends AbstractCollectionSpaceResourceImpl<AccountRole, AccountRole> {
 
     final public static String ACCOUNT_ACCOUNTROLE_SERVICE = "accounts/accountroles";
     final public static String ROLE_ACCOUNTROLE_SERVICE = "roles/accountroles";
@@ -96,6 +104,7 @@ public class AccountRoleSubResource
      */
     @Override
     public ServiceContextFactory<AccountRole, AccountRole> getServiceContextFactory() {
+//    public ServiceContextFactory<AccountRole, AccountRolesList> getServiceContextFactory() {
         return RemoteServiceContextFactory.get();
     }
 
@@ -145,7 +154,10 @@ public class AccountRoleSubResource
 
         ServiceContext<AccountRole, AccountRole> ctx = createServiceContext(input, subject);
         DocumentHandler handler = createDocumentHandler(ctx);
-        return getStorageClient(ctx).create(ctx, handler);
+        
+        String bogusCsid = getStorageClient(ctx).create(ctx, handler);
+        
+        return bogusCsid;
     }
 
     /**
@@ -171,6 +183,57 @@ public class AccountRoleSubResource
         return result;
     }
 
+    /**
+     * Gets the account role.
+     *
+     * @param csid the csid
+     * @param subject the subject
+     * @param accountRoleCsid the account role csid
+     * @return the account role
+     * @throws Exception the exception
+     */
+    public AccountRoleRel getAccountRoleRel(String csid,
+    		SubjectType subject,
+    		String accountRoleCsid) throws Exception {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("getAccountRole with csid=" + csid);
+        }
+//        AccountRolesList result = new AccountRolesList();
+        ServiceContext<AccountRole, AccountRole> ctx = createServiceContext((AccountRole) null, subject);
+        AccountRoleDocumentHandler handler = (AccountRoleDocumentHandler)createDocumentHandler(ctx);
+        handler.setAccountRoleCsid(accountRoleCsid);
+        //getStorageClient(ctx).get(ctx, csid, handler);
+        AccountRoleRel accountRoleRel = (AccountRoleRel)JpaStorageUtils.getEntity(new Long(accountRoleCsid).longValue(), AccountRoleRel.class);
+//        List<AccountRoleListItem> accountRoleList = result.getAccountRoleListItems();
+//        AccountRoleListItem listItem = new AccountRoleListItem();
+//        // fill the item
+//        listItem.setCsid(accountRoleRel.getHjid().toString());
+//        listItem.setRoleId(accountRoleRel.getRoleId());
+//        listItem.setRoleName(accountRoleRel.getRoleName());
+        // add item to result list
+//        result = (AccountRolesList) ctx.getOutput();
+        
+        return accountRoleRel;
+    }
+
+    /**
+     * X_delete account role.
+     *
+     * @param csid the csid
+     * @param subject the subject
+     * @throws Exception the exception
+     */
+    public void x_deleteAccountRole(String csid,
+            SubjectType subject) throws Exception {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("deleteAccountRole with csid=" + csid);
+        }
+        AccountRole toDelete = getAccountRole(csid, subject);
+        deleteAccountRole(csid, subject, toDelete);
+    }
+    
     /**
      * deleteAccountRole deletes all account-role relationships using given
      * csid of object (account/role) and subject (role/account)
