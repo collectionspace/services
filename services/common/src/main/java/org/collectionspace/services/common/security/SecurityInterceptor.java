@@ -160,12 +160,12 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 		for (String pathParamName : pathParams.keySet()) {
 			//assumption : path params for csid for any entity has substring csid in name
 			String pathParamValue = pathParams.get(pathParamName).get(0);
-			if ((pathParamName.toLowerCase().indexOf("ms") > -1)) {
+			if ((pathParamName.toLowerCase().indexOf("csid") > -1)) {
 				//replace csids with wildcard
 				uriPath = uriPath.replace(pathParamValue, "*");
 			}
-			if ((pathParamName.toLowerCase().indexOf("csid") > -1)) {
-				//replace csids with wildcard
+			if ((pathParamName.toLowerCase().indexOf("id") > -1)) {
+				//replace id with wildcard
 				uriPath = uriPath.replace(pathParamValue, "*");
 			}
 			if ((pathParamName.toLowerCase().indexOf("predicate") > -1)) {
@@ -176,6 +176,10 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 				//replace name and specifiers with wildcard
 				uriPath = uriPath.replace("urn:cspace:name(" + pathParamValue
 						+ ")", "*");
+			}
+			if ((pathParamName.toLowerCase().indexOf("ms") > -1)) {
+				//replace csids with wildcard
+				uriPath = uriPath.replace(pathParamValue, "*");
 			}
 		}
 		uriPath = uriPath.replace("//", "/");

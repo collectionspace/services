@@ -436,10 +436,10 @@ public class AccountResource
     }
 
     @GET
-    @Path("{csid}/accountroles/{accrolecsid}")
+    @Path("{csid}/accountroles/{id}")
     public AccountRoleRel getAccountRole(
             @PathParam("csid") String accCsid,
-            @PathParam("accrolecsid") String accrolecsid) {
+            @PathParam("id") String accrolecsid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getAccountRole with accCsid=" + accCsid);
         }

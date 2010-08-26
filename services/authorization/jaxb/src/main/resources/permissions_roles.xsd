@@ -68,6 +68,7 @@
         </xs:sequence>
     </xs:complexType>
 
+	<xs:element name="permission_role_rel" type="permission_role_rel"/>
     <xs:complexType name="permission_role_rel">
         <xs:annotation>
             <xs:documentation>

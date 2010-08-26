@@ -505,10 +505,10 @@ public class RoleResource
     }
 
     @GET
-    @Path("{csid}/permroles/{permrolecsid}")
+    @Path("{csid}/permroles/{id}")
     public PermissionRoleRel getRolePermission(
             @PathParam("csid") String roleCsid,
-            @PathParam("permrolecsid") String permrolecsid) {
+            @PathParam("id") String permrolecsid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getRolePermission with roleCsid=" + roleCsid);
         }
