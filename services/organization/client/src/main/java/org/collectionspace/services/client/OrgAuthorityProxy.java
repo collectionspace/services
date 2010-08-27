@@ -141,6 +141,24 @@ public interface OrgAuthorityProxy extends CollectionSpaceProxy {
     ClientResponse<ContactsCommonList> readContactList(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid);
+    @GET
+    @Produces({"application/xml"})
+    @Path("/{parentcsid}/items/urn:cspace:name({itemspecifier})/contacts/")
+    ClientResponse<ContactsCommonList> readContactListForNamedItem(
+            @PathParam("parentcsid") String parentcsid,
+            @PathParam("itemspecifier") String itemspecifier);
+    @GET
+    @Produces({"application/xml"})
+    @Path("/urn:cspace:name({parentspecifier})/items/{itemcsid}/contacts/")
+    ClientResponse<ContactsCommonList> readContactListForItemInNamedAuthority(
+            @PathParam("parentspecifier") String parentspecifier,
+            @PathParam("itemcsid") String itemcsid);
+    @GET
+    @Produces({"application/xml"})
+    @Path("/urn:cspace:name({parentspecifier})/items/urn:cspace:name({itemspecifier})/contacts/")
+    ClientResponse<ContactsCommonList> readContactListForNamedItemInNamedAuthority(
+            @PathParam("parentspecifier") String parentspecifier,
+            @PathParam("itemspecifier") String itemspecifier);
 
     //(C)reate Contact
     @POST
@@ -149,6 +167,24 @@ public interface OrgAuthorityProxy extends CollectionSpaceProxy {
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             MultipartOutput multipart);
+    @POST
+    @Path("/{parentcsid}/items/urn:cspace:name({itemspecifier})/contacts/")
+    ClientResponse<Response> createContactForNamedItem(
+            @PathParam("parentcsid") String parentcsid,
+            @PathParam("itemspecifier") String itemspecifier,
+            MultipartOutput multipart);
+    @POST
+    @Path("/urn:cspace:name({parentspecifier})/items/{itemcsid}/contacts/")
+    ClientResponse<Response> createContactForItemInNamedAuthority(
+            @PathParam("parentspecifier") String parentspecifier,
+            @PathParam("itemcsid") String itemcsid,
+            MultipartOutput multipart);
+    @POST
+    @Path("/urn:cspace:name({parentspecifier})/items/urn:cspace:name({itemspecifier})/contacts/")
+    ClientResponse<Response> createContactForNamedItemInNamedAuthority(
+            @PathParam("parentspecifier") String parentspecifier,
+            @PathParam("itemspecifier") String itemspecifier,
+            MultipartOutput multipart);
 
      //(R)ead Contact
     @GET
@@ -156,6 +192,24 @@ public interface OrgAuthorityProxy extends CollectionSpaceProxy {
     ClientResponse<MultipartInput> readContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
+            @PathParam("csid") String csid);
+    @GET
+    @Path("/{parentcsid}/items/urn:cspace:name({itemspecifier})/contacts/{csid}")
+    ClientResponse<MultipartInput> readContactForNamedItem(
+            @PathParam("parentcsid") String parentcsid,
+            @PathParam("itemspecifier") String itemspecifier,
+            @PathParam("csid") String csid);
+    @GET
+    @Path("/urn:cspace:name({parentspecifier})/items/{itemcsid}/contacts/{csid}")
+    ClientResponse<MultipartInput> readContactInNamedAuthority(
+            @PathParam("parentspecifier") String parentspecifier,
+            @PathParam("itemcsid") String itemcsid,
+            @PathParam("csid") String csid);
+    @GET
+    @Path("/urn:cspace:name({parentspecifier})/items/urn:cspace:name({itemspecifier})/contacts/{csid}")
+    ClientResponse<MultipartInput> readContactForNamedItemInNamedAuthority(
+            @PathParam("parentspecifier") String parentspecifier,
+            @PathParam("itemspecifier") String itemspecifier,
             @PathParam("csid") String csid);
 
     //(U)pdate Contact
@@ -166,6 +220,27 @@ public interface OrgAuthorityProxy extends CollectionSpaceProxy {
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid,
             MultipartOutput multipart);
+    @PUT
+    @Path("/{parentcsid}/items/urn:cspace:name({itemspecifier})/contacts/{csid}")
+    ClientResponse<MultipartInput> updateContactForNamedItem(
+            @PathParam("parentcsid") String parentcsid,
+            @PathParam("itemspecifier") String itemspecifier,
+            @PathParam("csid") String csid,
+            MultipartOutput multipart);
+    @PUT
+    @Path("/urn:cspace:name({parentspecifier})/items/{itemcsid}/contacts/{csid}")
+    ClientResponse<MultipartInput> updateContactInNamedAuthority(
+            @PathParam("parentspecifier") String parentspecifier,
+            @PathParam("itemcsid") String itemcsid,
+            @PathParam("csid") String csid,
+            MultipartOutput multipart);
+    @PUT
+    @Path("/urn:cspace:name({parentspecifier})/items/urn:cspace:name({itemspecifier})/contacts/{csid}")
+    ClientResponse<MultipartInput> updateContactForNamedItemInNamedAuthority(
+            @PathParam("parentspecifier") String parentspecifier,
+            @PathParam("itemspecifier") String itemspecifier,
+            @PathParam("csid") String csid,
+            MultipartOutput multipart);
 
     //(D)elete Contact
     @DELETE
@@ -173,6 +248,24 @@ public interface OrgAuthorityProxy extends CollectionSpaceProxy {
     ClientResponse<Response> deleteContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
+            @PathParam("csid") String csid);
+    @DELETE
+    @Path("/{parentcsid}/items/urn:cspace:name({itemspecifier})/contacts/{csid}")
+    ClientResponse<Response> deleteContactForNamedItem(
+            @PathParam("parentcsid") String parentcsid,
+            @PathParam("itemspecifier") String itemspecifier,
+            @PathParam("csid") String csid);
+    @DELETE
+    @Path("/urn:cspace:name({parentspecifier})/items/{itemcsid}/contacts/{csid}")
+    ClientResponse<Response> deleteContactInNamedAuthority(
+            @PathParam("parentspecifier") String parentspecifier,
+            @PathParam("itemcsid") String itemcsid,
+            @PathParam("csid") String csid);
+    @DELETE
+    @Path("/urn:cspace:name({parentspecifier})/items/urn:cspace:name({itemspecifier})/contacts/{csid}")
+    ClientResponse<Response> deleteContactForNamedItemInNamedAuthority(
+            @PathParam("parentspecifier") String parentspecifier,
+            @PathParam("itemspecifier") String itemspecifier,
             @PathParam("csid") String csid);
 
 }

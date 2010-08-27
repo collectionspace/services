@@ -307,6 +307,12 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
         return orgAuthorityProxy.deleteItem(vcsid, csid);
     }
 
+    /***************************************************************************
+     * 
+     * Contact sub-resource interfaces
+     * 
+     ***************************************************************************/
+    
     /**
      * Creates the contact.
      *
@@ -321,6 +327,49 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
     }
 
     /**
+     * Creates the contact.
+     *
+     * @param parentcsid
+     * @param itemspecifier (shortIdentifier)
+     * @param multipart
+     * @return the client response
+     */
+    public ClientResponse<Response> createContactForNamedItem(
+    		String parentcsid,
+    		String itemspecifier,
+    		MultipartOutput multipart) {
+    	return orgAuthorityProxy.createContactForNamedItem(parentcsid, itemspecifier, multipart);
+    }
+    /**
+     * Creates the contact.
+     *
+     * @param parentspecifier (shortIdentifier)
+     * @param itemcsid
+     * @param multipart
+     * @return the client response
+     */
+    public ClientResponse<Response> createContactForItemInNamedAuthority(
+    		String parentspecifier,
+    		String itemcsid,
+    		MultipartOutput multipart) {
+    	return orgAuthorityProxy.createContactForItemInNamedAuthority(parentspecifier, itemcsid, multipart);
+    }
+    /**
+     * Creates the contact.
+     *
+     * @param parentspecifier (shortIdentifier)
+     * @param itemspecifier (shortIdentifier)
+     * @param multipart
+     * @return the client response
+     */
+    public ClientResponse<Response> createContactForNamedItemInNamedAuthority(
+    		String parentspecifier,
+    		String itemspecifier,
+    		MultipartOutput multipart) {
+    	return orgAuthorityProxy.createContactForNamedItemInNamedAuthority(parentspecifier, itemspecifier, multipart);
+    }
+    
+    /**
      * Read contact.
      *
      * @param parentcsid the parentcsid
@@ -332,6 +381,52 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
             String itemcsid, String csid) {
         return orgAuthorityProxy.readContact(parentcsid, itemcsid, csid);
     }
+    
+    /**
+     * Read contact.
+     *
+     * @param parentcsid
+     * @param itemspecifier (shortIdentifier)
+     * @param csid
+     * @return the client response
+     */
+    public ClientResponse<MultipartInput> readContactForNamedItem(
+    		String parentcsid,
+    		String itemspecifier,
+    		String csid){
+    	return orgAuthorityProxy.readContactForNamedItem(parentcsid, itemspecifier, csid);
+    }
+
+    /**
+     * Read contact.
+     *
+     * @param parentspecifier (shortIdentifier)
+     * @param itemcsid
+     * @param csid
+     * @return the client response
+     */
+    public ClientResponse<MultipartInput> readContactInNamedAuthority(
+    		String parentspecifier,
+    		String itemcsid,
+    		String csid){
+    	return orgAuthorityProxy.readContactInNamedAuthority(parentspecifier, itemcsid, csid);
+    }
+
+    /**
+     * Read contact.
+     *
+     * @param parentspecifier (shortIdentifier)
+     * @param itemspecifier (shortIdentifier)
+     * @param csid
+     * @return the client response
+     */
+    public ClientResponse<MultipartInput> readContactForNamedItemInNamedAuthority(
+    		String parentspecifier,
+    		String itemspecifier,
+    		String csid){
+    	return orgAuthorityProxy.readContactForNamedItemInNamedAuthority(parentspecifier, itemspecifier, csid);
+    }
+            
 
     /**
      * Read contact list.
@@ -344,6 +439,46 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
             String itemcsid) {
         return orgAuthorityProxy.readContactList(parentcsid, itemcsid);
     }
+    
+    /**
+     * Read contact list.
+     *
+     * @param parentcsid
+     * @param itemspecifier (shortIdentifier)
+     * @return the client response
+     */
+    public ClientResponse<ContactsCommonList> readContactListForNamedItem(
+    		String parentcsid,
+    		String itemspecifier){
+    	return orgAuthorityProxy.readContactList(parentcsid, itemspecifier);
+    }
+
+    /**
+     * Read contact list.
+     *
+     * @param parentspecifier (shortIdentifier)
+     * @param itemcsid
+     * @return the client response
+     */
+    public ClientResponse<ContactsCommonList> readContactListForItemInNamedAuthority(
+    		String parentspecifier,
+    		String itemcsid){
+    	return orgAuthorityProxy.readContactList(parentspecifier, itemcsid);
+    }
+
+    /**
+     * Read contact list.
+     *
+     * @param parentspecifier (shortIdentifier)
+     * @param itemspecifier (shortIdentifier)
+     * @return the client response
+     */
+    public ClientResponse<ContactsCommonList> readContactListForNamedItemInNamedAuthority(
+    		String parentspecifier,
+    		String itemspecifier){
+    	return orgAuthorityProxy.readContactList(parentspecifier, itemspecifier);
+    }
+            
 
     /**
      * Update contact.
@@ -358,6 +493,58 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
             String itemcsid, String csid, MultipartOutput multipart) {
         return orgAuthorityProxy.updateContact(parentcsid, itemcsid, csid, multipart);
     }
+    
+    /**
+     * Update contact.
+     *
+     * @param parentcsid the parentcsid
+     * @param itemspecifier (shortIdentifier)
+     * @param csid the csid
+     * @param multipart the multipart
+     * @return the client response
+     */
+    public ClientResponse<MultipartInput> updateContactForNamedItem(
+    		String parentcsid,
+    		String itemspecifier,
+    		String csid,
+    		MultipartOutput multipart) {
+    	return orgAuthorityProxy.updateContactForNamedItem(parentcsid, itemspecifier, csid, multipart);
+    }
+
+    /**
+     * Update contact.
+     *
+     * @param parentspecifier (shortIdentifier)
+     * @param itemcsid the itemcsid
+     * @param csid the csid
+     * @param multipart the multipart
+     * @return the client response
+     */
+    public ClientResponse<MultipartInput> updateContactInNamedAuthority(
+    		String parentspecifier,
+    		String itemcsid,
+    		String csid,
+    		MultipartOutput multipart) {
+    	return orgAuthorityProxy.updateContactInNamedAuthority(parentspecifier, itemcsid, csid, multipart);
+    }
+
+    /**
+     * Update contact.
+     *
+     * @param parentspecifier (shortIdentifier)
+     * @param itemspecifier (shortIdentifier)
+     * @param csid the csid
+     * @param multipart the multipart
+     * @return the client response
+     */
+    public ClientResponse<MultipartInput> updateContactForNamedItemInNamedAuthority(
+    		String parentspecifier,
+    		String itemspecifier,
+    		String csid,
+    		MultipartOutput multipart) {
+    	return orgAuthorityProxy.updateContactForNamedItemInNamedAuthority(parentspecifier, itemspecifier, csid, multipart);
+    }
+
 
     /**
      * Delete contact.
@@ -371,6 +558,54 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
         String itemcsid, String csid) {
         return orgAuthorityProxy.deleteContact(parentcsid,
             itemcsid, csid);
+    }
+    
+    /**
+     * Delete contact.
+     *
+     * @param parentcsid the parentcsid
+     * @param itemspecifier (shortIdentifier)
+     * @param csid the csid
+     * @return the client response
+     */
+    public ClientResponse<Response> deleteContactForNamedItem(
+    		String parentcsid,
+    		String itemspecifier,
+    		String csid) {
+    	return orgAuthorityProxy.deleteContactForNamedItem(parentcsid,
+    			itemspecifier, csid);
+    }
+
+    /**
+     * Delete contact.
+     *
+     * @param parentspecifier (shortIdentifier)
+     * @param itemcsid the itemcsid
+     * @param csid the csid
+     * @return the client response
+     */
+    public ClientResponse<Response> deleteContactInNamedAuthority(
+    		String parentspecifier,
+    		String itemcsid,
+    		String csid) {
+    	return orgAuthorityProxy.deleteContactInNamedAuthority(parentspecifier,
+    			itemcsid, csid);
+    }
+
+    /**
+     * Delete contact.
+     *
+     * @param parentspecifier (shortIdentifier)
+     * @param itemspecifier (shortIdentifier)
+     * @param csid the csid
+     * @return the client response
+     */
+    public ClientResponse<Response> deleteContactForNamedItemInNamedAuthority(
+    		String parentspecifier,
+    		String itemspecifier,
+    		String csid) {
+    	return orgAuthorityProxy.deleteContactForNamedItemInNamedAuthority(parentspecifier,
+    			itemspecifier, csid);
     }
 
 }
