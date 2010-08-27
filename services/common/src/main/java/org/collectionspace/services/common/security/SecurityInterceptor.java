@@ -157,15 +157,12 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 		String uriPath = uriInfo.getPath();
 
 		MultivaluedMap<String, String> pathParams = uriInfo.getPathParameters();
+		
 		for (String pathParamName : pathParams.keySet()) {
 			//assumption : path params for csid for any entity has substring csid in name
 			String pathParamValue = pathParams.get(pathParamName).get(0);
 			if ((pathParamName.toLowerCase().indexOf("csid") > -1)) {
 				//replace csids with wildcard
-				uriPath = uriPath.replace(pathParamValue, "*");
-			}
-			if ((pathParamName.toLowerCase().indexOf("id") > -1)) {
-				//replace id with wildcard
 				uriPath = uriPath.replace(pathParamValue, "*");
 			}
 			if ((pathParamName.toLowerCase().indexOf("predicate") > -1)) {
@@ -182,6 +179,18 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 				uriPath = uriPath.replace(pathParamValue, "*");
 			}
 		}
+		
+		// FIXME: REM
+		// Since the hjid (HyperJaxb3 generated IDs are not unique strings in URIs that also have a CSID,
+		// we need to replace hjid last.  We can fix this by having HyperJaxb3 generate UUID.
+		// Assumption : path param name for csid is lowercase
+		//
+		List<String> hjidValueList = pathParams.get("id");
+		if (hjidValueList != null) {
+			String hjidValue = hjidValueList.get(0); //should be just one value, so get the first.
+			uriPath = uriPath.replace(hjidValue, "*");
+		}
+		
 		uriPath = uriPath.replace("//", "/");
 		return uriPath;
 	}
