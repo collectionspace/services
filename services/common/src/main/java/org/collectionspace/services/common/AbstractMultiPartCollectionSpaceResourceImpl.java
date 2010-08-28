@@ -34,6 +34,8 @@ import org.collectionspace.services.common.document.DocumentHandler;
 
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Class AbstractMultiPartCollectionSpaceResourceImpl.
@@ -41,16 +43,16 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends
 		AbstractCollectionSpaceResourceImpl<MultipartInput, MultipartOutput> {
 
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Override
     public ServiceContextFactory<MultipartInput, MultipartOutput> getServiceContextFactory() {
-    	return (ServiceContextFactory<MultipartInput, MultipartOutput>)MultipartServiceContextFactory.get();
+    	return MultipartServiceContextFactory.get();
     }
 
     @Override
     public DocumentHandler createDocumentHandler(ServiceContext<MultipartInput, MultipartOutput> ctx) throws Exception {
-    	DocumentHandler docHandler = createDocumentHandler(ctx, ctx.getCommonPartLabel(),
-    			getCommonPartClass());
-    	return docHandler;
+    	return createDocumentHandler(ctx, ctx.getCommonPartLabel(),getCommonPartClass());
     }
     
     /**
@@ -72,9 +74,7 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends
     	if (ctx.getInput() != null) {
         	commonPart = ctx.getInputPart(schemaName, commonClass);
         }
-        DocumentHandler docHandler = super.createDocumentHandler(ctx, commonPart);
-        
-        return docHandler;
+        return super.createDocumentHandler(ctx, commonPart);
     }
     
     /**

@@ -52,6 +52,7 @@ import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.w3c.dom.Document;
 
@@ -176,7 +177,7 @@ public abstract class BaseServiceTest {
      *
      * @param expectedStatusCode  A status code expected to be returned in the response.
      *
-     * @param serviceRequestType  A type of service request (e.g. CREATE, DELETE).
+     * @param reqType  A type of service request (e.g. CREATE, DELETE).
      */
     protected void testSetup(
             int expectedStatusCode,
@@ -191,7 +192,7 @@ public abstract class BaseServiceTest {
      * specific call to a service does not fall within a set of valid status
      * codes for that service.
      *
-     * @param serviceRequestType  A type of service request (e.g. CREATE, DELETE).
+     * @param requestType  A type of service request (e.g. CREATE, DELETE).
      *
      * @param statusCode  The invalid status code that was returned in the response,
      *                    from submitting that type of request to the service.
@@ -257,7 +258,7 @@ public abstract class BaseServiceTest {
                     "Exception during HTTP " + method + " request to "
                     + url + ":", e);
         } finally {
-        	httpMethod.releaseConnection();
+        	if (httpMethod != null) httpMethod.releaseConnection();
         }
         return statusCode;
     }
@@ -273,12 +274,11 @@ public abstract class BaseServiceTest {
      *
      * @param  mediaType  The media type of the entity body to be submitted.
      *
-     * @param  entity     The contents of the entity body to be submitted.
+     * @param  entityStr     The contents of the entity body to be submitted.
      *
      * @return The status code received in the HTTP response.
      */
-    protected int submitRequest(String method, String url, String mediaType,
-            String entityStr) {
+    protected int submitRequest(String method, String url, String mediaType, String entityStr) {
         int statusCode = 0;
         EntityEnclosingMethod httpMethod = null;
         try {
@@ -299,7 +299,7 @@ public abstract class BaseServiceTest {
                     "Exception during HTTP " + method + " request to "
                     + url + ":", e);
         } finally {
-        	httpMethod.releaseConnection();
+        	if (httpMethod != null) httpMethod.releaseConnection();
         }
         return statusCode;
     }
@@ -385,10 +385,13 @@ public abstract class BaseServiceTest {
                     if (logger.isDebugEnabled()) {
                         logger.debug("extracted part as str=\n" + partStr);
                     }
-                    obj = part.getBody(clazz, null);
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("extracted part as obj=\n",
-                                objectAsXmlString(obj, clazz));
+                    try {
+                        obj = part.getBody(clazz, null);
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("extracted part as obj="+objectAsXmlString(obj, clazz));
+                        }
+                    } catch (Throwable t) {
+                        logger.error("Could not get part body based on content and classname. "+ clazz.getName()+ " error: "+t);
                     }
                 }
                 break;
@@ -428,7 +431,7 @@ public abstract class BaseServiceTest {
                 try {
                     bais.close();
                 } catch (Exception e) {
-                	if (logger.isDebugEnabled() == true) {
+                	if (logger.isDebugEnabled()) {
                 		e.printStackTrace();
                 	}
                 }
@@ -595,4 +598,14 @@ public abstract class BaseServiceTest {
         }
         return className;
     }
+
+    public void assertStatusCode(ClientResponse<?> res, String testName) {
+        int statusCode = res.getStatus();
+        // Check the status code of the response: does it match the expected response(s)?
+        logger.debug(testName + ": status = " + statusCode);
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode), invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    }
+
+
 }

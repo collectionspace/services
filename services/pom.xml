@@ -41,6 +41,7 @@
         <module>intake</module>
         <module>loanin</module>
         <module>loanout</module>
+        <module>objectexit</module>
         <module>location</module>
         <module>movement</module>
         <module>report</module>
