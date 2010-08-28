@@ -1114,7 +1114,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         nonexMap.put(LocationJAXBSchema.LOCATION_TYPE, TEST_LOCATION_TYPE);
         nonexMap.put(LocationJAXBSchema.TERM_STATUS, TEST_STATUS);
         MultipartOutput multipart = 
-    	LocationAuthorityClientUtils.createLocationInstance(NON_EXISTENT_ID, 
+    	LocationAuthorityClientUtils.createLocationInstance(
     			LocationAuthorityClientUtils.createLocationRefName(knownResourceRefName, "nonEx", "Non Existent"), 
     			nonexMap, client.getItemCommonPartName() );
         ClientResponse<MultipartInput> res =

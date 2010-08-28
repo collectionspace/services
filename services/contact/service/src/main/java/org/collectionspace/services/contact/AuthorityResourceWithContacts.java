@@ -153,7 +153,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
             MultipartInput input) {
         try {
    			Specifier parentSpec = getSpecifier(parentspecifier, 
-   					"createContact(parent)", "CREATE_ITEM_CONTACT");
+   					"createContact(authority)", "CREATE_ITEM_CONTACT");
 			Specifier itemSpec = getSpecifier(itemspecifier, 
 					"createContact(item)", "CREATE_ITEM_CONTACT");
 			// Note that we have to create the service context for the Items, not the main service
@@ -192,6 +192,15 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Create failed reason " + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("createContact", dnfe);
+            }
+            Response response = Response.status(Response.Status.NOT_FOUND)
+                .entity("Create Contact failed; one of the requested specifiers for authority:"
+                		+parentspecifier+": and item:"+itemspecifier+": was not found.")
+                .type("text/plain").build();
+            throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in createContact", e);
@@ -224,9 +233,9 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
         ContactsCommonList contactObjectList = new ContactsCommonList();
         try {
    			Specifier parentSpec = getSpecifier(parentspecifier, 
-   					"createContact(parent)", "CREATE_ITEM_CONTACT");
+   					"getContactList(parent)", "GET_CONTACT_LIST");
 			Specifier itemSpec = getSpecifier(itemspecifier, 
-					"createContact(item)", "CREATE_ITEM_CONTACT");
+					"getContactList(item)", "GET_CONTACT_LIST");
 			// Note that we have to create the service context for the Items, not the main service
             ServiceContext<MultipartInput, MultipartOutput> ctx = null;
 			String parentcsid;
@@ -262,6 +271,15 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getContactList", dnfe);
+            }
+            Response response = Response.status(Response.Status.NOT_FOUND)
+                .entity("Get ContactList failed; one of the requested specifiers for authority:"
+                		+parentspecifier+": and item:"+itemspecifier+": was not found.")
+                .type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -329,7 +347,9 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
                 logger.debug("getContact", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND)
-                .entity("Get failed, the requested Contact CSID:" + csid + ": was not found.")
+                .entity("Get failed, the requested Contact CSID:" + csid + 
+                		": or one of the specifiers for authority:"+parentspecifier+
+                		": and item:"+itemspecifier+": was not found.")
                 .type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
@@ -371,9 +391,9 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
         MultipartOutput result = null;
         try {
    			Specifier parentSpec = getSpecifier(parentspecifier, 
-   					"updateContact(parent)", "UPDATE_ITEM_CONTACT");
+   					"updateContact(authority)", "UPDATE_CONTACT");
 			Specifier itemSpec = getSpecifier(itemspecifier, 
-					"updateContact(item)", "UPDATE_ITEM_CONTACT");
+					"updateContact(item)", "UPDATE_CONTACT");
 			// Note that we have to create the service context for the Items, not the main service
             ServiceContext<MultipartInput, MultipartOutput> ctx = null;
 			String parentcsid;
@@ -411,9 +431,11 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
             if (logger.isDebugEnabled()) {
                 logger.debug("caught exception in updateContact", dnfe);
             }
-            Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    "Update failed on Contact csid=" + itemspecifier).type(
-                    "text/plain").build();
+            Response response = Response.status(Response.Status.NOT_FOUND)
+                    .entity("Update failed, the requested Contact CSID:" + csid + 
+                    		": or one of the specifiers for authority:"+parentspecifier+
+                    		": and item:"+itemspecifier+": was not found.")
+                    .type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             Response response = Response.status(
@@ -440,9 +462,9 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
             @PathParam("csid") String csid) {
         try {
    			Specifier parentSpec = getSpecifier(parentspecifier, 
-   					"updateContact(parent)", "UPDATE_ITEM_CONTACT");
+   					"deleteContact(authority)", "DELETE_CONTACT");
 			Specifier itemSpec = getSpecifier(itemspecifier, 
-					"updateContact(item)", "UPDATE_ITEM_CONTACT");
+					"deleteContact(item)", "DELETE_CONTACT");
 			// Note that we have to create the service context for the Items, not the main service
             ServiceContext<MultipartInput, MultipartOutput> ctx = null;
 			String parentcsid;
@@ -476,7 +498,9 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
                 logger.debug("Caught exception in deleteContact", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND)
-                .entity("Delete failed, the requested Contact CSID:" + csid + ": was not found.")
+                .entity("Delete failed, the requested Contact CSID:" + csid + 
+                		": or one of the specifiers for authority:"+parentspecifier+
+                		": and item:"+itemspecifier+": was not found.")
                 .type("text/plain").build();
             throw new WebApplicationException(response);
        } catch (Exception e) {

@@ -168,7 +168,7 @@ public class OrgAuthorityClientUtils {
      * @param client the client
      * @return the string
      */
-    public static String createItemInAuthority(String inAuthority, 
+    public static String createItemInAuthority( String inAuthority,
     		String orgAuthorityRefName, Map<String, String> orgInfo,
                 Map<String, List<String>> orgRepeatablesInfo, OrgAuthorityClient client) {
     	// Expected status code: 201 Created
@@ -182,7 +182,7 @@ public class OrgAuthorityClientUtils {
     				+"\" in orgAuthority: \"" + orgAuthorityRefName +"\"");
     	}
     	MultipartOutput multipart =
-    		createOrganizationInstance(inAuthority, orgAuthorityRefName, 
+    		createOrganizationInstance(orgAuthorityRefName, 
     				orgInfo, orgRepeatablesInfo, client.getItemCommonPartName());
 
     	ClientResponse<Response> res = client.createItem(inAuthority, multipart);
@@ -211,17 +211,16 @@ public class OrgAuthorityClientUtils {
     /**
      * Creates the organization instance.
      *
-     * @param inAuthority the in authority
      * @param orgAuthRefName the owning Authority ref name
      * @param orgInfo the org info
      * @param headerLabel the header label
      * @return the multipart output
      */
-    public static MultipartOutput createOrganizationInstance(String inAuthority, 
+    public static MultipartOutput createOrganizationInstance(
     		String orgAuthRefName, Map<String, String> orgInfo, String headerLabel){
             final Map<String, List<String>> EMPTY_ORG_REPEATABLES_INFO =
                 new HashMap<String, List<String>>();
-            return createOrganizationInstance(inAuthority, orgAuthRefName,
+            return createOrganizationInstance(orgAuthRefName,
                     orgInfo, EMPTY_ORG_REPEATABLES_INFO, headerLabel);
     }
 
@@ -229,7 +228,6 @@ public class OrgAuthorityClientUtils {
     /**
      * Creates the organization instance.
      *
-     * @param inAuthority the in authority
      * @param orgAuthRefName the owning Authority ref name
      * @param orgInfo the org info
      * @param orgRepeatablesInfo names and values of repeatable scalar
@@ -237,11 +235,10 @@ public class OrgAuthorityClientUtils {
      * @param headerLabel the header label
      * @return the multipart output
      */
-    public static MultipartOutput createOrganizationInstance(String inAuthority, 
+    public static MultipartOutput createOrganizationInstance( 
     		String orgAuthRefName, Map<String, String> orgInfo,
                 Map<String, List<String>> orgRepeatablesInfo, String headerLabel){
         OrganizationsCommon organization = new OrganizationsCommon();
-        organization.setInAuthority(inAuthority);
     	String shortId = orgInfo.get(OrganizationJAXBSchema.SHORT_IDENTIFIER);
     	if (shortId == null || shortId.isEmpty()) {
     		throw new IllegalArgumentException("shortIdentifier cannot be null or empty");

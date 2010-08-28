@@ -54,19 +54,17 @@ public class LocationAuthorityClientUtils {
     }
 
     /**
-     * @param inAuthority CSID of the authority to create a new location in
      * @param locationRefName  The proper refName for this authority
      * @param locationInfo the properties for the new Location
      * @param headerLabel	The common part label
      * @return	The MultipartOutput payload for the create call
      */
-    public static MultipartOutput createLocationInstance(String inAuthority, 
+    public static MultipartOutput createLocationInstance( 
     		String locationAuthRefName, Map<String, String> locationInfo, String headerLabel){
         LocationsCommon location = new LocationsCommon();
     	String shortId = locationInfo.get(LocationJAXBSchema.SHORT_IDENTIFIER);
     	String displayName = locationInfo.get(LocationJAXBSchema.DISPLAY_NAME);
     	location.setShortIdentifier(shortId);
-        location.setInAuthority(inAuthority);
     	String locationRefName = createLocationRefName(locationAuthRefName, shortId, displayName);
        	location.setRefName(locationRefName);
        	String value = null;
@@ -134,7 +132,7 @@ public class LocationAuthorityClientUtils {
     				+"\" in locationAuthority: \"" + locationAuthorityRefName +"\"");
     	}
     	MultipartOutput multipart = 
-    		createLocationInstance( vcsid, locationAuthorityRefName,
+    		createLocationInstance( locationAuthorityRefName,
     			locationMap, client.getItemCommonPartName() );
     	String newID = null;
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);

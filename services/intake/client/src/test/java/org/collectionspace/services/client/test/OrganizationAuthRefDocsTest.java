@@ -209,7 +209,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
         orgInfo.put(OrganizationJAXBSchema.SHORT_NAME, shortName);
         orgInfo.put(OrganizationJAXBSchema.LONG_NAME, longName);
     	MultipartOutput multipart = 
-    		OrgAuthorityClientUtils.createOrganizationInstance(orgAuthCSID, orgAuthRefName,
+    		OrgAuthorityClientUtils.createOrganizationInstance(orgAuthRefName,
     				orgInfo, orgAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = orgAuthClient.createItem(orgAuthCSID, multipart);
         int statusCode = res.getStatus();

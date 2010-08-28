@@ -261,7 +261,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         itemInfo.put(AuthorityItemJAXBSchema.SHORT_IDENTIFIER, "Bad Item Short Id!");
         itemInfo.put(AuthorityItemJAXBSchema.DISPLAY_NAME, "Bad Item!");
     	MultipartOutput multipart = 
-    		VocabularyClientUtils.createVocabularyItemInstance( knownResourceId, knownResourceRefName,
+    		VocabularyClientUtils.createVocabularyItemInstance( knownResourceRefName,
     				itemInfo, client.getItemCommonPartName() );
     	ClientResponse<Response> res = client.createItem(knownResourceId, multipart);
 
@@ -1109,7 +1109,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         itemInfo.put(AuthorityItemJAXBSchema.SHORT_IDENTIFIER, "nonex");
         itemInfo.put(AuthorityItemJAXBSchema.DISPLAY_NAME, "display-nonex");
         MultipartOutput multipart = 
-        	VocabularyClientUtils.createVocabularyItemInstance(knownResourceId, 
+        	VocabularyClientUtils.createVocabularyItemInstance( 
         		VocabularyClientUtils.createVocabularyRefName(NON_EXISTENT_ID, null),
         		itemInfo, client.getItemCommonPartName());
         ClientResponse<MultipartInput> res =

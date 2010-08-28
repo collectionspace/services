@@ -349,7 +349,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         orgInfo.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortIdentifier);
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
     	MultipartOutput multipart =
-    		OrgAuthorityClientUtils.createOrganizationInstance(orgAuthCSID,
+    		OrgAuthorityClientUtils.createOrganizationInstance(
     				orgAuthRefName, orgInfo, orgAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = orgAuthClient.createItem(orgAuthCSID, multipart);
         int statusCode = res.getStatus();

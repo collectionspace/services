@@ -302,7 +302,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         subBodyOrgMap.put(OrganizationJAXBSchema.LONG_NAME, subBodyName + " Long Name");
         subBodyOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, subBodyName + " Founding Place");
     	MultipartOutput multipart =
-    	    OrgAuthorityClientUtils.createOrganizationInstance(knownResourceId,
+    	    OrgAuthorityClientUtils.createOrganizationInstance(
     		knownResourceRefName, subBodyOrgMap, orgAuthClient.getItemCommonPartName());
 
     	String result = null;

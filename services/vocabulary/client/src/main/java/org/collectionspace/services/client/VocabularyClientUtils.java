@@ -43,10 +43,9 @@ public class VocabularyClientUtils {
 
 		// Note that we do not use the map, but we will once we add more info to the 
 		// items
-    public static MultipartOutput createVocabularyItemInstance(String inAuthority, 
+    public static MultipartOutput createVocabularyItemInstance( 
     		String vocabularyRefName, Map<String, String> vocabItemInfo, String headerLabel){
         VocabularyitemsCommon vocabularyItem = new VocabularyitemsCommon();
-        vocabularyItem.setInAuthority(inAuthority);
     	String shortId = vocabItemInfo.get(AuthorityItemJAXBSchema.SHORT_IDENTIFIER);
     	String displayName = vocabItemInfo.get(AuthorityItemJAXBSchema.DISPLAY_NAME);
        	vocabularyItem.setShortIdentifier(shortId);
@@ -78,7 +77,7 @@ public class VocabularyClientUtils {
     				+"\" in personAuthority: \"" + vcsid +"\"");
     	}
     	MultipartOutput multipart = 
-    		createVocabularyItemInstance( vcsid, vocabularyRefName,
+    		createVocabularyItemInstance( vocabularyRefName,
     				itemMap, client.getItemCommonPartName() );
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
 

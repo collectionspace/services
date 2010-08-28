@@ -72,6 +72,29 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
 		this.inAuthority = inAuthority;
 	}
 
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleCreate(org.collectionspace.services.common.document.DocumentWrapper)
+     */
+    @Override
+    public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	// first fill all the parts of the document
+    	super.handleCreate(wrapDoc);    	
+    	handleInAuthority(wrapDoc.getWrappedObject());
+    }
+    
+    /**
+     * Check the logic around the parent pointer. Note that we only need do this on
+     * create, since we have logic to make this read-only on update. 
+     * 
+     * @param docModel
+     * 
+     * @throws Exception the exception
+     */
+    private void handleInAuthority(DocumentModel docModel) throws Exception {
+    	docModel.setProperty(authorityItemCommonSchemaName, 
+    			AuthorityItemJAXBSchema.IN_AUTHORITY, inAuthority);
+    }
+
 
     /**
      * getCommonPart get associated item

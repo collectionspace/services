@@ -1664,7 +1664,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         nonexOrgMap.put(OrganizationJAXBSchema.SHORT_NAME, "Non-existent");
         MultipartOutput multipart = 
         	OrgAuthorityClientUtils.createOrganizationInstance(
-        		NON_EXISTENT_ID, knownResourceRefName,
+        		knownResourceRefName,
         		nonexOrgMap, client.getItemCommonPartName() );
         ClientResponse<MultipartInput> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);

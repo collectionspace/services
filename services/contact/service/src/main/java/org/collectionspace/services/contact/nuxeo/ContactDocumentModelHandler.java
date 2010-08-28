@@ -25,10 +25,13 @@ package org.collectionspace.services.contact.nuxeo;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.collectionspace.services.contact.ContactJAXBSchema;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.service.ObjectPartType;
+import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.contact.ContactsCommonList.ContactListItem;
@@ -95,6 +98,32 @@ public class ContactDocumentModelHandler
      */
     public void setInItem(String inItem) {
         this.inItem = inItem;
+    }
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#handleCreate(org.collectionspace.services.common.document.DocumentWrapper)
+     */
+    @Override
+    public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+    	// first fill all the parts of the document
+    	super.handleCreate(wrapDoc);    	
+    	handleInAuthority(wrapDoc.getWrappedObject());
+    }
+    
+    /**
+     * Check the logic around the parent pointer. Note that we only need do this on
+     * create, since we have logic to make this read-only on update. 
+     * 
+     * @param docModel
+     * 
+     * @throws Exception the exception
+     */
+    private void handleInAuthority(DocumentModel docModel) throws Exception {
+    	String commonPartLabel = getServiceContext().getCommonPartLabel("contacts");
+    	docModel.setProperty(commonPartLabel, 
+    			ContactJAXBSchema.IN_AUTHORITY, inAuthority);
+    	docModel.setProperty(commonPartLabel, 
+    			ContactJAXBSchema.IN_ITEM, inItem);
     }
 
     /* (non-Javadoc)
@@ -178,5 +207,20 @@ public class ContactDocumentModelHandler
     public String getQProperty(String prop) {
         return ContactConstants.NUXEO_SCHEMA_NAME + ":" + prop;
     }
+    
+    /**
+     * Filters out ContactJAXBSchema.IN_AUTHORITY, and IN_ITEM, to ensure that
+     * the parent links remains untouched.
+     * @param objectProps the properties parsed from the update payload
+     * @param partMeta metadata for the object to fill
+     */
+    @Override
+    public void filterReadOnlyPropertiesForPart(
+    		Map<String, Object> objectProps, ObjectPartType partMeta) {
+    	super.filterReadOnlyPropertiesForPart(objectProps, partMeta);
+    	objectProps.remove(ContactJAXBSchema.IN_AUTHORITY);
+    	objectProps.remove(ContactJAXBSchema.IN_ITEM);
+    }
+
 }
 
