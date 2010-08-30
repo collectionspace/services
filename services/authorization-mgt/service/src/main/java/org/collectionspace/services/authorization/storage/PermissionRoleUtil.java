@@ -25,14 +25,24 @@ package org.collectionspace.services.authorization.storage;
 
 import java.util.HashMap;
 import java.util.List;
+
+import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.context.ServiceContextProperties;
+import org.collectionspace.services.common.storage.jpa.JpaRelationshipStorageClient;
+import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
+
+import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionRoleRel;
 import org.collectionspace.services.authorization.PermissionValue;
+import org.collectionspace.services.authorization.Role;
+import org.collectionspace.services.authorization.RoleResource;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
-import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.context.ServiceContextProperties;
-import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -41,6 +51,8 @@ import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
  * @author
  */
 public class PermissionRoleUtil {
+
+    final Logger logger = LoggerFactory.getLogger(PermissionRoleUtil.class);
 
     /**
      * Gets the relation subject.
@@ -86,7 +98,8 @@ public class PermissionRoleUtil {
     static public void buildPermissionRoleRel(PermissionRole pr,
     		SubjectType subject,
     		List<PermissionRoleRel> prrl,
-    		boolean handleDelete) {
+    		boolean handleDelete)
+    			throws DocumentNotFoundException {
         if (subject.equals(SubjectType.ROLE)) {
             //FIXME: potential index out of bounds exception...negative test needed
             PermissionValue pv = pr.getPermissions().get(0);
@@ -105,34 +118,74 @@ public class PermissionRoleUtil {
     }
 
     /**
-     * Builds the permisson role rel.
+     * Builds a permisson role relationship for either 'create' or 'delete'
      *
-     * @param pv the pv
-     * @param rv the rv
+     * @param pv the pv (currently using only the ID)
+     * @param rv the rv (currently using only the ID)
      * @param handleDelete the handle delete
      * @return the permission role rel
      */
-    static private PermissionRoleRel buildPermissonRoleRel(PermissionValue pv,
-    		RoleValue rv,
+    static private PermissionRoleRel buildPermissonRoleRel(PermissionValue permissionValue,
+    		RoleValue roleValue,
     		SubjectType subject,
-    		boolean handleDelete) {
-        PermissionRoleRel prr = new PermissionRoleRel();
-        prr.setPermissionId(pv.getPermissionId());
-        prr.setPermissionResource(pv.getResourceName());
-        prr.setActionGroup(pv.getActionGroup());
-        prr.setRoleId(rv.getRoleId());
-        prr.setRoleName(rv.getRoleName());
-        
+    		boolean handleDelete)
+    			throws DocumentNotFoundException {
+
+    	PermissionRoleRel result = null;
+    	
+    	//
+    	// Ensure we can find both the Permission and Role to relate.
+    	// FIXME: REM - This is a workaround until the Import utility creates Perm/Role relationships
+    	// correctly.  The import utility should create and store the permissions and roles BEFORE creating the relationships
+    	//
+    	PermissionValue pv = permissionValue;
+    	try {
+	    	Permission permission = (Permission)JpaStorageUtils.getEntity(pv.getPermissionId(),
+	    			Permission.class);
+	    	if (permission != null) {
+	    		// If the permission already exists, then use it to fill our the relation record
+	    		pv = JpaRelationshipStorageClient.createPermissionValue(permission);
+	    	}
+    	} catch (DocumentNotFoundException e) {
+    		// ignore this exception, pv is set to permissionValue;
+    	}
+    	//
+    	// Ensure we can find both the Permission and Role to relate.
+    	// FIXME: REM - This is a workaround until the Import utility creates Perm/Role relationships
+    	// correctly.  The import utility should create and store the permissions and roles BEFORE creating the relationships
+    	//
+    	RoleValue rv = roleValue;
+    	try {
+	    	Role role = (Role)JpaStorageUtils.getEntity(rv.getRoleId(),
+	    			Role.class);
+	    	if (role != null) {
+	    		// If the role already exists, then use it to fill out the relation record
+	    		rv = JpaRelationshipStorageClient.createRoleValue(role);
+	    	}
+    	} catch (DocumentNotFoundException e) {
+    		// ignore this exception, rv is set to roleValue
+    	}
+    	
+        result = new PermissionRoleRel();
+        result.setPermissionId(pv.getPermissionId());
+        result.setPermissionResource(pv.getResourceName());
+        result.setActionGroup(pv.getActionGroup());
+        result.setRoleId(rv.getRoleId());
+        result.setRoleName(rv.getRoleName());
+        //
+        // For 'delete' we need to set the hjid of the existing relstionship
+        //
         String relationshipId = null;
         if (subject.equals(SubjectType.ROLE) == true) {
-        	relationshipId = rv.getRoleRelationshipId();
+        	relationshipId = roleValue.getRoleRelationshipId();
         } else if (subject.equals(SubjectType.PERMISSION) == true) {
-        	relationshipId = pv.getPermRelationshipId();
+        	relationshipId = permissionValue.getPermRelationshipId();
         }
         if (relationshipId != null && handleDelete == true) {
-        	prr.setHjid(Long.parseLong(relationshipId));  // set this so we can convince JPA to del the relation
-        }        
-        return prr;
+        	result.setHjid(Long.parseLong(relationshipId));  // set this so we can convince JPA to del the relation
+        }
+    	
+        return result;
     }
 
     /**

@@ -58,6 +58,7 @@ import org.collectionspace.services.account.Tenant;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.InvalidDocumentException;
 import org.collectionspace.services.common.document.ValidatorHandler;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
@@ -149,7 +150,8 @@ public class AccountValidatorHandler implements ValidatorHandler {
         return invalid;
     }
 
-    private boolean isInvalidTenant(List<AccountTenant> atList, StringBuilder msgBldr) {
+    private boolean isInvalidTenant(List<AccountTenant> atList, StringBuilder msgBldr)
+    		throws DocumentNotFoundException {
         boolean invalid = false;
         for (AccountTenant at : atList) {
             String tid = at.getTenantId();

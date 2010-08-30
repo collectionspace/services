@@ -24,12 +24,17 @@
 package org.collectionspace.services.common.storage.jpa;
 
 import java.util.HashMap;
+
+import javax.persistence.PersistenceException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
+
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.security.SecurityUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +47,7 @@ public class JpaStorageUtils {
     final private static Logger logger = LoggerFactory.getLogger(JpaStorageUtils.class);
     /** The Constant CS_PERSISTENCE_UNIT. */
     public final static String CS_PERSISTENCE_UNIT = "org.collectionspace.services";
+    private final static String CS_AUTHZ_PERSISTENCE_UNIT = "org.collectionspace.services.authorization";
 
     /**
      * getEntity for given id and class
@@ -49,7 +55,8 @@ public class JpaStorageUtils {
      * @param entityClazz
      * @return null if entity is not found
      */
-    public static Object getEntity(String id, Class entityClazz) {
+    public static Object getEntity(String id, Class entityClazz)
+    		throws DocumentNotFoundException {
         EntityManagerFactory emf = null;
         EntityManager em = null;
         Object entityFound = null;
@@ -66,7 +73,8 @@ public class JpaStorageUtils {
         return entityFound;
     }
 
-    public static Object getEntity(long id, Class entityClazz) {
+    public static Object getEntity(long id, Class entityClazz)
+    		throws DocumentNotFoundException {
         EntityManagerFactory emf = null;
         EntityManager em = null;
         Object entityFound = null;
@@ -226,7 +234,33 @@ public class JpaStorageUtils {
      * @return the entity manager factory
      */
     public static EntityManagerFactory getEntityManagerFactory() {
-        return getEntityManagerFactory(CS_PERSISTENCE_UNIT);
+    	EntityManagerFactory result = null;
+    	PersistenceException persistenceException = null;
+    	
+    	try {
+    		result = getEntityManagerFactory(CS_PERSISTENCE_UNIT);
+    	} catch (PersistenceException e) {
+    		persistenceException = e;
+    	}
+    	//
+    	// If the CS_PERSISTENCE_UNIT does not exist, our caller may be from
+    	// the import utility.
+    	// FIXME: REM - EntityManagerFactory should be passed in from the Import utility.
+    	//
+    	if (result == null) {
+	    	try {
+	    		result = getEntityManagerFactory(CS_AUTHZ_PERSISTENCE_UNIT);
+	    		return result;
+	    	} catch (PersistenceException e) {
+	    		persistenceException = e;
+	    	}
+    	}
+    	        
+        if (result == null) {
+        	throw persistenceException;
+        }
+        
+        return result;
     }
 
     /**

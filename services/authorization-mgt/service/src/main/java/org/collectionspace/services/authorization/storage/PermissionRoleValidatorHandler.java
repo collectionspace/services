@@ -24,6 +24,7 @@
  */
 package org.collectionspace.services.authorization.storage;
 
+import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
@@ -82,7 +83,8 @@ public class PermissionRoleValidatorHandler implements ValidatorHandler {
         }
     }
 
-    private boolean isPermissionInvalid(String id, StringBuilder msgBldr) {
+    private boolean isPermissionInvalid(String id, StringBuilder msgBldr)
+    		throws DocumentNotFoundException {
         boolean invalid = false;
 
         if (id == null || id.isEmpty()) {
@@ -100,7 +102,8 @@ public class PermissionRoleValidatorHandler implements ValidatorHandler {
         return invalid;
     }
 
-    private boolean isRoleInvalid(String id, StringBuilder msgBldr) {
+    private boolean isRoleInvalid(String id, StringBuilder msgBldr)
+    		throws DocumentNotFoundException {
         boolean invalid = false;
 
         if (id == null || id.isEmpty()) {

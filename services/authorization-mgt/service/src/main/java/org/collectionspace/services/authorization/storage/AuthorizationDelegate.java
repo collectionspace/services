@@ -189,7 +189,8 @@ public class AuthorizationDelegate {
      * @return string array with role names
      * @see RoleValue
      */
-    private static String[] getRoles(List<RoleValue> rvl) {
+    private static String[] getRoles(List<RoleValue> rvl)
+    		throws DocumentNotFoundException {
         List<String> rvls = new ArrayList<String>();
         for (RoleValue rv : rvl) {
             Role r = getRole(rv.getRoleId());
@@ -228,13 +229,15 @@ public class AuthorizationDelegate {
         return rl.toArray(new CSpaceResource[0]);
     }
 
-    private static Permission getPermission(String permCsid) {
+    private static Permission getPermission(String permCsid)
+    		throws DocumentNotFoundException {
         Permission p = (Permission) JpaStorageUtils.getEntity(permCsid,
                 Permission.class);
         return p;
     }
 
-    private static Role getRole(String roleCsid) {
+    private static Role getRole(String roleCsid)
+    		throws DocumentNotFoundException {
         Role r = (Role) JpaStorageUtils.getEntity(roleCsid,
                 Role.class);
         return r;

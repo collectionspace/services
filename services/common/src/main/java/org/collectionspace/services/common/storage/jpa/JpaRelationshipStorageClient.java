@@ -35,6 +35,10 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
+import org.collectionspace.services.authorization.Permission;
+import org.collectionspace.services.authorization.PermissionValue;
+import org.collectionspace.services.authorization.Role;
+import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.AccountRoleRel;
 import org.collectionspace.services.authorization.PermissionRoleRel;
 
@@ -64,7 +68,23 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
 
     private final Logger logger = LoggerFactory.getLogger(JpaRelationshipStorageClient.class);
 
+    public static PermissionValue createPermissionValue(Permission permission) {
+    	PermissionValue result = new PermissionValue();
+    	result.setPermissionId(permission.getCsid());
+    	result.setResourceName(permission.getResourceName());
+    	result.setActionGroup(permission.getActionGroup());
+    	return result;
+    }
+    
+    public static RoleValue createRoleValue(Role role) {
+    	RoleValue result = new RoleValue();
+    	result.setRoleId(role.getCsid());
+    	result.setRoleName(role.getRoleName());
+    	return result;
+    }
+    
     public JpaRelationshipStorageClient() {
+    	//empty
     }
 
     /**
@@ -446,7 +466,8 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
      * @param id
      * @return
      */
-    protected Object getObject(ServiceContext ctx, String id) {
+    protected Object getObject(ServiceContext ctx, String id)
+    		throws DocumentNotFoundException {
         Class objectClass = getObjectClass(ctx);
         return JpaStorageUtils.getEntity(id, objectClass);
     }
