@@ -31,6 +31,8 @@ import org.collectionspace.services.account.storage.AccountRoleDocumentHandler;
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.AccountValue;
 import org.collectionspace.services.authorization.AccountRoleRel;
+import org.collectionspace.services.authorization.Permission;
+import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.SubjectType;
 
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
@@ -55,7 +57,7 @@ public class AccountRoleSubResource
     	extends AbstractCollectionSpaceResourceImpl<AccountRole, AccountRole> {
 
     final public static String ACCOUNT_ACCOUNTROLE_SERVICE = "accounts/accountroles";
-    final public static String ROLE_ACCOUNTROLE_SERVICE = "roles/accountroles";
+    final public static String ROLE_ACCOUNTROLE_SERVICE = "authorization/roles/accountroles";
     //this service is never exposed as standalone RESTful service...just use unique
     //service name to identify binding
     /** The service name. */
@@ -69,7 +71,7 @@ public class AccountRoleSubResource
      *
      * @param serviceName qualified service path
      */
-    AccountRoleSubResource(String serviceName) {
+    public AccountRoleSubResource(String serviceName) {
         this.serviceName = serviceName;
     }
 
@@ -126,9 +128,16 @@ public class AccountRoleSubResource
         ctx.setProperty(ServiceContextProperties.ENTITY_CLASS, AccountRoleRel.class);
         //subject name is necessary to indicate if role or account is a subject
         ctx.setProperty(ServiceContextProperties.SUBJECT, subject);
+        
         //set context for the relationship query
-        ctx.setProperty(ServiceContextProperties.OBJECT_CLASS, AccountsCommon.class);
-        ctx.setProperty(ServiceContextProperties.OBJECT_ID, "account_id");
+        if (subject == SubjectType.ROLE) {
+            ctx.setProperty(ServiceContextProperties.OBJECT_CLASS, AccountsCommon.class);
+            ctx.setProperty(ServiceContextProperties.OBJECT_ID, "account_id");
+        } else if (subject == SubjectType.ACCOUNT) {
+            ctx.setProperty(ServiceContextProperties.OBJECT_CLASS, Role.class);
+            ctx.setProperty(ServiceContextProperties.OBJECT_ID, "role_id");
+        }
+        
         return ctx;
     }
 

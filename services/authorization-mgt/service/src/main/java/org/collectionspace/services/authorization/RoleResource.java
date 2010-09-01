@@ -39,6 +39,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.account.AccountRoleSubResource;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 //import org.collectionspace.services.common.context.RemoteServiceContextImpl;
 import org.collectionspace.services.common.ServiceMessages;
@@ -351,13 +352,17 @@ public class RoleResource
             throw new WebApplicationException(response);
         }
         try {
-            //FIXME ideally the following two ops should be in the same tx CSPACE-658
+            //FIXME ideally the following three operations should be in the same tx CSPACE-658
             //delete all relationships for this permission
-            PermissionRoleSubResource subResource =
+            PermissionRoleSubResource permRoleResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
-            subResource.deletePermissionRole(csid, SubjectType.PERMISSION);
-
-            ServiceContext ctx = createServiceContext((Role) null, Role.class);
+            permRoleResource.deletePermissionRole(csid, SubjectType.PERMISSION);
+            //delete all the account/role relationships associate with this role
+            AccountRoleSubResource accountRoleResource =
+                new AccountRoleSubResource(AccountRoleSubResource.ROLE_ACCOUNTROLE_SERVICE);
+            accountRoleResource.deleteAccountRole(csid, SubjectType.ACCOUNT);
+            //finally, delete the role itself
+            ServiceContext<Role, Role> ctx = createServiceContext((Role) null, Role.class);
             ((JpaStorageClientImpl) getStorageClient(ctx)).deleteWhere(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
