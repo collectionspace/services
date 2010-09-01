@@ -90,15 +90,16 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
     // created during testing.
     private String personAuthCSID = null;
     
-    /** The organization contact person ref name. */
-    private String organizationContactPersonRefName = null;
+    /** The organization contact person refNames. */
+    private String organizationContactPersonRefName1 = null;
+    private String organizationContactPersonRefName2 = null;
 
     // The refName of an Organization item that represents
     // the sub-body organization of a second Organization item.
     private String subBodyRefName = null;
     
     /** The number of authorityreferences expected. */
-    private final int NUM_AUTH_REFS_EXPECTED = 2;
+    private final int NUM_AUTH_REFS_EXPECTED = 3;
 
     protected void setKnownResource( String id, String refName ) {
     	knownResourceId = id;
@@ -198,7 +199,8 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
 
         Map<String, List<String>> testOrgRepeatablesMap = new HashMap<String,List<String>>();
         List<String> testOrgContactNames = new ArrayList<String>();
-        testOrgContactNames.add(organizationContactPersonRefName);
+        testOrgContactNames.add(organizationContactPersonRefName1);
+        testOrgContactNames.add(organizationContactPersonRefName2);
         testOrgRepeatablesMap.put(OrganizationJAXBSchema.CONTACT_NAMES, testOrgContactNames);
         List<String> testOrgSubBodies = new ArrayList<String>();
         testOrgSubBodies.add(subBodyRefName);
@@ -242,7 +244,13 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         // by which they can be identified.
        	String csid = createPerson("Charlie", "Orgcontact", "charlieOrgcontact", authRefName);
         personIdsCreated.add(csid);
-        organizationContactPersonRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        organizationContactPersonRefName1 = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+
+        // Create temporary Person resources, and their corresponding refNames
+        // by which they can be identified.
+       	csid = createPerson("Chelsie", "Contact", "chelsieContact", authRefName);
+        personIdsCreated.add(csid);
+        organizationContactPersonRefName2 = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
     }
     
     /**
@@ -361,7 +369,9 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         }
         // Check one or more of the authority fields in the Organization item
         Assert.assertEquals(organization.getContactNames().getContactName().get(0),
-                organizationContactPersonRefName);
+                organizationContactPersonRefName1);
+        Assert.assertEquals(organization.getContactNames().getContactName().get(1),
+                organizationContactPersonRefName2);
         Assert.assertEquals(organization.getSubBodies().getSubBody().get(0),
                 subBodyRefName);
 
