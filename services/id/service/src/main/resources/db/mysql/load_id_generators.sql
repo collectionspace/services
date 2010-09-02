@@ -391,6 +391,30 @@ INSERT INTO `id_generators`
       <initialValue>1</initialValue>
       <currentValue>-1</currentValue>
     </org.collectionspace.services.id.NumericIDGeneratorPart>
+  </parts>
+</org.collectionspace.services.id.SettableIDGenerator>');
+
+-- OBJECT_EXIT_NUMBER
+
+INSERT INTO `id_generators`
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
+  VALUES
+    ('d4eea707-d473-4367-853a-728fbcd9be17',
+     'Object Exit Number',
+     'Identifies an exit from the museum of collection objects, via
+transfer or destruction, and the deaccessioning of those objects
+from the museum\'s collections.',
+     '9',
+     '',
+'<org.collectionspace.services.id.SettableIDGenerator>
+  <parts>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>EX</initialValue>
+      <currentValue>EX</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.YearIDGeneratorPart>
+      <currentValue></currentValue>
+    </org.collectionspace.services.id.YearIDGeneratorPart>
     <org.collectionspace.services.id.StringIDGeneratorPart>
       <initialValue>.</initialValue>
       <currentValue>.</currentValue>
@@ -420,6 +444,38 @@ formally acquired for study.',
     <org.collectionspace.services.id.StringIDGeneratorPart>
       <initialValue>ST</initialValue>
       <currentValue>ST</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.YearIDGeneratorPart>
+      <currentValue></currentValue>
+    </org.collectionspace.services.id.YearIDGeneratorPart>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>.</initialValue>
+      <currentValue>.</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.NumericIDGeneratorPart>
+      <maxLength>6</maxLength>
+      <initialValue>1</initialValue>
+      <currentValue>-1</currentValue>
+    </org.collectionspace.services.id.NumericIDGeneratorPart>
+  </parts>
+</org.collectionspace.services.id.SettableIDGenerator>');
+
+-- TRANSFER_OF_TITLE_NUMBER
+
+INSERT INTO `id_generators`
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
+  VALUES
+    ('c597a209-5954-4fa6-bf3f-f83c1a0ad586',
+     'Transfer of Title Number',
+     'Identifies the transfer of title for one or more collection objects
+to a receiving institution.',
+     '9',
+     '',
+'<org.collectionspace.services.id.SettableIDGenerator>
+  <parts>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>TT</initialValue>
+      <currentValue>TT</currentValue>
     </org.collectionspace.services.id.StringIDGeneratorPart>
     <org.collectionspace.services.id.YearIDGeneratorPart>
       <currentValue></currentValue>
