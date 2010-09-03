@@ -420,7 +420,7 @@ public class RoleResource
             PermissionRoleSubResource subResource =
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
             String permrolecsid = subResource.createPermissionRole(input, SubjectType.PERMISSION);
-            UriBuilder path = UriBuilder.fromResource(PermissionResource.class);
+            UriBuilder path = UriBuilder.fromResource(RoleResource.class);
             path.path(roleCsid + "/permroles/" + permrolecsid);
             Response response = Response.created(path.build()).build();
             return response;
