@@ -115,10 +115,10 @@
         </xs:complexType>
     </xs:element>
 
-    <!-- FIXME Start of Content event name repeatable group -->
+    <!-- FIXME Start of Content object repeatable group -->
     <xs:element name="contentObject" type="xs:string"/>
     <xs:element name="contentObjectType" type="xs:string"/>
-    <!-- FIXME End of Content event name repeatable group -->
+    <!-- FIXME End of Content object repeatable group -->
 
     <xs:element name="contentOrganizations">
         <xs:complexType>
