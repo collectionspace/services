@@ -22,12 +22,14 @@
  */
 package org.collectionspace.services.client.test;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.collectionobject.BriefDescriptionList;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -54,10 +56,17 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
     private final String CLASS_NAME = CollectionObjectSearchTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
-    final static String KEYWORD = "Tsolyani";
-    // final static String[] TWO_KEYWORDS = {"Cheggarra", "Ahoggya"};
-    final static String NOISE_WORD = "Mihalli";
+    final static String IDENTIFIER = getSystemTimeIdentifier();
+    final static String KEYWORD = "Tsolyani" + IDENTIFIER;
+    final static List<String> TWO_KEYWORDS =
+            Arrays.asList(new String[]{"Cheggarra" + IDENTIFIER, "Ahoggya" + IDENTIFIER});
+    final static List<String> TWO_MORE_KEYWORDS =
+            Arrays.asList(new String[]{"Karihaya" + IDENTIFIER, "Hlikku" + IDENTIFIER});
+    final static String NOISE_WORD = "Mihalli + IDENTIFIER";
     final static String NON_EXISTENT_KEYWORD = "jlmbsoqjlmbsoq";
+    final static String KEYWORD_SEPARATOR = " ";
+    final long numNoiseWordResources = 10;
+    final double pctNonNoiseWordResources = 0.5;
 
     /* Use this to keep track of resources to delete */
     private List<String> allResourceIdsCreated = new ArrayList<String>();
@@ -89,10 +98,14 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
     /**
      * Creates one or more resources containing a "noise" keyword,
      * which should NOT be retrieved by keyword searches.
+     *
+     * This also helps ensure that searches will not fail, due
+     * to a database-specific constraint or otherwise, if the
+     * number of records retrieved by a particular keyword represent
+     * too high a proportion of the total records retrieved.
      */
     @BeforeClass(alwaysRun=true)
     public void setup() {
-        long numNoiseWordResources = 2;
         if (logger.isDebugEnabled()) {
             logger.debug("Creating " + numNoiseWordResources +
                 " 'noise word' resources ...");
@@ -107,9 +120,9 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 
     // Success outcomes
 
-    // FIXME: Rename to searchWithOneKeyword
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
-    public void keywordSearchOneWord(String testName) throws Exception {
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        groups = {"oneKeyword"})
+    public void searchWithOneKeyword(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
@@ -117,20 +130,19 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 
         // Create one or more keyword retrievable resources, each containing
         // a specified keyword.
-        long numKeywordRetrievableResources = 3;
+        long numKeywordRetrievableResources =
+                (long) (numNoiseWordResources * pctNonNoiseWordResources);
         if (logger.isDebugEnabled()) {
             logger.debug("Creating " + numKeywordRetrievableResources +
                 " keyword-retrievable resources ...");
         }
         createCollectionObjects(numKeywordRetrievableResources, KEYWORD);
-
+        
+        // Set the expected status code and group of valid status codes
         testSetup(STATUS_OK, ServiceRequestType.SEARCH);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Searching on keyword(s): " + KEYWORD + " ...");
-        }
-        CollectionObjectClient client = new CollectionObjectClient();
-        ClientResponse<CollectionobjectsCommonList> res =
-            client.keywordSearch(KEYWORD);
+
+        // Send the search request and receive a response
+        ClientResponse<CollectionobjectsCommonList> res = doSearch(KEYWORD);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -140,30 +152,147 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        CollectionobjectsCommonList list = (CollectionobjectsCommonList)
-            res.getEntity(CollectionobjectsCommonList.class);
-        long numMatched = list.getTotalItems();
+        // Verify that the number of resources matched by the search
+        // is identical to the expected result
+        long NUM_MATCHES_EXPECTED = numKeywordRetrievableResources;
+        long numMatched = getNumMatched(res, NUM_MATCHES_EXPECTED);
+        Assert.assertEquals(numMatched, NUM_MATCHES_EXPECTED);
+    }
+
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
+    public void searchWithTwoKeywordsInSameField(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Keyword search matched " + numMatched +
-                " resources, expected to match " + numKeywordRetrievableResources);
+            logger.debug(testBanner(testName, CLASS_NAME));
         }
 
-        // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = false;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            itemizeListItems(list);
+        // Create one or more keyword retrievable resources, each containing
+        // two specified keywords.
+        long numKeywordRetrievableResources =
+                (long) (numNoiseWordResources * pctNonNoiseWordResources);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating " + numKeywordRetrievableResources +
+                " keyword-retrievable resources ...");
         }
+        boolean keywordsInSameField = true;
+        createCollectionObjects(numKeywordRetrievableResources, TWO_KEYWORDS, keywordsInSameField);
 
-        Assert.assertEquals(numMatched, numKeywordRetrievableResources);
+        // Set the expected status code and group of valid status codes
+        testSetup(STATUS_OK, ServiceRequestType.SEARCH);
+
+        // Search using both terms
+
+        // Send the search request and receive a response
+        ClientResponse<CollectionobjectsCommonList> res = doSearch(TWO_KEYWORDS);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Verify that the number of resources matched by the search
+        // is identical to the expected result
+        long NUM_MATCHES_EXPECTED = numKeywordRetrievableResources;
+        long numMatched = getNumMatched(res, NUM_MATCHES_EXPECTED);
+        Assert.assertEquals(numMatched, NUM_MATCHES_EXPECTED);
+
+        // Search using a single term
+
+        // Send the search request and receive a response
+        res = doSearch(TWO_KEYWORDS.get(0));
+        statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Verify that the number of resources matched by the search
+        // is identical to the expected result
+        NUM_MATCHES_EXPECTED = numKeywordRetrievableResources;
+        numMatched = getNumMatched(res, NUM_MATCHES_EXPECTED);
+        Assert.assertEquals(numMatched, NUM_MATCHES_EXPECTED);
 
     }
 
-    // FIXME: Rename to searchWithOneKeywordInRepeatableScalarField
-    // @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
-    public void keywordSearchRepeatableScalarField(String testName) throws Exception {
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
+    public void searchWithTwoKeywordsAcrossTwoFields(String testName) throws Exception {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+
+        // Create one or more keyword retrievable resources, each containing
+        // two specified keywords.
+        long numKeywordRetrievableResources = 5;
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating " + numKeywordRetrievableResources +
+                " keyword-retrievable resources ...");
+        }
+        boolean keywordsInSameField = false;
+        createCollectionObjects(numKeywordRetrievableResources, TWO_MORE_KEYWORDS, keywordsInSameField);
+
+        // Set the expected status code and group of valid status codes
+        testSetup(STATUS_OK, ServiceRequestType.SEARCH);
+
+        // Search using both terms
+
+        // Send the search request and receive a response
+        ClientResponse<CollectionobjectsCommonList> res = doSearch(TWO_MORE_KEYWORDS);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Verify that the number of resources matched by the search
+        // is identical to the expected result
+        long NUM_MATCHES_EXPECTED = numKeywordRetrievableResources;
+        long numMatched = getNumMatched(res, NUM_MATCHES_EXPECTED);
+        Assert.assertEquals(numMatched, NUM_MATCHES_EXPECTED);
+
+        // Search using a single term
+
+        // Send the search request and receive a response
+        res = doSearch(TWO_MORE_KEYWORDS.get(0));
+        statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Verify that the number of resources matched by the search
+        // is identical to the expected result
+        NUM_MATCHES_EXPECTED = numKeywordRetrievableResources;
+        numMatched = getNumMatched(res, NUM_MATCHES_EXPECTED);
+        Assert.assertEquals(numMatched, NUM_MATCHES_EXPECTED);
+
     }
+
+//    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
+//    public void searchWithOneKeywordInRepeatableScalarField(String testName) throws Exception {
+//    }
 
     // Failure outcomes
 
@@ -175,15 +304,11 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
 
-        final long NUM_MATCHES_EXPECTED = 0;
-
+        // Set the expected status code and group of valid status codes
         testSetup(STATUS_OK, ServiceRequestType.SEARCH);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Searching on keyword(s): " + NON_EXISTENT_KEYWORD + " ...");
-        }
-        CollectionObjectClient client = new CollectionObjectClient();
-        ClientResponse<CollectionobjectsCommonList> res =
-            client.keywordSearch(NON_EXISTENT_KEYWORD);
+
+        // Send the search request and receive a response
+        ClientResponse<CollectionobjectsCommonList> res = doSearch(NON_EXISTENT_KEYWORD);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -193,16 +318,12 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        CollectionobjectsCommonList list = (CollectionobjectsCommonList)
-            res.getEntity(CollectionobjectsCommonList.class);
-        long numMatched = list.getTotalItems();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Keyword search matched " + numMatched +
-                " resources, expected to match " + NUM_MATCHES_EXPECTED);
-        }
-
+        // Verify that the number of resources matched by the search
+        // is identical to the expected result
+        long NUM_MATCHES_EXPECTED = 0;
+        long numMatched = getNumMatched(res, NUM_MATCHES_EXPECTED);
         Assert.assertEquals(numMatched, NUM_MATCHES_EXPECTED);
 
     }
@@ -212,7 +333,7 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
     // ---------------------------------------------------------------
 
     /**
-     * Deletes all resources created by tests, after all tests have been run.
+     * Deletes all resources created by setup and tests, after all tests have been run.
      *
      * This cleanup method will always be run, even if one or more tests fail.
      * For this reason, it attempts to remove all resources created
@@ -242,31 +363,103 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
     // Utility methods used by tests above
     // ---------------------------------------------------------------
     
-    private void createCollectionObjects(long numToCreate, String keywords) {
+    private void createCollectionObjects(long numToCreate, String keyword) {
+        List keywords = new ArrayList<String>();
+        keywords.add(keyword);
+        boolean keywordsInSameField = true;
+        createCollectionObjects(numToCreate, keywords, keywordsInSameField);
+    }
+    
+    private void createCollectionObjects(long numToCreate, List<String> keywords,
+            boolean keywordsInSameField) {
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
         CollectionObjectClient client = new CollectionObjectClient();
         for (long i = 0; i < numToCreate; i++) {
-            MultipartOutput multipart = createCollectionObjectInstance(keywords);
+            MultipartOutput multipart =
+                    createCollectionObjectInstance(i, keywords, keywordsInSameField);
             ClientResponse<Response> res = client.create(multipart);
             try {
                 int statusCode = res.getStatus();
                 Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-                allResourceIdsCreated.add(extractId(res));
+                String id = extractId(res);
+                allResourceIdsCreated.add(id);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Created new resource [" + i + "] with ID " + id);
+                }
             } finally {
                 res.releaseConnection();
             }
         }
     }
-
-    private MultipartOutput createCollectionObjectInstance(String keywords) {
+    
+    private MultipartOutput createCollectionObjectInstance(long i, List<String> keywords,
+            boolean keywordsInSameField) {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
         collectionObject.setObjectNumber(createIdentifier());
-        collectionObject.setTitle(keywords);
+        if (keywordsInSameField) {
+            collectionObject.setTitle(listToString(keywords, KEYWORD_SEPARATOR));
+        } else {
+            if (keywords.size() == 1) {
+                collectionObject.setTitle(keywords.get(0));
+            } else if (keywords.size() == 2) {
+                collectionObject.setTitle(keywords.get(0));
+                collectionObject.setDistinguishingFeatures(keywords.get(1));
+            } else {
+                Assert.fail("List of keywords must have exactly one or two members.");
+            }
+        }
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(collectionObject,
                 MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", new CollectionObjectClient().getCommonPartName());
         return multipart;
+    }
+
+    private static String listToString(List<String> list, String separator) {
+        StringBuffer sb = new StringBuffer();
+        if (list.size() > 0) {
+            sb.append(list.get(0));
+            for (int i=1; i < list.size(); i++) {
+                sb.append(separator);
+                sb.append(list.get(i));
+            }
+        }
+        return sb.toString();
+    }
+
+    private ClientResponse<CollectionobjectsCommonList> doSearch(List<String> keywords) {
+        String searchParamValue = listToString(keywords, KEYWORD_SEPARATOR);
+        return doSearch(searchParamValue);
+    }
+
+    private ClientResponse<CollectionobjectsCommonList> doSearch(String keyword) {
+       String searchParamValue = keyword;
+        if (logger.isDebugEnabled()) {
+            logger.debug("Searching on keyword(s): " + searchParamValue + " ...");
+        }
+        CollectionObjectClient client = new CollectionObjectClient();
+        ClientResponse<CollectionobjectsCommonList> res =
+            client.keywordSearch(searchParamValue);
+        return res;
+    }
+
+    private long getNumMatched(ClientResponse<CollectionobjectsCommonList> res,
+            long numExpectedMatches) {
+        CollectionobjectsCommonList list = (CollectionobjectsCommonList)
+            res.getEntity(CollectionobjectsCommonList.class);
+        long numMatched = list.getTotalItems();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Keyword search matched " + numMatched +
+                " resources, expected to match " + numExpectedMatches);
+        }
+
+        // Optionally output additional data about list members for debugging.
+        boolean iterateThroughList = false;
+        if (iterateThroughList && logger.isDebugEnabled()) {
+            itemizeListItems(list);
+        }
+        return numMatched;
     }
 
     private void itemizeListItems(CollectionobjectsCommonList list) {
@@ -280,6 +473,10 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
                     + item.getUri());
             i++;
         }
+    }
+
+    public static String getSystemTimeIdentifier() {
+      return Long.toString(System.currentTimeMillis());
     }
 
 }
