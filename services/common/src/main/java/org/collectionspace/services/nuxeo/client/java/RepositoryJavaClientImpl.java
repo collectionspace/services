@@ -18,8 +18,11 @@
 package org.collectionspace.services.nuxeo.client.java;
 
 import java.util.Hashtable;
-import java.util.UUID;
 import java.util.List;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.query.IQueryManager;
@@ -67,6 +70,12 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
     private final Logger logger = LoggerFactory.getLogger(RepositoryJavaClientImpl.class);
 //    private final Logger profilerLogger = LoggerFactory.getLogger("remperf");
 //    private String foo = Profiler.createLogger();
+
+    // Regular expressions pattern for identifying valid ORDER BY clauses.
+    // FIXME: Currently supports ordering on only one field.
+    // FIXME: Currently supports only USASCII word characters in field names.
+    final String ORDER_BY_CLAUSE_REGEX = "\\w+(_\\w+)?:\\w+( ASC| DESC)?";
+
     /**
      * Instantiates a new repository java client impl.
      */
@@ -866,35 +875,59 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
     /**
      * Append an ORDER BY clause to the NXQL query.
      *
-     * @param query         The NXQL query to which the ORDER BY clause will be appended.
-     * @param querycontext  The query context, which provides the ORDER BY clause to append.
+     * @param query         the NXQL query to which the ORDER BY clause will be appended.
+     * @param querycontext  the query context, which provides the ORDER BY clause to append.
+     *
+     * @throws DocumentException  if the supplied value of the orderBy clause is not valid.
+     *
      */
-    private final void appendNXQLOrderBy(StringBuilder query, QueryContext queryContext) {
-        // Append the incoming ORDER BY clause
+    private final void appendNXQLOrderBy(StringBuilder query, QueryContext queryContext)
+            throws Exception {
         String orderByClause = queryContext.getOrderByClause();
         if (orderByClause != null && ! orderByClause.trim().isEmpty()) {
-            // FIXME Verify whether enclosing parentheses may be required, and add
-            // them if so, as is being done in appendNXQLWhere.
-            query.append(" ORDER BY ");
-            query.append(orderByClause);
+            if (isValidOrderByClause(orderByClause)) {
+                query.append(" ORDER BY ");
+                query.append(orderByClause);
+            } else {
+                throw new DocumentException("Invalid format in sort request '" + orderByClause
+                        + "': must be schema_name:fieldName followed by optional sort order (' ASC' or ' DESC').");
+            }
         }
-
-        // FIXME Determine where and how to handle ASC[ending] and DESC[ending] qualifiers:
-        //
-        // Will these be included in the value of the relevant 'order by' query param?
-        //
-        // Will the format of the order by clause be verified, including placement of
-        // the 'order by' qualifiers?
     }
 
+    /**
+     * Identifies whether the ORDER BY clause is valid.
+     *
+     * @param orderByClause the ORDER BY clause.
+     *
+     * @return              true if the ORDER BY clause is valid;
+     *                      false if it is not.
+     */
+    private final boolean isValidOrderByClause(String orderByClause) {
+        boolean isValidClause = false;
+        try {
+            Pattern orderByPattern = Pattern.compile(ORDER_BY_CLAUSE_REGEX);
+            Matcher orderByMatcher = orderByPattern.matcher(orderByClause);
+            if (orderByMatcher.matches()) {
+                isValidClause = true;
+            }
+        } catch (PatternSyntaxException pe) {
+            logger.warn("ORDER BY clause regex pattern '" + ORDER_BY_CLAUSE_REGEX
+                    + "' could not be compiled: " + pe.getMessage());
+            // If reached, method will return a value of false.
+        }
+        return isValidClause;
+    }
+    
 
     /**
      * Builds an NXQL SELECT query for a single document type.
      *
      * @param queryContext The query context
      * @return an NXQL query
+     * @throws Exception if supplied values in the query are invalid.
      */
-    private final String buildNXQLQuery(QueryContext queryContext) {
+    private final String buildNXQLQuery(QueryContext queryContext) throws Exception {
         StringBuilder query = new StringBuilder("SELECT * FROM ");
         query.append(queryContext.getDocType());
         appendNXQLWhere(query, queryContext);
@@ -960,4 +993,5 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
             // no need to throw this service specific exception
         }
     }
+
 }
