@@ -58,7 +58,11 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     /** The service path component. */
     final String SERVICE_PATH_COMPONENT = "personauthorities";
     
-    // Test name for partial term matching: Lech Walesa
+    // Test name for partial term matching: Lech Wałęsa
+    //
+    // For details regarding the łę characters in the last name, see:
+    // http://en.wikipedia.org/wiki/L_with_stroke
+    // http://en.wikipedia.org/wiki/%C4%98
     //
     // Forename
     final String TEST_PARTIAL_TERM_FORE_NAME = "Lech";
@@ -73,7 +77,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     // shortId
     final String TEST_SHORT_ID = "lechWalesa";
     
-    final String TEST_KWD_BIRTH_PLACE = "Gdansk"; // Probably wrong on facts
+    final String TEST_KWD_BIRTH_PLACE = "Popowo, Poland";
 
     final String TEST_KWD_NO_MATCH = "Foobar";
 
