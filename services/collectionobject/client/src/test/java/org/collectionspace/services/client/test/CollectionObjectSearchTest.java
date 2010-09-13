@@ -44,8 +44,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- * CollectionObjectAuthRefsTest, carries out tests against a
- * deployed and running CollectionObject Service.
+ * CollectionObjectSearchTest, carries out tests of keyword
+ * search functionality against a deployed and running
+ * CollectionObject Service.
  *
  * $LastChangedRevision: 1327 $
  * $LastChangedDate: 2010-02-12 10:35:11 -0800 (Fri, 12 Feb 2010) $
@@ -57,13 +58,24 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     final static String IDENTIFIER = getSystemTimeIdentifier();
+
     final static String KEYWORD = "Tsolyani" + IDENTIFIER;
     final static List<String> TWO_KEYWORDS =
             Arrays.asList(new String[]{"Cheggarra" + IDENTIFIER, "Ahoggya" + IDENTIFIER});
     final static List<String> TWO_MORE_KEYWORDS =
             Arrays.asList(new String[]{"Karihaya" + IDENTIFIER, "Hlikku" + IDENTIFIER});
     final static String NOISE_WORD = "Mihalli + IDENTIFIER";
+    // Test Unicode UTF-8 term for keyword searching: the last name of Lech
+    // Wałęsa, which contains two non-USASCII range Unicode UTF-8 characters.
+    //
+    // For details regarding the łę characters in the last name, see:
+    // http://en.wikipedia.org/wiki/L_with_stroke
+    // http://en.wikipedia.org/wiki/%C4%98
+    final String UTF8_KEYWORD = "Wa" + '\u0142' + '\u0119' + "sa";
+    // Non-existent term, consisting of two back-to-back sets of the first letters
+    // of each of the words in a short pangram for the English alphabet.
     final static String NON_EXISTENT_KEYWORD = "jlmbsoqjlmbsoq";
+
     final static String KEYWORD_SEPARATOR = " ";
     final long numNoiseWordResources = 10;
     final double pctNonNoiseWordResources = 0.5;
@@ -101,8 +113,8 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
      *
      * This also helps ensure that searches will not fail, due
      * to a database-specific constraint or otherwise, if the
-     * number of records retrieved by a particular keyword represent
-     * too high a proportion of the total records retrieved.
+     * number of records containing a particular keyword represent
+     * too high a proportion of the total number of records.
      */
     @BeforeClass(alwaysRun=true)
     public void setup() {
@@ -292,8 +304,59 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 
 //    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
 //    public void searchWithOneKeywordInRepeatableScalarField(String testName) throws Exception {
+//        BriefDescriptionList descriptionList = new BriefDescriptionList();
+//        List<String> descriptions = descriptionList.getBriefDescription();
+//        if (TWO_KEYWORDS.size() >= 2) {
+//            descriptions.add(TWO_KEYWORDS.get(0));
+//            descriptions.add(TWO_KEYWORDS.get(1));
+//        }
 //    }
 
+
+    // FIXME: Test currently fails with a true UTF-8 String - need to investigate why.
+    // Will be commented out for now until we get this working ...
+/*
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        groups = {"utf8"})
+    public void searchWithUTF8Keyword(String testName) {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+
+        // Create one or more keyword retrievable resources, each containing
+        // two specified keywords.
+        long numKeywordRetrievableResources = 2;
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating " + numKeywordRetrievableResources +
+                " keyword-retrievable resources ...");
+        }
+        createCollectionObjects(numKeywordRetrievableResources, UTF8_KEYWORD);
+
+        // Set the expected status code and group of valid status codes
+        testSetup(STATUS_OK, ServiceRequestType.SEARCH);
+
+        // Send the search request and receive a response
+        ClientResponse<CollectionobjectsCommonList> res = doSearch(UTF8_KEYWORD);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Verify that the number of resources matched by the search
+        // is identical to the expected result
+        long NUM_MATCHES_EXPECTED = numKeywordRetrievableResources;
+        long numMatched = getNumMatched(res, NUM_MATCHES_EXPECTED);
+        Assert.assertEquals(numMatched, NUM_MATCHES_EXPECTED);
+    }
+*/
+    
     // Failure outcomes
 
     // FIXME: Rename to searchWithNonExistentKeyword
