@@ -64,7 +64,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     final String TEST_PARTIAL_TERM_FORE_NAME = "Lech";
     //
     // Surname (contains two non-USASCII range Unicode UTF-8 characters)
-    final String TEST_PARTIAL_TERM_SUR_NAME = "Wa" + "\u0142" + "\u0119" + "sa";
+    final String TEST_PARTIAL_TERM_SUR_NAME = "Wa" + '\u0142' + '\u0119' + "sa";
     //
     // Displayname
     final String TEST_PARTIAL_TERM_DISPLAY_NAME =
