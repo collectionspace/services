@@ -767,6 +767,7 @@
                               label="acquisitions_common" updated="" order="1">
                     <service:properties>
                         <types:item><types:key>authRef</types:key><types:value>acquisitionAuthorizer</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>owners|owner</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>acquisitionSources|acquisitionSource</types:value></types:item>
                         <!-- Commented out for now, as searching within a field in a complexType breaks searches for referenced objects -->
                         <!-- <types:item><types:key>authRef</types:key><types:value>acquisitionFundingList|acquisitionFundingSource</types:value></types:item> -->
@@ -1910,6 +1911,7 @@
                               label="acquisitions_common" updated="" order="1">
                     <service:properties>
                         <types:item><types:key>authRef</types:key><types:value>acquisitionAuthorizer</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>owners|owner</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>acquisitionSources|acquisitionSource</types:value></types:item>
                         <!-- Commented out for now, as searching within a field in a complexType breaks searches for referenced objects -->
                         <!-- <types:item><types:key>authRef</types:key><types:value>acquisitionFundingList|acquisitionFundingSource</types:value></types:item> -->

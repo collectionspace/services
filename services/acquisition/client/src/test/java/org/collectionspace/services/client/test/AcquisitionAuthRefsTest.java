@@ -41,6 +41,7 @@ import org.collectionspace.services.acquisition.AcquisitionsCommon;
 import org.collectionspace.services.acquisition.AcquisitionFunding;
 import org.collectionspace.services.acquisition.AcquisitionFundingList;
 import org.collectionspace.services.acquisition.AcquisitionSourceList;
+import org.collectionspace.services.acquisition.OwnerList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -75,8 +76,9 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
     private String personAuthCSID = null; 
     private String acquisitionAuthorizerRefName = null;
     private List<String> acquisitionFundingSourcesRefNames = new ArrayList<String>();
+    private List<String> ownersRefNames = new ArrayList<String>();
     private List<String> acquisitionSourcesRefNames = new ArrayList<String>();
-    private final int NUM_AUTH_REFS_EXPECTED = 3;
+    private final int NUM_AUTH_REFS_EXPECTED = 5;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -119,6 +121,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
             "April 1, 2010",
 	    acquisitionAuthorizerRefName,
             acquisitionFundingSourcesRefNames,
+            ownersRefNames,
             acquisitionSourcesRefNames);
 
         AcquisitionClient acquisitionClient = new AcquisitionClient();
@@ -180,6 +183,14 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         acquisitionFundingSourcesRefNames.add(PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null));
         personIdsCreated.add(csid);
          */
+        
+        csid = createPerson("Owen", "OwnerOne", "owenOwnerOne", authRefName);
+        ownersRefNames.add(PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null));
+        personIdsCreated.add(csid);
+
+        csid = createPerson("Orelia", "OwnerTwo", "oreliaOwnerTwo", authRefName);
+        ownersRefNames.add(PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null));
+        personIdsCreated.add(csid);
 
         csid = createPerson("Sammy", "SourceOne", "sammySourceOne", authRefName);
         acquisitionSourcesRefNames.add(PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null));
@@ -256,6 +267,12 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         */
 
         // In scalar repeatable fields
+        OwnerList ownersList = acquisition.getOwners();
+        List<String> owners = ownersList.getOwner();
+        for (String refName : owners) {
+          Assert.assertTrue(ownersRefNames.contains(refName));
+        }
+
         AcquisitionSourceList acquisitionSources = acquisition.getAcquisitionSources();
         List<String> sources = acquisitionSources.getAcquisitionSource();
         for (String refName : sources) {
@@ -358,11 +375,15 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
     	String accessionDate,
 	String acquisitionAuthorizer,
 	List<String> acquisitionFundingSources,
+        List<String> acqOwners,
         List<String> acquisitionSources) {
        
         AcquisitionsCommon acquisition = new AcquisitionsCommon();
         acquisition.setAccessionDate(accessionDate);
         acquisition.setAcquisitionAuthorizer(acquisitionAuthorizer);
+
+        // AcquisitionFunding-related authrefs fields are *not* currently
+        // enabled, as described in issue CSPACE-2818
 
         /*
         AcquisitionFundingList acqFundingsList = new AcquisitionFundingList();
@@ -380,6 +401,13 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         acqFundings.add(addtlAcqFunding);
         acquisition.setAcquisitionFundingList(acqFundingsList);
         */
+
+        OwnerList ownersList = new OwnerList();
+        List<String> owners = ownersList.getOwner();
+        for (String owner: acqOwners) {
+          owners.add(owner);
+        }
+        acquisition.setOwners(ownersList);
 
         AcquisitionSourceList acqSourcesList = new AcquisitionSourceList();
         List<String> acqSources = acqSourcesList.getAcquisitionSource();
