@@ -34,6 +34,7 @@ import org.collectionspace.services.account.AccountsCommonList;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
@@ -78,7 +79,7 @@ public class AccountClient extends AbstractServiceClientImpl {
     public void setProxy() {
         if (useAuth()) {
             accountProxy = ProxyFactory.create(AccountProxy.class,
-                    getBaseURL(), getHttpClient());
+                    getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
         } else {
             accountProxy = ProxyFactory.create(AccountProxy.class,
                     getBaseURL());

@@ -9,6 +9,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
@@ -63,8 +64,8 @@ public interface PersonAuthorityProxy extends CollectionSpaceProxy {
     @Path("/{csid}/items/")
     ClientResponse<PersonsCommonList>readItemList(
             @PathParam("csid") String parentcsid,
-            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) String partialTerm,
-            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
+            @QueryParam (IQueryManager.SEARCH_TYPE_PARTIALTERM) @Encoded String partialTerm,
+            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) @Encoded String keywords);
 
     /**
      * @param parentcsid 

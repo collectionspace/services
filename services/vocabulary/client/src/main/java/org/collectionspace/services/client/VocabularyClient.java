@@ -34,6 +34,7 @@ import org.collectionspace.services.client.VocabularyProxy;
 
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ProxyFactory;
+import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -89,7 +90,8 @@ public class VocabularyClient extends AbstractServiceClientImpl {
      */
     public void setProxy() {
         if (useAuth()) {
-            vocabularyProxy = ProxyFactory.create(VocabularyProxy.class, getBaseURL(), getHttpClient());
+            vocabularyProxy = ProxyFactory.create(VocabularyProxy.class, getBaseURL(), 
+            		new ApacheHttpClientExecutor(getHttpClient()));
         } else {
             vocabularyProxy = ProxyFactory.create(VocabularyProxy.class, getBaseURL());
         }

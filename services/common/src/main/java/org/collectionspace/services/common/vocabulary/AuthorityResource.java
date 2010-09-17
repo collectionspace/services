@@ -27,6 +27,7 @@ import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -584,10 +585,9 @@ AbstractMultiPartCollectionSpaceResourceImpl {
 
 			// AND vocabularyitems_common:displayName LIKE '%partialTerm%'
 			if (partialTerm != null && !partialTerm.isEmpty()) {
-				String ptClause = authorityItemCommonSchemaName + ":"
-				+ AuthorityItemJAXBSchema.DISPLAY_NAME
-				+ IQueryManager.SEARCH_LIKE
-				+ "'%" + partialTerm + "%'";
+				String ptClause = QueryManager.createWhereClauseForPartialMatch(
+				authorityItemCommonSchemaName + ":"
+				+ AuthorityItemJAXBSchema.DISPLAY_NAME, partialTerm );
 				myFilter.appendWhereClause(ptClause, IQueryManager.SEARCH_QUALIFIER_AND);
 			} else if (keywords != null) {
 				String kwdClause = QueryManager.createWhereClauseFromKeywords(keywords);

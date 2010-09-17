@@ -33,6 +33,7 @@ import org.collectionspace.services.authorization.PermissionRole;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 // TODO: Auto-generated Javadoc
@@ -78,7 +79,7 @@ public class RolePermissionClient extends AbstractServiceClientImpl {
     public void setProxy() {
         if (useAuth()) {
             rolePermissionProxy = ProxyFactory.create(RolePermissionProxy.class,
-                    getBaseURL(), getHttpClient());
+                    getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
         } else {
             rolePermissionProxy = ProxyFactory.create(RolePermissionProxy.class,
                     getBaseURL());

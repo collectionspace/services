@@ -50,4 +50,14 @@ public interface IQueryManager {
 	 */
 	public String createWhereClauseFromKeywords(String keywords);
 
+	/**
+	 * Creates the where clause for partial term match.
+	 * 
+	 * @param field the qualified field to match on
+	 * @param partialTerm the term to match against
+	 * 
+	 * @return the string
+	 */
+	public String createWhereClauseForPartialMatch(String field, String partialTerm);
+
 }

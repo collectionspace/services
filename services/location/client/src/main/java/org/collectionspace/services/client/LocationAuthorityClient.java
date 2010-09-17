@@ -38,6 +38,7 @@ import org.collectionspace.services.client.LocationAuthorityProxy;
 
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ProxyFactory;
+import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -96,7 +97,7 @@ public class LocationAuthorityClient extends AbstractServiceClientImpl {
     public void setProxy() {
         if (useAuth()) {
             locationAuthorityProxy = ProxyFactory.create(LocationAuthorityProxy.class,
-                    getBaseURL(), getHttpClient());
+                    getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
         } else {
             locationAuthorityProxy = ProxyFactory.create(LocationAuthorityProxy.class,
                     getBaseURL());

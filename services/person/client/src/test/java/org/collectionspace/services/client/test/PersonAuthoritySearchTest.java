@@ -22,6 +22,10 @@
  */
 package org.collectionspace.services.client.test;
 
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +62,8 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     /** The service path component. */
     final String SERVICE_PATH_COMPONENT = "personauthorities";
     
+    final String UTF8_CHARSET_NAME = "UTF-8";
+    
     // Test name for partial term matching: Lech Wałęsa
     //
     // For details regarding the łę characters in the last name, see:
@@ -67,17 +73,39 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     // Forename
     final String TEST_PARTIAL_TERM_FORE_NAME = "Lech";
     //
+    // Surname (contains single quote character)
+    final String TEST_PARTIAL_TERM_SUR_NAME_QUOTE = "O'Hara";
+    //
     // Surname (contains two non-USASCII range Unicode UTF-8 characters)
-    final String TEST_PARTIAL_TERM_SUR_NAME = "Wa" + '\u0142' + '\u0119' + "sa";
+    final String TEST_PARTIAL_TERM_SUR_NAME_UNICODE = "Wałęsa";
+	// Wrong: "Wa" + "\u0142" + "\u0119" + "sa";
+	// Should also work: "Wa" + '\u0142' + '\u0119' + "sa";
+	// Should also work: "Wa\u0142\u0119sa";
+    //
     //
     // Displayname
-    final String TEST_PARTIAL_TERM_DISPLAY_NAME =
-            TEST_PARTIAL_TERM_FORE_NAME + " " + TEST_PARTIAL_TERM_SUR_NAME;
+    final String TEST_PARTIAL_TERM_DISPLAY_NAME_UNICODE =
+            TEST_PARTIAL_TERM_FORE_NAME + " " + TEST_PARTIAL_TERM_SUR_NAME_UNICODE;
+    //
+    // Displayname
+    final String TEST_PARTIAL_TERM_DISPLAY_NAME_QUOTE =
+            TEST_PARTIAL_TERM_FORE_NAME + " " + TEST_PARTIAL_TERM_SUR_NAME_QUOTE;
     //
     // shortId
-    final String TEST_SHORT_ID = "lechWalesa";
+    final String TEST_SHORT_ID_UNICODE = "lechWalesa";
+    //
+    // shortId
+    final String TEST_SHORT_ID_QUOTE = "lechOHara";
     
     final String TEST_KWD_BIRTH_PLACE = "Popowo, Poland";
+
+    final String TEST_KWD_UTF8_STYLE = "Appliqu"+'\u00e8'+"d Arts";
+    
+    final String TEST_KWD_BIO_NOTE_NO_QUOTES = 
+    	"This is a silly bionote with no so-called quotes.";
+    
+    final String TEST_KWD_BIO_NOTE_DBL_QUOTES = 
+    	"This is a silly \"bionote\" for testing so called quote_handling";
 
     final String TEST_KWD_NO_MATCH = "Foobar";
 
@@ -104,7 +132,8 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         new HashMap<String, String>();
 
     // The number of matches expected on each partial term.
-    final int NUM_MATCHES_EXPECTED = 1;
+    final int NUM_MATCHES_EXPECTED_COMMON = 2;
+    final int NUM_MATCHES_EXPECTED_SPECIFIC = 1;
 
     // The minimum number of characters that must be included
     // a partial term, in order to permit matching to occur.
@@ -127,12 +156,16 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     return response.getEntity(PersonsCommonList.class);
     }
 
-    private String getPartialTerm() {
+    private String getPartialTermCommon() {
         return TEST_PARTIAL_TERM_FORE_NAME;
     }
 
     private String getPartialTermUtf8() {
-        return TEST_PARTIAL_TERM_SUR_NAME;
+        return TEST_PARTIAL_TERM_SUR_NAME_UNICODE;
+    }
+
+    private String getPartialTermQuote() {
+        return TEST_PARTIAL_TERM_SUR_NAME_QUOTE;
     }
 
     private String getPartialTermNonExistent() {
@@ -140,11 +173,11 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     }
 
     private String getPartialTermMinimumLength() {
-        String partialTerm = getPartialTerm();
+        String partialTerm = getPartialTermCommon();
         if (partialTerm == null || partialTerm.trim().isEmpty()) {
             return partialTerm;
         }
-        if (getPartialTerm().length() > PARTIAL_TERM_MIN_LENGTH) {
+        if (partialTerm.length() > PARTIAL_TERM_MIN_LENGTH) {
             return partialTerm.substring(0, PARTIAL_TERM_MIN_LENGTH);
         } else {
           return partialTerm;
@@ -153,6 +186,10 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
 
     private String getKwdTerm() {
         return TEST_KWD_BIRTH_PLACE;
+    }
+
+    private String getKwdTermUTF8() {
+        return TEST_KWD_UTF8_STYLE;
     }
 
     private String getKwdTermNonExistent() {
@@ -167,7 +204,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
             Assert.fail("Could not create new Authority for search tests.", e);
         }
         try {
-            createItemInAuthorityForPartialTermMatch(knownResourceId, knownResourceRefName);
+            createItemsInAuthorityForPartialTermMatch(knownResourceId, knownResourceRefName);
         } catch (Exception e) {
             Assert.fail("Could not create new item in Authority for search tests.", e);
         }
@@ -189,16 +226,16 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
             logger.debug(testBanner(testName, CLASS_NAME));
         }
         int numMatchesFound = 0;
-        String partialTerm = getPartialTerm();
+        String partialTerm = getPartialTermCommon();
         if (logger.isDebugEnabled()) {
             logger.debug("Attempting match on partial term '" + partialTerm + "' ...");
         }
         numMatchesFound = readItemListWithFilters(testName, knownResourceId, partialTerm, null);
         if (logger.isDebugEnabled()) {
             logger.debug("Found " + numMatchesFound + " match(es), expected " +
-                NUM_MATCHES_EXPECTED + " match(es).");
+                NUM_MATCHES_EXPECTED_COMMON + " match(es).");
         }
-        Assert.assertEquals(numMatchesFound, NUM_MATCHES_EXPECTED);
+        Assert.assertEquals(numMatchesFound, NUM_MATCHES_EXPECTED_COMMON);
     }
 
     /**
@@ -214,7 +251,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         }
         int numMatchesFound = 0;
 
-        final String partialTerm = getPartialTerm().toLowerCase();
+        final String partialTerm = getPartialTermCommon().toLowerCase();
         if (logger.isDebugEnabled()) {
             logger.debug("Attempting match on partial term '" + partialTerm + "' ...");
         }
@@ -222,9 +259,9 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         	readItemListWithFilters(testName, knownResourceId, partialTerm, null);
                 if (logger.isDebugEnabled()) {
         logger.debug("Found " + numMatchesFound + " match(es), expected " +
-                NUM_MATCHES_EXPECTED + " match(es).");
+        		NUM_MATCHES_EXPECTED_COMMON + " match(es).");
         }
-        Assert.assertEquals(numMatchesFound, NUM_MATCHES_EXPECTED);
+        Assert.assertEquals(numMatchesFound, NUM_MATCHES_EXPECTED_COMMON);
     }
 
     /**
@@ -240,7 +277,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         }
         int numMatchesFound = 0;
 
-        final String partialTerm = getPartialTerm().toUpperCase();
+        final String partialTerm = getPartialTermCommon().toUpperCase();
         if (logger.isDebugEnabled()) {
             logger.debug("Attempting match on partial term '" + partialTerm + "' ...");
         }
@@ -248,9 +285,9 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         	readItemListWithFilters(testName, knownResourceId, partialTerm, null);
         if (logger.isDebugEnabled()) {
             logger.debug("Found " + numMatchesFound + " match(es), expected " +
-                NUM_MATCHES_EXPECTED + " match(es).");
+            		NUM_MATCHES_EXPECTED_COMMON + " match(es).");
         }
-        Assert.assertEquals(numMatchesFound, NUM_MATCHES_EXPECTED);
+        Assert.assertEquals(numMatchesFound, NUM_MATCHES_EXPECTED_COMMON);
     }
 
     /**
@@ -272,18 +309,15 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         // Zero matches are expected on a non-existent term.
         if (logger.isDebugEnabled()) {
             logger.debug("Found " + numMatchesFound + " match(es), expected " +
-                NUM_MATCHES_EXPECTED + " match(es).");
+            		NUM_MATCHES_EXPECTED_COMMON + " match(es).");
         }
-        Assert.assertEquals(numMatchesFound, NUM_MATCHES_EXPECTED);
+        Assert.assertEquals(numMatchesFound, NUM_MATCHES_EXPECTED_COMMON);
     }
 
     /**
      * Reads an item list by partial term, with a partial term that contains
      * at least one Unicode UTF-8 character (outside the USASCII range).
      */
-    // FIXME: Test currently fails with a true UTF-8 String - need to investigate why.
-    // Will be commented out for now until we get this working ...
-/*
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
     public void partialTermMatchUTF8(String testName) {
@@ -292,23 +326,54 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         }
         int numMatchesFound = 0;
         String partialTerm = getPartialTermUtf8();
+        String ptEncoded;
+        try {
+        	ptEncoded = URLEncoder.encode(partialTerm, UTF8_CHARSET_NAME);
+        }
+        catch (UnsupportedEncodingException ex) {
+          throw new RuntimeException("Broken VM does not support UTF-8");
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Attempting match on partial term '" + partialTerm + "', Encoded:'"+ptEncoded+"' ...");
+        }
+        numMatchesFound =
+        	readItemListWithFilters(testName, knownResourceId, partialTerm, null);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Found " + numMatchesFound + " match(es), expected " +
+                NUM_MATCHES_EXPECTED_SPECIFIC + " match(es).");
+        }
+        Assert.assertEquals(numMatchesFound, NUM_MATCHES_EXPECTED_SPECIFIC);
+    }
+    
+    /**
+     * Reads an item list by partial term, with a partial term that contains
+     * at least one Unicode UTF-8 character (outside the USASCII range).
+     */
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        groups = {"readListByPartialTerm"}, dependsOnMethods = {"partialTermMatch"})
+    public void partialTermMatchQuote(String testName) {
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        int numMatchesFound = 0;
+        String partialTerm = getPartialTermQuote();
         if (logger.isDebugEnabled()) {
             logger.debug("Attempting match on partial term '" + partialTerm + "' ...");
         }
         numMatchesFound =
-            readItemListByPartialTerm(knownResourceId, partialTerm);
+        	readItemListWithFilters(testName, knownResourceId, partialTerm, null);
         if (logger.isDebugEnabled()) {
             logger.debug("Found " + numMatchesFound + " match(es), expected " +
-                NUM_MATCHES_EXPECTED + " match(es).");
+                NUM_MATCHES_EXPECTED_SPECIFIC + " match(es).");
         }
-        Assert.assertEquals(numMatchesFound, NUM_MATCHES_EXPECTED);
+        Assert.assertEquals(numMatchesFound, NUM_MATCHES_EXPECTED_SPECIFIC);
     }
-*/
+
     /**
-     * Reads an item list by partial term.
+     * Finds terms by keywords.
      */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"readListByKwdTerm"}, dependsOnGroups = {"readListByPartialTerm"})
+            groups = {"readListByKwdTerm"})
     public void keywordTermMatch(String testName) {
         if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
@@ -321,11 +386,34 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         numMatchesFound = readItemListWithFilters(testName, knownResourceId, null, kwdTerm);
         if (logger.isDebugEnabled()) {
             logger.debug("Found " + numMatchesFound + " match(es), expected " +
-                NUM_MATCHES_EXPECTED + " match(es).");
+                    NUM_MATCHES_EXPECTED_COMMON + " match(es).");
         }
-        Assert.assertEquals(numMatchesFound, NUM_MATCHES_EXPECTED);
+        Assert.assertEquals(numMatchesFound, NUM_MATCHES_EXPECTED_COMMON);
     }
 
+    /**
+     * Finds terms by keywords.
+     */
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        groups = {"readListByKwdTerm"}, dependsOnMethods = {"keywordTermMatch"})
+    public void keywordTermMatchUTF8(String testName) {
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        int numMatchesFound = 0;
+        String kwdTerm = getKwdTermUTF8();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Attempting match on kwd term '" + kwdTerm + "' ...");
+        }
+        numMatchesFound = readItemListWithFilters(testName, knownResourceId, null, kwdTerm);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Found " + numMatchesFound + " match(es), expected " +
+                NUM_MATCHES_EXPECTED_COMMON + " match(es).");
+        }
+        Assert.assertEquals(numMatchesFound, NUM_MATCHES_EXPECTED_COMMON);
+    }
+
+    
     
     // Failure outcomes
 
@@ -495,6 +583,9 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     public void createAuthority() throws Exception {
 
         String testName = "createAuthority";
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
 
         // Perform setup.
         int expectedStatusCode = Response.Status.CREATED.getStatusCode();
@@ -547,11 +638,11 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
      * @param authorityCsid The CSID of the Authority in which the term will be created.
      * @param authRefName The refName of the Authority in which the term will be created.
      */
-    private void createItemInAuthorityForPartialTermMatch(
+    private void createItemsInAuthorityForPartialTermMatch(
     		String authorityCsid, String authRefName)
         throws Exception {
             
-        String testName = "createItemInAuthorityForPartialTermMatch";
+        String testName = "createItemsInAuthorityForPartialTermMatch";
 
         int expectedStatusCode = Response.Status.CREATED.getStatusCode();
         ServiceRequestType requestType = ServiceRequestType.CREATE;
@@ -561,18 +652,43 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         PersonAuthorityClient client = new PersonAuthorityClient();
         Map<String, String> partialTermPersonMap = new HashMap<String,String>();
         //
-        // Fill the property map
+        // Fill the property map for the UNICODE item
         //
-        partialTermPersonMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, TEST_SHORT_ID );
+        partialTermPersonMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, TEST_SHORT_ID_UNICODE );
         partialTermPersonMap.put(PersonJAXBSchema.DISPLAY_NAME_COMPUTED, "false");
-        partialTermPersonMap.put(PersonJAXBSchema.DISPLAY_NAME, TEST_PARTIAL_TERM_DISPLAY_NAME);
+        partialTermPersonMap.put(PersonJAXBSchema.DISPLAY_NAME, TEST_PARTIAL_TERM_DISPLAY_NAME_UNICODE);
         partialTermPersonMap.put(PersonJAXBSchema.FORE_NAME, TEST_PARTIAL_TERM_FORE_NAME);
-        partialTermPersonMap.put(PersonJAXBSchema.SUR_NAME, TEST_PARTIAL_TERM_SUR_NAME);
+        partialTermPersonMap.put(PersonJAXBSchema.SUR_NAME, TEST_PARTIAL_TERM_SUR_NAME_UNICODE);
         partialTermPersonMap.put(PersonJAXBSchema.BIRTH_PLACE, TEST_KWD_BIRTH_PLACE);
         partialTermPersonMap.put(PersonJAXBSchema.GENDER, "male");
+        partialTermPersonMap.put(PersonJAXBSchema.BIO_NOTE, TEST_KWD_BIO_NOTE_NO_QUOTES);
 
         Map<String, List<String>> partialTermRepeatablesMap = new HashMap<String, List<String>>();
+        ArrayList<String> styles = new ArrayList<String>();
+        styles.add(TEST_KWD_UTF8_STYLE);
+        partialTermRepeatablesMap.put(PersonJAXBSchema.SCHOOLS_OR_STYLES, styles);
 
+        createItem(testName, authorityCsid, authRefName, client, 
+                partialTermPersonMap, partialTermRepeatablesMap);
+        //
+        // Adjust the property map for the QUOTE item
+        //
+        partialTermPersonMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, TEST_SHORT_ID_QUOTE );
+        partialTermPersonMap.put(PersonJAXBSchema.DISPLAY_NAME, TEST_PARTIAL_TERM_DISPLAY_NAME_QUOTE);
+        partialTermPersonMap.put(PersonJAXBSchema.SUR_NAME, TEST_PARTIAL_TERM_SUR_NAME_QUOTE);
+        partialTermPersonMap.put(PersonJAXBSchema.BIO_NOTE, TEST_KWD_BIO_NOTE_DBL_QUOTES);
+
+        createItem(testName, authorityCsid, authRefName, client, 
+                partialTermPersonMap, partialTermRepeatablesMap);
+    }
+    
+    private void createItem(
+    		String testName, 
+    		String authorityCsid, 
+    		String authRefName,
+    		PersonAuthorityClient client,
+    		Map<String, String> partialTermPersonMap,
+    		Map<String, List<String>> partialTermRepeatablesMap) throws Exception {
         MultipartOutput multipart =
             PersonAuthorityClientUtils.createPersonInstance(authorityCsid, authRefName, 
                 partialTermPersonMap, partialTermRepeatablesMap, client.getItemCommonPartName() );

@@ -23,6 +23,7 @@ import org.collectionspace.services.note.NotesCommonList;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
@@ -75,7 +76,7 @@ public class NoteClient extends AbstractServiceClientImpl {
     public void setProxy() {
         if (useAuth()) {
             noteProxy = ProxyFactory.create(NoteProxy.class,
-                    getBaseURL(), getHttpClient());
+                    getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
         } else {
             noteProxy = ProxyFactory.create(NoteProxy.class,
                     getBaseURL());

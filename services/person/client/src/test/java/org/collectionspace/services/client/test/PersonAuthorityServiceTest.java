@@ -573,8 +573,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      * @throws Exception the exception
      */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-            groups = {"read"}, dependsOnGroups = {"create"})
-        public void readByName(String testName) throws Exception {
+            groups = {"read"}, dependsOnMethods = {"read"})
+	public void readByName(String testName) throws Exception {
     	readInternal(testName, null, knownResourceShortIdentifer);
     }
     
@@ -638,7 +638,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      * @throws Exception the exception
      */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-    		groups = {"readItem"}, dependsOnGroups = {"read"})
+    		groups = {"readItem"}, dependsOnMethods = {"readItem"})
     public void readItemInNamedAuth(String testName) throws Exception {
         readItemInternal(testName, null, knownResourceShortIdentifer, knownItemResourceId, null);
     }
@@ -650,7 +650,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      * @throws Exception the exception
      */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-    		groups = {"readItem"}, dependsOnGroups = {"read"})
+    		groups = {"readItem"}, dependsOnMethods = {"readItem"})
     public void readNamedItem(String testName) throws Exception {
         readItemInternal(testName, knownResourceId, null, null, knownItemResourceShortIdentifer);
     }
@@ -662,7 +662,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      * @throws Exception the exception
      */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-    		groups = {"readItem"}, dependsOnGroups = {"read"})
+    		groups = {"readItem"}, dependsOnMethods = {"readItem"})
     public void readNamedItemInNamedAuth(String testName) throws Exception {
         readItemInternal(testName, null, knownResourceShortIdentifer, null, knownItemResourceShortIdentifer);
     }
@@ -745,7 +745,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      * @throws Exception the exception
      */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        dependsOnMethods = {"readItem", "updateItem"})
+    		groups = {"update"}, dependsOnMethods = {"updateItem"})
     public void verifyItemDisplayName(String testName) throws Exception {
         
          if (logger.isDebugEnabled()) {
@@ -878,7 +878,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      * @throws Exception the exception
      */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-            dependsOnMethods = {"verifyItemDisplayName"})
+    		groups = {"update"}, dependsOnMethods = {"verifyItemDisplayName"})
     public void verifyIllegalItemDisplayName(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -1332,7 +1332,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-        groups = {"update"}, dependsOnGroups = {"read", "readList", "readListByPartialTerm"})
+        groups = {"update"}, dependsOnGroups = {"readItem", "readList"})
     public void update(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {
@@ -1809,7 +1809,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      * @throws Exception the exception
      */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class, 
-        groups = {"delete"}, dependsOnGroups = {"create", "read", "readList", "readListByPartialTerm", "update"})
+        groups = {"delete"}, dependsOnGroups = {"update"})
     public void deleteContact(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {

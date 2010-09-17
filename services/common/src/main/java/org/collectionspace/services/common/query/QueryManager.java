@@ -45,4 +45,17 @@ public class QueryManager {
 	static public String createWhereClauseFromKeywords(String keywords) {
 		return queryManager.createWhereClauseFromKeywords(keywords);
 	}
+	
+	/**
+	 * Creates the where clause for partial term match.
+	 * 
+	 * @param field the qualified field to match on
+	 * @param partialTerm the term to match against
+	 * 
+	 * @return the string
+	 */
+	static public String createWhereClauseForPartialMatch(String field, String partialTerm) {
+		return queryManager.createWhereClauseForPartialMatch(field, partialTerm);
+	}
+	
 }

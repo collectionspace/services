@@ -37,6 +37,7 @@ import org.collectionspace.services.organization.OrganizationsCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ProxyFactory;
+import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -93,7 +94,7 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
     public void setProxy() {
         if (useAuth()) {
             orgAuthorityProxy = ProxyFactory.create(OrgAuthorityProxy.class,
-                    getBaseURL(), getHttpClient());
+                    getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
         } else {
             orgAuthorityProxy = ProxyFactory.create(OrgAuthorityProxy.class,
                     getBaseURL());

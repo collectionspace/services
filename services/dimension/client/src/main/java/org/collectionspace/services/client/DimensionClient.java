@@ -34,6 +34,7 @@ import org.collectionspace.services.dimension.DimensionsCommonList;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
@@ -87,7 +88,7 @@ public class DimensionClient extends AbstractServiceClientImpl {
     public void setProxy() {
         if (useAuth()) {
             dimensionProxy = ProxyFactory.create(DimensionProxy.class,
-                    getBaseURL(), getHttpClient());
+                    getBaseURL(), new ApacheHttpClientExecutor(getHttpClient()));
         } else {
             dimensionProxy = ProxyFactory.create(DimensionProxy.class,
                     getBaseURL());
