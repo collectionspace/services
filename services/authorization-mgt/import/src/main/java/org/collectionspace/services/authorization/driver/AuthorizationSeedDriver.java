@@ -124,6 +124,7 @@ public class AuthorizationSeedDriver {
     public void seed() {
         TransactionStatus status = null;
         try {
+        	// Push all the authz info into the cspace DB tables.
             store();
 
             setupSpring();
