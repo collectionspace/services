@@ -198,7 +198,8 @@ public class RefNameServiceUtils {
                         ilistItem.setSourceField(sourceField);
                         // FIXME Returns only the first field in which the refName is found.
                         // We may want to return all; this may require multiple sourceFields
-                        // in the list item schema.
+                        // in the list item schema; or else multiple list items, one per sourceField.
+                        // See CSPACE-2863 for a discussion of how this might be handled.
                         break;
                     }
 
