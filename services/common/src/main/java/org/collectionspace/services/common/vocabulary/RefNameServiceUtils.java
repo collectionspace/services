@@ -24,9 +24,11 @@
 package org.collectionspace.services.common.vocabulary;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -78,22 +80,26 @@ public class RefNameServiceUtils {
 //    	String domain = 
 //    		tReader.getTenantBinding(ctx.getTenantId()).getRepositoryDomain();
         ArrayList<String> docTypes = new ArrayList<String>();
-        HashMap<String, ServiceBindingType> queriedServiceBindings = new HashMap<String, ServiceBindingType>();
-        HashMap<String, List<String>> authRefFieldsByService = new HashMap<String, List<String>>();
+        Map<String, ServiceBindingType> queriedServiceBindings = new HashMap<String, ServiceBindingType>();
+        Map<String, Map<String, String>> authRefFieldsByService = new HashMap<String, Map<String, String>>();
         StringBuilder whereClause = new StringBuilder();
         boolean fFirst = true;
+        List<String> authRefFieldPaths = new ArrayList<String>();
         for (ServiceBindingType sb : servicebindings) {
-            List<String> authRefFields =
+            authRefFieldPaths =
                     ServiceBindingUtils.getAllPartsPropertyValues(sb,
                     ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
-            if (authRefFields.isEmpty()) {
+            if (authRefFieldPaths.isEmpty()) {
                 continue;
             }
-            String fieldName = "";
-            for (int i = 0; i < authRefFields.size(); i++) {
+            String authRefPath = "";
+            String ancestorAuthRefFieldName = "";
+            Map<String, String> authRefFields = new HashMap<String, String>();
+            for (int i = 0; i < authRefFieldPaths.size(); i++) {
                 // fieldName = DocumentUtils.getDescendantOrAncestor(authRefFields.get(i));
-                fieldName = DocumentUtils.getAncestorAuthRefFieldName(authRefFields.get(i));
-                authRefFields.set(i, fieldName);
+                authRefPath = authRefFieldPaths.get(i);
+                ancestorAuthRefFieldName = DocumentUtils.getAncestorAuthRefFieldName(authRefFieldPaths.get(i));
+                authRefFields.put(authRefPath, ancestorAuthRefFieldName);
             }
 
             String docType = sb.getObject().getName();
@@ -110,7 +116,8 @@ public class RefNameServiceUtils {
             else if(docType.equalsIgnoreCase("Acquisition"))
             prefix = "acquisitions_common:";
              */
-            for (String field : authRefFields) {
+            Collection<String> fields = authRefFields.values();
+            for (String field : fields) {
                 // Build up the where clause for each authRef field
                 if (fFirst) {
                     fFirst = false;
@@ -124,6 +131,7 @@ public class RefNameServiceUtils {
                 whereClause.append("'");
             }
         }
+        String whereClauseStr = whereClause.toString(); // for debugging
         if (fFirst) // found no authRef fields - nothing to query
         {
             return wrapperList;
@@ -156,24 +164,38 @@ public class RefNameServiceUtils {
                     ServiceBindingUtils.getMappedFieldInDoc(sb, ServiceBindingUtils.OBJ_NAME_PROP, docModel));
             // Now, we have to loop over the authRefFieldsByService to figure
             // out which field matched this. Ignore multiple matches.
-            List<String> authRefFields = authRefFieldsByService.get(docType);
-            if (authRefFields == null || authRefFields.isEmpty()) {
+            Map<String,String> matchingAuthRefFields = authRefFieldsByService.get(docType);
+            if (matchingAuthRefFields == null || matchingAuthRefFields.isEmpty()) {
                 throw new RuntimeException(
                         "getAuthorityRefDocs: internal logic error: can't fetch authRefFields for DocType.");
             }
+            String authRefAncestorField = "";
+            String authRefDescendantField = "";
+            String sourceField = "";
             boolean fRefFound = false;
             // Use this if we go to qualified field names
-            for (String field : authRefFields) {
-                String[] strings = field.split(":");
-                if (strings.length != 2) {
-                    throw new RuntimeException(
-                            "getAuthorityRefDocs: Bad configuration of authRefField.");
-                }
+            for (String path : matchingAuthRefFields.keySet()) {
                 try {
+                    authRefAncestorField = (String) matchingAuthRefFields.get(path);
+                    authRefDescendantField = DocumentUtils.getDescendantOrAncestor(path);
+                    String[] strings = authRefAncestorField.split(":");
+                    if (strings.length != 2) {
+                        throw new RuntimeException(
+                                "getAuthorityRefDocs: Bad configuration of path to authority reference field.");
+                    }
+                    // strings[0] holds a schema name, such as "intakes_common"
+                    //
+                    // strings[1] holds:
+                    // * The name of an authority reference field, such as "depositor";
+                    //   or
+                    // * The name of an ancestor (e.g. parent, grandparent ...) field,
+                    //   such as "fieldCollectors", of a repeatable authority reference
+                    //   field, such as "fieldCollector".
                     Object fieldValue = docModel.getProperty(strings[0], strings[1]);
                     fRefFound = refNameFoundInField(refName, fieldValue);
                     if (fRefFound) {
-                        ilistItem.setSourceField(field);
+                        sourceField = authRefDescendantField;
+                        ilistItem.setSourceField(sourceField);
                         // FIXME Returns only the first field in which the refName is found.
                         // We may want to return all; this may require multiple sourceFields
                         // in the list item schema.
@@ -182,12 +204,12 @@ public class RefNameServiceUtils {
 
                 } catch (ClientException ce) {
                     throw new RuntimeException(
-                            "getAuthorityRefDocs: Problem fetching: " + field, ce);
+                            "getAuthorityRefDocs: Problem fetching: " + sourceField, ce);
                 }
             }
             // Used before going to schema-qualified field names.
             /*
-            for(String field:authRefFields){
+            for(String field:matchingAuthRefFields){
             try {
             if(refName.equals(docModel.getPropertyValue(field))) {
             ilistItem.setSourceField(field);
