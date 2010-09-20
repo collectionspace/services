@@ -177,26 +177,27 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
         Assert.assertEquals(statusCode, STATUS_CREATED);
         orgAuthCSID = extractId(res);
         
-		currentOwnerOrgCSID = createOrganization("olivierOwner", "Olivier Owner", "Olivier Owner");
+		currentOwnerOrgCSID = createOrganization("olivierOwnerCompany", "Olivier Owner Company", "Olivier Owner Company");
         orgIdsCreated.add(currentOwnerOrgCSID);
         currentOwnerRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, currentOwnerOrgCSID, orgAuthClient);
         
-		String newOrgCSID = createOrganization("debbieDepositor", "Debbie Depositor", "Debbie Depositor");
+		String newOrgCSID =
+                        createOrganization("debbieDepositorAssocs", "Debbie Depositor & Associates", "Debbie Depositor & Associates");
         depositorRefName = 
         	OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, newOrgCSID, orgAuthClient);
         orgIdsCreated.add(newOrgCSID);
         
-		newOrgCSID = createOrganization("andrewCheckerAssessor", "Andrew Checker-Assessor", "Andrew Checker-Assessor");
+		newOrgCSID = createOrganization("andrewCheckerAssessorLtd", "Andrew Checker-Assessor Ltd.", "Andrew Checker-Assessor Ltd.");
 		conditionCheckerAssessorRefName = 
         	OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, newOrgCSID, orgAuthClient);
         orgIdsCreated.add(newOrgCSID);
         
-		newOrgCSID = createOrganization("ingridInsurer", "Ingrid Insurer", "Ingrid Insurer");
+		newOrgCSID = createOrganization("ingridInsurerBureau", "Ingrid Insurer Bureau", "Ingrid Insurer Bureau");
 		insurerRefName = 
         	OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, newOrgCSID, orgAuthClient);
         orgIdsCreated.add(newOrgCSID);
         
-		newOrgCSID = createOrganization("vinceValuer", "Vince Valuer", "Vince Valuer");
+		newOrgCSID = createOrganization("vinceValuerLLC", "Vince Valuer LLC", "Vince Valuer LLC");
 		valuerRefName = 
         	OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, newOrgCSID, orgAuthClient);
         orgIdsCreated.add(newOrgCSID);
