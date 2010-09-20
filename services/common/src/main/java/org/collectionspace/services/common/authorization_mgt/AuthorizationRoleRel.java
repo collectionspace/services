@@ -1,5 +1,6 @@
 package org.collectionspace.services.common.authorization_mgt;
 
+import org.collectionspace.services.authorization.AccountValue;
 import org.collectionspace.services.authorization.PermissionRoleRel;
 import org.collectionspace.services.authorization.AccountRoleRel;
 import org.collectionspace.services.authorization.PermissionValue;
@@ -7,6 +8,20 @@ import org.collectionspace.services.authorization.RoleValue;
 
 public class AuthorizationRoleRel {
 
+    /**
+     * Builds the account value.
+     *
+     * @param arr the arr
+     * @return the account value
+     */
+    static public AccountValue buildAccountValue(AccountRoleRel arr) {
+        AccountValue av = new AccountValue();
+        av.setAccountId(arr.getAccountId());
+        av.setUserId(arr.getUserId());
+        av.setScreenName(arr.getScreenName());
+        return av;
+    }
+	
     /**
      * Builds the role value.
      *

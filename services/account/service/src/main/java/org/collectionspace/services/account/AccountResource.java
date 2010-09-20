@@ -40,6 +40,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.authorization.AccountRoleRel;
+import org.collectionspace.services.authorization.AccountPermission;
 //import org.collectionspace.services.authorization.AccountRolesList;
 import org.collectionspace.services.account.storage.AccountStorageClient;
 import org.collectionspace.services.authorization.AccountRole;
@@ -55,6 +56,7 @@ import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.storage.StorageClient;
+import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.jboss.resteasy.util.HttpResponseCodes;
 
 import org.slf4j.Logger;
@@ -180,6 +182,7 @@ public class AccountResource
     @Path("{csid}")
     public AccountsCommon getAccount(
             @PathParam("csid") String csid) {
+    	
         if (logger.isDebugEnabled()) {
             logger.debug("getAccount with csid=" + csid);
         }
@@ -542,6 +545,56 @@ public class AccountResource
         return result;
     }
 
+    @GET
+    @Path("{csid}/accountperms")
+    public AccountPermission getAccountPerm(
+    		@PathParam("csid") String accCsid) {
+    	
+        if (logger.isDebugEnabled()) {
+            logger.debug("getAccountPerm with accCsid=" + accCsid);
+        }
+        if (accCsid == null || "".equals(accCsid)) {
+            logger.error("getAccountPerm: missing accCsid!");
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(
+                    ServiceMessages.GET_FAILED + "getAccountPerm account "
+                    + ServiceMessages.MISSING_INVALID_CSID + accCsid).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+
+        AccountPermission result = null;
+        String userId = "undefined";
+        try {
+            result = JpaStorageUtils.getAccountPermissions(accCsid);
+        } catch (UnauthorizedException ue) {
+            Response response = Response.status(Response.Status.UNAUTHORIZED).entity(ServiceMessages.GET_FAILED +
+                    ue.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (DocumentNotFoundException dnfe) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getAccountPerm", dnfe);
+            }
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(ServiceMessages.GET_FAILED +
+            		"account userId=" + userId).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+            	logger.debug("getAccountPerm", e);
+            }
+            logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
+            Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    ServiceMessages.GET_FAILED + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        if (result == null) {
+            Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    ServiceMessages.GET_FAILED + "account userId=" + userId).type(
+                    "text/plain").build();
+            throw new WebApplicationException(response);
+        }
+        return result;
+    }
+    
     /**
      * Delete account role.
      *

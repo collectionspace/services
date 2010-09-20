@@ -65,6 +65,7 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory.getLogger(SecurityInterceptor.class);
+	private static final String ACCOUNT_PERMISSIONS = "accounts/*/accountperms";
 
 	/* (non-Javadoc)
 	 * @see org.jboss.resteasy.spi.interception.PreProcessInterceptor#preProcess(org.jboss.resteasy.spi.HttpRequest, org.jboss.resteasy.core.ResourceMethod)
@@ -84,25 +85,33 @@ public class SecurityInterceptor implements PreProcessInterceptor {
 		// If the resource entity is acting as a proxy then all sub-resource will map to the resource itself.
 		// This essentially means that the sub-resource inherit all the authz permissions of the entity.
 		//
-		if (SecurityUtils.isEntityProxy() == true) {
+		if (SecurityUtils.isEntityProxy() == true && !resName.equalsIgnoreCase(ACCOUNT_PERMISSIONS)) {
 			resName = resEntity;
 		}
 		
 		checkActive();
-		AuthZ authZ = AuthZ.get();
-		CSpaceResource res = new URIResourceImpl(resName, httpMethod);
-		if (!authZ.isAccessAllowed(res)) {
-			logger.error("Access to " + res.getId() + " is NOT allowed to "
-					+ " user=" + AuthN.get().getUserId());
-			Response response = Response.status(
-					Response.Status.FORBIDDEN).entity(uriPath + " " + httpMethod).type("text/plain").build();
-			throw new WebApplicationException(response);
+		
+		//
+		// All active users are allowed to the their current list of permissions.  If this is not
+		// the request, then we'll do a full AuthZ check.
+		//
+		if (resName.equalsIgnoreCase(ACCOUNT_PERMISSIONS) != true) {
+			AuthZ authZ = AuthZ.get();
+			CSpaceResource res = new URIResourceImpl(resName, httpMethod);
+			if (!authZ.isAccessAllowed(res)) {
+				logger.error("Access to " + res.getId() + " is NOT allowed to "
+						+ " user=" + AuthN.get().getUserId());
+				Response response = Response.status(
+						Response.Status.FORBIDDEN).entity(uriPath + " " + httpMethod).type("text/plain").build();
+				throw new WebApplicationException(response);
+			}
+			if (logger.isDebugEnabled()) {
+				logger.debug("Access to " + res.getId() + " is allowed to "
+						+ " user=" + AuthN.get().getUserId() +
+						" for tenant id=" + AuthN.get().getCurrentTenantName());
+			}
 		}
-		if (logger.isDebugEnabled()) {
-			logger.debug("Access to " + res.getId() + " is allowed to "
-					+ " user=" + AuthN.get().getUserId() +
-					" for tenant id=" + AuthN.get().getCurrentTenantName());
-		}
+		
 		return null;
 	}
 

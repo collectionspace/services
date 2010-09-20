@@ -23,7 +23,10 @@
  */
 package org.collectionspace.services.common.storage.jpa;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.EntityManager;
@@ -31,8 +34,24 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
+import org.collectionspace.authentication.AuthN;
+import org.collectionspace.services.authorization.AccountPermission;
+import org.collectionspace.services.authorization.AccountValue;
+import org.collectionspace.services.authorization.AccountRole;
+import org.collectionspace.services.authorization.AccountRoleRel;
+import org.collectionspace.services.authorization.AuthZ;
+import org.collectionspace.services.authorization.CSpaceResource;
+import org.collectionspace.services.authorization.PermissionRole;
+import org.collectionspace.services.authorization.PermissionRoleRel;
+import org.collectionspace.services.authorization.PermissionValue;
+import org.collectionspace.services.authorization.URIResourceImpl;
+import org.collectionspace.services.common.authorization_mgt.AuthorizationRoleRel;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.security.UnauthorizedException;
+import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.security.SecurityUtils;
 
 import org.slf4j.Logger;
@@ -107,6 +126,124 @@ public class JpaStorageUtils {
         }
         //FIXME: it would be nice to verify tenantid as well
         return em.find(entityClazz, id);
+    }
+    
+    private static String getUserId(String csid)
+    		throws DocumentNotFoundException  {
+    	String result = null;
+    	
+    	//FIXME: Why can't the common jar depend on the account service?  Can we move the account
+    	//jaxb classes to the common "jaxb" module?
+    	try {
+			//can't use JAXB here as this runs from the common jar which cannot
+			//depend upon the account service
+			String whereClause = "where csid = :csid";
+			HashMap<String, Object> params = new HashMap<String, Object>();
+			params.put("csid", csid);
+	
+			Object account = JpaStorageUtils.getEntity(
+					"org.collectionspace.services.account.AccountsCommon", whereClause, params);
+			if (account == null) {
+				String msg = "User's account not found, csid=" + csid;
+				throw new DocumentNotFoundException(msg);
+			}
+			//
+			// Retrieve the userId that corresponds to the csid passed in to us
+			//
+			result = (String)JaxbUtils.getValue(account, "getUserId");
+    	} catch (Exception e) {
+			String msg = "User's account is in invalid state, csid=" + csid;
+			throw new DocumentNotFoundException(msg);    		
+    	}
+    	    	
+    	return result;
+    }
+    
+    //FIXME: This method should be moved to the AccountPermissionDocumemntHandler
+    /*
+     * This is a prototype for the /accounts/{csid}/permissions GET service call.
+     */
+    public static AccountPermission getAccountPermissions(String csid)
+    	throws UnauthorizedException, DocumentNotFoundException {
+        //
+        // Make sure the user asking for this list has the correct
+        // permission -that is, the csid's userId match the currently logged in userId or
+    	// that they have read access to the "accounts" resource.
+        //
+    	String userId = getUserId(csid);
+    	String currentUserId = AuthN.get().getUserId(); 
+        if (currentUserId.equalsIgnoreCase(userId) == false) {
+			CSpaceResource res = new URIResourceImpl("accounts", "GET");
+			if (AuthZ.get().isAccessAllowed(res) == false) {
+	        	String msg = "Access to the permissions for the account with csid = " + csid + " is NOT allowed for " +
+					" user=" + currentUserId;
+	        	if (logger.isDebugEnabled() == true) {
+	        		logger.debug(msg);
+	        	}
+				throw new UnauthorizedException(msg);
+			}
+        }
+        
+        AccountPermission result = new AccountPermission();
+    	EntityManagerFactory emf = null;
+        EntityManager em = null;
+        Iterator<Object[]> tuples = null;
+        try {
+            StringBuilder queryStrBldr = new StringBuilder("SELECT ar, pr FROM " + AccountRoleRel.class.getName() +
+            		" ar, " + PermissionRoleRel.class.getName() + " pr" +
+            		" WHERE ar.roleId = pr.roleId and ar.userId=" + "'" + userId + "'" +
+            		"group by pr.permissionId");
+
+            emf = getEntityManagerFactory();
+            em = emf.createEntityManager();
+            String queryStr = queryStrBldr.toString(); //for debugging
+            Query q = em.createQuery(queryStr);            
+            tuples = q.getResultList().iterator();
+            if (tuples.hasNext()) {
+            	//
+            	// get the first tuple, extract the AccountRoleRel and set the Account value for the result list
+            	//
+            	Object[] tuple = tuples.next();
+            	List<AccountValue> accountValues = new ArrayList<AccountValue>();
+            	accountValues.add(AuthorizationRoleRel.buildAccountValue((AccountRoleRel)tuple[0]));
+            	//
+            	// Since we extracted the first tuple, we need to store the first perm value as well
+            	// before iterating over the rest of the tuples.
+            	//
+            	List<PermissionValue> permissionValues = new ArrayList<PermissionValue>();
+            	permissionValues.add(AuthorizationRoleRel.buildPermissionValue((PermissionRoleRel)tuple[1]));
+            	//
+            	// Now finish add the permission values.
+            	//
+	            while (tuples.hasNext()) {
+	            	tuple = tuples.next();
+	            	permissionValues.add(AuthorizationRoleRel.buildPermissionValue((PermissionRoleRel)tuple[1]));
+	            }
+	            result.setAccounts(accountValues);
+	            result.setPermissions(permissionValues);
+            }
+        } catch (NoResultException nre) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("could not find entity with id=" + userId, nre);
+            }
+            //returns null
+        } catch (Exception e) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("could not find entity(2) with id=" + userId, e);
+            }
+        } finally {
+            if (em != null) {
+                releaseEntityManagerFactory(emf);
+            }
+        }
+        
+        return result;
     }
 
     /**

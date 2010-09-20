@@ -266,7 +266,7 @@ public class AccountRoleDocumentHandler
 
             List<AccountValue> avs = new ArrayList<AccountValue>();
             ar.setAccounts(avs);
-            AccountValue av = buildAccountValue(ar0);
+            AccountValue av = AuthorizationRoleRel.buildAccountValue(ar0);
             avs.add(av);
 
             //add roles
@@ -287,7 +287,7 @@ public class AccountRoleDocumentHandler
             List<AccountValue> avs = new ArrayList<AccountValue>();
             ar.setAccounts(avs);
             for (AccountRoleRel arr : arrl) {
-                AccountValue av = buildAccountValue(arr);
+                AccountValue av = AuthorizationRoleRel.buildAccountValue(arr);
                 avs.add(av);
             }
         }
@@ -342,20 +342,6 @@ public class AccountRoleDocumentHandler
     @Override
     public DocumentFilter createDocumentFilter() {
         return new DocumentFilter(this.getServiceContext());
-    }
-
-    /**
-     * Builds the account value.
-     *
-     * @param arr the arr
-     * @return the account value
-     */
-    private AccountValue buildAccountValue(AccountRoleRel arr) {
-        AccountValue av = new AccountValue();
-        av.setAccountId(arr.getAccountId());
-        av.setUserId(arr.getUserId());
-        av.setScreenName(arr.getScreenName());
-        return av;
     }
 
     /**
