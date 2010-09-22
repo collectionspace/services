@@ -1,0 +1,105 @@
+Copy the following Nuxeo field type declarations to the ..\nuxeo.ear\config\default-repository-config.xml file.  Insert into the existing <schema> element.
+
+ <!-- CollectionObject fields -->
+          <field type="largetext">collectionobjects_common:objectNumber</field>
+          <field type="largetext">collectionobjects_common:otherNumber</field>
+          <field type="largetext">collectionobjects_common:otherNumberType</field>
+          <field type="largetext">collectionobjects_common:briefDescriptions</field>
+          <field type="largetext">collectionobjects_common:distinguishingFeatures</field>
+          <field type="largetext">collectionobjects_common:numberOfObjects</field>
+          
+          
+          <field type="largetext">collectionobjects_common:collection</field>
+          <field type="largetext">collectionobjects_common:title</field>
+          <field type="largetext">collectionobjects_common:titleLanguage</field>
+          <field type="largetext">collectionobjects_common:titleTranslation</field>
+          <field type="largetext">collectionobjects_common:titleTranslationLanguage</field>
+          <field type="largetext">collectionobjects_common:titleType</field>
+          <field type="largetext">collectionobjects_common:recordStatus</field>
+          <field type="largetext">collectionobjects_common:age</field>
+          <field type="largetext">collectionobjects_common:ageQualifier</field>
+          <field type="largetext">collectionobjects_common:ageUnit</field>
+                    
+          <field type="largetext">collectionobjects_common:contentDate</field>
+          <field type="largetext">collectionobjects_common:contentDescription</field>
+          <field type="largetext">collectionobjects_common:contentEventName</field>
+          <field type="largetext">collectionobjects_common:contentEventNameType</field>
+          <field type="largetext">collectionobjects_common:contentNote</field>
+          <field type="largetext">collectionobjects_common:contentLanguages</field>
+          <field type="largetext">collectionobjects_common:contentObject</field>
+          <field type="largetext">collectionobjects_common:contentObjectType</field>
+          <field type="largetext">collectionobjects_common:contentOrganizations</field>
+          <field type="largetext">collectionobjects_common:contentOther</field>
+          <field type="largetext">collectionobjects_common:contentOtherType</field>
+          <field type="largetext">collectionobjects_common:copyNumber</field>
+          
+          <field type="largetext">collectionobjects_common:dimensionSummary</field>
+          <field type="largetext">collectionobjects_common:dimension</field>
+          <field type="largetext">collectionobjects_common:dimensionMeasuredPart</field>
+          <field type="largetext">collectionobjects_common:dimensionMeasurementUnit</field>
+          <field type="largetext">collectionobjects_common:dimensionValue</field>
+          <field type="largetext">collectionobjects_common:dimensionValueDate</field>
+          <field type="largetext">collectionobjects_common:dimensionValueQualifier</field>
+          <field type="largetext">collectionobjects_common:editionNumber</field>
+          
+          <field type="largetext">collectionobjects_common:inscriptionContent</field>
+          <field type="largetext">collectionobjects_common:inscriptionContentInscriber</field>
+          <field type="largetext">collectionobjects_common:inscriptionContentDate</field>
+          <field type="largetext">collectionobjects_common:inscriptionContentInterpretation</field>
+          <field type="largetext">collectionobjects_common:inscriptionContentLanguage</field>
+          <field type="largetext">collectionobjects_common:inscriptionContentMethod</field>
+          <field type="largetext">collectionobjects_common:inscriptionContentPosition</field>
+          <field type="largetext">collectionobjects_common:inscriptionContentScript</field>
+          <field type="largetext">collectionobjects_common:inscriptionContentTranslation</field>
+          <field type="largetext">collectionobjects_common:inscriptionContentTransliteration</field>
+          <field type="largetext">collectionobjects_common:inscriptionContentType</field>
+          <field type="largetext">collectionobjects_common:inscriptionDescription</field>
+          <field type="largetext">collectionobjects_common:inscriptionDescriptionInscriber</field>
+          <field type="largetext">collectionobjects_common:inscriptionDescriptionDate</field>
+          <field type="largetext">collectionobjects_common:inscriptionDescriptionInterpretation</field>
+          <field type="largetext">collectionobjects_common:inscriptionDescriptionMethod</field>
+          <field type="largetext">collectionobjects_common:inscriptionDescriptionPosition</field>
+          <field type="largetext">collectionobjects_common:inscriptionDescriptionType</field>
+          
+          <field type="largetext">collectionobjects_common:ownersReferences</field>
+          <field type="largetext">collectionobjects_common:ownersContributionNote</field>
+          <field type="largetext">collectionobjects_common:viewersRole</field>
+          <field type="largetext">collectionobjects_common:viewersPersonalExperience</field>
+          <field type="largetext">collectionobjects_common:viewersPersonalResponse</field>
+          <field type="largetext">collectionobjects_common:viewersContributionNote</field>
+          <field type="largetext">collectionobjects_common:catalogNumber</field>
+          <field type="largetext">collectionobjects_common:fieldCollectionDate</field>
+          <field type="largetext">collectionobjects_common:fieldCollectionMethods</field>
+          <field type="largetext">collectionobjects_common:fieldCollectionNote</field>
+          <field type="largetext">collectionobjects_common:fieldCollectionNumber</field>
+          <field type="largetext">collectionobjects_common:fieldCollectionPlace</field>
+          <field type="largetext">collectionobjects_common:dateAssociation</field>
+          <field type="largetext">collectionobjects_common:dateEarliestSingle</field>
+          <field type="largetext">collectionobjects_common:dateEarliestSingleCertainty</field>
+          <field type="largetext">collectionobjects_common:dateEarliestSingleQualifier</field>
+          <field type="largetext">collectionobjects_common:dateLatest</field>
+          <field type="largetext">collectionobjects_common:dateLatestCertainty</field>
+          <field type="largetext">collectionobjects_common:dateLatestQualifier</field>
+          <field type="largetext">collectionobjects_common:datePeriod</field>
+          <field type="largetext">collectionobjects_common:dateText</field>
+          <field type="largetext">collectionobjects_common:ownersPersonalExperience</field>
+          <field type="largetext">collectionobjects_common:ownersPersonalResponse</field>
+          <field type="largetext">collectionobjects_common:ownersReferences</field>
+          <field type="largetext">collectionobjects_common:ownersContributionNote</field>
+          <field type="largetext">collectionobjects_common:viewersRole</field>
+          <field type="largetext">collectionobjects_common:viewersPersonalExperience</field>
+          <field type="largetext">collectionobjects_common:viewersPersonalResponse</field>
+          <field type="largetext">collectionobjects_common:viewersReferences</field>
+          <field type="largetext">collectionobjects_common:viewersContributionNote</field>
+          <field type="largetext">collectionobjects_common:references</field>
+          <field type="largetext">collectionobjects_common:owners</field>
+          <field type="largetext">collectionobjects_common:ownershipAccess</field>
+          <field type="largetext">collectionobjects_common:ownershipCategory</field>
+          <field type="largetext">collectionobjects_common:ownershipDates</field>
+          <field type="largetext">collectionobjects_common:ownershipExchangeMethod</field>
+          <field type="largetext">collectionobjects_common:ownershipExchangeNote</field>
+          <field type="largetext">collectionobjects_common:ownershipExchangePriceCurrency</field>
+          <field type="largetext">collectionobjects_common:ownershipExchangePriceValue</field>
+          <field type="largetext">collectionobjects_common:ownershipPlace</field>
+          <field type="largetext">collectionobjects_common:usage</field>
+          <field type="largetext">collectionobjects_common:usageNote</field>
