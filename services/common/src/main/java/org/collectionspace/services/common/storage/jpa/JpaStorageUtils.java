@@ -67,6 +67,7 @@ public class JpaStorageUtils {
     /** The Constant CS_PERSISTENCE_UNIT. */
     public final static String CS_PERSISTENCE_UNIT = "org.collectionspace.services";
     private final static String CS_AUTHZ_PERSISTENCE_UNIT = "org.collectionspace.services.authorization";
+    private final static String CS_CURRENT_USER = "0";
 
     /**
      * getEntity for given id and class
@@ -131,6 +132,12 @@ public class JpaStorageUtils {
     private static String getUserId(String csid)
     		throws DocumentNotFoundException  {
     	String result = null;
+    	//
+    	// If the CSID is null then return the currently logged in user's ID
+    	//
+    	if (csid.equals(CS_CURRENT_USER) == true) {
+    		return AuthN.get().getUserId();
+    	}
     	
     	//FIXME: Why can't the common jar depend on the account service?  Can we move the account
     	//jaxb classes to the common "jaxb" module?
