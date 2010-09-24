@@ -1,6 +1,6 @@
 Copy the following Nuxeo field type declarations to the ..\nuxeo.ear\config\default-repository-config.xml file.  Insert into the existing <schema> element.
 
- <!-- CollectionObject fields -->
+          <!-- CollectionObject fields -->
           <field type="largetext">collectionobjects_common:objectNumber</field>
           <field type="largetext">collectionobjects_common:otherNumber</field>
           <field type="largetext">collectionobjects_common:otherNumberType</field>

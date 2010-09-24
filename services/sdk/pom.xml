@@ -5,7 +5,7 @@
     <artifactId>org.collectionspace.services.sdk</artifactId>
     <packaging>pom</packaging>
     <name>services.sdk</name>
-    <version>0.9-SNAPSHOT</version>
+    <version>0.9.1-SNAPSHOT</version>
     
     <distributionManagement>
         <repository>
