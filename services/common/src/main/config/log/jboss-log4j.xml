@@ -152,7 +152,7 @@
  
    </appender>
 
-   <!-- collectionspace appender -->
+   <!-- collectionspace performance appender -->
    <appender name="CSLOG_PERF" class="org.jboss.logging.appender.DailyRollingFileAppender">
       <errorHandler  class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
      <param name="Append" value="false"/>
@@ -166,6 +166,18 @@
          <param name="DeployURL" value="cspace-services.war"/>
       </filter> 
       <filter class="org.apache.log4j.varia.DenyAllFilter"></filter-->
+   </appender>
+
+   <!-- collectionspace performance appender, generating a format -->
+   <!-- common to the services and app layers -->
+   <appender name="CSLOG_PERF_COMMON" class="org.jboss.logging.appender.DailyRollingFileAppender">
+      <errorHandler  class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
+     <param name="Append" value="false"/>
+     <param name="DatePattern" value="'.'yyyy-MM-dd"/> <!-- Roll over at midnight daily -->
+      <param name="File" value="${jboss.server.log.dir}/collectionspace-perf-common.log"/>
+      <layout class="org.apache.log4j.PatternLayout">
+         <param name="ConversionPattern" value="&quot;%d&quot;,%r,%t,app,svc,%C{2},%M,method_get_uri_placeholder,svc%n"/>
+      </layout>
    </appender>
    
    <!-- ================ -->
@@ -377,6 +389,7 @@
    <category name="perf.collectionspace">
      <priority value="DEBUG" />
      <appender-ref ref="CSLOG_PERF"/>
+     <appender-ref ref="CSLOG_PERF_COMMON"/>
    </category>
    
    <!-- ======================= -->
