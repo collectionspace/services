@@ -154,12 +154,14 @@
 
    <!-- collectionspace performance appender -->
    <appender name="CSLOG_PERF" class="org.jboss.logging.appender.DailyRollingFileAppender">
-      <errorHandler  class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
-     <param name="Append" value="false"/>
-     <param name="DatePattern" value="'.'yyyy-MM-dd"/>
+      <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
+      <param name="Append" value="false"/>
+      <param name="DatePattern" value="'.'yyyy-MM-dd"/>
       <param name="File" value="${jboss.server.log.dir}/collectionspace-perf.log"/>
       <layout class="org.apache.log4j.PatternLayout">
-         <param name="ConversionPattern" value="%d [%t] %m%n"/>
+         <!-- FIXME: Temporary change to accommodate interleaved CSV log entries -->
+         <!-- param name="ConversionPattern" value="%d [%t] %m%n"/ -->
+         <param name="ConversionPattern" value="&quot;%d&quot;,%m%n"/>
       </layout>
             <!--filter class="org.jboss.logging.filter.TCLFilter">
          <param name="AcceptOnMatch" value="true"/>
@@ -168,15 +170,16 @@
       <filter class="org.apache.log4j.varia.DenyAllFilter"></filter-->
    </appender>
 
-   <!-- collectionspace performance appender, generating a format -->
-   <!-- common to the services and app layers -->
-   <appender name="CSLOG_PERF_COMMON" class="org.jboss.logging.appender.DailyRollingFileAppender">
-      <errorHandler  class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
-     <param name="Append" value="false"/>
-     <param name="DatePattern" value="'.'yyyy-MM-dd"/> <!-- Roll over at midnight daily -->
-      <param name="File" value="${jboss.server.log.dir}/collectionspace-perf-common.log"/>
+   <!-- collectionspace performance appender, generating a comma-separated value (CSV) -->
+   <!-- format common to (at least) the services and app layers -->
+   <appender name="CSLOG_PERF_CSV" class="org.jboss.logging.appender.DailyRollingFileAppender">
+      <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
+      <param name="Append" value="false"/>
+      <param name="DatePattern" value="'.'yyyy-MM-dd"/> <!-- Roll over at midnight daily -->
+      <param name="File" value="${jboss.server.log.dir}/collectionspace-perf-csv.log"/>
       <layout class="org.apache.log4j.PatternLayout">
-         <param name="ConversionPattern" value="&quot;%d&quot;,%r,%t,app,svc,%C{2},%M,method_get_uri_placeholder,svc%n"/>
+         <!-- param name="ConversionPattern" value="&quot;%d&quot;,%r,%t,app,svc,%C{2},%M,method_get_uri_placeholder,svc%n"/ -->
+         <param name="ConversionPattern" value="&quot;%d&quot;,%m%n"/>
       </layout>
    </appender>
    
@@ -389,7 +392,11 @@
    <category name="perf.collectionspace">
      <priority value="DEBUG" />
      <appender-ref ref="CSLOG_PERF"/>
-     <appender-ref ref="CSLOG_PERF_COMMON"/>
+   </category>
+
+   <category name="perf.collectionspace.csv">
+     <priority value="DEBUG" />
+     <appender-ref ref="CSLOG_PERF_CSV"/>
    </category>
    
    <!-- ======================= -->
