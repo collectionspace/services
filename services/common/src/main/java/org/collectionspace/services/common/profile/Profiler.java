@@ -179,13 +179,32 @@ public class Profiler {
     }
 
     /**
-     * Writes a log entry.
+     * Writes a message to a log entry.  The message will
+     * be formatted, using current settings for indentation,
+     * prefix, etc. before being written.
      *
-     * @param msg the message to log.
+     * @param msg the message to be written to a log entry.
      */
     public void log(String msg) {
         if (getLogger().isDebugEnabled()) {
             getLogger().debug(formatLogMessage(msg));
+        }
+    }
+
+    /**
+     * Writes a message to a log entry,
+     *
+     * @param msg the message to write to a log entry.
+     * @param formatMsg true if the message is to be formatted;
+     *                  false if it is not to be formatted.
+     */
+    public void log(String msg, boolean formatMsg) {
+        if (getLogger().isDebugEnabled()) {
+            if (formatMsg) {
+                getLogger().debug(formatLogMessage(msg));
+            } else {
+                getLogger().debug(msg);
+            }
         }
     }
 
@@ -197,7 +216,7 @@ public class Profiler {
     protected Logger getLogger() {
         return this.profileLogger;
     }
-
+    
     private void setMessagePrefix(String prefix) {
         this.messagePrefix = prefix;
     }
@@ -251,10 +270,10 @@ public class Profiler {
     }
 
     /**
-     * Returns a formatted log message, including indentation and prefix.
+     * Returns a formatted log message, after adding indentation and prefix, if any.
      *
      * @param msg the message to log.
-     * @return a constructed log message, including indentation and prefix, if any.
+     * @return a formatted log message, including indentation and prefix, if any.
      */
     private String formatLogMessage(String msg) {
         StringBuffer logMsg = new StringBuffer();
@@ -287,4 +306,5 @@ public class Profiler {
         }
         return defaultStopMessage.toString();
     }
+
 }
