@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.collectionspace.services.LoanoutJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanout.LoansoutCommon;
 import org.collectionspace.services.loanout.LoansoutCommonList;
 import org.collectionspace.services.loanout.LoansoutCommonList.LoanoutListItem;
@@ -129,6 +130,8 @@ public class LoanoutDocumentModelHandler
     @Override
     public LoansoutCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         LoansoutCommonList coList = extractPagingInfo(new LoansoutCommonList(), wrapDoc);
+        AbstractCommonList commonList = (AbstractCommonList) coList;
+        commonList.setFieldsReturned("loanOutNumber|borrower|loanReturnDate|uri|csid");
         List<LoansoutCommonList.LoanoutListItem> list = coList.getLoanoutListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         String label = getServiceContext().getCommonPartLabel();

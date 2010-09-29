@@ -31,6 +31,7 @@ import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumen
 import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.service.ObjectPartType;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.organization.OrganizationsCommon;
 import org.collectionspace.services.organization.OrganizationsCommonList;
@@ -135,6 +136,8 @@ public class OrganizationDocumentModelHandler
     public OrganizationsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) 
     		throws Exception {
         OrganizationsCommonList coList = this.extractPagingInfo(new OrganizationsCommonList(), wrapDoc);
+        AbstractCommonList commonList = (AbstractCommonList) coList;
+        commonList.setFieldsReturned("displayName|refName|uri|csid");
         List<OrganizationsCommonList.OrganizationListItem> list = coList.getOrganizationListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         String commonPartLabel = getServiceContext().getCommonPartLabel("organizations");

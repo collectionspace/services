@@ -30,6 +30,7 @@ import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommon;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommonList;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommonList.VocabularyitemListItem;
@@ -60,6 +61,8 @@ public class VocabularyItemDocumentModelHandler
 	public VocabularyitemsCommonList extractCommonPartList(
 			DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
 		VocabularyitemsCommonList coList = extractPagingInfo(new VocabularyitemsCommonList(), wrapDoc);
+        AbstractCommonList commonList = (AbstractCommonList) coList;
+        commonList.setFieldsReturned("displayName|refName|uri|csid");
 		
 		List<VocabularyitemsCommonList.VocabularyitemListItem> list = coList.getVocabularyitemListItem();
 		Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();

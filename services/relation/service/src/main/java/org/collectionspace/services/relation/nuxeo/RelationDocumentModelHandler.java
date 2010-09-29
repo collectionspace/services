@@ -34,6 +34,7 @@ import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
 
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -124,6 +125,8 @@ public class RelationDocumentModelHandler
     @Override
     public RelationsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         RelationsCommonList relList = this.extractPagingInfo(new RelationsCommonList(), wrapDoc) ;
+        AbstractCommonList commonList = (AbstractCommonList) relList;
+        commonList.setFieldsReturned("subjectCsid|relationshipType|predicateDisplayName|objectCsid|uri|csid");
         List<RelationsCommonList.RelationListItem> itemList = relList.getRelationListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){

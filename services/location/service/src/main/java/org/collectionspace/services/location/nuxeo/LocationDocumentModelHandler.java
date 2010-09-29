@@ -36,6 +36,7 @@ import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.location.LocationsCommon;
 import org.collectionspace.services.location.LocationsCommonList;
 import org.collectionspace.services.location.LocationsCommonList.LocationListItem;
@@ -132,6 +133,8 @@ public class LocationDocumentModelHandler
 	public LocationsCommonList extractCommonPartList(
 			DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
 		LocationsCommonList coList = extractPagingInfo(new LocationsCommonList(), wrapDoc);
+        AbstractCommonList commonList = (AbstractCommonList) coList;
+        commonList.setFieldsReturned("displayName|refName|uri|csid");
 		List<LocationsCommonList.LocationListItem> list = coList.getLocationListItem();
 		Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
 		String commonPartLabel = getServiceContext().getCommonPartLabel(

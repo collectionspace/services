@@ -33,6 +33,7 @@ import org.collectionspace.services.dimension.DimensionsCommon;
 import org.collectionspace.services.dimension.DimensionsCommonList;
 import org.collectionspace.services.dimension.DimensionsCommonList.DimensionListItem;
 
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -108,6 +109,8 @@ public class DimensionDocumentModelHandler
     @Override
     public DimensionsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         DimensionsCommonList coList = extractPagingInfo(new DimensionsCommonList(), wrapDoc) ;
+        AbstractCommonList commonList = (AbstractCommonList) coList;
+        commonList.setFieldsReturned("dimension|uri|csid");
         List<DimensionsCommonList.DimensionListItem> list = coList.getDimensionListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){

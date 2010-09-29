@@ -35,6 +35,7 @@ import org.collectionspace.services.acquisition.AcquisitionsCommonList.Acquisiti
 import org.collectionspace.services.acquisition.AcquisitionSourceList;
 import org.collectionspace.services.acquisition.OwnerList;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -110,6 +111,8 @@ public class AcquisitionDocumentModelHandler
     @Override
     public AcquisitionsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         AcquisitionsCommonList coList = this.extractPagingInfo(new AcquisitionsCommonList(), wrapDoc);
+        AbstractCommonList commonList = (AbstractCommonList) coList;
+        commonList.setFieldsReturned("acquisitionReferenceNumber|acquisitionSources|owners|uri|csid");
         List<AcquisitionsCommonList.AcquisitionListItem> list = coList.getAcquisitionListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         String label = getServiceContext().getCommonPartLabel();

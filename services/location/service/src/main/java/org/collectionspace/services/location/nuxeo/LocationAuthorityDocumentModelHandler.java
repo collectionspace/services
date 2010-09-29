@@ -31,6 +31,7 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.location.LocationauthoritiesCommon;
 import org.collectionspace.services.location.LocationauthoritiesCommonList;
 import org.collectionspace.services.location.LocationauthoritiesCommonList.LocationauthorityListItem;
@@ -64,6 +65,8 @@ public class LocationAuthorityDocumentModelHandler
     public LocationauthoritiesCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         LocationauthoritiesCommonList coList = extractPagingInfo(new LocationauthoritiesCommonList(),
         		wrapDoc);
+        AbstractCommonList commonList = (AbstractCommonList) coList;
+        commonList.setFieldsReturned("displayName|refName|shortIdentifier|vocabType|uri|csid");
 
         //FIXME: iterating over a long list of documents is not a long term
         //strategy...need to change to more efficient iterating in future

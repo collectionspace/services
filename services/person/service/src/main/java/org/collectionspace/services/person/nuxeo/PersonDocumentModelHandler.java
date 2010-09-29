@@ -33,6 +33,7 @@ import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonsCommonList;
 import org.collectionspace.services.person.PersonsCommonList.PersonListItem;
@@ -188,6 +189,8 @@ public class PersonDocumentModelHandler
 	public PersonsCommonList extractCommonPartList(
 			DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
 		PersonsCommonList coList = extractPagingInfo(new PersonsCommonList(), wrapDoc);
+        AbstractCommonList commonList = (AbstractCommonList) coList;
+        commonList.setFieldsReturned("displayName|refName|uri|csid");
 		List<PersonsCommonList.PersonListItem> list = coList.getPersonListItem();
 		Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
 		String commonPartLabel = getServiceContext().getCommonPartLabel(

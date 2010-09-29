@@ -33,6 +33,7 @@ import org.collectionspace.services.organization.OrgauthoritiesCommonList;
 import org.collectionspace.services.organization.OrgauthoritiesCommonList.OrgauthorityListItem;
 
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityDocumentModelHandler;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -63,6 +64,8 @@ public class OrgAuthorityDocumentModelHandler
     @Override
     public OrgauthoritiesCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         OrgauthoritiesCommonList coList = this.extractPagingInfo(new OrgauthoritiesCommonList(), wrapDoc);
+        AbstractCommonList commonList = (AbstractCommonList) coList;
+        commonList.setFieldsReturned("displayName|refName|shortIdentifier|vocabType|uri|csid");
     	List<OrgauthoritiesCommonList.OrgauthorityListItem> list = coList.getOrgauthorityListItem();
     	Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         String label = getServiceContext().getCommonPartLabel();

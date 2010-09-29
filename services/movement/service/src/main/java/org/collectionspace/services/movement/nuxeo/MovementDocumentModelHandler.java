@@ -30,6 +30,7 @@ import java.util.List;
 import org.collectionspace.services.MovementJAXBSchema;
 import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.movement.MovementsCommon;
 import org.collectionspace.services.movement.MovementsCommonList;
 import org.collectionspace.services.movement.MovementsCommonList.MovementListItem;
@@ -133,6 +134,8 @@ public class MovementDocumentModelHandler
     @Override
     public MovementsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         MovementsCommonList coList = extractPagingInfo(new MovementsCommonList(), wrapDoc);
+        AbstractCommonList commonList = (AbstractCommonList) coList;
+        commonList.setFieldsReturned("movementReferenceNumber|currentLocation|locationDate|uri|csid");
         List<MovementsCommonList.MovementListItem> list = coList.getMovementListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         String label = getServiceContext().getCommonPartLabel();

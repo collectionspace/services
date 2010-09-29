@@ -31,6 +31,7 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.objectexit.ObjectexitCommon;
 import org.collectionspace.services.objectexit.ObjectexitCommonList;
 import org.collectionspace.services.objectexit.ObjectexitCommonList.ObjectexitListItem;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -129,6 +130,8 @@ public class ObjectExitDocumentModelHandler
     @Override
     public ObjectexitCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         ObjectexitCommonList coList = extractPagingInfo(new ObjectexitCommonList(), wrapDoc);
+        AbstractCommonList commonList = (AbstractCommonList) coList;
+        commonList.setFieldsReturned("currentOwner|depositor|exitDate|exitMethod|exitNote|exitNumber|exitReason|packingNote|uri|csid");
         List<ObjectexitCommonList.ObjectexitListItem> list = coList.getObjectexitListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){

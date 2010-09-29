@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.collectionspace.services.ReportJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.report.ReportsCommon;
 import org.collectionspace.services.report.ReportsCommonList;
 import org.collectionspace.services.report.ReportsCommonList.ReportListItem;
@@ -119,6 +120,8 @@ public class ReportDocumentModelHandler
     @Override
     public ReportsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         ReportsCommonList coList = this.extractPagingInfo(new ReportsCommonList(), wrapDoc);
+        AbstractCommonList commonList = (AbstractCommonList) coList;
+        commonList.setFieldsReturned("name|outputMIME|forDocType|forSingleDoc|uri|csid");
         List<ReportsCommonList.ReportListItem> list = coList.getReportListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
 				String label = getServiceContext().getCommonPartLabel();

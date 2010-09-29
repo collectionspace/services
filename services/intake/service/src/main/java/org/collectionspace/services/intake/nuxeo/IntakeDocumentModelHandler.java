@@ -31,6 +31,7 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.IntakesCommonList;
 import org.collectionspace.services.intake.IntakesCommonList.IntakeListItem;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -119,6 +120,8 @@ public class IntakeDocumentModelHandler
     @Override
     public IntakesCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         IntakesCommonList coList = this.extractPagingInfo(new IntakesCommonList(), wrapDoc);
+        AbstractCommonList commonList = (AbstractCommonList) coList;
+        commonList.setFieldsReturned("entryNumber|depositor|currentOwner|uri|csid");
         List<IntakesCommonList.IntakeListItem> list = coList.getIntakeListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         String label = getServiceContext().getCommonPartLabel();

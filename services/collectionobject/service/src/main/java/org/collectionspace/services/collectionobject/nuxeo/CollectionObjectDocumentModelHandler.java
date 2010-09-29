@@ -35,6 +35,7 @@ import org.collectionspace.services.collectionobject.CollectionobjectsCommonList
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList.CollectionObjectListItem;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -124,6 +125,8 @@ public class CollectionObjectDocumentModelHandler
     public CollectionobjectsCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         CollectionobjectsCommonList coList = this.extractPagingInfo(new CollectionobjectsCommonList(),
         		wrapDoc);
+        AbstractCommonList commonList = (AbstractCommonList) coList;
+        commonList.setFieldsReturned("objectNumber|objectName|title|responsibleDepartment|uri|csid");
         List<CollectionobjectsCommonList.CollectionObjectListItem> list = coList.getCollectionObjectListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         String label = getServiceContext().getCommonPartLabel();

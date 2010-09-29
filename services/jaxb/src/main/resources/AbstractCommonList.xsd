@@ -20,6 +20,7 @@
                 <!-- "itemsInPage" is useful to our testing framework's unit tests -->
                 <xs:element name="itemsInPage" type="xs:unsignedInt" />
                 <xs:element name="totalItems" type="xs:unsignedInt" />
+                <xs:element name="fieldsReturned" type="xs:string" />
             </xs:sequence>
         </xs:complexType>
     </xs:element>

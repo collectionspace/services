@@ -34,6 +34,7 @@ import org.collectionspace.services.vocabulary.VocabulariesCommonList;
 import org.collectionspace.services.vocabulary.VocabulariesCommonList.VocabularyListItem;
 
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
@@ -65,6 +66,8 @@ public class VocabularyDocumentModelHandler
     		DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
 		String label = getServiceContext().getCommonPartLabel();
         VocabulariesCommonList coList = extractPagingInfo(new VocabulariesCommonList(), wrapDoc);
+        AbstractCommonList commonList = (AbstractCommonList) coList;
+        commonList.setFieldsReturned("displayName|refName|shortIdentifier|vocabType|uri|csid");
         List<VocabulariesCommonList.VocabularyListItem> list = coList.getVocabularyListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){

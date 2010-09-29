@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonauthoritiesCommonList;
 import org.collectionspace.services.person.PersonauthoritiesCommonList.PersonauthorityListItem;
@@ -61,6 +62,8 @@ public class PersonAuthorityDocumentModelHandler
     public PersonauthoritiesCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         PersonauthoritiesCommonList coList = extractPagingInfo(new PersonauthoritiesCommonList(),
         		wrapDoc);
+        AbstractCommonList commonList = (AbstractCommonList) coList;
+        commonList.setFieldsReturned("displayName|refName|shortIdentifier|vocabType|uri|csid");
 
         //FIXME: iterating over a long list of documents is not a long term
         //strategy...need to change to more efficient iterating in future
