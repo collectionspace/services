@@ -5,7 +5,7 @@
     </description>
     <!-- set global properties for this build -->
     <property name="services.trunk" value="../../.."/>
-    <!-- enviornment should be declared before reading build.properties -->
+    <!-- environment should be declared before reading build.properties -->
     <property environment="env" />
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
@@ -193,9 +193,10 @@
     </target>
 
     <target name="undeploy"
-            description="undeploy authentication service from ${jboss.server.cspace}">
+            description="undeploy authentication service from ${jboss.server.cspace}"
+            depends="check.db.scripts.deploy.dir" if="${db.scripts.deploy.dir.exists}">
         <delete>
-            <fileset dir="${jboss.server.cspace}/cspace/services/db/${db}"
+            <fileset dir="${db.scripts.deploy.dir}"
                      includes="**authentication**.sql"/>
         </delete>
     </target>
@@ -206,6 +207,13 @@
         <copy todir="${services.trunk}/${dist.server.cspace}/cspace/services">
             <fileset dir="${src}/main/resources/"/>
         </copy>
+    </target>
+    
+    <target name="check.db.scripts.deploy.dir">
+        <property name="db.scripts.deploy.dir" value="${jboss.server.cspace}/cspace/services/db/${db}"/>
+        <condition property="db.scripts.deploy.dir.exists">
+            <available file="${db.scripts.deploy.dir}" type="dir"/>
+        </condition>
     </target>
 
 </project>
