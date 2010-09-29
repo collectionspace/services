@@ -211,6 +211,20 @@ public class PersonAuthorityClientUtils {
     	if (displayNameComputed == false && displayName == null) {
     		throw new IllegalArgumentException("displayName cannot be null when displayComputed is 'false'");
     	}      	
+
+    	booleanStr = personInfo.get(PersonJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED);
+    	boolean shortDisplayNameComputed = true;
+    	if (booleanStr != null && booleanStr.length() > 0) {
+    		shortDisplayNameComputed = Boolean.parseBoolean(booleanStr);
+    	}
+    	person.setShortDisplayNameComputed(shortDisplayNameComputed);
+
+       	String shortDisplayName = personInfo.get(PersonJAXBSchema.SHORT_DISPLAY_NAME);
+       	person.setShortDisplayName(shortDisplayName);
+    	if (shortDisplayNameComputed == false && shortDisplayName == null) {
+    		throw new IllegalArgumentException("shortDisplayName cannot be null when shortDisplayComputed is 'false'");
+    	}      	
+
     	String refName = createPersonRefName(personAuthRefName, shortId, displayName);
        	person.setRefName(refName);
     	
@@ -314,6 +328,20 @@ public class PersonAuthorityClientUtils {
     		    	personMap.get(PersonJAXBSchema.BIRTH_DATE),
     		    	personMap.get(PersonJAXBSchema.DEATH_DATE));
         	personMap.put(PersonJAXBSchema.DISPLAY_NAME, displayName);
+    	}
+    	String shortDisplayName = personMap.get(PersonJAXBSchema.SHORT_DISPLAY_NAME);
+    	String shortDisplayNameComputedStr = personMap.get(PersonJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED);
+    	boolean shortDisplayNameComputed = (shortDisplayNameComputedStr==null) || shortDisplayNameComputedStr.equalsIgnoreCase("true");
+    	if( shortDisplayName == null ) {
+    		if(!shortDisplayNameComputed) {
+	    		throw new RuntimeException(
+	    		"CreateItem: Must supply a shortDisplayName if shortDisplayNameComputed is set to false.");
+    		}
+    		shortDisplayName = 
+        		prepareDefaultDisplayName(
+    		    	personMap.get(PersonJAXBSchema.FORE_NAME), null,
+    		    	personMap.get(PersonJAXBSchema.SUR_NAME),null,null);
+        	personMap.put(PersonJAXBSchema.SHORT_DISPLAY_NAME, shortDisplayName);
     	}
     	
     	if(logger.isDebugEnabled()){

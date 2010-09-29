@@ -25,6 +25,7 @@ package org.collectionspace.services.common.vocabulary;
 
 public interface AuthorityItemListItemJAXBSchema {
 	final static String DISPLAY_NAME = "displayName";
+	final static String SHORT_DISPLAY_NAME = "shortDisplayName";
 	final static String REF_NAME = "refName";
 	final static String SHORT_IDENTIFIER = "shortIdentifier";
 	final static String CSID = "csid";

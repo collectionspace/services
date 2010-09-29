@@ -3,16 +3,15 @@
  */
 package org.collectionspace.services;
 
-import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
+import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 
 /**
  * @author pschmitz
  *
  */
-public interface OrganizationJAXBSchema extends AuthorityJAXBSchema {
+public interface OrganizationJAXBSchema extends AuthorityItemJAXBSchema {
 
     final static String ORGANIZATIONS_COMMON = "organizations_common";
-    final static String DISPLAY_NAME_COMPUTED = "displayNameComputed";
     final static String SHORT_NAME = "shortName";
     final static String LONG_NAME = "longName";
     final static String NAME_ADDITIONS = "nameAdditions";

@@ -75,7 +75,7 @@ public class PersonDocumentModelHandler
     public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
     	// first fill all the parts of the document
     	super.handleCreate(wrapDoc);    	
-    	handleDisplayName(wrapDoc.getWrappedObject());
+    	handleDisplayNames(wrapDoc.getWrappedObject());
     }
     
     /* (non-Javadoc)
@@ -84,30 +84,51 @@ public class PersonDocumentModelHandler
     @Override
     public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
     	super.handleUpdate(wrapDoc);
-    	handleDisplayName(wrapDoc.getWrappedObject());
+    	handleDisplayNames(wrapDoc.getWrappedObject());
     }
 
     /**
-     * Handle display name.
+     * Handle display names.
      *
      * @param docModel the doc model
      * @throws Exception the exception
      */
-    private void handleDisplayName(DocumentModel docModel) throws Exception {
+    private void handleDisplayNames(DocumentModel docModel) throws Exception {
     	String commonPartLabel = getServiceContext().getCommonPartLabel("persons");
     	Boolean displayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
     			PersonJAXBSchema.DISPLAY_NAME_COMPUTED);
-    	if (displayNameComputed == true) {
-    		String displayName = prepareDefaultDisplayName(
-				(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.FORE_NAME),    			
-				(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.MIDDLE_NAME),    			
-				(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.SUR_NAME),    			
-				(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.BIRTH_DATE),    			
-				(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.DEATH_DATE));
-    		docModel.setProperty(commonPartLabel, PersonJAXBSchema.DISPLAY_NAME,
-    				displayName);
+    	Boolean shortDisplayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
+    			PersonJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED);
+    	if(displayNameComputed==null)
+    		displayNameComputed = true;
+    	if(shortDisplayNameComputed==null)
+    		shortDisplayNameComputed = true;
+    	if (displayNameComputed || shortDisplayNameComputed) {
+    		String forename = 
+				(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.FORE_NAME);
+    		String lastname = 
+				(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.SUR_NAME);
+    		if(shortDisplayNameComputed) {
+	    		String displayName = prepareDefaultDisplayName(forename, null, lastname,
+	    				null, null);
+	    		docModel.setProperty(commonPartLabel, PersonJAXBSchema.SHORT_DISPLAY_NAME,
+	    				displayName);
+    		}
+    		if(displayNameComputed) {
+	    		String midname = 
+					(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.MIDDLE_NAME);    			
+	    		String birthdate = 
+					(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.BIRTH_DATE);
+	    		String deathdate = 
+					(String)docModel.getProperty(commonPartLabel, PersonJAXBSchema.DEATH_DATE);
+	    		String displayName = prepareDefaultDisplayName(forename, midname, lastname,
+	    				birthdate, deathdate);
+	    		docModel.setProperty(commonPartLabel, PersonJAXBSchema.DISPLAY_NAME,
+	    				displayName);
+    		}
     	}
     }
+	
 	
     /**
      * Produces a default displayName from the basic name and dates fields.
@@ -190,7 +211,7 @@ public class PersonDocumentModelHandler
 			DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
 		PersonsCommonList coList = extractPagingInfo(new PersonsCommonList(), wrapDoc);
         AbstractCommonList commonList = (AbstractCommonList) coList;
-        commonList.setFieldsReturned("displayName|refName|uri|csid");
+        commonList.setFieldsReturned("displayName|refName|shortIdentifier|uri|csid");
 		List<PersonsCommonList.PersonListItem> list = coList.getPersonListItem();
 		Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
 		String commonPartLabel = getServiceContext().getCommonPartLabel(
@@ -200,6 +221,8 @@ public class PersonDocumentModelHandler
 			PersonListItem ilistItem = new PersonListItem();
 			ilistItem.setDisplayName((String) docModel.getProperty(
 					commonPartLabel, PersonJAXBSchema.DISPLAY_NAME));
+			ilistItem.setShortIdentifier((String) docModel.getProperty(commonPartLabel,
+					PersonJAXBSchema.SHORT_IDENTIFIER));
 			ilistItem.setRefName((String) docModel.getProperty(commonPartLabel,
 					PersonJAXBSchema.REF_NAME));
 			String id = NuxeoUtils.extractId(docModel.getPathAsString());

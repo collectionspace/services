@@ -29,10 +29,13 @@ package org.collectionspace.services.common.vocabulary;
  */
 public interface AuthorityItemJAXBSchema {
 	final static String DISPLAY_NAME = "displayName";
+	final static String DISPLAY_NAME_COMPUTED = "displayNameComputed";
+	final static String SHORT_DISPLAY_NAME = "shortDisplayName";
+	final static String SHORT_DISPLAY_NAME_COMPUTED = "shortDisplayNameComputed";
 	final static String IN_AUTHORITY = "inAuthority";
 	final static String REF_NAME = "refName";
 	final static String SHORT_IDENTIFIER = "shortIdentifier";
-	final static String STATUS = "status";
+	final static String TERM_STATUS = "termStatus";
 	final static String CSID = "csid";
 }
 

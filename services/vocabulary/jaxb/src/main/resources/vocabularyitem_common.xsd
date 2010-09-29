@@ -50,6 +50,8 @@
                                 <xs:sequence>
                                     <xs:element name="displayName" type="xs:string"
                                         minOccurs="1" />
+									<xs:element name="shortIdentifier" type="xs:string"
+                                        minOccurs="1" />
                                     <!-- uri to retrieve vocabularyitem details -->
                                     <xs:element name="uri" type="xs:anyURI"
                                         minOccurs="1" />

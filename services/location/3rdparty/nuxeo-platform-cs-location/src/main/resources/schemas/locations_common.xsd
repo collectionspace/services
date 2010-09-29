@@ -28,6 +28,8 @@
     <xs:element name="termStatus" type="xs:string"/>
     <xs:element name="displayName" type="xs:string"/>
     <xs:element name="displayNameComputed" type="xs:boolean"/>
+    <xs:element name="shortDisplayName" type="xs:string"/>
+    <xs:element name="shortDisplayNameComputed" type="xs:boolean"/>
     <xs:element name="name" type="xs:string"/>
     <xs:element name="conditionNote" type="xs:string"/>
     <xs:element name="conditionNoteDate" type="xs:string"/>

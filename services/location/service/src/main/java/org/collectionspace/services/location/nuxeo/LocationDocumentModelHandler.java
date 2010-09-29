@@ -33,6 +33,7 @@ import org.collectionspace.services.LocationJAXBSchema;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.service.ObjectPartType;
+import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
@@ -76,7 +77,7 @@ public class LocationDocumentModelHandler
     public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
     	// first fill all the parts of the document
     	super.handleCreate(wrapDoc);    	
-    	handleDisplayName(wrapDoc.getWrappedObject());
+    	handleDisplayNames(wrapDoc.getWrappedObject());
     }
     
     /* (non-Javadoc)
@@ -85,7 +86,7 @@ public class LocationDocumentModelHandler
     @Override
     public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
     	super.handleUpdate(wrapDoc);
-    	handleDisplayName(wrapDoc.getWrappedObject());
+    	handleDisplayNames(wrapDoc.getWrappedObject());
     }
 
     /**
@@ -94,15 +95,27 @@ public class LocationDocumentModelHandler
      * @param docModel the doc model
      * @throws Exception the exception
      */
-    private void handleDisplayName(DocumentModel docModel) throws Exception {
+    private void handleDisplayNames(DocumentModel docModel) throws Exception {
     	String commonPartLabel = getServiceContext().getCommonPartLabel("locations");
     	Boolean displayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
     			LocationJAXBSchema.DISPLAY_NAME_COMPUTED);
-    	if (displayNameComputed) {
+    	Boolean shortDisplayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
+    			LocationJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED);
+    	if(displayNameComputed==null)
+    		displayNameComputed = true;
+    	if(shortDisplayNameComputed==null)
+    		shortDisplayNameComputed = true;
+    	if (displayNameComputed || shortDisplayNameComputed) {
     		String displayName = prepareDefaultDisplayName(
 			(String)docModel.getProperty(commonPartLabel, LocationJAXBSchema.NAME ));
-			docModel.setProperty(commonPartLabel, LocationJAXBSchema.DISPLAY_NAME,
-					displayName);
+    		if (displayNameComputed) {
+    			docModel.setProperty(commonPartLabel, LocationJAXBSchema.DISPLAY_NAME,
+    					displayName);
+    		}
+    		if (shortDisplayNameComputed) {
+    			docModel.setProperty(commonPartLabel, LocationJAXBSchema.SHORT_DISPLAY_NAME,
+    					displayName);
+    		}
     	}
     }
 	
@@ -134,7 +147,7 @@ public class LocationDocumentModelHandler
 			DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
 		LocationsCommonList coList = extractPagingInfo(new LocationsCommonList(), wrapDoc);
         AbstractCommonList commonList = (AbstractCommonList) coList;
-        commonList.setFieldsReturned("displayName|refName|uri|csid");
+        commonList.setFieldsReturned("displayName|refName|shortIdentifier|uri|csid");
 		List<LocationsCommonList.LocationListItem> list = coList.getLocationListItem();
 		Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
 		String commonPartLabel = getServiceContext().getCommonPartLabel(
@@ -143,9 +156,11 @@ public class LocationDocumentModelHandler
 			DocumentModel docModel = iter.next();
 			LocationListItem ilistItem = new LocationListItem();
 			ilistItem.setDisplayName((String) docModel.getProperty(
-					commonPartLabel, LocationJAXBSchema.DISPLAY_NAME));
+					commonPartLabel, AuthorityItemJAXBSchema.DISPLAY_NAME));
+			ilistItem.setShortIdentifier((String) docModel.getProperty(commonPartLabel,
+					AuthorityItemJAXBSchema.SHORT_IDENTIFIER));
 			ilistItem.setRefName((String) docModel.getProperty(commonPartLabel,
-					LocationJAXBSchema.REF_NAME));
+					AuthorityItemJAXBSchema.REF_NAME));
 			String id = NuxeoUtils.extractId(docModel.getPathAsString());
 			ilistItem.setUri("/locationauthorities/" + inAuthority + "/items/"
 					+ id);

@@ -252,6 +252,12 @@ public class OrgAuthorityClientUtils {
        	if((value = (String)orgInfo.get(OrganizationJAXBSchema.DISPLAY_NAME))!=null)
         	organization.setDisplayName(value);
    		
+    	value = orgInfo.get(OrganizationJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED);
+    	boolean shortDisplayNameComputed = (value==null) || value.equalsIgnoreCase("true"); 
+   		organization.setShortDisplayNameComputed(shortDisplayNameComputed);
+       	if((value = (String)orgInfo.get(OrganizationJAXBSchema.SHORT_DISPLAY_NAME))!=null)
+        	organization.setShortDisplayName(value);
+   		
     	String refName = createOrganizationRefName(orgAuthRefName, shortId, value);
     	organization.setRefName(refName);
 

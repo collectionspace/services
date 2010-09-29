@@ -246,6 +246,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         String shortId = "johnWayneActor";
         johnWayneMap.put(PersonJAXBSchema.DISPLAY_NAME_COMPUTED, "false");
         johnWayneMap.put(PersonJAXBSchema.DISPLAY_NAME, "John Wayne");
+        johnWayneMap.put(PersonJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED, "false");
+        johnWayneMap.put(PersonJAXBSchema.SHORT_DISPLAY_NAME, "JohnWayne");
         johnWayneMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
         
         johnWayneMap.put(PersonJAXBSchema.FORE_NAME, TEST_FORE_NAME);
@@ -746,7 +748,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
     		groups = {"update"}, dependsOnMethods = {"updateItem"})
-    public void verifyItemDisplayName(String testName) throws Exception {
+    public void verifyItemDisplayNames(String testName) throws Exception {
         
          if (logger.isDebugEnabled()) {
             logger.debug(testBanner(testName, CLASS_NAME));
@@ -785,16 +787,27 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
             PersonAuthorityClientUtils.prepareDefaultDisplayName(
 	        TEST_FORE_NAME, null, TEST_SUR_NAME,
 	        TEST_BIRTH_DATE, TEST_DEATH_DATE);
-        Assert.assertNotNull(displayName, expectedDisplayName);
+        Assert.assertFalse(displayName.equals(expectedDisplayName));
     
-        // Update the shortName and verify the computed name is updated.
+        String shortDisplayName = person.getShortDisplayName();
+        // Make sure displayName matches computed form
+        String expectedShortDisplayName = 
+            PersonAuthorityClientUtils.prepareDefaultDisplayName(
+            		TEST_FORE_NAME, null, TEST_SUR_NAME,null, null);
+        Assert.assertFalse(expectedShortDisplayName.equals(shortDisplayName));
+    
+        // Update the forename and verify the computed name is updated.
         person.setCsid(null);
         person.setDisplayNameComputed(true);
+        person.setShortDisplayNameComputed(true);
         person.setForeName("updated-" + TEST_FORE_NAME);
         expectedDisplayName = 
             PersonAuthorityClientUtils.prepareDefaultDisplayName(
         	"updated-" + TEST_FORE_NAME, null, TEST_SUR_NAME, 
 	       	TEST_BIRTH_DATE, TEST_DEATH_DATE);
+        expectedShortDisplayName = 
+            PersonAuthorityClientUtils.prepareDefaultDisplayName(
+            		"updated-" + TEST_FORE_NAME, null, TEST_SUR_NAME,null, null);
 
         // Submit the updated resource to the service and store the response.
         MultipartOutput output = new MultipartOutput();
@@ -829,11 +842,16 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Verify that the updated resource computes the right displayName.
         Assert.assertEquals(updatedPerson.getDisplayName(), expectedDisplayName,
             "Updated ForeName in Person not reflected in computed DisplayName.");
+        // Verify that the updated resource computes the right displayName.
+        Assert.assertEquals(updatedPerson.getShortDisplayName(), expectedShortDisplayName,
+            "Updated ForeName in Person not reflected in computed ShortDisplayName.");
 
         // Now Update the displayName, not computed and verify the computed name is overriden.
         person.setDisplayNameComputed(false);
         expectedDisplayName = "TestName";
         person.setDisplayName(expectedDisplayName);
+        person.setShortDisplayNameComputed(false);
+        person.setShortDisplayName(expectedDisplayName);
 
         // Submit the updated resource to the service and store the response.
         output = new MultipartOutput();
@@ -869,6 +887,13 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(updatedPerson.getDisplayName(),
         		expectedDisplayName,
                 "Updated DisplayName (not computed) in Person not stored.");
+        // Verify that the updated resource received the correct data.
+        Assert.assertEquals(updatedPerson.isShortDisplayNameComputed(), false,
+                "Updated shortDisplayNameComputed in Person did not match submitted data.");
+        // Verify that the updated resource computes the right displayName.
+        Assert.assertEquals(updatedPerson.getShortDisplayName(),
+        		expectedDisplayName,
+                "Updated ShortDisplayName (not computed) in Person not stored.");
     }
 
     /**
@@ -878,7 +903,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      * @throws Exception the exception
      */
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
-    		groups = {"update"}, dependsOnMethods = {"verifyItemDisplayName"})
+    		groups = {"update"}, dependsOnMethods = {"verifyItemDisplayNames"})
     public void verifyIllegalItemDisplayName(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {

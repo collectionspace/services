@@ -27,6 +27,8 @@
 								<xs:element name="termStatus" type="xs:string"/>
 								<xs:element name="displayName" type="xs:string"/>
 								<xs:element name="displayNameComputed" type="xs:boolean"/>
+							    <xs:element name="shortDisplayName" type="xs:string"/>
+							    <xs:element name="shortDisplayNameComputed" type="xs:boolean"/>
 								<xs:element name="name" type="xs:string"/>
 								<xs:element name="conditionNote" type="xs:string"/>
 								<xs:element name="conditionNoteDate" type="xs:string"/>
@@ -57,6 +59,8 @@
                             <xs:complexType>
                                 <xs:sequence>
                                     <xs:element name="displayName" type="xs:string"
+                                        minOccurs="1" />
+									<xs:element name="shortIdentifier" type="xs:string"
                                         minOccurs="1" />
                                     <!-- uri to retrieve location details -->
                                     <xs:element name="uri" type="xs:anyURI"

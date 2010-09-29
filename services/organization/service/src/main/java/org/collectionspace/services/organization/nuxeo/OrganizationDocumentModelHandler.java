@@ -68,7 +68,7 @@ public class OrganizationDocumentModelHandler
     public void handleCreate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
     	// first fill all the parts of the document
     	super.handleCreate(wrapDoc);    	
-    	handleDisplayName(wrapDoc.getWrappedObject());
+    	handleDisplayNames(wrapDoc.getWrappedObject());
     }
     
     /* (non-Javadoc)
@@ -77,7 +77,7 @@ public class OrganizationDocumentModelHandler
     @Override
     public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
     	super.handleUpdate(wrapDoc);
-    	handleDisplayName(wrapDoc.getWrappedObject());
+    	handleDisplayNames(wrapDoc.getWrappedObject());
     }
 
     /**
@@ -87,16 +87,31 @@ public class OrganizationDocumentModelHandler
      * 
      * @throws Exception the exception
      */
-    private void handleDisplayName(DocumentModel docModel) throws Exception {
+    private void handleDisplayNames(DocumentModel docModel) throws Exception {
     	String commonPartLabel = getServiceContext().getCommonPartLabel("organizations");
     	Boolean displayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
     			OrganizationJAXBSchema.DISPLAY_NAME_COMPUTED);
-    	if (displayNameComputed) {
-    		String displayName = prepareDefaultDisplayName(
-        			(String) docModel.getProperty(commonPartLabel,OrganizationJAXBSchema.SHORT_NAME),
-        			(String) docModel.getProperty(commonPartLabel,OrganizationJAXBSchema.FOUNDING_PLACE));
-			docModel.setProperty(commonPartLabel, OrganizationJAXBSchema.DISPLAY_NAME,
-						displayName);
+    	Boolean shortDisplayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
+    			OrganizationJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED);
+    	if(displayNameComputed==null)
+    		displayNameComputed = true;
+    	if(shortDisplayNameComputed==null)
+    		shortDisplayNameComputed = true;
+    	if (displayNameComputed || shortDisplayNameComputed) {
+    		String shortName = (String) docModel.getProperty(commonPartLabel,
+    									OrganizationJAXBSchema.SHORT_NAME);
+    		if(shortDisplayNameComputed) {
+	    		String displayName = prepareDefaultDisplayName(shortName, null);
+	    		docModel.setProperty(commonPartLabel, OrganizationJAXBSchema.SHORT_DISPLAY_NAME,
+	    				displayName);
+    		}
+    		if(displayNameComputed) {
+            	String foundingPlace = (String) docModel.getProperty(commonPartLabel,
+						OrganizationJAXBSchema.FOUNDING_PLACE);
+	       		String displayName = prepareDefaultDisplayName(shortName, foundingPlace);
+				docModel.setProperty(commonPartLabel, OrganizationJAXBSchema.DISPLAY_NAME,
+							displayName);
+    		}
     	}
     }
 
@@ -137,7 +152,7 @@ public class OrganizationDocumentModelHandler
     		throws Exception {
         OrganizationsCommonList coList = this.extractPagingInfo(new OrganizationsCommonList(), wrapDoc);
         AbstractCommonList commonList = (AbstractCommonList) coList;
-        commonList.setFieldsReturned("displayName|refName|uri|csid");
+        commonList.setFieldsReturned("displayName|refName|shortIdentifier|uri|csid");
         List<OrganizationsCommonList.OrganizationListItem> list = coList.getOrganizationListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         String commonPartLabel = getServiceContext().getCommonPartLabel("organizations");
@@ -146,6 +161,8 @@ public class OrganizationDocumentModelHandler
             OrganizationListItem ilistItem = new OrganizationListItem();
             ilistItem.setDisplayName((String)
             		docModel.getProperty(commonPartLabel,OrganizationJAXBSchema.DISPLAY_NAME ));
+			ilistItem.setShortIdentifier((String) docModel.getProperty(commonPartLabel,
+					OrganizationJAXBSchema.SHORT_IDENTIFIER));
 			ilistItem.setRefName((String) 
 					docModel.getProperty(commonPartLabel, OrganizationJAXBSchema.REF_NAME));
 			String id = NuxeoUtils.extractId(docModel.getPathAsString());
