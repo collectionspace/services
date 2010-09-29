@@ -3,7 +3,7 @@
     <parent>
         <artifactId>org.collectionspace.services.contact</artifactId>
         <groupId>org.collectionspace.services</groupId>
-        <version>0.9-SNAPSHOT</version>
+        <version>0.9.1-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
@@ -72,7 +72,6 @@
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-api</artifactId>
-            <version>${nuxeo.version.1.5}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>jboss-remoting</artifactId>

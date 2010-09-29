@@ -13,7 +13,6 @@ Require-Bundle: org.nuxeo.runtime,
  org.nuxeo.ecm.platform.versioning.api,
  org.nuxeo.ecm.platform.ui,
  org.nuxeo.ecm.platform.forms.layout.client,
- org.nuxeo.ecm.platform.publishing.api,
  org.nuxeo.ecm.platform.ws,
  org.collectionspace.collectionspace_core
 Provide-Package: org.collectionspace.movement
