@@ -302,10 +302,22 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
             List<String> authRefFieldNames) throws PropertyException {
 
         AuthorityRefList authRefList = new AuthorityRefList();
+        AbstractCommonList commonList = (AbstractCommonList) authRefList;
+        
+        DocumentFilter docFilter = this.getDocumentFilter();
+        long pageSize = docFilter.getPageSize();
+        long pageNum = pageSize != 0 ? docFilter.getOffset() / pageSize : pageSize;
+        // set the page size and page number
+        commonList.setPageNum(pageNum);
+        commonList.setPageSize(pageSize);
+        
         List<AuthorityRefList.AuthorityRefItem> list = authRefList.getAuthorityRefItem();
         DocumentModel docModel = docWrapper.getWrappedObject();
 
         try {
+        	int iFirstToUse = (int)(pageSize*pageNum);
+        	int nFoundInPage = 0;
+        	int nFoundTotal = 0;
             for (String authRefFieldName : authRefFieldNames) {
 
                 // FIXME: Can use the schema to validate field existence,
@@ -327,7 +339,22 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
                 // If this is a single scalar field, with no children,
                 // add an item with its values to the authRefs list.
                 if (DocumentUtils.isSimpleType(prop)) {
-                    appendToAuthRefsList(prop.getValue(String.class), schemaName, authRefFieldName, list);
+                	String refName = prop.getValue(String.class);
+                    if (refName == null) {
+                        continue;
+                    }
+                    refName = refName.trim();
+                    if (refName.isEmpty()) {
+                        continue;
+                    }
+                	if((nFoundTotal < iFirstToUse)
+                		|| (nFoundInPage >= pageSize)) {
+                		nFoundTotal++;
+                		continue;
+                	}
+            		nFoundTotal++;
+            		nFoundInPage++;
+            		appendToAuthRefsList(refName, schemaName, authRefFieldName, list);
 
                     // Otherwise, if this field has children, cycle through each child.
                     //
@@ -343,22 +370,53 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
                     Collection<Property> childProp = prop.getChildren();
                     for (Property cProp : childProp) {
                         if (DocumentUtils.isSimpleType(cProp) && cProp.getName().equals(descendantAuthRefFieldName)) {
-                            appendToAuthRefsList(cProp.getValue(String.class), schemaName, descendantAuthRefFieldName, list);
+                        	String refName = cProp.getValue(String.class);
+                            if (refName == null) {
+                                continue;
+                            }
+                            refName = refName.trim();
+                            if (refName.isEmpty()) {
+                                continue;
+                            }
+                        	if((nFoundTotal < iFirstToUse)
+                            		|| (nFoundInPage >= pageSize)) {
+                        		nFoundTotal++;
+                        		continue;
+                        	}
+                    		nFoundTotal++;
+                    		nFoundInPage++;
+                            appendToAuthRefsList(refName, schemaName, descendantAuthRefFieldName, list);
                         } else if ((DocumentUtils.isListType(cProp) || DocumentUtils.isComplexType(cProp))
                             && prop.size() > 0) {
                             Collection<Property> grandChildProp = cProp.getChildren();
                             for (Property gProp : grandChildProp) {
                                 if (DocumentUtils.isSimpleType(gProp) && gProp.getName().equals(descendantAuthRefFieldName)) {
-                                    appendToAuthRefsList(gProp.getValue(String.class), schemaName, descendantAuthRefFieldName, list);
+                                	String refName = gProp.getValue(String.class);
+                                    if (refName == null) {
+                                        continue;
+                                    }
+                                    refName = refName.trim();
+                                    if (refName.isEmpty()) {
+                                        continue;
+                                    }
+                                	if((nFoundTotal < iFirstToUse)
+                                    		|| (nFoundInPage >= pageSize)) {
+                                		nFoundTotal++;
+                                		continue;
+                                	}
+                            		nFoundTotal++;
+                            		nFoundInPage++;
+                                    appendToAuthRefsList(refName, schemaName, descendantAuthRefFieldName, list);
                                 }
                             }
                         }
                     }
-
                 }
-
             }
-
+            // Set num of items in list. this is useful to our testing framework.
+            commonList.setItemsInPage(nFoundInPage);
+            // set the total result size
+            commonList.setTotalItems(nFoundTotal);
             
         } catch (PropertyException pe) {
             String msg = "Attempted to retrieve value for invalid or missing authority field. "
@@ -382,9 +440,6 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
     private void appendToAuthRefsList(String refName, String schemaName,
             String fieldName, List<AuthorityRefList.AuthorityRefItem> list)
             throws Exception {
-        if (refName == null || refName.trim().isEmpty()) {
-            return;
-        }
         if (DocumentUtils.getSchemaNamePart(fieldName).isEmpty()) {
             fieldName = DocumentUtils.appendSchemaName(schemaName, fieldName);
         }

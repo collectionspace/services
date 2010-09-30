@@ -48,6 +48,7 @@ import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.service.ServiceBindingType;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
 /**
@@ -66,6 +67,10 @@ public class RefNameServiceUtils {
             String refName,
             int pageSize, int pageNum, boolean computeTotal) throws DocumentException, DocumentNotFoundException {
         AuthorityRefDocList wrapperList = new AuthorityRefDocList();
+        AbstractCommonList commonList = (AbstractCommonList) wrapperList;
+        commonList.setPageNum(pageNum);
+        commonList.setPageSize(pageSize);
+        
         List<AuthorityRefDocList.AuthorityRefDocItem> list =
                 wrapperList.getAuthorityRefDocItem();
         TenantBindingConfigReaderImpl tReader =
@@ -142,6 +147,10 @@ public class RefNameServiceUtils {
                 docTypes, whereClause.toString(), pageSize, pageNum, computeTotal);
         // Now we gather the info for each document into the list and return
         DocumentModelList docList = docListWrapper.getWrappedObject();
+        // Set num of items in list. this is useful to our testing framework.
+        commonList.setItemsInPage(docList.size());
+        // set the total result size
+        commonList.setTotalItems(docList.totalSize());
         Iterator<DocumentModel> iter = docList.iterator();
         while (iter.hasNext()) {
             DocumentModel docModel = iter.next();
