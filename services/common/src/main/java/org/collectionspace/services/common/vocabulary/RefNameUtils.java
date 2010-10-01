@@ -59,7 +59,7 @@ public class RefNameUtils {
     private static final int INSTANCE_DISPLAYNAME_TOKEN = 2;// optional displayName suffix
     private static final int INSTANCE_TOKENS_MIN = 2;
     private static final int INSTANCE_TOKENS_MAX = 3;
-    private static final String SEPARATOR = ":";
+    public static final String SEPARATOR = ":";
 
     public static class AuthorityInfo {
         private final Logger logger = LoggerFactory.getLogger(AuthorityInfo.class);
@@ -208,6 +208,37 @@ public class RefNameUtils {
     		}
     		return sb.toString();
     	}
+    }
+
+    /*
+     * Returns the name / shortIdentifier value of an authority item in a refName
+     */
+    public static String getItemShortId(String refName) {
+        String name = "";
+        try {
+            String [] refNameTokens = refName.substring(URN_PREFIX_LEN).split(SEPARATOR);
+            AuthorityTermInfo authTermInfo = new AuthorityTermInfo(refNameTokens);
+            name = authTermInfo.name;
+        } catch(Exception e) {
+            // do nothing
+        }
+        return name;
+    }
+
+    /**
+     * Creates a refName in the name / shortIdentifier form.
+     *
+     * @param shortId a shortIdentifier for an authority or one of its terms
+     * @return a refName for that authority or term, in the name / shortIdentifier form.
+     *         If the provided shortIdentifier is null or empty, returns
+     *         the empty string.
+     */
+    public static String createShortIdRefName(String shortId) {
+        if (shortId == null || shortId.trim().isEmpty()) {
+            return "";
+        } else {
+            return "urn:cspace:name("+shortId+")";
+        }
     }
     
 }

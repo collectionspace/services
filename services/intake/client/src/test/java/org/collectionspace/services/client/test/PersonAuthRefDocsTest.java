@@ -71,6 +71,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
     private List<String> intakeIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
+    private String personShortId = PERSON_AUTHORITY_NAME;
     private String currentOwnerPersonCSID = null;
     private String depositorPersonCSID = null;
     private String insurerPersonCSID = null;
@@ -79,6 +80,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
     private String conditionCheckerAssessorRefName = null;
     private String insurerRefName = null;
     private String valuerRefName = null;
+    private String valuerShortId = null;
     private final int NUM_AUTH_REF_DOCS_EXPECTED = 1;
 
     /* (non-Javadoc)
@@ -207,6 +209,9 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         csid = createPerson("Vince", "Valuer", "vinceValuer", authRefName);
         Assert.assertNotNull(csid);
         valuerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        if (logger.isDebugEnabled()) {
+            logger.debug("valuerShortId=" + valuerShortId);
+        }
         Assert.assertNotNull(valuerRefName);
         personIdsCreated.add(csid);
 
@@ -255,14 +260,17 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
         AuthorityRefDocList list = refDocListResp.getEntity();
+        List<AuthorityRefDocList.AuthorityRefDocItem> items =
+                list.getAuthorityRefDocItem();
+        Assert.assertTrue(items != null);
+        Assert.assertTrue(items.size() > 0);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
         boolean fFoundIntake = false;
         if (iterateThroughList && logger.isDebugEnabled()) {
-            List<AuthorityRefDocList.AuthorityRefDocItem> items =
-                    list.getAuthorityRefDocItem();
             int i = 0;
             logger.debug(testName + ": Docs that use: " + currentOwnerRefName);
             for (AuthorityRefDocList.AuthorityRefDocItem item : items) {
@@ -292,14 +300,17 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-        list = refDocListResp.getEntity();
 
+        list = refDocListResp.getEntity();
+        items = list.getAuthorityRefDocItem();
+        Assert.assertTrue(items != null);
+        Assert.assertTrue(items.size() > 0);
+        Assert.assertTrue(items.get(0) != null);
+        
         // Optionally output additional data about list members for debugging.
         iterateThroughList = true;
         fFoundIntake = false;
         if (iterateThroughList && logger.isDebugEnabled()) {
-            List<AuthorityRefDocList.AuthorityRefDocItem> items =
-                    list.getAuthorityRefDocItem();
             int i = 0;
             logger.debug(testName + ": Docs that use: " + depositorRefName);
             for (AuthorityRefDocList.AuthorityRefDocItem item : items) {
@@ -347,14 +358,18 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
         AuthorityRefDocList list = refDocListResp.getEntity();
+        List<AuthorityRefDocList.AuthorityRefDocItem> items =
+                list.getAuthorityRefDocItem();
+        Assert.assertTrue(items != null);
+        Assert.assertTrue(items.size() > 0);
+        Assert.assertTrue(items.get(0) != null);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
         boolean fFoundIntake = false;
         if (iterateThroughList && logger.isDebugEnabled()) {
-            List<AuthorityRefDocList.AuthorityRefDocItem> items =
-                    list.getAuthorityRefDocItem();
             int i = 0;
             logger.debug(testName + ": Docs that use: " + insurerRefName);
             for (AuthorityRefDocList.AuthorityRefDocItem item : items) {
@@ -372,6 +387,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
             Assert.assertTrue(fFoundIntake, "Did not find Intake with authref!");
         }
     }
+
 
     // ---------------------------------------------------------------
     // Cleanup of resources created during testing
