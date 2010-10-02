@@ -223,7 +223,36 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     }
 
     /**
-     * Creates the item in authority.
+     * Creates the item with an empty short identifier.
+     *
+     * @param testName the test name
+     */
+ /*
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        groups = {"create"}, dependsOnMethods = {"create"})
+    public void createItemWithEmptyShortId(String testName) {
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupCreate();
+
+        // Fill the property map
+        String shortId = "";
+        Map<String, String> fieldProperties = new HashMap<String,String>();
+        fieldProperties.put(PersonJAXBSchema.DISPLAY_NAME_COMPUTED, "false");
+        fieldProperties.put(PersonJAXBSchema.DISPLAY_NAME, "Rod Beck");
+        fieldProperties.put(PersonJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED, "false");
+        fieldProperties.put(PersonJAXBSchema.SHORT_DISPLAY_NAME, "RodBeck");
+
+        final Map NULL_REPEATABLE_FIELD_PROPERTIES = null;
+        String newID = createItemInAuthority(knownResourceId, knownResourceRefName,
+                shortId, fieldProperties, NULL_REPEATABLE_FIELD_PROPERTIES);
+        allResourceIdsCreated.add(newID);
+    }
+*/
+
+    /**
+     * Creates an item in an authority, using test data.
      *
      * @param vcsid the vcsid
      * @param authRefName the auth ref name
@@ -236,9 +265,6 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
             logger.debug(testName + ":"+vcsid+"...");
         }
 
-        // Submit the request to the service and store the response.
-        PersonAuthorityClient client = new PersonAuthorityClient();
-        
         Map<String, String> johnWayneMap = new HashMap<String,String>();
         //
         // Fill the property map
@@ -249,7 +275,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         johnWayneMap.put(PersonJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED, "false");
         johnWayneMap.put(PersonJAXBSchema.SHORT_DISPLAY_NAME, "JohnWayne");
         johnWayneMap.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
-        
+
         johnWayneMap.put(PersonJAXBSchema.FORE_NAME, TEST_FORE_NAME);
         johnWayneMap.put(PersonJAXBSchema.SUR_NAME, TEST_SUR_NAME);
         johnWayneMap.put(PersonJAXBSchema.GENDER, "male");
@@ -269,9 +295,33 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         johnWayneGroups.add("Scottish");
         johnWayneRepeatablesMap.put(PersonJAXBSchema.GROUPS, johnWayneGroups);
 
+        return createItemInAuthority(vcsid, authRefName, shortId, johnWayneMap, johnWayneRepeatablesMap);
+
+    }
+
+    /**
+     * Creates an item in an authority.
+     *
+     * @param vcsid the vcsid
+     * @param authRefName the auth ref name
+     * @param itemFieldProperties a set of properties specifying the values of fields.
+     * @param itemRepeatableFieldProperties a set of properties specifying the values of repeatable fields.
+     * @return the string
+     */
+    private String createItemInAuthority(String vcsid, String authRefName, String shortId,
+            Map itemFieldProperties, Map itemRepeatableFieldProperties) {
+
+        final String testName = "createItemInAuthority";
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ":"+vcsid+"...");
+        }
+
+        // Submit the request to the service and store the response.
+        PersonAuthorityClient client = new PersonAuthorityClient();
+        
         MultipartOutput multipart = 
-            PersonAuthorityClientUtils.createPersonInstance(vcsid, authRefName, johnWayneMap,
-                johnWayneRepeatablesMap, client.getItemCommonPartName() );
+            PersonAuthorityClientUtils.createPersonInstance(vcsid, authRefName, itemFieldProperties,
+                itemRepeatableFieldProperties, client.getItemCommonPartName() );
 
         String newID = null;
         ClientResponse<Response> res = client.createItem(vcsid, multipart);
@@ -501,6 +551,102 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 */
+
+    /**
+     * Attempts to create an authority with an short identifier that contains
+     * non-word characters.
+     *
+     * @param testName the test name
+     */
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        groups = {"create", "nonWordCharsInShortId"})
+    public void createWithShortIdNonWordChars(String testName) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        EXPECTED_STATUS_CODE = STATUS_BAD_REQUEST;
+        REQUEST_TYPE = ServiceRequestType.CREATE;
+        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE);
+
+        // Create the payload to be included in the body of the request
+        PersonAuthorityClient client = new PersonAuthorityClient();
+        String shortId = createIdentifier() + "*" + createIdentifier();
+    	String displayName = "displayName-" + shortId;
+        MultipartOutput multipart =
+            PersonAuthorityClientUtils.createPersonAuthorityInstance(
+    	    displayName, shortId, client.getCommonPartName());
+
+        // Submit the request to the service and store the response.
+    	ClientResponse<Response> res = client.create(multipart);
+
+ 	// Check the status code of the response: does it match
+	// the expected response(s)?
+        try {
+            int statusCode = res.getStatus();
+            if(logger.isDebugEnabled()){
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(this.REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(this.REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, this.EXPECTED_STATUS_CODE);
+    	} finally {
+    		res.releaseConnection();
+    	}
+
+    }
+
+    /**
+     * Attempts to create an item with an short identifier that contains
+     * non-word characters.
+     *
+     * @param testName the test name
+     */
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        groups = {"create", "nonWordCharsInShortId"}, dependsOnMethods = {"create"})
+    public void createItemWithShortIdNonWordChars(String testName) {
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        EXPECTED_STATUS_CODE = STATUS_BAD_REQUEST;
+        REQUEST_TYPE = ServiceRequestType.CREATE;
+        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE);
+
+         PersonAuthorityClient client = new PersonAuthorityClient();
+
+        // Create the payload to be included in the body of the request
+        String shortId = "7-Eleven";
+        Map<String, String> fieldProperties = new HashMap<String,String>();
+        fieldProperties.put(PersonJAXBSchema.DISPLAY_NAME_COMPUTED, "false");
+        fieldProperties.put(PersonJAXBSchema.DISPLAY_NAME, shortId);
+        fieldProperties.put(PersonJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED, "false");
+        fieldProperties.put(PersonJAXBSchema.SHORT_DISPLAY_NAME, shortId);
+        fieldProperties.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
+        final Map NULL_REPEATABLE_FIELD_PROPERTIES = null;
+        MultipartOutput multipart =
+            PersonAuthorityClientUtils.createPersonInstance(knownResourceId,
+                knownResourceRefName, fieldProperties,
+                NULL_REPEATABLE_FIELD_PROPERTIES, client.getItemCommonPartName());
+        
+        // Send the request and receive a response
+        ClientResponse<Response> res = client.createItem(knownResourceId, multipart);
+
+        // Check the status code of the response: does it match
+	// the expected response(s)?
+        try {
+            int statusCode = res.getStatus();
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            if(logger.isDebugEnabled()){
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                    invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+            Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+        } finally {
+        	res.releaseConnection();
+
+        }
+    }
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE LIST tests

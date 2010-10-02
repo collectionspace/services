@@ -252,36 +252,41 @@ public class PersonAuthorityClientUtils {
         	person.setBirthPlace(value);
         if((value = (String)personInfo.get(PersonJAXBSchema.DEATH_PLACE))!=null)
         	person.setDeathPlace(value);
-        if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.GROUPS))!=null) {
-                GroupList groupsList = new GroupList();
-                List<String> groups = groupsList.getGroup();
-        	groups.addAll(values);
-                person.setGroups(groupsList);
-        }
-        if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.NATIONALITIES))!=null) {
-                NationalityList nationalitiesList = new NationalityList();
-                List<String> nationalities = nationalitiesList.getNationality();
-        	nationalities.addAll(values);
-                person.setNationalities(nationalitiesList);
-        }
         if((value = (String)personInfo.get(PersonJAXBSchema.GENDER))!=null)
         	person.setGender(value);
-        if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.OCCUPATIONS))!=null) {
-                OccupationList occupationsList = new OccupationList();
-                List<String> occupations = occupationsList.getOccupation();
-        	occupations.addAll(values);
-                person.setOccupations(occupationsList);
-        }
-        if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.SCHOOLS_OR_STYLES))!=null) {
-                SchoolOrStyleList schoolOrStyleList = new SchoolOrStyleList();
-                List<String> schoolsOrStyles = schoolOrStyleList.getSchoolOrStyle();
-        	schoolsOrStyles.addAll(values);
-                person.setSchoolsOrStyles(schoolOrStyleList);
-        }
-        if((value = (String)personInfo.get(PersonJAXBSchema.BIO_NOTE))!=null)
+         if((value = (String)personInfo.get(PersonJAXBSchema.BIO_NOTE))!=null)
         	person.setBioNote(value);
         if((value = (String)personInfo.get(PersonJAXBSchema.NAME_NOTE))!=null)
         	person.setNameNote(value);
+        
+        if (personRepeatablesInfo != null) {
+            if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.GROUPS))!=null) {
+                    GroupList groupsList = new GroupList();
+                    List<String> groups = groupsList.getGroup();
+                    groups.addAll(values);
+                    person.setGroups(groupsList);
+            }
+            if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.NATIONALITIES))!=null) {
+                    NationalityList nationalitiesList = new NationalityList();
+                    List<String> nationalities = nationalitiesList.getNationality();
+                    nationalities.addAll(values);
+                    person.setNationalities(nationalitiesList);
+            }
+
+            if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.OCCUPATIONS))!=null) {
+                    OccupationList occupationsList = new OccupationList();
+                    List<String> occupations = occupationsList.getOccupation();
+                    occupations.addAll(values);
+                    person.setOccupations(occupationsList);
+            }
+            if((values = (List<String>)personRepeatablesInfo.get(PersonJAXBSchema.SCHOOLS_OR_STYLES))!=null) {
+                    SchoolOrStyleList schoolOrStyleList = new SchoolOrStyleList();
+                    List<String> schoolsOrStyles = schoolOrStyleList.getSchoolOrStyle();
+                    schoolsOrStyles.addAll(values);
+                    person.setSchoolsOrStyles(schoolOrStyleList);
+            }
+        }
+
         
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(person,
@@ -414,6 +419,7 @@ public class PersonAuthorityClientUtils {
      */
     public static String extractId(ClientResponse<Response> res) {
         MultivaluedMap<String, Object> mvm = res.getMetadata();
+        // FIXME: This may throw an NPE if the Location: header isn't present
         String uri = (String) ((ArrayList<Object>) mvm.get("Location")).get(0);
         if(logger.isDebugEnabled()){
         	logger.debug("extractId:uri=" + uri);

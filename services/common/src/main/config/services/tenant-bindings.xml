@@ -490,6 +490,9 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.organization.nuxeo.OrgAuthorityDocumentModelHandler
             </service:documentHandler>
+            <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.organization.nuxeo.OrgAuthorityValidatorHandler
+            </service:validatorHandler>
             <service:object id="1" name="Orgauthority" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -582,6 +585,9 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.person.nuxeo.PersonAuthorityDocumentModelHandler
             </service:documentHandler>
+            <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.person.nuxeo.PersonAuthorityValidatorHandler
+            </service:validatorHandler>
             <service:object id="1" name="Personauthority" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -664,6 +670,9 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.location.nuxeo.LocationAuthorityDocumentModelHandler
             </service:documentHandler>
+            <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.location.nuxeo.LocationAuthorityValidatorHandler
+            </service:validatorHandler>
             <service:object id="1" name="Locationauthority" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -1630,6 +1639,9 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.organization.nuxeo.OrgAuthorityDocumentModelHandler
             </service:documentHandler>
+            <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.organization.nuxeo.OrgAuthorityValidatorHandler
+            </service:validatorHandler>
             <service:object id="1" name="Orgauthority" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -1726,6 +1738,9 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.person.nuxeo.PersonAuthorityDocumentModelHandler
             </service:documentHandler>
+            <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.person.nuxeo.PersonAuthorityValidatorHandler
+            </service:validatorHandler>
             <service:object id="1" name="Personauthority" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -1808,6 +1823,9 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.location.nuxeo.LocationAuthorityDocumentModelHandler
             </service:documentHandler>
+            <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.location.nuxeo.LocationAuthorityValidatorHandler
+            </service:validatorHandler>
             <service:object id="1" name="Locationauthority" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
