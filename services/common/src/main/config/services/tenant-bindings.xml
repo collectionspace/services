@@ -670,9 +670,6 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.location.nuxeo.LocationAuthorityDocumentModelHandler
             </service:documentHandler>
-            <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
-                org.collectionspace.services.location.nuxeo.LocationAuthorityValidatorHandler
-            </service:validatorHandler>
             <service:object id="1" name="Locationauthority" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -1823,9 +1820,6 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.location.nuxeo.LocationAuthorityDocumentModelHandler
             </service:documentHandler>
-            <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
-                org.collectionspace.services.location.nuxeo.LocationAuthorityValidatorHandler
-            </service:validatorHandler>
             <service:object id="1" name="Locationauthority" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
