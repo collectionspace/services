@@ -23,6 +23,8 @@
       <schema name="dublincore"/>
       <schema name="collectionspace_core"/>
       <schema name="persons_common"/>
+      <prefetch>persons_common:displayName persons_common:refName persons_common:shortIdentifier</prefetch>
     </doctype>
   </extension>
+    
 </component>
