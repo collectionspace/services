@@ -11,6 +11,11 @@
             <schema name="collectionspace_core"/>
             <schema name="collectionobjects_common"/>
             <schema name="collectionobjects_naturalhistory"/>
+            <prefetch>
+            collectionobjects_common:objectNumber
+            collectionobjects_common:objectNameList
+            collectionobjects_common:title
+            collectionobjects_common:responsibleDepartments</prefetch>
         </doctype>
     </extension>
 </component>
