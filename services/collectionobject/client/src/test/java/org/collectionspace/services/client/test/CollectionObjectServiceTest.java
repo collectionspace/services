@@ -73,6 +73,8 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
     private final String OBJECT_NAME_VALUE = "an object name";
     private final String UPDATED_MEASURED_PART_VALUE = "updated measured part value";
+    private final String UTF8_TITLE = "Audiorecording album cover signed by Lech "
+            + "Wa" + '\u0142' + '\u0119' + "sa";
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
@@ -302,7 +304,35 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         }
         testSubmitRequest(newId);
     }
-    
+
+    /**
+     * Creates a CollectionObject resource, one of whose fields contains
+     * non-Latin 1 Unicode UTF-8 characters.
+     *
+     * @param testName the test name
+     * @throws Exception the exception
+     */
+ /*
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+        dependsOnMethods = {"create", "testSubmitRequest"}, groups={"utf8-create"})
+    public void createWithUTF8Title(String testName) throws Exception {
+    	String testDataDir = System.getProperty("test-data.fileName");
+    	String newId =
+            createFromXmlFile(testName, testDataDir + "/cspace-2779-utf-8-create.xml", false);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Created record with UTF-8 chars in payload.");
+            logger.debug("Attempting to retrieve just-created record ...");
+        }
+        CollectionobjectsCommon collectionObject = readCollectionObjectCommonPart(newId);
+        String title = collectionObject.getTitle();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Sent title: " + UTF8_TITLE);
+            logger.debug("Received title: " + title);
+        }
+        Assert.assertTrue(title.equals(UTF8_TITLE));
+    }
+ */
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.ServiceTest#createList()
      */
