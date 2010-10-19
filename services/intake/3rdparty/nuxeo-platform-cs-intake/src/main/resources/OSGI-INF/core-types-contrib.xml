@@ -9,6 +9,7 @@
       <schema name="dublincore"/>
       <schema name="collectionspace_core"/>
       <schema name="intakes_common"/>
+      <prefetch>intakes_common:entryNumber intakes_common:depositor intakes_common:currentOwner</prefetch>
     </doctype>
   </extension>
 </component>

@@ -9,6 +9,10 @@
       <schema name="dublincore"/>
       <schema name="collectionspace_core"/>
       <schema name="acquisitions_common"/>
+      <prefetch>
+      	acquisitions_common:acquisitionReferenceNumber
+      	acquisitions_common:acquisitionSources
+      	acquisitions_common:owners</prefetch>
     </doctype>
   </extension>
 </component>

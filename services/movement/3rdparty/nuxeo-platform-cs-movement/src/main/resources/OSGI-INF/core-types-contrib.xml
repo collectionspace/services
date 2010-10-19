@@ -9,6 +9,11 @@
       <schema name="dublincore"/>
       <schema name="collectionspace_core"/>
       <schema name="movements_common"/>
+      <prefetch>
+      	movements_common:movementReferenceNumber
+      	movements_common:currentLocation
+      	movements_common:locationDate
+      </prefetch>
     </doctype>
   </extension>
 </component>

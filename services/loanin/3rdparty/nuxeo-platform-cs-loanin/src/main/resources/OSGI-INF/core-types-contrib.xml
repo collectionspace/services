@@ -9,6 +9,11 @@
       <schema name="dublincore"/>
       <schema name="collectionspace_core"/>
       <schema name="loansin_common"/>
+      <prefetch>
+      	loansin_common:loanInNumber
+      	loansin_common:lender
+      	loansin_common:loanReturnDate
+      </prefetch>
     </doctype>
   </extension>
 </component>
