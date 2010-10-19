@@ -23,6 +23,11 @@
       <schema name="dublincore"/>
       <schema name="collectionspace_core"/>
       <schema name="organizations_common"/>
+      <prefetch>
+      	organizations_common:displayName
+      	organizations_common:refName
+      	organizations_common:shortIdentifier
+      </prefetch>      
     </doctype>
   </extension>
 </component>
