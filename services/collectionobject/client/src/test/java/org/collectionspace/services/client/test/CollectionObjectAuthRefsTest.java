@@ -82,6 +82,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     
     /** The person authority name. */
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
+    final String PERSON_AUTHORITY_NAME_DISPLAY = "TestPersonAuth_DisplayName";
 
     /** The organization authority name. */
     final String ORG_AUTHORITY_NAME = "TestOrgAuth";
@@ -119,6 +120,31 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     private String ownerRefName = null;
     private String fieldCollectionSourceRefName = null;
     private String fieldCollectorRefName = null;
+
+    public String toString(){
+        String result = "CollectionObjectauthRefsTest: "
+                        + "\r\npersonAuthCSID: "+personAuthCSID
+                        + "\r\npersonAuthRefName: "+personAuthRefName
+                        + "\r\norgAuthCSID: "+orgAuthCSID
+                        + "\r\norgAuthRefName: "+orgAuthRefName
+                        + "\r\n"
+                        + "\r\n contentOrganizationRefName: "+contentOrganizationRefName
+                        + "\r\n contentPersonRefName: "+contentPersonRefName
+                        + "\r\n contentInscriberRefName: "+contentInscriberRefName
+                        + "\r\n descriptionInscriberRefName: "+descriptionInscriberRefName
+                        + "\r\n objectProductionPersonRefName: "+objectProductionPersonRefName
+                        + "\r\n objectProductionOrganizationRefName: "+objectProductionOrganizationRefName
+                        + "\r\n assocEventOrganizationRefName: "+assocEventOrganizationRefName
+                        + "\r\n assocEventPersonRefName: "+assocEventPersonRefName
+                        + "\r\n assocOrganizationRefName: "+assocOrganizationRefName
+                        + "\r\n assocPersonRefName: "+assocPersonRefName
+                        + "\r\n ownerRefName: "+ownerRefName
+                        + "\r\n fieldCollectionSourceRefName: "+fieldCollectionSourceRefName
+                        + "\r\n fieldCollectorRefName: "+fieldCollectorRefName;
+        StringBuffer buff = new StringBuffer();
+
+        return result;
+    }
 
     /** The number of authority references expected. */
     private final int NUM_AUTH_REFS_EXPECTED = 13;
@@ -272,7 +298,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
      */
     protected void createPersonRefs(){
 
-        createPersonAuthority(PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME);
+        createPersonAuthority(PERSON_AUTHORITY_NAME_DISPLAY, PERSON_AUTHORITY_NAME);
 
         String csid = "";
         
@@ -457,6 +483,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         Assert.assertEquals(collectionObject.getAssocEventOrganizations().getAssocEventOrganization().get(0), assocEventOrganizationRefName);
 
         // Optionally output additional data about list members for debugging.
+        logger.info(this.toString());
         boolean iterateThroughList = true;
         if(iterateThroughList && logger.isDebugEnabled()){;
             int i = 0;
