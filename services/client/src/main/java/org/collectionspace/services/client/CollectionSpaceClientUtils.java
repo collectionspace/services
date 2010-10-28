@@ -212,11 +212,6 @@ public class CollectionSpaceClientUtils {
      */
     static public Object getObjectFromFile(Class<?> jaxbClass, String fileName)
             throws Exception {
-
-        JAXBContext context = JAXBContext.newInstance(jaxbClass);
-        Unmarshaller unmarshaller = context.createUnmarshaller();
-        //note: setting schema to null will turn validator off
-        unmarshaller.setSchema(null);
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         InputStream is = tccl.getResourceAsStream(fileName);
         return getObjectFromStream(jaxbClass, is);
