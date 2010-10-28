@@ -417,12 +417,13 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
             logger.debug(testName + ": received = " + actual
                     + " expected=" + EXPECTED_ITEMS);
         }
-        Assert.assertEquals(EXPECTED_ITEMS, list.getPermissions().size());
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
         if (iterateThroughList && logger.isDebugEnabled()) {
             printList(testName, list);
         }
+        Assert.assertEquals(EXPECTED_ITEMS, list.getPermissions().size());
+
     }
 
     // Failure outcomes
