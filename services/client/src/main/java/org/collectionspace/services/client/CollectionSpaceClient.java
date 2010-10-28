@@ -33,18 +33,12 @@ import org.jboss.resteasy.client.ClientResponse;
  */
 public interface CollectionSpaceClient {
 
-    /** The AUTH property. */
-    String AUTH_PROPERTY = "cspace.auth";
-    /** The PASSWORD property. */
-    String PASSWORD_PROPERTY = "cspace.password";
-    /** The SSL property. */
-    String SSL_PROPERTY = "cspace.ssl";
-    /** The URL property. */
-    String URL_PROPERTY = "cspace.url";
-    /** The USER property. */
-    String USER_PROPERTY = "cspace.user";
-    /** The tenant property */
-    String TENANT_PROPERTY = "cspace.tenant";
+    public static final String AUTH_PROPERTY = "cspace.auth";
+    public static final String PASSWORD_PROPERTY = "cspace.password";
+    public static final String SSL_PROPERTY = "cspace.ssl";
+    public static final String URL_PROPERTY = "cspace.url";
+    public static final String USER_PROPERTY = "cspace.user";
+    public static final String TENANT_PROPERTY = "cspace.tenant";
 
     /**
      * Gets the proxy.
