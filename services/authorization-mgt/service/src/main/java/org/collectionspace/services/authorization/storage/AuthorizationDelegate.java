@@ -87,7 +87,7 @@ public class AuthorizationDelegate {
                 logger.error(msg);
                 throw new DocumentNotFoundException(msg);
             }
-            String[] roles = {rv.getRoleName()};
+            String[] roles = {r.getRoleName()}; //this ensures we're getting the "ROLE" prefix/qualified name
             for (PermissionValue pv : pr.getPermissions()) {
                 Permission p = getPermission(pv.getPermissionId());
                 if (p == null) {
