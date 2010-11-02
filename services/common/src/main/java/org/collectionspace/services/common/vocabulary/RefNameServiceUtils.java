@@ -260,14 +260,14 @@ public class RefNameServiceUtils {
         if (fieldValue instanceof List) {
             List<String> fieldValueList = (List) fieldValue;
             for (String listItemValue : fieldValueList) {
-                if (refName.equals(listItemValue)) {
+                if (refName.equalsIgnoreCase(listItemValue)) {
                     result = true;
                     break;
                 }
 
             }
-        } else {
-            if (refName.equals(fieldValue)) {
+        } else if (fieldValue instanceof String){
+            if (refName.equalsIgnoreCase((String)fieldValue)) {
                 result = true;
             }
         }
