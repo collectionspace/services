@@ -87,7 +87,9 @@ public class AuthorizationDelegate {
                 logger.error(msg);
                 throw new DocumentNotFoundException(msg);
             }
-            String[] roles = {r.getRoleName()}; //this ensures we're getting the "ROLE" prefix/qualified name
+            //using r not rv ensures we're getting the "ROLE" prefix/qualified name
+            // This needs to use the qualified name, not the display name
+            String[] roles = {r.getRoleName()};
             for (PermissionValue pv : pr.getPermissions()) {
                 Permission p = getPermission(pv.getPermissionId());
                 if (p == null) {
@@ -136,7 +138,9 @@ public class AuthorizationDelegate {
                 logger.error(msg);
                 throw new DocumentNotFoundException(msg);
             }
-            String[] roles = {rv.getRoleName()};
+            //using r not rv ensures we're getting the "ROLE" prefix/qualified name
+            // This needs to use the qualified name, not the display name
+            String[] roles = {r.getRoleName()}; 
             for (PermissionValue pv : pr.getPermissions()) {
                 Permission p = getPermission(pv.getPermissionId());
                 if (p == null) {

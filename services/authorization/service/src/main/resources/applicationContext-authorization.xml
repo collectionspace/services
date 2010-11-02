@@ -82,8 +82,9 @@
     <tx:annotation-driven transaction-manager="transactionManager" />
 
     <bean id="cspaceAuthorizationProvider" class="org.collectionspace.services.authorization.spring.SpringAuthorizationProvider">
-        <property name="providerAclService" ref="aclService"/>
-        <property name="providerPermissionEvaluator" ref="permissionEvaluator"/>
-        <property name="txManager" ref="transactionManager"/>
+       <property name="providerAclService" ref="aclService"/>
+       <property name="providerPermissionEvaluator" ref="permissionEvaluator"/>
+       <property name="txManager" ref="transactionManager"/>
+			 <property name="providerAclCache" ref="aclCache"/>
     </bean>
 </beans>

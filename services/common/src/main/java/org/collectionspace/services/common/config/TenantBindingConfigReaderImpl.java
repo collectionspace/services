@@ -160,14 +160,17 @@ public class TenantBindingConfigReaderImpl
             throw new IllegalArgumentException("no service binding found for " + serviceName
                     + " of tenant with id=" + tenantId);
         }
-        if (serviceBinding.getRepositoryDomain() == null) {
+        String repoDomain = serviceBinding.getRepositoryDomain(); 
+        if (repoDomain == null) {
+        	/* This is excessive - every call to a JPA based service dumps this msg.
             if (logger.isDebugEnabled()) {
                 logger.debug("No repository domain configured for " + serviceName
                         + " of tenant with id=" + tenantId);
             }
+            */
             return null;
         }
-        return domains.get(serviceBinding.getRepositoryDomain().trim());
+        return domains.get(repoDomain.trim());
     }
 
     /**

@@ -42,4 +42,6 @@ public interface CSpaceAuthorizationProvider {
     public CSpacePermissionEvaluator getPermissionEvaluator();
 
     public CSpacePermissionManager getPermissionManager();
+    
+    public void clearAclCache();
 }

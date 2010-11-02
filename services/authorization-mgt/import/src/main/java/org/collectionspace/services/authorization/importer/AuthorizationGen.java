@@ -333,6 +333,7 @@ public class AuthorizationGen {
         List<RoleValue> roleValues = new ArrayList<RoleValue>();
         for (Role role : roles) {
             RoleValue rv = new RoleValue();
+            // This needs to use the qualified name, not the display name
             rv.setRoleName(role.getRoleName().toUpperCase());
             rv.setRoleId(role.getCsid());
             roleValues.add(rv);

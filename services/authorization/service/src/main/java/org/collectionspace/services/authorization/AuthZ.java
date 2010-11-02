@@ -96,6 +96,7 @@ public class AuthZ {
     public void addPermissions(CSpaceResource res, CSpaceAction action, String[] principals, boolean grant)
             throws PermissionException {
         provider.getPermissionManager().addPermissions(res, action, principals, grant);
+        provider.clearAclCache();
     }
 
     /**
@@ -121,6 +122,7 @@ public class AuthZ {
     public void deletePermissions(CSpaceResource res, CSpaceAction action, String[] principals)
             throws PermissionNotFoundException, PermissionException {
         provider.getPermissionManager().deletePermissions(res, action, principals);
+        provider.clearAclCache();
     }
 
     /**
@@ -138,6 +140,7 @@ public class AuthZ {
             deletePermissions(res, action);
         } else {
             provider.getPermissionManager().deletePermissions(res);
+            provider.clearAclCache();
         }
     }
 
@@ -151,6 +154,7 @@ public class AuthZ {
     public void deletePermissions(CSpaceResource res, CSpaceAction action)
             throws PermissionNotFoundException, PermissionException {
         provider.getPermissionManager().deletePermissions(res, action);
+        provider.clearAclCache();
     }
 
     /**

@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.acls.domain.BasePermission;
+import org.springframework.security.acls.domain.EhCacheBasedAclCache;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
 import org.springframework.security.acls.model.MutableAclService;
@@ -58,6 +59,8 @@ public class SpringAuthorizationProvider implements CSpaceAuthorizationProvider 
     private PermissionEvaluator providerPermissionEvaluator;
     @Autowired
     private DataSourceTransactionManager txManager;
+		@Autowired
+		private EhCacheBasedAclCache providerAclCache;
     private SpringPermissionEvaluator permissionEvaluator;
     private SpringPermissionManager permissionManager;
     private String version = "1.0";
@@ -159,6 +162,34 @@ public class SpringAuthorizationProvider implements CSpaceAuthorizationProvider 
      */
     public void setTxManager(DataSourceTransactionManager txManager) {
         this.txManager = txManager;
+    }
+
+    /**
+     * @return the providerAclCache
+     */
+    EhCacheBasedAclCache getProviderAclCache() {
+        return providerAclCache;
+    }
+
+    /**
+     * @param providerAclCache the providerAclCache to set
+     */
+    public void setProviderAclCache(EhCacheBasedAclCache providerAclCache) {
+        this.providerAclCache = providerAclCache;
+    }
+
+    /**
+     * clear the ACL Cache associated with the provider
+     */
+    public void clearAclCache() {
+    	if(providerAclCache != null) {
+    		providerAclCache.clearCache();
+            if (log.isDebugEnabled()) {
+                log.debug("Clearing providerAclCache.");
+            }
+    	} else {
+            log.error("providerAclCache is NULL!");
+    	}
     }
 
     TransactionStatus beginTransaction(String name) {
