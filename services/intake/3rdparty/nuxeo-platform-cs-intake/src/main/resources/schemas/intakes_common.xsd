@@ -92,11 +92,7 @@
     
     <!-- Object Location Information Group -->
 
-    <!-- FIXME Start of Current location repeatable group -->
-    <xs:element name="currentLocation" type="xs:string"/>
-    <xs:element name="currentLocationFitness" type="xs:string"/>
-    <xs:element name="currentLocationNote" type="xs:string"/>
-    <!-- FIXME End of Current location repeatable group -->
+    <xs:element name="currentLocationList" type="currentLocationList"/>
 
     <xs:element name="locationDate" type="xs:string"/>
     <xs:element name="normalLocation" type="xs:string"/>
@@ -126,5 +122,19 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <xs:complexType name="currentLocationList">
+        <xs:sequence>
+            <xs:element name="currentLocationGroup" type="currentLocationGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="currentLocationGroup">
+        <xs:sequence>
+            <xs:element name="currentLocation" type="xs:string"/>
+            <xs:element name="currentLocationFitness" type="xs:string"/>
+            <xs:element name="currentLocationNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
 
 </xs:schema>
