@@ -10,7 +10,7 @@
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="" />
     <property name="src" location="src"/>
-    <property name="authorization.jar" value="cspace-services-authz.jar"/>
+    <property name="authorization.jar" value="collectionspace-services-authz-mgt.jar"/>
     <condition property="osfamily-unix">
         <os family="unix" />
     </condition>
@@ -109,6 +109,7 @@
         </exec>
     </target>
 
+<!--
     <target name="deploy" depends="install"
             description="deploy authorization service in ${jboss.server.cspace}">
         <copy file="${basedir}/target/${authorization.jar}" todir="${jboss.server.cspace}/lib"/>
@@ -120,6 +121,7 @@
         <delete file="${jboss.server.cspace}/lib/${authorization.jar}"/>
         <echo message="Check out authorization Service Configuration Guide on wiki.collectionspace.org for more details"/>
     </target>
+-->    
 
     <target name="dist"
             description="generate distribution for authorization service" depends="package">

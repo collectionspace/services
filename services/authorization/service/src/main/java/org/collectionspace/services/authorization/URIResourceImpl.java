@@ -121,6 +121,37 @@ public class URIResourceImpl extends CSpaceResourceImpl {
         return uri;
     }
 
+    /*
+     * Map a Permission ActionType to a CSpaceAction
+     */
+    public static CSpaceAction getAction(ActionType action) {
+    	System.out.println("Hello, world? " + action.name());
+    	System.out.println("Hello, world? " + ActionType.CREATE.name());
+    	
+    	try {
+        if (ActionType.CREATE.name().equals(action.name())) {
+            return CSpaceAction.CREATE;
+        } else if (ActionType.READ.equals(action)) {
+            return CSpaceAction.READ;
+        } else if (ActionType.UPDATE.equals(action)) {
+            return CSpaceAction.UPDATE;
+        } else if (ActionType.DELETE.equals(action)) {
+            return CSpaceAction.DELETE;
+        } else if (ActionType.SEARCH.equals(action)) {
+            return CSpaceAction.SEARCH;
+        } else if (ActionType.ADMIN.equals(action)) {
+            return CSpaceAction.ADMIN;
+        } else if (ActionType.START.equals(action)) {
+            return CSpaceAction.START;
+        } else if (ActionType.STOP.equals(action)) {
+            return CSpaceAction.STOP;
+        }
+    	} catch (Exception x) {
+    		x.printStackTrace();
+    	}
+        throw new IllegalArgumentException("action = " + action.toString());
+    }
+    
     /**
      * getAction is a conveneniece method to get action
      * for given HTTP method invoked on the resource

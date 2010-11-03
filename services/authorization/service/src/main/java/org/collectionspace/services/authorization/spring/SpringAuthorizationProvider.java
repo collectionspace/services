@@ -113,7 +113,8 @@ public class SpringAuthorizationProvider implements CSpaceAuthorizationProvider 
     }
 
     static Long getObjectIdentityIdentifier(CSpaceResource res) {
-        return Long.valueOf(res.getId().hashCode());
+    	return res.getHashedId();
+        //return Long.valueOf(res.getId().hashCode());
     }
 
     static String getObjectIdentityType(CSpaceResource res) {

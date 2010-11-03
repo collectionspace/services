@@ -116,7 +116,7 @@ public class AuthorizationSeed {
         }
         List<PermissionAction> permActions = perm.getActions();
         for (PermissionAction permAction : permActions) {
-            CSpaceAction action = getAction(permAction.getName());
+            CSpaceAction action = URIResourceImpl.getAction(permAction.getName());
             URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(),
                     perm.getResourceName(), action);
             boolean grant = perm.getEffect().equals(EffectType.PERMIT) ? true : false;
@@ -129,7 +129,7 @@ public class AuthorizationSeed {
      * given ActionType
      * @param action
      * @return
-     */
+     *
     private CSpaceAction getAction(ActionType action) {
         if (ActionType.CREATE.equals(action)) {
             return CSpaceAction.CREATE;
@@ -150,6 +150,7 @@ public class AuthorizationSeed {
         }
         throw new IllegalArgumentException("action = " + action.toString());
     }
+    */
 
     static Object fromFile(Class jaxbClass, String fileName) throws Exception {
         InputStream is = new FileInputStream(fileName);

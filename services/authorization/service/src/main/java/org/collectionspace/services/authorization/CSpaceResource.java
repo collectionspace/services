@@ -44,6 +44,13 @@ public interface CSpaceResource {
      * @return
      */
     public String getId();
+    
+    /**
+     * Gets the hashed id.
+     *
+     * @return the hashed id
+     */
+    public Long getHashedId();
 
     /**
      * getType get type of the resource

@@ -87,6 +87,11 @@ public abstract class CSpaceResourceImpl implements CSpaceResource {
         //tenant-qualified id
         return tenantId + SEPARATOR_COLON + id;
     }
+    
+    @Override
+    public Long getHashedId() {
+    	return Long.valueOf(getId().hashCode());
+    }
 
     @Override
     public TYPE getType() {

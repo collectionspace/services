@@ -29,10 +29,16 @@ import java.util.UUID;
 
 import org.collectionspace.services.authorization.AccountRole;
 import org.collectionspace.services.authorization.AccountRoleRel;
+import org.collectionspace.services.authorization.ActionType;
+import org.collectionspace.services.authorization.AuthZ;
+import org.collectionspace.services.authorization.CSpaceAction;
+import org.collectionspace.services.authorization.EffectType;
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.PermissionAction;
+import org.collectionspace.services.authorization.PermissionActionUtil;
 import org.collectionspace.services.authorization.PermissionsList;
 import org.collectionspace.services.authorization.PermissionsRolesList;
+import org.collectionspace.services.authorization.URIResourceImpl;
 
 import org.collectionspace.services.common.document.AbstractDocumentHandlerImpl;
 import org.collectionspace.services.common.document.BadRequestException;
@@ -54,6 +60,54 @@ public class PermissionDocumentHandler
     private final Logger logger = LoggerFactory.getLogger(PermissionDocumentHandler.class);
     private Permission permission;
     private PermissionsList permissionsList;
+    
+    public CSpaceAction getAction(ActionType action) {
+    	System.out.println("Hello, world? " + action.name());
+    	System.out.println("Hello, world? " + ActionType.CREATE.name());
+    	
+    	try {
+        if (ActionType.CREATE.name().equals(action.name())) {
+            return CSpaceAction.CREATE;
+        } else if (ActionType.READ.equals(action)) {
+            return CSpaceAction.READ;
+        } else if (ActionType.UPDATE.equals(action)) {
+            return CSpaceAction.UPDATE;
+        } else if (ActionType.DELETE.equals(action)) {
+            return CSpaceAction.DELETE;
+        } else if (ActionType.SEARCH.equals(action)) {
+            return CSpaceAction.SEARCH;
+        } else if (ActionType.ADMIN.equals(action)) {
+            return CSpaceAction.ADMIN;
+        } else if (ActionType.START.equals(action)) {
+            return CSpaceAction.START;
+        } else if (ActionType.STOP.equals(action)) {
+            return CSpaceAction.STOP;
+        }
+    	} catch (Exception x) {
+    		x.printStackTrace();
+    	}
+        throw new IllegalArgumentException("action = " + action.toString());
+    }
+    
+    /*
+     * Add the ACE hashed ID to the permission action so we can map the permission to the Spring Security
+     * tables.
+     */
+    private void handlePermissionActions(Permission perm) {
+    	//FIXME: REM - Having Java class loader issues with ActionType class.  Not sure of the cause.
+    	try {
+	        List<PermissionAction> permActions = perm.getActions();
+	        for (PermissionAction permAction : permActions) {
+	            CSpaceAction action = getAction(permAction.getName());
+	            URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(),
+	                    perm.getResourceName(), action);
+	            permAction.setObjectIdentity(uriRes.getHashedId().toString());
+	            //PermissionActionUtil.update(perm, permAction);
+	        }
+    	} catch (Exception x) {
+    		x.printStackTrace();
+    	}
+    }
 
     @Override
     public void handleCreate(DocumentWrapper<Permission> wrapDoc) throws Exception {
@@ -61,6 +115,7 @@ public class PermissionDocumentHandler
         Permission permission = wrapDoc.getWrappedObject();
         permission.setCsid(id);
         setTenant(permission);
+        handlePermissionActions(permission);
     }
 
     @Override
@@ -105,6 +160,7 @@ public class PermissionDocumentHandler
             logger.debug("merged permission=" + JaxbUtils.toString(to, Permission.class));
         }
 
+        handlePermissionActions(to);
         return to;
     }
 

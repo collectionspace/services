@@ -37,6 +37,7 @@ import org.collectionspace.services.authorization.ActionType;
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.EffectType;
 import org.collectionspace.services.authorization.PermissionAction;
+import org.collectionspace.services.authorization.PermissionActionUtil;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.PermissionsList;
@@ -154,21 +155,20 @@ public class AuthorizationGen {
         ArrayList<PermissionAction> pas = new ArrayList<PermissionAction>();
         perm.setActions(pas);
 
-        PermissionAction pa = new PermissionAction();
-        pa.setName(ActionType.CREATE);
-        pas.add(pa);
-        PermissionAction pa1 = new PermissionAction();
-        pa1.setName(ActionType.READ);
-        pas.add(pa1);
-        PermissionAction pa2 = new PermissionAction();
-        pa2.setName(ActionType.UPDATE);
-        pas.add(pa2);
-        PermissionAction pa3 = new PermissionAction();
-        pa3.setName(ActionType.DELETE);
-        pas.add(pa3);
-        PermissionAction pa4 = new PermissionAction();
-        pa4.setName(ActionType.SEARCH);
-        pas.add(pa4);
+        PermissionAction permAction = PermissionActionUtil.create(perm, ActionType.CREATE);
+        pas.add(permAction);
+        
+        permAction = PermissionActionUtil.create(perm, ActionType.READ);
+        pas.add(permAction);
+        
+        permAction = PermissionActionUtil.create(perm, ActionType.UPDATE);
+        pas.add(permAction);
+        
+        permAction = PermissionActionUtil.create(perm, ActionType.DELETE);
+        pas.add(permAction);
+        
+        permAction = PermissionActionUtil.create(perm, ActionType.SEARCH);
+        pas.add(permAction);
         
         return perm;
     }
@@ -220,13 +220,12 @@ public class AuthorizationGen {
         ArrayList<PermissionAction> pas = new ArrayList<PermissionAction>();
         perm.setActions(pas);
 
-        PermissionAction pa1 = new PermissionAction();
-        pa1.setName(ActionType.READ);
-        pas.add(pa1);
+        PermissionAction permAction = PermissionActionUtil.create(perm, ActionType.READ);
+        pas.add(permAction);
 
-        PermissionAction pa4 = new PermissionAction();
-        pa4.setName(ActionType.SEARCH);
-        pas.add(pa4);
+        permAction = PermissionActionUtil.create(perm, ActionType.SEARCH);
+        pas.add(permAction);
+
         return perm;
     }
 
@@ -257,7 +256,6 @@ public class AuthorizationGen {
 
             Role rrole = buildTenantReaderRole(tenantId);
             readerRoles.add(rrole);
-
         }
     }
 
