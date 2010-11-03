@@ -62,10 +62,6 @@ public class PermissionDocumentHandler
     private PermissionsList permissionsList;
     
     public CSpaceAction getAction(ActionType action) {
-    	System.out.println("Hello, world? " + action.name());
-    	System.out.println("Hello, world? " + ActionType.CREATE.name());
-    	
-    	try {
         if (ActionType.CREATE.name().equals(action.name())) {
             return CSpaceAction.CREATE;
         } else if (ActionType.READ.equals(action)) {
@@ -83,9 +79,9 @@ public class PermissionDocumentHandler
         } else if (ActionType.STOP.equals(action)) {
             return CSpaceAction.STOP;
         }
-    	} catch (Exception x) {
-    		x.printStackTrace();
-    	}
+        //
+        // We could not find a match, so we need to throw an exception.
+        //
         throw new IllegalArgumentException("action = " + action.toString());
     }
     

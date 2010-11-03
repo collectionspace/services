@@ -124,11 +124,9 @@ public class URIResourceImpl extends CSpaceResourceImpl {
     /*
      * Map a Permission ActionType to a CSpaceAction
      */
+    //FIXME: This method is duplicated in PermissionDocumentHandler.java class.  The class loader was having
+    //trouble with the ActionType class file.  Not sure why?
     public static CSpaceAction getAction(ActionType action) {
-    	System.out.println("Hello, world? " + action.name());
-    	System.out.println("Hello, world? " + ActionType.CREATE.name());
-    	
-    	try {
         if (ActionType.CREATE.name().equals(action.name())) {
             return CSpaceAction.CREATE;
         } else if (ActionType.READ.equals(action)) {
@@ -146,9 +144,6 @@ public class URIResourceImpl extends CSpaceResourceImpl {
         } else if (ActionType.STOP.equals(action)) {
             return CSpaceAction.STOP;
         }
-    	} catch (Exception x) {
-    		x.printStackTrace();
-    	}
         throw new IllegalArgumentException("action = " + action.toString());
     }
     
