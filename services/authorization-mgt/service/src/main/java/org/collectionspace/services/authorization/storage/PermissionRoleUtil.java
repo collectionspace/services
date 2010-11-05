@@ -101,19 +101,23 @@ public class PermissionRoleUtil {
     		boolean handleDelete)
     			throws DocumentNotFoundException {
         if (subject.equals(SubjectType.ROLE)) {
-            //FIXME: potential index out of bounds exception...negative test needed
-            PermissionValue pv = pr.getPermissions().get(0);
-            for (RoleValue rv : pr.getRoles()) {
-                PermissionRoleRel prr = buildPermissonRoleRel(pv, rv, subject, handleDelete);
-                prrl.add(prr);
-            }
-        } else if (SubjectType.PERMISSION.equals(subject)) {
-            //FIXME: potential index out of bounds exception...negative test needed
-            RoleValue rv = pr.getRoles().get(0);
-            for (PermissionValue pv : pr.getPermissions()) {
-                PermissionRoleRel prr = buildPermissonRoleRel(pv, rv, subject, handleDelete);
-                prrl.add(prr);
-            }
+        	List<PermissionValue> permissionValues = pr.getPermissions();
+        	if (permissionValues != null && permissionValues.size() > 0) {
+	            PermissionValue pv = permissionValues.get(0);
+	            for (RoleValue rv : pr.getRoles()) {
+	                PermissionRoleRel prr = buildPermissonRoleRel(pv, rv, subject, handleDelete);
+	                prrl.add(prr);
+	            }
+        	}
+        } else if (subject.equals(SubjectType.PERMISSION)) {
+        	List<RoleValue> roleValues = pr.getRoles();
+        	if (roleValues != null && roleValues.size() > 0) {
+	            RoleValue rv = roleValues.get(0);
+	            for (PermissionValue pv : pr.getPermissions()) {
+	                PermissionRoleRel prr = buildPermissonRoleRel(pv, rv, subject, handleDelete);
+	                prrl.add(prr);
+	            }
+        	}
         }
     }
 
