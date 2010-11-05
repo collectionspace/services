@@ -233,8 +233,8 @@ public class PermissionRoleSubResource
         if (logger.isDebugEnabled()) {
             logger.debug("deletePermissionRole with csid=" + csid);
         }
-        ServiceContext<PermissionRole, PermissionRole> ctx = createServiceContext((PermissionRole) null, subject);
-        getStorageClient(ctx).delete(ctx, csid);
+        PermissionRole permRole = this.getPermissionRole(csid, subject);
+        this.deletePermissionRole(csid, subject, permRole);
     }
 
     /**
