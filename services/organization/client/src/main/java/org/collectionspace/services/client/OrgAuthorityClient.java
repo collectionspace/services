@@ -6,8 +6,8 @@
  * {Other Notes Relating to This Class (Optional)}
  *
  * $LastChangedBy: $
- * $LastChangedRevision: $
- * $LastChangedDate: $
+ * $LastChangedRevision$
+ * $LastChangedDate$
  *
  * This document is a part of the source code and related artifacts
  * for CollectionSpace, an open source collections management system

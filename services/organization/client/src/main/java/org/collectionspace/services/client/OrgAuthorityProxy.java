@@ -23,7 +23,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
- * @version $Revision:$
+ * @version $Revision$
  */
 @Path("/orgauthorities/")
 @Produces({"multipart/mixed"})

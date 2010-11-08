@@ -6,8 +6,8 @@
  * {Other Notes Relating to This Class (Optional)}
  *
  * $LastChangedBy: $
- * $LastChangedRevision: $
- * $LastChangedDate: $
+ * $LastChangedRevision$
+ * $LastChangedDate$
  *
  * This document is a part of the source code and related artifacts
  * for CollectionSpace, an open source collections management system
@@ -42,6 +42,7 @@ import org.collectionspace.services.organization.ContactNameList;
 import org.collectionspace.services.organization.FunctionList;
 import org.collectionspace.services.organization.GroupList;
 import org.collectionspace.services.organization.HistoryNoteList;
+import org.collectionspace.services.organization.MainBodyGroupList;
 import org.collectionspace.services.organization.OrganizationsCommon;
 import org.collectionspace.services.organization.OrgauthoritiesCommon;
 import org.collectionspace.services.organization.SubBodyList;
@@ -170,7 +171,7 @@ public class OrgAuthorityClientUtils {
      */
     public static String createItemInAuthority( String inAuthority,
     		String orgAuthorityRefName, Map<String, String> orgInfo,
-                Map<String, List<String>> orgRepeatablesInfo, OrgAuthorityClient client) {
+                Map<String, List<String>> orgRepeatablesInfo, MainBodyGroupList mainBodyList, OrgAuthorityClient client) {
     	// Expected status code: 201 Created
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
     	// Type of service request being tested
@@ -183,7 +184,7 @@ public class OrgAuthorityClientUtils {
     	}
     	MultipartOutput multipart =
     		createOrganizationInstance(orgAuthorityRefName, 
-    				orgInfo, orgRepeatablesInfo, client.getItemCommonPartName());
+    				orgInfo, orgRepeatablesInfo, mainBodyList, client.getItemCommonPartName());
 
     	ClientResponse<Response> res = client.createItem(inAuthority, multipart);
     	String result;
@@ -220,8 +221,9 @@ public class OrgAuthorityClientUtils {
     		String orgAuthRefName, Map<String, String> orgInfo, String headerLabel){
             final Map<String, List<String>> EMPTY_ORG_REPEATABLES_INFO =
                 new HashMap<String, List<String>>();
+            final MainBodyGroupList EMPTY_MAIN_BODY_LIST = new MainBodyGroupList();
             return createOrganizationInstance(orgAuthRefName,
-                    orgInfo, EMPTY_ORG_REPEATABLES_INFO, headerLabel);
+                    orgInfo, EMPTY_ORG_REPEATABLES_INFO, EMPTY_MAIN_BODY_LIST, headerLabel);
     }
 
 
@@ -237,7 +239,7 @@ public class OrgAuthorityClientUtils {
      */
     public static MultipartOutput createOrganizationInstance( 
     		String orgAuthRefName, Map<String, String> orgInfo,
-                Map<String, List<String>> orgRepeatablesInfo, String headerLabel){
+                Map<String, List<String>> orgRepeatablesInfo, MainBodyGroupList mainBodyList, String headerLabel){
         OrganizationsCommon organization = new OrganizationsCommon();
     	String shortId = orgInfo.get(OrganizationJAXBSchema.SHORT_IDENTIFIER);
     	if (shortId == null || shortId.isEmpty()) {
@@ -261,12 +263,10 @@ public class OrgAuthorityClientUtils {
     	String refName = createOrganizationRefName(orgAuthRefName, shortId, value);
     	organization.setRefName(refName);
 
-        if((value = (String)orgInfo.get(OrganizationJAXBSchema.SHORT_NAME))!=null)
-        	organization.setShortName(value);
-        if((value = (String)orgInfo.get(OrganizationJAXBSchema.LONG_NAME))!=null)
-        	organization.setLongName(value);
-        if((value = (String)orgInfo.get(OrganizationJAXBSchema.NAME_ADDITIONS))!=null)
-        	organization.setNameAdditions(value);
+        if (mainBodyList != null) {
+            organization.setMainBodyGroupList(mainBodyList);
+        }
+
         if((values = (List<String>)orgRepeatablesInfo.get(OrganizationJAXBSchema.CONTACT_NAMES))!=null) {
                 ContactNameList contactsList = new ContactNameList();
                 List<String> contactNames = contactsList.getContactName();

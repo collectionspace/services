@@ -2,23 +2,23 @@
 
 <!--
     Organization schema (XSD)
-    
+
     Entity  : Organization
     Part    : Common
     Used for: Nuxeo EP core document type
-    
-    $LastChangedRevision: 860 $
-    $LastChangedDate: 2009-10-14 14:48:05 -0700 (Wed, 14 Oct 2009) $
+
+    $LastChangedRevision$
+    $LastChangedDate$
 -->
 
 <xs:schema 
-  xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:ns="http://collectionspace.org/services/organization"
-  xmlns="http://collectionspace.org/services/organization"
-  targetNamespace="http://collectionspace.org/services/organization"
-  version="0.1"
->
-<!-- See http://wiki.collectionspace.org/display/collectionspace/Name+Authority+Schema -->
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/services/organization"
+    xmlns="http://collectionspace.org/services/organization"
+    targetNamespace="http://collectionspace.org/services/organization"
+    version="0.1"
+    >
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Name+Authority+Schema -->
 <!-- See http://wiki.collectionspace.org/display/collectionspace/Organization+Service+Home -->    
 
     <!--  Organization Information Group -->
@@ -31,12 +31,7 @@
     <xs:element name="displayNameComputed" type="xs:boolean"/>
     <xs:element name="shortDisplayName" type="xs:string"/>
     <xs:element name="shortDisplayNameComputed" type="xs:boolean"/>
-
-    <!-- FIXME Start of main body (represented by 'longName' element) repeatable group -->
-    <xs:element name="shortName" type="xs:string"/>
-    <xs:element name="longName" type="xs:string"/>
-    <xs:element name="nameAdditions" type="xs:string"/>
-    <!-- FIXME End of main body repeatable group -->
+    <xs:element name="mainBodyGroupList" type="mainBodyGroupList"/>
 
     <xs:element name="contactNames">
         <xs:complexType>
@@ -76,6 +71,20 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <xs:complexType name="mainBodyGroupList">
+        <xs:sequence>
+            <xs:element name="mainBodyGroup" type="mainBodyGroup" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="mainBodyGroup">
+        <xs:sequence>
+            <xs:element name="longName" type="xs:string"/>
+            <xs:element name="shortName" type="xs:string"/>
+            <xs:element name="nameAdditions" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
 
 </xs:schema>
 

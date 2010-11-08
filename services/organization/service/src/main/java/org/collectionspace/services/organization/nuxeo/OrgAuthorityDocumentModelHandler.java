@@ -43,8 +43,8 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
 /**
  * OrgAuthorityDocumentModelHandler
  *
- * $LastChangedRevision: $
- * $LastChangedDate: $
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
 public class OrgAuthorityDocumentModelHandler
         extends AuthorityDocumentModelHandler<OrgauthoritiesCommon, OrgauthoritiesCommonList> {

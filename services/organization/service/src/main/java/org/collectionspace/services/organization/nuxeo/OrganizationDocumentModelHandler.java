@@ -44,8 +44,8 @@ import org.slf4j.LoggerFactory;
 /**
  * OrganizationDocumentModelHandler
  *
- * $LastChangedRevision: $
- * $LastChangedDate: $
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
 public class OrganizationDocumentModelHandler
 		extends AuthorityItemDocumentModelHandler<OrganizationsCommon, OrganizationsCommonList> {
@@ -98,8 +98,11 @@ public class OrganizationDocumentModelHandler
     	if(shortDisplayNameComputed==null)
     		shortDisplayNameComputed = true;
     	if (displayNameComputed || shortDisplayNameComputed) {
-    		String shortName = (String) docModel.getProperty(commonPartLabel,
-    									OrganizationJAXBSchema.SHORT_NAME);
+                 List<Object> mainBodyGroupList = (List<Object>) docModel.getProperty(commonPartLabel,
+                         OrganizationJAXBSchema.MAIN_BODY_GROUP_LIST);
+                 // FIXME: Determine how to handle cases where primary short name is null or empty.
+                String shortName = primaryValueFromMultivalue(mainBodyGroupList,
+                        OrganizationJAXBSchema.SHORT_NAME);
     		if(shortDisplayNameComputed) {
 	    		String displayName = prepareDefaultDisplayName(shortName, null);
 	    		docModel.setProperty(commonPartLabel, OrganizationJAXBSchema.SHORT_DISPLAY_NAME,
@@ -182,6 +185,42 @@ public class OrganizationDocumentModelHandler
     @Override
     public String getQProperty(String prop) {
         return OrganizationConstants.NUXEO_SCHEMA_NAME + ":" + prop;
+    }
+
+    /**
+     * Returns the primary value from a list of values.
+     *
+     * Assumes that the first value is the primary value.
+     * This assumption may change when and if the primary value
+     * is identified explicitly.
+     *
+     * @param values a list of values.
+     * @param propertyName the name of a property through
+     *     which the value can be extracted.
+     * @return the primary value.
+     */
+    private String primaryValueFromMultivalue(List<Object> values, String propertyName) {
+        String primaryValue = "";
+        if (values == null || values.size() == 0) {
+            return primaryValue;
+        }
+        Object value = values.get(0);
+        if (value instanceof String) {
+            if (value != null) {
+                primaryValue = (String) value;
+            }
+       // Multivalue group of fields
+       } else if (value instanceof Map) {
+            if (value != null) {
+                Map map = (Map) value;
+                if (map.values().size() > 0) {
+                    if (map.get(propertyName) != null) {
+                      primaryValue = (String) map.get(propertyName);
+                    }
+                }
+            }
+       }
+       return primaryValue;
     }
 }
 

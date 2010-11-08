@@ -38,6 +38,8 @@ import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.organization.MainBodyGroup;
+import org.collectionspace.services.organization.MainBodyGroupList;
 import org.collectionspace.services.organization.OrganizationsCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
@@ -55,8 +57,8 @@ import org.slf4j.LoggerFactory;
  * LoaninAuthRefsTest, carries out Authority References tests against a
  * deployed and running Loanin (aka Loans In) Service.
  *
- * $LastChangedRevision: 1327 $
- * $LastChangedDate: 2010-02-12 10:35:11 -0800 (Fri, 12 Feb 2010) $
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
 public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
 
@@ -192,9 +194,6 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         // per the initialization(s) below.
         Map<String, String> testOrgMap = new HashMap<String,String>();
         testOrgMap.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
-        testOrgMap.put(OrganizationJAXBSchema.SHORT_NAME,
-            "Test Organization-" + shortId);
-        testOrgMap.put(OrganizationJAXBSchema.LONG_NAME, "Test Organization Name");
         testOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, "Anytown, USA");
 
         Map<String, List<String>> testOrgRepeatablesMap = new HashMap<String,List<String>>();
@@ -206,11 +205,18 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         testOrgSubBodies.add(subBodyRefName);
         testOrgRepeatablesMap.put(OrganizationJAXBSchema.SUB_BODIES, testOrgSubBodies);
 
+        MainBodyGroupList mainBodyList = new MainBodyGroupList();
+        List<MainBodyGroup> mainBodyGroups = mainBodyList.getMainBodyGroup();
+        MainBodyGroup mainBodyGroup = new MainBodyGroup();
+        mainBodyGroup.setShortName("Test Organization-" + shortId);
+        mainBodyGroup.setLongName("Test Organization Name");
+        mainBodyGroups.add(mainBodyGroup);
+
         // Finishing creating the new Organization item, then
         // submit the request to the service and store the response.
         knownItemResourceId = OrgAuthorityClientUtils.createItemInAuthority(
         		knownResourceId, knownResourceRefName, testOrgMap,
-                        testOrgRepeatablesMap, orgAuthClient);
+                        testOrgRepeatablesMap, mainBodyList, orgAuthClient);
 
         // Store the IDs from every item created by tests,
         // so they can be deleted after tests have been run.

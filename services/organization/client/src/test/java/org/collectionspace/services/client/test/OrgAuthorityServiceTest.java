@@ -38,6 +38,8 @@ import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.client.OrgAuthorityClientUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.organization.MainBodyGroup;
+import org.collectionspace.services.organization.MainBodyGroupList;
 import org.collectionspace.services.organization.OrgauthoritiesCommon;
 import org.collectionspace.services.organization.OrgauthoritiesCommonList;
 import org.collectionspace.services.organization.OrganizationsCommon;
@@ -57,8 +59,8 @@ import org.testng.annotations.Test;
  * OrgAuthorityServiceTest, carries out tests against a
  * deployed and running OrgAuthority Service.
  *
- * $LastChangedRevision: 753 $
- * $LastChangedDate: 2009-09-23 11:03:36 -0700 (Wed, 23 Sep 2009) $
+ * $LastChangedRevision$
+ * $LastChangedDate$
  */
 public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
@@ -238,9 +240,16 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         testOrgContactNames.add("joe@example.org");
         testOrgContactNames.add("sally@example.org");
         testOrgRepeatablesMap.put(OrganizationJAXBSchema.CONTACT_NAMES, testOrgContactNames);
+        
+        MainBodyGroupList mainBodyList = new MainBodyGroupList();
+        List<MainBodyGroup> mainBodyGroups = mainBodyList.getMainBodyGroup();
+        MainBodyGroup mainBodyGroup = new MainBodyGroup();
+        mainBodyGroup.setShortName(TEST_ORG_SHORTNAME);
+        mainBodyGroup.setLongName("The real official test organization");
+        mainBodyGroups.add(mainBodyGroup);
 
         String newID = OrgAuthorityClientUtils.createItemInAuthority(
-        		vcsid, authRefName, testOrgMap, testOrgRepeatablesMap, client);
+        		vcsid, authRefName, testOrgMap, testOrgRepeatablesMap, mainBodyList, client);
         
         // Store the ID returned from the first item resource created
         // for additional tests below.
@@ -732,10 +741,18 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         // Update the shortName and verify the computed name is updated.
         organization.setCsid(null);
         organization.setDisplayNameComputed(true);
-        organization.setShortName("updated-" + TEST_ORG_SHORTNAME);
+
+        MainBodyGroupList mainBodyList = organization.getMainBodyGroupList();
+        List<MainBodyGroup> mainBodyGroups = mainBodyList.getMainBodyGroup();
+        MainBodyGroup mainBodyGroup = new MainBodyGroup();
+        String updatedShortName = "updated-" + TEST_ORG_SHORTNAME;
+        mainBodyGroup.setShortName(updatedShortName);
+        mainBodyGroups.add(mainBodyGroup);
+        organization.setMainBodyGroupList(mainBodyList);
+
         expectedDisplayName = 
             OrgAuthorityClientUtils.prepareDefaultDisplayName(
-        	"updated-" + TEST_ORG_SHORTNAME, TEST_ORG_FOUNDING_PLACE);
+        	updatedShortName, TEST_ORG_FOUNDING_PLACE);
 
         // Submit the updated resource to the service and store the response.
         MultipartOutput output = new MultipartOutput();
@@ -765,8 +782,12 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(updatedOrganization);
 
         // Verify that the updated resource received the correct data.
-        Assert.assertEquals(updatedOrganization.getShortName(), organization.getShortName(),
-            "Updated ShortName in Organization did not match submitted data.");
+        mainBodyList = organization.getMainBodyGroupList();
+        Assert.assertNotNull(mainBodyList);
+        Assert.assertTrue(mainBodyList.getMainBodyGroup().size() > 0);
+        Assert.assertEquals(updatedOrganization.getMainBodyGroupList().getMainBodyGroup().get(0).getShortName(),
+                updatedShortName, "Updated ShortName in Organization did not match submitted data.");
+
         // Verify that the updated resource computes the right displayName.
         Assert.assertEquals(updatedOrganization.getDisplayName(), expectedDisplayName,
             "Updated ShortName in Organization not reflected in computed DisplayName.");
@@ -1371,7 +1392,14 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	
 	        // Update the contents of this resource.
 	        organization.setCsid(null);
-	        organization.setShortName("updated-" + organization.getShortName());
+
+                MainBodyGroupList mainBodyList = organization.getMainBodyGroupList();
+                Assert.assertNotNull(mainBodyList);
+                List<MainBodyGroup> mainBodyGroups = mainBodyList.getMainBodyGroup();
+                Assert.assertTrue(mainBodyList.getMainBodyGroup().size() > 0);
+                String updatedShortName = "updated-" + mainBodyGroups.get(0).getShortName();
+                mainBodyGroups.get(0).setShortName(updatedShortName);
+
 	        if(logger.isDebugEnabled()){
 	            logger.debug("to be updated Organization");
 	            logger.debug(objectAsXmlString(organization,
@@ -1402,9 +1430,11 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertNotNull(updatedOrganization);
 	
 	        // Verify that the updated resource received the correct data.
-	        Assert.assertEquals(updatedOrganization.getShortName(),
-	                organization.getShortName(),
-	                "Data in updated Organization did not match submitted data.");
+                mainBodyList = organization.getMainBodyGroupList();
+                Assert.assertNotNull(mainBodyList);
+                Assert.assertTrue(mainBodyList.getMainBodyGroup().size() > 0);
+                Assert.assertEquals(updatedOrganization.getMainBodyGroupList().getMainBodyGroup().get(0).getShortName(),
+                        updatedShortName, "Data in updated Organization did not match submitted data.");
 	    } finally {
 	    	res.releaseConnection();
 	    }
