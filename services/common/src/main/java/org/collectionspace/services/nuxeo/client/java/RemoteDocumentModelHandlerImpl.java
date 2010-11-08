@@ -462,4 +462,43 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         return ilistItem;
     }
 
+    /**
+     * Returns the primary value from a list of values.
+     *
+     * Assumes that the first value is the primary value.
+     * This assumption may change when and if the primary value
+     * is identified explicitly.
+     *
+     * @param values a list of values.
+     * @param propertyName the name of a property through
+     *     which the value can be extracted.
+     * @return the primary value.
+     */
+    protected String primaryValueFromMultivalue(List<Object> values, String propertyName) {
+        String primaryValue = "";
+        if (values == null || values.size() == 0) {
+            return primaryValue;
+        }
+        Object value = values.get(0);
+        if (value instanceof String) {
+            if (value != null) {
+                primaryValue = (String) value;
+            }
+       // Multivalue group of fields
+       } else if (value instanceof Map) {
+            if (value != null) {
+                Map map = (Map) value;
+                if (map.values().size() > 0) {
+                    if (map.get(propertyName) != null) {
+                      primaryValue = (String) map.get(propertyName);
+                    }
+                }
+            }
+       } else {
+            logger.warn("Unexpected type for property " + propertyName
+                    + " in multivalue list: not String or Map.");
+       }
+       return primaryValue;
+    }
+
 }
