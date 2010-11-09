@@ -94,10 +94,75 @@
             <artifactId>commons-httpclient</artifactId>
             <version>3.1</version>
         </dependency>
+        <dependency>
+            <groupId>javax.security</groupId>
+            <artifactId>jaas</artifactId>
+            <version>1.0.01</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.6.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jaxen</groupId>
+            <artifactId>jaxen</artifactId>
+            <version>1.1.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-jexl</artifactId>
+            <version>2.0.1</version>
+        </dependency>
     </dependencies>
     
     <build>
         <finalName>collectionspace-services-IntegrationTests</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- The way this works, is you call:
+                     cd C:\src\trunk\services\IntegrationTests\
+                        mvn exec:java
+                     or, with an override:
+                        mvn exec:java -DxmlReplayBaseDir=C:/my/override/directory
+                     or:
+                        mvn -DskipTests exec:java -DtestID=testfoo -DtestGroupID=bar -DxmlReplayBaseDir=mojo -DautoDeletePOSTS=true
+                -->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>org.collectionspace.services.IntegrationTests.xmlreplay.XmlReplay</mainClass>
+                    <arguments>
+                        <argument>-xmlReplayBaseDir</argument>
+                        <argument>${basedir}/src/test/resources/test-data/xmlreplay</argument>
+                    </arguments>
+                    <systemProperties>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+
+        </plugins>
     </build>
 </project>
 
