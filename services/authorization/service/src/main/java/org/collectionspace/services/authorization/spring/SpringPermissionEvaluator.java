@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.authorization.spring;
 
+import java.util.List;
 import java.io.Serializable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,6 +34,7 @@ import org.collectionspace.services.authorization.CSpaceResource;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
@@ -55,7 +57,28 @@ public class SpringPermissionEvaluator implements CSpacePermissionEvaluator {
         Serializable objectIdId = SpringAuthorizationProvider.getObjectIdentityIdentifier(res);
         String objectIdType = SpringAuthorizationProvider.getObjectIdentityType(res);
         PermissionEvaluator eval = provider.getProviderPermissionEvaluator();
+        
+        debug(res, authToken, objectIdId, objectIdType, perm);
         return eval.hasPermission(authToken,
                 objectIdId, objectIdType, perm);
+    }
+    
+    private void debug(CSpaceResource res,
+    		Authentication authToken,
+    		Serializable objectIdId,
+    		String objectIdType,
+    		Permission perm) {
+    	if (log.isDebugEnabled() == true) {
+    		log.debug(this.getClass().getCanonicalName() + ":" + this);
+    		String resourceTarget = "[" + res.getId() + "]" + " | " +
+				"[" + "objectIdId: " + objectIdType + "(" + objectIdId + ")]";
+    		System.out.println("PERMISSION CHECK FOR: " + resourceTarget);
+	    	System.out.println("\tPrincipal: " + authToken.getName() +
+	    			"\tTenant ID: " + res.getTenantId());
+	    	System.out.println("\tRoles: " + authToken.getAuthorities());
+	    	System.out.println("\tPermission Mask: " + perm.getMask() +
+	    			" - Permission Pattern: " + perm.getPattern());
+	    	System.out.println("");
+    	}
     }
 }

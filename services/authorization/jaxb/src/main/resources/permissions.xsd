@@ -179,6 +179,15 @@
                     </xs:appinfo>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="objectIdentityResource" type="xs:string" minOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>
+                        <hj:basic>
+                            <orm:column name="objectIdentityResource" length="128" nullable="false"/>
+                        </hj:basic>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:element>            
         </xs:sequence>
     </xs:complexType>
 

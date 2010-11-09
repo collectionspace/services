@@ -51,13 +51,13 @@
         <constructor-arg>
             <list>
                 <bean class="org.springframework.security.core.authority.GrantedAuthorityImpl">
-                    <constructor-arg value="ROLE_ADMINISTRATOR"/>
+                    <constructor-arg value="ROLE_SPRING_ADMIN"/>
                 </bean>
                 <bean class="org.springframework.security.core.authority.GrantedAuthorityImpl">
-                    <constructor-arg value="ROLE_ADMINISTRATOR"/>
+                    <constructor-arg value="ROLE_SPRING_ADMIN"/>
                 </bean>
                 <bean class="org.springframework.security.core.authority.GrantedAuthorityImpl">
-                    <constructor-arg value="ROLE_ADMINISTRATOR"/>
+                    <constructor-arg value="ROLE_SPRING_ADMIN"/>
                 </bean>
             </list>
         </constructor-arg>

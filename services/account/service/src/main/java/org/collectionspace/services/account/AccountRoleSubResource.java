@@ -33,6 +33,7 @@ import org.collectionspace.services.authorization.AccountValue;
 import org.collectionspace.services.authorization.AccountRoleRel;
 import org.collectionspace.services.authorization.Permission;
 import org.collectionspace.services.authorization.Role;
+import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
 
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
@@ -56,6 +57,10 @@ public class AccountRoleSubResource
 //        extends AbstractCollectionSpaceResourceImpl<AccountRole, AccountRolesList> {
     	extends AbstractCollectionSpaceResourceImpl<AccountRole, AccountRole> {
 
+	//FIXME: These belong in an Authorization class, not here
+    private static String ROLE_SPRING_ADMIN_ID = "-1";
+    private static String ROLE_SPRING_ADMIN_NAME = "ROLE_SPRING_ADMIN";    
+	
     final public static String ACCOUNT_ACCOUNTROLE_SERVICE = "accounts/accountroles";
     final public static String ROLE_ACCOUNTROLE_SERVICE = "authorization/roles/accountroles";
     //this service is never exposed as standalone RESTful service...just use unique
@@ -160,10 +165,20 @@ public class AccountRoleSubResource
      */
     public String createAccountRole(AccountRole input, SubjectType subject)
             throws Exception {
+    	
+    	//
+    	// We need to associate every new account with the Spring Security Admin role so we can make
+    	// changes to the Spring Security ACL tables.  The Spring Security Admin role has NO CollectionSpace
+    	// specific permissions.  It is an internal/private role that service consumers and end-users NEVER see.
+    	//
+    	RoleValue springAdminRole = new RoleValue();
+    	springAdminRole.setRoleId(ROLE_SPRING_ADMIN_ID);
+    	springAdminRole.setRoleName(ROLE_SPRING_ADMIN_NAME);
+    	List<RoleValue> roleValues = input.getRoles();
+    	roleValues.add(springAdminRole);
 
         ServiceContext<AccountRole, AccountRole> ctx = createServiceContext(input, subject);
-        DocumentHandler handler = createDocumentHandler(ctx);
-        
+        DocumentHandler handler = createDocumentHandler(ctx);        
         String bogusCsid = getStorageClient(ctx).create(ctx, handler);
         
         return bogusCsid;

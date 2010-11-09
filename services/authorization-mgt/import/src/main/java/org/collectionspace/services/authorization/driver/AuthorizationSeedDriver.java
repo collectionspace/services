@@ -165,9 +165,11 @@ public class AuthorizationSeedDriver {
     }
 
     private void login() {
-        GrantedAuthority gauth = new GrantedAuthorityImpl("ROLE_ADMINISTRATOR");
+        GrantedAuthority cspace_admin = new GrantedAuthorityImpl("ROLE_ADMINISTRATOR");
+        GrantedAuthority spring_security_admin = new GrantedAuthorityImpl("ROLE_SPRING_ADMIN");
         HashSet<GrantedAuthority> gauths = new HashSet<GrantedAuthority>();
-        gauths.add(gauth);
+        gauths.add(cspace_admin);
+        gauths.add(spring_security_admin);
         Authentication authRequest = new UsernamePasswordAuthenticationToken(user, password, gauths);
         SecurityContextHolder.getContext().setAuthentication(authRequest);
         if (logger.isDebugEnabled()) {

@@ -58,9 +58,10 @@ import org.collectionspace.services.common.security.SecurityUtils;
  */
 public class AuthorizationGen {
 
-    final public static String ROLE_ADMINISTRATOR = "ROLE_ADMINISTRATOR";
-    final public static String ROLE_TENANT_ADMINISTRATOR = "ROLE_TENANT_ADMINISTRATOR";
-    final public static String ROLE_TENANT_READER = "ROLE_TENANT_READER";
+	final public static String ROLE_PREFIX = "ROLE_";
+    final public static String ROLE_ADMINISTRATOR = "ADMINISTRATOR";
+    final public static String ROLE_TENANT_ADMINISTRATOR = "TENANT_ADMINISTRATOR";
+    final public static String ROLE_TENANT_READER = "TENANT_READER";
     final public static String ROLE_ADMINISTRATOR_ID = "0";
     //
     // ActionGroup labels/constants
@@ -262,7 +263,9 @@ public class AuthorizationGen {
     private Role buildTenantAdminRole(String tenantId) {
         Role role = new Role();
         role.setCreatedAtItem(new Date());
-        role.setRoleName(ROLE_TENANT_ADMINISTRATOR);
+        role.setRoleName(ROLE_PREFIX +
+        		tenantId + "_" +
+        		ROLE_TENANT_ADMINISTRATOR);
         String id = UUID.randomUUID().toString();
         role.setCsid(id);
         role.setDescription("generated tenant admin role");
@@ -273,7 +276,9 @@ public class AuthorizationGen {
     private Role buildTenantReaderRole(String tenantId) {
         Role role = new Role();
         role.setCreatedAtItem(new Date());
-        role.setRoleName(ROLE_TENANT_READER);
+        role.setRoleName(ROLE_PREFIX +
+        		tenantId + "_" +
+        		ROLE_TENANT_READER);
         String id = UUID.randomUUID().toString();
         role.setCsid(id);
         role.setDescription("generated tenant read only role");
@@ -289,21 +294,23 @@ public class AuthorizationGen {
     }
 
     public void associateDefaultPermissionsRoles() {
-        List<Role> roles = new ArrayList<Role>();
-        roles.add(cspaceAdminRole);
         for (Permission p : adminPermList) {
             PermissionRole permAdmRole = associatePermissionRoles(p, adminRoles);
             adminPermRoleList.add(permAdmRole);
-
-            //CSpace Administrator has all access
-            PermissionRole permCAdmRole = associatePermissionRoles(p, roles);
-            adminPermRoleList.add(permCAdmRole);
         }
 
         for (Permission p : readerPermList) {
             PermissionRole permRdrRole = associatePermissionRoles(p, readerRoles);
             readerPermRoleList.add(permRdrRole);
         }
+        
+        //CSpace Administrator has all access
+        List<Role> roles = new ArrayList<Role>();
+        roles.add(cspaceAdminRole);
+        for (Permission p : adminPermList) {
+            PermissionRole permCAdmRole = associatePermissionRoles(p, roles);
+            adminPermRoleList.add(permCAdmRole);
+        }        
     }
 
     public List<PermissionRole> associatePermissionsRoles(List<Permission> perms, List<Role> roles) {
@@ -358,7 +365,7 @@ public class AuthorizationGen {
 
     private Role buildCSpaceAdminRole() {
         Role role = new Role();
-        role.setRoleName(ROLE_ADMINISTRATOR);
+        role.setRoleName(ROLE_PREFIX + ROLE_ADMINISTRATOR);
         role.setCsid(ROLE_ADMINISTRATOR_ID);
         return role;
     }

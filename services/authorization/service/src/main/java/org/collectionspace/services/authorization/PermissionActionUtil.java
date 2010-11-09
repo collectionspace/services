@@ -15,6 +15,7 @@ public class PermissionActionUtil {
 	            perm.getResourceName(), action);
 	    pa.setName(actionType);
 	    pa.setObjectIdentity(uriRes.getHashedId().toString());
+	    pa.setObjectIdentityResource(uriRes.getId());
 	    
 	    return pa;
 	}
@@ -26,6 +27,7 @@ public class PermissionActionUtil {
 	    URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(),
 	            perm.getResourceName(), action);
 	    pa.setObjectIdentity(uriRes.getHashedId().toString());
+	    pa.setObjectIdentityResource(uriRes.getId());
 	    
 	    return pa;
 	}

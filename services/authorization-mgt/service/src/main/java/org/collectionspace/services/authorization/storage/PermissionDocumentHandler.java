@@ -98,6 +98,7 @@ public class PermissionDocumentHandler
 	            URIResourceImpl uriRes = new URIResourceImpl(perm.getTenantId(),
 	                    perm.getResourceName(), action);
 	            permAction.setObjectIdentity(uriRes.getHashedId().toString());
+	            permAction.setObjectIdentityResource(uriRes.getId());
 	            //PermissionActionUtil.update(perm, permAction);
 	        }
     	} catch (Exception x) {

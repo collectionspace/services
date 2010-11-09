@@ -351,7 +351,8 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         Role output = (Role) res.getEntity();
         Assert.assertNotNull(output);
 
-        String roleNameToVerify = "ROLE_" + verifyRoleName.toUpperCase();
+        //FIXME: Tenant ID of "1" should not be hard coded
+        String roleNameToVerify = "ROLE_" + "1_" + verifyRoleName.toUpperCase();
         Assert.assertEquals(output.getRoleName(), roleNameToVerify,
                 "RoleName fix did not work!");
     }

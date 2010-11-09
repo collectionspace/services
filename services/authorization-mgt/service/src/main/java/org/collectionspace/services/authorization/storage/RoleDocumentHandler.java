@@ -54,16 +54,18 @@ public class RoleDocumentHandler
     public void handleCreate(DocumentWrapper<Role> wrapDoc) throws Exception {
         String id = UUID.randomUUID().toString();
         Role role = wrapDoc.getWrappedObject();
-        role.setRoleName(fixRoleName(role.getRoleName()));
-        role.setCsid(id);
         setTenant(role);
+        role.setRoleName(fixRoleName(role.getRoleName(),
+        		role.getTenantId()));
+        role.setCsid(id);
     }
 
     @Override
     public void handleUpdate(DocumentWrapper<Role> wrapDoc) throws Exception {
         Role roleFound = wrapDoc.getWrappedObject();
         Role roleReceived = getCommonPart();
-        roleReceived.setRoleName(fixRoleName(roleReceived.getRoleName()));
+        roleReceived.setRoleName(fixRoleName(roleReceived.getRoleName(),
+        		roleFound.getTenantId()));
         merge(roleReceived, roleFound);
     }
 
@@ -185,9 +187,9 @@ public class RoleDocumentHandler
         }
     }
 
-    private String fixRoleName(String role) {
+    private String fixRoleName(String role, String tenantId) {
         String roleName = role.toUpperCase();
-        String rolePrefix = "ROLE_";
+        String rolePrefix = "ROLE_" + tenantId + "_";
         if (!roleName.startsWith(rolePrefix)) {
             roleName = rolePrefix + roleName;
         }
