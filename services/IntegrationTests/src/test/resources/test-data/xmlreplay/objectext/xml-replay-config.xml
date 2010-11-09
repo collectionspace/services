@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    <protoHostPort>http://localhost:8280</protoHostPort>
+
+    <testGroup ID="CRUDLA" autoDeletePOSTS="true">
+        <test ID="CREATE">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/repfield_whitesp1.xml</filename>
+            </part>
+        </test>
+        <test ID="READ">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <fromTestID>nh</fromTestID>
+        </test>
+        <test ID="UPDATE">
+            <method>PUT</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/testCambridge-update.xml</filename>
+            </part>
+            <fromTestID>cambridge-1</fromTestID>
+        </test>
+        <test ID="DELETE">
+            <method>DELETE</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <fromTestID>1001</fromTestID>
+        </test>
+        <test ID="LIST">
+            <method>LIST</method>
+            <uri>/cspace-services/personauthorities/</uri>
+            <fromTestID>newPersonAuthority</fromTestID>
+        </test>
+        <test ID="AUTHREFS">
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/repfield_whitesp2.xml</filename>
+            </part>
+        </test>
+    </testGroup>
+
+    <testGroup ID="2parts" autoDeletePOSTS="true">
+        <test ID="nh">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <parts>
+                <part>
+                    <label>collectionobjects_common</label>
+                    <filename>collectionobject/nh-collectionobject.xml</filename>
+                </part>
+                <part>
+                    <label>collectionobjects_naturalhistory</label>
+                    <filename>collectionobject/nh-part.xml</filename>
+                </part>
+            </parts>
+        </test>
+        <test>
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <fromTestID>nh</fromTestID>
+        </test>
+    </testGroup>
+
+    <test ID="1002">
+        <method>POST</method>
+        <uri>/cspace-services/collectionobjects/</uri>
+        <part>
+            <label>collectionobjects_common</label>
+            <filename>collectionobject/repfield_whitesp2.xml</filename>
+        </part>
+    </test>
+
+    <testGroup ID="collectionobjects" autoDeletePOSTS="true">
+        <test ID="1001">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/repfield_whitesp1.xml</filename>
+            </part>
+        </test>
+        <test ID="1002">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/repfield_whitesp2.xml</filename>
+            </part>
+        </test>
+        <test>
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/repfield_whitesp3.xml</filename>
+            </part>
+        </test>
+        <test>
+            <method>DELETE</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <fromTestID>1001</fromTestID>
+        </test>
+        <test>
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/repfield_whitesp4.xml</filename>
+            </part>
+        </test>
+        <test>
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/cspace-2242-first-value-instance-blank.xml</filename>
+            </part>
+        </test>
+        <test>
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/cspace-2242-first-value-instance-nonblank.xml</filename>
+            </part>
+        </test>
+        <test>
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/repfield_null1.xml</filename>
+            </part>
+        </test>
+        <test>
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/?sortBy=&amp;pgNum=0&amp;pgSz=8</uri>
+        </test>
+        <test ID="cambridge-1">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/testCambridge.xml</filename>
+            </part>
+        </test>
+        <test>
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <fromTestID>cambridge-1</fromTestID>
+        </test>
+        <test ID="cambridge-1-put">
+            <method>PUT</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/testCambridge-update.xml</filename>
+            </part>
+            <fromTestID>cambridge-1</fromTestID>
+        </test>
+    </testGroup>
+
+    <!-- You can run this with
+         mvn -q -DtestGroupID=cambridge-put-demo exec:java
+    -->
+    <testGroup ID="cambridge-put-demo" autoDeletePOSTS="true">
+        <test ID="cambridge-2">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/testCambridge.xml</filename>
+            </part>
+        </test>
+        <test>
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <fromTestID>cambridge-2</fromTestID>
+        </test>
+        <test ID="cambridge-2-put">
+            <method>PUT</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/testCambridge-update.xml</filename>
+            </part>
+            <fromTestID>cambridge-2</fromTestID>
+        </test>
+    </testGroup>
+
+    <!-- You can run this with
+         mvn -q -DtestGroupID=authrefs exec:java
+    -->
+    <testGroup ID="authrefs" autoDeletePOSTS="true">
+        <test ID="newPersonAuthority">
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/</uri>
+            <part>
+                <label>personauthorities_common</label>
+                <filename>authrefs/newPersonAuthority.xml</filename>
+            </part>
+        </test>
+        <test>
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/</uri>
+            <fromTestID>newPersonAuthority</fromTestID>
+        </test>
+        <test ID="newPerson">
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/</uri>
+            <part>
+                <label>persons_common</label>
+                <filename>authrefs/newPerson.xml</filename>
+            </part>
+            <fromTestID>newPersonAuthority</fromTestID>
+        </test>
+
+
+        <test ID="personAuthsList">
+            <method>LIST</method>
+            <uri>/cspace-services/personauthorities/</uri>
+            <fromTestID>newPersonAuthority</fromTestID>
+        </test>
+    </testGroup>
+
+</xmlReplay>

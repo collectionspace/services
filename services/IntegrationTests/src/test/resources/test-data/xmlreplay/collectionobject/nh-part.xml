@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:collectionobjects_naturalhistory xmlns:ns2="http://collectionspace.org/services/collectionobject/domain/naturalhistory">
+<nh-string>test-string</nh-string>
+<nh-int>999</nh-int>
+<nh-long>9999</nh-long>
+</ns2:collectionobjects_naturalhistory>

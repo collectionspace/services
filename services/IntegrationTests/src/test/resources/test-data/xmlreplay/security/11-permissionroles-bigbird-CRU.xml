@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:permission_role
+xmlns:ns2="http://collectionspace.org/services/authorization">
+  <permission>
+    <permissionId>${permBigbird_CRU.CSID}</permissionId>
+    <resourceName>dimensions</resourceName>
+  </permission>
+  <role>
+    <roleId>${roleTestCM.CSID}</roleId>
+    <roleName>ROLE_TEST_CM</roleName>
+  </role>
+</ns2:permission_role>
+

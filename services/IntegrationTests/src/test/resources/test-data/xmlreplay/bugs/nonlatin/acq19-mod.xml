@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:acquisitions_common xmlns:ns2="http://collectionspace.org/services/acquisition">
+   <fieldCollectionNumber/>
+   <transferOfTitleNumber>This is a transfer of title number</transferOfTitleNumber>
+   <acquisitionFundingSourceProvisos/>
+   <acquisitionAuthorizerDate/>
+   <acquisitionFundingValue/>
+   <acquisitionFundingSource/>
+   <acquisitionReason/>
+   <accessionDate/>
+   <acquisitionMethod/>
+   <acquisitionNote>fubar</acquisitionNote>
+   <fieldCollectionEventName/>
+   <acquisitionAuthorizer/>
+   <objectPurchasePriceDenomination/>
+   <acquisitionDate/>
+   <fieldCollector/>
+   <acquisitionProvisos/>
+   <objectPurchaseOfferPriceValue/>
+   <acquisitionSources>
+       <acquisitionSource> ⺠ , 0 1The  β Source of All  ψ Acquisitions</acquisitionSource>
+   </acquisitionSources>
+   <objectPurchaseOfferPriceDenomination/>
+   <acquisitionReferenceNumber/>
+   <acquisitionFundingDenomination/>
+</ns2:acquisitions_common>
+

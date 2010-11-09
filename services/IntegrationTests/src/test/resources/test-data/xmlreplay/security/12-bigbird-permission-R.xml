@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:permission
+xmlns:ns2="http://collectionspace.org/services/authorization">
+  <resourceName>dimensions</resourceName>
+  <action>
+    <name>READ</name>
+  </action>
+  <effect>PERMIT</effect>
+</ns2:permission>
+

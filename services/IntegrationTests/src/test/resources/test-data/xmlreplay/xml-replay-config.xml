@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    <!--
+    How to use this file.
+    ======================
+    From a command-line, run, for example:
+        cd C:\cs\trunk\services\common-test
+        mvn exec:java
+    To run one testGroup with ID="2collectionobjects", use:
+        mvn -DtestGroupID=2collectionobjects exec:java
+
+    To run one test with ID="1001" in one testGroup "2collectionobjects", use:
+        mvn -DtestGroupID=2collectionobjects -DtestID=1001 exec:java
+
+    If you need to compile, you can use:
+      mvn -q  install exec:java
+
+    To make maven a bit more quiet (all the lovely INFO lines) run with
+        mvn -q
+    This class is not a test class, so if you want to skip other test classes, use
+       mvn -DskipTests
+    Example:
+        mvn -q -DskipTests  exec:java
+
+    Maven knows where to find the command line args.  It looks in the pom:
+       C:\cs\trunk\services\common-test\pom.xml
+    for the values under the element:
+        /project/build/plugins/plugin/artifactId[exec-maven-plugin]
+    However, you may override this with a full path
+        mvn  -DxmlReplayBaseDir="C:\tmp\xmlReplay" exec:java
+        
+    It always looks for this master config file, named "xml-replay-config.xml"
+
+    For URLs, any ampersands must be escaped in this file in query strings like so: &amp;
+
+    The attribute
+        /testGroup/test/@ID
+    is optional. If present, it may be referred to in a DELETE using
+        /testGroup/test/fromTestID/
+    If it is not present, the driver will use
+       /testGroup/test/part/filename
+    as the ID for POST tests.
+    If the attribute
+        /testGroup/@autoDeletePOSTS
+    is "true" then any POSTs that are sent that return a "Location:" header
+    will be deleted with DELETE at the end of the test group.
+    Alternately, you may delete them
+    manually by providing a DELETE test as specified above.
+
+    PUT methods also use the
+        /testGroup/test/fromTestID/
+    value to update the object posted by a POST test.
+
+    -->
+    <testGroup ID="2collectionobjects" autoDeletePOSTS="true">
+        <test ID="1001">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/repfield_whitesp1.xml</filename>
+            </part>
+        </test>
+
+        <test ID="1002">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/repfield_whitesp2.xml</filename>
+            </part>
+        </test>
+    </testGroup>
+
+    <testGroup ID="2parts" autoDeletePOSTS="true">
+        <test ID="nh">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <parts>
+                <part>
+                    <label>collectionobjects_common</label>
+                    <filename>collectionobject/nh-collectionobject.xml</filename>
+                </part>
+                <part>
+                    <label>collectionobjects_naturalhistory</label>
+                    <filename>collectionobject/nh-part.xml</filename>
+                </part>
+            </parts>
+        </test>
+        <test>
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <fromTestID>nh</fromTestID>
+        </test>
+    </testGroup>
+
+    <testGroup ID="collectionobjects" autoDeletePOSTS="true">
+        <test ID="1001">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/repfield_whitesp1.xml</filename>
+            </part>
+        </test>
+        <test ID="1002">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/repfield_whitesp2.xml</filename>
+            </part>
+        </test>
+        <test>
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/repfield_whitesp3.xml</filename>
+            </part>
+        </test>
+        <test>
+            <method>DELETE</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <fromTestID>1001</fromTestID>
+        </test>
+        <test>
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/repfield_whitesp4.xml</filename>
+            </part>
+        </test>
+        <test>
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/cspace-2242-first-value-instance-blank.xml</filename>
+            </part>
+        </test>
+        <test>
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/cspace-2242-first-value-instance-nonblank.xml</filename>
+            </part>
+        </test>
+        <test>
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/repfield_null1.xml</filename>
+            </part>
+        </test>
+        <test>
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/?sortBy=&amp;pgNum=0&amp;pgSz=8</uri>
+        </test>
+        <test ID="cambridge-1">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/testCambridge.xml</filename>
+            </part>
+        </test>
+        <test>
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <fromTestID>cambridge-1</fromTestID>
+        </test>
+        <test ID="cambridge-1-put">
+            <method>PUT</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/testCambridge-update.xml</filename>
+            </part>
+            <fromTestID>cambridge-1</fromTestID>
+        </test>
+    </testGroup>
+
+    <!-- You can run this with
+         mvn -q -DtestGroupID=cambridge-put-demo exec:java
+    -->
+    <testGroup ID="cambridge-put-demo" autoDeletePOSTS="true">
+        <test ID="cambridge-2">
+            <method>POST</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/testCambridge.xml</filename>
+            </part>
+        </test>
+        <test>
+            <method>GET</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <fromTestID>cambridge-2</fromTestID>
+        </test>
+        <test ID="cambridge-2-put">
+            <method>PUT</method>
+            <uri>/cspace-services/collectionobjects/</uri>
+            <part>
+                <label>collectionobjects_common</label>
+                <filename>collectionobject/testCambridge-update.xml</filename>
+            </part>
+            <fromTestID>cambridge-2</fromTestID>
+        </test>
+    </testGroup>
+
+    <!-- You can run this with
+         mvn -q -DtestGroupID=authrefs exec:java
+    -->
+    <testGroup ID="authrefs" autoDeletePOSTS="true">
+        <test ID="newPersonAuthority">
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/</uri>
+            <part>
+                <label>personauthorities_common</label>
+                <filename>authrefs/newPersonAuthority.xml</filename>
+            </part>
+        </test>
+        <test>
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/</uri>
+            <fromTestID>newPersonAuthority</fromTestID>
+        </test>
+        <test ID="newPerson">
+            <method>POST</method>
+            <uri>/cspace-services/personauthorities/</uri>
+            <part>
+                <label>persons_common</label>
+                <filename>authrefs/newPerson.xml</filename>
+            </part>
+            <fromTestID>newPersonAuthority</fromTestID>
+        </test>
+
+        <test ID="personAuthsList">
+            <method>LIST</method>
+            <uri>/cspace-services/personauthorities/</uri>
+            <fromTestID>newPersonAuthority</fromTestID>
+        </test>
+    </testGroup>
+
+
+
+
+    
+
+
+</xmlReplay>

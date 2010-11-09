@@ -20,7 +20,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.collectionspace.services.ItegrationTests.test;
+package org.collectionspace.services.IntegrationTests.test;
 
 import java.util.List;
 
