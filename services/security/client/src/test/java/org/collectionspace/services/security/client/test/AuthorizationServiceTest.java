@@ -615,6 +615,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         RoleClient roleClient = new RoleClient();
 
         Role role = RoleFactory.createRoleInstance(roleName,
+        		roleName, //the display name
                 "role for " + roleName, true);
         ClientResponse<Response> res = roleClient.create(role);
         int statusCode = res.getStatus();

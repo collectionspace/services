@@ -725,6 +725,7 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
         UserInfo ui = tenantAdminUsers.get(tenantId);
         roleClient.setAuth(true, ui.userName, true, ui.password, true);
         Role role = RoleFactory.createRoleInstance(roleName,
+        		roleName, //the display name
                 "role for " + roleName, true);
         role.setTenantId(tenantId);
         ClientResponse<Response> res = roleClient.create(role);

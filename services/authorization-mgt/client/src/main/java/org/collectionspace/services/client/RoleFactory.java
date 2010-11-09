@@ -69,13 +69,15 @@ public class RoleFactory {
      * @return
      */
     public static Role createRoleInstance(String roleName,
+    		String displayName,
             String description,
             boolean useRoleName) {
 
         Role role = new Role();
-        if (useRoleName) {
+        if (useRoleName == true) {
             role.setRoleName(roleName);
         }
+        role.setDisplayName(displayName);
         role.setDescription(description);
         return role;
 

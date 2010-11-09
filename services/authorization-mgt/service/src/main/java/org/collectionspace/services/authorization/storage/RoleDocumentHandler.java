@@ -54,6 +54,17 @@ public class RoleDocumentHandler
     public void handleCreate(DocumentWrapper<Role> wrapDoc) throws Exception {
         String id = UUID.randomUUID().toString();
         Role role = wrapDoc.getWrappedObject();
+        
+        // Synthesize the display name if it was not passed in.
+        String displayName = role.getDisplayName();
+        boolean displayNameEmpty = true;
+        if (displayName != null) {
+        	displayNameEmpty = displayName.trim().isEmpty();    	
+        }
+        if (displayNameEmpty == true) {
+        	role.setDisplayName(role.getRoleName());
+        }
+        
         setTenant(role);
         role.setRoleName(fixRoleName(role.getRoleName(),
         		role.getTenantId()));
@@ -82,6 +93,9 @@ public class RoleDocumentHandler
             String msg = "Role name cannot be changed " + to.getRoleName();
             logger.error(msg);
             throw new BadRequestException(msg);
+        }
+        if (from.getDisplayName() != null) {
+        	to.setDisplayName(from.getDisplayName());
         }
         if (from.getRoleGroup() != null) {
             to.setRoleGroup(from.getRoleGroup());

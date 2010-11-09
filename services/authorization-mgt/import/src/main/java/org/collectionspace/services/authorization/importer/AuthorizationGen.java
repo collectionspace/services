@@ -263,9 +263,11 @@ public class AuthorizationGen {
     private Role buildTenantAdminRole(String tenantId) {
         Role role = new Role();
         role.setCreatedAtItem(new Date());
+        role.setDisplayName(ROLE_TENANT_ADMINISTRATOR);
         role.setRoleName(ROLE_PREFIX +
         		tenantId + "_" +
-        		ROLE_TENANT_ADMINISTRATOR);
+        		role.getDisplayName());
+
         String id = UUID.randomUUID().toString();
         role.setCsid(id);
         role.setDescription("generated tenant admin role");
@@ -276,9 +278,10 @@ public class AuthorizationGen {
     private Role buildTenantReaderRole(String tenantId) {
         Role role = new Role();
         role.setCreatedAtItem(new Date());
+        role.setDisplayName(ROLE_TENANT_READER);
         role.setRoleName(ROLE_PREFIX +
         		tenantId + "_" +
-        		ROLE_TENANT_READER);
+        		role.getDisplayName());
         String id = UUID.randomUUID().toString();
         role.setCsid(id);
         role.setDescription("generated tenant read only role");
@@ -365,7 +368,8 @@ public class AuthorizationGen {
 
     private Role buildCSpaceAdminRole() {
         Role role = new Role();
-        role.setRoleName(ROLE_PREFIX + ROLE_ADMINISTRATOR);
+        role.setDisplayName(ROLE_ADMINISTRATOR);
+        role.setRoleName(ROLE_PREFIX + role.getDisplayName());
         role.setCsid(ROLE_ADMINISTRATOR_ID);
         return role;
     }

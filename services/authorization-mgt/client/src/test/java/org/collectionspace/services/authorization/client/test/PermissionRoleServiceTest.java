@@ -689,6 +689,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
         RoleClient roleClient = new RoleClient();
 
         Role role = RoleFactory.createRoleInstance(roleName,
+        		roleName, //the display name
                 "role for " + roleName, true);
         ClientResponse<Response> res = null;
         String id = null;

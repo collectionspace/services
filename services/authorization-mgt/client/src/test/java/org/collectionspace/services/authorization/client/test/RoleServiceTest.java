@@ -494,6 +494,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         Role roleToUpdate = new Role();
         roleToUpdate.setCsid(knownResourceId);
         roleToUpdate.setRoleName(knownRoleName);
+        roleToUpdate.setDisplayName(knownRoleName);
         
         // Update the content of this resource.
         roleToUpdate.setDescription("updated role description");
@@ -534,6 +535,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         roleToUpdate.setCsid(knownResourceId);
         // Update the content of this resource.
         roleToUpdate.setRoleName("UPDATED-ROLE_USERS_TEST");
+        roleToUpdate.setDisplayName("UPDATED-ROLE_USERS_TEST");
         if (logger.isDebugEnabled()) {
             logger.debug("updated object");
             logger.debug(objectAsXmlString(roleToUpdate,
@@ -723,7 +725,9 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
             String description,
             boolean useRoleName) {
 
-        Role role = RoleFactory.createRoleInstance(roleName, description,
+        Role role = RoleFactory.createRoleInstance(roleName,
+        		roleName, //the display name
+        		description,
                 useRoleName);
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, role");
