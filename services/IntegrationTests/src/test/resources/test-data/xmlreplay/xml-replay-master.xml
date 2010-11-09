@@ -18,9 +18,10 @@
     This was working but is not now because security db hangs onto results from failed tests.
     However, it is more complete than testGroup="security", so is the correct testGroup to run.
     When the DB is cleaned with [ant create_db import] it runs OK.
-    <run controlFile="./security.xml" testGroup="securityRemovingRoleperms" />
     -->
 
+    <run controlFile="./security.xml" testGroup="securityRemovingRoleperms" />
+    
     <run controlFile="./organization.xml" testGroup="organization" />
 
 </xmlReplayMaster>
