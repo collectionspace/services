@@ -189,7 +189,7 @@ public class RoleDocumentHandler
 
     private String fixRoleName(String role, String tenantId) {
         String roleName = role.toUpperCase();
-        String rolePrefix = "ROLE_";//FIXME: Need to qualify role names with tenant ID. // + tenantId + "_";
+        String rolePrefix = "ROLE_" + tenantId + "_";
         if (!roleName.startsWith(rolePrefix)) {
             roleName = rolePrefix + roleName;
         }

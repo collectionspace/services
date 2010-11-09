@@ -353,7 +353,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
 
         //FIXME: Tenant ID of "1" should not be hard coded
         String roleNameToVerify = "ROLE_" +
-        	//"1_" + FIXME: Need to qualify role name with tenant ID
+        	"1_" +
         	verifyRoleName.toUpperCase();
         Assert.assertEquals(output.getRoleName(), roleNameToVerify,
                 "RoleName fix did not work!");
