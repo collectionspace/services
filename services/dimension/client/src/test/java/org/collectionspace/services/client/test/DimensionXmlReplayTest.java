@@ -14,14 +14,14 @@ import java.util.List;
  */
 public class DimensionXmlReplayTest extends XmlReplayTest { 
 
-    @Test
+    //@Test
     public void runMaster() throws Exception {
         XmlReplay replay = createXmlReplayUsingIntegrationTestsModule("../../");
         List<List<ServiceResult>> list = replay.runMaster("dimension-master.xml");
         logTestForGroup(list, "runMaster");
     }
 
-    @Test
+    //@Test
     public void runOneTest() throws Exception {
         XmlReplay replay = createXmlReplayForModule();
         replay.readOptionsFromMasterConfigFile("dimension-master.xml");

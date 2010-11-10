@@ -11,7 +11,7 @@
    <testGroup ID="dimensionTestGroup" autoDeletePOSTS="false">
         <!-- should fail on auth="bigbird2010" since bigbird2010 is not defined on back end. -->
         <test ID="dimension1"  auth="bigbird2010">
-            <expectedCodes>403</expectedCodes>
+            <expectedCodes>401,403</expectedCodes>
             <method>POST</method>
             <uri>/cspace-services/dimensions/</uri>
             <part>
