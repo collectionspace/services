@@ -435,110 +435,114 @@ public class XmlReplay {
             int testElementIndex = -1;
 
             for (Node testNode : tests) {
-                testElementIndex++;
-                String testID = testNode.valueOf("@ID");
-                String testIDLabel = Tools.notEmpty(testID) ? (testGroupID+'.'+testID) : (testGroupID+'.'+testElementIndex);
-                String method = testNode.valueOf("method");
-                String uri = testNode.valueOf("uri");
-                String fullURL = Tools.glue(protoHostPort, "/", uri);
-                String initURI = uri;
+                try {
+                    testElementIndex++;
+                    String testID = testNode.valueOf("@ID");
+                    String testIDLabel = Tools.notEmpty(testID) ? (testGroupID+'.'+testID) : (testGroupID+'.'+testElementIndex);
+                    String method = testNode.valueOf("method");
+                    String uri = testNode.valueOf("uri");
+                    String fullURL = Tools.glue(protoHostPort, "/", uri);
+                    String initURI = uri;
 
-                String authIDForTest = testNode.valueOf("@auth");
-                String currentAuthForTest = authsMap.map.get(authIDForTest);
-                if (Tools.notEmpty(currentAuthForTest)){
-                    authForTest = currentAuthForTest; //else just run with current from last loop;
-                }
-                if (Tools.isEmpty(authForTest)){
-                    authForTest = defaultAuths.getDefaultAuth();
-                }
-
-                if (uri.indexOf("$")>-1){
-                    uri = evalStruct.eval(uri, serviceResultsMap, jexl, jc);
-                }
-                fullURL = fixupFullURL(fullURL, protoHostPort, uri);
-
-                List<Integer> expectedCodes = new ArrayList<Integer>();
-                String expectedCodesStr = testNode.valueOf("expectedCodes");
-                if (Tools.notEmpty(expectedCodesStr)){
-                     String[] codesArray = expectedCodesStr.split(",");
-                     for (String code : codesArray){
-                         expectedCodes.add(new Integer(code));
-                     }
-                }
-
-                ServiceResult serviceResult;
-                boolean isPOST = method.equalsIgnoreCase("POST");
-                boolean isPUT =  method.equalsIgnoreCase("PUT");
-                if ( isPOST || isPUT ) {
-                    PartsStruct parts = PartsStruct.readParts(testNode, testID, xmlReplayBaseDir);
-                    if (Tools.notEmpty(parts.overrideTestID)) {
-                        testID = parts.overrideTestID;
+                    String authIDForTest = testNode.valueOf("@auth");
+                    String currentAuthForTest = authsMap.map.get(authIDForTest);
+                    if (Tools.notEmpty(currentAuthForTest)){
+                        authForTest = currentAuthForTest; //else just run with current from last loop;
                     }
-                    if (isPOST){
-                        String csid = CSIDfromTestID(testNode, serviceResultsMap);
-                        if (Tools.notEmpty(csid)) uri = Tools.glue(uri, "/", csid+"/items/");
-                    } else if (isPUT) {
-                        uri = fromTestID(uri, testNode, serviceResultsMap);
+                    if (Tools.isEmpty(authForTest)){
+                        authForTest = defaultAuths.getDefaultAuth();
                     }
-                    if (parts.bDoingSinglePartPayload){
-                        serviceResult = XmlReplayTransport.doPOST_PUTFromXML(parts.singlePartPayloadFilename, protoHostPort, uri, "POST", XmlReplayTransport.APPLICATION_XML, evalStruct, authForTest, testIDLabel);
-                    } else {
-                        serviceResult = XmlReplayTransport.doPOST_PUTFromXML_Multipart(parts.filesList, parts.partsList, protoHostPort, uri, "POST", evalStruct, authForTest, testIDLabel);
-                    }
-                    results.add(serviceResult);
-                    if (isPOST){
-                        serviceResultsMap.put(testID, serviceResult);      //PUTs do not return a Location, so don't add PUTs to serviceResultsMap.
+
+                    if (uri.indexOf("$")>-1){
+                        uri = evalStruct.eval(uri, serviceResultsMap, jexl, jc);
                     }
                     fullURL = fixupFullURL(fullURL, protoHostPort, uri);
-                } else if (method.equalsIgnoreCase("DELETE")){
-                    String fromTestID = testNode.valueOf("fromTestID");
-                    ServiceResult pr = serviceResultsMap.get(fromTestID);
-                    if (pr!=null){
-                        serviceResult = XmlReplayTransport.doDELETE(pr.deleteURL, authForTest, testIDLabel, fromTestID);
-                        serviceResult.fromTestID = fromTestID;
-                        results.add(serviceResult);
-                        if (serviceResult.gotExpectedResult()){
-                            serviceResultsMap.remove(fromTestID);
+
+                    List<Integer> expectedCodes = new ArrayList<Integer>();
+                    String expectedCodesStr = testNode.valueOf("expectedCodes");
+                    if (Tools.notEmpty(expectedCodesStr)){
+                         String[] codesArray = expectedCodesStr.split(",");
+                         for (String code : codesArray){
+                             expectedCodes.add(new Integer(code.trim()));
+                         }
+                    }
+
+                    ServiceResult serviceResult;
+                    boolean isPOST = method.equalsIgnoreCase("POST");
+                    boolean isPUT =  method.equalsIgnoreCase("PUT");
+                    if ( isPOST || isPUT ) {
+                        PartsStruct parts = PartsStruct.readParts(testNode, testID, xmlReplayBaseDir);
+                        if (Tools.notEmpty(parts.overrideTestID)) {
+                            testID = parts.overrideTestID;
                         }
-                    } else {
-                        if (Tools.notEmpty(fromTestID)){
-                            serviceResult = new ServiceResult();
-                            serviceResult.responseCode = 0;
-                            serviceResult.error = "ID not found in element fromTestID: "+fromTestID;
-                            System.err.println("****\r\nServiceResult: "+serviceResult.error+". SKIPPING TEST. Full URL: "+fullURL);
+                        if (isPOST){
+                            String csid = CSIDfromTestID(testNode, serviceResultsMap);
+                            if (Tools.notEmpty(csid)) uri = Tools.glue(uri, "/", csid+"/items/");
+                        } else if (isPUT) {
+                            uri = fromTestID(uri, testNode, serviceResultsMap);
+                        }
+                        if (parts.bDoingSinglePartPayload){
+                            serviceResult = XmlReplayTransport.doPOST_PUTFromXML(parts.singlePartPayloadFilename, protoHostPort, uri, "POST", XmlReplayTransport.APPLICATION_XML, evalStruct, authForTest, testIDLabel);
                         } else {
-                            serviceResult = XmlReplayTransport.doDELETE(fullURL, authForTest, testID, fromTestID);
+                            serviceResult = XmlReplayTransport.doPOST_PUTFromXML_Multipart(parts.filesList, parts.partsList, protoHostPort, uri, "POST", evalStruct, authForTest, testIDLabel);
                         }
-                        serviceResult.fromTestID = fromTestID;
                         results.add(serviceResult);
+                        if (isPOST){
+                            serviceResultsMap.put(testID, serviceResult);      //PUTs do not return a Location, so don't add PUTs to serviceResultsMap.
+                        }
+                        fullURL = fixupFullURL(fullURL, protoHostPort, uri);
+                    } else if (method.equalsIgnoreCase("DELETE")){
+                        String fromTestID = testNode.valueOf("fromTestID");
+                        ServiceResult pr = serviceResultsMap.get(fromTestID);
+                        if (pr!=null){
+                            serviceResult = XmlReplayTransport.doDELETE(pr.deleteURL, authForTest, testIDLabel, fromTestID);
+                            serviceResult.fromTestID = fromTestID;
+                            results.add(serviceResult);
+                            if (serviceResult.gotExpectedResult()){
+                                serviceResultsMap.remove(fromTestID);
+                            }
+                        } else {
+                            if (Tools.notEmpty(fromTestID)){
+                                serviceResult = new ServiceResult();
+                                serviceResult.responseCode = 0;
+                                serviceResult.error = "ID not found in element fromTestID: "+fromTestID;
+                                System.err.println("****\r\nServiceResult: "+serviceResult.error+". SKIPPING TEST. Full URL: "+fullURL);
+                            } else {
+                                serviceResult = XmlReplayTransport.doDELETE(fullURL, authForTest, testID, fromTestID);
+                            }
+                            serviceResult.fromTestID = fromTestID;
+                            results.add(serviceResult);
+                        }
+                    } else if (method.equalsIgnoreCase("GET")){
+                        fullURL = fromTestID(fullURL, testNode, serviceResultsMap);
+                        serviceResult = XmlReplayTransport.doGET(fullURL, authForTest, testIDLabel);
+                        results.add(serviceResult);
+                    } else if (method.equalsIgnoreCase("LIST")){
+                        fullURL = fixupFullURL(fullURL, protoHostPort, uri);
+                        String listQueryParams = ""; //TODO: empty for now, later may pick up from XML control file.
+                        serviceResult = XmlReplayTransport.doLIST(fullURL, listQueryParams, authForTest, testIDLabel);
+                        results.add(serviceResult);
+                    } else {
+                        throw new Exception("HTTP method not supported by XmlReplay: "+method);
                     }
-                } else if (method.equalsIgnoreCase("GET")){
-                    fullURL = fromTestID(fullURL, testNode, serviceResultsMap);
-                    serviceResult = XmlReplayTransport.doGET(fullURL, authForTest, testIDLabel);
-                    results.add(serviceResult);
-                } else if (method.equalsIgnoreCase("LIST")){
-                    fullURL = fixupFullURL(fullURL, protoHostPort, uri);
-                    String listQueryParams = ""; //TODO: empty for now, later may pick up from XML control file.
-                    serviceResult = XmlReplayTransport.doLIST(fullURL, listQueryParams, authForTest, testIDLabel);
-                    results.add(serviceResult);
-                } else {
-                    throw new Exception("HTTP method not supported by XmlReplay: "+method);
-                }
 
-                serviceResult.testID = testID;
-                serviceResult.fullURL = fullURL;
-                serviceResult.auth = authForTest;
-                serviceResult.method = method;
-                if (expectedCodes.size()>0){
-                    serviceResult.expectedCodes = expectedCodes;
-                }
-                if (Tools.isEmpty(serviceResult.testID)) serviceResult.testID = testIDLabel;
-                if (Tools.isEmpty(serviceResult.testGroupID)) serviceResult.testGroupID = testGroupID;
+                    serviceResult.testID = testID;
+                    serviceResult.fullURL = fullURL;
+                    serviceResult.auth = authForTest;
+                    serviceResult.method = method;
+                    if (expectedCodes.size()>0){
+                        serviceResult.expectedCodes = expectedCodes;
+                    }
+                    if (Tools.isEmpty(serviceResult.testID)) serviceResult.testID = testIDLabel;
+                    if (Tools.isEmpty(serviceResult.testGroupID)) serviceResult.testGroupID = testGroupID;
 
-                String serviceResultRow = serviceResult.dump(dump.dumpServiceResult);
-                String leader = (dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.detailed) ? "XmlReplay:"+testIDLabel+": ": "";
-                System.out.println(leader+serviceResultRow+"\r\n");
-                if (dump.payloads) System.out.println(serviceResult.result);
+                    String serviceResultRow = serviceResult.dump(dump.dumpServiceResult);
+                    String leader = (dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.detailed) ? "XmlReplay:"+testIDLabel+": ": "";
+                    System.out.println(leader+serviceResultRow+"\r\n");
+                    if (dump.payloads) System.out.println(serviceResult.result);
+                } catch (Throwable t) {
+                    System.out.println("ERROR: XmlReplay experienced an error in a test node: "+testNode+" Throwable: "+t);
+                }
             }
             if (Tools.isTrue(autoDeletePOSTS)&&param_autoDeletePOSTS){
                 autoDelete(serviceResultsMap, "default");

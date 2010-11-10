@@ -20,9 +20,9 @@
     When the DB is cleaned with [ant create_db import] it runs OK.
     -->
 
-    <!--<run controlFile="./security.xml" testGroup="securityRemovingRoleperms" />
-    -->
-    <run controlFile="./organization.xml" testGroup="organization" />
+    <run controlFile="./security.xml" testGroup="securityRemovingRoleperms" />
+    
+    <!--<run controlFile="./organization.xml" testGroup="organization" />-->
 
 </xmlReplayMaster>
 

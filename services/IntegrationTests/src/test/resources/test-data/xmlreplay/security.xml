@@ -208,7 +208,7 @@
 
         <!--First test that bigbird2010 does NOT have write access: -->
         <test ID="dimensionBeforePerms"  auth="bigbird2010">
-            <expectedCodes>401,500,501</expectedCodes>
+            <expectedCodes>401,403,500,501</expectedCodes>
             <method>POST</method>
             <uri>/cspace-services/dimensions/</uri>
             <part>
@@ -310,7 +310,7 @@
             <fromTestID>dimensionBigbird_POST_AfterPermrolesDeleted</fromTestID>
         </test>
         <test ID="dimensionBigbird_DELETE_AfterPermrolesDeleted" auth="bigbird2010">
-            <expectedCodes>403,404</expectedCodes>
+            <expectedCodes>0,403,404</expectedCodes>
             <method>DELETE</method>
             <fromTestID>dimensionBigbird_POST_AfterPermrolesDeleted</fromTestID>
         </test>
