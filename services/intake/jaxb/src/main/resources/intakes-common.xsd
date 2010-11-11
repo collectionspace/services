@@ -67,7 +67,7 @@
                 <xs:element name="insurers" type="insurerList"/>
 
                 <!-- Object Location Information Group -->
-                <xs:element name="currentLocationList" type="currentLocationList"/>
+                <xs:element name="currentLocationGroupList" type="currentLocationGroupList"/>
                 <xs:element name="locationDate" type="xs:string"/>
                 <xs:element name="normalLocation" type="xs:string"/>
 
@@ -119,7 +119,7 @@
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="currentLocationList">
+    <xs:complexType name="currentLocationGroupList">
         <xs:sequence>
             <xs:element name="currentLocationGroup" type="currentLocationGroup" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>

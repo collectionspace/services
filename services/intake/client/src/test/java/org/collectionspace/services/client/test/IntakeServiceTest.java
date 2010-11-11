@@ -30,6 +30,8 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IntakeClient;
 import org.collectionspace.services.intake.EntryMethodList;
 import org.collectionspace.services.intake.FieldCollectionEventNameList;
+import org.collectionspace.services.intake.CurrentLocationGroup;
+import org.collectionspace.services.intake.CurrentLocationGroupList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.IntakesCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -313,6 +315,15 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
                 intake.getFieldCollectionEventNames().getFieldCollectionEventName();
         Assert.assertTrue(fieldCollectionEventNames.size() > 0);
         Assert.assertNotNull(fieldCollectionEventNames.get(0));
+
+        CurrentLocationGroupList currentLocationGroupList = intake.getCurrentLocationGroupList();
+        Assert.assertNotNull(currentLocationGroupList);
+        List<CurrentLocationGroup> currentLocationGroups = currentLocationGroupList.getCurrentLocationGroup();
+        Assert.assertNotNull(currentLocationGroups);
+        Assert.assertTrue(currentLocationGroups.size() > 0);
+        CurrentLocationGroup currentLocationGroup = currentLocationGroups.get(0);
+        Assert.assertNotNull(currentLocationGroup);
+        Assert.assertNotNull(currentLocationGroup.getCurrentLocationNote());
     }
 
     // Failure outcomes
@@ -435,13 +446,26 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(intake);
 
         // Update the content of this resource.
-        // Update the content of this resource.
         intake.setEntryNumber("updated-" + intake.getEntryNumber());
         intake.setEntryDate("updated-" + intake.getEntryDate());
         if(logger.isDebugEnabled()){
             logger.debug("to be updated object");
             logger.debug(objectAsXmlString(intake, IntakesCommon.class));
         }
+
+        CurrentLocationGroupList currentLocationGroupList = intake.getCurrentLocationGroupList();
+        Assert.assertNotNull(currentLocationGroupList);
+        List<CurrentLocationGroup> currentLocationGroups = currentLocationGroupList.getCurrentLocationGroup();
+        Assert.assertNotNull(currentLocationGroups);
+        Assert.assertTrue(currentLocationGroups.size() > 0);
+        CurrentLocationGroup currentLocationGroup = currentLocationGroups.get(0);
+        Assert.assertNotNull(currentLocationGroup);
+        String currentLocationNote = currentLocationGroup.getCurrentLocationNote();
+        Assert.assertNotNull(currentLocationNote);
+        String updatedCurrentLocationNote = "updated-" + currentLocationNote;
+        currentLocationGroups.get(0).setCurrentLocationNote(updatedCurrentLocationNote);
+        intake.setCurrentLocationGroupList(currentLocationGroupList);
+
         // Submit the request to the service and store the response.
         MultipartOutput output = new MultipartOutput();
         OutputPart commonPart = output.addPart(intake, MediaType.APPLICATION_XML_TYPE);
@@ -457,15 +481,25 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-
         input = (MultipartInput) res.getEntity();
         IntakesCommon updatedIntake =
                 (IntakesCommon) extractPart(input,
                         client.getCommonPartName(), IntakesCommon.class);
+
         Assert.assertNotNull(updatedIntake);
 
         Assert.assertEquals(updatedIntake.getEntryDate(),
                 intake.getEntryDate(),
+                "Data in updated object did not match submitted data.");
+
+        currentLocationGroupList = updatedIntake.getCurrentLocationGroupList();
+        Assert.assertNotNull(currentLocationGroupList);
+        currentLocationGroups = currentLocationGroupList.getCurrentLocationGroup();
+        Assert.assertNotNull(currentLocationGroups);
+        Assert.assertTrue(currentLocationGroups.size() > 0);
+        Assert.assertNotNull(currentLocationGroups.get(0));
+        Assert.assertEquals(updatedCurrentLocationNote,
+                currentLocationGroups.get(0).getCurrentLocationNote(),
                 "Data in updated object did not match submitted data.");
 
     }
@@ -763,6 +797,15 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         eventNames.add("Field Collection Event Name-1");
         eventNames.add("Field Collection Event Name-2");
         intake.setFieldCollectionEventNames(eventNamesList);
+
+        CurrentLocationGroupList currentLocationGroupList = new CurrentLocationGroupList();
+        List<CurrentLocationGroup> currentLocationGroups = currentLocationGroupList.getCurrentLocationGroup();
+        CurrentLocationGroup currentLocationGroup = new CurrentLocationGroup();
+        currentLocationGroup.setCurrentLocation("upstairs");
+        currentLocationGroup.setCurrentLocationFitness("suitable");
+        currentLocationGroup.setCurrentLocationNote("A most suitable location.");
+        currentLocationGroups.add(currentLocationGroup);
+        intake.setCurrentLocationGroupList(currentLocationGroupList);
 
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
