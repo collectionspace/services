@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.query.QueryContext;
 import org.collectionspace.services.common.repository.RepositoryClient;
@@ -100,12 +101,20 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         documentModel.setProperty(DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA,
                 DocumentModelHandler.COLLECTIONSPACE_CORE_TENANTID,
                 ctx.getTenantId());
+
+        String now = GregorianCalendarDateTimeUtils.timestampUTC();
+        
         switch (action) {
             case CREATE:
-                //add creation date value
+                documentModel.setProperty(DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA,
+                                DocumentModelHandler.COLLECTIONSPACE_CORE_CREATED_AT,
+                                now);
                 break;
             case UPDATE:
-                //add update value
+                documentModel.setProperty(DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA,
+                                DocumentModelHandler.COLLECTIONSPACE_CORE_UPDATED_AT,
+                                now);
+
                 break;
             default:
         }
@@ -115,8 +124,6 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
      * create document in the Nuxeo repository
      *
      * @param ctx service context under which this method is invoked
-     * @param docType
-     *            of the document created
      * @param handler
      *            should be used by the caller to provide and transform the
      *            document
@@ -331,7 +338,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
     /**
      * find wrapped documentModel from the Nuxeo repository
      * @param ctx service context under which this method is invoked
-     * @param where NXQL where clause to get the document
+     * @param whereClause where NXQL where clause to get the document
      * @throws DocumentException
      */
     @Override
@@ -381,7 +388,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
     /**
      * find doc and return CSID from the Nuxeo repository
      * @param ctx service context under which this method is invoked
-     * @param where NXQL where clause to get the document
+     * @param whereClause where NXQL where clause to get the document
      * @throws DocumentException
      */
     @Override
@@ -411,8 +418,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
     /**
      * Find a list of documentModels from the Nuxeo repository
      * @param docTypes a list of DocType names to match
-     * @param where the clause to qualify on
-     * @param domain the domain for the associated services
+     * @param  whereClause where the clause to qualify on
      * @return
      */
     @Override
@@ -637,7 +643,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
             ((DocumentModelHandler) handler).setRepositorySession(repoSession);
             DocumentWrapper<DocumentModel> wrapDoc = new DocumentWrapperImpl<DocumentModel>(doc);
             handler.handle(Action.UPDATE, wrapDoc);
-            setCollectionSpaceCoreValues(ctx, doc, Action.CREATE);
+            setCollectionSpaceCoreValues(ctx, doc, Action.UPDATE);
             repoSession.saveDocument(doc);
             repoSession.save();
             handler.complete(Action.UPDATE, wrapDoc);
@@ -841,7 +847,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
      * Append a WHERE clause to the NXQL query.
      *
      * @param query         The NXQL query to which the WHERE clause will be appended.
-     * @param querycontext  The query context, which provides the WHERE clause to append.
+     * @param queryContext  The query context, which provides the WHERE clause to append.
      */
     private final void appendNXQLWhere(StringBuilder query, QueryContext queryContext) {
         //
@@ -876,7 +882,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
      * Append an ORDER BY clause to the NXQL query.
      *
      * @param query         the NXQL query to which the ORDER BY clause will be appended.
-     * @param querycontext  the query context, which provides the ORDER BY clause to append.
+     * @param queryContext  the query context, which provides the ORDER BY clause to append.
      *
      * @throws DocumentException  if the supplied value of the orderBy clause is not valid.
      *

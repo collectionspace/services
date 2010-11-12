@@ -57,7 +57,9 @@ public abstract class DocumentModelHandler<T, TL>
 
     public final static String COLLECTIONSPACE_CORE_SCHEMA = "collectionspace_core";
     public final static String COLLECTIONSPACE_CORE_TENANTID = "tenantId";
-    
+    public final static String COLLECTIONSPACE_CORE_CREATED_AT = "createdAt";
+    public final static String COLLECTIONSPACE_CORE_UPDATED_AT = "updatedAt";
+
     /**
      * getRepositorySession returns Nuxeo Repository Session
      * @return

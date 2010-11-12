@@ -13,6 +13,10 @@
     xmlns="http://collectionspace.org/collectionspace_core/"
     targetNamespace="http://collectionspace.org/collectionspace_core/"
     version="0.1">
+         
 
-    <xs:element name="tenantId" type="xs:string"/>    
+    <xs:element name="tenantId" type="xs:string"/>
+    <!--<xs:element name="createdAt" type="xs:string"/>-->
+    <xs:element name="createdAt" type="xs:dateTime"/>
+    <xs:element name="updatedAt" type="xs:dateTime"/>
 </xs:schema>
