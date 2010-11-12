@@ -29,6 +29,8 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.LoanoutClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.loanout.LoanedObjectStatusGroup;
+import org.collectionspace.services.loanout.LoanedObjectStatusGroupList;
 import org.collectionspace.services.loanout.LoansoutCommon;
 import org.collectionspace.services.loanout.LoansoutCommonList;
 
@@ -298,6 +300,15 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         LoansoutCommon loanout = (LoansoutCommon) extractPart(input,
                 client.getCommonPartName(), LoansoutCommon.class);
         Assert.assertNotNull(loanout);
+        Assert.assertNotNull(loanout.getLoanOutNumber());
+        LoanedObjectStatusGroupList statusGroupList = loanout.getLoanedObjectStatusGroupList();
+        Assert.assertNotNull(statusGroupList);
+        List<LoanedObjectStatusGroup> statusGroups = statusGroupList.getLoanedObjectStatusGroup();
+        Assert.assertNotNull(statusGroups);
+        Assert.assertTrue(statusGroups.size() > 0);
+        LoanedObjectStatusGroup statusGroup = statusGroups.get(0);
+        Assert.assertNotNull(statusGroup);
+        Assert.assertNotNull(statusGroup.getLoanedObjectStatus());
     }
 
     // Failure outcomes
@@ -426,6 +437,19 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
             logger.debug("to be updated object");
             logger.debug(objectAsXmlString(loanout, LoansoutCommon.class));
         }
+        LoanedObjectStatusGroupList statusGroupList = loanout.getLoanedObjectStatusGroupList();
+        Assert.assertNotNull(statusGroupList);
+        List<LoanedObjectStatusGroup> statusGroups = statusGroupList.getLoanedObjectStatusGroup();
+        Assert.assertNotNull(statusGroups);
+        Assert.assertTrue(statusGroups.size() > 0);
+        LoanedObjectStatusGroup statusGroup = statusGroups.get(0);
+        Assert.assertNotNull(statusGroup);
+        String loanedObjectStatus = statusGroup.getLoanedObjectStatus();
+        Assert.assertNotNull(loanedObjectStatus);
+        String updatedLoanedObjectStatus = "updated-" + loanedObjectStatus;
+        statusGroups.get(0).setLoanedObjectStatus(updatedLoanedObjectStatus);
+        loanout.setLoanedObjectStatusGroupList(statusGroupList);
+
         // Submit the request to the service and store the response.
         MultipartOutput output = new MultipartOutput();
         OutputPart commonPart = output.addPart(loanout, MediaType.APPLICATION_XML_TYPE);
@@ -450,6 +474,16 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
 
         Assert.assertEquals(updatedLoanout.getLoanReturnDate(),
                 loanout.getLoanReturnDate(),
+                "Data in updated object did not match submitted data.");
+
+        statusGroupList = updatedLoanout.getLoanedObjectStatusGroupList();
+        Assert.assertNotNull(statusGroupList);
+        statusGroups = statusGroupList.getLoanedObjectStatusGroup();
+        Assert.assertNotNull(statusGroups);
+        Assert.assertTrue(statusGroups.size() > 0);
+        Assert.assertNotNull(statusGroups.get(0));
+        Assert.assertEquals(updatedLoanedObjectStatus,
+                statusGroups.get(0).getLoanedObjectStatus(),
                 "Data in updated object did not match submitted data.");
 
     }
@@ -734,6 +768,13 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         loanout.setBorrowersContact(
             "urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth):person:name(Chris Contact)'Chris Contact'");
         loanout.setLoanPurpose("Allow people in cold climes to share the magic of Surfboards of the 1960s.");
+        LoanedObjectStatusGroupList statusGroupList = new LoanedObjectStatusGroupList();
+        List<LoanedObjectStatusGroup> statusGroups = statusGroupList.getLoanedObjectStatusGroup();
+        LoanedObjectStatusGroup statusGroup = new LoanedObjectStatusGroup();
+        statusGroup.setLoanedObjectStatus("returned");
+        statusGroup.setLoanedObjectStatusNote("Left under the front mat.");
+        statusGroups.add(statusGroup);
+        loanout.setLoanedObjectStatusGroupList(statusGroupList);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
             multipart.addPart(loanout, MediaType.APPLICATION_XML_TYPE);
