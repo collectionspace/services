@@ -165,8 +165,8 @@ public class RoleResource
             logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
             Response response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.POST_FAILED
-                    + ServiceMessages.UNKNOWN_ERROR_MSG).type("text/plain").build();
-            throw new WebApplicationException(response);
+                    + e.getMessage()).type("text/plain").build();
+            throw new WebApplicationException(e, response);
         }
     }
 

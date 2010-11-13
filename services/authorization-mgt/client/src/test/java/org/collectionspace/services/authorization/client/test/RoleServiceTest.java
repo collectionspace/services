@@ -174,7 +174,10 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
         int statusCode = res.getStatus();
 
         if (logger.isDebugEnabled()) {
+        	logger.debug(testName + ": Role with name \"" +
+        			knownRoleName + "\" should already exist, so this request should fail.");
             logger.debug(testName + ": status = " + statusCode);
+            logger.debug(testName + ": " + res);
         }
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));

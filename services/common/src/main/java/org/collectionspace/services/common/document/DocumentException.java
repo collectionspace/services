@@ -18,6 +18,10 @@
 
 package org.collectionspace.services.common.document;
 
+import java.sql.BatchUpdateException;
+
+import javax.persistence.RollbackException;
+
 import org.collectionspace.services.common.ServiceException;
 
 /**
@@ -26,6 +30,25 @@ import org.collectionspace.services.common.ServiceException;
  */
 public class DocumentException extends ServiceException {
 
+    static public DocumentException createDocumentException(Throwable ex) {
+    	DocumentException result = new DocumentException(ex);
+    	
+    	if (RollbackException.class.isInstance(ex) == true) {
+    		Throwable jpaProviderCause = ex.getCause();
+    		if (jpaProviderCause != null) {
+    			Throwable cause = jpaProviderCause.getCause();
+	    		if (cause != null && BatchUpdateException.class.isInstance(cause) == true) {
+	    			BatchUpdateException bue = (BatchUpdateException)cause;
+	    			String sqlState = bue.getSQLState();
+	    			result = new DocumentException(bue.getSQLState() +
+	    					" : " +
+	    					bue.getMessage());
+	    		}
+    		}
+    	}
+    	
+    	return result;
+    }
 
     /**
      * Creates a new instance of <code>DocumentException</code> without detail message.

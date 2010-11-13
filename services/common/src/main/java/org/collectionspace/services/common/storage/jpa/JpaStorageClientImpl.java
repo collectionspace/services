@@ -19,6 +19,8 @@ package org.collectionspace.services.common.storage.jpa;
 
 import java.util.Date;
 import java.util.List;
+import javax.persistence.RollbackException;
+import java.sql.BatchUpdateException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -89,8 +91,9 @@ public class JpaStorageClientImpl implements StorageClient {
      * Instantiates a new jpa storage client.
      */
     public JpaStorageClientImpl() {
+    	//intentionally empty
     }
-
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.storage.StorageClient#create(org.collectionspace.services.common.context.ServiceContext, org.collectionspace.services.common.document.DocumentHandler)
      */
@@ -98,7 +101,7 @@ public class JpaStorageClientImpl implements StorageClient {
     public String create(ServiceContext ctx,
             DocumentHandler handler) throws BadRequestException,
             DocumentException {
-
+    	boolean rollbackTransaction = false;
         if (ctx == null) {
             throw new IllegalArgumentException(
                     "create: ctx is missing");
@@ -117,31 +120,32 @@ public class JpaStorageClientImpl implements StorageClient {
             JaxbUtils.setValue(entity, "setCreatedAtItem", Date.class, new Date());
             emf = JpaStorageUtils.getEntityManagerFactory();
             em = emf.createEntityManager();
-            em.getTransaction().begin();
-            em.persist(entity);
+            em.getTransaction().begin(); { //begin of transaction block
+            	em.persist(entity);
+            }
             em.getTransaction().commit();
             handler.complete(Action.CREATE, wrapDoc);
             return (String) JaxbUtils.getValue(entity, "getCsid");
         } catch (BadRequestException bre) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+        	rollbackTransaction = true;
             throw bre;
         } catch (DocumentException de) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+        	rollbackTransaction = true;
             throw de;
         } catch (Exception e) {
-            if (em != null && em.getTransaction().isActive()) {
-                em.getTransaction().rollback();
-            }
+        	rollbackTransaction = true;
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception ", e);
             }
-            throw new DocumentException(e);
+            throw DocumentException.createDocumentException(e);
         } finally {
             if (em != null) {
+            	if (rollbackTransaction == true) {
+            		if (em.getTransaction().isActive() == true) {
+            			em.getTransaction().rollback();
+            		}
+            	}
+            	// Don't call this unless "em" is not null -hence the check above.
                 JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }
