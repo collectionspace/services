@@ -482,9 +482,9 @@ public class XmlReplay {
                             uri = fromTestID(uri, testNode, serviceResultsMap);
                         }
                         if (parts.bDoingSinglePartPayload){
-                            serviceResult = XmlReplayTransport.doPOST_PUTFromXML(parts.singlePartPayloadFilename, protoHostPort, uri, "POST", XmlReplayTransport.APPLICATION_XML, evalStruct, authForTest, testIDLabel);
+                            serviceResult = XmlReplayTransport.doPOST_PUTFromXML(parts.singlePartPayloadFilename, protoHostPort, uri, method, XmlReplayTransport.APPLICATION_XML, evalStruct, authForTest, testIDLabel);
                         } else {
-                            serviceResult = XmlReplayTransport.doPOST_PUTFromXML_Multipart(parts.filesList, parts.partsList, protoHostPort, uri, "POST", evalStruct, authForTest, testIDLabel);
+                            serviceResult = XmlReplayTransport.doPOST_PUTFromXML_Multipart(parts.filesList, parts.partsList, protoHostPort, uri, method, evalStruct, authForTest, testIDLabel);
                         }
                         results.add(serviceResult);
                         if (isPOST){

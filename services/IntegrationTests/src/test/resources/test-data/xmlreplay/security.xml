@@ -217,7 +217,7 @@
             </part>
         </test>
 
-        <!--Next, set up permissions and roles, and test bigbird2010 and elmo2010. -->
+        <!--Next, set up permissions and roles, and test bigbird2010.-->
         <test ID="permBigbird" auth="test">
             <method>POST</method>
             <uri>/cspace-services/authorization/permissions</uri>
@@ -243,8 +243,9 @@
             <uri>/cspace-services/authorization/permissions/${permBigbird.CSID}/permroles</uri>
             <filename>security/9-permissionroles-bigbird.xml</filename>
         </test>
-        
-        <!--  NOW TRY CRUDL BY BIGBIRD -->
+
+        <!--  bigbird2010 now has CRUD permissions, -->
+        <!--  so now try CRUDL by bigbird2010 -->
         
         <test ID="dimensionBigbird_POST"  auth="bigbird2010">
             <method>POST</method>
@@ -254,7 +255,7 @@
                 <filename>dimension/1.xml</filename>
             </part>
         </test>
-        <!-- TODO: FAILING, BUT SHOULD SUCCEED.  REMOVING TEST FOR NOW. 
+        <!-- TODO: FAILING, BUT SHOULD SUCCEED.  REMOVING TEST FOR NOW. -->
         <test ID="dimensionBigbird_PUT">
             <method>PUT</method>
             <uri>/cspace-services/dimensions/${dimensionBigbird_POST.CSID}</uri>
@@ -263,8 +264,10 @@
                 <filename>dimension/2-put.xml</filename>
             </part>
         </test>
-        -->
-        <test ID="dimensionBigbird_GET">
+
+
+
+       <test ID="dimensionBigbird_GET">
             <method>GET</method>
             <uri>/cspace-services/dimensions/</uri>
             <fromTestID>dimensionBigbird_POST</fromTestID>
@@ -295,7 +298,7 @@
             </part>
         </test>
         <test ID="dimensionBigbird_PUT_AfterPermrolesDeleted">
-            <expectedCodes>403, 404</expectedCodes>
+            <expectedCodes>403, 404,405</expectedCodes><!-- Expected failure because dimensionBigbird_POST_AfterPermrolesDeleted failed.-->
             <method>PUT</method>
             <uri>/cspace-services/dimensions/${dimensionBigbird_POST_AfterPermrolesDeleted.CSID}</uri>
             <part>
@@ -339,8 +342,6 @@
             </part>
         </test>
         <test ID="dimensionBigbird_PUT_CRU">
-            <!-- TODO: WE DIDN'T REALLY EXPECT THIS, BUT 405 IS WHAT THE SERVER SENDS. -->
-            <expectedCodes>405</expectedCodes>
             <method>PUT</method>
             <uri>/cspace-services/dimensions/${dimensionBigbird_POST_CRU.CSID}</uri>
             <part>
@@ -392,7 +393,7 @@
             </part>
         </test>
         <test ID="dimensionBigbird_PUT_R">
-            <expectedCodes>403,404</expectedCodes>
+            <expectedCodes>403,404,405</expectedCodes>
             <method>PUT</method>
             <uri>/cspace-services/dimensions/${dimensionBigbird_POST_R.CSID}</uri>
             <part>
