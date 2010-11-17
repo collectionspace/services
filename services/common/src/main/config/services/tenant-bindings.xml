@@ -14,7 +14,7 @@
         
     <!-- begin movingimages.us tenant meta-data -->
     <tenant:tenantBinding
-        id="1" name="movingimage.us" displayName="Museum of Moving Images" version="0.1">
+        id="1" name="collectionspace.org" displayName="CollectionSpace Demo" version="0.1">
 
         <tenant:repositoryDomain name="default-domain" repositoryClient="nuxeo-java"/>
 
@@ -1200,7 +1200,7 @@
         </tenant:serviceBindings>
         
     </tenant:tenantBinding>
-    <!-- end movingimages.us tenant meta-data -->
+    <!-- end collectionspace.org tenant meta-data -->
 
 
     <!-- ##################################################################### -->

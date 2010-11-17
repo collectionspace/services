@@ -52,7 +52,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
  */
 public class SpringAuthorizationProvider implements CSpaceAuthorizationProvider {
 
-    final Log log = LogFactory.getLog(SpringPermissionEvaluator.class);
+    final Log log = LogFactory.getLog(SpringAuthorizationProvider.class);
     @Autowired
     private MutableAclService providerAclService;
     @Autowired

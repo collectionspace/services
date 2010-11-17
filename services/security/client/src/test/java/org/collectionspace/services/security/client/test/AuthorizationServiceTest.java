@@ -53,6 +53,7 @@ import org.collectionspace.services.client.AccountRoleFactory;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.DimensionClient;
 import org.collectionspace.services.client.DimensionFactory;
+import org.collectionspace.services.client.IntakeClient;
 import org.collectionspace.services.client.PermissionClient;
 import org.collectionspace.services.client.PermissionFactory;
 import org.collectionspace.services.client.PermissionRoleClient;
@@ -61,6 +62,7 @@ import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.RoleFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.dimension.DimensionsCommon;
+import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -102,6 +104,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     private String bigbirdPermId;
     private String elmoPermId;
     private final static String TEST_SERVICE_NAME = "dimensions";
+    private boolean accountRolesFlipped = false;
     /*
      * This method is called only by the parent class, AbstractServiceTestImpl
      */
@@ -169,21 +172,29 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     }
 
     private void seedAccounts() {
-        String userId = "bigbird2010";
-        String accId = createAccount(userId, "bigbird@cspace.org");
-        AccountValue ava = new AccountValue();
-        ava.setScreenName(userId);
-        ava.setUserId(userId);
-        ava.setAccountId(accId);
-        accValues.put(ava.getUserId(), ava);
+        String userId1 = "bigbird2010";
+        String accId1 = createAccount(userId1, "bigbird@cspace.org");
+        AccountValue av1 = new AccountValue();
+        av1.setScreenName(userId1);
+        av1.setUserId(userId1);
+        av1.setAccountId(accId1);
+        accValues.put(av1.getUserId(), av1);
 
         String userId2 = "elmo2010";
-        String coAccId = createAccount(userId2, "elmo@cspace.org");
-        AccountValue avc = new AccountValue();
-        avc.setScreenName(userId2);
-        avc.setUserId(userId2);
-        avc.setAccountId(coAccId);
-        accValues.put(avc.getUserId(), avc);
+        String accId2 = createAccount(userId2, "elmo@cspace.org");
+        AccountValue av2 = new AccountValue();
+        av2.setScreenName(userId2);
+        av2.setUserId(userId2);
+        av2.setAccountId(accId2);
+        accValues.put(av2.getUserId(), av2);
+
+        String userId3 = "lockedOut";
+        String accId3 = createAccount(userId3, "lockedOut@cspace.org");
+        AccountValue av3 = new AccountValue();
+        av3.setScreenName(userId3);
+        av3.setUserId(userId3);
+        av3.setAccountId(accId3);
+        accValues.put(av3.getUserId(), av3);
     }
 
     private void seedAccountRoles() {
@@ -271,6 +282,118 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": knownResourceId=" + knownResourceId);
         }
+        
+        // Now verify that elmo cannot create
+        client = new DimensionClient();
+        client.setAuth(true, "elmo2010", true, "elmo2010", true);
+        res = client.create(multipart);
+
+        statusCode = res.getStatus();
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + " (verify not allowed): status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
+        
+        //Finally, verify that elmo has no access to Intakes
+        // Submit the request to the service and store the response.
+        IntakeClient iclient = new IntakeClient();
+        iclient.setAuth(true, "elmo2010", true, "elmo2010", true);
+        multipart = createIntakeInstance(
+                "entryNumber-" + identifier,
+                "entryDate-" + identifier,
+                "depositor-" + identifier);
+        res = iclient.create(multipart);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + " (verify create intake not allowed): status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
+        
+    }
+    
+    /**
+     * Creates the intake instance.
+     *
+     * @param entryNumber the entry number
+     * @param entryDate the entry date
+     * @param depositor the depositor
+     * @return the multipart output
+     */
+    private MultipartOutput createIntakeInstance(String entryNumber,
+    		String entryDate,
+    		String depositor) {
+        IntakesCommon intake = new IntakesCommon();
+        intake.setEntryNumber(entryNumber);
+        intake.setEntryDate(entryDate);
+        intake.setDepositor(depositor);
+
+        MultipartOutput multipart = new MultipartOutput();
+        OutputPart commonPart =
+            multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", new IntakeClient().getCommonPartName());
+
+        if(logger.isDebugEnabled()){
+            logger.debug("to be created, intake common");
+            logger.debug(objectAsXmlString(intake, IntakesCommon.class));
+        }
+
+        return multipart;
+    }
+
+    
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    	    dependsOnMethods = {"delete"})
+    public void verifyCreateWithFlippedRoles(String testName) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        setupCreate();
+
+        // Submit the request to the service and store the response.
+        DimensionClient client = new DimensionClient();
+        flipInitialAccountRoles();
+
+        // Now verify that elmo can create
+        client.setAuth(true, "elmo2010", true, "elmo2010", true);
+        client = new DimensionClient();
+        
+        String identifier = createIdentifier();
+        DimensionsCommon dimension = new DimensionsCommon();
+        dimension.setDimension("dimensionType");
+        dimension.setValue("value-" + identifier);
+        dimension.setValueDate(new Date().toString());
+        MultipartOutput multipart = DimensionFactory.createDimensionInstance(client.getCommonPartName(),
+                dimension);
+        ClientResponse<Response> res = client.create(multipart);
+
+        int statusCode = res.getStatus();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.CREATED.getStatusCode());
+        knownResourceId = extractId(res);
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": knownResourceId=" + knownResourceId);
+        }
+        
+        //bigbird no longer allowed to create
+        client.setAuth(true, "bigbird2010", true, "bigbird2010", true);
+        res = client.create(multipart);
+
+        statusCode = res.getStatus();
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + " (verify not allowed): status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
+        restoreInitialAccountRoles();
     }
 
     //to not cause uniqueness violation for permRole, createList is removed
@@ -330,7 +453,33 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         DimensionsCommon dimension = (DimensionsCommon) extractPart(input,
                 client.getCommonPartName(), DimensionsCommon.class);
         Assert.assertNotNull(dimension);
+    }
 
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    	    dependsOnMethods = {"read"})
+    public void readLockedOut(String testName) throws Exception {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupRead();
+
+        // Submit the request to the service and store the response.
+        DimensionClient client = new DimensionClient();
+        //lockedOut allowed to read
+        client.setAuth(true, "lockedOut", true, "lockedOut", true);
+        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + " (test lockedOut): status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
     }
 
     // Failure outcomes
@@ -400,6 +549,21 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
+        
+        client = new DimensionClient();
+
+        //lockedOut not allowed to update
+        client.setAuth(true, "lockedOut", true, "lockedOut", true);
+        res = client.update(knownResourceId, output);
+        statusCode = res.getStatus();
+        // Check the status code of the response: does it match the expected response(s)?
+        if (logger.isDebugEnabled()) {
+            logger.debug(testName + ": (lockedOut) status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, Response.Status.FORBIDDEN.getStatusCode());
+        
     }
 
     // Failure outcomes
@@ -524,7 +688,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         //FIXME delete on permission deletes all associations with roles
         //this would delete association with ROLE_ADMINISTRATOR too
         //deletePermissions();
-        deleteRoles();
+       	deleteRoles();
         deleteAccounts();
     }
 
@@ -543,12 +707,52 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
     private void deleteAccountRoles() {
         List<RoleValue> bigbirdRoleValues = new ArrayList<RoleValue>();
         bigbirdRoleValues.add(roleValues.get("ROLE_TEST_CM"));
-        deleteAccountRole(accValues.get("bigbird2010"), bigbirdRoleValues);
 
         List<RoleValue> elmoRoleValues = new ArrayList<RoleValue>();
         elmoRoleValues.add(roleValues.get("ROLE_TEST_INTERN"));
-        deleteAccountRole(accValues.get("elmo2010"), elmoRoleValues);
+        if(!accountRolesFlipped) {
+	        deleteAccountRole(accValues.get("bigbird2010"), bigbirdRoleValues);
+	        deleteAccountRole(accValues.get("elmo2010"), elmoRoleValues);
+        } else {
+	        deleteAccountRole(accValues.get("bigbird2010"), elmoRoleValues);
+	        deleteAccountRole(accValues.get("elmo2010"),bigbirdRoleValues );
+        }
     }
+    
+    private void flipInitialAccountRoles() {
+        if(!accountRolesFlipped) {
+	        List<RoleValue> cmRoleValues = new ArrayList<RoleValue>();
+	        List<RoleValue> internRoleValues = new ArrayList<RoleValue>();
+	        cmRoleValues.add(roleValues.get("ROLE_TEST_CM"));
+	        internRoleValues.add(roleValues.get("ROLE_TEST_INTERN"));
+	        
+	        deleteAccountRole(accValues.get("bigbird2010"), cmRoleValues);
+	        deleteAccountRole(accValues.get("elmo2010"), internRoleValues);
+
+	        createAccountRole(accValues.get("bigbird2010"), internRoleValues);
+	        createAccountRole(accValues.get("elmo2010"), cmRoleValues);
+	        
+	        accountRolesFlipped = true;
+        }
+    }
+
+    private void restoreInitialAccountRoles() {
+        if(accountRolesFlipped) {
+	        List<RoleValue> cmRoleValues = new ArrayList<RoleValue>();
+	        List<RoleValue> internRoleValues = new ArrayList<RoleValue>();
+	        cmRoleValues.add(roleValues.get("ROLE_TEST_CM"));
+	        internRoleValues.add(roleValues.get("ROLE_TEST_INTERN"));
+	        
+	        deleteAccountRole(accValues.get("bigbird2010"), internRoleValues);
+	        deleteAccountRole(accValues.get("elmo2010"), cmRoleValues);
+
+	        createAccountRole(accValues.get("bigbird2010"), internRoleValues);
+	        createAccountRole(accValues.get("elmo2010"), cmRoleValues);
+	        accountRolesFlipped = false;
+        }
+    }
+
+
 
     private void deletePermissions() {
         //delete entities

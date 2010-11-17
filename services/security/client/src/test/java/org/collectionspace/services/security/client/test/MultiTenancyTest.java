@@ -90,8 +90,9 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
 
     private final String CLASS_NAME = MultiTenancyTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    private final static String TENANT_1_ADMIN_USER = "test";
-    private final static String TENANT_2_ADMIN_USER = "test-pahma";
+    private final static String TENANT_1_ADMIN_USER = "admin@collectionspace.org";
+    private final static String TENANT_2_ADMIN_USER = "admin@hearstmuseum.berkeley.edu";
+    private final static String TENANT_ADMIN_PASS = "Administrator";
     private final static String TENANT_1_USER = "user1@museum1.org";
     private final static String TENANT_2_USER = "user2@museum2.org";
     private final static String TENANT_1 = "1";
@@ -143,8 +144,8 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
 
         //tenant admin users are used to create accounts, roles and permissions and relationships
         //assumption : two tenant admin users exist before running this test
-        tenantAdminUsers.put(TENANT_1, new UserInfo(TENANT_1_ADMIN_USER, "test"));
-        tenantAdminUsers.put(TENANT_2, new UserInfo(TENANT_2_ADMIN_USER, "test"));
+        tenantAdminUsers.put(TENANT_1, new UserInfo(TENANT_1_ADMIN_USER, TENANT_ADMIN_PASS));
+        tenantAdminUsers.put(TENANT_2, new UserInfo(TENANT_2_ADMIN_USER, TENANT_ADMIN_PASS));
 
         seedAccounts();
         seedPermissions();
