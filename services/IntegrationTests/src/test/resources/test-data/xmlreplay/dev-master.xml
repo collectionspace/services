@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xmlReplayMaster>
+<!-- Use this file to drive local testing.  Check it in or don't ... no automated tests should reference this file. -->
     <protoHostPort>http://localhost:8180</protoHostPort>
     
     <!-- legal values for dumpServiceResult=[minimal,detailed,full] -->
@@ -9,13 +10,9 @@
        <auth ID="test">dGVzdDp0ZXN0</auth>
     </auths>
 
-    
-    <!--
-    <run controlFile="./dimension.xml" testGroup="dimensionTestGroup" />
-    -->
 
-    <run controlFile="./dimension.xml" testGroup="dimensionCRUDGroup" />
-
+    <run controlFile="objectexit/object-exit.xml" testGroup="CRUDL" />
     
+
 </xmlReplayMaster>
 

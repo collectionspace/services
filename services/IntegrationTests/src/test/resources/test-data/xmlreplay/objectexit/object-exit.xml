@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    <auths>
+        <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
+        <auth ID="test">dGVzdDp0ZXN0</auth>
+    </auths>
+    
+   <!-- ================================================================================ -->
+    
+     <testGroup ID="CRUDL" autoDeletePOSTS="true">
+         <test ID="oe1"  auth="test">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <part>
+                 <label>objectexit_common</label>
+                 <filename>objectexit/oe1.xml</filename>
+             </part>
+         </test>
+        <test ID="oe2">
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/${oe1.CSID}</uri>
+            <reponse>oe2.res.xml</reponse>
+        </test>
+        <test ID="oe3">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <part>
+                 <label>objectexit_common</label>
+                 <filename>objectexit/oe3.xml</filename>
+             </part>
+         </test>
+        <test ID="oe4">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <part>
+                 <label>objectexit_common</label>
+                 <filename>objectexit/oe4.xml</filename>
+             </part>
+         </test>
+         <test ID="oe5">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <part>
+                 <label>objectexit_common</label>
+                 <filename>objectexit/oe5.xml</filename>
+             </part>
+         </test>
+         <test ID="oe6">
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/</uri>
+            <reponse>oe6.res.xml</reponse>
+            <!--response elements will need parts, too, e.g. personauthorities_common -->
+            <!-- inside oe6.res.xml, there is a CSID which will change every time, and should be ref'd as 6f7a1e3e-5821-4ef2-bfcf ==> ${oe1.CSID}
+            -->
+        </test>
+         <test ID="oe7">
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/9223372036854775807</uri>
+            <expectedCodes>404</expectedCodes>
+        </test>
+        <test ID="oe8">
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/${oe1.CSID}</uri>
+            <reponse>oe8.res.xml</reponse>
+        </test>
+         <test ID="oe9">
+             <method>POST</method>
+             <uri>/cspace-services/personauthorities/</uri>
+             <part>
+                 <label>personauthorities_common</label>
+                 <filename>objectexit/oe9.xml</filename>
+             </part>
+         </test>
+         <test ID="oe10">
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/${oe9.CSID}</uri>
+        </test>
+       
+        <test ID="oe11">
+             <method>POST</method>
+             <uri>/cspace-services/personauthorities/${oe9.CSID}/items/</uri>
+             <part>
+                 <label>persons_common</label>
+                 <filename>objectexit/oe11.xml</filename>
+             </part>
+        </test>
+        <test ID="oe12">
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/${oe9.CSID}/items/${oe11.CSID}</uri>
+        </test>
+        <test ID="oe13">
+             <method>POST</method>
+             <uri>/cspace-services/personauthorities/${oe9.CSID}/items/</uri>
+             <part>
+                 <label>persons_common</label>
+                 <filename>objectexit/oe13.xml</filename>
+             </part>
+        </test>
+        <test ID="oe14">
+            <method>GET</method>
+            <uri>/cspace-services/personauthorities/${oe11.CSID}/items/${oe13.CSID}</uri>
+        </test>
+        <test ID="oe15">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <part>
+                 <label>objectexit_common</label>
+                 <filename>objectexit/oe15.xml</filename>
+             </part>
+        </test>
+        <test ID="oe16">
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/${oe15.CSID}</uri>
+        </test>
+        <test ID="oe17">
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/${oe15.CSID}/authorityrefs/</uri>
+        </test>
+        <test ID="oe18">
+            <method>DELETE</method>
+            <uri>/cspace-services/personauthorities/${oe9.CSID}/items/${oe11.CSID}</uri>
+        </test>
+ 
+        <test ID="oe19">
+            <method>DELETE</method>
+            <uri>/cspace-services/personauthorities/${oe9.CSID}/items/${oe13.CSID}</uri>
+        </test>
+        <test ID="oe20">
+            <method>DELETE</method>
+            <uri>/cspace-services/personauthorities/${oe9.CSID}</uri>
+        </test>
+        <test ID="oe21">
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${oe15.CSID}</uri>
+        </test>
+        <test ID="oe22">
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/${oe1.CSID}</uri>
+        </test>
+        <test ID="oe23">
+             <method>PUT</method>
+             <uri>/cspace-services/objectexit/${oe1.CSID}</uri>
+             <part>
+                 <label>objectexit_common</label>
+                 <filename>objectexit/oe23.xml</filename>
+             </part>
+        </test>
+        <test ID="oe24">
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${oe1.CSID}</uri>
+        </test>
+        <test ID="oe25">
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/9223372036854775807</uri>
+            <expectedCodes>404</expectedCodes>
+        </test>
+       <test ID="oe26">
+             <method>PUT</method>
+             <uri>/cspace-services/objectexit/9223372036854775807</uri>
+             <part>
+                 <label>objectexit_common</label>
+                 <filename>objectexit/oe23.xml</filename><!-- won't be found, so just re-using older post file as payload.-->
+             </part>
+             <expectedCodes>404</expectedCodes>
+        </test>
+        <test ID="oe27">
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/?sortBy=&amp;pgNum=0&amp;pgSz=1</uri>
+        </test>
+        <test ID="oe28">
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/?sortBy=&amp;pgNum=0&amp;pgSz=1</uri>
+        </test>
+        <test ID="oe29">
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/?sortBy=&amp;pgNum=1&amp;pgSz=1</uri>
+        </test>
+        <test ID="oe30">
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/?sortBy=&amp;pgNum=2&amp;pgSz=1</uri>
+        </test>
+        <test ID="oe31">
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${oe1.CSID}</uri>
+            <expectedCodes>404</expectedCodes>
+        </test>
+        <test ID="oe32">
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${oe3.CSID}</uri>
+        </test>
+        <test ID="oe33">
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${oe4.CSID}</uri>
+        </test>
+        <test ID="oe34">
+            <method>DELETE</method>
+            <uri>/cspace-services/objectexit/${oe5.CSID}</uri>
+        </test>
+
+     </testGroup>
+
+</xmlReplay>
+        
+        

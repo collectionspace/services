@@ -1,0 +1,792 @@
+======== oe1
+
+POST /cspace-services/objectexit/ HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+content-type: multipart/mixed; boundary=95109d0e-0a73-427b-b504-8d34fe9cc4b1
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+Content-Length: 565
+
+--95109d0e-0a73-427b-b504-8d34fe9cc4b1
+label: objectexit_common
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:objectexit_common xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:ns3="http://collectionspace.org/services/jaxb"><depositor>urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'</depositor><exitNumber>objectexitNumber-1290026472360</exitNumber></ns2:objectexit_common>
+--95109d0e-0a73-427b-b504-8d34fe9cc4b1--
+
+HTTP/1.1 201 Created
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Location: http://localhost:8280/cspace-services/objectexit/${oe1.CSID}
+Set-Cookie: JSESSIONID=0D95D475BD20A8BF0819E365E2BEACF0; Path=/
+Content-Length: 0
+Date: Wed, 17 Nov 2010 20:41:12 GMT
+
+======== oe2
+GET /cspace-services/objectexit/${oe1.CSID} HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Set-Cookie: JSESSIONID=6F986605121E80118EB5BC4A02983F44; Path=/
+Content-Type: multipart/mixed; boundary=e52df003-dfc3-47ad-af38-8274b383938c
+Content-Length: 696
+Date: Wed, 17 Nov 2010 20:41:12 GMT
+
+--e52df003-dfc3-47ad-af38-8274b383938c
+label: objectexit_common
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:objectexit_common xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://collectionspace.org/services/objectexit http://services.collectionspace.org/objectexit/objectexit_common.xsd">
+<exitNumber>objectexitNumber-1290026472360</exitNumber>
+<depositor>urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'</depositor>
+</ns2:objectexit_common>
+
+--e52df003-dfc3-47ad-af38-8274b383938c--
+
+======== oe3
+
+POST /cspace-services/objectexit/ HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+content-type: multipart/mixed; boundary=e06d4476-22bc-4c76-b715-c8bab4e6a0eb
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+Content-Length: 565
+
+--e06d4476-22bc-4c76-b715-c8bab4e6a0eb
+label: objectexit_common
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:objectexit_common xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:ns3="http://collectionspace.org/services/jaxb"><depositor>urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'</depositor><exitNumber>objectexitNumber-1290026473391</exitNumber></ns2:objectexit_common>
+--e06d4476-22bc-4c76-b715-c8bab4e6a0eb--
+HTTP/1.1 201 Created
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Location: http://localhost:8280/cspace-services/objectexit/${oe3.CSID}
+Set-Cookie: JSESSIONID=ED99F25DE8919EECFCCA46867914635C; Path=/
+Content-Length: 0
+Date: Wed, 17 Nov 2010 20:41:12 GMT
+
+======== oe4
+POST /cspace-services/objectexit/ HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+content-type: multipart/mixed; boundary=09c91a11-de7b-4183-a1c6-1e17f15a4349
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+Content-Length: 565
+
+--09c91a11-de7b-4183-a1c6-1e17f15a4349
+label: objectexit_common
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:objectexit_common xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:ns3="http://collectionspace.org/services/jaxb"><depositor>urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'</depositor><exitNumber>objectexitNumber-1290026473626</exitNumber></ns2:objectexit_common>
+--09c91a11-de7b-4183-a1c6-1e17f15a4349--
+HTTP/1.1 201 Created
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Location: http://localhost:8280/cspace-services/objectexit/${oe4.CSID}
+Set-Cookie: JSESSIONID=CB777B7BD098E310CD731CFC9F582208; Path=/
+Content-Length: 0
+Date: Wed, 17 Nov 2010 20:41:12 GMT
+
+======== oe5
+
+POST /cspace-services/objectexit/ HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+content-type: multipart/mixed; boundary=6af5cd15-2735-4378-b16e-00db9e8e4398
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+Content-Length: 565
+
+--6af5cd15-2735-4378-b16e-00db9e8e4398
+label: objectexit_common
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:objectexit_common xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:ns3="http://collectionspace.org/services/jaxb"><depositor>urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'</depositor><exitNumber>objectexitNumber-1290026473860</exitNumber></ns2:objectexit_common>
+--6af5cd15-2735-4378-b16e-00db9e8e4398--
+HTTP/1.1 201 Created
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Location: http://localhost:8280/cspace-services/objectexit/${oe5.CSID}
+Set-Cookie: JSESSIONID=1F2D32B5EB70119A0ABFF7D10BBEBF00; Path=/
+Content-Length: 0
+Date: Wed, 17 Nov 2010 20:41:14 GMT
+
+======== oe6
+GET /cspace-services/objectexit/ HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: application/xml
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Set-Cookie: JSESSIONID=FE5B4A7097D26C95D875ACAB3EBB646D; Path=/
+Content-Type: application/xml
+Content-Length: 1176
+Date: Wed, 17 Nov 2010 20:41:14 GMT
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:objectexit_common_list xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:ns3="http://collectionspace.org/services/jaxb"><pageNum>0</pageNum><pageSize>40</pageSize><itemsInPage>4</itemsInPage><totalItems>4</totalItems><fieldsReturned>currentOwner|depositor|exitDate|exitMethod|exitNote|exitNumber|exitReason|packingNote|uri|csid</fieldsReturned><objectexit_list_item><exitNumber>objectexitNumber-1290026473391</exitNumber><uri>/objectexit/${oe3.CSID}</uri><csid>${oe3.CSID}</csid></objectexit_list_item><objectexit_list_item><exitNumber>objectexitNumber-1290026473626</exitNumber><uri>/objectexit/${oe4.CSID}</uri><csid>${oe4.CSID}</csid></objectexit_list_item><objectexit_list_item><exitNumber>objectexitNumber-1290026473860</exitNumber><uri>/objectexit/${oe5.CSID}</uri><csid>${oe5.CSID}</csid></objectexit_list_item><objectexit_list_item><exitNumber>objectexitNumber-1290026472360</exitNumber><uri>/objectexit/${oe1.CSID}</uri><csid>${oe1.CSID}</csid></objectexit_list_item></ns2:objectexit_common_list>
+
+======== oe7
+GET /cspace-services/objectexit/9223372036854775807 HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+
+
+HTTP/1.1 404 Not Found
+Server: Apache-Coyote/1.1
+Set-Cookie: JSESSIONID=A8D371B125EF13189E82D94B69A6DA10; Path=/
+Content-Type: text/plain
+Content-Length: 108
+Date: Wed, 17 Nov 2010 20:41:14 GMT
+
+Read request failed:  on org.collectionspace.services.objectexit.ObjectExitResource csid=9223372036854775807
+
+======== oe8
+GET /cspace-services/objectexit/${oe1.CSID} HTTP/1.1
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Set-Cookie: JSESSIONID=2DDA7D892A19F66617ED0A102BF0251F; Path=/
+Content-Type: multipart/mixed; boundary=33518b91-2dd8-49b5-aaa3-b62d69afbc5e
+Content-Length: 696
+Date: Wed, 17 Nov 2010 20:41:14 GMT
+
+--33518b91-2dd8-49b5-aaa3-b62d69afbc5e
+label: objectexit_common
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:objectexit_common xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://collectionspace.org/services/objectexit http://services.collectionspace.org/objectexit/objectexit_common.xsd">
+<exitNumber>objectexitNumber-1290026472360</exitNumber>
+<depositor>urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'</depositor>
+</ns2:objectexit_common>
+
+--33518b91-2dd8-49b5-aaa3-b62d69afbc5e--
+
+======== oe9
+POST /cspace-services/personauthorities/ HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+content-type: multipart/mixed; boundary=29b0ab9b-bace-400f-8d79-d2942c0ef373
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+Content-Length: 631
+
+--29b0ab9b-bace-400f-8d79-d2942c0ef373
+label: personauthorities_common
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:personauthorities_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:ns3="http://collectionspace.org/services/jaxb"><displayName>ObjectexitPersonAuth</displayName><shortIdentifier>ObjectexitPersonAuth</shortIdentifier><refName>urn:cspace:org.collectionspace.demo:personauthority:name(ObjectexitPersonAuth)'ObjectexitPersonAuth'</refName><vocabType>PersonAuthority</vocabType></ns2:personauthorities_common>
+--29b0ab9b-bace-400f-8d79-d2942c0ef373--
+HTTP/1.1 201 Created
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Location: http://localhost:8280/cspace-services/personauthorities/${oe9.CSID}
+Set-Cookie: JSESSIONID=F14CB81349A9521CA4BA8B94B80A0E22; Path=/
+Content-Length: 0
+Date: Wed, 17 Nov 2010 20:41:14 GMT
+
+======== oe10
+GET /cspace-services/personauthorities/${oe9.CSID} HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Set-Cookie: JSESSIONID=1B5DD74155F06F53DB16E17E53A5F3BC; Path=/
+Content-Type: multipart/mixed; boundary=cff38d51-a45b-4527-a17d-d363191ca7ab
+Content-Length: 803
+Date: Wed, 17 Nov 2010 20:41:14 GMT
+
+--cff38d51-a45b-4527-a17d-d363191ca7ab
+label: personauthorities_common
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:personauthorities_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://collectionspace.org/services/person http://services.collectionspace.org/person/personauthorities_common.xsd">
+<shortIdentifier>ObjectexitPersonAuth</shortIdentifier>
+<refName>urn:cspace:org.collectionspace.demo:personauthority:name(ObjectexitPersonAuth)'ObjectexitPersonAuth'</refName>
+<csid>${oe9.CSID}</csid>
+<displayName>ObjectexitPersonAuth</displayName>
+<vocabType>PersonAuthority</vocabType>
+</ns2:personauthorities_common>
+
+--cff38d51-a45b-4527-a17d-d363191ca7ab--
+
+
+======== oe11
+POST /cspace-services/personauthorities/${oe9.CSID}/items/ HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+content-type: multipart/mixed; boundary=9a9bbb94-3dbc-493a-93bb-74e3f792c24d
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+Content-Length: 745
+
+--9a9bbb94-3dbc-493a-93bb-74e3f792c24d
+label: persons_common
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:persons_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:ns3="http://collectionspace.org/services/jaxb"><inAuthority>${oe9.CSID}</inAuthority><shortIdentifier>owenCurOwner</shortIdentifier><refName>urn:cspace:org.collectionspace.demo:personauthority:name(ObjectexitPersonAuth)'ObjectexitPersonAuth':person:name(owenCurOwner)</refName><displayNameComputed>true</displayNameComputed><shortDisplayNameComputed>true</shortDisplayNameComputed><foreName>Owen the Cur</foreName><surName>Owner</surName></ns2:persons_common>
+--9a9bbb94-3dbc-493a-93bb-74e3f792c24d--
+HTTP/1.1 201 Created
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Location: http://localhost:8280/cspace-services/personauthorities/${oe9.CSID}/items/${oe11.CSID}
+Set-Cookie: JSESSIONID=71F795AAF4F6F403B222DB5FB42D5789; Path=/
+Content-Length: 0
+Date: Wed, 17 Nov 2010 20:41:15 GMT
+
+======== oe12
+GET /cspace-services/personauthorities/${oe9.CSID}/items/${oe11.CSID} HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Set-Cookie: JSESSIONID=4F9B2572AC16F5B471EF068B36133F24; Path=/
+Content-Type: multipart/mixed; boundary=74a0fd49-2bb5-46dd-9f76-9057e2d59b62
+Content-Length: 1082
+Date: Wed, 17 Nov 2010 20:41:15 GMT
+
+--74a0fd49-2bb5-46dd-9f76-9057e2d59b62
+label: persons_common
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:persons_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://collectionspace.org/services/person http://services.collectionspace.org/person/persons_common.xsd">
+<surName>Owner</surName>
+<nationalities/>
+<shortIdentifier>owenCurOwner</shortIdentifier>
+<shortDisplayName>Owen the Cur Owner</shortDisplayName>
+<schoolsOrStyles/>
+<foreName>Owen the Cur</foreName>
+<groups/>
+<occupations/>
+<displayNameComputed>true</displayNameComputed>
+<csid>${oe11.CSID}</csid>
+<shortDisplayNameComputed>true</shortDisplayNameComputed>
+<inAuthority>${oe9.CSID}</inAuthority>
+<refName>urn:cspace:org.collectionspace.demo:personauthority:name(ObjectexitPersonAuth)'ObjectexitPersonAuth':person:name(owenCurOwner)</refName>
+<displayName>Owen the Cur Owner</displayName>
+</ns2:persons_common>
+
+--74a0fd49-2bb5-46dd-9f76-9057e2d59b62--
+
+======== oe13
+POST /cspace-services/personauthorities/${oe9.CSID}/items/ HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+content-type: multipart/mixed; boundary=d32d9c8b-21be-47bf-bce9-2484a4504760
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+Content-Length: 758
+
+--d32d9c8b-21be-47bf-bce9-2484a4504760
+label: persons_common
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:persons_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:ns3="http://collectionspace.org/services/jaxb"><inAuthority>${oe9.CSID}</inAuthority><shortIdentifier>davenportDepositor</shortIdentifier><refName>urn:cspace:org.collectionspace.demo:personauthority:name(ObjectexitPersonAuth)'ObjectexitPersonAuth':person:name(davenportDepositor)</refName><displayNameComputed>true</displayNameComputed><shortDisplayNameComputed>true</shortDisplayNameComputed><foreName>Davenport</foreName><surName>Depositor</surName></ns2:persons_common>
+--d32d9c8b-21be-47bf-bce9-2484a4504760--
+HTTP/1.1 201 Created
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Location: http://localhost:8280/cspace-services/personauthorities/${oe9.CSID}/items/${oe13.CSID}
+Set-Cookie: JSESSIONID=57428CBB795F309B69DD763783FA8B97; Path=/
+Content-Length: 0
+Date: Wed, 17 Nov 2010 20:41:15 GMT
+
+======== oe14
+GET /cspace-services/personauthorities/${oe9.CSID}/items/${oe13.CSID} HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Set-Cookie: JSESSIONID=420FFE6C806EFAD5EEFD858BF24E4038; Path=/
+Content-Type: multipart/mixed; boundary=2b0d244d-ed3b-4266-a924-098448116026
+Content-Length: 1097
+Date: Wed, 17 Nov 2010 20:41:15 GMT
+
+--2b0d244d-ed3b-4266-a924-098448116026
+label: persons_common
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:persons_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://collectionspace.org/services/person http://services.collectionspace.org/person/persons_common.xsd">
+<surName>Depositor</surName>
+<nationalities/>
+<shortIdentifier>davenportDepositor</shortIdentifier>
+<shortDisplayName>Davenport Depositor</shortDisplayName>
+<schoolsOrStyles/>
+<foreName>Davenport</foreName>
+<groups/>
+<occupations/>
+<displayNameComputed>true</displayNameComputed>
+<csid>${oe13.CSID}</csid>
+<shortDisplayNameComputed>true</shortDisplayNameComputed>
+<inAuthority>${oe9.CSID}</inAuthority>
+<refName>urn:cspace:org.collectionspace.demo:personauthority:name(ObjectexitPersonAuth)'ObjectexitPersonAuth':person:name(davenportDepositor)</refName>
+<displayName>Davenport Depositor</displayName>
+</ns2:persons_common>
+
+--2b0d244d-ed3b-4266-a924-098448116026--
+
+
+======== oe15
+POST /cspace-services/objectexit/ HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+content-type: multipart/mixed; boundary=273986a9-962e-412c-a576-2053157b992c
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+Content-Length: 602
+
+--273986a9-962e-412c-a576-2053157b992c
+label: objectexit_common
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:objectexit_common xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:ns3="http://collectionspace.org/services/jaxb"><depositor>urn:cspace:org.collectionspace.demo:personauthority:name(ObjectexitPersonAuth)'ObjectexitPersonAuth':person:name(davenportDepositor)</depositor><exitDate>exitDate-1290026474563</exitDate><exitNumber>exitNumber-1290026474563</exitNumber></ns2:objectexit_common>
+--273986a9-962e-412c-a576-2053157b992c--
+HTTP/1.1 201 Created
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Location: http://localhost:8280/cspace-services/objectexit/${oe15.CSID}
+Set-Cookie: JSESSIONID=0E7CB5149F40401464EA40FF9ACE4B76; Path=/
+Content-Length: 0
+Date: Wed, 17 Nov 2010 20:41:15 GMT
+
+======== oe16
+GET /cspace-services/objectexit/${oe15.CSID} HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Set-Cookie: JSESSIONID=EAF02B50AE4FE2B2049862509C70AC82; Path=/
+Content-Type: multipart/mixed; boundary=323db230-9e89-4c61-ad78-df3888cb2a24
+Content-Length: 735
+Date: Wed, 17 Nov 2010 20:41:15 GMT
+
+--323db230-9e89-4c61-ad78-df3888cb2a24
+label: objectexit_common
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:objectexit_common xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://collectionspace.org/services/objectexit http://services.collectionspace.org/objectexit/objectexit_common.xsd">
+<exitDate>exitDate-1290026474563</exitDate>
+<exitNumber>exitNumber-1290026474563</exitNumber>
+<depositor>urn:cspace:org.collectionspace.demo:personauthority:name(ObjectexitPersonAuth)'ObjectexitPersonAuth':person:name(davenportDepositor)</depositor>
+</ns2:objectexit_common>
+
+--323db230-9e89-4c61-ad78-df3888cb2a24--
+
+======== oe17
+GET /cspace-services/objectexit/${oe15.CSID}/authorityrefs/ HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: application/xml
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+Cookie: $Version=0; JSESSIONID=EAF02B50AE4FE2B2049862509C70AC82; $Path=/
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Content-Type: application/xml
+Content-Length: 732
+Date: Wed, 17 Nov 2010 20:41:16 GMT
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns3:authority-ref-list xmlns:ns2="http://collectionspace.org/services/jaxb" xmlns:ns3="http://collectionspace.org/services/common/authorityref"><pageNum>0</pageNum><pageSize>40</pageSize><itemsInPage>1</itemsInPage><totalItems>1</totalItems><authority-ref-item><sourceField>objectexit_common:depositor</sourceField><refName>urn:cspace:org.collectionspace.demo:personauthority:name(ObjectexitPersonAuth)'ObjectexitPersonAuth':person:name(davenportDepositor)</refName><authDisplayName>ObjectexitPersonAuth</authDisplayName><uri>/personauthorities/urn:cspace:name(ObjectexitPersonAuth)/items/urn:cspace:name(davenportDepositor)</uri></authority-ref-item></ns3:authority-ref-list>
+
+======== oe18
+DELETE /cspace-services/personauthorities/${oe9.CSID}/items/${oe11.CSID} HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Set-Cookie: JSESSIONID=BED65C154222FD06E833B9349D96914C; Path=/
+Content-Length: 0
+Date: Wed, 17 Nov 2010 20:41:16 GMT
+
+======== oe19
+DELETE /cspace-services/personauthorities/${oe9.CSID}/items/${oe13.CSID} HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+Cookie: $Version=0; JSESSIONID=BED65C154222FD06E833B9349D96914C; $Path=/
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Content-Length: 0
+Date: Wed, 17 Nov 2010 20:41:16 GMT
+
+======== oe20
+DELETE /cspace-services/personauthorities/${oe9.CSID} HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+Cookie: $Version=0; JSESSIONID=BED65C154222FD06E833B9349D96914C; $Path=/
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Content-Length: 0
+Date: Wed, 17 Nov 2010 20:41:16 GMT
+
+======== oe21
+DELETE /cspace-services/objectexit/${oe15.CSID} HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Set-Cookie: JSESSIONID=B313F52A28802B5E71964AA08889FE48; Path=/
+Content-Length: 0
+Date: Wed, 17 Nov 2010 20:41:16 GMT
+
+======== oe22
+GET /cspace-services/objectexit/${oe1.CSID} HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Set-Cookie: JSESSIONID=547BE78D120918848DD5EF019448A30D; Path=/
+Content-Type: multipart/mixed; boundary=6a92c52e-0fab-4b08-800d-6351bff85e47
+Content-Length: 696
+Date: Wed, 17 Nov 2010 20:41:17 GMT
+
+--6a92c52e-0fab-4b08-800d-6351bff85e47
+label: objectexit_common
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:objectexit_common xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://collectionspace.org/services/objectexit http://services.collectionspace.org/objectexit/objectexit_common.xsd">
+<exitNumber>objectexitNumber-1290026472360</exitNumber>
+<depositor>urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'</depositor>
+</ns2:objectexit_common>
+
+--6a92c52e-0fab-4b08-800d-6351bff85e47--
+
+
+======== oe23
+PUT /cspace-services/objectexit/${oe1.CSID} HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+content-type: multipart/mixed; boundary=f0a8c80d-55a3-4e80-8455-30afc3b0fd88
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+Cookie: $Version=0; JSESSIONID=547BE78D120918848DD5EF019448A30D; $Path=/
+Content-Length: 573
+
+--f0a8c80d-55a3-4e80-8455-30afc3b0fd88
+label: objectexit_common
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:objectexit_common xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:ns3="http://collectionspace.org/services/jaxb"><depositor>urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'</depositor><exitNumber>updated-objectexitNumber-1290026472360</exitNumber></ns2:objectexit_common>
+--f0a8c80d-55a3-4e80-8455-30afc3b0fd88--
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Content-Type: multipart/mixed; boundary=d780d765-8f33-4cea-aca9-4b067dd54904
+Content-Length: 704
+Date: Wed, 17 Nov 2010 20:41:17 GMT
+
+--d780d765-8f33-4cea-aca9-4b067dd54904
+label: objectexit_common
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:objectexit_common xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://collectionspace.org/services/objectexit http://services.collectionspace.org/objectexit/objectexit_common.xsd">
+<exitNumber>updated-objectexitNumber-1290026472360</exitNumber>
+<depositor>urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'</depositor>
+</ns2:objectexit_common>
+
+--d780d765-8f33-4cea-aca9-4b067dd54904--
+
+
+======== oe24
+DELETE /cspace-services/objectexit/${oe1.CSID} HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Set-Cookie: JSESSIONID=79F2803D76A09EFA3CFA17AD80DAB85C; Path=/
+Content-Length: 0
+Date: Wed, 17 Nov 2010 20:41:17 GMT
+
+======== oe25
+DELETE /cspace-services/objectexit/9223372036854775807 HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+
+
+HTTP/1.1 404 Not Found
+Server: Apache-Coyote/1.1
+Set-Cookie: JSESSIONID=D29FC1A1070DE8340567B38066D7EA23; Path=/
+Content-Type: text/plain
+Content-Length: 110
+Date: Wed, 17 Nov 2010 20:41:17 GMT
+
+Delete request failed:  on org.collectionspace.services.objectexit.ObjectExitResource csid=9223372036854775807
+
+
+======== oe26
+PUT /cspace-services/objectexit/9223372036854775807 HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+content-type: multipart/mixed; boundary=28e8b34c-d7a0-49f1-b395-fcf98688fe9a
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+Content-Length: 571
+
+--28e8b34c-d7a0-49f1-b395-fcf98688fe9a
+label: objectexit_common
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:objectexit_common xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:ns3="http://collectionspace.org/services/jaxb"><depositor>urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'</depositor><exitNumber>objectexitNumber-9223372036854775807</exitNumber></ns2:objectexit_common>
+--28e8b34c-d7a0-49f1-b395-fcf98688fe9a--
+
+HTTP/1.1 404 Not Found
+Server: Apache-Coyote/1.1
+Set-Cookie: JSESSIONID=53D7107A81ACCB36184372922800B942; Path=/
+Content-Type: text/plain
+Content-Length: 110
+Date: Wed, 17 Nov 2010 20:41:17 GMT
+
+Update request failed:  on org.collectionspace.services.objectexit.ObjectExitResource csid=9223372036854775807
+
+======== oe27
+GET /cspace-services/objectexit/?sortBy=&pgNum=0&pgSz=1 HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: application/xml
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Set-Cookie: JSESSIONID=30815B258FC0BC268BA2CE0EF3786DE2; Path=/
+Content-Type: application/xml
+Content-Length: 629
+Date: Wed, 17 Nov 2010 20:41:17 GMT
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:objectexit_common_list xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:ns3="http://collectionspace.org/services/jaxb"><pageNum>0</pageNum><pageSize>1</pageSize><itemsInPage>1</itemsInPage><totalItems>3</totalItems><fieldsReturned>currentOwner|depositor|exitDate|exitMethod|exitNote|exitNumber|exitReason|packingNote|uri|csid</fieldsReturned><objectexit_list_item><exitNumber>objectexitNumber-1290026473391</exitNumber><uri>/objectexit/${oe3.CSID}</uri><csid>${oe3.CSID}</csid></objectexit_list_item></ns2:objectexit_common_list>
+
+======== oe28
+GET /cspace-services/objectexit/?sortBy=&pgNum=0&pgSz=1 HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: application/xml
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+Cookie: $Version=0; JSESSIONID=30815B258FC0BC268BA2CE0EF3786DE2; $Path=/
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Content-Type: application/xml
+Content-Length: 629
+Date: Wed, 17 Nov 2010 20:41:18 GMT
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:objectexit_common_list xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:ns3="http://collectionspace.org/services/jaxb"><pageNum>0</pageNum><pageSize>1</pageSize><itemsInPage>1</itemsInPage><totalItems>3</totalItems><fieldsReturned>currentOwner|depositor|exitDate|exitMethod|exitNote|exitNumber|exitReason|packingNote|uri|csid</fieldsReturned><objectexit_list_item><exitNumber>objectexitNumber-1290026473391</exitNumber><uri>/objectexit/${oe3.CSID}</uri><csid>${oe3.CSID}</csid></objectexit_list_item></ns2:objectexit_common_list>
+
+======== oe29
+GET /cspace-services/objectexit/?sortBy=&pgNum=1&pgSz=1 HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: application/xml
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+Cookie: $Version=0; JSESSIONID=30815B258FC0BC268BA2CE0EF3786DE2; $Path=/
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Content-Type: application/xml
+Content-Length: 629
+Date: Wed, 17 Nov 2010 20:41:18 GMT
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:objectexit_common_list xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:ns3="http://collectionspace.org/services/jaxb"><pageNum>1</pageNum><pageSize>1</pageSize><itemsInPage>1</itemsInPage><totalItems>3</totalItems><fieldsReturned>currentOwner|depositor|exitDate|exitMethod|exitNote|exitNumber|exitReason|packingNote|uri|csid</fieldsReturned><objectexit_list_item><exitNumber>objectexitNumber-1290026473626</exitNumber><uri>/objectexit/${oe4.CSID}</uri><csid>${oe4.CSID}</csid></objectexit_list_item></ns2:objectexit_common_list>
+
+======== oe30
+GET /cspace-services/objectexit/?sortBy=&pgNum=2&pgSz=1 HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: application/xml
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+Cookie: $Version=0; JSESSIONID=30815B258FC0BC268BA2CE0EF3786DE2; $Path=/
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Content-Type: application/xml
+Content-Length: 629
+Date: Wed, 17 Nov 2010 20:41:18 GMT
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><ns2:objectexit_common_list xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:ns3="http://collectionspace.org/services/jaxb"><pageNum>2</pageNum><pageSize>1</pageSize><itemsInPage>1</itemsInPage><totalItems>3</totalItems><fieldsReturned>currentOwner|depositor|exitDate|exitMethod|exitNote|exitNumber|exitReason|packingNote|uri|csid</fieldsReturned><objectexit_list_item><exitNumber>objectexitNumber-1290026473860</exitNumber><uri>/objectexit/${oe5.CSID}</uri><csid>${oe5.CSID}</csid></objectexit_list_item></ns2:objectexit_common_list>
+
+
+======== oe31
+DELETE /cspace-services/objectexit/${oe1.CSID} HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+
+
+HTTP/1.1 404 Not Found
+Server: Apache-Coyote/1.1
+Set-Cookie: JSESSIONID=DAFA3BA307CC8CB35DB8882CDA24E2EE; Path=/
+Content-Type: text/plain
+Content-Length: 114
+Date: Wed, 17 Nov 2010 20:41:18 GMT
+
+Delete request failed:  on org.collectionspace.services.objectexit.ObjectExitResource csid=${oe1.CSID}
+
+
+======== oe32
+DELETE /cspace-services/objectexit/${oe3.CSID} HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+Cookie: $Version=0; JSESSIONID=DAFA3BA307CC8CB35DB8882CDA24E2EE; $Path=/
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Content-Length: 0
+Date: Wed, 17 Nov 2010 20:41:18 GMT
+
+======== oe33
+DELETE /cspace-services/objectexit/${oe4.CSID} HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+Cookie: $Version=0; JSESSIONID=DAFA3BA307CC8CB35DB8882CDA24E2EE; $Path=/
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Content-Length: 0
+Date: Wed, 17 Nov 2010 20:41:18 GMT
+
+======== oe34
+DELETE /cspace-services/objectexit/${oe5.CSID} HTTP/1.1
+Accept-Encoding: gzip, deflate
+Accept: multipart/mixed
+Authorization: Basic dGVzdDp0ZXN0
+User-Agent: Jakarta Commons-HttpClient/3.1
+Host: localhost:8280
+Cookie: $Version=0; JSESSIONID=DAFA3BA307CC8CB35DB8882CDA24E2EE; $Path=/
+
+
+HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+X-Powered-By: Servlet 2.4; JBoss-4.2.3.GA (build: SVNTag=JBoss_4_2_3_GA date=200807181439)/JBossWeb-2.0
+Content-Length: 0
+Date: Wed, 17 Nov 2010 20:41:19 GMT
+
+

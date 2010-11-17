@@ -349,7 +349,8 @@ public class XmlReplay {
         try {
             document = reader.read(xmlFileName);
         } catch (DocumentException e) {
-            //e.printStackTrace();
+            System.out.println("ERROR reading document: "+e);
+            e.printStackTrace();
         }
         return document;
     }
