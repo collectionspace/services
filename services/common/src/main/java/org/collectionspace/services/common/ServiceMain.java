@@ -338,7 +338,7 @@ public class ServiceMain {
         	// Fifth, fetch and save the default roles
 			String springAdminRoleCSID = null;
         	String querySpringRole = 
-        		"SELECT `csid` from `Roles` WHERE `rolename`='"+SPRING_ADMIN_ROLE+"'";
+        		"SELECT `csid` from `roles` WHERE `rolename`='"+SPRING_ADMIN_ROLE+"'";
 			rs = stmt.executeQuery(querySpringRole);
     		if(rs.next()) {
     			springAdminRoleCSID = rs.getString(1);
@@ -348,7 +348,7 @@ public class ServiceMain {
             	}
     		} else {
                 String insertSpringAdminRoleSQL =
-                	"INSERT INTO `Roles` (`csid`, `rolename`, `displayName`, `rolegroup`, `created_at`, `tenant_id`) "
+                	"INSERT INTO `roles` (`csid`, `rolename`, `displayName`, `rolegroup`, `created_at`, `tenant_id`) "
                 	+ "VALUES ('-1', 'ROLE_SPRING_ADMIN', 'SPRING_ADMIN', 'Spring Security Administrator', now(), '0')";
     			stmt.executeUpdate(insertSpringAdminRoleSQL);
     			springAdminRoleCSID = "-1";
@@ -359,7 +359,7 @@ public class ServiceMain {
     		}
         	rs.close();
         	String getRoleCSIDSql =
-        		"SELECT `csid` from `Roles` WHERE `tenant_id`=? and `rolename`=?";
+        		"SELECT `csid` from `roles` WHERE `tenant_id`=? and `rolename`=?";
         	pstmt = conn.prepareStatement(getRoleCSIDSql); // create a statement
         	rs = null;
             Hashtable<String, String> tenantAdminRoleCSIDs = new Hashtable<String, String>();
@@ -371,7 +371,7 @@ public class ServiceMain {
         		// extract data from the ResultSet
         		if(!rs.next()) {
         			throw new RuntimeException("Cannot find role: "+getDefaultAdminRole(tId)
-        					+" for tenant id: "+tId+" in Roles!");
+        					+" for tenant id: "+tId+" in roles!");
         		}
     			String tenantAdminRoleCSID = rs.getString(1);
             	if (logger.isDebugEnabled()) {
@@ -387,7 +387,7 @@ public class ServiceMain {
         		// extract data from the ResultSet
         		if(!rs.next()) {
         			throw new RuntimeException("Cannot find role: "+getDefaultReaderRole(tId)
-        					+" for tenant id: "+tId+" in Roles!");
+        					+" for tenant id: "+tId+" in roles!");
         		}
     			String tenantReaderRoleCSID = rs.getString(1);
             	if (logger.isDebugEnabled()) {
