@@ -336,17 +336,27 @@ public class ServiceMain {
         	}
         	pstmt.close();
         	// Fifth, fetch and save the default roles
+			String springAdminRoleCSID = null;
         	String querySpringRole = 
         		"SELECT `csid` from `Roles` WHERE `rolename`='"+SPRING_ADMIN_ROLE+"'";
 			rs = stmt.executeQuery(querySpringRole);
-    		if(!rs.next()) {
-    			throw new RuntimeException("Cannot find SPRING ADMIN role!");
+    		if(rs.next()) {
+    			springAdminRoleCSID = rs.getString(1);
+            	if (logger.isDebugEnabled()) {
+            		logger.debug("createDefaultAccounts found Spring Admin role: "
+            				+springAdminRoleCSID);
+            	}
+    		} else {
+                String insertSpringAdminRoleSQL =
+                	"INSERT INTO `Roles` (`csid`, `rolename`, `displayName`, `rolegroup`, `created_at`, `tenant_id`) "
+                	+ "VALUES ('-1', 'ROLE_SPRING_ADMIN', 'SPRING_ADMIN', 'Spring Security Administrator', now(), '0')";
+    			stmt.executeUpdate(insertSpringAdminRoleSQL);
+    			springAdminRoleCSID = "-1";
+            	if (logger.isDebugEnabled()) {
+            		logger.debug("createDefaultAccounts CREATED Spring Admin role: "
+            				+springAdminRoleCSID);
+            	}
     		}
-			String springAdminRoleCSID = rs.getString(1);
-        	if (logger.isDebugEnabled()) {
-        		logger.debug("createDefaultAccounts found Spring Admin role: "
-        				+springAdminRoleCSID);
-        	}
         	rs.close();
         	String getRoleCSIDSql =
         		"SELECT `csid` from `Roles` WHERE `tenant_id`=? and `rolename`=?";

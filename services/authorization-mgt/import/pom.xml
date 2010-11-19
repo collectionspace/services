@@ -142,9 +142,9 @@
                     <mainClass>org.collectionspace.ImportAuthz</mainClass>
                     <arguments>
                         <argument>-u</argument>
-                        <argument>test</argument>
+                        <argument>SPRING_ADMIN</argument>
                         <argument>-p</argument>
-                        <argument>test</argument>
+                        <argument>does_not_matter</argument>
                         <argument>-b</argument>
                         <argument>${basedir}/../../common/src/main/config/services/tenant-bindings.xml</argument>
                         <argument>-edir</argument>

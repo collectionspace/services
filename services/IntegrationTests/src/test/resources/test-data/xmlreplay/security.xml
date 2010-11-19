@@ -2,8 +2,7 @@
 <xmlReplay>
     <auths>
         <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
-        <auth ID="test">dGVzdDp0ZXN0</auth>
-        <auth ID="test-pahma">dGVzdC1wYWhtYTp0ZXN0</auth>
+        <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
         <auth ID="user1@museum1">dXNlcjFAbXVzZXVtMS5vcmc6dXNlcjFAbXVzZXVtMS5vcmc=</auth>
         <auth ID="bigbird2010">YmlnYmlyZDIwMTA6YmlnYmlyZDIwMTA=</auth>
         <auth ID="elmo2010">ZWxtbzIwMTA6ZWxtbzIwMTA=</auth>
@@ -22,7 +21,7 @@
         </test>
 
         <!--Next, set up permissions and roles, and test bigbird2010 and elmo2010. -->
-        <test ID="permBigbird" auth="test">
+        <test ID="permBigbird" auth="admin@collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/authorization/permissions</uri>
             <filename>security/1-bigbird-permission.xml</filename>
@@ -133,7 +132,7 @@
         -->
 
 
-        <test auth="test">
+        <test auth="admin@collectionspace.org">
             <method>DELETE</method>
             <uri>/cspace-services/authorization/permissions/${permBigbird.CSID}/permroles</uri>
             <!-- don't do <fromTestID>, no CSID of permrole on end of url, but deleteURL will put one there for you, so don't use it.
@@ -169,7 +168,7 @@
         </test>
 
         
-        <test ID="accountroles2" auth="test">
+        <test ID="accountroles2" auth="admin@collectionspace.org">
             <method>DELETE</method>
             <uri>/cspace-services/accounts/${accountBigbird.CSID}/accountroles</uri>
         </test>
@@ -218,12 +217,12 @@
         </test>
 
         <!--Next, set up permissions and roles, and test bigbird2010.-->
-        <test ID="permBigbird" auth="test">
+        <test ID="permBigbird" auth="admin@collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/authorization/permissions</uri>
             <filename>security/1-bigbird-permission.xml</filename>
         </test>
-        <test ID="roleTestCM"  auth="test">
+        <test ID="roleTestCM"  auth="admin@collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/authorization/roles</uri>
             <filename>security/3-role-test-cm.xml</filename>
@@ -279,7 +278,7 @@
         
         <!--  NOW **REMOVE** PERMROLES FROM BIGBIRD -->
         
-        <test ID="deletePermrolesBigbird" auth="test">
+        <test ID="deletePermrolesBigbird" auth="admin@collectionspace.org">
             <msg>Deleting permroles from bigbird2010</msg>
             <method>DELETE</method>
             <uri>/cspace-services/authorization/permissions/${permBigbird.CSID}/permroles</uri>
@@ -320,12 +319,12 @@
 
         <!--  NOW **ADD** PERMS CRU TO BIGBIRD -->
 
-        <test ID="permBigbird_CRU" auth="test">
+        <test ID="permBigbird_CRU" auth="admin@collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/authorization/permissions</uri>
             <filename>security/11-bigbird-permission-CRU.xml</filename>
         </test>
-        <test ID="bigbirdPermrolesCRU" auth="test">
+        <test ID="bigbirdPermrolesCRU" auth="admin@collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/authorization/permissions/${permBigbird_CRU.CSID}/permroles</uri>
             <filename>security/11-permissionroles-bigbird-CRU.xml</filename>
@@ -362,7 +361,7 @@
 
         <!--  NOW **REMOVE** PERMROLES FROM BIGBIRD -->
         
-        <test ID="deletePermrolesBigbird" auth="test">
+        <test ID="deletePermrolesBigbird" auth="admin@collectionspace.org">
             <msg>Deleting permroles from bigbird2010</msg>
             <method>DELETE</method>
             <uri>/cspace-services/authorization/permissions/${permBigbird_CRU.CSID}/permroles</uri>
@@ -370,12 +369,12 @@
         
         <!--  NOW **ADD** PERMS R TO BIGBIRD -->
 
-        <test ID="permBigbird_R" auth="test">
+        <test ID="permBigbird_R" auth="admin@collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/authorization/permissions</uri>
             <filename>security/12-bigbird-permission-R.xml</filename>
         </test>
-        <test ID="bigbirdPermroles_R" auth="test">
+        <test ID="bigbirdPermroles_R" auth="admin@collectionspace.org">
             <method>POST</method>
             <uri>/cspace-services/authorization/permissions/${permBigbird_R.CSID}/permroles</uri>
             <filename>security/12-permissionroles-bigbird-R.xml</filename>
@@ -414,7 +413,7 @@
         </test>
         
         <!-- CLEANUP -->
-        <test  auth="test">
+        <test  auth="admin@collectionspace.org">
             <method>DELETE</method>
             <uri>/cspace-services/accounts/${accountBigbird.CSID}/accountroles</uri>
         </test>

@@ -5,8 +5,8 @@
     <!-- legal values for dumpServiceResult=[minimal,detailed,full] -->
     <dump payloads="false" dumpServiceResult="minimal" />
     
-    <auths default="test">
-       <auth ID="test">dGVzdDp0ZXN0</auth>
+    <auths default="admin@collectionspace.org">
+       <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
     </auths>
 
     

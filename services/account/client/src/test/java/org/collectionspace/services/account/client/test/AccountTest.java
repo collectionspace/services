@@ -58,44 +58,6 @@ public class AccountTest {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    @Test(dataProvider = "testName", dataProviderClass = AccountTest.class)
-    public void createTest(String testName) throws Exception {
-        AccountsCommon account = null;
-        try {
-            account = findAccount("test");
-            if (account != null) {
-                return;
-            }
-        } catch (NoResultException nre) {
-            //ignore
-        }
-        if (account == null) {
-            account = new AccountsCommon();
-        }
-        account.setScreenName("test");
-        account.setPersonRefName("test hello");
-        account.setEmail("test.test@berkeley.edu");
-        account.setUserId("test");
-        account.setStatus(Status.ACTIVE);
-        id = UUID.randomUUID().toString();
-        account.setCsid(id);
-
-        AccountTenant tenant = new AccountTenant();
-        tenant.setTenantId("1");
-        List<AccountTenant> tList = new ArrayList<AccountTenant>();
-        tList.add(tenant);
-        account.setTenants(tList);
-        em.getTransaction().begin();
-        em.persist(account);
-        // Commit the transaction
-        em.getTransaction().commit();
-        if (logger.isDebugEnabled()) {
-            logger.debug("created/updated account "
-                    + " screen name=" + account.getScreenName()
-                    + " email=" + account.getEmail());
-        }
-    }
 
     @SuppressWarnings("unchecked")
     @Test(dataProvider = "testName", dataProviderClass = AccountTest.class)

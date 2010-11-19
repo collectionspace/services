@@ -5,6 +5,5 @@
 --
 use cspace;
 
--- default test user --
--- This should go away.
-insert into `users` (`username`,`passwd`, `created_at`) VALUES ('test','n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg=', now());
+-- default bootstrap user required to run ImportAuthZ (to bootstrap Spring) --
+-- insert into `users` (`username`,`passwd`, `created_at`) VALUES ('SPRING_ADMIN','MzwE3RUaKmgxwDnLmmUd8pGYvooE4WzoYdS2o0oRyVQ=', now());

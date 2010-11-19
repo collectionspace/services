@@ -2,13 +2,13 @@
 <xmlReplay>
     <auths>
         <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
-        <auth ID="test">dGVzdDp0ZXN0</auth>
+        <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
     </auths>
     
    <!-- ================================================================================ -->
     
      <testGroup ID="CRUDL" autoDeletePOSTS="true">
-         <test ID="oe1"  auth="test">
+         <test ID="oe1"  auth="admin@collectionspace.org">
              <method>POST</method>
              <uri>/cspace-services/objectexit/</uri>
              <part>

@@ -111,7 +111,8 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         setupCreate();
 
         AccountClient accountClient = new AccountClient();
-        accountClient.setAuth(true, "test", true, "test", true);
+        // This should not be needed - the auth is already set up
+        //accountClient.setAuth(true, "test", true, "test", true);
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
@@ -147,7 +148,8 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         setupCreate();
 
         AccountClient accountClient = new AccountClient();
-        accountClient.setAuth(true, "test", true, "test", true);
+        // This should not be needed - the auth is already set up
+        //accountClient.setAuth(true, "test", true, "test", true);
 
         // Submit the request to the service and store the response.
         AccountsCommon account =
@@ -233,7 +235,9 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         }
         setupCreate();
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        collectionObjectClient.setAuth(false, "test", true, "test", true);
+        String user = collectionObjectClient.getProperty(collectionObjectClient.USER_PROPERTY);
+        String pass = collectionObjectClient.getProperty(collectionObjectClient.PASSWORD_PROPERTY);
+        collectionObjectClient.setAuth(false, user, true, pass, true);
         String identifier = BaseServiceTest.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
@@ -278,7 +282,8 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
             logger.debug(testBanner(testName));
         }
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        collectionObjectClient.setAuth(true, "test", true, "", false);
+        String user = collectionObjectClient.getProperty(collectionObjectClient.USER_PROPERTY);
+        collectionObjectClient.setAuth(true, user, true, "", false);
         String identifier = BaseServiceTest.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
@@ -320,7 +325,8 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
             logger.debug(testBanner(testName));
         }
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        collectionObjectClient.setAuth(true, "test", true, "bar", true);
+        String user = collectionObjectClient.getProperty(collectionObjectClient.USER_PROPERTY);
+        collectionObjectClient.setAuth(true, user, true, "bar", true);
         String identifier = BaseServiceTest.createIdentifier();
         MultipartOutput multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
@@ -397,7 +403,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         // Perform setup.
         setupDelete();
         AccountClient accountClient = new AccountClient();
-        accountClient.setAuth(true, "test", true, "test", true);
+        // accountClient.setAuth(true, "test", true, "test", true);
         // Submit the request to the service and store the response.
         ClientResponse<Response> res = accountClient.delete(barneyAccountId);
         int statusCode = res.getStatus();
