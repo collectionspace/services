@@ -2,13 +2,19 @@ package org.collectionspace.services.IntegrationTests.xmlreplay;
 
 import org.apache.commons.cli.*;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.JexlEngine;
 import org.apache.commons.jexl2.MapContext;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Node;
+import org.dom4j.*;
 import org.dom4j.io.SAXReader;
+import org.jdom.input.SAXBuilder;
+import org.xml.sax.InputSource;
+
+
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
 
 import java.io.*;
 import java.util.*;
@@ -88,8 +94,8 @@ public class XmlReplay {
 
     // ============== METHODS ===========================================================
 
-    public Document openMasterConfigFile(String masterFilename) throws FileNotFoundException {
-        Document document = getDocument(Tools.glue(basedir, "/", masterFilename)); //will check full path first, then checks relative to PWD.
+    public org.dom4j.Document openMasterConfigFile(String masterFilename) throws FileNotFoundException {
+        org.dom4j.Document document = getDocument(Tools.glue(basedir, "/", masterFilename)); //will check full path first, then checks relative to PWD.
         if (document == null){
             throw new FileNotFoundException("XmlReplay master control file ("+masterFilename+") not found in basedir: "+basedir+". Exiting test.");
         }
@@ -99,8 +105,8 @@ public class XmlReplay {
     /** specify the master config file, relative to getBaseDir(), but ignore any tests or testGroups in the master.
      *  @return a Document object, which you don't need to use: all options will be stored in XmlReplay instance.
      */
-    public Document readOptionsFromMasterConfigFile(String masterFilename) throws FileNotFoundException {
-        Document document = openMasterConfigFile(masterFilename);
+    public org.dom4j.Document readOptionsFromMasterConfigFile(String masterFilename) throws FileNotFoundException {
+        org.dom4j.Document document = openMasterConfigFile(masterFilename);
         protoHostPort = document.selectSingleNode("/xmlReplayMaster/protoHostPort").getText().trim();
         AuthsMap authsMap = readAuths(document);
         setDefaultAuthsMap(authsMap);
@@ -117,7 +123,7 @@ public class XmlReplay {
      *  and setting defaults from this instance, but not sharing ServiceResult objects or maps. */
     public List<List<ServiceResult>> runMaster(String masterFilename, boolean readOptionsFromMaster) throws Exception {
         List<List<ServiceResult>> list = new ArrayList<List<ServiceResult>>();
-        Document document;
+        org.dom4j.Document document;
         if (readOptionsFromMaster){
             document = readOptionsFromMasterConfigFile(masterFilename);
         } else {
@@ -225,7 +231,7 @@ public class XmlReplay {
         }
     }
 
-    public static AuthsMap readAuths(Document document){
+    public static AuthsMap readAuths(org.dom4j.Document document){
     Map<String, String> map = new HashMap<String, String>();
         List<Node> authNodes = document.selectNodes("//auths/auth");
         for (Node auth : authNodes) {
@@ -255,7 +261,7 @@ public class XmlReplay {
         return new Dump();
     }
 
-    public static Dump readDumpOptions(Document document){
+    public static Dump readDumpOptions(org.dom4j.Document document){
         Dump dump = getDumpConfig();
         Node dumpNode = document.selectSingleNode("//dump");
         if (dumpNode != null){
@@ -284,7 +290,8 @@ public class XmlReplay {
             } else {
                 result.bDoingSinglePartPayload = false;
                 List<Node> parts = testNode.selectNodes("parts/part");
-                if (parts == null || parts.size()==0){  //path is just /testGroup/test/part/
+                if (parts == null || parts.size()==0){
+                    //path is just /testGroup/test/part/
                     String commonPartName = testNode.valueOf("part/label");
                     String testfile = testNode.valueOf("part/filename");
                     String fullTestFilename = xmlReplayBaseDir + '/' + testfile;
@@ -293,7 +300,8 @@ public class XmlReplay {
                     }
                     result.partsList.add(commonPartName);
                     result.filesList.add(fullTestFilename);
-                } else { // path is /testGroup/test/parts/part/
+                } else {
+                    // path is /testGroup/test/parts/part/
                     for (Node part : parts){
                         String commonPartName = part.valueOf("label");
                         String filename = part.valueOf("filename");
@@ -342,9 +350,8 @@ public class XmlReplay {
         return result;
     }
 
-
     public static org.dom4j.Document getDocument(String xmlFileName) {
-        Document document = null;
+        org.dom4j.Document document = null;
         SAXReader reader = new SAXReader();
         try {
             document = reader.read(xmlFileName);
@@ -353,6 +360,57 @@ public class XmlReplay {
             e.printStackTrace();
         }
         return document;
+    }
+
+    protected static String validateResponse(ServiceResult serviceResult,
+                                             Map<String, ServiceResult> serviceResultsMap,
+                                             PartsStruct expectedResponseParts){
+        String OK = "";
+        if (expectedResponseParts == null) return OK;
+        if (serviceResult == null) return OK;
+        if (serviceResult.result.length() == 0) return OK;
+        String responseDump = serviceResult.result;
+        //System.out.println("responseDump: "+responseDump);
+        PayloadLogger.HttpTraffic traffic = PayloadLogger.readPayloads(responseDump, serviceResult.boundary, serviceResult.contentLength);
+        try {
+            for (int i=0; i<expectedResponseParts.partsList.size(); i++){
+                String fileName = expectedResponseParts.filesList.get(i);
+                String label = expectedResponseParts.partsList.get(i);
+                byte[] b = FileUtils.readFileToByteArray(new File(fileName));
+                String expectedPartContent = new String(b);
+                System.out.println("expected: "+label+ " content ==>\r\n"+expectedPartContent);
+                PayloadLogger.Part partFromServer = traffic.getPart(label);
+                String partFromServerContent = "";
+                if (partFromServer != null){
+                    partFromServerContent = partFromServer.getContent();
+                } else {
+                    partFromServerContent = "";
+                }
+                //if (partFromServer!=null) {
+                    //System.out.println("====part content from server.   label-->"+label+"<-- \r\npart-->"+partFromServerContent+"<--");
+
+                    String leftID  = "{from expected part, label:"+label+" filename: "+fileName+"}";
+                    String rightID = "{from server, label:"+label
+                                        //+" testGroupID: "+serviceResult.testGroupID
+                                        +" fromTestID: "+serviceResult.fromTestID
+                                        +" URL: "+serviceResult.fullURL
+                                        +"}";
+                    TreeWalkResults list =
+                        XmlCompareJdom.compareParts(expectedPartContent,
+                                                    leftID,
+                                                    partFromServerContent,
+                                                    rightID);
+                    //if (list.getMismatchCount()>0){
+                        serviceResult.addPartSummary(label, list);
+                    //}
+                //}
+            }
+        } catch (Exception e){
+            String err = "ERROR in XmlReplay.validateResponse() : "+e; 
+            //System.out.println(err);
+            return err  ;
+        }
+        return OK;
     }
 
 
@@ -374,7 +432,7 @@ public class XmlReplay {
         List<ServiceResult> results = new ArrayList<ServiceResult>();
 
         String controlFile = Tools.glue(xmlReplayBaseDir, "/", controlFileName);
-        Document document;
+        org.dom4j.Document document;
         document = getDocument(controlFile); //will check full path first, then checks relative to PWD.
         if (document==null){
             throw new FileNotFoundException("XmlReplay control file ("+controlFileName+") not found in basedir: "+xmlReplayBaseDir+" Exiting test.");
@@ -468,6 +526,13 @@ public class XmlReplay {
                          }
                     }
 
+                    Node responseNode = testNode.selectSingleNode("response");
+                    PartsStruct expectedResponseParts = null;
+                    if (responseNode!=null){
+                        expectedResponseParts = PartsStruct.readParts(responseNode, testID, xmlReplayBaseDir);
+                        //System.out.println("reponse parts: >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"+expectedResponseParts);
+                    }
+
                     ServiceResult serviceResult;
                     boolean isPOST = method.equalsIgnoreCase("POST");
                     boolean isPUT =  method.equalsIgnoreCase("PUT");
@@ -498,8 +563,11 @@ public class XmlReplay {
                         if (pr!=null){
                             serviceResult = XmlReplayTransport.doDELETE(pr.deleteURL, authForTest, testIDLabel, fromTestID);
                             serviceResult.fromTestID = fromTestID;
+                            if (expectedCodes.size()>0){
+                                serviceResult.expectedCodes = expectedCodes;
+                            }
                             results.add(serviceResult);
-                            if (serviceResult.gotExpectedResult()){
+                            if (serviceResult.gotExpectedResult()){  //gotExpectedResult depends on serviceResult.expectedCodes.
                                 serviceResultsMap.remove(fromTestID);
                             }
                         } else {
@@ -536,6 +604,18 @@ public class XmlReplay {
                     }
                     if (Tools.isEmpty(serviceResult.testID)) serviceResult.testID = testIDLabel;
                     if (Tools.isEmpty(serviceResult.testGroupID)) serviceResult.testGroupID = testGroupID;
+
+                    Node expectedLevel = testNode.selectSingleNode("response/expected");
+                    if (expectedLevel!=null){
+                        String level = expectedLevel.valueOf("@level");
+                        serviceResult.payloadStrictness = level;
+                    }
+
+                    String vError = validateResponse(serviceResult, serviceResultsMap, expectedResponseParts);
+                    if (Tools.notEmpty(vError)){
+                        serviceResult.error = vError;
+                        serviceResult.failureReason = " : VALIDATION ERROR; ";
+                    }
 
                     String serviceResultRow = serviceResult.dump(dump.dumpServiceResult);
                     String leader = (dump.dumpServiceResult == ServiceResult.DUMP_OPTIONS.detailed) ? "XmlReplay:"+testIDLabel+": ": "";

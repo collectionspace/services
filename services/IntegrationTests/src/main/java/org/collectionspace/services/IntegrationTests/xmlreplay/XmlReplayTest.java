@@ -132,7 +132,6 @@ public class XmlReplayTest {
                     buff.append(ROWSTARTRED+serviceResult.minimal()+ROWENDRED);
                 }
             }
-
         }
         buff.append(TBLEND);
         summary.table = buff.toString();

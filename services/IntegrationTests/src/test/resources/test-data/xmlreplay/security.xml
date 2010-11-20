@@ -297,7 +297,7 @@
             </part>
         </test>
         <test ID="dimensionBigbird_PUT_AfterPermrolesDeleted">
-            <expectedCodes>403, 404,405</expectedCodes><!-- Expected failure because dimensionBigbird_POST_AfterPermrolesDeleted failed.-->
+            <expectedCodes>403,404,405</expectedCodes><!-- Expected failure because dimensionBigbird_POST_AfterPermrolesDeleted failed.-->
             <method>PUT</method>
             <uri>/cspace-services/dimensions/${dimensionBigbird_POST_AfterPermrolesDeleted.CSID}</uri>
             <part>

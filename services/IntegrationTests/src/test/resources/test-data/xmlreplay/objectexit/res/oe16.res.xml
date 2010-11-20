@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:objectexit_common xmlns:ns2="http://collectionspace.org/services/objectexit" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://collectionspace.org/services/objectexit http://services.collectionspace.org/objectexit/objectexit_common.xsd">
+<exitDate>exitDate-1290026474563</exitDate>
+<exitNumber>exitNumber-1290026474563</exitNumber>
+<depositor>urn:cspace:org.collectionspace.demo:personauthority:name(ObjectexitPersonAuth)'ObjectexitPersonAuth':person:name(davenportDepositor)</depositor>
+</ns2:objectexit_common>
+

@@ -23,6 +23,7 @@
 
 package org.collectionspace.services.IntegrationTests.xmlreplay;
 
+import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -34,6 +35,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -59,10 +61,19 @@ public class XmlReplayTransport {
 
         int statusCode1 = client.executeMethod(getMethod);
         pr.responseCode = statusCode1;
+        pr.fromTestID = fromTestID;
         pr.method = "GET";
         try {
             pr.result = getMethod.getResponseBodyAsString();
             pr.responseMessage = getMethod.getStatusText();
+            Header[] headers = getMethod.getResponseHeaders();
+            pr.responseHeaders = Arrays.copyOf(headers, headers.length);
+            Header hdr = getMethod.getResponseHeader("CONTENT-TYPE");
+            if (hdr!=null){
+                String hdrStr = hdr.toExternalForm();
+                pr.boundary = PayloadLogger.parseBoundary(hdrStr);
+            }
+            pr.contentLength = getMethod.getResponseContentLength();
         } catch (Throwable t){
             //System.err.println("ERROR getting content from response: "+t);
             pr.error = t.toString();
@@ -77,6 +88,7 @@ public class XmlReplayTransport {
         ServiceResult pr = new ServiceResult();
         pr.method = "DELETE";
         pr.fullURL = urlString;
+        pr.fromTestID = fromTestID;
         if (Tools.isEmpty(urlString)){
             pr.error = "url was empty.  Check the result for fromTestID: "+fromTestID+". currentTest: "+testID;
             return pr;
@@ -207,6 +219,8 @@ public class XmlReplayTransport {
             }
             String msg = sb.toString();
             result.result = msg;
+            result.boundary = PayloadLogger.parseBoundary(conn.getHeaderField("CONTENT-TYPE"));
+
             rd.close();
         } catch (Throwable t){
             //System.err.println("ERROR getting content from response: "+t);

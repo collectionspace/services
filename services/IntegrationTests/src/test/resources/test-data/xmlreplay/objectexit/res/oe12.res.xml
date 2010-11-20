@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:persons_common xmlns:ns2="http://collectionspace.org/services/person" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://collectionspace.org/services/person http://services.collectionspace.org/person/persons_common.xsd">
+<surName>Owner</surName>
+<nationalities/>
+<shortIdentifier>owenCurOwner</shortIdentifier>
+<shortDisplayName>Owen the Cur Owner</shortDisplayName>
+<schoolsOrStyles/>
+<foreName>Owen the Cur</foreName>
+<groups/>
+<occupations/>
+<displayNameComputed>true</displayNameComputed>
+<csid>${oe11.CSID}</csid>
+<shortDisplayNameComputed>true</shortDisplayNameComputed>
+<inAuthority>${oe9.CSID}</inAuthority>
+<refName>urn:cspace:org.collectionspace.demo:personauthority:name(ObjectexitPersonAuth)'ObjectexitPersonAuth':person:name(owenCurOwner)</refName>
+<displayName>Owen the Cur Owner</displayName>
+</ns2:persons_common>
+

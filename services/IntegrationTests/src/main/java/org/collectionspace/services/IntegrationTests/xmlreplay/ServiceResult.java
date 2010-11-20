@@ -23,8 +23,12 @@
 
 package org.collectionspace.services.IntegrationTests.xmlreplay;
 
+import org.apache.commons.httpclient.Header;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * User: laramie
@@ -46,7 +50,36 @@ public class ServiceResult {
     public String error = "";
     public String fromTestID = "";
     public String auth = "";
+    public String boundary = "";
+    public String payloadStrictness = "";
+    public long contentLength = 0;
+    public String failureReason = "";
+    public Header[] responseHeaders = new Header[0];
     public List<Integer> expectedCodes = new ArrayList<Integer>();
+    private Map<String, TreeWalkResults> partSummaries = new HashMap<String, TreeWalkResults>();
+    public void addPartSummary(String label, TreeWalkResults list){
+        partSummaries.put(label, list);
+    }
+    public String partsSummary(boolean detailed){
+        StringBuffer buf = new StringBuffer();
+        if (!isDomWalkOK()){
+            if (detailed) buf.append("\r\nDOM CHECK FAILED:\r\n");
+            else buf.append("; DOM CHECK FAILED:");
+        }
+        for (Map.Entry<String,TreeWalkResults> entry : partSummaries.entrySet()) {
+            String key = entry.getKey();
+            TreeWalkResults value = entry.getValue();
+            buf.append(" label:"+key+": ");
+            if (detailed){
+                buf.append("\r\n");
+                buf.append(value.fullSummary());
+            } else {
+                buf.append(value.miniSummary());
+            }
+
+        }
+        return buf.toString();
+    }
     public boolean codeInSuccessRange(int code){
         if (0<=code && code<200){
             return false;
@@ -55,50 +88,113 @@ public class ServiceResult {
         }
         return true;
     }
-    public boolean gotExpectedResult(){
-        for (Integer oneExpected : expectedCodes){
-            if (responseCode == oneExpected){
-                return true;
+
+    public boolean isDomWalkOK(){
+        if (Tools.isEmpty(payloadStrictness)){
+            return true;
+        }
+        PAYLOAD_STRICTNESS strictness = PAYLOAD_STRICTNESS.valueOf(payloadStrictness);
+        for (Map.Entry<String,TreeWalkResults> entry : partSummaries.entrySet()) {
+            String key = entry.getKey();
+            TreeWalkResults value = entry.getValue();
+            if (value.hasDocErrors()){
+                failureReason = " : DOM DOC_ERROR; ";
+                return false;
+            }
+            switch (strictness){
+            case STRICT:
+                if (!value.isStrictMatch()) {
+                    failureReason = " : DOM NOT STRICT; ";
+                    return false;
+                }
+                break;
+            case ADDOK:
+                if (value.countFor(TreeWalkResults.TreeWalkEntry.STATUS.TEXT_DIFFERENT)>0) {
+                    failureReason = " : DOM TEXT_DIFFERENT; ";
+                    return false;
+                }
+                if (value.countFor(TreeWalkResults.TreeWalkEntry.STATUS.R_MISSING)>0){
+                    failureReason = " : DOM R_MISSING; ";
+                    return false;
+                }
+                break;
+            case TEXT:
+                if (value.countFor(TreeWalkResults.TreeWalkEntry.STATUS.TEXT_DIFFERENT)>0) {
+                    failureReason = " : DOM TEXT_DIFFERENT; ";
+                    return false;
+                }
+                break;
+            case TREE:
+                if (!value.treesMatch()) {
+                    failureReason = " : DOM TREE MISMATCH; ";
+                    return false;
+                }
+                break;
+            case ZERO:
+                break;
             }
         }
-        if (expectedCodes.size()>0 && codeInSuccessRange(responseCode)){ //none found, but result expected.
+        return true;
+    }
+
+    public boolean gotExpectedResult(){
+        if (Tools.notEmpty(failureReason)){
+            return false;
+        }
+        for (Integer oneExpected : expectedCodes){
+            if (responseCode == oneExpected){
+                return isDomWalkOK();
+            }
+        }
+        if ( expectedCodes.size()>0 && codeInSuccessRange(responseCode)){ //none found, but result expected.
             for (Integer oneExpected : expectedCodes){
                 if ( ! codeInSuccessRange(oneExpected)){
-                    return false;
+                    return isDomWalkOK();
                 }
             }
         }
-        return codeInSuccessRange(responseCode);
+        boolean ok = codeInSuccessRange(responseCode);
+        if (ok) {
+            return isDomWalkOK();
+        }
+        failureReason = " : STATUS CODE UNEXPECTED; ";
+        return false;
     }
+
     //public static final String[] DUMP_OPTIONS = {"minimal", "detailed", "full"};
     public static enum DUMP_OPTIONS {minimal, detailed, full};
+
+    public static enum PAYLOAD_STRICTNESS {ZERO, ADDOK, TREE, TEXT, STRICT};
 
     public String toString(){
         return detail(true);
 
     }
     public String detail(boolean includePayloads){
-        return "{ServiceResult: "
-                + ( Tools.notEmpty(testID) ? " testID:"+testID : "" )
-                + ( Tools.notEmpty(testGroupID) ? "; testGroupID:"+testGroupID : "" )
-                + ( Tools.notEmpty(fromTestID) ? "; fromTestID:"+fromTestID : "" )
+        return "{"
+                + ( gotExpectedResult() ? "SUCCESS" : "FAILURE"  )
+                + failureReason
                 +"; "+method
                 +"; "+responseCode
+                + ( (expectedCodes.size()>0) ? "; expectedCodes:"+expectedCodes : "" )
+                + ( Tools.notEmpty(testID) ? "; testID:"+testID : "" )
+                + ( Tools.notEmpty(testGroupID) ? "; testGroupID:"+testGroupID : "" )
+                + ( Tools.notEmpty(fromTestID) ? "; fromTestID:"+fromTestID : "" )
                 + ( Tools.notEmpty(responseMessage) ? "; msg:"+responseMessage : "" )
                 +"; URL:"+fullURL
                 +"; auth: "+auth
                 + ( Tools.notEmpty(deleteURL) ? "; deleteURL:"+deleteURL : "" )
                 + ( Tools.notEmpty(location) ? "; location.CSID:"+location : "" )
                 + ( Tools.notEmpty(error) ? "; ERROR:"+error : "" )
-                + ( (expectedCodes.size()>0) ? "; expectedCodes:"+expectedCodes : "" )
                 + "; gotExpected:"+gotExpectedResult()
                 + ( includePayloads && Tools.notEmpty(result) ? "; result:"+result : "" )
+                + ( partsSummary(true))
                 +"}";
     }
     public String minimal(){
         return "{"
                 + ( gotExpectedResult() ? "SUCCESS" : "FAILURE"  )
-
+                + failureReason
                 + ( Tools.notEmpty(testID) ? "; "+testID : "" )
                 +"; "+method
                 +"; "+responseCode
@@ -107,6 +203,7 @@ public class ServiceResult {
                 +"; URL:"+fullURL
                 +"; auth: "+auth
                 + ( Tools.notEmpty(error) ? "; ERROR:"+error : "" )
+                + ( partsSummary(false))
                 +"}";
     }
     public String dump(ServiceResult.DUMP_OPTIONS opt){

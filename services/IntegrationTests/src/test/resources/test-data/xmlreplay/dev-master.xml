@@ -12,6 +12,7 @@
 
 
     <run controlFile="objectexit/object-exit.xml" testGroup="CRUDL" />
+    <run controlFile="objectexit/object-exit.xml" testGroup="domwalk" />
     
 
 </xmlReplayMaster>

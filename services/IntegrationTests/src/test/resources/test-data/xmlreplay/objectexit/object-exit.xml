@@ -3,7 +3,32 @@
     <auths>
         <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
         <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
+        <auth ID="testAdministator">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
     </auths>
+    
+    
+    
+    <testGroup ID="domwalk" autoDeletePOSTS="true">
+         <test ID="oe1"  auth="test">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <part>
+                 <label>objectexit_common</label>
+                 <filename>objectexit/oe1.xml</filename>
+             </part>
+         </test>
+        <test ID="oe2">
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/${oe1.CSID}</uri>
+            <response>
+                <expected level="TEXT" />
+                <part>
+                     <label>objectexit_common</label>
+                     <filename>objectexit/res/oe2.res.xml</filename>
+                 </part>
+             </response>
+        </test>
+    </testGroup>
     
    <!-- ================================================================================ -->
     
@@ -19,7 +44,12 @@
         <test ID="oe2">
             <method>GET</method>
             <uri>/cspace-services/objectexit/${oe1.CSID}</uri>
-            <reponse>oe2.res.xml</reponse>
+            <response>
+                <part>
+                     <label>objectexit_common</label>
+                     <filename>objectexit/res/oe2.res.xml</filename>
+                 </part>
+             </response>
         </test>
         <test ID="oe3">
              <method>POST</method>
