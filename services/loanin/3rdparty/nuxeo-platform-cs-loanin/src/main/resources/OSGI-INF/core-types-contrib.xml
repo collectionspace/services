@@ -9,9 +9,10 @@
       <schema name="dublincore"/>
       <schema name="collectionspace_core"/>
       <schema name="loansin_common"/>
+      <!-- Removed loansin_common:lender from the list below until we -->
+      <!-- find out if/how to include elements in complexTypes -->
       <prefetch>
       	loansin_common:loanInNumber
-      	loansin_common:lender
       	loansin_common:loanReturnDate
       </prefetch>
     </doctype>

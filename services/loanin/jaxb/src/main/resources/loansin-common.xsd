@@ -33,10 +33,7 @@
             <xs:sequence>                
                 <!--  Loan In Information Group -->
                 <xs:element name="loanInNumber" type="xs:string"/>
-                <xs:element name="lender" type="xs:string"/>
-                <xs:element name="lendersAuthorizer" type="xs:string"/>
-                <xs:element name="lendersAuthorizationDate" type="xs:string"/>
-                <xs:element name="lendersContact" type="xs:string"/>
+                <xs:element name="lenderGroupList" type="lenderGroupList"/>
                 <xs:element name="loanInContact" type="xs:string"/>
                 <xs:element name="borrowersAuthorizer" type="xs:string"/>
                 <xs:element name="loanInConditions" type="xs:string"/>
@@ -48,7 +45,23 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    
+
+    <xs:complexType name="lenderGroupList">
+       <xs:sequence>
+           <xs:element name="lenderGroup" type="lenderGroup" minOccurs="0"
+                   maxOccurs="unbounded"/>
+       </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="lenderGroup">
+       <xs:sequence>
+           <xs:element name="lender" type="xs:string"/>
+           <xs:element name="lendersAuthorizer" type="xs:string"/>
+           <xs:element name="lendersAuthorizationDate" type="xs:string"/>
+           <xs:element name="lendersContact" type="xs:string"/>
+       </xs:sequence>
+    </xs:complexType>
+
     <!-- This is the base class for paginated lists -->
     <xs:complexType name="abstractCommonList">
         <xs:annotation>

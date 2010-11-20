@@ -203,9 +203,10 @@
                               versionable="true" auditable="false"
                               label="loansin_common" updated="" order="1">
                     <service:properties>
-                        <types:item><types:key>authRef</types:key><types:value>lender</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>lendersAuthorizer</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>lendersContact</types:value></types:item>
+                        <!-- Commented out for now, as searching within a field in a complexType breaks searches -->
+                        <!-- types:item><types:key>authRef</types:key><types:value>lender</types:value></types:item -->
+                        <!-- types:item><types:key>authRef</types:key><types:value>lendersAuthorizer</types:value></types:item -->
+                        <!-- types:item><types:key>authRef</types:key><types:value>lendersContact</types:value></types:item -->
                         <types:item><types:key>authRef</types:key><types:value>loanInContact</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>borrowersAuthorizer</types:value></types:item>
                     </service:properties>
@@ -1396,9 +1397,10 @@
                               versionable="true" auditable="false"
                               label="loansin_common" updated="" order="1">
                     <service:properties>
-                        <types:item><types:key>authRef</types:key><types:value>lender</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>lendersAuthorizer</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>lendersContact</types:value></types:item>
+                        <!-- Commented out for now, as searching within a field in a complexType breaks searches -->
+                        <!-- types:item><types:key>authRef</types:key><types:value>lender</types:value></types:item -->
+                        <!-- types:item><types:key>authRef</types:key><types:value>lendersAuthorizer</types:value></types:item -->
+                        <!-- types:item><types:key>authRef</types:key><types:value>lendersContact</types:value></types:item -->
                         <types:item><types:key>authRef</types:key><types:value>loanInContact</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>borrowersAuthorizer</types:value></types:item>
                     </service:properties>

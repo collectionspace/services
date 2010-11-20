@@ -30,6 +30,8 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.LoaninClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.loanin.LenderGroup;
+import org.collectionspace.services.loanin.LenderGroupList;
 import org.collectionspace.services.loanin.LoansinCommon;
 import org.collectionspace.services.loanin.LoansinCommonList;
 
@@ -63,6 +65,9 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
     
     /** The known resource id. */
     private String knownResourceId = null;
+
+    private String LENDER_REF_NAME =
+            "urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth):person:name(Harry Lender)'Harry Lender'";
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -311,6 +316,15 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         LoansinCommon loanin = (LoansinCommon) extractPart(input,
                 client.getCommonPartName(), LoansinCommon.class);
         Assert.assertNotNull(loanin);
+
+        LenderGroupList lenderGroupList = loanin.getLenderGroupList();
+        Assert.assertNotNull(lenderGroupList);
+        List<LenderGroup> lenderGroups = lenderGroupList.getLenderGroup();
+        Assert.assertNotNull(lenderGroups);
+        Assert.assertTrue(lenderGroups.size() > 0);
+        String lender = lenderGroups.get(0).getLender();
+        Assert.assertEquals(lender, LENDER_REF_NAME);
+
     }
 
     // Failure outcomes
@@ -773,7 +787,11 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         LoansinCommon loanin = new LoansinCommon();
         loanin.setLoanInNumber(loaninNumber);
         loanin.setLoanReturnDate(returnDate);
-        loanin.setLender("urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth):person:name(Harry Lender)'Harry Lender'");
+        LenderGroupList lenderGroupList = new LenderGroupList();
+        LenderGroup lenderGroup = new LenderGroup();
+        lenderGroup.setLender(LENDER_REF_NAME);
+        lenderGroupList.getLenderGroup().add(lenderGroup);
+        loanin.setLenderGroupList(lenderGroupList);
         loanin.setLoanPurpose("For Surfboards of the 1960s exhibition.");
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart =
