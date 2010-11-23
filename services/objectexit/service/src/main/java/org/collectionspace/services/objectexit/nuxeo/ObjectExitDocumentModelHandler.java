@@ -131,7 +131,8 @@ public class ObjectExitDocumentModelHandler
     public ObjectexitCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         ObjectexitCommonList coList = extractPagingInfo(new ObjectexitCommonList(), wrapDoc);
         AbstractCommonList commonList = (AbstractCommonList) coList;
-        commonList.setFieldsReturned("currentOwner|depositor|exitDate|exitMethod|exitNote|exitNumber|exitReason|packingNote|uri|csid");
+        //CSPACE-3209 don't use all fields.  commonList.setFieldsReturned("currentOwner|depositor|exitDate|exitMethod|exitNote|exitNumber|exitReason|packingNote|uri|csid");
+        commonList.setFieldsReturned("exitNumber|currentOwner|uri|csid");  //CSPACE-3209 now do this
         List<ObjectexitCommonList.ObjectexitListItem> list = coList.getObjectexitListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){
@@ -140,7 +141,8 @@ public class ObjectExitDocumentModelHandler
 
             String label = getServiceContext().getCommonPartLabel();
             ilistItem.setExitNumber((String) docModel.getProperty(label, ObjectexitJAXBSchema.OBJECT_EXIT_NUMBER));
-            ilistItem.setExitDate((String) docModel.getProperty(label, ObjectexitJAXBSchema.OBJECT_EXIT_DATE));
+            //CSPACE-3209 ilistItem.setExitDate((String) docModel.getProperty(label, ObjectexitJAXBSchema.OBJECT_EXIT_DATE));
+            ilistItem.setCurrentOwner((String) docModel.getProperty(label, ObjectexitJAXBSchema.OBJECT_EXIT_CURRENT_OWNER));  //CSPACE-3209
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);
             ilistItem.setCsid(id);
