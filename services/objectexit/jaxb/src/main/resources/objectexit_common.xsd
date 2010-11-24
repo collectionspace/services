@@ -35,7 +35,7 @@
                 <xs:element name="currentOwner" type="xs:string"/>
                 <xs:element name="depositor" type="xs:string"/>
                 <xs:element name="exitDate" type="xs:string"/>
-                <xs:element name="exitMethod" type="xs:string"/>
+                <xs:element name="exitMethods" type="exitMethods"/>
                 <xs:element name="exitNote" type="xs:string"/>
                 <xs:element name="exitNumber" type="xs:string"/>
                 <xs:element name="exitReason" type="xs:string"/>
@@ -43,6 +43,12 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    
+    <xs:complexType name="exitMethods">
+        <xs:sequence>
+            <xs:element name="exitMethod" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
 
     <!-- This is the base class for paginated lists -->
     <xs:complexType name="abstractCommonList">
