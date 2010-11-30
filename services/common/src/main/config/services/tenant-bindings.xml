@@ -112,6 +112,47 @@
         </tenant:serviceBindings>
         <!--end collectionobject service meta-data -->
 
+        <!-- begin blob service meta-data -->
+        <tenant:serviceBindings name="Blob" type="procedure" version="0.1">
+            <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
+                default-domain
+            </service:repositoryDomain>
+            <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler
+            </service:documentHandler>
+            <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.blob.nuxeo.BlobValidatorHandler
+            </service:validatorHandler>
+            <service:object name="Blob" version="0.1"
+                            xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:part id="0" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="blob-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/common/system"
+                            schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="blob_common" updated="" order="1">
+                    <service:properties>
+                        <types:item><types:key>authRef</types:key><types:value>currentOwner</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>depositor</types:value></types:item>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/blob"
+                            schemaLocation="http://collectionspace.org/services/blob http://services.collectionspace.org/blob/blob_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end blob service meta-data -->
+
         <!-- begin intake service meta-data -->
         <tenant:serviceBindings name="Intakes" type="procedure" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
@@ -163,6 +204,18 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <!-- BEGIN Laramie for new collectionspace_core -->
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <!-- END Laramie for new collectionspace_core -->
             </service:object>
         </tenant:serviceBindings>
         <!-- end intake service meta-data -->
@@ -308,6 +361,47 @@
             </service:object>
         </tenant:serviceBindings>
         <!-- end objectexit service meta-data -->
+
+        <!-- begin media service meta-data -->
+        <tenant:serviceBindings name="Media" type="procedure" version="0.1">
+            <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
+                default-domain
+            </service:repositoryDomain>
+            <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.media.nuxeo.MediaDocumentModelHandler
+            </service:documentHandler>
+            <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.media.nuxeo.MediaValidatorHandler
+            </service:validatorHandler>
+            <service:object name="Media" version="0.1"
+                            xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:part id="0" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="media-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/common/system"
+                            schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="media_common" updated="" order="1">
+                    <service:properties>
+                        <types:item><types:key>authRef</types:key><types:value>currentOwner</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>depositor</types:value></types:item>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/media"
+                            schemaLocation="http://collectionspace.org/services/media http://services.collectionspace.org/media/media_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end media service meta-data -->
 
         <!-- begin movement service meta-data -->
         <tenant:serviceBindings name="Movements" type="procedure" version="0.1">
@@ -1306,6 +1400,47 @@
         </tenant:serviceBindings>
         <!--end collectionobject service meta-data -->
 
+        <!-- begin blob service meta-data -->
+        <tenant:serviceBindings name="Blob" type="procedure" version="0.1">
+            <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
+                default-domain
+            </service:repositoryDomain>
+            <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler
+            </service:documentHandler>
+            <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.blob.nuxeo.BlobValidatorHandler
+            </service:validatorHandler>
+            <service:object name="Blob" version="0.1"
+                            xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:part id="0" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="blob-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/common/system"
+                            schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="blob_common" updated="" order="1">
+                    <service:properties>
+                        <types:item><types:key>authRef</types:key><types:value>currentOwner</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>depositor</types:value></types:item>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/blob"
+                            schemaLocation="http://collectionspace.org/services/blob http://services.collectionspace.org/blob/blob_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end blob service meta-data -->
+        
         <!-- begin intake service meta-data -->
         <tenant:serviceBindings name="Intakes" type="procedure" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
@@ -1354,6 +1489,17 @@
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/intake"
                             schemaLocation="http://collectionspace.org/services/intake http://services.collectionspace.org/intake/intakes_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <!-- Laramie test for collectionspace_core -->
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -1502,6 +1648,48 @@
             </service:object>
         </tenant:serviceBindings>
         <!-- end objectexit service meta-data -->
+
+        <!-- begin media service meta-data -->
+        <tenant:serviceBindings name="Media" type="procedure" version="0.1">
+            <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
+                default-domain
+            </service:repositoryDomain>
+            <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.media.nuxeo.MediaDocumentModelHandler
+            </service:documentHandler>
+            <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                org.collectionspace.services.media.nuxeo.MediaValidatorHandler
+            </service:validatorHandler>
+            <service:object name="Media" version="0.1"
+                            xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:part id="0" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="media-system" updated="" order="0">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/common/system"
+                            schemaLocation="http://collectionspace.org/services/common/system http://collectionspace.org/services/common/system/system-response.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="1" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="media_common" updated="" order="1">
+                    <service:properties>
+                        <types:item><types:key>authRef</types:key><types:value>currentOwner</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>depositor</types:value></types:item>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/services/media"
+                            schemaLocation="http://collectionspace.org/services/media http://services.collectionspace.org/media/media_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
+        <!-- end media service meta-data -->
+
 
         <!-- begin movement service meta-data -->
         <tenant:serviceBindings name="Movements" type="procedure" version="0.1">
