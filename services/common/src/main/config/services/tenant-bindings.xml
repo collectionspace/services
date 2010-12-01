@@ -138,10 +138,6 @@
                 <service:part id="1" control_group="Managed"
                               versionable="true" auditable="false"
                               label="blob_common" updated="" order="1">
-                    <service:properties>
-                        <types:item><types:key>authRef</types:key><types:value>currentOwner</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>depositor</types:value></types:item>
-                    </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/blob"
@@ -388,10 +384,6 @@
                 <service:part id="1" control_group="Managed"
                               versionable="true" auditable="false"
                               label="media_common" updated="" order="1">
-                    <service:properties>
-                        <types:item><types:key>authRef</types:key><types:value>currentOwner</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>depositor</types:value></types:item>
-                    </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/media"
@@ -1426,10 +1418,6 @@
                 <service:part id="1" control_group="Managed"
                               versionable="true" auditable="false"
                               label="blob_common" updated="" order="1">
-                    <service:properties>
-                        <types:item><types:key>authRef</types:key><types:value>currentOwner</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>depositor</types:value></types:item>
-                    </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/blob"
@@ -1675,10 +1663,6 @@
                 <service:part id="1" control_group="Managed"
                               versionable="true" auditable="false"
                               label="media_common" updated="" order="1">
-                    <service:properties>
-                        <types:item><types:key>authRef</types:key><types:value>currentOwner</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>depositor</types:value></types:item>
-                    </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/media"
