@@ -213,6 +213,11 @@ public class PayloadLogger{
             String[] boundaryTokens = headerLine.split("boundary=");
             if (boundaryTokens.length == 2) {
                 boundary = killTrailingWS(boundaryTokens[1]);
+                //Header might be:
+                // Content-Type: multipart/mixed; boundary=a97c20ab-3ef6-4adc-82b0-6cf28c450faf;charset=ISO-8859-1
+
+                String[] boundaryTerm = boundary.split(";");
+                boundary = boundaryTerm[0];
 
             } else if (boundaryTokens.length > 2) {
                 System.err.println("WARNING: too many tokens after boundary= on Content-Type: header line: " + headerLine);
