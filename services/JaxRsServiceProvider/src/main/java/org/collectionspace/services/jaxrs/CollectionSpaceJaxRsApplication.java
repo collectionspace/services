@@ -23,8 +23,10 @@
 package org.collectionspace.services.jaxrs;
 
 import org.collectionspace.services.account.AccountResource;
+import org.collectionspace.services.blob.BlobResource;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.id.IDResource;
+import org.collectionspace.services.media.MediaResource;
 import org.collectionspace.services.note.NoteResource;
 import org.collectionspace.services.intake.IntakeResource;
 import org.collectionspace.services.loanin.LoaninResource;
@@ -87,6 +89,8 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new LoanoutResource());
         singletons.add(new ObjectExitResource());
         singletons.add(new LocationAuthorityResource());
+        singletons.add(new MediaResource());
+        singletons.add(new BlobResource());
         singletons.add(new MovementResource());
         singletons.add(new ReportResource());
         singletons.add(new AcquisitionResource());

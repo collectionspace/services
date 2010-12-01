@@ -22,6 +22,7 @@
     <modules>
         <module>authentication</module>
         <module>authorization</module>
+        <module>blob</module>
         <module>client</module>
         <module>jaxb</module>
         <module>hyperjaxb</module>
@@ -41,6 +42,7 @@
         <module>intake</module>
         <module>loanin</module>
         <module>loanout</module>
+        <module>media</module>
         <module>objectexit</module>
         <module>location</module>
         <module>movement</module>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Loan Out schema (XSD)
+    
+    Entity  : Media
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+
+    $LastChangedRevision: 2316 $
+    $LastChangedDate: 2010-06-02 16:03:51 -0700 (Wed, 02 Jun 2010) $
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:ns="http://collectionspace.org/services/media"
+  xmlns="http://collectionspace.org/services/media"
+  targetNamespace="http://collectionspace.org/services/media"
+  version="0.1"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+<!-- See http://wiki.collectionspace.org/display/collectionspace/Loans+Out+Schema -->    
+    
+    <!-- media -->
+    <xs:element name="media_common">
+        <xs:complexType>
+            <xs:sequence>
+                <!--  Media Information Group -->
+                <xs:element name="currentOwner" type="xs:string"/>
+                <xs:element name="depositor" type="xs:string"/>
+                <xs:element name="exitDate" type="xs:string"/>
+                <xs:element name="exitMethods" type="exitMethods"/>
+                <xs:element name="exitNote" type="xs:string"/>
+                <xs:element name="exitNumber" type="xs:string"/>
+                <xs:element name="exitReason" type="xs:string"/>
+                <xs:element name="packingNote" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:complexType name="exitMethods">
+        <xs:sequence>
+            <xs:element name="exitMethod" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- This is the base class for paginated lists -->
+    <xs:complexType name="abstractCommonList">
+        <xs:annotation>
+            <xs:appinfo>
+                <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
+            </xs:appinfo>
+        </xs:annotation>
+    </xs:complexType>
+    
+    <!-- media records, as in nuxeo repository -->
+    <xs:element name="media_common_list">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="abstractCommonList">                    
+                    <xs:sequence>
+                        <xs:element name="media_list_item" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="exitNumber" type="xs:string"   minOccurs="1" />
+                                    <xs:element name="currentOwner" type="xs:string" minOccurs="1" />
+                                    <xs:element name="uri" type="xs:anyURI"          minOccurs="1" />
+                                    <xs:element name="csid" type="xs:string"         minOccurs="1" />
+                                    <!--
+                                    <xs:element name="depositor" type="xs:string"    minOccurs="1" />
+                                    <xs:element name="exitDate" type="xs:string"     minOccurs="1" />
+                                    <xs:element name="exitMethod" type="xs:string"   minOccurs="1" />
+                                    <xs:element name="exitNote" type="xs:string"     minOccurs="1" />
+                                    <xs:element name="exitReason" type="xs:string"   minOccurs="1" />
+                                    <xs:element name="packingNote" type="xs:string"  minOccurs="1" />
+                                    -->
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:extension>
+            </xs:complexContent>                    
+        </xs:complexType>
+    </xs:element>
+    
+</xs:schema>
+

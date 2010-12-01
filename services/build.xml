@@ -150,6 +150,7 @@
             description="deploy services in ${jboss.server.cspace}">
         <ant antfile="authentication/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="authorization/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="blob/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="common/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="account/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="relation/build.xml" target="deploy" inheritAll="false"/>
@@ -161,6 +162,7 @@
         <ant antfile="loanout/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="objectexit/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="location/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="media/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="movement/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="report/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="vocabulary/build.xml" target="deploy" inheritAll="false"/>
@@ -188,6 +190,7 @@
         <ant antfile="movement/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="loanout/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="loanin/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="media/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="collectionobject/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="note/build.xml" target="undeploy" inheritAll="false"/>
@@ -195,6 +198,8 @@
         <ant antfile="relation/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="account/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="common/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="media/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="blob/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="authorization/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="authentication/build.xml" target="undeploy" inheritAll="false"/>
     </target>
@@ -210,6 +215,7 @@
         <ant antfile="authentication/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="authorization/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="account/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="blob/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="common/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="relation/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="id/build.xml" target="dist" inheritAll="false"/>
@@ -219,6 +225,7 @@
         <ant antfile="loanout/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="location/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="objectexit/build.xml" target="dist" inheritAll="false"/>
+        <ant antfile="media/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="movement/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="report/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="vocabulary/build.xml" target="dist" inheritAll="false"/>
