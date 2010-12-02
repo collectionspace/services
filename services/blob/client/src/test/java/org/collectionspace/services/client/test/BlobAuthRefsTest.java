@@ -151,7 +151,13 @@ public class BlobAuthRefsTest extends BaseServiceTest {
         return extractId(res);
     }
 
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"createWithAuthRefs"})
+    // @Test annotation commented out by Aron 2010-12-02 until blob payload is set to the
+    // actual payload - it currently appears to be cloned from another record type - and
+    // it's determined that this payload has at least one authority field.
+    //
+    // If there are no authref fields in the payload, we might remove this test class outright.
+    //
+    // @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"createWithAuthRefs"})
     public void readAndCheckAuthRefs(String testName) throws Exception {
         logger.debug(testBanner(testName, CLASS_NAME));
         testSetup(STATUS_OK, ServiceRequestType.READ);

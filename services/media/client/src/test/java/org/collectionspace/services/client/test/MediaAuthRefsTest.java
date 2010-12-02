@@ -151,7 +151,14 @@ public class MediaAuthRefsTest extends BaseServiceTest {
         return extractId(res);
     }
 
-    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"createWithAuthRefs"})
+    // @Test annotation commented out by Aron 2010-12-02 until media payload is set to the
+    // actual payload - it currently appears to be cloned from another record type - and
+    // it's determined that this payload has at least one authority field.
+    //
+    // When that happens, this test class will also need to be revised accordingly to
+    // reflect the actual names and number of authref fields in that payload.
+    //
+    // @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods = {"createWithAuthRefs"})
     public void readAndCheckAuthRefs(String testName) throws Exception {
         logger.debug(testBanner(testName, CLASS_NAME));
         testSetup(STATUS_OK, ServiceRequestType.READ);
