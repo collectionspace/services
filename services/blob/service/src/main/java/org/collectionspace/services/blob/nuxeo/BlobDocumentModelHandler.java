@@ -131,22 +131,27 @@ public class BlobDocumentModelHandler
     public BlobCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
         BlobCommonList coList = extractPagingInfo(new BlobCommonList(), wrapDoc);
         AbstractCommonList commonList = (AbstractCommonList) coList;
-        //CSPACE-3209 don't use all fields.  commonList.setFieldsReturned("currentOwner|depositor|exitDate|exitMethod|exitNote|exitNumber|exitReason|packingNote|uri|csid");
-        commonList.setFieldsReturned("exitNumber|currentOwner|uri|csid");  //CSPACE-3209 now do this
+        commonList.setFieldsReturned("name|mimeType|encoding|length|csid");
+
+
         List<BlobCommonList.BlobListItem> list = coList.getBlobListItem();
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
-            BlobListItem ilistItem = new BlobListItem();
+            BlobListItem item = new BlobListItem();
 
             String label = getServiceContext().getCommonPartLabel();
-            ilistItem.setExitNumber((String) docModel.getProperty(label, BlobJAXBSchema.OBJECT_EXIT_NUMBER));
-            //CSPACE-3209 ilistItem.setExitDate((String) docModel.getProperty(label, BlobJAXBSchema.OBJECT_EXIT_DATE));
-            ilistItem.setCurrentOwner((String) docModel.getProperty(label, BlobJAXBSchema.OBJECT_EXIT_CURRENT_OWNER));  //CSPACE-3209
+            item.setEncoding((String) docModel.getProperty(label, BlobJAXBSchema.encoding));
+            item.setMimeType((String) docModel.getProperty(label, BlobJAXBSchema.mimeType));
+            String theData = (String) docModel.getProperty(label, BlobJAXBSchema.data);
+            item.setName((String) docModel.getProperty(label, BlobJAXBSchema.name));
+            item.setLength((String) docModel.getProperty(label, BlobJAXBSchema.length));
+
+
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
-            ilistItem.setUri(getServiceContextPath() + id);
-            ilistItem.setCsid(id);
-            list.add(ilistItem);
+            item.setUri(getServiceContextPath() + id);
+            item.setCsid(id);
+            list.add(item);
         }
 
         return coList;

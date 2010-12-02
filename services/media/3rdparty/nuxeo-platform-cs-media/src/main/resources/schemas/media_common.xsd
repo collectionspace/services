@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 <!--
-    Loan Out schema (XSD)
+    Media schema (XSD)
     
     Entity  : Media
     Part    : Common
@@ -18,21 +18,55 @@
     targetNamespace="http://collectionspace.org/media/"
     version="0.1">
     
-    <!-- See http://wiki.collectionspace.org/display/collectionspace/Loans+Out+Schema -->
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Media+Handling+Schema -->
 
     <!--  Media Information Group -->
-    <xs:element name="currentOwner" type="xs:string"/>
-    <xs:element name="depositor" type="xs:string"/>
-    <xs:element name="exitDate" type="xs:string"/>
-    <xs:element name="exitMethods">
+
+    <xs:element name="contributor" type="xs:string"/>
+    <xs:element name="copyrightStatement" type="xs:string"/>
+    <xs:element name="coverage" type="xs:string"/>
+    <xs:element name="creator" type="xs:string"/>
+    <xs:element name="dates">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="exitMethod" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="date" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
-   </xs:element>
-    <xs:element name="exitNote" type="xs:string"/>
-    <xs:element name="exitNumber" type="xs:string"/>
-    <xs:element name="exitReason" type="xs:string"/>
-    <xs:element name="packingNote" type="xs:string"/>    
+    </xs:element>
+    <xs:element name="dateCreated" type="xs:string"/>
+    <xs:element name="dateModified" type="xs:string"/>
+    <xs:element name="description" type="xs:string"/>
+    <xs:element name="dimensions">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="dimension" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="filename" type="xs:string"/>
+    <xs:element name="format" type="xs:string"/>
+    <xs:element name="identificationNumber" type="xs:string"/>
+    <xs:element name="languages">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="language" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="location" type="xs:string"/>
+    <xs:element name="publisher" type="xs:string"/>
+    <xs:element name="relation" type="xs:string"/>
+    <xs:element name="rightsHolder" type="xs:string"/>
+    <xs:element name="source" type="xs:string"/>
+    <xs:element name="subjects">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="subject" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="title" type="xs:string"/>
+    <xs:element name="type" type="xs:string"/>
+    <xs:element name="uri" type="xs:string" />
+
 </xs:schema>

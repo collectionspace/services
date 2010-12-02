@@ -117,7 +117,7 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
             int i = 0;
             for (BlobCommonList.BlobListItem item : items) {
                 logger.debug(testName + ": list-item[" + i + "] csid=" + item.getCsid());
-                logger.debug(testName + ": list-item[" + i + "] blobNumber=" + item.getExitNumber());
+                logger.debug(testName + ": list-item[" + i + "] blob.name=" + item.getName());
                 logger.debug(testName + ": list-item[" + i + "] URI=" + item.getUri());
                 i++;
             }
@@ -137,7 +137,7 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
         BlobCommon blob = (BlobCommon) extractPart(input, client.getCommonPartName(), BlobCommon.class);
         Assert.assertNotNull(blob);
 
-        blob.setExitNumber("updated-" + blob.getExitNumber());
+        blob.setName("updated-" + blob.getName());
         logger.debug("Object to be updated:"+objectAsXmlString(blob, BlobCommon.class));
         MultipartOutput output = new MultipartOutput();
         OutputPart commonPart = output.addPart(blob, MediaType.APPLICATION_XML_TYPE);
@@ -252,8 +252,7 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
     private MultipartOutput createBlobInstance(String exitNumber) {
         String identifier = "blobNumber-" + exitNumber;
         BlobCommon blob = new BlobCommon();
-        blob.setExitNumber(identifier);
-        blob.setDepositor("urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'");
+        blob.setName(identifier);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(blob, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", new BlobClient().getCommonPartName());

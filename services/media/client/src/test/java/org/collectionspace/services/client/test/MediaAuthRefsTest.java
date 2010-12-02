@@ -67,8 +67,7 @@ public class MediaAuthRefsTest extends BaseServiceTest {
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
     private String depositorRefName = null;
-    private String exitDate = null;
-    private String exitNumber = null;
+    private String title = null;
 
     @Override
     protected CollectionSpaceClient getClientInstance() {
@@ -85,14 +84,11 @@ public class MediaAuthRefsTest extends BaseServiceTest {
         return SERVICE_PATH_COMPONENT;
     }
 
-    private MultipartOutput createMediaInstance(String depositorRefName, String exitNumber, String exitDate) {
-        this.exitDate = exitDate;
-        this.exitNumber = exitNumber;
+    private MultipartOutput createMediaInstance(String depositorRefName, String title) {
+        this.title = title;
         this.depositorRefName = depositorRefName;
         MediaCommon media = new MediaCommon();
-        media.setDepositor(depositorRefName);
-        media.setExitNumber(exitNumber);
-        media.setExitDate(exitDate);
+        media.setTitle(title);
 
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(media, MediaType.APPLICATION_XML_TYPE);
@@ -110,7 +106,7 @@ public class MediaAuthRefsTest extends BaseServiceTest {
         // Create a new Loans In resource. One or more fields in this resource will be PersonAuthority
         //    references, and will refer to Person resources by their refNames.
         MediaClient mediaClient = new MediaClient();
-        MultipartOutput multipart = createMediaInstance(depositorRefName, "exitNumber-" + identifier, "exitDate-" + identifier);
+        MultipartOutput multipart = createMediaInstance(depositorRefName, "media.title-" + identifier);
         ClientResponse<Response> res = mediaClient.create(multipart);
         assertStatusCode(res, testName);
         if (knownResourceId == null) {// Store the ID returned from the first resource created for additional tests below.
@@ -171,9 +167,7 @@ public class MediaAuthRefsTest extends BaseServiceTest {
         logger.debug(objectAsXmlString(media, MediaCommon.class));
 
         // Check a couple of fields
-        Assert.assertEquals(media.getDepositor(), depositorRefName);
-        Assert.assertEquals(media.getExitDate(), exitDate);
-        Assert.assertEquals(media.getExitNumber(), exitNumber);
+        Assert.assertEquals(media.getTitle(), title);
 
         // Get the auth refs and check them
         ClientResponse<AuthorityRefList> res2 = mediaClient.getAuthorityRefs(knownResourceId);

@@ -117,7 +117,7 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
             int i = 0;
             for (MediaCommonList.MediaListItem item : items) {
                 logger.debug(testName + ": list-item[" + i + "] csid=" + item.getCsid());
-                logger.debug(testName + ": list-item[" + i + "] mediaNumber=" + item.getExitNumber());
+                logger.debug(testName + ": list-item[" + i + "] media.title=" + item.getTitle());
                 logger.debug(testName + ": list-item[" + i + "] URI=" + item.getUri());
                 i++;
             }
@@ -137,7 +137,7 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
         MediaCommon media = (MediaCommon) extractPart(input, client.getCommonPartName(), MediaCommon.class);
         Assert.assertNotNull(media);
 
-        media.setExitNumber("updated-" + media.getExitNumber());
+        media.setTitle("updated-" + media.getTitle());
         logger.debug("Object to be updated:"+objectAsXmlString(media, MediaCommon.class));
         MultipartOutput output = new MultipartOutput();
         OutputPart commonPart = output.addPart(media, MediaType.APPLICATION_XML_TYPE);
@@ -249,11 +249,10 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
         return SERVICE_PATH_COMPONENT;
     }
 
-    private MultipartOutput createMediaInstance(String exitNumber) {
-        String identifier = "mediaNumber-" + exitNumber;
+    private MultipartOutput createMediaInstance(String title) {
+        String identifier = "media.title-" + title;
         MediaCommon media = new MediaCommon();
-        media.setExitNumber(identifier);
-        media.setDepositor("urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'");
+        media.setTitle(identifier);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(media, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", new MediaClient().getCommonPartName());

@@ -67,8 +67,7 @@ public class BlobAuthRefsTest extends BaseServiceTest {
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
     private String depositorRefName = null;
-    private String exitDate = null;
-    private String exitNumber = null;
+    private String blobName = null;
 
     @Override
     protected CollectionSpaceClient getClientInstance() {
@@ -85,14 +84,11 @@ public class BlobAuthRefsTest extends BaseServiceTest {
         return SERVICE_PATH_COMPONENT;
     }
 
-    private MultipartOutput createBlobInstance(String depositorRefName, String exitNumber, String exitDate) {
-        this.exitDate = exitDate;
-        this.exitNumber = exitNumber;
+    private MultipartOutput createBlobInstance(String depositorRefName) {
         this.depositorRefName = depositorRefName;
+        this.blobName = "testblob-"+createIdentifier();
         BlobCommon blob = new BlobCommon();
-        blob.setDepositor(depositorRefName);
-        blob.setExitNumber(exitNumber);
-        blob.setExitDate(exitDate);
+        blob.setName(this.blobName);
 
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(blob, MediaType.APPLICATION_XML_TYPE);
@@ -110,7 +106,7 @@ public class BlobAuthRefsTest extends BaseServiceTest {
         // Create a new Loans In resource. One or more fields in this resource will be PersonAuthority
         //    references, and will refer to Person resources by their refNames.
         BlobClient blobClient = new BlobClient();
-        MultipartOutput multipart = createBlobInstance(depositorRefName, "exitNumber-" + identifier, "exitDate-" + identifier);
+        MultipartOutput multipart = createBlobInstance(depositorRefName);
         ClientResponse<Response> res = blobClient.create(multipart);
         assertStatusCode(res, testName);
         if (knownResourceId == null) {// Store the ID returned from the first resource created for additional tests below.
@@ -170,9 +166,7 @@ public class BlobAuthRefsTest extends BaseServiceTest {
         logger.debug(objectAsXmlString(blob, BlobCommon.class));
 
         // Check a couple of fields
-        Assert.assertEquals(blob.getDepositor(), depositorRefName);
-        Assert.assertEquals(blob.getExitDate(), exitDate);
-        Assert.assertEquals(blob.getExitNumber(), exitNumber);
+        Assert.assertEquals(blob.getName(), blobName);
 
         // Get the auth refs and check them
         ClientResponse<AuthorityRefList> res2 = blobClient.getAuthorityRefs(knownResourceId);

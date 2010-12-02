@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 <!--
-    Loan Out schema (XSD)
+    Media schema (XSD)
     
     Entity  : Media
     Part    : Common
@@ -32,21 +32,59 @@
         <xs:complexType>
             <xs:sequence>
                 <!--  Media Information Group -->
-                <xs:element name="currentOwner" type="xs:string"/>
-                <xs:element name="depositor" type="xs:string"/>
-                <xs:element name="exitDate" type="xs:string"/>
-                <xs:element name="exitMethods" type="exitMethods"/>
-                <xs:element name="exitNote" type="xs:string"/>
-                <xs:element name="exitNumber" type="xs:string"/>
-                <xs:element name="exitReason" type="xs:string"/>
-                <xs:element name="packingNote" type="xs:string"/>
+                <xs:element name="contributor" type="xs:string"/>
+                <xs:element name="copyrightStatement" type="xs:string"/>
+                <xs:element name="coverage" type="xs:string"/>
+                <xs:element name="creator" type="xs:string"/>
+                <xs:element name="dates" type="dates"/>
+                <xs:element name="dateCreated" type="xs:string"/>
+                <xs:element name="dateModified" type="xs:string"/>
+                <xs:element name="description" type="xs:string"/>
+                <xs:element name="dimensions" type="dimensions"/>
+                <xs:element name="filename" type="xs:string"/>
+                <xs:element name="format" type="xs:string"/>
+                <xs:element name="identificationNumber" type="xs:string"/>
+                <xs:element name="languages" type="languages"/>
+                <xs:element name="location" type="xs:string"/>
+                <xs:element name="publisher" type="xs:string"/>
+                <xs:element name="relation" type="xs:string"/>
+                <xs:element name="rightsHolder" type="xs:string"/>
+                <xs:element name="source" type="xs:string"/>
+                <xs:element name="subjects" type="subjects"/>
+                <xs:element name="title" type="xs:string"/>
+                <xs:element name="type" type="xs:string"/>
+                <xs:element name="uri" type="xs:string" />
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    
-    <xs:complexType name="exitMethods">
+
+    <xs:complexType name="dates">
         <xs:sequence>
-            <xs:element name="exitMethod" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="date" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="dimensions">
+        <xs:sequence>
+            <xs:element name="dimension" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="languages">
+        <xs:sequence>
+            <xs:element name="language" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="relations">
+        <xs:sequence>
+            <xs:element name="relation" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="subjects">
+        <xs:sequence>
+            <xs:element name="subject" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -68,18 +106,13 @@
                         <xs:element name="media_list_item" maxOccurs="unbounded">
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element name="exitNumber" type="xs:string"   minOccurs="1" />
-                                    <xs:element name="currentOwner" type="xs:string" minOccurs="1" />
-                                    <xs:element name="uri" type="xs:anyURI"          minOccurs="1" />
+                                    <xs:element name="title" type="xs:string"   minOccurs="1" />
+                                    <xs:element name="source" type="xs:string" minOccurs="1" />
+                                    <xs:element name="filename" type="xs:anyURI"          minOccurs="1" />
+                                    <xs:element name="identificationNumber" type="xs:anyURI"          minOccurs="1" />
+                                    <xs:element name="dimension" type="xs:anyURI"          minOccurs="1" />
+                                    <xs:element name="uri" type="xs:string" />
                                     <xs:element name="csid" type="xs:string"         minOccurs="1" />
-                                    <!--
-                                    <xs:element name="depositor" type="xs:string"    minOccurs="1" />
-                                    <xs:element name="exitDate" type="xs:string"     minOccurs="1" />
-                                    <xs:element name="exitMethod" type="xs:string"   minOccurs="1" />
-                                    <xs:element name="exitNote" type="xs:string"     minOccurs="1" />
-                                    <xs:element name="exitReason" type="xs:string"   minOccurs="1" />
-                                    <xs:element name="packingNote" type="xs:string"  minOccurs="1" />
-                                    -->
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>

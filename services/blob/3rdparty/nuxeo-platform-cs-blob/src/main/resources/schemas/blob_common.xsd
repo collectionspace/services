@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 <!--
-    Loan Out schema (XSD)
+    Blob schema (XSD)
     
     Entity  : Blob
     Part    : Common
@@ -21,18 +21,11 @@
     <!-- See http://wiki.collectionspace.org/display/collectionspace/Loans+Out+Schema -->
 
     <!--  Blob Information Group -->
-    <xs:element name="currentOwner" type="xs:string"/>
-    <xs:element name="depositor" type="xs:string"/>
-    <xs:element name="exitDate" type="xs:string"/>
-    <xs:element name="exitMethods">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="exitMethod" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-   </xs:element>
-    <xs:element name="exitNote" type="xs:string"/>
-    <xs:element name="exitNumber" type="xs:string"/>
-    <xs:element name="exitReason" type="xs:string"/>
-    <xs:element name="packingNote" type="xs:string"/>    
+    <xs:element name="encoding" type="xs:string" />
+    <xs:element name="mime-type" type="xs:string" />
+    <xs:element name="data" type="xs:string" />
+    <xs:element name="name" type="xs:string" />
+    <xs:element name="length" type="xs:string" />
+    <xs:element name="digest" type="xs:string" />
+    <xs:element name="uri" type="xs:string" />
 </xs:schema>

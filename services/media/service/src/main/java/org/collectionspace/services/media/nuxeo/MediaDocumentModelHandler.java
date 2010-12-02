@@ -137,16 +137,19 @@ public class MediaDocumentModelHandler
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
-            MediaListItem ilistItem = new MediaListItem();
+            MediaListItem item = new MediaListItem();
 
             String label = getServiceContext().getCommonPartLabel();
-            ilistItem.setExitNumber((String) docModel.getProperty(label, MediaJAXBSchema.OBJECT_EXIT_NUMBER));
-            //CSPACE-3209 ilistItem.setExitDate((String) docModel.getProperty(label, MediaJAXBSchema.OBJECT_EXIT_DATE));
-            ilistItem.setCurrentOwner((String) docModel.getProperty(label, MediaJAXBSchema.OBJECT_EXIT_CURRENT_OWNER));  //CSPACE-3209
+
+            item.setTitle((String) docModel.getProperty(label, MediaJAXBSchema.title));
+            item.setSource((String) docModel.getProperty(label, MediaJAXBSchema.source));
+            item.setFilename((String) docModel.getProperty(label, MediaJAXBSchema.filename));
+            item.setIdentificationNumber((String) docModel.getProperty(label, MediaJAXBSchema.identificationNumber));
+            
             String id = NuxeoUtils.extractId(docModel.getPathAsString());
-            ilistItem.setUri(getServiceContextPath() + id);
-            ilistItem.setCsid(id);
-            list.add(ilistItem);
+            item.setUri(getServiceContextPath() + id);
+            item.setCsid(id);
+            list.add(item);
         }
 
         return coList;
