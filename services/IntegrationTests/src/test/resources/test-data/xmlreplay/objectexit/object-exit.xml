@@ -29,7 +29,18 @@
              </response>
         </test>
     </testGroup>
-    
+
+    <testGroup ID="repeat" autoDeletePOSTS="true">
+        <test ID="oeRepeat"  auth="admin@collectionspace.org">
+            <method>POST</method>
+            <uri>/cspace-services/objectexit/</uri>
+            <part>
+                <label>objectexit_common</label>
+                <filename>objectexit/oeRepeat.xml</filename>
+            </part>
+        </test>
+    </testGroup>
+
    <!-- ================================================================================ -->
     
      <testGroup ID="CRUDL" autoDeletePOSTS="true">
