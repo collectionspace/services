@@ -127,6 +127,11 @@ public interface CollectionObjectProxy extends CollectionSpaceProxy {
     @Path("/{csid}")
     ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
     
+    @GET
+    @Produces({"application/xml"})
+    @Path("/{csid}/picture")
+    ClientResponse<Response> createPicture(@PathParam("csid") String csid);
+    
     // List Authority references
     /**
      * Gets the authority refs.

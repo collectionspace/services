@@ -25,9 +25,12 @@
  */
 package org.collectionspace.services.collectionobject;
 
+import java.io.InputStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -46,6 +49,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
+import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 //import org.collectionspace.services.common.context.MultipartServiceContext;
@@ -70,12 +74,15 @@ import org.collectionspace.services.relation.NewRelationResource;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationshipType;
 import org.collectionspace.services.common.profile.Profiler;
+import org.collectionspace.services.common.FileUtils;
 
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 
+//FIXME: There should be no direct dependency on Nuxeo in our resource classes.
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -504,22 +511,100 @@ public class CollectionObjectResource
 		
 		return result;
     }
+        
+    @GET
+    @Path("{csid}/getpicture/{blobId}")
+    @Produces("image/jpeg")
+    public InputStream getPicture(
+    		@PathParam("csid") String csid,
+    		@PathParam("blobId") String blobId) {
+    	InputStream result = null;
+    	RepositoryInstance repoSession = null;
+    	try {
+			repoSession = ServiceMain.getInstance().getNuxeoConnector().getRepositorySession();
+			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+			result = NuxeoImageUtils.getPicture(ctx, repoSession, blobId, null);
+    	} catch (Exception e) {
+    		logger.error("Could not get image blob: " + blobId, e);
+    	} finally {
+    		try {
+				ServiceMain.getInstance().getNuxeoConnector().releaseRepositorySession(repoSession);
+			} catch (Exception e) {
+				logger.error("Could not release Nuxeo repository session", e);
+			}
+    	}
+    	
+    	if (result == null) {
+	        Response response = Response.status(
+	                Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed.").type("text/plain").build();
+	        throw new WebApplicationException(response);
+    	}
+    	
+    	return result;
+    }
     
     @GET
-    @Path("/picture")
-    @Produces("application/xml")
-    public Response createPictureDocument() {
-    	Response result = null;
+    @Path("{csid}/getpicture/{blobId}/{derivativeTerm}")
+    @Produces("image/jpeg")
+    public InputStream getPicture(
+    		@PathParam("csid") String csid,
+    		@PathParam("blobId") String blobId,
+    		@PathParam("derivativeTerm") String derivativeTerm) {
+    	InputStream result = null;
+    	RepositoryInstance repoSession = null;
+    	try {
+			repoSession = ServiceMain.getInstance().getNuxeoConnector().getRepositorySession();
+			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+			result = NuxeoImageUtils.getPicture(ctx, repoSession, blobId, derivativeTerm);
+    	} catch (Exception e) {
+    		logger.error("Could not get image blob: " + blobId, e);
+    	} finally {
+    		try {
+				ServiceMain.getInstance().getNuxeoConnector().releaseRepositorySession(repoSession);
+			} catch (Exception e) {
+				logger.error("Could not release Nuxeo repository session", e);
+			}
+    	}
     	
-		if (logger.isDebugEnabled()) {
-			logger.debug("------------------------------------------------------------------------------");
-			logger.debug("Prototype to create a Picture document in Nuxeo");
-			logger.debug("------------------------------------------------------------------------------");
-			logger.debug("");
-		}
-		
-		NuxeoImageUtils.createPicture();
-		result = Response.status(HttpResponseCodes.SC_OK).build();
+    	if (result == null) {
+	        Response response = Response.status(
+	                Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed.").type("text/plain").build();
+	        throw new WebApplicationException(response);
+    	}
+        
+    	return result;
+    }    
+    
+    @POST
+    @Path("{csid}/postpicture")
+    @Consumes("multipart/form-data")
+    @Produces("application/xml")
+    public String createPictureDocument(@Context HttpServletRequest req,
+    		@PathParam("csid") String csid,
+    		@QueryParam("blobUri") String blobUri) {
+    	String result = null;
+    	
+    	RepositoryInstance repoSession = null;
+    	try {
+			repoSession = ServiceMain.getInstance().getNuxeoConnector().getRepositorySession();
+	    	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+	    	File tmpFile = FileUtils.createTmpFile(req);
+			result = NuxeoImageUtils.createPicture(ctx, repoSession, tmpFile);
+    	} catch (Exception e) {
+    		logger.error("Could not create the new image file", e);
+    	} finally {
+    		try {
+				ServiceMain.getInstance().getNuxeoConnector().releaseRepositorySession(repoSession);
+			} catch (Exception e) {
+				logger.error("Could not release Nuxeo repository session", e);
+			}
+    	}
+    	
+    	if (result == null) {
+	        Response response = Response.status(
+	                Response.Status.INTERNAL_SERVER_ERROR).entity("Index failed.").type("text/plain").build();
+	        throw new WebApplicationException(response);
+    	}    	
 		
 		return result;
     }    

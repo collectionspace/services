@@ -144,6 +144,10 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
         return collectionObjectProxy.read(csid);
     }
 
+    public ClientResponse<Response> createPicture(String csid) {
+        return collectionObjectProxy.createPicture(csid);
+    }
+    
     /**
      * @param csid
      * @return response
