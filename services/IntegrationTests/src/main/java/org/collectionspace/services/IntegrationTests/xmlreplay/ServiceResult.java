@@ -43,6 +43,7 @@ public class ServiceResult {
     public String location = "";
     public String CSID = "";
     public String subresourceCSID = "";
+    public String requestPayload = "";
     public String result = "";
     public int responseCode = 0;
     public String responseMessage = "";
@@ -171,7 +172,7 @@ public class ServiceResult {
 
     }
     public String detail(boolean includePayloads){
-        return "{"
+        String res =  "{"
                 + ( gotExpectedResult() ? "SUCCESS" : "FAILURE"  )
                 + failureReason
                 +"; "+method
@@ -187,9 +188,11 @@ public class ServiceResult {
                 + ( Tools.notEmpty(location) ? "; location.CSID:"+location : "" )
                 + ( Tools.notEmpty(error) ? "; ERROR:"+error : "" )
                 + "; gotExpected:"+gotExpectedResult()
+                + ( includePayloads && Tools.notEmpty(requestPayload) ? "; requestPayload:\r\n"+requestPayload+"\r\n" : "" )
                 + ( includePayloads && Tools.notEmpty(result) ? "; result:"+result : "" )
                 + ( partsSummary(true))
                 +"}";
+        return res;
     }
     public String minimal(){
         return "{"

@@ -3,7 +3,7 @@
     <protoHostPort>http://localhost:8180</protoHostPort>
     
     <!-- legal values for dumpServiceResult=[minimal,detailed,full] -->
-    <dump payloads="false" dumpServiceResult="full" />
+    <dump payloads="true" dumpServiceResult="full" />
     
     <auths default="admin@collectionspace.org">
        <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
@@ -23,7 +23,6 @@
     <run controlFile="./security.xml" testGroup="securityRemovingRoleperms" />
     <run controlFile="objectexit/object-exit.xml" testGroup="CRUDL" />
     <run controlFile="objectexit/object-exit.xml" testGroup="domwalk" />
-    <run controlFile="objectexit/object-exit.xml" testGroup="repeat" />
 
     <!--<run controlFile="./organization.xml" testGroup="organization" />-->
 

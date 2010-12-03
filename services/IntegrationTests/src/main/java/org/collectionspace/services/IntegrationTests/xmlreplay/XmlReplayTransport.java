@@ -206,6 +206,7 @@ public class XmlReplayTransport {
 
         ServiceResult result = new ServiceResult();
         try {
+            result.requestPayload = content;
             result.responseCode = conn.getResponseCode();
             //System.out.println("responseCode: "+result.responseCode);
             if (400 <= result.responseCode && result.responseCode <= 499){

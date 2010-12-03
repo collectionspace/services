@@ -6,7 +6,8 @@
         <auth ID="testAdministator">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
     </auths>
     
-    
+     <dump payloads="true" dumpServiceResult="minimal" />
+
     
     <testGroup ID="domwalk" autoDeletePOSTS="true">
          <test ID="oe1"  auth="test">
@@ -30,6 +31,9 @@
         </test>
     </testGroup>
 
+    <!-- ================================================================================ -->
+
+
     <testGroup ID="repeat" autoDeletePOSTS="true">
         <test ID="oeRepeat"  auth="admin@collectionspace.org">
             <method>POST</method>
@@ -41,8 +45,7 @@
         </test>
     </testGroup>
 
-   <!-- ================================================================================ -->
-    
+
      <testGroup ID="CRUDL" autoDeletePOSTS="true">
          <test ID="oe1"  auth="admin@collectionspace.org">
              <method>POST</method>
