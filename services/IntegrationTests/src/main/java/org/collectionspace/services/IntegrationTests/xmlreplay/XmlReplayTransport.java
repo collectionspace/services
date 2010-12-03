@@ -59,11 +59,11 @@ public class XmlReplayTransport {
         getMethod.setRequestHeader("X-XmlReplay-fromTestID", fromTestID);
         ServiceResult pr = new ServiceResult();
 
-        int statusCode1 = client.executeMethod(getMethod);
-        pr.responseCode = statusCode1;
         pr.fromTestID = fromTestID;
         pr.method = "GET";
         try {
+            int statusCode1 = client.executeMethod(getMethod);
+            pr.responseCode = statusCode1;
             pr.result = getMethod.getResponseBodyAsString();
             pr.responseMessage = getMethod.getStatusText();
             Header[] headers = getMethod.getResponseHeaders();
@@ -74,13 +74,13 @@ public class XmlReplayTransport {
                 pr.boundary = PayloadLogger.parseBoundary(hdrStr);
             }
             pr.contentLength = getMethod.getResponseContentLength();
+            getMethod.releaseConnection();
         } catch (Throwable t){
             //System.err.println("ERROR getting content from response: "+t);
             pr.error = t.toString();
         }
 
 
-        getMethod.releaseConnection();
         return pr;
     }
 
@@ -183,69 +183,75 @@ public class XmlReplayTransport {
 
     public static ServiceResult doPOST_PUT(String urlString, String content, String boundary, String method, String contentType,
                                            String authForTest, String fromTestID) throws Exception {
-        URL url = new URL(urlString);
-        HttpURLConnection conn;
-        conn = (HttpURLConnection) url.openConnection();
-
-        if (MULTIPART_MIXED.equalsIgnoreCase(contentType)){
-            conn.setRequestProperty("Accept", "multipart/mixed");
-            conn.setRequestProperty("content-type", "multipart/mixed; boundary=" + boundary);
-        } else {
-            conn.setRequestProperty("Accept", "application/xml");
-            conn.setRequestProperty("content-type", contentType);
-        }
-        conn.setRequestProperty("Authorization", "Basic " + authForTest);  //TODO: remove test user : hard-coded as "dGVzdDp0ZXN0"
-        conn.setRequestProperty("Connection", "close");
-        conn.setRequestProperty("X-XmlReplay-fromTestID", fromTestID);
-        conn.setDoOutput(true);
-        conn.setDoInput(true);
-        conn.setRequestMethod(method); // "POST" or "PUT"
-        OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-        wr.write(content);
-        wr.flush();
-
         ServiceResult result = new ServiceResult();
-        try {
-            result.requestPayload = content;
-            result.responseCode = conn.getResponseCode();
-            //System.out.println("responseCode: "+result.responseCode);
-            if (400 <= result.responseCode && result.responseCode <= 499){
-                return result;
-            }
-            BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String line;
-            StringBuffer sb = new StringBuffer();
-            while ((line = rd.readLine()) != null) {
-                sb.append(line).append("\r\n");
-            }
-            String msg = sb.toString();
-            result.result = msg;
-            result.boundary = PayloadLogger.parseBoundary(conn.getHeaderField("CONTENT-TYPE"));
-
-            rd.close();
-        } catch (Throwable t){
-            //System.err.println("ERROR getting content from response: "+t);
-            result.error = t.toString();
-        }
-        wr.close();
-
-
-        String deleteURL = "";
-        String location = "";
-        Map<String, List<String>> headers = conn.getHeaderFields();
-        List<String> locations = headers.get("Location");
-        if (locations != null){
-            String locationZero = locations.get(0);
-            if (locationZero != null){
-                String[] segments = locationZero.split("/");
-                location = segments[segments.length - 1];
-                deleteURL = Tools.glue(urlString, "/", location);
-            }
-        }
-        result.location = location;
-        result.deleteURL = deleteURL;
-        result.CSID = location;
         result.method = method;
+        try {
+            URL url = new URL(urlString);
+            HttpURLConnection conn;
+            conn = (HttpURLConnection) url.openConnection();
+
+            if (MULTIPART_MIXED.equalsIgnoreCase(contentType)){
+                conn.setRequestProperty("Accept", "multipart/mixed");
+                conn.setRequestProperty("content-type", "multipart/mixed; boundary=" + boundary);
+            } else {
+                conn.setRequestProperty("Accept", "application/xml");
+                conn.setRequestProperty("content-type", contentType);
+            }
+            conn.setRequestProperty("Authorization", "Basic " + authForTest);  //TODO: remove test user : hard-coded as "dGVzdDp0ZXN0"
+            conn.setRequestProperty("Connection", "close");
+            conn.setRequestProperty("X-XmlReplay-fromTestID", fromTestID);
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setRequestMethod(method); // "POST" or "PUT"
+            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+            wr.write(content);
+            wr.flush();
+
+
+            try {
+                result.requestPayload = content;
+                result.responseCode = conn.getResponseCode();
+                //System.out.println("responseCode: "+result.responseCode);
+                if (400 <= result.responseCode && result.responseCode <= 499){
+                    return result;
+                }
+                BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                String line;
+                StringBuffer sb = new StringBuffer();
+                while ((line = rd.readLine()) != null) {
+                    sb.append(line).append("\r\n");
+                }
+                String msg = sb.toString();
+                result.result = msg;
+                result.boundary = PayloadLogger.parseBoundary(conn.getHeaderField("CONTENT-TYPE"));
+
+                rd.close();
+            } catch (Throwable t){
+                //System.err.println("ERROR getting content from response: "+t);
+                result.error = t.toString();
+            }
+            wr.close();
+
+
+            String deleteURL = "";
+            String location = "";
+            Map<String, List<String>> headers = conn.getHeaderFields();
+            List<String> locations = headers.get("Location");
+            if (locations != null){
+                String locationZero = locations.get(0);
+                if (locationZero != null){
+                    String[] segments = locationZero.split("/");
+                    location = segments[segments.length - 1];
+                    deleteURL = Tools.glue(urlString, "/", location);
+                }
+            }
+            result.location = location;
+            result.deleteURL = deleteURL;
+            result.CSID = location;
+
+        } catch (Throwable t2){
+            result.error = "ERROR in XmlReplayTransport: "+t2;
+        }
         return result;
     }
 

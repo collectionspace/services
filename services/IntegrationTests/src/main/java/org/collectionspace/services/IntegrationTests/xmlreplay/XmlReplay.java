@@ -33,6 +33,7 @@ public class XmlReplay {
 
     public static final String DEFAULT_CONTROL = "xml-replay-control.xml";
     public static final String DEFAULT_MASTER_CONTROL = "xml-replay-master.xml";
+    public static final String DEFAULT_DEV_MASTER_CONTROL = "dev-master.xml";
 
     private String basedir = ".";  //set from constructor.
     public String getBaseDir(){
@@ -89,7 +90,7 @@ public class XmlReplay {
 
 
     public String toString(){
-        return "XmlReplay{"+this.basedir+", "+this.controlFileName+", "+this.defaultAuthsMap+", "+this.dump+'}';
+        return "XmlReplay{"+this.basedir+", "+this.defaultAuthsMap+", "+this.dump+'}';
     }
 
     // ============== METHODS ===========================================================
