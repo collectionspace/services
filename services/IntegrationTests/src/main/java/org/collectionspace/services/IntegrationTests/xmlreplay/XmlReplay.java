@@ -362,23 +362,52 @@ public class XmlReplay {
         }
         return document;
     }
+    protected static String validateResponseSinglePayload(ServiceResult serviceResult,
+                                                 Map<String, ServiceResult> serviceResultsMap,
+                                                 PartsStruct expectedResponseParts,
+                                                 XmlReplayEval evalStruct)
+    throws Exception {
+        String OK = "";
+        byte[] b = FileUtils.readFileToByteArray(new File(expectedResponseParts.singlePartPayloadFilename));
+        String expectedPartContent = new String(b);
+        expectedPartContent = evalStruct.eval(expectedPartContent, serviceResultsMap, evalStruct.jexl, evalStruct.jc);
+        String label = "NOLABEL";
+        String leftID  = "{from expected part, label:"+label+" filename: "+expectedResponseParts.singlePartPayloadFilename+"}";
+        String rightID = "{from server, label:"+label
+                            +" fromTestID: "+serviceResult.fromTestID
+                            +" URL: "+serviceResult.fullURL
+                            +"}";
+        TreeWalkResults list =
+            XmlCompareJdom.compareParts(expectedPartContent,
+                                        leftID,
+                                        serviceResult.result,
+                                        rightID);
+        serviceResult.addPartSummary(label, list);
+        return OK;
+    }
 
     protected static String validateResponse(ServiceResult serviceResult,
                                              Map<String, ServiceResult> serviceResultsMap,
-                                             PartsStruct expectedResponseParts){
+                                             PartsStruct expectedResponseParts,
+                                             XmlReplayEval evalStruct){
         String OK = "";
         if (expectedResponseParts == null) return OK;
         if (serviceResult == null) return OK;
         if (serviceResult.result.length() == 0) return OK;
         String responseDump = serviceResult.result;
-        //System.out.println("responseDump: "+responseDump);
-        PayloadLogger.HttpTraffic traffic = PayloadLogger.readPayloads(responseDump, serviceResult.boundary, serviceResult.contentLength);
         try {
+            if (expectedResponseParts.bDoingSinglePartPayload){
+                return validateResponseSinglePayload(serviceResult, serviceResultsMap, expectedResponseParts, evalStruct);
+            }
+            //System.out.println("responseDump: "+responseDump);
+            PayloadLogger.HttpTraffic traffic = PayloadLogger.readPayloads(responseDump, serviceResult.boundary, serviceResult.contentLength);
+
             for (int i=0; i<expectedResponseParts.partsList.size(); i++){
                 String fileName = expectedResponseParts.filesList.get(i);
                 String label = expectedResponseParts.partsList.get(i);
                 byte[] b = FileUtils.readFileToByteArray(new File(fileName));
                 String expectedPartContent = new String(b);
+                expectedPartContent = evalStruct.eval(expectedPartContent, serviceResultsMap, evalStruct.jexl, evalStruct.jc);
                 System.out.println("expected: "+label+ " content ==>\r\n"+expectedPartContent);
                 PayloadLogger.Part partFromServer = traffic.getPart(label);
                 String partFromServerContent = "";
@@ -612,7 +641,7 @@ public class XmlReplay {
                         serviceResult.payloadStrictness = level;
                     }
 
-                    String vError = validateResponse(serviceResult, serviceResultsMap, expectedResponseParts);
+                    String vError = validateResponse(serviceResult, serviceResultsMap, expectedResponseParts, evalStruct);
                     if (Tools.notEmpty(vError)){
                         serviceResult.error = vError;
                         serviceResult.failureReason = " : VALIDATION ERROR; ";

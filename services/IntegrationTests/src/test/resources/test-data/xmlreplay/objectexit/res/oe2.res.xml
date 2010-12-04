@@ -3,18 +3,8 @@
   xmlns:ns2="http://collectionspace.org/services/objectexit" 
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
   xsi:schemaLocation="http://collectionspace.org/services/objectexit http://services.collectionspace.org/objectexit/objectexit_common.xsd">
-<exitNumber>objectexitNumber-1290026472360
-<second>
-        second content
-    </second>
-</exitNumber>
-<first>
-    <second>
-        second content
-    </second>
-</first>
-
+<exitNumber>objectexitNumber-1290026472360</exitNumber>
 <depositor>urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'</depositor>
-<newField>objectexitNumber-1290026472360</newField>
+<exitMethods></exitMethods>
 </ns2:objectexit_common>
 

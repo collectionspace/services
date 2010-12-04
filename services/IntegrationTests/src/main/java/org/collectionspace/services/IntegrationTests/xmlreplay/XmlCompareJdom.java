@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.collectionspace.services.IntegrationTests.xmlreplay.TreeWalkResults.TreeWalkEntry;
+import org.jdom.output.XMLOutputter;
 
 /**
  * User: laramie
@@ -124,6 +125,7 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
         }
         List l = left.getChildren();
         Map foundRightMap = new HashMap();
+        List<String> foundRepeatingList = new ArrayList<String>();
         boolean result = true;
         for (Object o : l) {
             if (!(o instanceof Element)){
@@ -135,33 +137,49 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
                 continue;
             }
             String leftChildPath = Tools.glue(parentPath, "/", leftChildName);
-            Element rightChild  = (Element)selectSingleNode(right,leftChildName);
-            if (rightChild == null){
-                TreeWalkEntry entry = new TreeWalkEntry();
-                entry.lpath = leftChildPath;
-                entry.status = TreeWalkEntry.STATUS.R_MISSING;
-                msgList.add(entry);
+
+            if (foundRepeatingList.indexOf(leftChildPath)>=0){
                 continue;
             }
-            foundRightMap.put(leftChildName, "OK");
-            String leftChildTextTrim = leftChild.getText().trim();
-            String rightChildTextTrim = rightChild.getText().trim();
-            TreeWalkEntry entry = new TreeWalkEntry();
-            entry.ltextTrimmed = leftChildTextTrim;
-            entry.rtextTrimmed = rightChildTextTrim;
-            entry.lpath = leftChildPath;
-            entry.rpath = leftChildPath; //same
-
-            if (leftChildTextTrim.equals(rightChildTextTrim)){
-                entry.status = TreeWalkEntry.STATUS.MATCHED;
-                msgList.add(entry);
+            List leftlist = select(left, leftChildName);
+            if (leftlist != null && leftlist.size() > 1){
+                //System.out.println("-----------------doRepeating------"+leftChildPath);
+                foundRepeatingList.add(leftChildPath);
+                boolean repeatingIdentical =
+                    doRepeatingFieldComparison(leftlist, leftChildPath, leftChildName, left, right, msgList) ; //todo: deal with foundRightMap in this repeating field block.
+                if ( ! repeatingIdentical ){
+                    //System.out.println("\r\n\r\n\r\n*****************************\r\nOne repeating field failed: "+msgList);
+                    return false;
+                }
+                foundRightMap.put(leftChildName, "OK");
             } else {
-                entry.status = TreeWalkEntry.STATUS.TEXT_DIFFERENT;
-                msgList.add(entry);
-            }
+                Element rightChild  = (Element)selectSingleNode(right,leftChildName);
+                if (rightChild == null){
+                    TreeWalkEntry entry = new TreeWalkEntry();
+                    entry.lpath = leftChildPath;
+                    entry.status = TreeWalkEntry.STATUS.R_MISSING;
+                    msgList.add(entry);
+                    continue;
+                }
+                foundRightMap.put(leftChildName, "OK");
+                String leftChildTextTrim = leftChild.getText().trim();
+                String rightChildTextTrim = rightChild.getText().trim();
+                TreeWalkEntry entry = new TreeWalkEntry();
+                entry.ltextTrimmed = leftChildTextTrim;
+                entry.rtextTrimmed = rightChildTextTrim;
+                entry.lpath = leftChildPath;
+                entry.rpath = leftChildPath; //same
 
-            //============ DIVE !! =====================================================
-            result = result && treeWalk( leftChild, rightChild, leftChildPath, msgList);
+                if (leftChildTextTrim.equals(rightChildTextTrim)){
+                    entry.status = TreeWalkEntry.STATUS.MATCHED;
+                    msgList.add(entry);
+                } else {
+                    entry.status = TreeWalkEntry.STATUS.TEXT_DIFFERENT;
+                    msgList.add(entry);
+                }
+                //============ DIVE !! =====================================================
+                result = result && treeWalk( leftChild, rightChild, leftChildPath, msgList);
+            }
         }
         for (Object r : right.getChildren()){
             if (!(r instanceof Element)){
@@ -180,5 +198,82 @@ private static final String DEFAULT_SAX_DRIVER_CLASS = "org.apache.xerces.parser
         }
         return true;
     }
-    
+
+    private static void dumpXML_OUT(Element el) throws Exception {
+        XMLOutputter outputter = new XMLOutputter();
+        outputter.output(el, System.out);
+    }
+    private static String dumpXML(Element el) throws Exception {
+        XMLOutputter outputter = new XMLOutputter();
+        return outputter.outputString(el);
+    }
+
+    public static boolean doRepeatingFieldComparison(List leftList, String leftChildPath, String leftChildName, Element left, Element right, TreeWalkResults msgList)
+    throws Exception {
+        //todo: deal with foundRightMap in this repeating field block.
+        List rightList = select(right, leftChildName);
+        if (rightList == null || rightList.size() == 0 || rightList.size() < leftList.size()){
+            TreeWalkEntry twe = new TreeWalkEntry();
+            twe.lpath = leftChildPath;
+            twe.status = TreeWalkEntry.STATUS.R_MISSING;
+            String rmsg = (rightList == null)
+                    ? " Right: 0"
+                    : " Right: "+rightList.size();
+            twe.message = "Repeating field count not matched. Field: "+leftChildPath+" Left: "+leftList.size()+rmsg;
+            msgList.add(twe);
+            return false;
+        }
+        if (rightList.size() > leftList.size()){
+            TreeWalkEntry twe = new TreeWalkEntry();
+            twe.lpath = leftChildPath;
+            twe.status = TreeWalkEntry.STATUS.R_ADDED;
+            twe.message = "Repeating field count not matched. Field: "+leftChildPath+" Left: "+leftList.size()+" Right: "+rightList.size();
+            msgList.add(twe);
+            return false;
+        }
+
+        for (Object le : leftList){
+            boolean found = false;
+            Element leftEl = (Element)le;
+            //pl("left", leftEl);
+            for(Object re : rightList){
+                Element rightEl = (Element)re;
+                //pl("right", rightEl);
+                TreeWalkResults msgListInner = new TreeWalkResults();
+                treeWalk(leftEl, rightEl, leftChildPath, msgListInner);
+                if (msgListInner.isStrictMatch()){
+                    found = true;
+                    TreeWalkEntry twe = new TreeWalkEntry();
+                    twe.lpath = leftChildPath;
+                    twe.status = TreeWalkEntry.STATUS.MATCHED;
+                    msgList.add(twe);
+                    //System.out.println("===========================\r\nfound match for "+leftEl+"\r\n===========================\r\n");
+                    rightList.remove(re); //found it, don't need to inspect this element again.  Since we are breaking from loop, removing element won't mess up iterator--we get a new one on the next loop.
+                    break;
+                }
+            }
+            if ( ! found){
+                TreeWalkEntry twe = new TreeWalkEntry();
+                twe.lpath = leftChildPath;
+                twe.status = TreeWalkEntry.STATUS.R_MISSING;
+                twe.message = "Repeating field not matched. Source: {"+dumpXML(leftEl)+"}";
+                msgList.add(twe);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static void pl(String name, Element el) throws Exception {
+        Object lobid = selectSingleNode(el, "@ID");
+        String lid = "";
+        if (lobid!=null){
+            lid = lobid.toString();
+        }
+
+        System.out.println(name+": "+lid);
+        dumpXML_OUT(el);
+        System.out.println();
+
+    }
 }

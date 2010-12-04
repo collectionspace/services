@@ -6,8 +6,6 @@
         <auth ID="testAdministator">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
     </auths>
     
-     <dump payloads="true" dumpServiceResult="minimal" />
-
     
     <testGroup ID="domwalk" autoDeletePOSTS="true">
          <test ID="oe1"  auth="test">
@@ -45,6 +43,7 @@
         </test>
     </testGroup>
 
+    <!-- ================================================================================ -->
 
      <testGroup ID="CRUDL" autoDeletePOSTS="true">
          <test ID="oe1"  auth="admin@collectionspace.org">
@@ -92,7 +91,11 @@
          <test ID="oe6">
             <method>GET</method>
             <uri>/cspace-services/objectexit/</uri>
-            <reponse>oe6.res.xml</reponse>
+            <response>
+                <expected level="TEXT" />
+                <filename>objectexit/res/oe6.res.xml</filename>
+             </response>
+            <!--reponse>oe6.res.xml</reponse-->
             <!--response elements will need parts, too, e.g. personauthorities_common -->
             <!-- inside oe6.res.xml, there is a CSID which will change every time, and should be ref'd as 6f7a1e3e-5821-4ef2-bfcf ==> ${oe1.CSID}
             -->
@@ -242,6 +245,51 @@
         </test>
 
      </testGroup>
+
+    <!-- =========== DOMWALK LIST ================================================ -->
+
+    <testGroup ID="DOMLIST" autoDeletePOSTS="true">
+         <test ID="oe1"  auth="admin@collectionspace.org">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <part>
+                 <label>objectexit_common</label>
+                 <filename>objectexit/oe1.xml</filename>
+             </part>
+         </test>
+        <test ID="oe3">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <part>
+                 <label>objectexit_common</label>
+                 <filename>objectexit/oe3.xml</filename>
+             </part>
+         </test>
+        <test ID="oe4">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <part>
+                 <label>objectexit_common</label>
+                 <filename>objectexit/oe4.xml</filename>
+             </part>
+         </test>
+         <test ID="oe5">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <part>
+                 <label>objectexit_common</label>
+                 <filename>objectexit/oe5.xml</filename>
+             </part>
+         </test>
+         <test ID="oe6">
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/</uri>
+            <response>
+                <expected level="TEXT" />
+                <filename>objectexit/res/oe6.res.xml</filename>
+             </response>
+        </test>
+    </testGroup>
 
 </xmlReplay>
         

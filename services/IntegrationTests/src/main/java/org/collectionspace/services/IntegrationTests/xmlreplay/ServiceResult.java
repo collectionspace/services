@@ -120,6 +120,10 @@ public class ServiceResult {
                 }
                 break;
             case TEXT:
+                if (!value.treesMatch()) {
+                    failureReason = " : DOM TREE MISMATCH; ";
+                    return false;
+                }
                 if (value.countFor(TreeWalkResults.TreeWalkEntry.STATUS.TEXT_DIFFERENT)>0) {
                     failureReason = " : DOM TEXT_DIFFERENT; ";
                     return false;
