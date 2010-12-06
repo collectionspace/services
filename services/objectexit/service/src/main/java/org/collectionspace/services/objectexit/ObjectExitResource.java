@@ -43,8 +43,6 @@ public class ObjectExitResource extends ResourceBase {
         return "objectexit";
     };
 
-    //FIXME retrieve client type from configuration
-    final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType();
 
     @Override
     protected String getVersionString() {
@@ -56,7 +54,7 @@ public class ObjectExitResource extends ResourceBase {
     public Class<ObjectexitCommon> getCommonPartClass() {
     	return ObjectexitCommon.class;
     }
-
+    /*
     public Class getResourceClass() {
         return this.getClass();
     }
@@ -73,6 +71,8 @@ public class ObjectExitResource extends ResourceBase {
     protected ObjectexitCommonList search(MultivaluedMap<String,String> queryParams,String keywords) {
          return (ObjectexitCommonList) super.search(queryParams, keywords);
     }
+    */
+   
 
     
 }
