@@ -54,25 +54,5 @@ public class ObjectExitResource extends ResourceBase {
     public Class<ObjectexitCommon> getCommonPartClass() {
     	return ObjectexitCommon.class;
     }
-    /*
-    public Class getResourceClass() {
-        return this.getClass();
-    }
-
-    public ObjectexitCommonList getObjectexitList(MultivaluedMap<String, String> queryParams) {
-        return (ObjectexitCommonList)getList(queryParams);
-    }
-
-    @Deprecated
-    public ObjectexitCommonList getObjectexitList(List<String> csidList) {
-        return (ObjectexitCommonList) getList(csidList);
-    }
-
-    protected ObjectexitCommonList search(MultivaluedMap<String,String> queryParams,String keywords) {
-         return (ObjectexitCommonList) super.search(queryParams, keywords);
-    }
-    */
-   
-
     
 }

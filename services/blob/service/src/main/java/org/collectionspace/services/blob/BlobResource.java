@@ -43,8 +43,6 @@ public class BlobResource extends ResourceBase {
         return "blob";
     };
 
-    //FIXME retrieve client type from configuration
-    final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType();
 
     @Override
     protected String getVersionString() {
@@ -56,23 +54,5 @@ public class BlobResource extends ResourceBase {
     public Class<BlobCommon> getCommonPartClass() {
     	return BlobCommon.class;
     }
-
-    public Class getResourceClass() {
-        return this.getClass();
-    }
-
-    public BlobCommonList getBlobList(MultivaluedMap<String, String> queryParams) {
-        return (BlobCommonList)getList(queryParams);
-    }
-
-    @Deprecated
-    public BlobCommonList getBlobList(List<String> csidList) {
-        return (BlobCommonList) getList(csidList);
-    }
-
-    protected BlobCommonList search(MultivaluedMap<String,String> queryParams,String keywords) {
-         return (BlobCommonList) super.search(queryParams, keywords);
-    }
-
     
 }

@@ -36,6 +36,9 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
     public static final String DELETE = "delete";
     public static final String LIST   = "list";
 
+    //FIXME retrieve client type from configuration
+    final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType();
+
     public void ensureCSID(String csid, String crudType) throws WebApplicationException {
         if (logger.isDebugEnabled()) {
             logger.debug(crudType+" for "+getClass().getName()+" with csid=" + csid);

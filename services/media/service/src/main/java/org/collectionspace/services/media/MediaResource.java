@@ -57,22 +57,6 @@ public class MediaResource extends ResourceBase {
     	return MediaCommon.class;
     }
 
-    public Class getResourceClass() {
-        return this.getClass();
-    }
-
-    public MediaCommonList getMediaList(MultivaluedMap<String, String> queryParams) {
-        return (MediaCommonList)getList(queryParams);
-    }
-
-    @Deprecated
-    public MediaCommonList getMediaList(List<String> csidList) {
-        return (MediaCommonList) getList(csidList);
-    }
-
-    protected MediaCommonList search(MultivaluedMap<String,String> queryParams,String keywords) {
-         return (MediaCommonList) super.search(queryParams, keywords);
-    }
 
     
 }
