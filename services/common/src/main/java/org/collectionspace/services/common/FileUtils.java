@@ -6,9 +6,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 //import java.io.IOException;
 import java.io.File;
+import java.io.InputStream;
+import java.io.FileOutputStream;
 
 //import javax.servlet.ServletException;
 //import javax.servlet.http.HttpServlet;
@@ -23,6 +26,30 @@ import org.slf4j.LoggerFactory;
 public class FileUtils {
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
+	
+	private static final String TMP_FILE_PREFIX = "cspace_blob_";
+	
+	static public File createTmpFile(InputStream streamIn) {
+		File tmpFile = null;		
+		String tmpDir = System.getProperty("java.io.tmpdir");
+		tmpFile = new File(tmpDir, UUID.randomUUID().toString());
+		
+		try {
+	        FileOutputStream streamOut = new FileOutputStream(tmpFile);
+			int c;
+	        while ((c = streamIn.read()) != -1) 
+	        {
+	           streamOut.write(c);
+	        }
+	
+	        streamIn.close();
+	        streamOut.close();
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		
+		return tmpFile;
+	}
 	
 	static public File createTmpFile(HttpServletRequest request) {
 		File result = null;

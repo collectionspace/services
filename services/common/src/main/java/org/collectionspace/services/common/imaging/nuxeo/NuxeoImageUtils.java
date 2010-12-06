@@ -40,8 +40,9 @@ import java.util.Map;
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.api.ServiceManager;
 import org.nuxeo.runtime.api.ServiceDescriptor;
+import org.nuxeo.runtime.services.streaming.RemoteInputStream;
 
-import org.nuxeo.common.utils.FileUtils;
+//import org.nuxeo.common.utils.FileUtils;
 
 import org.nuxeo.ecm.platform.picture.api.adapters.PictureResourceAdapter;
 import org.nuxeo.ecm.platform.mimetype.MimetypeDetectionException;
@@ -103,6 +104,7 @@ import org.slf4j.LoggerFactory;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentUtils;
+import org.collectionspace.services.common.FileUtils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -527,7 +529,9 @@ public class NuxeoImageUtils {
 				pictureBlob = pictureBlobHolder.getBlob();
 			}
 			
-			result = pictureBlob.getStream();			
+			InputStream remoteStream = pictureBlob.getStream();
+			File tmpFile = FileUtils.createTmpFile(remoteStream);
+			result = new FileInputStream(tmpFile);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}
