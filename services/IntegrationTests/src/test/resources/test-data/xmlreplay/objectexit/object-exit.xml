@@ -6,6 +6,12 @@
         <auth ID="testAdministator">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
     </auths>
     
+    <testGroup ID="cleanup" autoDeletePOSTS="true">
+         <test ID="oe1"  auth="test">
+             <method>DELETE</method>
+             <uri>/cspace-services/objectexit/98d61417-3986-4de6-bb98</uri>
+         </test>
+    </testGroup>
     
     <testGroup ID="domwalk" autoDeletePOSTS="true">
          <test ID="oe1"  auth="test">
@@ -92,7 +98,7 @@
             <method>GET</method>
             <uri>/cspace-services/objectexit/</uri>
             <response>
-                <expected level="TEXT" />
+                <expected level="ADDOK" />
                 <filename>objectexit/res/oe6.res.xml</filename>
              </response>
             <!--reponse>oe6.res.xml</reponse-->

@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xmlReplayMaster>
-<!-- Use this file to drive local testing.  Check it in or don't ... no automated tests should reference this file. -->
+<!-- Use this file to drive local testing.  
+     To run this file, do: 
+          cd C:\src\trunk\services\IntegrationTests
+          mvn test -Dtest=XmlReplayDevTest
+     Maven surefire will kick off XmlReplayDevTest, so see the note
+     below about not leaving any active testGroups enabled in this file
+     when you check it in.
+-->
     <protoHostPort>http://localhost:8180</protoHostPort>
     
     <!-- legal values for dumpServiceResult=[minimal,detailed,full] -->
@@ -10,14 +17,23 @@
        <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
     </auths>
 
-
-   <!-- <run controlFile="objectexit/object-exit.xml" testGroup="CRUDL" />-->   
-    <!--<run controlFile="objectexit/object-exit.xml" testGroup="domwalk" />
+    <!-- IMPORTANT :: DO NOT CHECK THIS FILE IN WITH ANY TESTS ACTIVE BELOW.
+                      Make sure all tests are commented out.
+                      This file should be modified locally and used instead of xml-replay-master.xml
+                      when you are developing.  This file can be used to point at a controlFile 
+                      and a testGroup, so you can test just one thing at a time, or a limited suite.
+    -->
+    
+    <!--
+    <run controlFile="objectexit/object-exit.xml" testGroup="CRUDL" />   
+    <run controlFile="objectexit/object-exit.xml" testGroup="domwalk" />
     <run controlFile="objectexit/object-exit.xml" testGroup="repeat" />
     <run controlFile="objectexit/object-exit.xml" testGroup="CRUDL" />
-    -->
+    <run controlFile="objectexit/object-exit.xml" testGroup="cleanup" />   
     <run controlFile="objectexit/object-exit.xml" testGroup="DOMLIST" />
-
+    -->
+    
+    
 
 </xmlReplayMaster>
 
