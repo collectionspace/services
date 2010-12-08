@@ -51,6 +51,8 @@ import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.common.blob.BlobInput;
+import org.collectionspace.services.blob.BlobsCommon;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 //import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
@@ -83,6 +85,7 @@ import org.jboss.resteasy.util.HttpResponseCodes;
 //FIXME: There should be no direct dependency on Nuxeo in our resource classes.
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.ecm.core.api.ClientException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -514,7 +517,7 @@ public class CollectionObjectResource
         
     @GET
     @Path("{csid}/getpicture/{blobId}")
-    @Produces("image/jpeg")
+    @Produces({"image/jpeg", "image/png", "image/tiff"})
     public InputStream getPicture(
     		@PathParam("csid") String csid,
     		@PathParam("blobId") String blobId) {
@@ -545,7 +548,7 @@ public class CollectionObjectResource
     
     @GET
     @Path("{csid}/getpicture/{blobId}/{derivativeTerm}")
-    @Produces("image/jpeg")
+    @Produces({"image/jpeg", "image/png", "image/tiff"})
     public InputStream getPicture(
     		@PathParam("csid") String csid,
     		@PathParam("blobId") String blobId,
@@ -589,7 +592,11 @@ public class CollectionObjectResource
 			repoSession = ServiceMain.getInstance().getNuxeoConnector().getRepositorySession();
 	    	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
 	    	File tmpFile = FileUtils.createTmpFile(req);
-			result = NuxeoImageUtils.createPicture(ctx, repoSession, tmpFile);
+	    	BlobInput blobInput = new BlobInput(tmpFile, blobUri);
+			BlobsCommon blobCommon = NuxeoImageUtils.createPicture(ctx, repoSession, blobInput);
+			if (blobCommon != null) {
+				result = blobCommon.getRepositoryId();
+			}
     	} catch (Exception e) {
     		logger.error("Could not create the new image file", e);
     	} finally {

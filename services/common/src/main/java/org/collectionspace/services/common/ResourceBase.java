@@ -39,7 +39,7 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
     //FIXME retrieve client type from configuration
     final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType();
 
-    public void ensureCSID(String csid, String crudType) throws WebApplicationException {
+    protected void ensureCSID(String csid, String crudType) throws WebApplicationException {
         if (logger.isDebugEnabled()) {
             logger.debug(crudType+" for "+getClass().getName()+" with csid=" + csid);
         }
@@ -91,6 +91,14 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
     public Response create(MultipartInput input) {
         try {
         	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
+            return create(input, ctx);
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
+        }
+    }
+    
+    protected Response create(MultipartInput input, ServiceContext<MultipartInput, MultipartOutput> ctx) {
+        try {
             DocumentHandler handler = createDocumentHandler(ctx);
             UriBuilder path = UriBuilder.fromResource(this.getClass());
             return create(input, ctx, handler, path); //==> CALL implementation method, which subclasses may override.
@@ -167,8 +175,7 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
         ensureCSID(csid, READ);
         try {
         	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
-            DocumentHandler handler = createDocumentHandler(ctx);
-            MultipartOutput result = get(csid, ctx, handler);// ==> CALL implementation method, which subclasses may override.
+            MultipartOutput result = get(csid, ctx);// ==> CALL implementation method, which subclasses may override.
             if (result == null) {
                 Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
@@ -179,10 +186,29 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
             throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
         }
     }
+    
+    protected MultipartOutput get(@PathParam("csid") String csid,
+    		ServiceContext<MultipartInput, MultipartOutput> ctx) throws Exception {
+    	MultipartOutput result = null;
+    	
+    	ensureCSID(csid, READ);
+        DocumentHandler handler = createDocumentHandler(ctx);
+        result = get(csid, ctx, handler);
+        if (result == null) {
+            String msg = "Could not find document with id = " + csid;
+            if (logger.isErrorEnabled() == true) {
+            	logger.error(msg);
+            }
+            throw new DocumentNotFoundException(msg);
+        }
+        
+        return result;
+    }
+    
 
     /** subclasses may override this method, which is called from #get(String)
      *  which handles setup of ServiceContext and DocumentHandler, and Exception handling.*/
-    public MultipartOutput get(String csid,
+    protected MultipartOutput get(String csid,
                                ServiceContext<MultipartInput, MultipartOutput> ctx,
                                DocumentHandler handler)
     throws Exception {

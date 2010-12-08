@@ -28,9 +28,11 @@ package org.collectionspace.services.common.imaging.nuxeo;
 
 import java.io.File;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileInputStream;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,10 +59,6 @@ import org.nuxeo.ecm.platform.picture.api.adapters.PictureBlobHolder;
 
 import org.nuxeo.ecm.core.repository.RepositoryDescriptor;
 import org.nuxeo.ecm.core.repository.RepositoryManager;
-
-//import org.nuxeo.ecm.core.api.repository.RepositoryManager;
-//import org.nuxeo.ecm.core.api.repository.Repository;
-
 
 import org.nuxeo.ecm.core.repository.RepositoryService;
 import org.nuxeo.runtime.model.ComponentManager;
@@ -102,9 +100,11 @@ import org.slf4j.LoggerFactory;
 //import org.nuxeo.ecm.core.repository.jcr.testing.RepositoryOSGITestCase;
 
 import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.FileUtils;
+import org.collectionspace.services.blob.BlobsCommon;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -138,6 +138,17 @@ public class NuxeoImageUtils {
 	public static void loggerSetup() {
 		//empty method
 	}	
+	
+	static private BlobsCommon createBlobCommon(DocumentModel documentModel, Blob nuxeoBlob) {
+		BlobsCommon result = new BlobsCommon();
+		if (documentModel != null) {
+			result.setMimeType(nuxeoBlob.getMimeType());
+			result.setName(nuxeoBlob.getFilename());
+			result.setLength(Long.toString(nuxeoBlob.getLength()));
+			result.setRepositoryId(documentModel.getId());
+		}
+		return result;
+	}
 	
 	static private File getBlobFile(RepositoryInstance ri, DocumentModel documentModel, Blob blob) {
 		DefaultBinaryManager binaryManager = null;
@@ -429,12 +440,13 @@ public class NuxeoImageUtils {
      * @param filePath the file path
      * @return the string
      */
-    public static String createPicture(ServiceContext ctx,
+    public static BlobsCommon createPicture(ServiceContext ctx,
     		RepositoryInstance repoSession,
-    		File blobFile) {
-		String result = null;
+    		BlobInput blobInput) {
+		BlobsCommon result = null;
 		
 		try {
+			File blobFile = blobInput.getBlobFile();
 			String nuxeoWspaceId = ctx.getRepositoryWorkspaceId();
             DocumentRef nuxeoWspace = new IdRef(nuxeoWspaceId);
             DocumentModel wspaceDoc = repoSession.getDocument(nuxeoWspace);
@@ -461,21 +473,21 @@ public class NuxeoImageUtils {
 	 * @param mimeType the mime type
 	 * @return the string
 	 */
-	static public String createImage(RepositoryInstance nuxeoSession,
+	static public BlobsCommon createImage(RepositoryInstance nuxeoSession,
 			DocumentModel blobLocation,
 			InputStream file,
             String fileName, 
             String mimeType) {
-		String result = null;
+		BlobsCommon result = null;
 				
 		try {
 			Blob fileBlob = createStreamingBlob(file, fileName, mimeType);
 			String digestAlgorithm = getFileManagerService().getDigestAlgorithm(); //Need some way on initializing the FileManager with a call.
-//			List<String> permissions = nuxeoSession.getAvailableSecurityPermissions();
 			DocumentModel documentModel = getFileManagerService().createDocumentFromBlob(nuxeoSession,
 					fileBlob, blobLocation.getPathAsString(), true, fileName);
-			result = documentModel.getId();
+			result = createBlobCommon(documentModel, fileBlob);
 		} catch (Exception e) {
+			result = null;
 			logger.error("Could not create new image blob", e);
 		}
 		
@@ -530,8 +542,10 @@ public class NuxeoImageUtils {
 			}
 			
 			InputStream remoteStream = pictureBlob.getStream();
-			File tmpFile = FileUtils.createTmpFile(remoteStream);
-			result = new FileInputStream(tmpFile);
+			BufferedInputStream bufferedInputStream = new BufferedInputStream(remoteStream);
+			result = bufferedInputStream;
+//			File tmpFile = FileUtils.createTmpFile(remoteStream);
+//			result = new FileInputStream(tmpFile);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}

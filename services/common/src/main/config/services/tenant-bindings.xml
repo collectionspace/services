@@ -113,7 +113,7 @@
         <!--end collectionobject service meta-data -->
 
         <!-- begin blob service meta-data -->
-        <tenant:serviceBindings name="Blob" type="procedure" version="0.1">
+        <tenant:serviceBindings name="Blobs" type="procedure" version="0.1">
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -137,11 +137,11 @@
                 </service:part>
                 <service:part id="1" control_group="Managed"
                               versionable="true" auditable="false"
-                              label="blob_common" updated="" order="1">
+                              label="blobs_common" updated="" order="1">
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/blob"
-                            schemaLocation="http://collectionspace.org/services/blob http://services.collectionspace.org/blob/blob_common.xsd">
+                            schemaLocation="http://collectionspace.org/services/blob http://services.collectionspace.org/blob/blobs_common.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -1393,7 +1393,7 @@
         <!--end collectionobject service meta-data -->
 
         <!-- begin blob service meta-data -->
-        <tenant:serviceBindings name="Blob" type="procedure" version="0.1">
+        <tenant:serviceBindings name="Blobs" type="procedure" version="0.1">
             <service:repositoryDomain xmlns:service='http://collectionspace.org/services/common/service'>
                 default-domain
             </service:repositoryDomain>
@@ -1417,11 +1417,11 @@
                 </service:part>
                 <service:part id="1" control_group="Managed"
                               versionable="true" auditable="false"
-                              label="blob_common" updated="" order="1">
+                              label="blobs_common" updated="" order="1">
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/blob"
-                            schemaLocation="http://collectionspace.org/services/blob http://services.collectionspace.org/blob/blob_common.xsd">
+                            schemaLocation="http://collectionspace.org/services/blob http://services.collectionspace.org/blob/blobs_common.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
