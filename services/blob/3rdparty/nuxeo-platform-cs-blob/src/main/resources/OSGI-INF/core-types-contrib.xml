@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <component name="org.collectionspace.blob.coreTypes">
   <extension target="org.nuxeo.ecm.core.schema.TypeService" point="schema">
-    <schema name="blob_common" prefix="blob_common" src="schemas/blob_common.xsd"/>
+    <schema name="blobs_common" prefix="blobs_common" src="schemas/blobs_common.xsd"/>
   </extension>
   
   <extension target="org.nuxeo.ecm.core.schema.TypeService" point="doctype">
@@ -9,7 +9,7 @@
       <schema name="common"/>
       <schema name="dublincore"/>
       <schema name="collectionspace_core"/>
-      <schema name="blob_common"/>
+      <schema name="blobs_common"/>
     </doctype>
   </extension>
 </component>

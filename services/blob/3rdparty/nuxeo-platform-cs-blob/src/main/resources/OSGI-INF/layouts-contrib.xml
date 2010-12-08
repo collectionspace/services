@@ -57,7 +57,7 @@ $LastChangedDate: $
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="blob_common">blobNumber</field>
+                    <field schema="blobs_common">blobNumber</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>
@@ -70,7 +70,7 @@ $LastChangedDate: $
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="blob_common">borrower</field>
+                    <field schema="blobs_common">borrower</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>
@@ -83,7 +83,7 @@ $LastChangedDate: $
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="blob_common">borrowersContact</field>
+                    <field schema="blobs_common">borrowersContact</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>
@@ -96,7 +96,7 @@ $LastChangedDate: $
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="blob_common">lendersAuthorizer</field>
+                    <field schema="blobs_common">lendersAuthorizer</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>
@@ -109,7 +109,7 @@ $LastChangedDate: $
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="blob_common">lendersAuthorizationDate</field>
+                    <field schema="blobs_common">lendersAuthorizationDate</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>
@@ -122,7 +122,7 @@ $LastChangedDate: $
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="blob_common">lendersContact</field>
+                    <field schema="blobs_common">lendersContact</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>
@@ -135,7 +135,7 @@ $LastChangedDate: $
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="blob_common">blobDate</field>
+                    <field schema="blobs_common">blobDate</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>
@@ -148,7 +148,7 @@ $LastChangedDate: $
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="blob_common">loanReturnDate</field>
+                    <field schema="blobs_common">loanReturnDate</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>
@@ -161,7 +161,7 @@ $LastChangedDate: $
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="blob_common">loanRenewalApplicationDate</field>
+                    <field schema="blobs_common">loanRenewalApplicationDate</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>
@@ -174,7 +174,7 @@ $LastChangedDate: $
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="blob_common">specialConditionsOfLoan</field>
+                    <field schema="blobs_common">specialConditionsOfLoan</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>
@@ -187,7 +187,7 @@ $LastChangedDate: $
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="blob_common">blobNote</field>
+                    <field schema="blobs_common">blobNote</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>
@@ -200,7 +200,7 @@ $LastChangedDate: $
                 </labels>
                 <translated>true</translated>
                 <fields>
-                    <field schema="blob_common">loanPurpose</field>
+                    <field schema="blobs_common">loanPurpose</field>
                 </fields>
                 <properties widgetMode="edit">
                     <property name="styleClass">dataInputText</property>

@@ -37,7 +37,7 @@ import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.blob.BlobCommon;
+import org.collectionspace.services.blob.BlobsCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -87,13 +87,13 @@ public class BlobAuthRefsTest extends BaseServiceTest {
     private MultipartOutput createBlobInstance(String depositorRefName) {
         this.depositorRefName = depositorRefName;
         this.blobName = "testblob-"+createIdentifier();
-        BlobCommon blob = new BlobCommon();
+        BlobsCommon blob = new BlobsCommon();
         blob.setName(this.blobName);
 
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(blob, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", new BlobClient().getCommonPartName());
-        logger.debug("to be created, blob common: " + objectAsXmlString(blob, BlobCommon.class));
+        logger.debug("to be created, blob common: " + objectAsXmlString(blob, BlobsCommon.class));
         return multipart;
     }
 
@@ -161,9 +161,9 @@ public class BlobAuthRefsTest extends BaseServiceTest {
         ClientResponse<MultipartInput> res = blobClient.read(knownResourceId);
         assertStatusCode(res, testName);
         MultipartInput input = (MultipartInput) res.getEntity();
-        BlobCommon blob = (BlobCommon) extractPart(input, blobClient.getCommonPartName(), BlobCommon.class);
+        BlobsCommon blob = (BlobsCommon) extractPart(input, blobClient.getCommonPartName(), BlobsCommon.class);
         Assert.assertNotNull(blob);
-        logger.debug(objectAsXmlString(blob, BlobCommon.class));
+        logger.debug(objectAsXmlString(blob, BlobsCommon.class));
 
         // Check a couple of fields
         Assert.assertEquals(blob.getName(), blobName);

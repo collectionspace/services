@@ -21,7 +21,7 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 //import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.blob.BlobCommonList;
+import org.collectionspace.services.blob.BlobsCommonList;
 
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
@@ -44,7 +44,7 @@ public class BlobClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */
     public String getServicePathComponent() {
-        return "blob"; //Laramie20100824 was blobs, but label was a mismatch.
+        return "blobs"; //Laramie20100824 was blobs, but label was a mismatch.
     }
     /**
      *
@@ -97,7 +97,7 @@ public class BlobClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.BlobProxy#getBlob()
      */
-    public ClientResponse<BlobCommonList> readList() {
+    public ClientResponse<BlobsCommonList> readList() {
         return blobProxy.readList();
     }
     

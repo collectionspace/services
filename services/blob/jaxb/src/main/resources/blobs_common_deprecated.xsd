@@ -28,7 +28,7 @@
 <!-- See http://wiki.collectionspace.org/display/collectionspace/Loans+Out+Schema -->    
     
     <!-- blob -->
-    <xs:element name="blob_common">
+    <xs:element name="blobs_common_deprecated">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="encoding" type="xs:string" />
@@ -38,6 +38,7 @@
                 <xs:element name="length" type="xs:string" />
                 <xs:element name="digest" type="xs:string" />
                 <xs:element name="uri" type="xs:string" />
+                <xs:element name="id" type="xs:string" />
           </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -52,12 +53,12 @@
     </xs:complexType>
     
     <!-- blob records, as in nuxeo repository -->
-    <xs:element name="blob_common_list">
+    <xs:element name="blobs_common_deprecated_list">
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="abstractCommonList">                    
                     <xs:sequence>
-                        <xs:element name="blob_list_item" maxOccurs="unbounded">
+                        <xs:element name="blobs_common_deprecated_list_item" maxOccurs="unbounded">
                             <xs:complexType>
                                 <xs:sequence>
                                     <xs:element name="name" type="xs:string"   minOccurs="1" />
@@ -65,7 +66,7 @@
                                     <xs:element name="encoding" type="xs:string" minOccurs="1" />
                                     <xs:element name="length" type="xs:string" minOccurs="1" />
                                     <xs:element name="uri" type="xs:string" />
-                                    <xs:element name="csid" type="xs:string"         minOccurs="1" />
+                                    <xs:element name="csid" type="xs:string" minOccurs="1" />
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>

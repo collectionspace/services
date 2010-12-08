@@ -11,7 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.blob.BlobCommonList;
+import org.collectionspace.services.blob.BlobsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -19,7 +19,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 /**
  * @version $Revision: 2108 $
  */
-@Path("/blob/")
+@Path("/blobs/")
 @Produces({"multipart/mixed"})
 @Consumes({"multipart/mixed"})
 public interface BlobProxy extends CollectionSpaceProxy {
@@ -46,7 +46,7 @@ public interface BlobProxy extends CollectionSpaceProxy {
     // List
     @GET
     @Produces({"application/xml"})
-    ClientResponse<BlobCommonList> readList();
+    ClientResponse<BlobsCommonList> readList();
 
     // List Authority References
     @GET

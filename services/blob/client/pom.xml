@@ -42,11 +42,6 @@
             <artifactId>org.collectionspace.services.client</artifactId>
             <version>${project.version}</version>
         </dependency>
-         <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.blob.jaxb</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.person.client</artifactId>

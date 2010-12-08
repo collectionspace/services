@@ -29,8 +29,8 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.blob.BlobCommon;
-import org.collectionspace.services.blob.BlobCommonList;
+import org.collectionspace.services.blob.BlobsCommon;
+import org.collectionspace.services.blob.BlobsCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -52,7 +52,7 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
 
     private final String CLASS_NAME = BlobServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    final String SERVICE_PATH_COMPONENT = "blob";
+    final String SERVICE_PATH_COMPONENT = "blobs";
     private String knownResourceId = null;
 
     @Override
@@ -62,7 +62,7 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
 
     @Override
     protected AbstractCommonList getAbstractCommonList(ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(BlobCommonList.class);
+        return response.getEntity(BlobsCommonList.class);
     }
 
     @Override
@@ -99,7 +99,7 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
         ClientResponse<MultipartInput> res = client.read(knownResourceId);
         assertStatusCode(res, testName);
         MultipartInput input = (MultipartInput) res.getEntity();
-        BlobCommon blob = (BlobCommon) extractPart(input, client.getCommonPartName(), BlobCommon.class);
+        BlobsCommon blob = (BlobsCommon) extractPart(input, client.getCommonPartName(), BlobsCommon.class);
         Assert.assertNotNull(blob);
     }
 
@@ -109,13 +109,13 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupReadList();
         BlobClient client = new BlobClient();
-        ClientResponse<BlobCommonList> res = client.readList();
-        BlobCommonList list = res.getEntity();
+        ClientResponse<BlobsCommonList> res = client.readList();
+        BlobsCommonList list = res.getEntity();
         assertStatusCode(res, testName);
         if (logger.isDebugEnabled()) {
-            List<BlobCommonList.BlobListItem> items = list.getBlobListItem();
+            List<BlobsCommonList.BlobListItem> items = list.getBlobListItem();
             int i = 0;
-            for (BlobCommonList.BlobListItem item : items) {
+            for (BlobsCommonList.BlobListItem item : items) {
                 logger.debug(testName + ": list-item[" + i + "] csid=" + item.getCsid());
                 logger.debug(testName + ": list-item[" + i + "] blob.name=" + item.getName());
                 logger.debug(testName + ": list-item[" + i + "] URI=" + item.getUri());
@@ -134,18 +134,18 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
         assertStatusCode(res, testName);
         logger.debug("got object to update with ID: " + knownResourceId);
         MultipartInput input = (MultipartInput) res.getEntity();
-        BlobCommon blob = (BlobCommon) extractPart(input, client.getCommonPartName(), BlobCommon.class);
+        BlobsCommon blob = (BlobsCommon) extractPart(input, client.getCommonPartName(), BlobsCommon.class);
         Assert.assertNotNull(blob);
 
         blob.setName("updated-" + blob.getName());
-        logger.debug("Object to be updated:"+objectAsXmlString(blob, BlobCommon.class));
+        logger.debug("Object to be updated:"+objectAsXmlString(blob, BlobsCommon.class));
         MultipartOutput output = new MultipartOutput();
         OutputPart commonPart = output.addPart(blob, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getCommonPartName());
         res = client.update(knownResourceId, output);
         assertStatusCode(res, testName);
         input = (MultipartInput) res.getEntity();
-        BlobCommon updatedBlob = (BlobCommon) extractPart(input, client.getCommonPartName(), BlobCommon.class);
+        BlobsCommon updatedBlob = (BlobsCommon) extractPart(input, client.getCommonPartName(), BlobsCommon.class);
         Assert.assertNotNull(updatedBlob);
     }
 
@@ -251,7 +251,7 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
 
     private MultipartOutput createBlobInstance(String exitNumber) {
         String identifier = "blobNumber-" + exitNumber;
-        BlobCommon blob = new BlobCommon();
+        BlobsCommon blob = new BlobsCommon();
         blob.setName(identifier);
         MultipartOutput multipart = new MultipartOutput();
         OutputPart commonPart = multipart.addPart(blob, MediaType.APPLICATION_XML_TYPE);
@@ -259,7 +259,7 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
 
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, blob common");
-            logger.debug(objectAsXmlString(blob, BlobCommon.class));
+            logger.debug(objectAsXmlString(blob, BlobsCommon.class));
         }
 
         return multipart;
