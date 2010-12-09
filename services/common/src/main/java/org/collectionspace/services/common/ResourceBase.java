@@ -218,17 +218,17 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
 
     //======================= GET without csid. List, search, etc. =====================================
 
-    @GET
-    @Produces("application/xml")
-    public AbstractCommonList getList   (@Context UriInfo ui,
-                                         @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
-        MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-    	if (keywords != null) {
-    		return search(queryParams, keywords);
-    	} else {
-    		return getList(queryParams);
-    	}
-    }
+	@GET
+	@Produces("application/xml")
+	public AbstractCommonList getList(@Context UriInfo ui,
+			@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
+		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+		if (keywords != null) {
+			return search(queryParams, keywords);
+		} else {
+			return getList(queryParams);
+		}
+	}
 
     protected AbstractCommonList getList(MultivaluedMap<String, String> queryParams) {
         try {
@@ -240,7 +240,6 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
             throw bigReThrow(e, ServiceMessages.LIST_FAILED);
         }
     }
-
 
     protected AbstractCommonList search(MultivaluedMap<String, String> queryParams, String keywords) {
         try {
@@ -262,6 +261,7 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
         }
     }
 
+    //FIXME: REM - This should not be @Deprecated since we may want to implement this -it has been on the wish list.
     @Deprecated
     public AbstractCommonList getList(List<String> csidList) {
         try {

@@ -31,6 +31,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.BlobJAXBSchema;
 
 import org.collectionspace.services.common.blob.BlobInput;
+import org.collectionspace.services.common.blob.BlobOutput;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
@@ -78,6 +79,11 @@ extends DocHandlerBase<BlobsCommon, AbstractCommonList> {
 		List list = ((BlobsCommonList)commonList).getBlobListItem();
 		return list;
 	}
+	
+	private String getDerivativePathBase(DocumentModel docModel) {
+		return getServiceContextPath() + docModel.getName() + "/" +
+			BlobInput.URI_DERIVATIVES_PATH + "/";
+	}
 
 	public Object createItemForCommonList(DocumentModel docModel, String label, String id) throws Exception {
 		BlobListItem item = new BlobListItem();
@@ -114,7 +120,8 @@ extends DocHandlerBase<BlobsCommon, AbstractCommonList> {
 				docModel.getProperty(label, BlobJAXBSchema.name));
 		result.setRepositoryId((String)
 				docModel.getProperty(label, BlobJAXBSchema.repositoryId));
-		result.setUri(getServiceContextPath() + docModel.getName() + "/content");
+		result.setUri(getServiceContextPath() + docModel.getName() + "/" +
+				BlobInput.URI_CONTENT_PATH);
 		
 		return result;
 	}
@@ -139,28 +146,37 @@ extends DocHandlerBase<BlobsCommon, AbstractCommonList> {
 	public void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc)
 			throws Exception {
 		ServiceContext ctx = this.getServiceContext();
+		RepositoryInstance repoSession = this.getRepositorySession();
 		DocumentModel docModel = wrapDoc.getWrappedObject();
-		//
-		// Setup of the content URL's
-		//
-		BlobsCommon blobsCommon = this.getCommonPartProperties(docModel);
-		String derivativeTerm = (String)ctx.getProperty(BlobInput.DERIVATIVE_TERM_KEY);
-		if (derivativeTerm != null  && !derivativeTerm.equalsIgnoreCase(BlobInput.DERIVATIVE_ORIGINAL_VALUE)) {
-			blobsCommon.setUri(getServiceContextPath() + docModel.getName() + "/derivatives/" +
-					derivativeTerm + "/content");
-		}
-		blobsCommon.setRepositoryId(null); //hide the repository id from the GET results since it is private
-		this.setCommonPartProperties(docModel, blobsCommon);
+		BlobsCommon blobsCommon = this.getCommonPartProperties(docModel);		
+		String blobRepositoryId = blobsCommon.getRepositoryId(); //cache the value to pass to the blob retriever
 		
-		super.extractAllParts(wrapDoc);
-		//
-		// If the derivativeTerm is set then we need to get the blob stream
-		//
-		if (derivativeTerm != null) {
-			RepositoryInstance repoSession = this.getRepositorySession();
-			InputStream blobStream = NuxeoImageUtils.getPicture(ctx, repoSession, blobsCommon.getRepositoryId(), derivativeTerm);
-			ctx.setProperty(BlobInput.DERIVATIVE_CONTENT_KEY, blobStream);
+		if (ctx.getProperty(BlobInput.BLOB_DERIVATIVE_LIST_KEY) != null) {
+			BlobsCommonList blobsCommonList = NuxeoImageUtils.getBlobDerivatives(
+					repoSession, blobRepositoryId, getDerivativePathBase(docModel));
+			ctx.setProperty(BlobInput.BLOB_DERIVATIVE_LIST_KEY, blobsCommonList);
+			return;  //FIXME: Don't like this exit point.  Perhaps derivatives should be a sub-resource?
+		}		
+
+		String derivativeTerm = (String)ctx.getProperty(BlobInput.BLOB_DERIVATIVE_TERM_KEY);
+		Boolean getContentFlag = ctx.getProperty(BlobInput.BLOB_CONTENT_KEY) != null ? true : false;
+		BlobOutput blobOutput = NuxeoImageUtils.getBlobOutput(ctx, repoSession,
+				blobRepositoryId, derivativeTerm, getContentFlag);
+		if (getContentFlag == true) {
+			ctx.setProperty(BlobInput.BLOB_CONTENT_KEY, blobOutput.getBlobInputStream());
 		}
+
+		if (derivativeTerm != null) {
+			// reset 'blobsCommon' if we have a derivative request
+			blobsCommon = blobOutput.getBlobsCommon();
+			blobsCommon.setUri(getDerivativePathBase(docModel) +
+					derivativeTerm + "/" + BlobInput.URI_CONTENT_PATH);
+		}
+		
+		blobsCommon.setRepositoryId(null); //hide the repository id from the GET results payload since it is private
+		this.setCommonPartProperties(docModel, blobsCommon);
+		// finish extracting the other parts by calling the parent
+		super.extractAllParts(wrapDoc);
 	}
 
 	@Override

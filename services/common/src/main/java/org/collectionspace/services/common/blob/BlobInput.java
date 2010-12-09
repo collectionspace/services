@@ -7,9 +7,12 @@ public class BlobInput {
 	private File blobFile;
 	private String blobUri;
 	
-	public static final String DERIVATIVE_TERM_KEY = "Derivative";
-	public static final String DERIVATIVE_ORIGINAL_VALUE = "Original";
-	public static final String DERIVATIVE_CONTENT_KEY = "Derivative_Content_Stream";
+	public static final String URI_CONTENT_PATH = "content";
+	public static final String URI_DERIVATIVES_PATH = "derivatives";
+	
+	public static final String BLOB_DERIVATIVE_TERM_KEY = "derivative";
+	public static final String BLOB_DERIVATIVE_LIST_KEY = "derivative.list";
+	public static final String BLOB_CONTENT_KEY = "derivative.content.stream";
 	
 	public BlobInput(File blobFile, String blobUri) {
 		this.blobFile = blobFile;

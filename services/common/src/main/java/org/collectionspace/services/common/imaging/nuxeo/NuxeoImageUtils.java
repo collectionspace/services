@@ -105,6 +105,9 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.blob.BlobsCommon;
+import org.collectionspace.services.blob.BlobsCommonList;
+import org.collectionspace.services.blob.BlobsCommonList.BlobListItem;
+import org.collectionspace.services.common.blob.BlobOutput;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -113,6 +116,23 @@ import org.collectionspace.services.blob.BlobsCommon;
 public class NuxeoImageUtils {
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory.getLogger(NuxeoImageUtils.class);
+	
+	/*
+	 * FIXME: REM - These constants should be coming from configuration and NOT hard coded.
+	 */
+	public static final String DERIVATIVE_ORIGINAL = "Original";
+	public static final String DERIVATIVE_ORIGINAL_TAG = DERIVATIVE_ORIGINAL + "_";
+	
+	public static final String DERIVATIVE_ORIGINAL_JPEG = "OriginalJpeg";
+	public static final String DERIVATIVE_ORIGINAL_JPEG_TAG = DERIVATIVE_ORIGINAL_JPEG + "_";
+	
+	public static final String DERIVATIVE_MEDIUM = "Medium";
+	public static final String DERIVATIVE_MEDIUM_TAG = DERIVATIVE_MEDIUM + "_";
+	
+	public static final String DERIVATIVE_THUMBNAIL = "Thumbnail";
+	public static final String DERIVATIVE_THUMBNAIL_TAG = DERIVATIVE_THUMBNAIL + "_";
+	
+	public static final String DERIVATIVE_UNKNOWN = "_UNKNOWN_DERIVATIVE_NAME_";
     	
 //	static DefaultBinaryManager binaryManager = new DefaultBinaryManager(); //can we get this from Nuxeo? i.e., Framework.getService(BinaryManger.class)
 
@@ -139,7 +159,55 @@ public class NuxeoImageUtils {
 		//empty method
 	}	
 	
-	static private BlobsCommon createBlobCommon(DocumentModel documentModel, Blob nuxeoBlob) {
+	//FIXME: This needs to be configuration-bases and NOT hard coded!
+	static private String getDerivativeUri(String uri, String derivativeName) {
+		String result = DERIVATIVE_UNKNOWN;
+		
+		if (derivativeName.startsWith(DERIVATIVE_ORIGINAL_TAG) == true) {
+			result = DERIVATIVE_ORIGINAL;
+		} else if (derivativeName.startsWith(DERIVATIVE_ORIGINAL_JPEG_TAG) == true) {
+			result = DERIVATIVE_ORIGINAL_JPEG;
+		} else if (derivativeName.startsWith(DERIVATIVE_MEDIUM_TAG) == true) {
+			result = DERIVATIVE_MEDIUM;
+		} else if (derivativeName.startsWith(DERIVATIVE_THUMBNAIL_TAG) == true) {
+			result = DERIVATIVE_THUMBNAIL;
+		}
+		
+		return uri + result + "/" + BlobInput.URI_CONTENT_PATH;
+	}
+	
+	static private BlobListItem createBlobListItem(Blob blob, String uri) {
+		BlobListItem result = new BlobListItem();
+
+		result.setEncoding(blob.getEncoding());
+		result.setLength(Long.toString(blob.getLength()));
+		result.setMimeType(blob.getMimeType());
+		result.setName(blob.getFilename());
+		result.setUri(getDerivativeUri(uri, blob.getFilename()));
+		
+		return result;
+	}
+	
+	static public BlobsCommonList getBlobDerivatives(RepositoryInstance repoSession,
+			String repositoryId,
+			String uri) throws Exception {
+		BlobsCommonList result = new BlobsCommonList();
+		
+		IdRef documentRef = new IdRef(repositoryId);
+		DocumentModel documentModel = repoSession.getDocument(documentRef);		
+		DocumentBlobHolder docBlobHolder = (DocumentBlobHolder)documentModel.getAdapter(BlobHolder.class);
+		List<Blob> docBlobs = docBlobHolder.getBlobs();		
+		List<BlobListItem> blobListItems = result.getBlobListItem();
+		BlobListItem blobListItem = null;
+		for (Blob blob : docBlobs) {
+			blobListItem = createBlobListItem(blob, uri);
+			blobListItems.add(blobListItem);
+		}
+		
+		return result;
+	}
+	
+	static private BlobsCommon createBlobsCommon(DocumentModel documentModel, Blob nuxeoBlob) {
 		BlobsCommon result = new BlobsCommon();
 		if (documentModel != null) {
 			result.setMimeType(nuxeoBlob.getMimeType());
@@ -153,8 +221,7 @@ public class NuxeoImageUtils {
 	static private File getBlobFile(RepositoryInstance ri, DocumentModel documentModel, Blob blob) {
 		DefaultBinaryManager binaryManager = null;
 		RepositoryDescriptor descriptor = null;
-		
-		
+				
 		try {
 			ServiceManager sm = (ServiceManager) Framework.getService(ServiceManager.class);
 			ServiceDescriptor[] sd = sm.getServiceDescriptors();
@@ -485,7 +552,7 @@ public class NuxeoImageUtils {
 			String digestAlgorithm = getFileManagerService().getDigestAlgorithm(); //Need some way on initializing the FileManager with a call.
 			DocumentModel documentModel = getFileManagerService().createDocumentFromBlob(nuxeoSession,
 					fileBlob, blobLocation.getPathAsString(), true, fileName);
-			result = createBlobCommon(documentModel, fileBlob);
+			result = createBlobsCommon(documentModel, fileBlob);
 		} catch (Exception e) {
 			result = null;
 			logger.error("Could not create new image blob", e);
@@ -493,22 +560,7 @@ public class NuxeoImageUtils {
 		
 		return result;
 	}
-	
-	
-    /**
-     * Gets the picture.
-     *
-     * @param ctx the ctx
-     * @param repoSession the repo session
-     * @param blobId the blob id
-     * @param derivativeTerm the derivative term
-     * @return the picture
-     */
-    public static InputStream getPicture(ServiceContext ctx, RepositoryInstance repoSession,
-    		String blobId, String derivativeTerm) {
-    	return getImage(repoSession, blobId, derivativeTerm);
-    }
-    	
+	    	
 	/**
 	 * Gets the image.
 	 *
@@ -517,9 +569,12 @@ public class NuxeoImageUtils {
 	 * @param derivativeTerm the derivative term
 	 * @return the image
 	 */
-	static public InputStream getImage(RepositoryInstance repoSession,
-			String repositoryId, String derivativeTerm) {
-		InputStream result = null;
+	static public BlobOutput getBlobOutput(ServiceContext ctx,
+			RepositoryInstance repoSession,
+			String repositoryId, 
+			String derivativeTerm,
+			Boolean getContentFlag) {
+		BlobOutput result = new BlobOutput();
 
 		try {
 			IdRef documentRef = new IdRef(repositoryId);
@@ -540,12 +595,17 @@ public class NuxeoImageUtils {
 			} else {
 				pictureBlob = pictureBlobHolder.getBlob();
 			}
+			//
+			// Create the result instance
+			//
+			BlobsCommon blobsCommon = createBlobsCommon(documentModel, pictureBlob);
+			result.setBlobsCommon(blobsCommon); // the blob metadata
+			if (getContentFlag == true) {
+				InputStream remoteStream = pictureBlob.getStream();
+				BufferedInputStream bufferedInputStream = new BufferedInputStream(remoteStream);
+				result.setBlobInputStream(bufferedInputStream); // the blob stream
+			}
 			
-			InputStream remoteStream = pictureBlob.getStream();
-			BufferedInputStream bufferedInputStream = new BufferedInputStream(remoteStream);
-			result = bufferedInputStream;
-//			File tmpFile = FileUtils.createTmpFile(remoteStream);
-//			result = new FileInputStream(tmpFile);
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		}

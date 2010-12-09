@@ -30,6 +30,7 @@ import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.blob.BlobsCommon;
 import org.collectionspace.services.blob.BlobsCommonList;
 
@@ -38,6 +39,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 //FIXME: REM - We should not have Nuxeo dependencies in our resource classes.
 import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 
 import javax.servlet.http.HttpServletRequest;
@@ -79,7 +81,9 @@ public class BlobResource extends ResourceBase {
     	return BlobsCommon.class;
     }
 
-    public BlobsCommonList getBlobList(MultivaluedMap<String, String> queryParams) {
+    //FIXME: Is this method used/needed?
+    @Deprecated
+    private BlobsCommonList getBlobList(MultivaluedMap<String, String> queryParams) {
         return (BlobsCommonList)getList(queryParams);
     }
 
@@ -88,8 +92,23 @@ public class BlobResource extends ResourceBase {
         return (BlobsCommonList) getList(csidList);
     }
 
+    @Deprecated
     protected BlobsCommonList search(MultivaluedMap<String,String> queryParams,String keywords) {
          return (BlobsCommonList) super.search(queryParams, keywords);
+    }
+    
+    private BlobsCommonList getDerivativeList(String csid) throws Exception {
+    	BlobsCommonList result = null;
+    	
+    	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+    	ctx.setProperty(BlobInput.BLOB_DERIVATIVE_LIST_KEY, Boolean.TRUE);
+    	MultipartOutput response = this.get(csid, ctx);
+    	if (logger.isDebugEnabled() == true) {
+    		logger.debug(response.toString());
+    	}
+    	result = (BlobsCommonList)ctx.getProperty(BlobInput.BLOB_DERIVATIVE_LIST_KEY);
+    	
+    	return result;
     }
     
     private InputStream getBlobContent(String csid, String derivativeTerm) throws WebApplicationException {
@@ -97,12 +116,13 @@ public class BlobResource extends ResourceBase {
     	
     	try {
 	    	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
-	    	ctx.setProperty(BlobInput.DERIVATIVE_TERM_KEY, derivativeTerm);
+	    	ctx.setProperty(BlobInput.BLOB_DERIVATIVE_TERM_KEY, derivativeTerm);
+    		ctx.setProperty(BlobInput.BLOB_CONTENT_KEY, Boolean.TRUE);
 	    	MultipartOutput response = this.get(csid, ctx);
 	    	if (logger.isDebugEnabled() == true) {
 	    		logger.debug(response.toString());
 	    	}
-	    	result = (InputStream)ctx.getProperty(BlobInput.DERIVATIVE_CONTENT_KEY);
+	    	result = (InputStream)ctx.getProperty(BlobInput.BLOB_CONTENT_KEY);
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
     	}
@@ -146,10 +166,10 @@ public class BlobResource extends ResourceBase {
     @GET
     @Path("{csid}/content")
     @Produces({"image/jpeg", "image/png", "image/tiff"})
-    public InputStream getPicture(
+    public InputStream getBlobContent(
     		@PathParam("csid") String csid) {
     	InputStream result = null;
-	    result = getBlobContent(csid, BlobInput.DERIVATIVE_ORIGINAL_VALUE);    	
+	    result = getBlobContent(csid, null /*derivative term*/);    	
     	return result;
     }
 
@@ -160,7 +180,55 @@ public class BlobResource extends ResourceBase {
     		@PathParam("csid") String csid,
     		@PathParam("derivative_term") String derivative_term) {
     	InputStream result = null;
-	    result = getBlobContent(csid, derivative_term);    	
+	    result = getBlobContent(csid, derivative_term);
+	    
+    	return result;
+    }
+    
+    @GET
+    @Path("{csid}/derivatives/{derivative_term}")
+    public MultipartOutput getDerivative(@PathParam("csid") String csid,
+    		@PathParam("derivative_term") String derivative_term) {
+    	MultipartOutput result = null;
+    	
+    	ensureCSID(csid, READ);
+        try {
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+        	ctx.setProperty(BlobInput.BLOB_DERIVATIVE_TERM_KEY, derivative_term);
+            result = get(csid, ctx);
+            if (result == null) {
+                Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
+                throw new WebApplicationException(response);
+            }
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
+        }
+        
+        return result;
+    }
+        
+    @GET
+    @Path("{csid}/derivatives")
+    @Produces("application/xml")
+    public BlobsCommonList getDerivatives(
+    		@PathParam("csid") String csid) {
+    	BlobsCommonList result = null;
+
+    	ensureCSID(csid, READ);
+        try {
+        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+        	ctx.setProperty(BlobInput.BLOB_DERIVATIVE_LIST_KEY, true);
+            result = this.getDerivativeList(csid);
+            if (result == null) {
+                Response response = Response.status(Response.Status.NOT_FOUND).entity(
+                    ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
+                throw new WebApplicationException(response);
+            }
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
+        }
+	    
     	return result;
     }
     
