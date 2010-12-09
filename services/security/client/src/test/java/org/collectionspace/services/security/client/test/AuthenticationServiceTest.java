@@ -34,16 +34,18 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import org.collectionspace.services.account.AccountTenant;
-import org.collectionspace.services.client.AccountClient;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.Status;
+import org.collectionspace.services.client.AccountClient;
 import org.collectionspace.services.client.AccountFactory;
-import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionObjectFactory;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.BaseServiceTest;
+import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
+import org.collectionspace.services.collectionobject.TitleGroup;
+import org.collectionspace.services.collectionobject.TitleGroupList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.slf4j.Logger;
@@ -454,7 +456,12 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
 
         collectionObject.setObjectNumber(objectNumber);
-        collectionObject.setTitle(title);
+        TitleGroupList titleGroupList = new TitleGroupList();
+        List<TitleGroup> titleGroups = titleGroupList.getTitleGroup();
+        TitleGroup titleGroup = new TitleGroup();
+        titleGroup.setTitle(title);
+        titleGroups.add(titleGroup);
+        collectionObject.setTitleGroupList(titleGroupList);
         MultipartOutput multipart =
                 CollectionObjectFactory.createCollectionObjectInstance(
                 commonPartName, collectionObject, null, null);

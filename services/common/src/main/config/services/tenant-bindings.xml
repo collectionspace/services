@@ -77,16 +77,20 @@
                               versionable="true" auditable="false"
                               label="collectionobjects_common" updated="" order="1">
                     <service:properties>
+                        <!-- Commented out for now, as searching within a field in a complexType breaks searches. -->
+                        <!-- The following fields were placed into complexTypes in group repeatability work in CSPACE-2927: -->
+                        <!--
+                            <types:item><types:key>authRef</types:key><types:value>inscriptionContentInscriber</types:value></types:item>
+                            <types:item><types:key>authRef</types:key><types:value>inscriptionDescriptionInscriber</types:value></types:item>
+                            <types:item><types:key>authRef</types:key><types:value>objectProductionPerson</types:value></types:item>
+                            <types:item><types:key>authRef</types:key><types:value>objectProductionOrganization</types:value></types:item>
+                            <types:item><types:key>authRef</types:key><types:value>assocOrganizations|assocOrganization</types:value></types:item>
+                            <types:item><types:key>authRef</types:key><types:value>assocPersons|assocPerson</types:value></types:item>
+                        -->
                         <types:item><types:key>authRef</types:key><types:value>contentOrganizations|contentOrganization</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>contentPersons|contentPerson</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>inscriptionContentInscriber</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>inscriptionDescriptionInscriber</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>objectProductionPerson</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>objectProductionOrganization</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>assocEventOrganizations|assocEventOrganization</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>assocEventPersons|assocEventPerson</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>assocOrganizations|assocOrganization</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>assocPersons|assocPerson</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>owners|owner</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>fieldCollectionSources|fieldCollectionSource</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>fieldCollectors|fieldCollector</types:value></types:item>
@@ -1357,16 +1361,20 @@
                               versionable="true" auditable="false"
                               label="collectionobjects_common" updated="" order="1">
                     <service:properties>
+                        <!-- Commented out for now, as searching within a field in a complexType breaks searches. -->
+                        <!-- The following fields were placed into complexTypes in group repeatability work in CSPACE-2927: -->
+                        <!--
+                            <types:item><types:key>authRef</types:key><types:value>inscriptionContentInscriber</types:value></types:item>
+                            <types:item><types:key>authRef</types:key><types:value>inscriptionDescriptionInscriber</types:value></types:item>
+                            <types:item><types:key>authRef</types:key><types:value>objectProductionPerson</types:value></types:item>
+                            <types:item><types:key>authRef</types:key><types:value>objectProductionOrganization</types:value></types:item>
+                            <types:item><types:key>authRef</types:key><types:value>assocOrganizations|assocOrganization</types:value></types:item>
+                            <types:item><types:key>authRef</types:key><types:value>assocPersons|assocPerson</types:value></types:item>
+                        -->
                         <types:item><types:key>authRef</types:key><types:value>contentOrganizations|contentOrganization</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>contentPersons|contentPerson</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>inscriptionContentInscriber</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>inscriptionDescriptionInscriber</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>objectProductionPerson</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>objectProductionOrganization</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>assocEventOrganizations|assocEventOrganization</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>assocEventPersons|assocEventPerson</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>assocOrganizations|assocOrganization</types:value></types:item>
-                        <types:item><types:key>authRef</types:key><types:value>assocPersons|assocPerson</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>owners|owner</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>fieldCollectionSources|fieldCollectionSource</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>fieldCollectors|fieldCollector</types:value></types:item>

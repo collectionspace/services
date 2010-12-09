@@ -460,13 +460,13 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
         collectionObject.setObjectNumber(createIdentifier());
         if (keywordsInSameField) {
-            collectionObject.setTitle(listToString(keywords, KEYWORD_SEPARATOR));
+            collectionObject.setDistinguishingFeatures(listToString(keywords, KEYWORD_SEPARATOR));
         } else {
             if (keywords.size() == 1) {
-                collectionObject.setTitle(keywords.get(0));
+                collectionObject.setDistinguishingFeatures(keywords.get(0));
             } else if (keywords.size() == 2) {
-                collectionObject.setTitle(keywords.get(0));
-                collectionObject.setDistinguishingFeatures(keywords.get(1));
+                collectionObject.setDistinguishingFeatures(keywords.get(0));
+                collectionObject.setPhysicalDescription(keywords.get(1));
             } else {
                 Assert.fail("List of keywords must have exactly one or two members.");
             }

@@ -11,8 +11,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
     xsi:schemaLocation="http://collectionspace.org/services/collectionobject http://services.collectionspace.org/collectionobject/collectionobjects_common.xsd">
     <objectNumber>2</objectNumber>
-    <comments>description</comments>
-    <title></title>
+    <distinguishingFeatures>distFeatures</distinguishingFeatures>
     <briefDescriptions>
         <!-- First value instance of this repeatable field is non-blank -->
         <briefDescription>data</briefDescription>

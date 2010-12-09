@@ -9,7 +9,11 @@
   <numberOfObjects>numberOfObjects</numberOfObjects>
   <responsibleDepartments>
   </responsibleDepartments>
-  <title>title</title>
+  <titleGroupList>
+      <titleGroup>
+          <title>title</title>
+      </titleGroup>
+  </titleGroupList>
   <objectTitleLanguage>objectTitleLanguage</objectTitleLanguage>
   <titleTranslation>titleTranslation</titleTranslation>
   <titleType>titleType</titleType>

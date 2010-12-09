@@ -41,6 +41,8 @@ import org.collectionspace.services.collectionobject.ObjectNameGroup;
 import org.collectionspace.services.collectionobject.ObjectNameList;
 import org.collectionspace.services.collectionobject.OtherNumber;
 import org.collectionspace.services.collectionobject.OtherNumberList;
+import org.collectionspace.services.collectionobject.TitleGroup;
+import org.collectionspace.services.collectionobject.TitleGroupList;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
@@ -324,7 +326,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
             logger.debug("Attempting to retrieve just-created record ...");
         }
         CollectionobjectsCommon collectionObject = readCollectionObjectCommonPart(newId);
-        String title = collectionObject.getTitle();
+        String title = collectionObject.getTitle(); // will need to be changed for multi-valued title
         if (logger.isDebugEnabled()) {
             logger.debug("Sent title: " + UTF8_TITLE);
             logger.debug("Received title: " + title);
@@ -493,7 +495,13 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         // a non-empty value is required, as enforced by the service's
         // validation routine(s).
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
-        collectionObject.setTitle("a title");
+
+        TitleGroupList titleGroupList = new TitleGroupList();
+        List<TitleGroup> titleGroups = titleGroupList.getTitleGroup();
+        TitleGroup titleGroup = new TitleGroup();
+        titleGroup.setTitle("a title");
+        titleGroups.add(titleGroup);
+        collectionObject.setTitleGroupList(titleGroupList);
 
         ObjectNameList objNameList = new ObjectNameList();
         List<ObjectNameGroup> objNameGroups = objNameList.getObjectNameGroup();
@@ -520,11 +528,12 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         // FIXME: Consider splitting off the following into its own test method.
         
         // Build a payload with invalid content, by setting a value to the
-        // empty String, in a field that requires a non-empty value,
-        // as enforced by the service's validation routine(s).
+        // empty String, in a field (objectNumber) that requires a non-empty
+        // value, as enforced by the service's validation routine(s).
         collectionObject = new CollectionobjectsCommon();
         collectionObject.setObjectNumber("");
-        collectionObject.setTitle("a title");
+        collectionObject.setDistinguishingFeatures("Distinguishing features.");
+
         objNameList = new ObjectNameList();
         objNameGroups = objNameList.getObjectNameGroup();
         objectNameGroup = new ObjectNameGroup();
@@ -1202,7 +1211,6 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         collectionObject.setRemNumber(remNumber);
         
         // Scalar fields
-        collectionObject.setTitle("atitle");
         collectionObject.setObjectNumber(objectNumber);
         collectionObject.setAge(""); //test for null string
         
@@ -1211,6 +1219,13 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         collectionObject.setOtherNumber("urn:org.walkerart.id:123");
 
         // Repeatable structured groups
+
+        TitleGroupList titleGroupList = new TitleGroupList();
+        List<TitleGroup> titleGroups = titleGroupList.getTitleGroup();
+        TitleGroup titleGroup = new TitleGroup();
+        titleGroup.setTitle("a title");
+        titleGroups.add(titleGroup);
+        collectionObject.setTitleGroupList(titleGroupList);
 
         ObjectNameList objNameList = new ObjectNameList();
         List<ObjectNameGroup> objNameGroups = objNameList.getObjectNameGroup();

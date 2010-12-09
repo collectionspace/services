@@ -12,7 +12,6 @@
     xsi:schemaLocation="http://collectionspace.org/services/collectionobject http://services.collectionspace.org/collectionobject/collectionobjects_common.xsd">
     <objectNumber>2</objectNumber>
     <comments>description</comments>
-    <title></title>
     <briefDescriptions>
         <!-- First value instance of this repeatable field is blank -->
         <briefDescription></briefDescription>

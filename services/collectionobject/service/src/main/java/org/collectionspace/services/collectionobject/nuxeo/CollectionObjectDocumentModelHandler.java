@@ -135,19 +135,25 @@ public class CollectionObjectDocumentModelHandler
             CollectionObjectListItem coListItem = new CollectionObjectListItem();
             try {
 	            coListItem.setObjectNumber((String) docModel.getProperty(label,
-	            		CollectionObjectListItemJAXBSchema.OBJECT_NUMBER));
-	            List names = (List) docModel.getProperty(label,
-	            		CollectionObjectListItemJAXBSchema.OBJECT_NAME_LIST);
-	            if(names!=null && !names.isEmpty()) {
-	            	HashMap<String,Object> firstNameInfo = (HashMap<String,Object>)names.get(0);
-		            coListItem.setObjectName((String)firstNameInfo.get(
-		            		CollectionObjectListItemJAXBSchema.OBJECT_NAME) );
-	            }
-	            coListItem.setTitle((String) docModel.getProperty(label,
-	            		CollectionObjectListItemJAXBSchema.TITLE));
-	            Object respDepts = docModel.getProperty(label,
-	            		CollectionObjectListItemJAXBSchema.RESPONSIBLE_DEPARTMENTS);
-		        coListItem.setResponsibleDepartment(DocumentUtils.getFirstString(respDepts));
+                            CollectionObjectListItemJAXBSchema.OBJECT_NUMBER));
+
+	            List<Object> objectNames = (List<Object>) docModel.getProperty(label,
+                            CollectionObjectListItemJAXBSchema.OBJECT_NAME_LIST);
+                    String primaryObjectName = primaryValueFromMultivalue(objectNames,
+                            CollectionObjectListItemJAXBSchema.OBJECT_NAME);
+	            coListItem.setObjectName(primaryObjectName);
+                    
+                    List<Object> titles =
+                        (List<Object>) docModel.getProperty(label,
+                            CollectionObjectListItemJAXBSchema.TITLE_GROUP_LIST);
+                    String primaryTitle = primaryValueFromMultivalue(titles,
+                            CollectionObjectListItemJAXBSchema.TITLE);
+                    coListItem.setTitle(primaryTitle);
+
+	            List<Object> respDepts =
+                        (List<Object>) docModel.getProperty(label,
+                            CollectionObjectListItemJAXBSchema.RESPONSIBLE_DEPARTMENTS);
+		    coListItem.setResponsibleDepartment(DocumentUtils.getFirstString(respDepts));
 	            
 	            String id = NuxeoUtils.extractId(docModel.getPathAsString());
 	            coListItem.setUri(getServiceContextPath() + id);

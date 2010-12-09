@@ -29,7 +29,7 @@
 <responsibleDepartment>urn:org.collectionspace.services.department:Registrar</responsibleDepartment>
 <responsibleDepartment>urn:org.walkerart.department:Fine Art</responsibleDepartment>
 </responsibleDepartments>
-<title>atitle</title>
+<titleGroupList><titleGroup><title>title</title></titleGroup></titleGroupList>
 <age>
 </age>
 <dimensions>

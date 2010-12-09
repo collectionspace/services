@@ -9,5 +9,4 @@
 <numberOfObjects>numberOfObjects</numberOfObjects>
 <!-- test whitespace as first child node -->
 <responsibleDepartments> <responsibleDepartment> responsibleDept1</responsibleDepartment><responsibleDepartment>responsibleDept2</responsibleDepartment></responsibleDepartments>
-<title>title</title>
 </ns2:collectionobjects_common> 

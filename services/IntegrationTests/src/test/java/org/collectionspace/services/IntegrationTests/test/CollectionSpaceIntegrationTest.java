@@ -27,6 +27,7 @@
 package org.collectionspace.services.IntegrationTests.test;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -34,6 +35,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
+import org.collectionspace.services.collectionobject.TitleGroup;
+import org.collectionspace.services.collectionobject.TitleGroupList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationshipType;
@@ -71,7 +74,12 @@ public abstract class CollectionSpaceIntegrationTest {
 	void fillCollectionObject(CollectionobjectsCommon co, String objectNumber,
 			String title) {
 		co.setObjectNumber(objectNumber);
-		co.setTitle(title);
+                TitleGroupList titleGroupList = new TitleGroupList();
+                List<TitleGroup> titleGroups = titleGroupList.getTitleGroup();
+                TitleGroup titleGroup = new TitleGroup();
+                titleGroup.setTitle(title);
+                titleGroups.add(titleGroup);
+                co.setTitleGroupList(titleGroupList);
 	}
 
 	/**
