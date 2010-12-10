@@ -29,8 +29,10 @@ import org.collectionspace.services.common.ResourceBase;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.blob.BlobInput;
+import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler; //FIXEME: A resource class should not have a dependency on a specific DocumentHandler
 import org.collectionspace.services.blob.BlobsCommon;
 import org.collectionspace.services.blob.BlobsCommonList;
 
@@ -64,10 +66,10 @@ import java.util.List;
 @Produces("multipart/mixed")
 public class BlobResource extends ResourceBase {
 
-    @Override
+	@Override
     public String getServiceName(){
-        return "blobs";
-    };
+        return BlobUtil.BLOB_RESOURCE_NAME;
+    }
 
 
     @Override
@@ -97,16 +99,23 @@ public class BlobResource extends ResourceBase {
          return (BlobsCommonList) super.search(queryParams, keywords);
     }
     
-    private BlobsCommonList getDerivativeList(String csid) throws Exception {
+    private BlobsCommonList getDerivativeList(ServiceContext<MultipartInput, MultipartOutput> ctx,
+    		String csid) throws Exception {
     	BlobsCommonList result = null;
     	
-    	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
-    	ctx.setProperty(BlobInput.BLOB_DERIVATIVE_LIST_KEY, Boolean.TRUE);
+    	BlobInput blobInput = new BlobInput();
+    	blobInput.setDerivativeListRequested(true);
+    	BlobUtil.setBlobInput(ctx, blobInput);
+
     	MultipartOutput response = this.get(csid, ctx);
     	if (logger.isDebugEnabled() == true) {
     		logger.debug(response.toString());
     	}
-    	result = (BlobsCommonList)ctx.getProperty(BlobInput.BLOB_DERIVATIVE_LIST_KEY);
+    	//
+    	// The result of a successful get should have put the results in the
+    	// blobInput instance
+    	//
+    	result = BlobUtil.getBlobInput(ctx).getDerivativeList();
     	
     	return result;
     }
@@ -116,13 +125,19 @@ public class BlobResource extends ResourceBase {
     	
     	try {
 	    	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
-	    	ctx.setProperty(BlobInput.BLOB_DERIVATIVE_TERM_KEY, derivativeTerm);
-    		ctx.setProperty(BlobInput.BLOB_CONTENT_KEY, Boolean.TRUE);
+	    	BlobInput blobInput = BlobUtil.getBlobInput(ctx);
+	    	blobInput.setDerivativeTerm(derivativeTerm);
+	    	blobInput.setContentRequested(true);
+	    	
 	    	MultipartOutput response = this.get(csid, ctx);
 	    	if (logger.isDebugEnabled() == true) {
 	    		logger.debug(response.toString());
 	    	}
-	    	result = (InputStream)ctx.getProperty(BlobInput.BLOB_CONTENT_KEY);
+	    	//
+	    	// The result of a successful get should have put the results in the
+	    	// blobInput instance
+	    	//	    	
+	    	result = BlobUtil.getBlobInput(ctx).getContentStream();
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
     	}
@@ -136,16 +151,7 @@ public class BlobResource extends ResourceBase {
     	
     	return result;
     }
-        
-    private BlobInput setBlobInput(ServiceContext<MultipartInput, MultipartOutput> ctx,
-    		HttpServletRequest req,
-    		String blobUri) {
-    	File tmpFile = FileUtils.createTmpFile(req);
-    	BlobInput blobInput = new BlobInput(tmpFile, blobUri);
-    	ctx.setProperty(BlobInput.class.getName(), blobInput);
-    	return blobInput;
-    }
-    
+            
     @POST
     @Consumes("multipart/form-data")
     @Produces("application/xml")
@@ -154,7 +160,8 @@ public class BlobResource extends ResourceBase {
     	Response response = null;    	
     	try {
 	    	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
-	    	setBlobInput(ctx, req, blobUri);
+	    	BlobInput blobInput = BlobUtil.getBlobInput(ctx);
+	    	blobInput.createBlobFile(req, blobUri);
 	    	response = this.create(null, ctx);
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
@@ -174,27 +181,28 @@ public class BlobResource extends ResourceBase {
     }
 
     @GET
-    @Path("{csid}/derivatives/{derivative_term}/content")
+    @Path("{csid}/derivatives/{derivativeTerm}/content")
     @Produces({"image/jpeg", "image/png", "image/tiff"})
     public InputStream getDerivativeContent(
     		@PathParam("csid") String csid,
-    		@PathParam("derivative_term") String derivative_term) {
+    		@PathParam("derivativeTerm") String derivativeTerm) {
     	InputStream result = null;
-	    result = getBlobContent(csid, derivative_term);
+	    result = getBlobContent(csid, derivativeTerm);
 	    
     	return result;
     }
     
     @GET
-    @Path("{csid}/derivatives/{derivative_term}")
+    @Path("{csid}/derivatives/{derivativeTerm}")
     public MultipartOutput getDerivative(@PathParam("csid") String csid,
-    		@PathParam("derivative_term") String derivative_term) {
+    		@PathParam("derivativeTerm") String derivativeTerm) {
     	MultipartOutput result = null;
     	
     	ensureCSID(csid, READ);
         try {
         	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
-        	ctx.setProperty(BlobInput.BLOB_DERIVATIVE_TERM_KEY, derivative_term);
+        	BlobInput blobInput = BlobUtil.getBlobInput(ctx);
+        	blobInput.setDerivativeTerm(derivativeTerm);
             result = get(csid, ctx);
             if (result == null) {
                 Response response = Response.status(Response.Status.NOT_FOUND).entity(
@@ -218,8 +226,7 @@ public class BlobResource extends ResourceBase {
     	ensureCSID(csid, READ);
         try {
         	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
-        	ctx.setProperty(BlobInput.BLOB_DERIVATIVE_LIST_KEY, true);
-            result = this.getDerivativeList(csid);
+            result = this.getDerivativeList(ctx, csid);
             if (result == null) {
                 Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();

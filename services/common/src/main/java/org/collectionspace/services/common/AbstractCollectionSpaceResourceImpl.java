@@ -23,10 +23,13 @@
  */
 package org.collectionspace.services.common;
 
+import java.util.List;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextProperties;
@@ -35,6 +38,7 @@ import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
+import org.jboss.resteasy.client.ClientResponse;
 
 /**
  * The Class AbstractCollectionSpaceResourceImpl.
@@ -55,6 +59,20 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     /** The storage client. */
     private StorageClient storageClient;
 
+    /**
+     * Extract id.
+     *
+     * @param res the res
+     * @return the string
+     */
+    protected static String extractId(Response res) {
+        MultivaluedMap<String, Object> mvm = res.getMetadata();
+        String uri = (String) ((List<Object>) mvm.get("Location")).get(0);
+        String[] segments = uri.split("/");
+        String id = segments[segments.length - 1];
+        return id;
+    }    
+    
     /**
      * Instantiates a new abstract collection space resource.
      */

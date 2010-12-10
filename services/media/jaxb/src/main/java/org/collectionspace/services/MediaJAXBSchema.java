@@ -26,4 +26,5 @@ public interface MediaJAXBSchema {
     final static String title = "title";
     final static String type = "type";
     final static String uri = "uri";
+    final static String blobCsid = "blobCsid";
 }

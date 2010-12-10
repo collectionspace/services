@@ -97,13 +97,21 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         //return at least those document part(s) that were received
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
-        List<InputPart> inputParts = ctx.getInput().getParts();
-        for (InputPart part : inputParts) {
-            String partLabel = part.getHeaders().getFirst("label");
-            ObjectPartType partMeta = partsMetaMap.get(partLabel);
-//            extractPart(docModel, partLabel, partMeta);
-            Map<String, Object> unQObjectProperties = extractPart(docModel, partLabel, partMeta);
-            addOutputPart(unQObjectProperties, partLabel, partMeta);
+        MultipartInput input = ctx.getInput();
+        if (input != null) {
+	        List<InputPart> inputParts = ctx.getInput().getParts();
+	        for (InputPart part : inputParts) {
+	            String partLabel = part.getHeaders().getFirst("label");
+	            ObjectPartType partMeta = partsMetaMap.get(partLabel);
+	//            extractPart(docModel, partLabel, partMeta);
+	            Map<String, Object> unQObjectProperties = extractPart(docModel, partLabel, partMeta);
+	            addOutputPart(unQObjectProperties, partLabel, partMeta);
+	        }
+        } else {
+        	if (logger.isWarnEnabled() == true) {
+        		logger.warn("MultipartInput part was null for document id = " +
+        				docModel.getName());
+        	}
         }
     }
 

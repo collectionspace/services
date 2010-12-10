@@ -58,32 +58,34 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
         return bigReThrow(e, serviceMsg, "");
     }
 
-    protected WebApplicationException bigReThrow(Exception e, String serviceMsg, String csid)
-        throws WebApplicationException {
-                Response response;
-        if (logger.isDebugEnabled()) {
-             logger.debug(getClass().getName(), e);
-        }
-        if (e instanceof UnauthorizedException) {
-            response = Response.status(Response.Status.UNAUTHORIZED)
-                               .entity(serviceMsg + e.getMessage())
-                               .type("text/plain")
-                               .build();
-             return new WebApplicationException(response);
-        } else if (e instanceof DocumentNotFoundException) {
-            response = Response.status(Response.Status.NOT_FOUND)
-                               .entity(serviceMsg + " on "+getClass().getName()+" csid=" + csid)
-                               .type("text/plain")
-                               .build();
-            return new WebApplicationException(response);
-        } else {  //e is now instanceof Exception
-            response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                               .entity(serviceMsg)
-                               .type("text/plain")
-                               .build();
-            return new WebApplicationException(response);
-        }
-    }
+	protected WebApplicationException bigReThrow(Exception e,
+			String serviceMsg, String csid) throws WebApplicationException {
+		Response response;
+		if (logger.isDebugEnabled()) {
+			logger.debug(getClass().getName(), e);
+		}
+		if (e instanceof UnauthorizedException) {
+			response = Response.status(Response.Status.UNAUTHORIZED)
+					.entity(serviceMsg + e.getMessage()).type("text/plain")
+					.build();
+			return new WebApplicationException(response);
+		} else if (e instanceof DocumentNotFoundException) {
+			response = Response
+					.status(Response.Status.NOT_FOUND)
+					.entity(serviceMsg + " on " + getClass().getName()
+							+ " csid=" + csid).type("text/plain").build();
+			return new WebApplicationException(response);
+		} else if (e instanceof WebApplicationException) {
+			//
+			// subresource may have already thrown this exception
+			// so just pass it on
+			return (WebApplicationException)e;
+		} else { // e is now instanceof Exception
+			response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity(serviceMsg).type("text/plain").build();
+			return new WebApplicationException(response);
+		}
+	}
 
     //======================= CREATE ====================================================
 
@@ -127,11 +129,20 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
         ensureCSID(csid, UPDATE);
         try {
         	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
-            DocumentHandler handler = createDocumentHandler(ctx);
-            return update(csid, theUpdate, ctx, handler); //==> CALL implementation method, which subclasses may override.
+            return update(csid, theUpdate, ctx); //==> CALL implementation method, which subclasses may override.
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED, csid);
         }
+    }
+
+    /** Subclasses may override this overload, which gets called from #udpate(String,MultipartInput)   */
+    protected MultipartOutput update(String csid,
+                                     MultipartInput theUpdate,
+                                     ServiceContext<MultipartInput, MultipartOutput> ctx)
+    throws Exception {
+        DocumentHandler handler = createDocumentHandler(ctx);
+        getRepositoryClient(ctx).update(ctx, csid, handler);
+        return (MultipartOutput) ctx.getOutput();
     }
 
     /** Subclasses may override this overload, which gets called from #udpate(String,MultipartInput)   */

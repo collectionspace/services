@@ -32,6 +32,7 @@ import org.collectionspace.services.jaxb.BlobJAXBSchema;
 
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.blob.BlobOutput;
+import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
@@ -46,6 +47,8 @@ import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
@@ -62,7 +65,7 @@ extends DocHandlerBase<BlobsCommon, AbstractCommonList> {
 
 	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(BlobDocumentModelHandler.class);
-
+	
 	public final String getNuxeoSchemaName(){
 		return "blobs";
 	}
@@ -79,7 +82,7 @@ extends DocHandlerBase<BlobsCommon, AbstractCommonList> {
 		List list = ((BlobsCommonList)commonList).getBlobListItem();
 		return list;
 	}
-	
+		
 	private String getDerivativePathBase(DocumentModel docModel) {
 		return getServiceContextPath() + docModel.getName() + "/" +
 			BlobInput.URI_DERIVATIVES_PATH + "/";
@@ -146,24 +149,27 @@ extends DocHandlerBase<BlobsCommon, AbstractCommonList> {
 	public void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc)
 			throws Exception {
 		ServiceContext ctx = this.getServiceContext();
+		BlobInput blobInput = BlobUtil.getBlobInput(ctx);
 		RepositoryInstance repoSession = this.getRepositorySession();
 		DocumentModel docModel = wrapDoc.getWrappedObject();
 		BlobsCommon blobsCommon = this.getCommonPartProperties(docModel);		
 		String blobRepositoryId = blobsCommon.getRepositoryId(); //cache the value to pass to the blob retriever
 		
-		if (ctx.getProperty(BlobInput.BLOB_DERIVATIVE_LIST_KEY) != null) {
+		if (blobInput.isDerivativeListRequested() == true) {
 			BlobsCommonList blobsCommonList = NuxeoImageUtils.getBlobDerivatives(
 					repoSession, blobRepositoryId, getDerivativePathBase(docModel));
-			ctx.setProperty(BlobInput.BLOB_DERIVATIVE_LIST_KEY, blobsCommonList);
+//			ctx.setProperty(BlobInput.BLOB_DERIVATIVE_LIST_KEY, blobsCommonList);
+			blobInput.setDerivativeList(blobsCommonList);
 			return;  //FIXME: Don't like this exit point.  Perhaps derivatives should be a sub-resource?
 		}		
 
-		String derivativeTerm = (String)ctx.getProperty(BlobInput.BLOB_DERIVATIVE_TERM_KEY);
-		Boolean getContentFlag = ctx.getProperty(BlobInput.BLOB_CONTENT_KEY) != null ? true : false;
+		String derivativeTerm = blobInput.getDerivativeTerm();
+		Boolean getContentFlag = blobInput.isContentRequested();
 		BlobOutput blobOutput = NuxeoImageUtils.getBlobOutput(ctx, repoSession,
 				blobRepositoryId, derivativeTerm, getContentFlag);
 		if (getContentFlag == true) {
-			ctx.setProperty(BlobInput.BLOB_CONTENT_KEY, blobOutput.getBlobInputStream());
+			blobInput.setContentStream(blobOutput.getBlobInputStream());
+//			ctx.setProperty(BlobInput.BLOB_CONTENT_KEY, blobOutput.getBlobInputStream());
 		}
 
 		if (derivativeTerm != null) {
@@ -182,17 +188,18 @@ extends DocHandlerBase<BlobsCommon, AbstractCommonList> {
 	@Override
 	public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
 		ServiceContext ctx = this.getServiceContext();
-		BlobInput blobInput = (BlobInput)ctx.getProperty(BlobInput.class.getName());
-		if (blobInput == null) {    		
-			super.fillAllParts(wrapDoc, action);
-		} else {
+		BlobInput blobInput = BlobUtil.getBlobInput(ctx);
+		if (blobInput.getBlobFile() != null) {    		
 			//
-			// If blobInput is set then we just received a multipart/form-data file post
+			// If blobInput has a file then we just received a multipart/form-data file post
 			//
 			DocumentModel documentModel = wrapDoc.getWrappedObject();
 			RepositoryInstance repoSession = this.getRepositorySession();    	
 			BlobsCommon blobsCommon = NuxeoImageUtils.createPicture(ctx, repoSession, blobInput);
 			this.setCommonPartProperties(documentModel, blobsCommon);
+			blobInput.setBlobCsid(documentModel.getName());
+		} else {
+			super.fillAllParts(wrapDoc, action);
 		}
 	}    
 }

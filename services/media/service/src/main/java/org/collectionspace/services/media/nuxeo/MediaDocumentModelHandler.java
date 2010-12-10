@@ -26,19 +26,30 @@ package org.collectionspace.services.media.nuxeo;
 import java.util.List;
 
 import org.collectionspace.services.MediaJAXBSchema;
+import org.collectionspace.services.blob.BlobsCommon;
 import org.collectionspace.services.common.DocHandlerBase;
+import org.collectionspace.services.common.blob.BlobInput;
+import org.collectionspace.services.common.blob.BlobUtil;
+import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
 import org.collectionspace.services.media.MediaCommon;
 import org.collectionspace.services.media.MediaCommonList;
 import org.collectionspace.services.media.MediaCommonList.MediaListItem;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.jaxb.BlobJAXBSchema;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 
 /**
  * The Class MediaDocumentModelHandler.
  */
 public class MediaDocumentModelHandler
         extends DocHandlerBase<MediaCommon, AbstractCommonList> {
-
+	
     public final String getNuxeoSchemaName(){
         return "media";
     }
@@ -55,7 +66,17 @@ public class MediaDocumentModelHandler
         List list = ((MediaCommonList)commonList).getMediaListItem();
         return list;
     }
-
+    
+	private MediaCommon getCommonPartProperties(DocumentModel docModel) throws Exception {
+		String label = getServiceContext().getCommonPartLabel();
+		MediaCommon result = new MediaCommon();
+		
+		result.setBlobCsid((String)	
+				docModel.getProperty(label, MediaJAXBSchema.blobCsid));
+		
+		return result;
+	}
+    
     public Object createItemForCommonList(DocumentModel docModel, String label, String id) throws Exception {
         MediaListItem item = new MediaListItem();
         item.setTitle((String) docModel.getProperty(label, MediaJAXBSchema.title));
@@ -66,5 +87,38 @@ public class MediaDocumentModelHandler
         item.setCsid(id);
         return item;
     }
+    
+	@Override
+	public void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc)
+			throws Exception {
+		ServiceContext ctx = this.getServiceContext();
+		
+		BlobInput blobInput = BlobUtil.getBlobInput(ctx);
+		if (blobInput != null && blobInput.isSchemaRequested()) { //Extract the blob info instead of the media info
+			DocumentModel docModel = wrapDoc.getWrappedObject();
+			MediaCommon mediaCommon = this.getCommonPartProperties(docModel);		
+			String blobCsid = mediaCommon.getBlobCsid(); //cache the value to pass to the blob retriever
+			blobInput.setBlobCsid(blobCsid);
+		} else {
+			super.extractAllParts(wrapDoc);
+		}		
+	}
+    
+	@Override
+	public void fillAllParts(DocumentWrapper<DocumentModel> wrapDoc, Action action) throws Exception {
+		ServiceContext ctx = this.getServiceContext();
+		BlobInput blobInput = BlobUtil.getBlobInput(ctx);
+		if (blobInput != null && blobInput.getBlobCsid() != null) {
+			String blobCsid = blobInput.getBlobCsid();
+			//
+			// If getBlobCsid has a value then we just received a multipart/form-data file post
+			//
+			DocumentModel documentModel = wrapDoc.getWrappedObject();
+			documentModel.setProperty(ctx.getCommonPartLabel(), MediaJAXBSchema.blobCsid, blobCsid);
+		} else {
+			super.fillAllParts(wrapDoc, action);
+		}
+	}    
+    
 }
 
