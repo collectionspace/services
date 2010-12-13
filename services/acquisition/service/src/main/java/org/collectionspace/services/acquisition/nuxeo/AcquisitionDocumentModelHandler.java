@@ -138,7 +138,7 @@ public class AcquisitionDocumentModelHandler
                      AcquisitionListItemJAXBSchema.OWNERS);
             OwnerList ownerList = new OwnerList();
             for (String owner : owners) {
-                  acquisitionSourceList.getAcquisitionSource().add(owner);
+                  ownerList.getOwner().add(owner);
             }
             listItem.setOwners(ownerList);
 
