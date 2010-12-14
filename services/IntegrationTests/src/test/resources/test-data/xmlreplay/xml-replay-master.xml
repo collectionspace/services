@@ -23,6 +23,7 @@
     <run controlFile="./security.xml" testGroup="securityRemovingRoleperms" />
     <run controlFile="objectexit/object-exit.xml" testGroup="CRUDL" />
     <run controlFile="objectexit/object-exit.xml" testGroup="domwalk" />
+    <run controlFile="acquisitions/acquisitions.xml" testGroup="testList" />
 
     <!--<run controlFile="./organization.xml" testGroup="organization" />-->
 

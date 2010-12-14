@@ -8,10 +8,10 @@
      below about not leaving any active testGroups enabled in this file
      when you check it in.
 -->
-    <protoHostPort>http://localhost:8180</protoHostPort>
+    <protoHostPort>http://localhost:8280</protoHostPort>
     
     <!-- legal values for dumpServiceResult=[minimal,detailed,full] -->
-    <dump payloads="false" dumpServiceResult="minimal" />
+    <dump payloads="false" dumpServiceResult="full" />
     
     <auths default="admin@collectionspace.org">
        <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
@@ -28,9 +28,14 @@
     <run controlFile="objectexit/object-exit.xml" testGroup="CRUDL" />   
     <run controlFile="objectexit/object-exit.xml" testGroup="domwalk" />
     <run controlFile="objectexit/object-exit.xml" testGroup="repeat" />
-    <run controlFile="objectexit/object-exit.xml" testGroup="CRUDL" />
     <run controlFile="objectexit/object-exit.xml" testGroup="cleanup" />   
-    <run controlFile="objectexit/object-exit.xml" testGroup="DOMLIST" />
+    <run controlFile="objectexit/object-exit.xml" testGroup="domlist" />
+    <run controlFile="objectexit/object-exit.xml" testGroup="authrefs" />
+    <run controlFile="objectexit/object-exit.xml" testGroup="cleanup" />
+    <run controlFile="objectexit/object-exit.xml" testGroup="makeone" />
+    
+    <run controlFile="acquisitions/acquisitions.xml" testGroup="makeone" />
+    <run controlFile="acquisitions/acquisitions.xml" testGroup="testList" />
     -->
     
     

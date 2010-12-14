@@ -5,15 +5,80 @@
         <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
         <auth ID="testAdministator">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
     </auths>
-    
+   
+    <!-- ============= authrefs ============================================== -->
+    <!-- run this group with autoDeletePOSTS="false" and then you can hit
+      http://nightly.collectionspace.org:8180/cspace-services/objectexit/
+    then grab a CSID, and paste it in here:
+      http://nightly.collectionspace.org:8180/cspace-services/objectexit/d781aed4-2e2c-45e2-ad8d/authorityrefs
+    -->
+    <testGroup ID="authrefs" autoDeletePOSTS="false">
+        <test ID="oe9">
+         <method>POST</method>
+         <uri>/cspace-services/personauthorities/</uri>
+         <part>
+             <label>personauthorities_common</label>
+             <filename>objectexit/oe9.xml</filename>
+         </part>
+      </test>
+      <test ID="oe11">
+             <method>POST</method>
+             <uri>/cspace-services/personauthorities/${oe9.CSID}/items/</uri>
+             <part>
+                 <label>persons_common</label>
+                 <filename>objectexit/oe11.xml</filename>
+             </part>
+        </test>
+        <test ID="oe15">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <part>
+                 <label>objectexit_common</label>
+                 <filename>objectexit/oe15.xml</filename>
+             </part>
+        </test>
+    </testGroup>
+     
+    <testGroup ID="makeone" autoDeletePOSTS="false">
+         <test ID="oe1"  auth="test">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <part>
+                 <label>objectexit_common</label>
+                 <filename>objectexit/oe1.xml</filename>
+             </part>
+         </test>
+        <test ID="oe2">
+            <method>GET</method>
+            <uri>/cspace-services/objectexit/${oe1.CSID}</uri>
+            <response>
+                <expected level="TEXT" />
+                <part>
+                     <label>objectexit_common</label>
+                     <filename>objectexit/res/oe2.res.xml</filename>
+                 </part>
+             </response>
+        </test>
+    </testGroup>
+     
+         
+             
     <testGroup ID="cleanup" autoDeletePOSTS="true">
          <test ID="oe1"  auth="test">
              <method>DELETE</method>
-             <uri>/cspace-services/objectexit/98d61417-3986-4de6-bb98</uri>
+             <uri>/cspace-services/objectexit/065aa56e-a4f5-44b7-955e</uri>
+         </test>
+         <test ID="oe1"  auth="test">
+             <method>DELETE</method>
+             <uri>/cspace-services/objectexit/1735327c-f9bb-42c7-959b</uri>
+         </test>
+         <test ID="oe1"  auth="test">
+             <method>DELETE</method>
+             <uri>/cspace-services/objectexit/106cb53d-ee79-44e3-8665</uri>
          </test>
     </testGroup>
     
-    <testGroup ID="domwalk" autoDeletePOSTS="true">
+    <testGroup ID="domwalk" autoDeletePOSTS="false">
          <test ID="oe1"  auth="test">
              <method>POST</method>
              <uri>/cspace-services/objectexit/</uri>
@@ -252,9 +317,9 @@
 
      </testGroup>
 
-    <!-- =========== DOMWALK LIST ================================================ -->
+    <!-- =========== domlist Walk a DOM ================================================ -->
 
-    <testGroup ID="DOMLIST" autoDeletePOSTS="true">
+    <testGroup ID="domlist" autoDeletePOSTS="true">
          <test ID="oe1"  auth="admin@collectionspace.org">
              <method>POST</method>
              <uri>/cspace-services/objectexit/</uri>
