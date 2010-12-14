@@ -49,7 +49,7 @@
                  </part>
              </response>
          </test>
-  <!--      
+
         <test ID="ac2"  auth="test">
              <method>POST</method>
              <uri>/cspace-services/acquisitions/</uri>
@@ -70,19 +70,21 @@
                  </part>
              </response>
         </test>
-        -->
+
+        <!--
         <test ID="ac3list">
             <method>GET</method>
             <uri>/cspace-services/acquisitions/?sortBy=&amp;pgNum=0&amp;pgSz=10</uri>
-            <reponse>acquisitions/res/ac3list.res.xml</reponse>
-            <!--response>
+            <response>acquisitions/res/ac3list.res.xml</response>
+            <response>
                 <expected level="TEXT" />
                 <part>
                      <label>acquisitions_common</label>
                      <filename>acquisitions/res/ac3list.res.xml</filename>
                  </part>
-             </response-->
+             </response>
         </test>
+        -->
         
     </testGroup>
      

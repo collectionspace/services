@@ -159,6 +159,7 @@
                  <filename>objectexit/oe5.xml</filename>
              </part>
          </test>
+         <!--
          <test ID="oe6">
             <method>GET</method>
             <uri>/cspace-services/objectexit/</uri>
@@ -166,11 +167,13 @@
                 <expected level="ADDOK" />
                 <filename>objectexit/res/oe6.res.xml</filename>
              </response>
-            <!--reponse>oe6.res.xml</reponse-->
+         -->
+            <!-- response>oe6.res.xml</response -->
             <!--response elements will need parts, too, e.g. personauthorities_common -->
-            <!-- inside oe6.res.xml, there is a CSID which will change every time, and should be ref'd as 6f7a1e3e-5821-4ef2-bfcf ==> ${oe1.CSID}
-            -->
+            <!-- inside oe6.res.xml, there is a CSID which will change every time, and should be ref'd as 6f7a1e3e-5821-4ef2-bfcf ==> ${oe1.CSID} -->
+        <!--
         </test>
+         -->
          <test ID="oe7">
             <method>GET</method>
             <uri>/cspace-services/objectexit/9223372036854775807</uri>

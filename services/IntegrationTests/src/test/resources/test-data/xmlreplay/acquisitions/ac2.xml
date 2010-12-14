@@ -3,17 +3,17 @@
 xmlns:ns2="http://collectionspace.org/services/jaxb"
 xmlns:ns3="http://collectionspace.org/services/acquisition">
   <acquisitionDates>
-    <acquisitionDate>First Acquisition Date -1292275631503</acquisitionDate>
     <acquisitionDate>Second Acquisition Date-1292275631503</acquisitionDate>
+    <acquisitionDate>First Acquisition Date -1292275631503</acquisitionDate>
   </acquisitionDates>
   <acquisitionReferenceNumber>acquisitionReferenceNumber-1292275631503</acquisitionReferenceNumber>
   <owners>
-    <owner>First Owner -1292275631503</owner>
     <owner>Second Owner-1292275631503</owner>
+    <owner>First Owner -1292275631503</owner>
   </owners>
   <acquisitionSources>
-    <acquisitionSource>Donor Acquisition Source-1292275631503</acquisitionSource>
     <acquisitionSource>Museum Acquisition Source-1292275631503</acquisitionSource>
+    <acquisitionSource>Donor Acquisition Source-1292275631503</acquisitionSource>
   </acquisitionSources>
 </ns3:acquisitions_common>
 
