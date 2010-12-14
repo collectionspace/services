@@ -39,7 +39,6 @@ import org.collectionspace.services.relation.NewRelationResource;
 import org.collectionspace.services.acquisition.AcquisitionResource;
 import org.collectionspace.services.dimension.DimensionResource;
 import org.collectionspace.services.contact.ContactResource;
-
 import org.collectionspace.services.vocabulary.VocabularyResource;
 import org.collectionspace.services.organization.OrgAuthorityResource;
 import org.collectionspace.services.person.PersonAuthorityResource;
@@ -49,6 +48,8 @@ import org.collectionspace.services.person.PersonAuthorityResource;
 import javax.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.authorization.PermissionResource;
 import org.collectionspace.services.authorization.RoleResource;
 import org.collectionspace.services.common.security.SecurityInterceptor;
@@ -76,6 +77,8 @@ public class CollectionSpaceJaxRsApplication extends Application {
     	Profiler.setup();
     	DocumentUtils.loggerSetup();
     	NuxeoImageUtils.loggerSetup();
+    	FileUtils.loggerSetup();
+    	
     	//
     	// Instantiate all our JaxRS resources
     	//

@@ -23,6 +23,9 @@
  */
 package org.collectionspace.services.blob;
 
+import java.util.Map;
+import java.util.UUID;
+
 import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.common.ResourceBase;
 //import org.collectionspace.services.common.ClientType;
@@ -36,6 +39,7 @@ import org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler; //FIXEM
 import org.collectionspace.services.blob.BlobsCommon;
 import org.collectionspace.services.blob.BlobsCommonList;
 
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
@@ -56,6 +60,10 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.MediaType;
+
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 import java.io.File;
 import java.io.InputStream;
@@ -151,7 +159,47 @@ public class BlobResource extends ResourceBase {
     	
     	return result;
     }
-            
+    
+    /*
+     * This method can replace the 'createBlob' -specifically, this JAX-RS technique can replace the call to
+     * the BlobInput.createBlobFile() method.  In theory, this should reduce by 1 the number of time we need to copy
+     * bits around.
+     */
+    @POST
+    @Path("{csid}/prototype")
+    @Consumes("multipart/form-data")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response prototype(@PathParam("csid") String csid,
+    		@Context HttpServletRequest req,
+    		@QueryParam("blobUri") String blobUri,
+    		MultipartFormDataInput partFormData) {
+    	Response response = null;    	
+    	try {
+    		InputStream fileStream = null;
+    		String preamble = partFormData.getPreamble();
+    		System.out.println("Preamble type is:" + preamble);
+    		
+    		Map<String, List<InputPart>> partsMap = partFormData.getFormDataMap();
+    		List<InputPart> fileParts = partsMap.get("file");
+    		
+    		for (InputPart part : fileParts)
+    		{
+    			String mediaType = part.getMediaType().toString();
+    			System.out.println("Media type is:" + mediaType);
+    			fileStream = part.getBody(InputStream.class, null);
+    			FileUtils.createTmpFile(fileStream, getServiceName() + "_");
+    		}
+    		
+	    	ResponseBuilder rb = Response.ok();
+	    	rb.entity("Goodbye, world!");
+	    	response = rb.build();
+    	} catch (Exception e) {
+    		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
+    	}
+    			
+		return response;
+    }    
+    
     @POST
     @Consumes("multipart/form-data")
     @Produces("application/xml")
@@ -172,7 +220,7 @@ public class BlobResource extends ResourceBase {
     
     @GET
     @Path("{csid}/content")
-    @Produces({"image/jpeg", "image/png", "image/tiff"})
+    @Produces({"image/jpeg", "image/png", "image/tiff", "application/pdf"})
     public InputStream getBlobContent(
     		@PathParam("csid") String csid) {
     	InputStream result = null;

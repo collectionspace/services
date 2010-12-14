@@ -29,13 +29,26 @@ public class FileUtils {
 	
 	private static final String TMP_FILE_PREFIX = "cspace_blob_";
 	
-	static public File createTmpFile(InputStream streamIn) {
-		File tmpFile = null;		
+	/**
+	 * Logger setup.
+	 */
+	public static void loggerSetup() {
+		//empty method
+	}
+	
+	static public File createTmpFile(InputStream streamIn,
+			String filePrefix) {
+		File result = null;
+		
+		filePrefix = filePrefix != null ? filePrefix : "";
 		String tmpDir = System.getProperty("java.io.tmpdir");
-		tmpFile = new File(tmpDir, UUID.randomUUID().toString());
+		result = new File(tmpDir, filePrefix + UUID.randomUUID().toString());
+		if (logger.isDebugEnabled() == true) {
+			logger.debug("Creating temp file at:" + result.getAbsolutePath());
+		}
 		
 		try {
-	        FileOutputStream streamOut = new FileOutputStream(tmpFile);
+	        FileOutputStream streamOut = new FileOutputStream(result);
 			int c;
 	        while ((c = streamIn.read()) != -1) 
 	        {
@@ -48,7 +61,7 @@ public class FileUtils {
 			logger.error(e.getMessage(), e);
 		}
 		
-		return tmpFile;
+		return result;
 	}
 	
 	static public File createTmpFile(HttpServletRequest request) {
@@ -80,6 +93,7 @@ public class FileUtils {
 						File savedFile = new File(tmpDir, fullFile.getName());
 
 						item.write(savedFile);
+//						item.getInputStream();//FIXME: We should make a version of this method that returns the input stream
 						result = savedFile;
 					}
 				}
