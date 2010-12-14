@@ -119,28 +119,17 @@ public class AcquisitionDocumentModelHandler
         while (iter.hasNext()) {
             DocumentModel docModel = iter.next();
             AcquisitionListItem listItem = new AcquisitionListItem();
+
             listItem.setAcquisitionReferenceNumber((String) docModel.getProperty(label,
                     AcquisitionListItemJAXBSchema.ACQUISITION_REFERENCE_NUMBER));
-            
-            // docModel.getProperty returns an ArrayList here.
-            List<String> acquisitionSources =
-                 (List<String>) docModel.getProperty(label,
-                     AcquisitionListItemJAXBSchema.ACQUISITION_SOURCES);
-            AcquisitionSourceList acquisitionSourceList = new AcquisitionSourceList();
-            for (String acquisitionSource : acquisitionSources) {
-                  acquisitionSourceList.getAcquisitionSource().add(acquisitionSource);
-            }
-            listItem.setAcquisitionSources(acquisitionSourceList);
 
-            // and here ...
-            List<String> owners = 
-                 (List<String>) docModel.getProperty(label,
-                     AcquisitionListItemJAXBSchema.OWNERS);
-            OwnerList ownerList = new OwnerList();
-            for (String owner : owners) {
-                  ownerList.getOwner().add(owner);
-            }
-            listItem.setOwners(ownerList);
+            List<Object> acquisitionSources =(List<Object>) docModel.getProperty(label,AcquisitionListItemJAXBSchema.ACQUISITION_SOURCES);
+            String primaryAcquisitionSource = primaryValueFromMultivalue(acquisitionSources,AcquisitionListItemJAXBSchema.ACQUISITION_SOURCE);
+            listItem.setAcquisitionSource(primaryAcquisitionSource);
+
+            List<Object> owners =(List<Object>) docModel.getProperty(label,AcquisitionListItemJAXBSchema.OWNERS);
+            String primaryOwner = primaryValueFromMultivalue(owners,AcquisitionListItemJAXBSchema.OWNER);
+            listItem.setOwner(primaryOwner);
 
             //need fully qualified context for URI
             String id = NuxeoUtils.extractId(docModel.getPathAsString());

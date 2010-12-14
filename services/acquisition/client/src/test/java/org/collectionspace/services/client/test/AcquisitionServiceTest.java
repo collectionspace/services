@@ -414,11 +414,10 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
                     item.getCsid());
                 logger.debug(testName + ": list-item[" + i + "] objectNumber=" +
                     item.getAcquisitionReferenceNumber());
-                logger.debug(testName + ": list-item[" + i + "] acquisitionSources:");
-                AcquisitionSourceList acqSource = item.getAcquisitionSources();
-                for (String acquisitionSource : acqSource.getAcquisitionSource()) {
-                    logger.debug("acquisitionSource=" + acquisitionSource);
-                }
+                logger.debug(testName + ": list-item[" + i + "] acquisitionSource=" +
+                    item.getAcquisitionSource());
+                logger.debug(testName + ": list-item[" + i + "] owner=" +
+                    item.getOwner());
                 logger.debug(testName + ": list-item[" + i + "] URI=" +
                     item.getUri());
                 i++;
