@@ -24,9 +24,9 @@
                       and a testGroup, so you can test just one thing at a time, or a limited suite.
     -->
     
+    <!--
     <run controlFile="objectexit/object-exit.xml" testGroup="CRUDL" />   
-     <!--
-   <run controlFile="objectexit/object-exit.xml" testGroup="domwalk" />
+    <run controlFile="objectexit/object-exit.xml" testGroup="domwalk" />
     <run controlFile="objectexit/object-exit.xml" testGroup="repeat" />
     <run controlFile="objectexit/object-exit.xml" testGroup="cleanup" />   
     <run controlFile="objectexit/object-exit.xml" testGroup="domlist" />
