@@ -6,15 +6,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.JexlEngine;
 import org.apache.commons.jexl2.MapContext;
+import org.collectionspace.services.common.Tools;
 import org.dom4j.*;
 import org.dom4j.io.SAXReader;
-import org.jdom.input.SAXBuilder;
-import org.xml.sax.InputSource;
-
-
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
 
 import java.io.*;
 import java.util.*;
@@ -652,7 +646,12 @@ public class XmlReplay {
                     System.out.println(leader+serviceResultRow+"\r\n");
                     if (dump.payloads) System.out.println(serviceResult.result);
                 } catch (Throwable t) {
-                    System.out.println("ERROR: XmlReplay experienced an error in a test node: "+testNode+" Throwable: "+t);
+                    String msg = "ERROR: XmlReplay experienced an error in a test node: "+testNode+" Throwable: "+t;
+                    System.out.println(msg);
+                    ServiceResult serviceResult = new ServiceResult();
+                    serviceResult.error = msg;
+                    serviceResult.failureReason = " : SYSTEM ERROR; ";
+                    results.add(serviceResult);
                 }
             }
             if (Tools.isTrue(autoDeletePOSTS)&&param_autoDeletePOSTS){
