@@ -23,6 +23,7 @@
 
 package org.collectionspace.services.IntegrationTests.xmlreplay;
 
+import org.collectionspace.services.common.Tools;
 import org.testng.Assert;
 
 import java.io.File;
