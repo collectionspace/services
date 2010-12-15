@@ -22,6 +22,7 @@
  */
 package org.collectionspace.services.IntegrationTests.xmlreplay;
 
+import org.collectionspace.services.common.Tools;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
