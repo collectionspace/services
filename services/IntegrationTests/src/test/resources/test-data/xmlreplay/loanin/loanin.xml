@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+    <auths>
+        <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
+        <auth ID="admin@collectionspace.org">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
+        <auth ID="testAdministator">YWRtaW5AY29sbGVjdGlvbnNwYWNlLm9yZzpBZG1pbmlzdHJhdG9y</auth>
+    </auths>
+   
+    <testGroup ID="makeone" autoDeletePOSTS="false">
+       <test ID="ac1"  auth="test">
+             <method>POST</method>
+             <uri>/cspace-services/loansin/</uri>
+             <part>
+                 <label>loansin_common</label>
+                 <filename>loanin/li1.xml</filename>
+             </part>
+         </test>
+     </testGroup>       
+
+     <testGroup ID="cleanup" autoDeletePOSTS="true">
+         <test ID="ac1"  auth="test">
+             <method>DELETE</method>
+             <uri>/cspace-services/loansin/8080b6b8-393a-4e8a-b823</uri>
+         </test>
+     </testGroup>
+    
+
+</xmlReplay>
