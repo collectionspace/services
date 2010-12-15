@@ -27,6 +27,9 @@ import java.util.List;
  * $LastChangedDate:  $
  * Author: laramie
  */
+@Path("/")
+@Consumes("multipart/mixed")
+@Produces("multipart/mixed")
 public abstract class ResourceBase
 extends AbstractMultiPartCollectionSpaceResourceImpl {
 
@@ -35,6 +38,8 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
     public static final String UPDATE = "update";
     public static final String DELETE = "delete";
     public static final String LIST   = "list";
+
+    public abstract String getPath();
 
     //FIXME retrieve client type from configuration
     final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType();
@@ -102,7 +107,7 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
     protected Response create(MultipartInput input, ServiceContext<MultipartInput, MultipartOutput> ctx) {
         try {
             DocumentHandler handler = createDocumentHandler(ctx);
-            UriBuilder path = UriBuilder.fromResource(this.getClass());
+            UriBuilder path = UriBuilder.fromPath(getPath());//UriBuilder.fromResource(this.getClass());
             return create(input, ctx, handler, path); //==> CALL implementation method, which subclasses may override.
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
