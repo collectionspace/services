@@ -34,14 +34,18 @@ import javax.ws.rs.core.MultivaluedMap;
 import java.util.List;
 
 @Path("/objectexit")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+//@Consumes("multipart/mixed")
+//@Produces("multipart/mixed")
 public class ObjectExitResource extends ResourceBase {
 
     @Override
     public String getServiceName(){
         return "objectexit";
     };
+
+    public String getPath(){
+        return "/objectexit";
+    }
 
 
     @Override
@@ -51,8 +55,13 @@ public class ObjectExitResource extends ResourceBase {
     }
 
     @Override
-    public Class<ObjectexitCommon> getCommonPartClass() {
-    	return ObjectexitCommon.class;
+    //public Class<ObjectexitCommon> getCommonPartClass() {
+    public Class getCommonPartClass() {
+    	try {
+            return Class.forName("org.collectionspace.services.objectexit.ObjectexitCommon");//.class;
+        } catch (ClassNotFoundException e){
+            return null;
+        }
     }
     
 }
