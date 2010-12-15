@@ -23,6 +23,8 @@
 
 package org.collectionspace.services.IntegrationTests.xmlreplay;
 
+import org.collectionspace.services.common.Tools;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
