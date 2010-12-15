@@ -1,0 +1,31 @@
+<project name="nuxeo-database-templates" default="package" basedir=".">
+    <description>
+       Deploys per-database templates used by Nuxeo.  Among other things, 
+       these templates designate the fields in database tables to be
+       defined as CLOB types, capable of holding large amounts of text.
+    </description>
+    <!-- set global properties for this build -->
+    <property name="services.trunk" value="../../.."/>
+    <!-- environment should be declared before reading build.properties -->
+    <property environment="env" />
+    <property file="${services.trunk}/build.properties" />
+
+    <target name="init">
+    <!-- Create the time stamp -->
+        <tstamp/>
+    </target>
+
+    <target name="deploy"
+    	description="deploys nuxeo database template folder for the ${db} database to ${jboss.deploy.nuxeo.templates}">
+        <mkdir dir="${jboss.deploy.nuxeo.templates}/collectionspace_${db}"/>
+        <copy todir="${jboss.deploy.nuxeo.templates}/collectionspace_${db}">
+            <fileset dir="${basedir}/${db}/collectionspace_${db}"/>
+        </copy>
+    </target>
+
+    <target name="undeploy"
+    description="undeploys nuxeo database template folder for the ${db} database from ${jboss.deploy.nuxeo.templates}">
+        <delete dir="${jboss.deploy.nuxeo.templates}/collectionspace_${db}"/>
+    </target>
+
+</project>
