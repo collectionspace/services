@@ -1,7 +1,6 @@
 package org.collectionspace.services.IntegrationTests.test;
 
 import org.collectionspace.services.IntegrationTests.xmlreplay.ServiceResult;
-import org.collectionspace.services.IntegrationTests.xmlreplay.Tools;
 import org.collectionspace.services.IntegrationTests.xmlreplay.XmlReplay;
 import org.collectionspace.services.IntegrationTests.xmlreplay.XmlReplayTest;
 import org.testng.annotations.Test;
