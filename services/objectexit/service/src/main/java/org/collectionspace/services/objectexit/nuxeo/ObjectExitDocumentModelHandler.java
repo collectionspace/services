@@ -23,48 +23,25 @@
  */
 package org.collectionspace.services.objectexit.nuxeo;
 
-import java.util.List;
-
-import org.collectionspace.services.ObjectexitJAXBSchema;
-import org.collectionspace.services.common.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.objectexit.ObjectexitCommon;
-import org.collectionspace.services.objectexit.ObjectexitCommonList;
-import org.collectionspace.services.objectexit.ObjectexitCommonList.ObjectexitListItem;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.nuxeo.ecm.core.api.DocumentModel;
 
-/**
- * The Class ObjectExitDocumentModelHandler.
- */
-public class ObjectExitDocumentModelHandler
-        extends DocHandlerBase<ObjectexitCommon, AbstractCommonList> {
+public class ObjectExitDocumentModelHandler extends DocHandlerBase<ObjectexitCommon, AbstractCommonList> {
 
-    public final String getNuxeoSchemaName(){
-        return "objectexit";
+    public static DocHandlerBase.CommonListReflection clr;
+    static {
+        clr = new DocHandlerBase.CommonListReflection();
+        clr.NuxeoSchemaName= "objectexit";
+        clr.SummaryFields = "exitNumber|currentOwner|uri|csid";
+        clr.AbstractCommonListClassname = "org.collectionspace.services.objectexit.ObjectexitCommonList";
+        clr.CommonListItemClassname = "org.collectionspace.services.objectexit.ObjectexitCommonList$ObjectexitListItem";
+        clr.ListItemMethodName = "getObjectexitListItem";
+        clr.ListItemsArray =   new String[][] {{"setExitNumber", "exitNumber", "", ""},
+                                               {"setCurrentOwner", "currentOwner", "", ""}};
     }
-
-    @Override
-    public String getSummaryFields(AbstractCommonList commonList){
-        return "exitNumber|currentOwner|uri|csid";
-    }
-
-    public AbstractCommonList createAbstractCommonListImpl(){
-        return new ObjectexitCommonList();
-    }
-
-    public List createItemsList(AbstractCommonList commonList){
-        //actually means getObjectexitListItems(), plural -- it's a list, but element is named singular, so JAXB generates like so.
-        List list = ((ObjectexitCommonList)commonList).getObjectexitListItem(); //List<ObjectexitCommonList.ObjectexitListItem> list = oeList.getObjectexitListItem();
-        return list;
-    }
-
-    public Object createItemForCommonList(DocumentModel docModel, String label, String id) throws Exception {
-        ObjectexitListItem item = new ObjectexitListItem();
-        item.setExitNumber((String) docModel.getProperty(label, ObjectexitJAXBSchema.OBJECT_EXIT_NUMBER));
-        item.setCurrentOwner((String) docModel.getProperty(label, ObjectexitJAXBSchema.OBJECT_EXIT_CURRENT_OWNER));
-        item.setUri(getServiceContextPath() + id);
-        item.setCsid(id);
-        return item;
+    public DocHandlerBase.CommonListReflection getCommonListReflection(){
+        return clr;
     }
 }
 
