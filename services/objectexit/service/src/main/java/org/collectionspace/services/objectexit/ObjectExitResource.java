@@ -34,19 +34,14 @@ import javax.ws.rs.core.MultivaluedMap;
 import java.util.List;
 
 @Path("/objectexit")
-//@Consumes("multipart/mixed")
-//@Produces("multipart/mixed")
+@Consumes("multipart/mixed")
+@Produces("multipart/mixed")
 public class ObjectExitResource extends ResourceBase {
 
     @Override
     public String getServiceName(){
         return "objectexit";
     };
-
-    public String getPath(){
-        return "/objectexit";
-    }
-
 
     @Override
     protected String getVersionString() {

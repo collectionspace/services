@@ -27,9 +27,6 @@ import java.util.List;
  * $LastChangedDate:  $
  * Author: laramie
  */
-@Path("/")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
 public abstract class ResourceBase
 extends AbstractMultiPartCollectionSpaceResourceImpl {
 
