@@ -39,7 +39,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.collectionspace.services.IntegrationTests.xmlreplay.ServiceResult;
+import org.collectionspace.services.common.Tools;
 
 /**
  *   @author Laramie Crocker
