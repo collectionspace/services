@@ -399,7 +399,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
         try {
             DocumentWrapper<DocumentModel> wrapDoc = findDoc(ctx, whereClause);
             DocumentModel docModel = wrapDoc.getWrappedObject();
-            csid = NuxeoUtils.extractId(docModel.getPathAsString());
+            csid = NuxeoUtils.getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
         } catch (DocumentNotFoundException dnfe) {
             throw dnfe;
         } catch (IllegalArgumentException iae) {

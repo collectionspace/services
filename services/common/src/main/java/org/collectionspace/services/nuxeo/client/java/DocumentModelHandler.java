@@ -32,6 +32,7 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.nuxeo.client.*;
+import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.common.profile.Profiler;
 
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -60,6 +61,13 @@ public abstract class DocumentModelHandler<T, TL>
     public final static String COLLECTIONSPACE_CORE_CREATED_AT = "createdAt";
     public final static String COLLECTIONSPACE_CORE_UPDATED_AT = "updatedAt";
 
+    /*
+     * We're using the "name" field of Nuxeo's DocumentModel to store
+     * the CSID.
+     */
+    public String getCsid(DocumentModel docModel) {
+    	return NuxeoUtils.getCsid(docModel);
+    }
     /**
      * getRepositorySession returns Nuxeo Repository Session
      * @return

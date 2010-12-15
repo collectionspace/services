@@ -136,7 +136,7 @@ public class ReportDocumentModelHandler
                     ReportJAXBSchema.FOR_SINGLE_DOC));
             ilistItem.setForDocType((String) docModel.getProperty(label,
                     ReportJAXBSchema.FOR_DOC_TYPE));
-            String id = NuxeoUtils.extractId(docModel.getPathAsString());
+            String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);
             ilistItem.setCsid(id);
             list.add(ilistItem);

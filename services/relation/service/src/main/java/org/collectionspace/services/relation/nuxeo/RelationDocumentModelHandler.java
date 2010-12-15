@@ -161,7 +161,7 @@ public class RelationDocumentModelHandler
     		DocumentModel docModel,
             String serviceContextPath) throws Exception {
         RelationListItem relationListItem = new RelationListItem();
-        String id = NuxeoUtils.extractId(docModel.getPathAsString());
+        String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
         relationListItem.setCsid(id);
         //
         // Subject

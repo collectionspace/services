@@ -76,7 +76,7 @@ public class VocabularyItemDocumentModelHandler
 					AuthorityItemJAXBSchema.SHORT_IDENTIFIER));
 			ilistItem.setRefName((String) docModel.getProperty(commonPartLabel, 
 					AuthorityItemJAXBSchema.REF_NAME));
-			String id = NuxeoUtils.extractId(docModel.getPathAsString());
+			String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
 			ilistItem.setUri("/vocabularies/" + inAuthority + "/items/" + id);
 			ilistItem.setCsid(id);
 			list.add(ilistItem);

@@ -81,7 +81,7 @@ public class PersonAuthorityDocumentModelHandler
             		AuthorityJAXBSchema.SHORT_IDENTIFIER));
             ilistItem.setVocabType((String) docModel.getProperty(label,
             		AuthorityJAXBSchema.VOCAB_TYPE));
-            String id = NuxeoUtils.extractId(docModel.getPathAsString());
+            String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);
             ilistItem.setCsid(id);
             list.add(ilistItem);

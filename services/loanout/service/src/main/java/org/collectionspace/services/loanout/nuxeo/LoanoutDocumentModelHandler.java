@@ -144,7 +144,7 @@ public class LoanoutDocumentModelHandler
                     LoanoutJAXBSchema.BORROWER));
             ilistItem.setLoanReturnDate((String) docModel.getProperty(label,
                     LoanoutJAXBSchema.LOAN_RETURN_DATE));
-            String id = NuxeoUtils.extractId(docModel.getPathAsString());
+            String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);
             ilistItem.setCsid(id);
             list.add(ilistItem);

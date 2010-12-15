@@ -150,7 +150,7 @@ public abstract class DocHandlerBase<T, TL> extends RemoteDocumentModelHandlerIm
         Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
         while(iter.hasNext()){
             DocumentModel docModel = iter.next();
-            String id = NuxeoUtils.extractId(docModel.getPathAsString());
+            String id = NuxeoUtils.getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
             Object item = createItemForCommonList(docModel, label, id);
             list.add(item);
         }

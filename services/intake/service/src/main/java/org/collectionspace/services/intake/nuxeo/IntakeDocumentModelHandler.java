@@ -134,7 +134,7 @@ public class IntakeDocumentModelHandler
                     IntakeJAXBSchema.DEPOSITOR));
             ilistItem.setCurrentOwner((String) docModel.getProperty(label,
                     IntakeJAXBSchema.CURRENT_OWNER));
-            String id = NuxeoUtils.extractId(docModel.getPathAsString());
+            String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);
             ilistItem.setCsid(id);
             list.add(ilistItem);

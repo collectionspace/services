@@ -211,12 +211,21 @@ public class NuxeoUtils {
                 "/" + id);
     }
 
+    /*
+     * We're using the "name" field of Nuxeo's DocumentModel to store
+     * the CSID.
+     */
+    public static String getCsid(DocumentModel docModel) {
+    	return docModel.getName();
+    }
+    
     /**
      * extractId extracts id from given path string
      * @param pathString
      * @return
      */
-    public static String extractId(String pathString) {
+    @Deprecated
+    public static String xextractId(String pathString) {
         if (pathString == null) {
             throw new IllegalArgumentException("empty pathString");
         }

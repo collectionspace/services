@@ -149,7 +149,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon, AICommonList>
     	
     	// Add the CSID to the common part
     	if (partMeta.getLabel().equalsIgnoreCase(authorityItemCommonSchemaName)) {
-	    	String csid = NuxeoUtils.extractId(docModel.getPathAsString());
+	    	String csid = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
 	    	unQObjectProperties.put("csid", csid);
     	}
     	

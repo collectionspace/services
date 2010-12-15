@@ -155,7 +155,7 @@ public class CollectionObjectDocumentModelHandler
                             CollectionObjectListItemJAXBSchema.RESPONSIBLE_DEPARTMENTS);
 		    coListItem.setResponsibleDepartment(DocumentUtils.getFirstString(respDepts));
 	            
-	            String id = NuxeoUtils.extractId(docModel.getPathAsString());
+	            String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
 	            coListItem.setUri(getServiceContextPath() + id);
 	            coListItem.setCsid(id);
             } catch (ClassCastException cce) {

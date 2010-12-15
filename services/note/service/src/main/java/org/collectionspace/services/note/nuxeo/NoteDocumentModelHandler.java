@@ -146,7 +146,7 @@ public class NoteDocumentModelHandler
             NoteListItem clistItem = new NoteListItem();
             clistItem.setContent((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     NoteJAXBSchema.CONTENT));
-            String id = NuxeoUtils.extractId(docModel.getPathAsString());
+            String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
             clistItem.setUri(getServiceContextPath() + id);
             clistItem.setCsid(id);
             list.add(clistItem);

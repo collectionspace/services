@@ -118,7 +118,7 @@ public class DimensionDocumentModelHandler
             DimensionListItem ilistItem = new DimensionListItem();
             ilistItem.setDimension((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     DimensionJAXBSchema.DIMENSION));
-            String id = NuxeoUtils.extractId(docModel.getPathAsString());
+            String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);
             ilistItem.setCsid(id);
             list.add(ilistItem);

@@ -168,7 +168,7 @@ public class OrganizationDocumentModelHandler
 					OrganizationJAXBSchema.SHORT_IDENTIFIER));
 			ilistItem.setRefName((String) 
 					docModel.getProperty(commonPartLabel, OrganizationJAXBSchema.REF_NAME));
-			String id = NuxeoUtils.extractId(docModel.getPathAsString());
+			String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri("/orgauthorities/" + this.inAuthority + "/items/" + id);
             ilistItem.setCsid(id);
             list.add(ilistItem);

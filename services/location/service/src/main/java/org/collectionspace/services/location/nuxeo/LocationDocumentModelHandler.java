@@ -161,7 +161,7 @@ public class LocationDocumentModelHandler
 					AuthorityItemJAXBSchema.SHORT_IDENTIFIER));
 			ilistItem.setRefName((String) docModel.getProperty(commonPartLabel,
 					AuthorityItemJAXBSchema.REF_NAME));
-			String id = NuxeoUtils.extractId(docModel.getPathAsString());
+			String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
 			ilistItem.setUri("/locationauthorities/" + inAuthority + "/items/"
 					+ id);
 			ilistItem.setCsid(id);

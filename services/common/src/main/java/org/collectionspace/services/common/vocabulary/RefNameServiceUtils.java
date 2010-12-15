@@ -155,7 +155,7 @@ public class RefNameServiceUtils {
         while (iter.hasNext()) {
             DocumentModel docModel = iter.next();
             AuthorityRefDocList.AuthorityRefDocItem ilistItem = new AuthorityRefDocList.AuthorityRefDocItem();
-            String csid = NuxeoUtils.extractId(docModel.getPathAsString());
+            String csid = NuxeoUtils.getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
             String docType = docModel.getDocumentType().getName();
             ServiceBindingType sb = queriedServiceBindings.get(docType);
             if (sb == null) {

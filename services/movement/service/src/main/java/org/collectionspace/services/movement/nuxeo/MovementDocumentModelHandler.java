@@ -149,7 +149,7 @@ public class MovementDocumentModelHandler
             GregorianCalendar gcal = (GregorianCalendar) docModel.getProperty(label,
                     MovementJAXBSchema.LOCATION_DATE);
             ilistItem.setLocationDate(DateTimeFormatUtils.formatAsISO8601Timestamp(gcal));
-            String id = NuxeoUtils.extractId(docModel.getPathAsString());
+            String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
             ilistItem.setUri(getServiceContextPath() + id);
             ilistItem.setCsid(id);
             list.add(ilistItem);

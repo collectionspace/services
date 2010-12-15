@@ -194,7 +194,7 @@ public class ContactDocumentModelHandler
             // See CSPACE-1018
             clistItem.setAddressPlace((String) docModel.getProperty(getServiceContext().getCommonPartLabel(),
                     ContactJAXBSchema.ADDRESS_PLACE));
-            String id = NuxeoUtils.extractId(docModel.getPathAsString());
+            String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
             clistItem.setUri(getServiceContextPath() + id);
             clistItem.setCsid(id);
             list.add(clistItem);
