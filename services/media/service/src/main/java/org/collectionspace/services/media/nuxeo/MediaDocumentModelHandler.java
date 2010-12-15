@@ -23,50 +23,43 @@
  */
 package org.collectionspace.services.media.nuxeo;
 
-import java.util.List;
-
 import org.collectionspace.services.MediaJAXBSchema;
-import org.collectionspace.services.blob.BlobsCommon;
-import org.collectionspace.services.common.DocHandlerBase;
+import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
-import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
-import org.collectionspace.services.media.MediaCommon;
-import org.collectionspace.services.media.MediaCommonList;
-import org.collectionspace.services.media.MediaCommonList.MediaListItem;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.jaxb.BlobJAXBSchema;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.collectionspace.services.media.MediaCommon;
 import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+
+import java.util.List;
 
 /**
  * The Class MediaDocumentModelHandler.
  */
 public class MediaDocumentModelHandler
         extends DocHandlerBase<MediaCommon, AbstractCommonList> {
-	
-    public final String getNuxeoSchemaName(){
-        return "media";
-    }
 
-    public String getSummaryFields(AbstractCommonList commonList){
-        return "title|source|filename|identificationNumber|uri|csid";
+    public static DocHandlerBase.CommonListReflection clr;
+    static {
+        clr = new DocHandlerBase.CommonListReflection();
+        clr.NuxeoSchemaName= "media";
+        clr.SummaryFields = "title|source|filename|identificationNumber|uri|csid";
+        clr.AbstractCommonListClassname = "org.collectionspace.services.media.MediaCommonList";
+        clr.CommonListItemClassname =     "org.collectionspace.services.media.MediaCommonList$MediaListItem";
+        clr.ListItemMethodName = "getMediaListItem";
+        clr.ListItemsArray =   new String[][]   {{"setTitle", "title"},
+                                                 {"setSource", "source"},
+                                                 {"setFilename", "filename"},
+                                                 {"setIdentificationNumber", "identificationNumber"}
+                                                 };
     }
+    public DocHandlerBase.CommonListReflection getCommonListReflection(){
+        return clr;
+    }
+    //==============================================================================
 
-    public AbstractCommonList createAbstractCommonListImpl(){
-        return new MediaCommonList();
-    }
-
-    public List createItemsList(AbstractCommonList commonList){
-        List list = ((MediaCommonList)commonList).getMediaListItem();
-        return list;
-    }
-    
 	private MediaCommon getCommonPartProperties(DocumentModel docModel) throws Exception {
 		String label = getServiceContext().getCommonPartLabel();
 		MediaCommon result = new MediaCommon();
@@ -77,18 +70,7 @@ public class MediaDocumentModelHandler
 		return result;
 	}
     
-    public Object createItemForCommonList(DocumentModel docModel, String label, String id) throws Exception {
-        MediaListItem item = new MediaListItem();
-        item.setTitle((String) docModel.getProperty(label, MediaJAXBSchema.title));
-        item.setSource((String) docModel.getProperty(label, MediaJAXBSchema.source));
-        item.setFilename((String) docModel.getProperty(label, MediaJAXBSchema.filename));
-        item.setIdentificationNumber((String) docModel.getProperty(label, MediaJAXBSchema.identificationNumber));
-        item.setUri(getServiceContextPath() + id);
-        item.setCsid(id);
-        return item;
-    }
-    
-	@Override
+    @Override
 	public void extractAllParts(DocumentWrapper<DocumentModel> wrapDoc)
 			throws Exception {
 		ServiceContext ctx = this.getServiceContext();

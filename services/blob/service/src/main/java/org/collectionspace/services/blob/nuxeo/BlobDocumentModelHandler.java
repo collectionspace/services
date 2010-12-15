@@ -23,39 +23,24 @@
  */
 package org.collectionspace.services.blob.nuxeo;
 
-import java.io.InputStream;
-import java.util.Iterator;
-import java.util.List;
-
-import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.jaxb.BlobJAXBSchema;
-
+import org.collectionspace.services.blob.BlobsCommon;
+import org.collectionspace.services.blob.BlobsCommonList;
+import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.blob.BlobOutput;
 import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentWrapper;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
-import org.collectionspace.services.common.DocHandlerBase;
-
-import org.collectionspace.services.blob.BlobsCommonList;
-import org.collectionspace.services.blob.BlobsCommon;
-import org.collectionspace.services.blob.BlobsCommonList.BlobListItem;
-
-import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.nuxeo.ecm.core.api.ClientException;
-
+import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * The Class BlobDocumentModelHandler.
@@ -65,30 +50,33 @@ extends DocHandlerBase<BlobsCommon, AbstractCommonList> {
 
 	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(BlobDocumentModelHandler.class);
-	
-	public final String getNuxeoSchemaName(){
-		return "blobs";
-	}
 
-	public String getSummaryFields(AbstractCommonList commonList){
-		return "name|mimeType|encoding|length|uri|csid";
-	}
+    public static DocHandlerBase.CommonListReflection clr;
+    static {
+        clr = new DocHandlerBase.CommonListReflection();
+        clr.NuxeoSchemaName= "blobs";
+        clr.SummaryFields = "name|mimeType|encoding|length|uri|csid";
+        clr.AbstractCommonListClassname = "org.collectionspace.services.blob.BlobsCommonList";
+        clr.CommonListItemClassname =     "org.collectionspace.services.blob.BlobsCommonList$BlobListItem";
+        clr.ListItemMethodName = "getBlobListItem";
+        clr.ListItemsArray =   new String[][]   {{"setEncoding", "encoding"},
+                                                 {"setMimeType", "mimeType"},
+                                                 {"setName", "name"},
+                                                 {"setLength", "length"}
+                                                 };
+    }
+    public DocHandlerBase.CommonListReflection getCommonListReflection(){
+        return clr;
+    }
 
-	public AbstractCommonList createAbstractCommonListImpl(){
-		return new BlobsCommonList();
-	}
+    //==============================================================================
 
-	public List createItemsList(AbstractCommonList commonList){
-		List list = ((BlobsCommonList)commonList).getBlobListItem();
-		return list;
-	}
-		
 	private String getDerivativePathBase(DocumentModel docModel) {
 		return getServiceContextPath() + docModel.getName() + "/" +
 			BlobInput.URI_DERIVATIVES_PATH + "/";
 	}
 
-	public Object createItemForCommonList(DocumentModel docModel, String label, String id) throws Exception {
+	/*public Object createItemForCommonList(DocumentModel docModel, String label, String id) throws Exception {
 		BlobListItem item = new BlobListItem();
 		item.setEncoding((String)
 				docModel.getProperty(label, BlobJAXBSchema.encoding));
@@ -104,7 +92,7 @@ extends DocHandlerBase<BlobsCommon, AbstractCommonList> {
 		item.setCsid(id);
 		return item;
 	}
-
+    */
 	private BlobsCommon getCommonPartProperties(DocumentModel docModel) throws Exception {
 		String label = getServiceContext().getCommonPartLabel();
 		BlobsCommon result = new BlobsCommon();
