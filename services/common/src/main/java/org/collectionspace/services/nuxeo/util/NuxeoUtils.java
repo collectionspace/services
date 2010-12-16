@@ -31,18 +31,26 @@ import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
 
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.PathRef;
+import org.nuxeo.ecm.core.api.IterableQueryResult;
 import org.nuxeo.ecm.core.api.model.DocumentPart;
+
 import org.nuxeo.ecm.core.io.DocumentPipe;
 import org.nuxeo.ecm.core.io.DocumentReader;
 import org.nuxeo.ecm.core.io.DocumentWriter;
 import org.nuxeo.ecm.core.io.impl.DocumentPipeImpl;
 import org.nuxeo.ecm.core.io.impl.plugins.SingleDocumentReader;
 import org.nuxeo.ecm.core.io.impl.plugins.XMLDocumentWriter;
+
+import org.nuxeo.ecm.core.search.api.client.querymodel.descriptor.QueryModelDescriptor;
+import org.nuxeo.ecm.core.storage.sql.jdbc.ResultSetQueryResult;
+import org.nuxeo.ecm.core.query.sql.NXQL;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -237,5 +245,51 @@ public class NuxeoUtils {
         }
         id = stz.nextToken(); //last token is id
         return id;
+    }
+    
+    public static boolean documentExists(RepositoryInstance repoSession,
+    		String csid) throws ClientException {
+		boolean result = false;
+		
+		/*
+		 * This is the code that Nuxeo support suggested, however it will not work with their
+		 * remote API's -it only works locally.
+		
+				String qname = QueryModelDescriptor.prepareStringLiteral(csid);
+				String statement = String.format(
+						"SELECT ecm:uuid FROM Document WHERE ecm:name = %s", qname);
+				ResultSetQueryResult res = (ResultSetQueryResult) repoSession
+						.queryAndFetch(statement, "NXQL");
+				result = res.hasNext();
+				if (result = false) {
+					if (logger.isDebugEnabled() == true) {
+						logger.debug("Existance check failed for document with CSID = " + csid);
+					}
+				} else {
+					//String uuid = (String) res.next().get(NXQL.ECM_UUID);
+				}
+		*/
+		
+		/*
+		 * Until I hear back from Nuxeo, we can use the following code:
+		 */
+		String qname = QueryModelDescriptor.prepareStringLiteral(csid);
+		String statement = String.format(
+				"SELECT ecm:uuid FROM Document WHERE ecm:name = %s", qname);
+//		ResultSetQueryResult res = (ResultSetQueryResult) repoSession
+//				.queryAndFetch(statement, "NXQL");
+		DocumentModelList  res = repoSession.query(statement, 1/*return no more than 1*/);//, "NXQL");
+
+//		result = res.hasNext();
+		result = res.iterator().hasNext();
+		if (result = false) {
+			if (logger.isDebugEnabled() == true) {
+				logger.debug("Existance check failed for document with CSID = " + csid);
+			}
+		} else {
+			//String uuid = (String) res.next().get(NXQL.ECM_UUID);
+		}
+			
+		return result;
     }
 }
