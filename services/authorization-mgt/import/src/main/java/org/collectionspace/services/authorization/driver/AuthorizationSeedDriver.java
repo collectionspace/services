@@ -111,7 +111,7 @@ public class AuthorizationSeedDriver {
             authzGen.exportDefaultPermissions(exportDir + File.separator + PERMISSION_FILE);
             authzGen.exportDefaultPermissionRoles(exportDir + File.separator + PERMISSION_ROLE_FILE);
             if (logger.isDebugEnabled()) {
-                logger.debug("authroization generation completed ");
+                logger.debug("authorization generation completed ");
             }
         } catch (Exception ex) {
             if (logger.isDebugEnabled()) {
