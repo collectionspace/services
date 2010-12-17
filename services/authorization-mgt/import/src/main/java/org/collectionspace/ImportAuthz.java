@@ -27,6 +27,7 @@
  */
 package org.collectionspace;
 
+import net.sf.ehcache.CacheException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -46,6 +47,8 @@ public class ImportAuthz {
     final private static String OPTIONS_IMPORT_DIR = "importdir";
     final private static String OPTIONS_EXPORT_DIR = "exportdir";
     final private static String OPTIONS_HELP = "help";
+
+    final private static String MSG_SEPARATOR = "--";
 
     public static void main(String[] args) {
 
@@ -76,9 +79,24 @@ public class ImportAuthz {
             System.err.println("Parsing failed.  Reason: " + exp.getMessage());
         } catch (Exception e) {
             System.out.println("Error : " + e.getMessage());
+            System.out.println(MSG_SEPARATOR);
             printUsage();
+            System.out.println(MSG_SEPARATOR);
+            System.out.println("Import failed: ");
+            printInitialErrorCauseMsg(e);
+            System.exit(1);
         }
 
+    }
+
+    private static void printInitialErrorCauseMsg(Throwable t) {
+        if (t != null) {
+            if (t.getCause() != null) {
+                printInitialErrorCauseMsg(t.getCause());
+            } else {
+               System.out.println(t.getMessage());
+            }
+        }
     }
 
     private static Options createOptions() {
