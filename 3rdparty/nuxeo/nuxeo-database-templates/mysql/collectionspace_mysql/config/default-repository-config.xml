@@ -262,10 +262,7 @@
           <field type="largetext">intakes_common:fieldCollectionNote</field>
           <field type="largetext">intakes_common:insuranceNote</field>
           <field type="largetext">intakes_common:conditionCheckNote</field>
-          
-          <!-- FIXME: multivalued fields - need to verify schema and field name -->
-          <field type="largetext">intakes_common:conditionCheckReasons</field>
-          <field type="largetext">intakes_common:currentLocationNote</field>
+          <field type="largetext">currentLocationNote</field>
 
 
           <!-- =========================================================== -->
