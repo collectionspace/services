@@ -380,6 +380,58 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
 
     }
 
+
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+        dependsOnMethods = {"createList", "read"})
+    public void readListPaginated(String testName) throws Exception {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        // Perform setup.
+        setupReadList();
+
+        Long pageSize=1L;
+        Long pageNumber=0L;
+        RelationClient client = new RelationClient();
+        ClientResponse<RelationsCommonList> res = client.readList("", //subjectCsid,
+                                                                  "", //subjectType,
+                                                                  "", //predicate,
+                                                                  "", //objectCsid,
+                                                                  "", //objectType,
+                                                                  "", //sortBy,
+                                                                  pageSize,
+                                                                  pageNumber);
+        RelationsCommonList list = res.getEntity();
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+
+        // Optionally output additional data about list members for debugging.
+        boolean iterateThroughList = false;
+        if(iterateThroughList && logger.isDebugEnabled()){
+            List<RelationsCommonList.RelationListItem> items =
+                    list.getRelationListItem();
+            int i = 0;
+            for(RelationsCommonList.RelationListItem item : items){
+                logger.debug(testName + ": list-item[" + i + "] csid=" +
+                        item.getCsid());
+                logger.debug(testName + ": list-item[" + i + "] URI=" +
+                        item.getUri());
+                i++;
+            }
+        }
+
+    }
+
+
     // Failure outcomes
     // None at present.
 

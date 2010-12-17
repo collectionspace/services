@@ -114,6 +114,18 @@ public class RelationClient extends AbstractServiceClientImpl {
 		return relationProxy.readList(subjectCsid, subjectType, predicate, objectCsid, objectType);
 	}
 
+    public ClientResponse<RelationsCommonList> readList(String subjectCsid,
+            String subjectType,
+            String predicate,
+            String objectCsid,
+            String objectType,
+            String sortBy,
+            Long pageSize,
+            Long pageNumber) {
+        return relationProxy.readList(subjectCsid, subjectType, predicate, objectCsid, objectType, sortBy, pageSize, pageNumber);
+    }
+
+
 	/**
 	 * Read.
 	 *
