@@ -109,6 +109,9 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
                 documentModel.setProperty(DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA,
                                 DocumentModelHandler.COLLECTIONSPACE_CORE_CREATED_AT,
                                 now);
+                documentModel.setProperty(DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA,
+                                                DocumentModelHandler.COLLECTIONSPACE_CORE_UPDATED_AT,
+                                                now);
                 break;
             case UPDATE:
                 documentModel.setProperty(DocumentModelHandler.COLLECTIONSPACE_CORE_SCHEMA,
