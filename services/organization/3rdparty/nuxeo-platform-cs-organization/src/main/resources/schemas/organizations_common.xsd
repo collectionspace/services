@@ -64,13 +64,7 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="historyNotes">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="historyNote" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+    <xs:element name="historyNotes" type="historyNotes"/>
 
     <xs:complexType name="mainBodyGroupList">
         <xs:sequence>
@@ -83,6 +77,12 @@
             <xs:element name="longName" type="xs:string"/>
             <xs:element name="shortName" type="xs:string"/>
             <xs:element name="nameAdditions" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="historyNotes">
+        <xs:sequence>
+            <xs:element name="historyNote" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 

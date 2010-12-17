@@ -18,19 +18,25 @@
           <!-- * -->
           
           <!-- =========================================================== -->
-          <!-- Acquisition fields -->
+          <!-- Acquisition -->
           <!-- =========================================================== -->
-          
+
+          <field type="largetext">acquisitionFundingSourceProvisos</field>
           <field type="largetext">acquisitions_common:acquisitionNote</field>
           <field type="largetext">acquisitions_common:acquisitionProvisos</field>
           <field type="largetext">acquisitions_common:acquisitionReason</field>
+          <field type="largetext">acquisitions_common:creditLine</field>
+
           
-          <!-- Add in 1.1 per CSPACE-2769 -->
-          <!-- field type="largetext">acquisitions_common:creditLine</field -->
-          
+          <!-- =========================================================== -->
+          <!-- Blob -->
+          <!-- =========================================================== -->
+
+          <!-- No largetext fields identified to date -->
+
 
           <!-- =========================================================== -->
-          <!-- CollectionObject / Cataloging fields -->
+          <!-- CollectionObject / Cataloging -->
           <!-- =========================================================== -->
           
           <!-- Object Identification Information -->
@@ -242,13 +248,13 @@
 
 
           <!-- =========================================================== -->
-          <!-- Contact fields -->
+          <!-- Contact -->
           <!-- =========================================================== -->
           <field type="largetext">contacts_common:addressPlace</field>
           
 
           <!-- =========================================================== -->
-          <!-- Intake fields -->
+          <!-- Intake -->
           <!-- =========================================================== -->
           
           <field type="largetext">intakes_common:entryNote</field>
@@ -263,7 +269,7 @@
 
 
           <!-- =========================================================== -->
-          <!-- Loan In fields -->
+          <!-- Loan In -->
           <!-- =========================================================== -->
           
           <field type="largetext">loansin_common:loanInConditions</field>
@@ -271,56 +277,78 @@
  
  
           <!-- =========================================================== -->
-          <!-- Loan Out fields -->
+          <!-- Loan Out -->
           <!-- =========================================================== -->
           
           <field type="largetext">loansout_common:specialConditionsOfLoan</field>
           <field type="largetext">loansout_common:loanOutNote</field>      
- 
+          <field type="largetext">loansout_common:loanPurpose</field>
+          <field type="largetext">loanedObjectStatusNote</field>
+
  
           <!-- =========================================================== -->
-          <!-- Movement fields -->
+          <!-- Movement / Location and Movement Control -->
           <!-- =========================================================== -->
           
           <field type="largetext">movements_common:currentLocationNote</field>
           <field type="largetext">movements_common:movementNote</field>
-          
-                   
-          <!-- =========================================================== -->
-          <!-- Object Exit fields -->
-          <!-- =========================================================== -->
-          
-          <!-- Note: schema name 'objectexit_common' is currently -->
-          <!-- intentionally singular -->
 
+
+          <!-- =========================================================== -->
+          <!-- Media / Media Handling -->
+          <!-- =========================================================== -->
+
+          <field type="largetext">media_common:copyrightStatement</field>
+          <field type="largetext">media_common:description</field>
+          <field type="largetext">media_common:title</field>
+
+
+          <!-- =========================================================== -->
+          <!-- Note -->
+          <!-- =========================================================== -->
+
+          <field type="largetext">notes_common:content</field>
+
+
+          <!-- =========================================================== -->
+          <!-- Object Exit -->
+          <!-- =========================================================== -->
+          
           <field type="largetext">objectexit_common:exitNote</field>
           <field type="largetext">objectexit_common:packingNote</field>
 
 
           <!-- =========================================================== -->
-          <!-- Organization fields -->
+          <!-- Organization -->
           <!-- =========================================================== -->
           
-          <field type="largetext">organizations_common:shortName</field>
-          <field type="largetext">organizations_common:longName</field>
-          <field type="largetext">organizations_common:nameAdditions</field>
-          
-          <!-- FIXME: multivalued field - need to verify schema and field name -->
-          <field type="largetext">organizations_common:historyNotes</field>
+          <field type="largetext">shortName</field>
+          <field type="largetext">longName</field>
+          <field type="largetext">nameAdditions</field>
+          <field type="largetext">historyNote</field>
 
 
           <!-- =========================================================== -->
-          <!-- Person fields -->
+          <!-- Person -->
           <!-- =========================================================== -->
           <field type="largetext">persons_common:bioNote</field>
           <field type="largetext">persons_common:nameNote</field>
 
 
           <!-- =========================================================== -->
-          <!-- Storage Location fields -->
+          <!-- Relation -->
+          <!-- =========================================================== -->
+
+          <!-- No largetext fields identified to date -->
+
+
+          <!-- =========================================================== -->
+          <!-- Storage Location / Location -->
           <!-- =========================================================== -->
           <field type="largetext">locations_common:displayName</field>
           <field type="largetext">locations_common:name</field>
+          <!-- conditionNote will be made part of a repeatable group of fields in a future release -->
+          <field type="largetext">locations_common:conditionNote</field>
           <field type="largetext">locations_common:securityNote</field>
           <field type="largetext">locations_common:accessNote</field>
          
