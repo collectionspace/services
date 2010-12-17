@@ -219,8 +219,8 @@ public abstract class DocHandlerBase<T, TL> extends RemoteDocumentModelHandlerIm
             }
         }
         if (includeStdFields){
-            callSetter(item, "Csid", id);
-            callSetter(item, "Uri", getServiceContextPath() + id);
+            callSetter(item, "setCsid", id);
+            callSetter(item, "setUri", getServiceContextPath() + id);
         }
         return item;
     }
