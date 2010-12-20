@@ -565,8 +565,11 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
     @Override
     public void getFiltered(ServiceContext ctx, DocumentHandler handler)
             throws DocumentNotFoundException, DocumentException {
-        QueryContext queryContext = new QueryContext(ctx, handler);
 
+        DocumentFilter filter =  handler.getDocumentFilter();
+        filter.setOrderByClause("collectionspace_core:updatedAt DESC");  //per http://issues.collectionspace.org/browse/CSPACE-705
+
+        QueryContext queryContext = new QueryContext(ctx, handler);
         RepositoryInstance repoSession = null;
         try {
             handler.prepare(Action.GET_ALL);
