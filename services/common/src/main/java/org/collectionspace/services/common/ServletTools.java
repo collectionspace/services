@@ -250,8 +250,10 @@ public class ServletTools {
                 }
                 authString = authString.substring(6).trim();
                 byte mydata[];
-                sun.misc.BASE64Decoder base64 = new sun.misc.BASE64Decoder();
-                mydata = base64.decodeBuffer(authString);
+//                sun.misc.BASE64Decoder base64 = new sun.misc.BASE64Decoder();
+                org.apache.commons.codec.binary.Base64 base64 = new org.apache.commons.codec.binary.Base64();
+//                mydata = base64.decodeBuffer(authString);
+                mydata = base64.decode(authString);
                 String loginInfo = new String(mydata);
                 int index = loginInfo.indexOf(":");
                 if( index != -1 ){
