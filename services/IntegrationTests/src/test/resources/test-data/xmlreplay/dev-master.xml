@@ -25,10 +25,11 @@
     -->
     
     <!--
+    <run controlFile="loanin/loanin.xml" testGroup="makeone" />
+    
     <run controlFile="objectexit/object-exit.xml" testGroup="CRUDL" />   
     <run controlFile="objectexit/object-exit.xml" testGroup="domwalk" />
     <run controlFile="objectexit/object-exit.xml" testGroup="repeat" />
-    <run controlFile="objectexit/object-exit.xml" testGroup="cleanup" />   
     <run controlFile="objectexit/object-exit.xml" testGroup="domlist" />
     <run controlFile="objectexit/object-exit.xml" testGroup="authrefs" />
     <run controlFile="objectexit/object-exit.xml" testGroup="cleanup" />
@@ -36,7 +37,12 @@
     
     <run controlFile="acquisitions/acquisitions.xml" testGroup="makeone" />
     <run controlFile="acquisitions/acquisitions.xml" testGroup="testList" />
+    
+    <run controlFile="media/media.xml" testGroup="authrefs" />
+    
     -->
+    
+    
     
     
 
