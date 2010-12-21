@@ -159,13 +159,6 @@ public class NuxeoImageUtils {
 		//empty constructor
 	}
 
-	/**
-	 * Logger setup.
-	 */
-	public static void loggerSetup() {
-		//empty method
-	}	
-
 	private static String toStringPictureView(PictureView pictureView) {
 		StringBuffer strBuffer = new StringBuffer();
 		strBuffer.append("Description: " + pictureView.getDescription() + '\n');

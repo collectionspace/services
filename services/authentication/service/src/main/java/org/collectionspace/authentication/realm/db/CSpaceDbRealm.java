@@ -65,10 +65,14 @@ import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+//import org.apache.commons.logging.Log;
+//import org.apache.commons.logging.LogFactory;
+
 import org.collectionspace.authentication.CSpaceTenant;
 import org.collectionspace.authentication.realm.CSpaceRealm;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * CSpaceDbRealm provides access to user, password, role, tenant database
@@ -76,7 +80,8 @@ import org.collectionspace.authentication.realm.CSpaceRealm;
  */
 public class CSpaceDbRealm implements CSpaceRealm {
 
-    private static Log log = LogFactory.getLog(CSpaceDbRealm.class);
+    private Logger logger = LoggerFactory.getLogger(CSpaceDbRealm.class);
+    
     private String datasourceName;
     private String principalsQuery;
     private String rolesQuery;
@@ -108,11 +113,11 @@ public class CSpaceDbRealm implements CSpaceRealm {
         if (tmp != null) {
             suspendResume = Boolean.valueOf(tmp.toString()).booleanValue();
         }
-        if (log.isTraceEnabled()) {
-            log.trace("DatabaseServerLoginModule, dsJndiName=" + datasourceName);
-            log.trace("principalsQuery=" + principalsQuery);
-            log.trace("rolesQuery=" + rolesQuery);
-            log.trace("suspendResume=" + suspendResume);
+        if (logger.isTraceEnabled()) {
+            logger.trace("DatabaseServerLoginModule, dsJndiName=" + datasourceName);
+            logger.trace("principalsQuery=" + principalsQuery);
+            logger.trace("rolesQuery=" + rolesQuery);
+            logger.trace("suspendResume=" + suspendResume);
         }
 
     }
@@ -127,15 +132,15 @@ public class CSpaceDbRealm implements CSpaceRealm {
         try {
             conn = getConnection();
             // Get the password
-            if (log.isDebugEnabled()) {
-                log.debug("Executing query: " + principalsQuery + ", with username: " + username);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Executing query: " + principalsQuery + ", with username: " + username);
             }
             ps = conn.prepareStatement(principalsQuery);
             ps.setString(1, username);
             rs = ps.executeQuery();
             if (rs.next() == false) {
-                if (log.isDebugEnabled()) {
-                    log.debug(principalsQuery + " returned no matches from db");
+                if (logger.isDebugEnabled()) {
+                    logger.debug(principalsQuery + " returned no matches from db");
                 }
                 throw new FailedLoginException("No matching username found");
             }
@@ -180,8 +185,8 @@ public class CSpaceDbRealm implements CSpaceRealm {
     @Override
     public Collection<Group> getRoles(String username, String principalClassName, String groupClassName) throws LoginException {
 
-        if (log.isDebugEnabled()) {
-            log.debug("getRoleSets using rolesQuery: " + rolesQuery + ", username: " + username);
+        if (logger.isDebugEnabled()) {
+            logger.debug("getRoleSets using rolesQuery: " + rolesQuery + ", username: " + username);
         }
 
         Connection conn = null;
@@ -192,8 +197,8 @@ public class CSpaceDbRealm implements CSpaceRealm {
         try {
             conn = getConnection();
             // Get the user role names
-            if (log.isDebugEnabled()) {
-                log.debug("Executing query: " + rolesQuery + ", with username: " + username);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Executing query: " + rolesQuery + ", with username: " + username);
             }
 
             ps = conn.prepareStatement(rolesQuery);
@@ -204,8 +209,8 @@ public class CSpaceDbRealm implements CSpaceRealm {
             }
             rs = ps.executeQuery();
             if (rs.next() == false) {
-                if (log.isDebugEnabled()) {
-                    log.debug("No roles found");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("No roles found");
                 }
 //                if(aslm.getUnauthenticatedIdentity() == null){
 //                    throw new FailedLoginException("No matching username found in Roles");
@@ -234,13 +239,13 @@ public class CSpaceDbRealm implements CSpaceRealm {
 
                 try {
                     Principal p = createPrincipal(principalClassName, roleName);
-                    if (log.isDebugEnabled()) {
-                        log.debug("Assign user to role " + roleName);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Assign user to role " + roleName);
                     }
 
                     group.addMember(p);
                 } catch (Exception e) {
-                    log.error("Failed to create principal: " + roleName + " " + e.toString());
+                    logger.error("Failed to create principal: " + roleName + " " + e.toString());
                 }
 
             } while (rs.next());
@@ -286,8 +291,8 @@ public class CSpaceDbRealm implements CSpaceRealm {
     @Override
     public Collection<Group> getTenants(String username, String groupClassName) throws LoginException {
 
-        if (log.isDebugEnabled()) {
-            log.debug("getTenants using tenantsQuery: " + tenantsQuery + ", username: " + username);
+        if (logger.isDebugEnabled()) {
+            logger.debug("getTenants using tenantsQuery: " + tenantsQuery + ", username: " + username);
         }
 
         Connection conn = null;
@@ -298,8 +303,8 @@ public class CSpaceDbRealm implements CSpaceRealm {
         try {
             conn = getConnection();
             // Get the user role names
-            if (log.isDebugEnabled()) {
-                log.debug("Executing query: " + tenantsQuery + ", with username: " + username);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Executing query: " + tenantsQuery + ", with username: " + username);
             }
 
             ps = conn.prepareStatement(tenantsQuery);
@@ -310,8 +315,8 @@ public class CSpaceDbRealm implements CSpaceRealm {
             }
             rs = ps.executeQuery();
             if (rs.next() == false) {
-                if (log.isDebugEnabled()) {
-                    log.debug("No tenants found");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("No tenants found");
                 }
                 // We are running with an unauthenticatedIdentity so create an
                 // empty Tenants set and return.
@@ -337,13 +342,13 @@ public class CSpaceDbRealm implements CSpaceRealm {
 
                 try {
                     Principal p = createTenant(tenantName, tenantId);
-                    if (log.isDebugEnabled()) {
-                        log.debug("Assign user to tenant " + tenantName);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Assign user to tenant " + tenantName);
                     }
 
                     group.addMember(p);
                 } catch (Exception e) {
-                    log.error("Failed to create tenant: " + tenantName + " " + e.toString());
+                    logger.error("Failed to create tenant: " + tenantName + " " + e.toString());
                 }
             } while (rs.next());
         } catch (SQLException ex) {

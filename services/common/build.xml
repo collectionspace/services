@@ -139,6 +139,13 @@
         </copy>
     </target>
 
+    <target name="deploy_slf4j"
+            description="deploy spring binaries in ${jboss.server.cspace}">
+        <copy todir="${jboss.server.cspace}/lib">
+            <fileset dir="${basedir}/lib/slf4j"/>
+        </copy>
+    </target>
+
     <target name="deploy" depends="install"
             description="deploy common elements in ${jboss.server.cspace}">
         <copy tofile="${jboss.server.cspace}/conf/jboss-log4j.xml.org"
@@ -153,6 +160,7 @@
               />
         <antcall target="deploy_jpa" />
         <antcall target="deploy_spring" />
+        <antcall target="deploy_slf4j" />
         <copy todir="${jboss.server.cspace}/cspace/config/services">
             <fileset dir="${basedir}/src/main/config/services"/>
         </copy>
@@ -161,6 +169,7 @@
     <target name="undeploy"
             description="undeploy common elements from ${jboss.server.cspace}">
         <antcall target="undeploy_spring" />
+		<antcall target="undeploy_slf4j" />
         <copy tofile="${jboss.server.cspace}/conf/jboss-log4j.xml"
               file="${jboss.server.cspace}/conf/jboss-log4j.xml.org"
               overwrite="true" failonerror="false" />
@@ -168,15 +177,21 @@
         <delete failonerror="false" dir="${jboss.server.cspace}/cspace/config/services"/>
     </target>
 
-
     <target name="undeploy_spring"
             description="undeploy spring binaries from ${jboss.server.cspace}">
         <delete>
-
             <fileset dir="${jboss.server.cspace}/lib" includes="org.springframework.*.jar"/>
             <fileset dir="${jboss.server.cspace}/lib" includes="spring-security*.jar"/>
         </delete>
     </target>
+	
+    <target name="undeploy_slf4j"
+            description="undeploy spring binaries from ${jboss.server.cspace}">
+        <delete>
+            <fileset dir="${jboss.server.cspace}/lib" includes="slf4j*.jar"/>
+        </delete>
+    </target>
+	
 
     <target name="dist_jpa"
             description="dist jpa binaries in ${dist.server.cspace}">

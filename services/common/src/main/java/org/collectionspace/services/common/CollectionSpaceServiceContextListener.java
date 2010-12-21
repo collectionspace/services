@@ -22,8 +22,8 @@ public class CollectionSpaceServiceContextListener implements ServletContextList
 
             //create repository select to stop jboss from jamming
             //our log on top of theirs
-            LogManager.setRepositorySelector(new CollectionSpaceLog4jRepositorySelector(),
-                    null);
+//            LogManager.setRepositorySelector(new CollectionSpaceLog4jRepositorySelector(),
+//                    null);
 
             ServiceMain svcMain = ServiceMain.getInstance(); //first access initializes as well
             svcMain.retrieveAllWorkspaceIds();

@@ -89,17 +89,6 @@ public class Profiler {
         init(messagePrefix, messageIndent);
     }
 
-    /*
-     * For some reason, we need to call this method "early" at startup time for our
-     * Logger instance to get created correctly.  FIXME: REM - Can we figure this out and fix it?
-     */
-    /**
-     * Setup.
-     */
-    public static void setup() {
-        //do nothing
-    }
-
     private void init(String messagePrefix, int messageIndent) {
         this.setMessagePrefix(messagePrefix);
         this.setMessageIndent(messageIndent);
@@ -189,6 +178,10 @@ public class Profiler {
         if (getLogger().isDebugEnabled()) {
             getLogger().debug(formatLogMessage(msg));
         }
+        if (getLogger().isTraceEnabled()) {
+            getLogger().trace("[TRACE] " + formatLogMessage(msg));
+        }
+        
     }
 
     /**

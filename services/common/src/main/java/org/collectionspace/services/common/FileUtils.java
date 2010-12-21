@@ -29,13 +29,6 @@ public class FileUtils {
 	
 	private static final String TMP_FILE_PREFIX = "cspace_blob_";
 	
-	/**
-	 * Logger setup.
-	 */
-	public static void loggerSetup() {
-		//empty method
-	}
-	
 	static public File createTmpFile(InputStream streamIn,
 			String filePrefix) {
 		File result = null;

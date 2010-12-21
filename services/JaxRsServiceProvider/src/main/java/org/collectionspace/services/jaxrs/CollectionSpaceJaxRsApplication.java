@@ -70,15 +70,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
     private Set<Object> singletons = new HashSet<Object>();
     private Set<Class<?>> empty = new HashSet<Class<?>>();    
 
-    public CollectionSpaceJaxRsApplication() {
-    	//
-    	// Setup the profiler logger
-    	//
-    	Profiler.setup();
-    	DocumentUtils.loggerSetup();
-    	NuxeoImageUtils.loggerSetup();
-    	FileUtils.loggerSetup();
-    	
+    public CollectionSpaceJaxRsApplication() {    	
     	//
     	// Instantiate all our JaxRS resources
     	//

@@ -23,23 +23,29 @@
  */
 package org.collectionspace.authentication.jaas;
 
-import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import java.util.Map;
+
+import java.security.acl.Group;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginException;
+
 import org.collectionspace.authentication.realm.db.CSpaceDbRealm;
 import org.jboss.security.auth.spi.UsernamePasswordLoginModule;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * CollectionSpace default identity provider supporting multi-tenancy
  * @author
  */
 public class CSpaceJBossDBLoginModule extends UsernamePasswordLoginModule {
+
+    private Logger logger = LoggerFactory.getLogger(CSpaceJBossDBLoginModule.class);
 
     private CSpaceDbRealm realm;
 
@@ -61,8 +67,6 @@ public class CSpaceJBossDBLoginModule extends UsernamePasswordLoginModule {
         super.initialize(subject, callbackHandler, sharedState, options);
         realm = new CSpaceDbRealm(options);
     }
-    //disabled due to classloading problem
-//    private Logger logger = LoggerFactory.getLogger(CSpaceDBLoginModule.class);
 
     protected String getUsersPassword() throws LoginException {
 
@@ -71,8 +75,8 @@ public class CSpaceJBossDBLoginModule extends UsernamePasswordLoginModule {
         try {
             password = realm.getUsersPassword(username);
             password = convertRawPassword(password);
-            if (log.isDebugEnabled()) {
-                log.debug("Obtained user password");
+            if (logger.isDebugEnabled()) {
+            	logger.debug("Obtained user password for: " + username);
             }
         } catch (LoginException lex) {
             throw lex;

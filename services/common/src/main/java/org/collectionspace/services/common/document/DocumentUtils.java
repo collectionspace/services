@@ -226,13 +226,6 @@ public class DocumentUtils {
 	}
 	
 	/**
-	 * Logger setup.
-	 */
-	public static void loggerSetup() {
-		//empty method
-	}
-
-	/**
 	 * parseProperties given payload to create XML document. this
 	 * method also closes given stream after parsing.
 	 * @param payload stream
