@@ -17,15 +17,16 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.security.auth.login.LoginException;
 import javax.sql.DataSource;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.document.IInitHandler;
 import org.collectionspace.services.common.security.SecurityUtils;
+import org.collectionspace.services.common.service.*;
 import org.collectionspace.services.common.tenant.TenantBindingType;
 import org.collectionspace.services.common.types.PropertyItemType;
 import org.collectionspace.services.common.types.PropertyType;
+import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.nuxeo.client.java.NuxeoConnector;
 import org.collectionspace.services.nuxeo.client.java.TenantRepository;
 import org.slf4j.Logger;
@@ -89,8 +90,7 @@ public class ServiceMain {
         return instance;
     }
 
-    private void initialize() throws Exception {
-        setServerRootDir();
+    private void initialize() throws Exception {        setServerRootDir();
         readConfig();
         propagateConfiguredProperties();
         try {
@@ -98,11 +98,18 @@ public class ServiceMain {
         } catch(Exception e) {
         	logger.error("Default Account setup failed on exception: "+e.getLocalizedMessage());
         }
+        try {
+            //loadDocHandlers();
+            firePostInitHandlers();
+        } catch(Exception e) {
+            logger.error("ServiceMain.initialize firePostInitHandlers failed on exception: "+e.getLocalizedMessage());
+        }
+
         if (getClientType().equals(ClientType.JAVA)) {
             nuxeoConnector = NuxeoConnector.getInstance();
-            nuxeoConnector.initialize(
-                    getServicesConfigReader().getConfiguration().getRepositoryClient());
+            nuxeoConnector.initialize(getServicesConfigReader().getConfiguration().getRepositoryClient());
         }
+
     }
 
     /**
@@ -508,7 +515,86 @@ public class ServiceMain {
     private String getDefaultReaderUserID(String tenantName) {
     	return TENANT_READER_ACCT_PREFIX+tenantName;
     }
-    
+
+    private void firePostInitHandlers() throws Exception {
+        Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
+        //Loop through all tenants in tenant-bindings.xml
+        for (TenantBindingType tbt: tenantBindingTypeMap.values()){
+            //String name = tbt.getName();
+            //String id = tbt.getId();
+            //Loop through all the services in this tenant
+            List<ServiceBindingType> sbtList = tbt.getServiceBindings();
+            for (ServiceBindingType sbt: sbtList){
+                //Get the list of InitHandler elements, extract the first one (only one supported right now) and fire it using reflection.
+                List<org.collectionspace.services.common.service.InitHandler> list = sbt.getInitHandler();
+                if (list!=null && list.size()>0){
+                    org.collectionspace.services.common.service.InitHandler handlerType = list.get(0);
+                    String initHandlerClassname = handlerType.getClassname();
+                    org.collectionspace.services.common.service.InitHandler.Fields ft = handlerType.getFields();
+                    List<String> fields = ft.getField();
+                    Object o = instantiate(initHandlerClassname, IInitHandler.class);
+                    if (o != null && o instanceof IInitHandler){
+                        IInitHandler handler = (IInitHandler)o;
+                        handler.onRepositoryInitialized(sbt, fields);
+                        //The InitHandler may be the default one,
+                        //  or specialized classes which still implement this interface and are registered in tenant-bindings.xml.
+                    }
+                }
+            }
+        }
+    }
+
+
+    public Object instantiate(String clazz, Class castTo) throws Exception {
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        clazz = clazz.trim();
+        Class<?> c = tccl.loadClass(clazz);
+        if (castTo.isAssignableFrom(c)) {
+            return c.newInstance();
+        }
+        return null;
+    }
+
+    private void loadDocHandlers() throws Exception {
+        Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
+        for (TenantBindingType tbt: tenantBindingTypeMap.values()){
+            String name = tbt.getName();
+            String id = tbt.getId();
+
+            List<ServiceBindingType> sbtList = tbt.getServiceBindings();
+            for (ServiceBindingType sbt: sbtList){
+                DocHandlerParams params = sbt.getDocHandlerParams();
+                if (params!=null){
+                    params.getClassname();
+                    DocHandlerParams.Params p = params.getParams();
+                    DocHandlerBase.CommonListReflection clr = new DocHandlerBase.CommonListReflection();
+                    //List<ListItemsArray> items = p.getListItemsArrays();   //todo: this thing only returns one row. xsd is wrong.  tenant-bindings.xml has an example of multiple elements in loansin.
+                    List<ListItemsArray> items = /*DocHandlerParams.Params.ListItemsArrays items =*/
+                            p.getListItemsArrays().getListItemsArray();   //todo: this thing only returns one row. xsd is wrong.  tenant-bindings.xml has an example of multiple elements in loansin.
+                    int size = items.size();
+                    String[][] rows = new String[size][4];
+                    int r = 0;
+                    for (ListItemsArray item: items){
+                        String[] row = rows[r];
+                        row[0] = item.getSetter();
+                        row[1] = item.getElement();
+                        row[2] = item.getContainer();
+                        row[3] = item.getSubelement();
+                        r++;
+                    }
+                    clr.ListItemsArray = rows;
+                    clr.AbstractCommonListClassname = p.getAbstractCommonListClassname();
+                    clr.CommonListItemClassname = p.getCommonListItemClassname();
+                    clr.DublinCoreTitle = p.getDublinCoreTitle();
+                    clr.ListItemMethodName = p.getListItemMethodName();
+                    clr.NuxeoSchemaName = p.getNuxeoSchemaName();
+                    clr.SummaryFields = p.getSummaryFields();
+                }
+            }
+        }
+    }
+
+
     private Connection getConnection() throws LoginException, SQLException {
         InitialContext ctx = null;
         Connection conn = null;

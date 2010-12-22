@@ -232,9 +232,50 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.loanin.nuxeo.LoaninDocumentModelHandler
             </service:documentHandler>
+            <service:DocHandlerParams xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.loanin.nuxeo.LoaninDocumentModelHandler</service:classname>
+                <service:params>
+                     <service:NuxeoSchemaName>loansin</service:NuxeoSchemaName>
+                     <service:DublinCoreTitle>loansin</service:DublinCoreTitle>
+                     <service:SummaryFields>loanInNumber|lenderList|loanReturnDate|uri|csid</service:SummaryFields>
+                     <service:NuxeoSchemaName>loansin</service:NuxeoSchemaName>
+                     <service:AbstractCommonListClassname>org.collectionspace.services.loanin.LoansinCommonList</service:AbstractCommonListClassname>
+                     <service:CommonListItemClassname>org.collectionspace.services.loanin.LoansinCommonList$LoaninListItem</service:CommonListItemClassname>
+                     <service:ListItemMethodName>getLoaninListItem</service:ListItemMethodName>
+                     <service:ListItemsArrays>
+                         <service:ListItemsArray>
+                             <service:setter>setLoanInNumber</service:setter>
+                             <service:element>loanInNumber</service:element>
+                             <service:container></service:container>
+                             <service:subelement></service:subelement>
+                         </service:ListItemsArray>
+
+                        <service:ListItemsArray>
+                            <service:setter>setLender</service:setter>
+                            <service:element>lenderList</service:element>
+                            <service:container>lenderGroupList</service:container>
+                            <service:subelement>lender</service:subelement>
+                        </service:ListItemsArray>
+
+                        <service:ListItemsArray>
+                            <service:setter>setLoanReturnDate</service:setter>
+                            <service:element>loanReturnDate</service:element>
+                            <service:container></service:container>
+                            <service:subelement></service:subelement>
+                        </service:ListItemsArray>
+                    </service:ListItemsArrays>
+                </service:params>
+            </service:DocHandlerParams>
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.loanin.nuxeo.LoaninValidatorHandler
             </service:validatorHandler>
+            <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.common.InitHandler</service:classname>
+                <service:fields>
+                    <service:field>ID</service:field>
+                    <service:field>Foo</service:field>
+                </service:fields>
+            </service:initHandler>
             <service:properties xmlns:service='http://collectionspace.org/services/common/service'>
                 <!-- What to use for name???
                 <types:item><types:key>objectNameProperty</types:key><types:value>objectName</types:value></types:item> -->
@@ -388,6 +429,14 @@
                 <service:part id="1" control_group="Managed"
                               versionable="true" auditable="false"
                               label="media_common" updated="" order="1">
+                    <service:properties>
+                        <types:item><types:key>authRef</types:key><types:value>contributor</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>coverage</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>creator</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>publisher</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>rightsHolder</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>subjects|subject</types:value></types:item>
+                   </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/media"
@@ -1671,6 +1720,16 @@
                 <service:part id="1" control_group="Managed"
                               versionable="true" auditable="false"
                               label="media_common" updated="" order="1">
+
+                    <service:properties>
+                        <types:item><types:key>authRef</types:key><types:value>contributor</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>coverage</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>creator</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>publisher</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>rightsHolder</types:value></types:item>
+                        <types:item><types:key>authRef</types:key><types:value>subjects|subject</types:value></types:item>
+                   </service:properties>
+
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/media"

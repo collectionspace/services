@@ -38,9 +38,15 @@
             <xs:element name="object" type="ServiceObjectType" minOccurs="1" maxOccurs="1"/>
             <!-- document handler to be used to process the content (need to be in classpath) -->
             <xs:element name="documentHandler" type="xs:string" minOccurs="1" maxOccurs="1"/>
+
+            <xs:element name="DocHandlerParams" type="DocHandlerParams" minOccurs="0" maxOccurs="1"/>
+
             <!-- validator handler(s) to be used to validate the content (need to be in classpath) -->
             <!-- validator handler is called for create (POST) and update (PUT) requests only -->
             <xs:element name="validatorHandler" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <!-- initHandler is a post-init task after the Nuxeo repository is available. -->
+            <!-- worked: <xs:element name="initHandler" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>-->
+            <xs:element name="initHandler" type="initHandler" minOccurs="0" maxOccurs="unbounded"/>
             <!-- name of the repository domain -->
             <xs:element name="repositoryDomain" type="xs:string" minOccurs="0" maxOccurs="1"/>
             <!-- repositoryWorkspaceId could be workspace id -->
@@ -174,5 +180,63 @@
             </xs:simpleType>
         </xs:attribute>
     </xs:complexType>
+
+    <xs:complexType name="FieldsType">
+        <xs:sequence>
+            <xs:element name="field" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="initHandler">
+        <xs:sequence>
+            <xs:element name="classname" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <!--<xs:element name="fields" type="FieldsType" minOccurs="0" maxOccurs="1"/>-->
+            <xs:element name="fields">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="field" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+           </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DocHandlerParams">
+        <xs:sequence>
+            <xs:element name="classname" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="params">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="NuxeoSchemaName" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="DublinCoreTitle" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="SummaryFields" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="AbstractCommonListClassname" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="CommonListItemClassname" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="ListItemMethodName" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="ListItemsArrays" minOccurs="1" maxOccurs="1">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="ListItemsArray" type="ListItemsArray" minOccurs="0" maxOccurs="unbounded"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+           </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ListItemsArray">
+        <xs:sequence>
+            <xs:element name="setter" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="element" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="container" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="subelement" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+
+
+
 
 </xs:schema>

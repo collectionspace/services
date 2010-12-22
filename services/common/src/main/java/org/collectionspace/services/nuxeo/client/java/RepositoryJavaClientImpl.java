@@ -567,8 +567,10 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
             throws DocumentNotFoundException, DocumentException {
 
         DocumentFilter filter =  handler.getDocumentFilter();
-        //filter.setOrderByClause("collectionspace_core:updatedAt DESC");  //per http://issues.collectionspace.org/browse/CSPACE-705
-
+        String oldOrderBy = filter.getOrderByClause();
+        if (oldOrderBy!=null && oldOrderBy.isEmpty()){
+            filter.setOrderByClause("collectionspace_core:updatedAt DESC");  //per http://issues.collectionspace.org/browse/CSPACE-705
+        }
         QueryContext queryContext = new QueryContext(ctx, handler);
         RepositoryInstance repoSession = null;
         try {
