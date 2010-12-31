@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 1
+Bundle-Name: Nuxeo Quote project
+Bundle-SymbolicName: org.collectionspace.ecm.platform.quote.tests;singleton=true
+Bundle-Vendor: Nuxeo

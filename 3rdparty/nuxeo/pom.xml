@@ -15,6 +15,8 @@
 
     <modules>
         <module>nuxeo-platform-collectionspace</module>
+		<module>nuxeo-platform-quote-api</module>
+		<module>nuxeo-platform-quote</module>
     </modules>
 
     <dependencies>

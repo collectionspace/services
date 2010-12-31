@@ -16,6 +16,11 @@
 
         <!-- CollectionSpace dependencies -->
         <dependency>
+			<groupId>org.collectionspace.services</groupId>
+			<artifactId>org.collectionspace.services.3rdparty.nuxeo.quote-api</artifactId>        
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.jaxb</artifactId>
             <version>${project.version}</version>
@@ -194,7 +199,7 @@
 	    <dependency>
 	      <groupId>org.nuxeo.ecm.platform</groupId>
 	      <artifactId>nuxeo-platform-filemanager-api</artifactId>
-	      <version>${nuxeo.platform.version}</version>
+		  <version>${nuxeo.platform.version}</version>	      
 	    </dependency>
         <dependency>
             <groupId>org.nuxeo.common</groupId>

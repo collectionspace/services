@@ -116,6 +116,8 @@ import org.collectionspace.services.blob.BlobsCommonList;
 import org.collectionspace.services.blob.BlobsCommonList.BlobListItem;
 import org.collectionspace.services.common.blob.BlobOutput;
 
+import org.collectionspace.ecm.platform.quote.api.QuoteManager;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class NuxeoImageUtils.
@@ -208,6 +210,17 @@ public class NuxeoImageUtils {
 		IdRef documentRef = new IdRef(repositoryId);
 		DocumentModel documentModel = repoSession.getDocument(documentRef);		
 		DocumentBlobHolder docBlobHolder = (DocumentBlobHolder)documentModel.getAdapter(BlobHolder.class);
+		//
+		//
+		try {
+			QuoteManager quoteManager = (QuoteManager)Framework.getService(QuoteManager.class);
+			quoteManager.createQuote(documentModel, "Quoted - Comment" + System.currentTimeMillis(),
+					"Administrator");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		//
+		//
 		List<Blob> docBlobs = docBlobHolder.getBlobs();		
 		List<BlobListItem> blobListItems = result.getBlobListItem();
 		BlobListItem blobListItem = null;

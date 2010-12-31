@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.ecm.platform.quote.service.QuoteService">
+  <documentation>
+    This component gives the user the possibility to add quotes to documents.
+  </documentation>
+
+  <implementation class="org.collectionspace.ecm.platform.quote.service.QuoteService"/>
+
+  <service>
+    <provide interface="org.collectionspace.ecm.platform.quote.api.QuoteManager"/>
+  </service>
+
+  <extension-point name="config">
+    <documentation>
+      This extension can be used to configure the Quote Service
+    </documentation>
+    <object class="org.collectionspace.ecm.platform.quote.service.QuoteServiceConfig"/>
+  </extension-point>
+  
+  
+  <extension target="org.collectionspace.ecm.platform.quote.service.QuoteService"
+    point="config">
+    <config>
+      <converterClass>
+        org.collectionspace.ecm.platform.quote.impl.QuoteConverterImpl
+      </converterClass>
+      <graphName>documentComments</graphName>
+      <!-- XXX AT: these namespaces should have an ending slash -->
+      <commentNamespace>http://www.nuxeo.org/comments/uid</commentNamespace>
+      <documentNamespace>http://www.nuxeo.org/document/uid</documentNamespace>
+      <predicateNamespace>
+        http://www.nuxeo.org/predicates/isCommentFor
+      </predicateNamespace>
+    </config>
+  </extension>  
+
+</component>
