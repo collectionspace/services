@@ -42,32 +42,29 @@
           <!-- Object Identification Information -->
           <!-- ================================= -->
           
-          <!-- FIXME: Will become group repeatable in 1.1 -->
+          <!-- FIXME: The following field may be removed from this configuration when it is confirmed -->
+          <!-- that the App/UI layers are using a repeatable other number group. -->
           <field type="largetext">collectionobjects_common:otherNumber</field> <!-- * -->
-          <!-- End of group repeatable -->
+
+          <!-- FIXME: Change this to otherNumberValue if and when the field name itself is so changed. -->
+          <field type="largetext">numberValue</field> <!-- * -->
 
           <!-- FIXME: multivalued field - need to verify schema and field name -->
           <field type="largetext">collectionobjects_common:briefDescriptions</field>
-          
+         
           <!-- FIXME: multivalued field - need to verify schema and field name -->
           <field type="largetext">collectionobjects_common:comments</field>
           
           <field type="largetext">collectionobjects_common:distinguishingFeatures</field>
           
-          <!-- FIXME: group repeatable - need to verify schema and field name -->
-          <field type="largetext">collectionobjects_common:objectNameNote</field>
+          <field type="largetext">objectNameNote</field>
 
-          <!-- FIXME: Will become group repeatable in 1.1 -->
-          <field type="largetext">collectionobjects_common:title</field>
-          <field type="largetext">collectionobjects_common:titleTranslation</field>
+          <field type="largetext">title</field>
+          <field type="largetext">titleTranslation</field>
                    
           <!-- Object Description Information -->
           <!-- ============================== -->
 
-          <!-- FIXME: Need to check each field from this point and below -->
-          <!-- to anticipate group repeatability changes coming in 1.1, -->
-          <!-- as we may need to change schema and field names when that occurs. -->
-          
           <field type="largetext">collectionobjects_common:ageQualifier</field>
           <field type="largetext">collectionobjects_common:color</field>
           <field type="largetext">collectionobjects_common:contentDescription</field>
@@ -76,24 +73,24 @@
           <field type="largetext">collectionobjects_common:copyNumber</field> <!-- * -->
           <field type="largetext">collectionobjects_common:editionNumber</field> <!-- * -->
           
-           <!-- FIXME: Will become group repeatable in 1.1 -->
+          <!-- FIXME: Will become group repeatable in a post-1.3 release -->
+          <!-- Remove the schema name(s) from the value(s) below when this occurs. -->
           <field type="largetext">collectionobjects_common:inscriptionContent</field>
           <field type="largetext">collectionobjects_common:inscriptionContentInterpretation</field>
           <field type="largetext">collectionobjects_common:inscriptionContentTranslation</field>
           <field type="largetext">collectionobjects_common:inscriptionContentTransliteration</field>
           
-          <!-- FIXME: Will become group repeatable in 1.1 -->
+          <!-- FIXME: Will become group repeatable in a post-1.3 release -->
+          <!-- Remove the schema name(s) from the value(s) below when this occurs. -->
           <field type="largetext">collectionobjects_common:inscriptionDescriptionInterpretation</field>
           
-          <!-- FIXME: Will become group repeatable in 1.1 -->
-          <field type="largetext">collectionobjects_common:materialComponentNote</field>
-          <field type="largetext">collectionobjects_common:materialName</field>  <!-- * -->
+          <field type="largetext">materialComponentNote</field>
+          <field type="largetext">materialName</field>  <!-- * -->
           
           <!-- FIXME: multivalued field - need to verify schema and field name -->
           <field type="largetext">collectionobjects_common:physicalDescription</field>
           
-          <!-- FIXME: Will become part of a group repeatable in 1.1 -->
-          <field type="largetext">collectionobjects_common:objectComponentInformation</field>
+          <field type="largetext">objectComponentInformation</field>
 
           <!-- Object Production Information -->
           <!-- ============================= -->
@@ -106,22 +103,26 @@
           <!-- Object History and Association Information -->
           <!-- ========================================== -->
           
-          <!-- FIXME: Will become part of a group repeatable in 1.1 -->
-          <field type="largetext">collectionobjects_common:assocActivityNote</field>
-          
-          <field type="largetext">collectionobjects_common:assocConceptNote</field>
-          <field type="largetext">collectionobjects_common:assocCulturalContextNote</field>
-          <field type="largetext">collectionobjects_common:assocDateNote</field>
+          <field type="largetext">assocActivityNote</field>
+          <field type="largetext">assocConceptNote</field>
+          <field type="largetext">assocCulturalContextNote</field>
+          <field type="largetext">assocDateNote</field>
+
+          <!-- FIXME: Will become group repeatable in a post-1.3 release. -->
+          <!-- Remove the schema name(s) from the value(s) below when this occurs. -->
+          <field type="largetext">collectionobjects_common:assocEventName</field>   <!-- * -->
           <field type="largetext">collectionobjects_common:assocEventNote</field>
-          <field type="largetext">collectionobjects_common:assocObject</field>
-          <field type="largetext">collectionobjects_common:assocOrganizationNote</field>
-          <field type="largetext">collectionobjects_common:assocPeopleNote</field>
-          <field type="largetext">collectionobjects_common:assocPersonNote</field>
-          <field type="largetext">collectionobjects_common:assocPlaceNote</field>
+          <field type="largetext">collectionobjects_common:assocEventType</field>   <!-- * -->
+
+          <field type="largetext">assocObject</field>
+          <field type="largetext">assocOrganizationNote</field>
+          <field type="largetext">assocPeopleNote</field>
+          <field type="largetext">assocPersonNote</field>
+          <field type="largetext">assocPlaceNote</field>
           
           <field type="largetext">collectionobjects_common:objectHistoryNote</field>
           <field type="largetext">collectionobjects_common:ownershipExchangeNote</field>
-          <field type="largetext">collectionobjects_common:usageNote</field>
+          <field type="largetext">usageNote</field>
 
            <!-- Object Owner's Contribution Information -->
            <!-- ======================================= -->  
@@ -175,25 +176,20 @@
           <field type="largetext">collectionobjects_common:otherNumberType</field>
           <field type="largetext">collectionobjects_common:numberOfObjects</field>
           <field type="largetext">collectionobjects_common:collection</field>
-          <field type="largetext">collectionobjects_common:titleTranslationLanguage</field>
-          <field type="largetext">collectionobjects_common:titleType</field>
           <field type="largetext">collectionobjects_common:recordStatus</field>
           <field type="largetext">collectionobjects_common:age</field>
           <field type="largetext">collectionobjects_common:ageQualifier</field>
           <field type="largetext">collectionobjects_common:ageUnit</field>
       
           <field type="largetext">collectionobjects_common:contentDate</field>
-          <field type="largetext">collectionobjects_common:contentEventName</field>
-          <field type="largetext">collectionobjects_common:contentEventNameType</field>
           <field type="largetext">collectionobjects_common:contentLanguages</field>
-          <field type="largetext">collectionobjects_common:contentObjectType</field>
           <field type="largetext">collectionobjects_common:contentOrganizations</field>
-          <field type="largetext">collectionobjects_common:contentOther</field>
-          <field type="largetext">collectionobjects_common:contentOtherType</field>
           
           <field type="largetext">collectionobjects_common:dimensionSummary</field>
  
-          <!-- These fields may be removed altogether when App/UI is using repeatable dimensions group -->
+          <!-- FIXME: The set of dimensions-related fields below may be removed -->
+          <!-- altogether when it is confirmed that the App/UI layers are using -->
+          <!-- a repeatable dimensions group. -->
           <field type="largetext">collectionobjects_common:dimension</field>
           <field type="largetext">collectionobjects_common:dimensionMeasuredPart</field>
           <field type="largetext">collectionobjects_common:dimensionMeasurementUnit</field>
@@ -221,7 +217,6 @@
           <field type="largetext">collectionobjects_common:objectStatus</field>
           <field type="largetext">collectionobjects_common:phase</field>
           <field type="largetext">collectionobjects_common:sex</field>
-          <field type="largetext">collectionobjects_common:assocObjectType</field>
           <field type="largetext">collectionobjects_common:ownershipAccess</field>
           <field type="largetext">collectionobjects_common:ownershipCategory</field>
           <field type="largetext">collectionobjects_common:ownershipDates</field>
@@ -229,13 +224,14 @@
           <field type="largetext">collectionobjects_common:ownershipExchangePriceCurrency</field>
           <field type="largetext">collectionobjects_common:ownershipExchangePriceValue</field>
           <field type="largetext">collectionobjects_common:ownershipPlace</field>
-          <field type="largetext">collectionobjects_common:usage</field>
           <field type="largetext">collectionobjects_common:fieldCollectionNumber</field>
           <field type="largetext">collectionobjects_common:fieldCollectionMethod</field>
           <field type="largetext">collectionobjects_common:fieldCollectionPlace</field>
-        
-          <!-- This sample set of date field can be removed when Cataloging -->
-          <!-- records are using structured date fields -->
+          <field type="largetext">collectionobjects_common:fieldCollectionDate</field>
+       
+          <!-- FIXME: This sample set of date field can be removed when Cataloging -->
+          <!-- records are using structured date fields, or earlier when it is confirmed that -->
+          <!-- the App/UI layers are not using this vestigial part of the Cataloging schema. -->
           <field type="largetext">collectionobjects_common:dateAssociation</field>
           <field type="largetext">collectionobjects_common:dateEarliestSingle</field>
           <field type="largetext">collectionobjects_common:dateEarliestSingleCertainty</field>
