@@ -422,7 +422,7 @@ public class MovementSortByTest extends BaseServiceTest {
                 logger.debug("list-item[" + i + "] movementNote=" + secondFieldValues.get(i));
             }
             // Verify that the value of the specified field in the current record
-            // is less than or greater than its value in the previous record.
+            // is less than or equal to than its value in the previous record.
             if (i > 0 && firstFieldValues.get(i) != null && firstFieldValues.get(i - 1) != null) {
                 Assert.assertTrue(comparator.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) <= 0);
                 // If the value of the first sort field in the current record is identical to
