@@ -69,6 +69,7 @@ public class MovementSortByTest extends BaseServiceTest {
     private final String TEST_SPECIFIC_KEYWORD = "msotebstpfscn";
     private List<String> movementIdsCreated = new ArrayList<String>();
     private final String SORT_FIELD_SEPARATOR = ", ";
+    private final Locale LOCALE = Locale.US;
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -114,7 +115,7 @@ public class MovementSortByTest extends BaseServiceTest {
                 list.getMovementListItem();
 
         ArrayList<String> values = new ArrayList<String>();
-        Collator usEnglishCollator = Collator.getInstance(Locale.US);
+        Collator localeSpecificCollator = Collator.getInstance(LOCALE);
         int i = 0;
         for (MovementsCommonList.MovementListItem item : items) {
             // Because movementNote is not currently a summary field
@@ -136,7 +137,7 @@ public class MovementSortByTest extends BaseServiceTest {
             // collator used for ordering by the database.  To help avoid this,
             // it might be useful to keep test strings fairly generic.)
             if (i > 0 && values.get(i) != null && values.get(i - 1) != null) {
-                Assert.assertTrue(usEnglishCollator.compare(values.get(i), values.get(i - 1)) >= 0);
+                Assert.assertTrue(localeSpecificCollator.compare(values.get(i), values.get(i - 1)) >= 0);
             }
             i++;
         }
@@ -167,7 +168,7 @@ public class MovementSortByTest extends BaseServiceTest {
                 list.getMovementListItem();
 
         ArrayList<String> values = new ArrayList<String>();
-        Collator usEnglishCollator = Collator.getInstance(Locale.US);
+        Collator localeSpecificCollator = Collator.getInstance(LOCALE);
         int i = 0;
         for (MovementsCommonList.MovementListItem item : items) {
             // Because movementNote is not currently a summary field
@@ -189,7 +190,7 @@ public class MovementSortByTest extends BaseServiceTest {
             // collator used for ordering by the database.  To help avoid this,
             // it might be useful to keep test strings fairly generic.)
             if (i > 0 && values.get(i) != null && values.get(i - 1) != null) {
-                Assert.assertTrue(usEnglishCollator.compare(values.get(i), values.get(i - 1)) >= 0);
+                Assert.assertTrue(localeSpecificCollator.compare(values.get(i), values.get(i - 1)) >= 0);
             }
             i++;
         }
@@ -218,7 +219,7 @@ public class MovementSortByTest extends BaseServiceTest {
                 list.getMovementListItem();
 
         ArrayList<String> values = new ArrayList<String>();
-        Collator usEnglishCollator = Collator.getInstance(Locale.US);
+        Collator localeSpecificCollator = Collator.getInstance(LOCALE);
         int i = 0;
         for (MovementsCommonList.MovementListItem item : items) {
             // Because movementNote is not currently a summary field
@@ -240,7 +241,7 @@ public class MovementSortByTest extends BaseServiceTest {
             // collator used for ordering by the database.  To help avoid this,
             // it might be useful to keep test strings fairly generic.)
             if (i > 0 && values.get(i) != null && values.get(i - 1) != null) {
-                Assert.assertTrue(usEnglishCollator.compare(values.get(i), values.get(i - 1)) <= 0);
+                Assert.assertTrue(localeSpecificCollator.compare(values.get(i), values.get(i - 1)) <= 0);
             }
             i++;
         }
@@ -346,7 +347,7 @@ public class MovementSortByTest extends BaseServiceTest {
 
         ArrayList<String> firstFieldValues = new ArrayList<String>();
         ArrayList<String> secondFieldValues = new ArrayList<String>();
-        Collator usEnglishCollator = Collator.getInstance(Locale.US);
+        Collator localeSpecificCollator = Collator.getInstance(LOCALE);
         Comparator<String> comparator = String.CASE_INSENSITIVE_ORDER;
         int i = 0;
         for (MovementsCommonList.MovementListItem item : items) {
@@ -365,12 +366,12 @@ public class MovementSortByTest extends BaseServiceTest {
             // Verify that the value of the specified field in the current record
             // is less than or greater than its value in the previous record.
             if (i > 0 && firstFieldValues.get(i) != null && firstFieldValues.get(i - 1) != null) {
-                Assert.assertTrue(usEnglishCollator.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) >= 0);
+                Assert.assertTrue(localeSpecificCollator.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) >= 0);
                 // If the value of the first sort field in the current record is identical to
                 // its value in the previous record, verify that the value of the second sort
                 // field is equal to or greater than its value in the previous record,
                 // using a locale-specific collator.
-                if (usEnglishCollator.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) == 0) {
+                if (localeSpecificCollator.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) == 0) {
                     if (i > 0 && secondFieldValues.get(i) != null && secondFieldValues.get(i - 1) != null) {
                         Assert.assertTrue(comparator.compare(secondFieldValues.get(i), secondFieldValues.get(i - 1)) >= 0);
                     }
@@ -405,7 +406,7 @@ public class MovementSortByTest extends BaseServiceTest {
 
         ArrayList<String> firstFieldValues = new ArrayList<String>();
         ArrayList<String> secondFieldValues = new ArrayList<String>();
-        Collator usEnglishCollator = Collator.getInstance(Locale.US);
+        Collator localeSpecificCollator = Collator.getInstance(LOCALE);
         Comparator<String> comparator = String.CASE_INSENSITIVE_ORDER;
         int i = 0;
         for (MovementsCommonList.MovementListItem item : items) {
@@ -431,7 +432,7 @@ public class MovementSortByTest extends BaseServiceTest {
                 // using a locale-specific collator.
                 if (comparator.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) == 0) {
                     if (i > 0 && secondFieldValues.get(i) != null && secondFieldValues.get(i - 1) != null) {
-                        Assert.assertTrue(usEnglishCollator.compare(secondFieldValues.get(i), secondFieldValues.get(i - 1)) >= 0);
+                        Assert.assertTrue(localeSpecificCollator.compare(secondFieldValues.get(i), secondFieldValues.get(i - 1)) >= 0);
                     }
                 }
             }
