@@ -73,9 +73,8 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
 //    private String foo = Profiler.createLogger();
 
     // Regular expressions pattern for identifying valid ORDER BY clauses.
-    // FIXME: Currently supports ordering on only one field.
     // FIXME: Currently supports only USASCII word characters in field names.
-    final String ORDER_BY_CLAUSE_REGEX = "\\w+(_\\w+)?:\\w+( ASC| DESC)?";
+    final String ORDER_BY_CLAUSE_REGEX = "\\w+(_\\w+)?:\\w+( ASC| DESC)?(, \\w+(_\\w+)?:\\w+( ASC| DESC)?)*";
 
     /**
      * Instantiates a new repository java client impl.

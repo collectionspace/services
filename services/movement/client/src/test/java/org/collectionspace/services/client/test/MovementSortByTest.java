@@ -63,11 +63,12 @@ public class MovementSortByTest extends BaseServiceTest {
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
-    final String DELIMITER_SCHEMA_AND_FIELD = ":";
-    final String KEYWORD_DESCENDING_SEARCH = "DESC";
-    final String SERVICE_PATH_COMPONENT = "movements";
-    final String TEST_SPECIFIC_KEYWORD = "msotebstpfscn";
+    private final String DELIMITER_SCHEMA_AND_FIELD = ":";
+    private final String KEYWORD_DESCENDING_SEARCH = "DESC";
+    private final String SERVICE_PATH_COMPONENT = "movements";
+    private final String TEST_SPECIFIC_KEYWORD = "msotebstpfscn";
     private List<String> movementIdsCreated = new ArrayList<String>();
+    private final String SORT_FIELD_SEPARATOR = ", ";
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -315,11 +316,129 @@ public class MovementSortByTest extends BaseServiceTest {
             // Verify that the value of the specified field in the current record
             // is less than or equal to its value in the previous record.
             if (i > 0 && values.get(i) != null && values.get(i - 1) != null) {
-                Assert.assertTrue(comparator.compare(values.get(i), values.get(i - 1)) <= 1);
+                Assert.assertTrue(comparator.compare(values.get(i), values.get(i - 1)) <= 0);
             }
             i++;
         }
     }
+
+    /*
+     * Tests whether a list of records, sorted by two different fields in
+     * ascending order, is returned in the expected order.
+     */
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"createList"})
+    public void sortByTwoFieldsAscending(String testName) throws Exception {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+
+        String firstSortFieldName = qualifySortFieldName(MovementJAXBSchema.MOVEMENT_NOTE);
+        String secondSortFieldName = qualifySortFieldName(MovementJAXBSchema.LOCATION_DATE);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Sorting on field names=" + firstSortFieldName + " and " + secondSortFieldName);
+        }
+        String sortExpression = firstSortFieldName + SORT_FIELD_SEPARATOR + secondSortFieldName;
+        MovementsCommonList list = readSortedList(sortExpression);
+        List<MovementsCommonList.MovementListItem> items =
+                list.getMovementListItem();
+
+        ArrayList<String> firstFieldValues = new ArrayList<String>();
+        ArrayList<String> secondFieldValues = new ArrayList<String>();
+        Collator usEnglishCollator = Collator.getInstance(Locale.US);
+        Comparator<String> comparator = String.CASE_INSENSITIVE_ORDER;
+        int i = 0;
+        for (MovementsCommonList.MovementListItem item : items) {
+            // Because movementNote is not currently a summary field
+            // (returned in summary list items), we will need to verify
+            // sort order by retrieving full records, using the
+            // IDs provided in the summary list items. amd then retriving
+            // the value of that field from each of those records.
+            MovementsCommon movement = read(item.getCsid());
+            firstFieldValues.add(i, movement.getMovementNote());
+            secondFieldValues.add(i, movement.getLocationDate());
+            if (logger.isDebugEnabled()) {
+                logger.debug("list-item[" + i + "] movementNote=" + firstFieldValues.get(i));
+                logger.debug("list-item[" + i + "] locationDate=" + secondFieldValues.get(i));
+            }
+            // Verify that the value of the specified field in the current record
+            // is less than or greater than its value in the previous record.
+            if (i > 0 && firstFieldValues.get(i) != null && firstFieldValues.get(i - 1) != null) {
+                Assert.assertTrue(usEnglishCollator.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) >= 0);
+                // If the value of the first sort field in the current record is identical to
+                // its value in the previous record, verify that the value of the second sort
+                // field is equal to or greater than its value in the previous record,
+                // using a locale-specific collator.
+                if (usEnglishCollator.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) == 0) {
+                    if (i > 0 && secondFieldValues.get(i) != null && secondFieldValues.get(i - 1) != null) {
+                        Assert.assertTrue(comparator.compare(secondFieldValues.get(i), secondFieldValues.get(i - 1)) >= 0);
+                    }
+                }
+            }
+            i++;
+        }
+    }
+
+    /*
+     * Tests whether a list of records, sorted by one different fields in
+     * descending order and a second field in ascending order, is returned in the expected order.
+     */
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+    dependsOnMethods = {"createList"})
+    public void sortByOneFieldAscendingOneFieldsDescending(String testName) throws Exception {
+
+       if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+
+        String firstSortFieldName =
+                asDescendingSort(qualifySortFieldName(MovementJAXBSchema.LOCATION_DATE));
+        String secondSortFieldName = qualifySortFieldName(MovementJAXBSchema.MOVEMENT_NOTE);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Sorting on field names=" + firstSortFieldName + " and " + secondSortFieldName);
+        }
+        String sortExpression = firstSortFieldName + SORT_FIELD_SEPARATOR + secondSortFieldName;
+        MovementsCommonList list = readSortedList(sortExpression);
+        List<MovementsCommonList.MovementListItem> items =
+                list.getMovementListItem();
+
+        ArrayList<String> firstFieldValues = new ArrayList<String>();
+        ArrayList<String> secondFieldValues = new ArrayList<String>();
+        Collator usEnglishCollator = Collator.getInstance(Locale.US);
+        Comparator<String> comparator = String.CASE_INSENSITIVE_ORDER;
+        int i = 0;
+        for (MovementsCommonList.MovementListItem item : items) {
+            // Because movementNote is not currently a summary field
+            // (returned in summary list items), we will need to verify
+            // sort order by retrieving full records, using the
+            // IDs provided in the summary list items. amd then retriving
+            // the value of that field from each of those records.
+            MovementsCommon movement = read(item.getCsid());
+            firstFieldValues.add(i, movement.getLocationDate());
+            secondFieldValues.add(i, movement.getMovementNote());
+            if (logger.isDebugEnabled()) {
+                logger.debug("list-item[" + i + "] locationDate=" + firstFieldValues.get(i));
+                logger.debug("list-item[" + i + "] movementNote=" + secondFieldValues.get(i));
+            }
+            // Verify that the value of the specified field in the current record
+            // is less than or greater than its value in the previous record.
+            if (i > 0 && firstFieldValues.get(i) != null && firstFieldValues.get(i - 1) != null) {
+                Assert.assertTrue(comparator.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) <= 0);
+                // If the value of the first sort field in the current record is identical to
+                // its value in the previous record, verify that the value of the second sort
+                // field is equal to or greater than its value in the previous record,
+                // using a locale-specific collator.
+                if (comparator.compare(firstFieldValues.get(i), firstFieldValues.get(i - 1)) == 0) {
+                    if (i > 0 && secondFieldValues.get(i) != null && secondFieldValues.get(i - 1) != null) {
+                        Assert.assertTrue(usEnglishCollator.compare(secondFieldValues.get(i), secondFieldValues.get(i - 1)) >= 0);
+                    }
+                }
+            }
+            i++;
+        }
+    }
+
 
     /*
      * Tests whether a request to sort by an empty field name is handled
@@ -512,10 +631,15 @@ public class MovementSortByTest extends BaseServiceTest {
         final String TEST_RECORD_SPECIFIC_STRING = CLASS_NAME + " " + TEST_SPECIFIC_KEYWORD;
         return new Object[][]{
                     {1, "Aardvark and plumeria. " + TEST_RECORD_SPECIFIC_STRING, "2009-01-29T00:00:05Z"},
-                    {4, "Bat fling off wall. " + TEST_RECORD_SPECIFIC_STRING, "2010-08-30T00:00:00Z"},
-                    {2, "Aardvarks and plumeria. " + TEST_RECORD_SPECIFIC_STRING, "2009-01-29T08:00:00Z"},
-                    {5, "Zounds! " + TEST_RECORD_SPECIFIC_STRING, "2010-08-31T00:00:00Z"},
-                    {3, "Bat flies off ball. " + TEST_RECORD_SPECIFIC_STRING, "2009-05-29T00:00:00Z"}
+                    {10, "Zounds! " + TEST_RECORD_SPECIFIC_STRING, "2010-08-31T00:00:00Z"},
+                    {3, "Aardvark and plumeria. " + TEST_RECORD_SPECIFIC_STRING, "2010-08-30T00:00:00Z"},
+                    {7, "Bat fling off wall. " + TEST_RECORD_SPECIFIC_STRING, "2010-08-30T00:00:00Z"},
+                    {4, "Aardvarks and plumeria. " + TEST_RECORD_SPECIFIC_STRING, "2009-01-29T08:00:00Z"},
+                    {5, "Aardvarks and plumeria. " + TEST_RECORD_SPECIFIC_STRING, "2009-05-29T00:00:00Z"},
+                    {2, "Aardvark and plumeria. " + TEST_RECORD_SPECIFIC_STRING, "2009-05-29T00:00:00Z"},
+                    {9, "Zounds! " + TEST_RECORD_SPECIFIC_STRING, "2009-05-29T00:00:00Z"}, // Identical to next record
+                    {8, "Zounds! " + TEST_RECORD_SPECIFIC_STRING, "2009-05-29T00:00:00Z"},
+                    {6, "Bat flies off ball. " + TEST_RECORD_SPECIFIC_STRING, "2009-05-29T00:00:00Z"}
                 };
     }
 
