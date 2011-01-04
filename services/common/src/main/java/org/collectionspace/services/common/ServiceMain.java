@@ -13,16 +13,14 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.security.auth.login.LoginException;
-import javax.sql.DataSource;
 
 import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
-import org.collectionspace.services.common.document.IInitHandler;
+import org.collectionspace.services.common.init.IInitHandler;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.service.*;
+import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.common.tenant.TenantBindingType;
 import org.collectionspace.services.common.types.PropertyItemType;
 import org.collectionspace.services.common.types.PropertyType;
@@ -58,7 +56,7 @@ public class ServiceMain {
     private static final String DEFAULT_ADMIN_PASSWORD = "Administrator";
     private static final String DEFAULT_READER_PASSWORD = "reader";
     
-    private static String repositoryName = "CspaceDS";
+    private static String REPOSITORY_NAME = "CspaceDS";
 
     private ServiceMain() {
     }
@@ -594,33 +592,9 @@ public class ServiceMain {
         }
     }
 
-
     private Connection getConnection() throws LoginException, SQLException {
-        InitialContext ctx = null;
-        Connection conn = null;
-        try {
-            ctx = new InitialContext();
-            DataSource ds = (DataSource) ctx.lookup(repositoryName);
-            if (ds == null) {
-                throw new IllegalArgumentException("datasource not found: " + repositoryName);
-            }
-            conn = ds.getConnection();
-            return conn;
-        } catch (NamingException ex) {
-            LoginException le = new LoginException("Error looking up DataSource from: " + repositoryName);
-            le.initCause(ex);
-            throw le;
-        } finally {
-            if (ctx != null) {
-                try {
-                    ctx.close();
-                } catch (Exception e) {
-                }
-            }
-        }
+        return JDBCTools.getConnection(REPOSITORY_NAME);
     }
-
-
 
     void retrieveAllWorkspaceIds() throws Exception {
         //all configs are read, connector is initialized, retrieve workspaceids

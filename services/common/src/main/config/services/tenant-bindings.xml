@@ -270,7 +270,7 @@
                 org.collectionspace.services.loanin.nuxeo.LoaninValidatorHandler
             </service:validatorHandler>
             <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
-                <service:classname>org.collectionspace.services.common.InitHandler</service:classname>
+                <service:classname>org.collectionspace.services.common.init.InitHandler</service:classname>
                 <service:fields>
                     <service:field>ID</service:field>
                     <service:field>Foo</service:field>

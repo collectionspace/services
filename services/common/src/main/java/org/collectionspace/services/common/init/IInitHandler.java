@@ -1,4 +1,4 @@
-package org.collectionspace.services.common.document;
+package org.collectionspace.services.common.init;
 
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.service.ServiceBindingType;
