@@ -7,8 +7,13 @@
     <!-- set global properties for this build -->
     <property name="services.trunk" value="../../.."/>
     <!-- environment should be declared before reading build.properties -->
-    <property environment="env" />
-    <property file="${services.trunk}/build.properties" />
+    <property environment="env"/>
+    <property file="${services.trunk}/build.properties"/>
+    <!-- set the name of CollectionSpace's template directory, based in part -->
+    <!-- on the name of the current database specified in top-level build.properties -->
+    <property name="collectionspace.prefix" value="collectionspace_"/>
+    <property name="collectionspace.template.dir" value="${collectionspace.prefix}${db}"/>
+    <property name="backup.suffix" value=".cspace.bak"/>
 
     <target name="init">
     <!-- Create the time stamp -->
@@ -16,16 +21,30 @@
     </target>
 
     <target name="deploy"
-    	description="deploys nuxeo database template folder for the ${db} database to ${jboss.deploy.nuxeo.templates}">
-        <mkdir dir="${jboss.deploy.nuxeo.templates}/collectionspace_${db}"/>
-        <copy todir="${jboss.deploy.nuxeo.templates}/collectionspace_${db}">
-            <fileset dir="${basedir}/${db}/collectionspace_${db}"/>
+    	description="deploys a database template directory to Nuxeo"
+        depends="copy-templates-dir, update-nuxeo-config">
+    </target>
+
+    <target name="copy-templates-dir"
+    	description="deploys nuxeo database template folder for the ${db} database to ${nuxeo.templates.dir}">
+        <mkdir dir="${nuxeo.templates.dir}/${collectionspace.template.dir}"/>
+        <copy todir="${nuxeo.templates.dir}/${collectionspace.template.dir}">
+            <fileset dir="${basedir}/${db}/${collectionspace.template.dir}"/>
         </copy>
     </target>
 
+    <target name="update-nuxeo-config"
+    	description="updates the main nuxeo configuration file to specify the database template folder to use for CollectionSpace}">
+        <!-- Currently requires an optional Ant task, such as PropertyFile or ReplaceRegExp -->
+        <!-- copy file="${nuxeo.main.config.file}" tofile="${nuxeo.main.config.file}${backup.suffix}" overwrite="true"/ -->
+        <!-- propertyfile file="${nuxeo.main.config.file}">
+            <entry key="nuxeo.templates" value="${collectionspace.template.dir}"/>
+        </propertyfile -->
+    </target>
+
     <target name="undeploy"
-    description="undeploys nuxeo database template folder for the ${db} database from ${jboss.deploy.nuxeo.templates}">
-        <delete dir="${jboss.deploy.nuxeo.templates}/collectionspace_${db}"/>
+    description="undeploys nuxeo database template folder for the ${db} database from ${nuxeo.templates.dir}">
+        <delete dir="${nuxeo.templates.dir}/${collectionspace.template.dir}"/>
     </target>
 
 </project>
