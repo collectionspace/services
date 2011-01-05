@@ -187,7 +187,7 @@
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="initHandler">
+    <xs:complexType name="initHandlerOLD">
         <xs:sequence>
             <xs:element name="classname" type="xs:string" minOccurs="0" maxOccurs="1"/>
             <!--<xs:element name="fields" type="FieldsType" minOccurs="0" maxOccurs="1"/>-->
@@ -195,6 +195,36 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element name="field" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+           </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="initHandler">
+        <xs:sequence>
+            <xs:element name="classname" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="params">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="field" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="table" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                                    <xs:element name="col" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                                    <xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                                    <xs:element name="param" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="property" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="key" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                                    <xs:element name="value" type="xs:string" minOccurs="1" maxOccurs="1"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
                     </xs:sequence>
                 </xs:complexType>
            </xs:element>

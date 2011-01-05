@@ -269,6 +269,7 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.loanin.nuxeo.LoaninValidatorHandler
             </service:validatorHandler>
+            <!--
             <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:classname>org.collectionspace.services.common.init.InitHandler</service:classname>
                 <service:fields>
@@ -276,6 +277,43 @@
                     <service:field>Foo</service:field>
                 </service:fields>
             </service:initHandler>
+            -->
+            <s:initHandler xmlns:s='http://collectionspace.org/services/common/service'>
+                <s:classname>org.collectionspace.services.common.init.InitHandler</s:classname>
+                <s:params>
+                    <s:field>
+                        <s:table>mytable</s:table>
+                        <s:col>mycol</s:col>
+                        <s:type>mytpe</s:type>
+                        <s:param>myparam, myparamB</s:param>
+                    </s:field>
+                    <s:field>
+                        <s:table>mytable2</s:table>
+                        <s:col>mycol2</s:col>
+                        <s:type>mytpe2</s:type>
+                        <s:param>myparam, myparam2B</s:param>
+                    </s:field>
+
+                    <s:property>
+                        <s:key>my key</s:key><s:value>my value</s:value>
+                    </s:property>
+                    <s:property>
+                        <s:key>my key 2</s:key><s:value>my value 2</s:value>
+                    </s:property>
+
+                </s:params>
+            </s:initHandler>
+
+            <tenant:properties>
+
+            <types:item><types:key>datePattern</types:key><types:value>MMM dd, yyyy</types:value></types:item>
+            <types:item><types:key>datePattern</types:key><types:value>dd.MM.yyyy</types:value></types:item>
+            <!-- <types:item><types:key>datePattern</types:key><types:value>dd/MM/yyyy</types:value></types:item> -->
+            <types:item><types:key>localeLanguage</types:key><types:value>en</types:value></types:item>
+            <!-- <types:item><types:key>localeLanguage</types:key><types:value>da</types:value></types:item> -->
+        </tenant:properties>
+
+
             <service:properties xmlns:service='http://collectionspace.org/services/common/service'>
                 <!-- What to use for name???
                 <types:item><types:key>objectNameProperty</types:key><types:value>objectName</types:value></types:item> -->

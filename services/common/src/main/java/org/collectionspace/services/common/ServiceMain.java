@@ -56,7 +56,7 @@ public class ServiceMain {
     private static final String DEFAULT_ADMIN_PASSWORD = "Administrator";
     private static final String DEFAULT_READER_PASSWORD = "reader";
     
-    private static String REPOSITORY_NAME = "CspaceDS";
+    public static String DEFAULT_REPOSITORY_NAME = "CspaceDS";
 
     private ServiceMain() {
     }
@@ -528,12 +528,19 @@ public class ServiceMain {
                 if (list!=null && list.size()>0){
                     org.collectionspace.services.common.service.InitHandler handlerType = list.get(0);
                     String initHandlerClassname = handlerType.getClassname();
-                    org.collectionspace.services.common.service.InitHandler.Fields ft = handlerType.getFields();
-                    List<String> fields = ft.getField();
+
+                    List<org.collectionspace.services.common.service.InitHandler.Params.Field>
+                            fields = handlerType.getParams().getField();
+
+                    List<org.collectionspace.services.common.service.InitHandler.Params.Property>
+                            props = handlerType.getParams().getProperty();
+
+                    //org.collectionspace.services.common.service.InitHandler.Fields ft = handlerType.getFields();
+                    //List<String> fields = ft.getField();
                     Object o = instantiate(initHandlerClassname, IInitHandler.class);
                     if (o != null && o instanceof IInitHandler){
                         IInitHandler handler = (IInitHandler)o;
-                        handler.onRepositoryInitialized(sbt, fields);
+                        handler.onRepositoryInitialized(sbt, fields, props);
                         //The InitHandler may be the default one,
                         //  or specialized classes which still implement this interface and are registered in tenant-bindings.xml.
                     }
@@ -593,7 +600,7 @@ public class ServiceMain {
     }
 
     private Connection getConnection() throws LoginException, SQLException {
-        return JDBCTools.getConnection(REPOSITORY_NAME);
+        return JDBCTools.getConnection(DEFAULT_REPOSITORY_NAME);
     }
 
     void retrieveAllWorkspaceIds() throws Exception {
