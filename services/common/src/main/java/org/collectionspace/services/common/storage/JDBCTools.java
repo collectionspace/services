@@ -70,7 +70,7 @@ public class JDBCTools {
         }
     }
 
-    public static ResultSet openResultSet(String sql) throws Exception {
+    public static ResultSet executeQuery(String sql) throws Exception {
         Connection conn = null;
     	Statement stmt = null;
         try {
@@ -103,7 +103,41 @@ public class JDBCTools {
 
     }
 
+    public static int executeUpdate(String sql) throws Exception {
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            conn = JDBCTools.getConnection(ServiceMain.DEFAULT_REPOSITORY_NAME);
+            stmt = conn.createStatement();
+            int rows = stmt.executeUpdate(sql);
+            stmt.close();
+            return rows;
+        } catch (RuntimeException rte) {
+            logger.debug("Exception in update: " + rte.getLocalizedMessage());
+            logger.debug(rte.getStackTrace().toString());
+            throw rte;
+        } catch (SQLException sqle) {
+            SQLException tempException = sqle;
+            while (null != tempException) {       // SQLExceptions can be chained. Loop to log all.
+                logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
+                tempException = tempException.getNextException();
+            }
+            logger.debug(sqle.getStackTrace().toString());
+            throw new RuntimeException("SQL problem in update: ", sqle);
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+            } catch (SQLException sqle) {
+                logger.debug("SQL Exception closing statement/connection in openResultSet: " + sqle.getLocalizedMessage());
+                return -1;
+            }
+        }
 
-
+    }
 
 }

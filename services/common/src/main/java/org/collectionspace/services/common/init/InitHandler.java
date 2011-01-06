@@ -15,7 +15,6 @@
 
  *  https://source.collectionspace.org/collection-space/LICENSE.txt
  */
-
 package org.collectionspace.services.common.init;
 
 import org.collectionspace.services.common.ServiceMain;
@@ -41,29 +40,31 @@ public class InitHandler implements IInitHandler {
 
     public void onRepositoryInitialized(ServiceBindingType sbt, List<Field> fields, List<Property> properties) throws Exception {
         // see org.collectionspace.services.common.init.AddIndices for a real implementation example.
-        System.out.println("\r\n\r\n~~~~~~~~~~~~~ in InitHandler.onRepositoryInitialized with ServiceBindingType: "+sbt);
-        for (Field field : fields){
-            System.out.println( "InitHandler.fields:"
-                               +"\r\n    col: "+field.getCol()
-                               +"   table: "+field.getTable()
-                               +"   type: "+field.getType()
-                               +"   param: "+field.getParam());
+        System.out.println("\r\n\r\n~~~~~~~~~~~~~ in InitHandler.onRepositoryInitialized with ServiceBindingType: " + sbt);
+        for (Field field : fields) {
+            System.out.println("InitHandler.fields:"
+                    + "\r\n    col: " + field.getCol()
+                    + "   table: " + field.getTable()
+                    + "   type: " + field.getType()
+                    + "   param: " + field.getParam());
         }
-        for (Property prop : properties){
-            System.out.println( "InitHandler.properties:"
-                               +"\r\n    key: "+prop.getKey()
-                               +"   value: "+prop.getValue());
+        for (Property prop : properties) {
+            System.out.println("InitHandler.properties:"
+                    + "\r\n    key: " + prop.getKey()
+                    + "   value: " + prop.getValue());
 
         }
     }
 
-    public ResultSet openResultSet(String sql) throws Exception {
-        return JDBCTools.openResultSet(sql);
+    public ResultSet executeQuery(String sql) throws Exception {
+        return JDBCTools.executeQuery(sql);
     }
 
     public void closeResultSet(ResultSet rs) throws SQLException {
         rs.close();
     }
 
-
+    public int executeUpdate(String sql) throws Exception {
+        return JDBCTools.executeUpdate(sql);
+    }
 }

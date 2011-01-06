@@ -35,8 +35,7 @@ import java.util.List;
 public class AddIndices extends InitHandler implements IInitHandler {
 
     final Logger logger = LoggerFactory.getLogger(AddIndices.class);
-
-    public void onRepositoryInitialized(ServiceBindingType sbt, List<org.collectionspace.services.common.service.InitHandler.Params.Field> fields, List<Property> property) throws Exception {
+    public void onRepositoryInitialized(ServiceBindingType sbt, List<Field> fields, List<Property> properties) throws Exception {
           //todo: all post-init tasks for services, or delegate to services that override.
           System.out.println("\r\n\r\n~~~~~~~~~~~~~ in AddIndices.onRepositoryInitialized with ServiceBindingType: "+sbt);
 
@@ -44,7 +43,7 @@ public class AddIndices extends InitHandler implements IInitHandler {
         ResultSet rs = null;
         try {
             String addIndex_SQL = "UPDATE TABLE ADD KEY `tablename`.`id`...";
-            rs = openResultSet(addIndex_SQL);
+            rs = executeQuery(addIndex_SQL);
             if (rs != null){
                 // .....
             }
