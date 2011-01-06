@@ -33,6 +33,7 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
 import org.collectionspace.services.authorization.Permission;
@@ -134,6 +135,8 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
                 em.getTransaction().rollback();
             }
             throw bre;
+        } catch (PersistenceException pe) {
+        	throw pe;
         } catch (Exception e) {
             if (em != null && em.getTransaction().isActive()) {
                 em.getTransaction().rollback();

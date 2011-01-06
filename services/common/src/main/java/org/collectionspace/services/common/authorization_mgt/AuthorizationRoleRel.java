@@ -5,6 +5,7 @@ import org.collectionspace.services.authorization.PermissionRoleRel;
 import org.collectionspace.services.authorization.AccountRoleRel;
 import org.collectionspace.services.authorization.PermissionValue;
 import org.collectionspace.services.authorization.RoleValue;
+import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 
 public class AuthorizationRoleRel {
 
@@ -29,10 +30,13 @@ public class AuthorizationRoleRel {
      * @return the role account value
      */
     static public RoleValue buildRoleValue(AccountRoleRel arr) {
-    	RoleValue rv = new RoleValue();
-        rv.setRoleId(arr.getRoleId());
-        rv.setRoleName(arr.getRoleName());
-    	rv.setRoleRelationshipId(arr.getHjid().toString());        
+    	RoleValue rv = null;
+    	if (arr.getRoleId().equals(AuthorizationCommon.ROLE_SPRING_ADMIN_ID) == false) {
+	    	rv = new RoleValue();
+	        rv.setRoleId(arr.getRoleId());
+	        rv.setRoleName(arr.getRoleName());
+	    	rv.setRoleRelationshipId(arr.getHjid().toString());
+    	}
         return rv;
     }
     

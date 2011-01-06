@@ -24,6 +24,9 @@
 package org.collectionspace.services.account;
 
 import java.util.List;
+import java.util.ArrayList;
+
+import javax.persistence.PersistenceException;
 
 import org.collectionspace.services.account.storage.AccountRoleDocumentHandler;
 //import org.collectionspace.services.authorization.AccountRolesList;
@@ -36,6 +39,7 @@ import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.SubjectType;
 
+import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -56,10 +60,6 @@ import org.slf4j.LoggerFactory;
 public class AccountRoleSubResource
 //        extends AbstractCollectionSpaceResourceImpl<AccountRole, AccountRolesList> {
     	extends AbstractCollectionSpaceResourceImpl<AccountRole, AccountRole> {
-
-	//FIXME: These belong in an Authorization class, not here
-    private static String ROLE_SPRING_ADMIN_ID = "-1";
-    private static String ROLE_SPRING_ADMIN_NAME = "ROLE_SPRING_ADMIN";    
 	
     final public static String ACCOUNT_ACCOUNTROLE_SERVICE = "accounts/accountroles";
     final public static String ROLE_ACCOUNTROLE_SERVICE = "authorization/roles/accountroles";
@@ -171,12 +171,38 @@ public class AccountRoleSubResource
     	// changes to the Spring Security ACL tables.  The Spring Security Admin role has NO CollectionSpace
     	// specific permissions.  It is an internal/private role that service consumers and end-users NEVER see.
     	//
-    	RoleValue springAdminRole = new RoleValue();
-    	springAdminRole.setRoleId(ROLE_SPRING_ADMIN_ID);
-    	springAdminRole.setRoleName(ROLE_SPRING_ADMIN_NAME);
-    	List<RoleValue> roleValues = input.getRoles();
-    	roleValues.add(springAdminRole);
+    	
+    	//Preserve the original incoming list of roles
+    	List<RoleValue> inputRoleValues = input.getRoles();
 
+    	//Change the role list to be just the Spring role
+    	List<RoleValue> springRoles = new ArrayList<RoleValue>();
+    	input.setRoles(springRoles);
+    	RoleValue springAdminRole = new RoleValue();
+    	springRoles.add(springAdminRole);
+    	springAdminRole.setRoleId(AuthorizationCommon.ROLE_SPRING_ADMIN_ID);
+    	springAdminRole.setRoleName(AuthorizationCommon.ROLE_SPRING_ADMIN_NAME);
+
+    	// The Spring role relationship may already exist, if it does then we'll get a PersistenceException that
+    	// we'll just ignore.
+    	try {
+	        ServiceContext<AccountRole, AccountRole> ctx = createServiceContext(input, subject);
+	        DocumentHandler handler = createDocumentHandler(ctx);        
+	        getStorageClient(ctx).create(ctx, handler);
+    	} catch (PersistenceException e) {
+    		//If we get this exception, it means that the role relationship already exists, so
+    		//we can just ignore this exception.
+    		if (logger.isTraceEnabled() == true) {
+    			logger.trace(AuthorizationCommon.ROLE_SPRING_ADMIN_NAME +
+    					" relationship already exists for account: " +
+    					input.getAccounts().get(0).getAccountId(), e);
+    		}
+    	}
+    	
+    	//
+    	// Now we'll add the account relationships for the original incoming roles.
+    	//
+    	input.setRoles(inputRoleValues);
         ServiceContext<AccountRole, AccountRole> ctx = createServiceContext(input, subject);
         DocumentHandler handler = createDocumentHandler(ctx);        
         String bogusCsid = getStorageClient(ctx).create(ctx, handler);

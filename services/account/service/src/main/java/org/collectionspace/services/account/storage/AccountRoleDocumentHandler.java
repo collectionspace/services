@@ -113,8 +113,7 @@ public class AccountRoleDocumentHandler
     @Override
     public void handleGet(DocumentWrapper<List<AccountRoleRel>> wrapDoc) throws Exception {
     	AccountRole output = extractCommonPart(wrapDoc);
-        setCommonPart(extractCommonPart(wrapDoc));
-//    	AccountRole accountRoleList = extractCommonPartList(wrapDoc);
+        setCommonPart(output);
         getServiceContext().setOutput(output);
     }
 
@@ -267,14 +266,18 @@ public class AccountRoleDocumentHandler
             List<AccountValue> avs = new ArrayList<AccountValue>();
             ar.setAccounts(avs);
             AccountValue av = AuthorizationRoleRel.buildAccountValue(ar0);
-            avs.add(av);
+            if (av != null) {
+            	avs.add(av);
+            }
 
             //add roles
             List<RoleValue> rvs = new ArrayList<RoleValue>();
             ar.setRoles(rvs);
             for (AccountRoleRel arr : arrl) {
             	RoleValue rv = AuthorizationRoleRel.buildRoleValue(arr);
-                rvs.add(rv);
+            	if (rv != null) {
+            		rvs.add(rv);
+            	}
             }
         } else if (SubjectType.ACCOUNT.equals(subject)) {
 
