@@ -123,6 +123,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="3" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="3">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!--end collectionobject service meta-data -->
@@ -360,6 +370,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end loanin service meta-data -->
@@ -407,6 +427,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end loanout service meta-data -->
@@ -445,6 +475,16 @@
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/objectexit"
                             schemaLocation="http://collectionspace.org/services/objectexit http://services.collectionspace.org/objectexit/objectexit_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -493,6 +533,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end media service meta-data -->
@@ -537,6 +587,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end movement service meta-data -->
@@ -578,6 +638,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end report service meta-data -->
@@ -613,6 +683,16 @@
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/vocabulary"
                             schemaLocation="http://collectionspace.org/services/vocabulary http://services.collectionspace.org/vocabulary/vocabularies_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -663,6 +743,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end vocabulary service meta-data -->
@@ -701,6 +791,16 @@
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/organization"
                             schemaLocation="http://collectionspace.org/services/organization http://services.collectionspace.org/organization/orgauthorities_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -755,6 +855,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end organization service meta-data -->
@@ -796,6 +906,16 @@
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/person"
                             schemaLocation="http://collectionspace.org/services/person http://services.collectionspace.org/person/personauthorities_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -843,6 +963,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end person service meta-data -->
@@ -878,6 +1008,16 @@
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/location"
                             schemaLocation="http://collectionspace.org/services/location http://services.collectionspace.org/location/locationauthorities_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -918,6 +1058,16 @@
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/location"
                             schemaLocation="http://collectionspace.org/services/location http://services.collectionspace.org/location/locations_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -974,6 +1124,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end acquisition service meta-data -->
@@ -1012,6 +1172,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end relation service meta-data -->
@@ -1047,6 +1217,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end account service meta-data -->
@@ -1079,6 +1259,16 @@
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/dimension"
                             schemaLocation="http://collectionspace.org/services/dimension http://services.collectionspace.org/dimension/dimensions_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -1123,6 +1313,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end contact service meta-data -->
@@ -1154,6 +1354,16 @@
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/note"
                             schemaLocation="http://collectionspace.org/services/note http://services.collectionspace.org/note/notes_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -1494,6 +1704,17 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+				
+                <service:part id="3" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="3">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!--end collectionobject service meta-data -->
@@ -1651,6 +1872,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end loanin service meta-data -->
@@ -1698,6 +1929,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end loanout service meta-data -->
@@ -1736,6 +1977,16 @@
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/objectexit"
                             schemaLocation="http://collectionspace.org/services/objectexit http://services.collectionspace.org/objectexit/objectexit_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -1831,6 +2082,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end movement service meta-data -->
@@ -1863,6 +2124,16 @@
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/vocabulary"
                             schemaLocation="http://collectionspace.org/services/vocabulary http://services.collectionspace.org/vocabulary/vocabularies_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -1910,6 +2181,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end vocabulary service meta-data -->
@@ -1948,6 +2229,16 @@
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/organization"
                             schemaLocation="http://collectionspace.org/services/organization http://services.collectionspace.org/organization/orgauthorities_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -2003,6 +2294,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end organization service meta-data -->
@@ -2050,6 +2351,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end personauthority service meta-data -->
@@ -2094,6 +2405,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end person service meta-data -->
@@ -2129,6 +2450,16 @@
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/location"
                             schemaLocation="http://collectionspace.org/services/location http://services.collectionspace.org/location/locationauthorities_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -2169,6 +2500,16 @@
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/location"
                             schemaLocation="http://collectionspace.org/services/location http://services.collectionspace.org/location/locations_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -2225,6 +2566,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end acquisition service meta-data -->
@@ -2263,6 +2614,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end relation service meta-data -->
@@ -2298,6 +2659,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end account service meta-data -->
@@ -2330,6 +2701,16 @@
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/dimension"
                             schemaLocation="http://collectionspace.org/services/dimension http://services.collectionspace.org/dimension/dimensions_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
@@ -2374,6 +2755,16 @@
                         </service:xmlContent>
                     </service:content>
                 </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
             </service:object>
         </tenant:serviceBindings>
         <!-- end contact service meta-data -->
@@ -2405,6 +2796,16 @@
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/note"
                             schemaLocation="http://collectionspace.org/services/note http://services.collectionspace.org/note/notes_common.xsd">
+                        </service:xmlContent>
+                    </service:content>
+                </service:part>
+                <service:part id="2" control_group="Managed"
+                              versionable="true" auditable="false"
+                              label="collectionspace_core" updated="" order="2">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent
+                            namespaceURI="http://collectionspace.org/collectionspace_core/"
+                            schemaLocation="http://collectionspace.org/collectionspace_core/ http://services.collectionspace.org/collectionspace_core.xsd">
                         </service:xmlContent>
                     </service:content>
                 </service:part>
