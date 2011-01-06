@@ -111,16 +111,6 @@ public class RefNameServiceUtils {
             queriedServiceBindings.put(docType, sb);
             authRefFieldsByService.put(docType, authRefFields);
             docTypes.add(docType);
-            /*
-            // HACK - need to get qualified properties from the ServiceBinding
-            String prefix = "";
-            if(docType.equalsIgnoreCase("Intake"))
-            prefix = "intakes_common:";
-            else if(docType.equalsIgnoreCase("Loanin"))
-            prefix = "loansin_common:";
-            else if(docType.equalsIgnoreCase("Acquisition"))
-            prefix = "acquisitions_common:";
-             */
             Collection<String> fields = authRefFields.values();
             for (String field : fields) {
                 // Build up the where clause for each authRef field
@@ -201,15 +191,18 @@ public class RefNameServiceUtils {
                     //   such as "fieldCollectors", of a repeatable authority reference
                     //   field, such as "fieldCollector".
                     Object fieldValue = docModel.getProperty(strings[0], strings[1]);
-                    fRefFound = refNameFoundInField(refName, fieldValue);
-                    if (fRefFound) {
+                    boolean fRefMatches = refNameFoundInField(refName, fieldValue);
+                    if (fRefMatches) {
                         sourceField = authRefDescendantField;
-                        ilistItem.setSourceField(sourceField);
-                        // FIXME Returns only the first field in which the refName is found.
-                        // We may want to return all; this may require multiple sourceFields
-                        // in the list item schema; or else multiple list items, one per sourceField.
-                        // See CSPACE-2863 for a discussion of how this might be handled.
-                        break;
+                        // Handle multiple fields matching in one Doc. See CSPACE-2863.
+                    	if(fRefFound) {
+                    		// We already added ilistItem, so we need to clone that and add again
+                            ilistItem = cloneAuthRefDocItem(ilistItem, sourceField);
+                    	} else {
+                    		ilistItem.setSourceField(sourceField);
+                            fRefFound = true;
+                    	}
+                        list.add(ilistItem);
                     }
 
                 } catch (ClientException ce) {
@@ -217,30 +210,25 @@ public class RefNameServiceUtils {
                             "getAuthorityRefDocs: Problem fetching: " + sourceField, ce);
                 }
             }
-            // Used before going to schema-qualified field names.
-            /*
-            for(String field:matchingAuthRefFields){
-            try {
-            if(refName.equals(docModel.getPropertyValue(field))) {
-            ilistItem.setSourceField(field);
-            fRefFound = true;
-            break;
-            }
-            } catch(ClientException ce) {
-            throw new RuntimeException(
-            "getAuthorityRefDocs: Problem fetching: "+field, ce);
-            }
-            }
-             * 
-             */
             if (!fRefFound) {
                 throw new RuntimeException(
                         "getAuthorityRefDocs: Could not find refname in object:"
                         + docType + ":" + csid);
             }
-            list.add(ilistItem);
         }
         return wrapperList;
+    }
+    
+    private static AuthorityRefDocList.AuthorityRefDocItem cloneAuthRefDocItem(
+    		AuthorityRefDocList.AuthorityRefDocItem ilistItem, String sourceField) {
+    	AuthorityRefDocList.AuthorityRefDocItem newlistItem = new AuthorityRefDocList.AuthorityRefDocItem();
+    	newlistItem.setDocId(ilistItem.getDocId());
+    	newlistItem.setDocName(ilistItem.getDocName());
+    	newlistItem.setDocNumber(ilistItem.getDocNumber());
+    	newlistItem.setDocType(ilistItem.getDocType());
+    	newlistItem.setUri(ilistItem.getUri());
+    	newlistItem.setSourceField(sourceField);
+    	return newlistItem;
     }
 
     /*

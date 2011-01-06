@@ -121,7 +121,8 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
                 "entryNumber-" + identifier,
                 "entryDate-" + identifier,
                 currentOwnerRefName,
-                depositorRefName,
+                // Use currentOwnerRefName twice to test fix for CSPACE-2863
+                currentOwnerRefName,    //depositorRefName,
                 conditionCheckerAssessorRefName,
                 insurerRefName,
                 valuerRefName );
@@ -249,7 +250,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
-        boolean fFoundIntake = false;
+        int nIntakesFound = 0;
         if(iterateThroughList && logger.isDebugEnabled()){
             List<AuthorityRefDocList.AuthorityRefDocItem> items =
                     list.getAuthorityRefDocItem();
@@ -262,12 +263,13 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
                 		item.getDocName() + "] Number:[" +
                 		item.getDocNumber() + "] in field:[" +
                 		item.getSourceField() + "]");
-                if(!fFoundIntake && knownIntakeId.equalsIgnoreCase(item.getDocId())) {
-               		fFoundIntake = true;
+                if(knownIntakeId.equalsIgnoreCase(item.getDocId())) {
+                	nIntakesFound++;
                 }
                 i++;
             }
-            Assert.assertTrue(fFoundIntake, "Did not find Intake with authref!");
+            //
+            Assert.assertTrue((nIntakesFound==2), "Did not find Intake (twice) with authref!");
         }
     }
 
