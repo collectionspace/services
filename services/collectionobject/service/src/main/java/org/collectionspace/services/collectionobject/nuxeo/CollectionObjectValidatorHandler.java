@@ -50,11 +50,14 @@
 package org.collectionspace.services.collectionobject.nuxeo;
 
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
-import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
+//import org.collectionspace.services.common.context.MultipartServiceContext;
+//import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.InvalidDocumentException;
-import org.collectionspace.services.common.document.ValidatorHandler;
+import org.collectionspace.services.common.document.ValidatorHandlerImpl;
+
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,41 +65,75 @@ import org.slf4j.LoggerFactory;
  *
  * @author 
  */
-public class CollectionObjectValidatorHandler implements ValidatorHandler {
+public class CollectionObjectValidatorHandler extends ValidatorHandlerImpl<MultipartInput, MultipartOutput> {
 
     final Logger logger = LoggerFactory.getLogger(CollectionObjectValidatorHandler.class);
 
-    @Override
-    public void validate(Action action, ServiceContext ctx)
-            throws InvalidDocumentException {
-        if(logger.isDebugEnabled()) {
-            logger.debug("validate() action=" + action.name());
-        }
-        try {
-            MultipartServiceContext mctx = (MultipartServiceContext) ctx;
-            CollectionobjectsCommon co = (CollectionobjectsCommon) mctx.getInputPart(mctx.getCommonPartLabel(),
-                    CollectionobjectsCommon.class);
-            StringBuilder msgBldr = new StringBuilder("validate()");
-            boolean invalid = false;
-            if (co.getObjectNumber() == null || co.getObjectNumber().isEmpty()) {
-                invalid = true;
-                msgBldr.append("\nobjectNumber : missing");
-            }
-            if(action.equals(Action.CREATE)) {
-                //create specific validation here
-            } else if(action.equals(Action.UPDATE)) {
-                //update specific validation here
-            }
+    //
+    // Error Strings
+    //
+    private static final String VALIDATION_ERROR = "The collection object record payload was invalid. See log file for more details.";
+    private static final String OBJECTNUMBER_NULL_ERROR = "The collection object field \"objectNumber\" cannot be empty or missing.";
 
-            if (invalid) {
-                String msg = msgBldr.toString();
-                logger.error(msg);
-                throw new InvalidDocumentException(msg);
-            }
-        } catch (InvalidDocumentException ide) {
-            throw ide;
-        } catch (Exception e) {
-            throw new InvalidDocumentException(e);
-        }
+    @Override
+    protected Class<?> getCommonPartClass() {
+    	return CollectionobjectsCommon.class;
+    }
+    
+	@Override
+	protected void handleGet(){
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void handleGetAll() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void handleUpdate()
+			throws InvalidDocumentException {
+    	try {
+            CollectionobjectsCommon co = (CollectionobjectsCommon) getCommonPart();
+            validateCollectionobjectsCommon(co);                        
+    	} catch (AssertionError e) {
+    		if (logger.isErrorEnabled() == true) {
+    			logger.error(e.getMessage(), e);
+    		}
+    		throw new InvalidDocumentException(VALIDATION_ERROR, e);
+    	}
+	}
+
+	@Override
+	protected void handleDelete() {
+		// TODO Auto-generated method stub
+		
+	}
+    
+    @Override
+    protected void handleCreate()
+    		throws InvalidDocumentException {
+    	try {
+            CollectionobjectsCommon co = (CollectionobjectsCommon) getCommonPart();
+            validateCollectionobjectsCommon(co);                        
+    	} catch (AssertionError e) {
+    		if (logger.isErrorEnabled() == true) {
+    			logger.error(e.getMessage(), e);
+    		}
+    		throw new InvalidDocumentException(VALIDATION_ERROR, e);
+    	}
+    }
+    
+    //
+    // Private Methods
+    //    
+    private void validateCollectionobjectsCommon(CollectionobjectsCommon co) throws AssertionError {
+        assert(co != null);
+        String objectNumber = co.getObjectNumber();
+        assert(objectNumber != null);
+        assert(objectNumber.isEmpty() == false) : OBJECTNUMBER_NULL_ERROR;
+
     }
 }

@@ -1,18 +1,64 @@
 package org.collectionspace.services.intake.nuxeo;
 
-import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.InvalidDocumentException;
-import org.collectionspace.services.common.document.ValidatorHandler;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.common.document.ValidatorHandlerImpl;
+import org.collectionspace.services.intake.IntakesCommon;
 
-public class IntakeValidatorHandler implements ValidatorHandler {
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class IntakeValidatorHandler extends ValidatorHandlerImpl<MultipartInput, MultipartOutput> {
+
+    /** The logger. */
+    private final Logger logger = LoggerFactory.getLogger(IntakeValidatorHandler.class);
+    
+    /** Error Messages **/
+    private static final String VALIDATION_ERROR = "The intake record payload was invalid. See log file for more details.";
+    
+	
+    @Override
+    protected Class<?> getCommonPartClass() {
+    	return IntakesCommon.class;
+    }
+	
+	@Override
+	protected void handleCreate() throws InvalidDocumentException {
+		try {
+			IntakesCommon intakesCommon = (IntakesCommon)getCommonPart();
+			assert(intakesCommon != null);
+    	} catch (AssertionError e) {
+    		if (logger.isErrorEnabled() == true) {
+    			logger.error(e.getMessage(), e);
+    		}
+    		throw new InvalidDocumentException(VALIDATION_ERROR, e);
+    	}
+	}
 
 	@Override
-	public void validate(Action action, ServiceContext ctx)
-			throws InvalidDocumentException {
+	protected void handleGet() throws InvalidDocumentException {
 		// TODO Auto-generated method stub
-		System.out.println("IntakeValidatorHandler executed.");
+		
+	}
 
+	@Override
+	protected void handleGetAll() throws InvalidDocumentException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void handleUpdate() throws InvalidDocumentException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void handleDelete() throws InvalidDocumentException {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

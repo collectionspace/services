@@ -2,15 +2,8 @@ package org.collectionspace.services.relation.nuxeo;
 
 //import junit.framework.Assert;
 
-import org.collectionspace.services.common.context.MultipartServiceContext;
-import org.collectionspace.services.common.context.ServiceContext;
-
 import org.collectionspace.services.common.document.InvalidDocumentException;
-import org.collectionspace.services.common.document.ValidatorHandler;
 import org.collectionspace.services.common.document.ValidatorHandlerImpl;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
-
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.relation.RelationsCommon;
 
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -27,7 +20,7 @@ public class RelationValidatorHandler extends ValidatorHandlerImpl<MultipartInpu
     
     /* Error messages 
      */
-    private static final String VALIDATION_ERROR = "The relation record is invalid. See log file for more details.";
+    private static final String VALIDATION_ERROR = "The relation record payload was invalid. See log file for more details.";
     private static final String SUBJECT_EQUALS_PREDICATE_ERROR = "The subject ID and object ID cannot be the same.";
     
     @Override
@@ -38,7 +31,6 @@ public class RelationValidatorHandler extends ValidatorHandlerImpl<MultipartInpu
     @Override
     protected void handleCreate()
     		throws InvalidDocumentException{
-    	ServiceContext<MultipartInput, MultipartOutput> ctx = getServiceContext();
     	try {
 	    	RelationsCommon relationsCommon = (RelationsCommon)getCommonPart();
 	    	assert(relationsCommon != null);
