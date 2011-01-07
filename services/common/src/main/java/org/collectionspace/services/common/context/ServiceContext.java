@@ -237,7 +237,7 @@ public interface ServiceContext<IT, OT> {
      * for the service. it creates the handlers if necessary.
      * @return validation handlers
      */
-    public List<ValidatorHandler> getValidatorHandlers() throws Exception;
+    public List<ValidatorHandler<IT, OT>> getValidatorHandlers() throws Exception;
 
     /**
      * Gets the query params.

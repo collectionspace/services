@@ -84,7 +84,7 @@ public abstract class AbstractServiceContextImpl<IT, OT>
     /** The override document type. */
     private String overrideDocumentType = null;
     /** The val handlers. */
-    private List<ValidatorHandler> valHandlers = null;
+    private List<ValidatorHandler<IT, OT>> valHandlers = null;
     /** The doc handler. */
     private DocumentHandler docHandler = null;
     /** security context */
@@ -507,21 +507,36 @@ public abstract class AbstractServiceContextImpl<IT, OT>
         }
         return serviceBinding.getDocumentHandler().trim();
     }
-
+    
+    /*
+     * If this element is set in the service binding then use it otherwise
+     * assume that asserts are NOT disabled.
+     */
+    private boolean disableValidationAsserts() {
+    	boolean result;
+    	Boolean disableAsserts = getServiceBinding().isDisableAsserts();
+    	result = (disableAsserts != null) ? disableAsserts : false;
+    	return result;
+    }
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.ServiceContext#getValidatorHandlers()
      */
     @Override
-    public List<ValidatorHandler> getValidatorHandlers() throws Exception {
+    public List<ValidatorHandler<IT, OT>> getValidatorHandlers() throws Exception {
         if (valHandlers != null) {
             return valHandlers;
         }
         List<String> handlerClazzes = getServiceBinding().getValidatorHandler();
-        List<ValidatorHandler> handlers = new ArrayList<ValidatorHandler>(handlerClazzes.size());
+        List<ValidatorHandler<IT, OT>> handlers = new ArrayList<ValidatorHandler<IT, OT>>(handlerClazzes.size());
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         for (String clazz : handlerClazzes) {
             clazz = clazz.trim();
             Class<?> c = tccl.loadClass(clazz);
+            if (disableValidationAsserts() == false) {
+            	// enable validation assertions
+            	tccl.setClassAssertionStatus(clazz, true);
+            }
             if (ValidatorHandler.class.isAssignableFrom(c)) {
                 handlers.add((ValidatorHandler) c.newInstance());
             }

@@ -43,7 +43,7 @@ public class InvalidDocumentException extends BadRequestException {
      * Creates a new instance of <code>InvalidDocumentException</code> without detail message.
      */
     public InvalidDocumentException() {
-    	//empty constructor
+    	super();
     }
 
     /**

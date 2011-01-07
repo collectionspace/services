@@ -30,7 +30,7 @@ import org.collectionspace.services.common.document.DocumentHandler.Action;
  * ValidatorHandler provides plugin for application level validation
  * for content received by services serving objects with extensible schema
  */
-public interface ValidatorHandler {
+public interface ValidatorHandler<IT, OT> {
 
     /**
      * validate is called by the document handler for CREATE and UPDATE actions.
@@ -41,6 +41,6 @@ public interface ValidatorHandler {
      * @param ctx
      * @throws InvalidDocumentException
      */
-    public void validate(Action action, ServiceContext ctx)
+    public void validate(Action action, ServiceContext<IT, OT> ctx)
             throws InvalidDocumentException;
 }

@@ -143,6 +143,39 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
             create(testName);
         }
     }
+    
+    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+            dependsOnMethods = {"create"})
+    public void createWithSelfRelation(String testName) throws Exception {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+
+        setupCreateWithInvalidBody();
+
+        // Submit the request to the service and store the response.
+        RelationClient client = new RelationClient();
+        String identifier = createIdentifier();
+        RelationsCommon relationsCommon = createRelationsCommon(identifier);
+        // Make the subject ID equal to the object ID
+        relationsCommon.setDocumentId1(relationsCommon.getDocumentId2());
+        MultipartOutput multipart = createRelationInstance(relationsCommon);
+        ClientResponse<Response> res = client.create(multipart);
+        int statusCode = res.getStatus();
+
+        // Check the status code of the response: does it match
+        // the expected response(s)?
+        //
+        // Does it fall within the set of valid status codes?
+        // Does it exactly match the expected status code?
+        if(logger.isDebugEnabled()){
+            logger.debug(testName + ": status = " + statusCode);
+        }
+        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
+                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
+    }
 
     // Failure outcomes
     // Placeholders until the three tests below can be uncommented.
@@ -777,6 +810,24 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         return SERVICE_PATH_COMPONENT;
     }
 
+    private RelationsCommon createRelationsCommon(String identifier) {
+        RelationsCommon result = new RelationsCommon();
+        fillRelation(result, identifier);
+        return result;
+    }
+    
+    private MultipartOutput createRelationInstance(RelationsCommon relation) {
+        MultipartOutput result = new MultipartOutput();
+        OutputPart commonPart =
+        	result.addPart(relation, MediaType.APPLICATION_XML_TYPE);
+        commonPart.getHeaders().add("label", new RelationClient().getCommonPartName());
+        if(logger.isDebugEnabled()){
+          logger.debug("to be created, relation common");
+          logger.debug(objectAsXmlString(relation, RelationsCommon.class));
+        }
+        return result;
+    }
+    
     /**
      * Creates the relation instance.
      *
@@ -784,18 +835,9 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
      * @return the multipart output
      */
     private MultipartOutput createRelationInstance(String identifier) {
-        RelationsCommon relation = new RelationsCommon();
-        fillRelation(relation, identifier);
-
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart =
-                multipart.addPart(relation, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new RelationClient().getCommonPartName());
-        if(logger.isDebugEnabled()){
-          logger.debug("to be created, relation common");
-          logger.debug(objectAsXmlString(relation, RelationsCommon.class));
-        }
-        return multipart;
+        RelationsCommon relation = createRelationsCommon(identifier);
+        MultipartOutput result = createRelationInstance(relation);
+        return result;
     }
 
     /**

@@ -123,6 +123,16 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         REQUEST_TYPE = ServiceRequestType.CREATE;
         testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE);
     }
+    
+    /**
+     * Sets up create tests with empty entity body.
+     */
+    protected void setupCreateWithInvalidBody() {
+        EXPECTED_STATUS_CODE = STATUS_BAD_REQUEST;
+        REQUEST_TYPE = ServiceRequestType.CREATE;
+        testSetup(EXPECTED_STATUS_CODE, REQUEST_TYPE);
+    }
+    
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.ServiceTest#createWithMalformedXml(java.lang.String)

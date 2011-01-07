@@ -47,6 +47,7 @@ import org.collectionspace.services.common.relation.IRelationsManager;
 import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.security.UnauthorizedException;
@@ -120,6 +121,11 @@ public class NewRelationResource extends
 		} catch (UnauthorizedException ue) {
 			Response response = Response.status(Response.Status.UNAUTHORIZED)
 					.entity("Create failed reason " + ue.getErrorReason())
+					.type("text/plain").build();
+			throw new WebApplicationException(response);
+		} catch (BadRequestException bre) {
+			Response response = Response.status(Response.Status.BAD_REQUEST)
+					.entity("Create failed reason " + bre.getErrorReason())
 					.type("text/plain").build();
 			throw new WebApplicationException(response);
 		} catch (Exception e) {
