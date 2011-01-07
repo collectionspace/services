@@ -40,30 +40,20 @@ public class MakeLargeTextFields extends InitHandler implements IInitHandler {
 
     final Logger logger = LoggerFactory.getLogger(MakeLargeTextFields.class);
 
+    @Override
     public void onRepositoryInitialized(ServiceBindingType sbt, List<Field> fields, List<Property> properties) throws Exception {
-          //todo: all post-init tasks for services, or delegate to services that override.
-          System.out.println("\r\n\r\n~~~~~~~~~~~~~ in MakeLargeTextFields.onRepositoryInitialized with ServiceBindingType: "+sbt);
-
-        String tableName = "nuxeo.collectionobjects_common_comments";
-        // String columnName = "item";
-        String columnDataType = "TEXT";
-
+        //todo: all post-init tasks for services, or delegate to services that override.
         int rows = 0;
         try {
             for (Field field : fields) {
                 // MySQL
                 String sql = "ALTER TABLE " + field.getTable() + " MODIFY COLUMN " + field.getCol() + " " + field.getType();
                 // PostgreSQL
-                // String sql = "ALTER TABLE " + tableName + " ALTER COLUMN " + columnName + " TYPE " + columnDataType;
+                // String sql = "ALTER TABLE " + field.getTable() + " ALTER COLUMN " + field.getCol() + " " + field.getType();
                 rows = executeUpdate(sql);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             throw e;
         }
-        //call something like this: services.common.storage.DBUtils.addIndex(String tablename, String fields[]);
-        //for every field that has an authRef, do ...
-        //    --> Connection conn = getConnection();
-        //see parameter that you need for adding indices to SQL.
-
     }
 }
