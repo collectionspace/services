@@ -15,7 +15,6 @@
 
  *  https://source.collectionspace.org/collection-space/LICENSE.txt
  */
-
 package org.collectionspace.services.common.storage;
 
 import org.collectionspace.services.common.ServiceMain;
@@ -43,8 +42,8 @@ public class JDBCTools {
     final static Logger logger = LoggerFactory.getLogger(JDBCTools.class);
 
     public static Connection getConnection(String repositoryName) throws LoginException, SQLException {
-        if (Tools.isEmpty(repositoryName)){
-            repositoryName = ServiceMain.DEFAULT_REPOSITORY_NAME;
+        if (Tools.isEmpty(repositoryName)) {
+            repositoryName = getDefaultRepositoryName();
         }
         InitialContext ctx = null;
         Connection conn = null;
@@ -72,48 +71,15 @@ public class JDBCTools {
 
     public static ResultSet executeQuery(String sql) throws Exception {
         Connection conn = null;
-    	Statement stmt = null;
-        try {
-        	conn = JDBCTools.getConnection(ServiceMain.DEFAULT_REPOSITORY_NAME);
-        	stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery(sql);
-			stmt.close();
-            return rs;  //don't call rs.close() here ... Let caller close and catch any exceptions.
-        } catch (RuntimeException rte) {
-            logger.debug("Exception in createDefaultAccounts: "+rte.getLocalizedMessage());
-            logger.debug(rte.getStackTrace().toString());
-            throw rte;
-        } catch (SQLException sqle) {
-            SQLException tempException = sqle;
-            while (null != tempException) {       // SQLExceptions can be chained. Loop to log all.
-                logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
-                tempException = tempException.getNextException();
-            }
-            logger.debug(sqle.getStackTrace().toString());
-            throw new RuntimeException("SQL problem in openResultSet: ", sqle);
-        } finally {
-        	try {
-            	if(conn!=null) conn.close();
-            	if(stmt!=null) stmt.close();
-            } catch (SQLException sqle) {
-                logger.debug("SQL Exception closing statement/connection in openResultSet: "+ sqle.getLocalizedMessage());
-                return null;
-        	}
-        }
-
-    }
-
-    public static int executeUpdate(String sql) throws Exception {
-        Connection conn = null;
         Statement stmt = null;
         try {
-            conn = JDBCTools.getConnection(ServiceMain.DEFAULT_REPOSITORY_NAME);
+            conn = getConnection(getDefaultRepositoryName());
             stmt = conn.createStatement();
-            int rows = stmt.executeUpdate(sql);
+            ResultSet rs = stmt.executeQuery(sql);
             stmt.close();
-            return rows;
+            return rs;  //don't call rs.close() here ... Let caller close and catch any exceptions.
         } catch (RuntimeException rte) {
-            logger.debug("Exception in update: " + rte.getLocalizedMessage());
+            logger.debug("Exception in createDefaultAccounts: " + rte.getLocalizedMessage());
             logger.debug(rte.getStackTrace().toString());
             throw rte;
         } catch (SQLException sqle) {
@@ -123,7 +89,7 @@ public class JDBCTools {
                 tempException = tempException.getNextException();
             }
             logger.debug(sqle.getStackTrace().toString());
-            throw new RuntimeException("SQL problem in update: ", sqle);
+            throw new RuntimeException("SQL problem in executeQuery: ", sqle);
         } finally {
             try {
                 if (conn != null) {
@@ -133,11 +99,86 @@ public class JDBCTools {
                     stmt.close();
                 }
             } catch (SQLException sqle) {
-                logger.debug("SQL Exception closing statement/connection in openResultSet: " + sqle.getLocalizedMessage());
+                logger.debug("SQL Exception closing statement/connection in executeQuery: " + sqle.getLocalizedMessage());
+                return null;
+            }
+        }
+    }
+
+    public static int executeUpdate(String sql) throws Exception {
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            conn = getConnection(getDefaultRepositoryName());
+            stmt = conn.createStatement();
+            int rows = stmt.executeUpdate(sql);
+            stmt.close();
+            return rows;
+        } catch (RuntimeException rte) {
+            logger.debug("Exception in executeUpdate: " + rte.getLocalizedMessage());
+            logger.debug(rte.getStackTrace().toString());
+            throw rte;
+        } catch (SQLException sqle) {
+            SQLException tempException = sqle;
+            while (null != tempException) {       // SQLExceptions can be chained. Loop to log all.
+                logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
+                tempException = tempException.getNextException();
+            }
+            logger.debug(sqle.getStackTrace().toString());
+            throw new RuntimeException("SQL problem in executeUpdate: ", sqle);
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+            } catch (SQLException sqle) {
+                logger.debug("SQL Exception closing statement/connection in executeUpdate: " + sqle.getLocalizedMessage());
                 return -1;
             }
         }
-
     }
 
+    public static String getDatabaseProductName() {
+        String productName = "";
+        Connection conn = null;
+        try {
+            conn = getConnection(getDefaultRepositoryName());
+            productName = conn.getMetaData().getDatabaseProductName();
+        } catch (Exception e) {
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException sqle) {
+                logger.debug("SQL Exception closing statement/connection in getDatabaseProductName: " + sqle.getLocalizedMessage());
+                return productName;
+            }
+        }
+        return productName;
+    }
+    
+        public static DatabaseProductType getDatabaseProductType() throws Exception {
+            DatabaseProductType productType = DatabaseProductType.UNRECOGNIZED;
+            try {
+                String productName = getDatabaseProductName();
+                if (productName.matches("(?i).*mysql.*")) {
+                    productType = DatabaseProductType.MYSQL;
+                } else if (productName.matches("(?i).*postgresql.*")) {
+                    productType = DatabaseProductType.POSTGRESQL;
+                } else {
+                    throw new Exception("Unrecognized database system " + productName);
+                }
+            } catch (Exception e) {
+                throw e;
+            }
+            return productType;
+        }
+
+    public static String getDefaultRepositoryName() {
+        return ServiceMain.DEFAULT_REPOSITORY_NAME;
+    }
 }

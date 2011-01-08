@@ -17,6 +17,7 @@
  */
 package org.collectionspace.services.common.init;
 
+import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.service.InitHandler.Params.Field;
@@ -77,5 +78,9 @@ public class InitHandler implements IInitHandler {
 
     public int executeUpdate(String sql) throws Exception {
         return JDBCTools.executeUpdate(sql);
+    }
+
+    public DatabaseProductType getDatabaseProductType() throws Exception {
+        return JDBCTools.getDatabaseProductType();
     }
 }

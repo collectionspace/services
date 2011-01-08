@@ -58,12 +58,36 @@
                 org.collectionspace.services.collectionobject.nuxeo.CollectionObjectValidatorHandler
             </service:validatorHandler>
             <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
-                <service:classname>org.collectionspace.services.common.init.MakeLargeTextFields</service:classname>
+                <service:classname>org.collectionspace.services.common.init.ModifyFieldDatatypes</service:classname>
                 <service:params>
+                    <service:field>
+                        <service:table>nuxeo.collectionobjects_common_briefdescriptions</service:table>
+                        <service:col>item</service:col>
+                        <service:type>LARGETEXT</service:type>
+                        <service:param></service:param>
+                    </service:field>
                     <service:field>
                         <service:table>nuxeo.collectionobjects_common_comments</service:table>
                         <service:col>item</service:col>
-                        <service:type>TEXT</service:type>
+                        <service:type>LARGETEXT</service:type>
+                        <service:param></service:param>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.collectionobjects_common_objectproductionreasons</service:table>
+                        <service:col>item</service:col>
+                        <service:type>LARGETEXT</service:type>
+                        <service:param></service:param>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.collectionobjects_common_ownersreferences</service:table>
+                        <service:col>item</service:col>
+                        <service:type>LARGETEXT</service:type>
+                        <service:param></service:param>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.collectionobjects_common_viewersreferences</service:table>
+                        <service:col>item</service:col>
+                        <service:type>LARGETEXT</service:type>
                         <service:param></service:param>
                     </service:field>
                 </service:params>
@@ -1649,6 +1673,41 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.collectionobject.nuxeo.CollectionObjectValidatorHandler
             </service:validatorHandler>
+            <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.common.init.ModifyFieldDatatypes</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>nuxeo.collectionobjects_common_briefdescriptions</service:table>
+                        <service:col>item</service:col>
+                        <service:type>LARGETEXT</service:type>
+                        <service:param></service:param>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.collectionobjects_common_comments</service:table>
+                        <service:col>item</service:col>
+                        <service:type>LARGETEXT</service:type>
+                        <service:param></service:param>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.collectionobjects_common_objectproductionreasons</service:table>
+                        <service:col>item</service:col>
+                        <service:type>LARGETEXT</service:type>
+                        <service:param></service:param>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.collectionobjects_common_ownersreferences</service:table>
+                        <service:col>item</service:col>
+                        <service:type>LARGETEXT</service:type>
+                        <service:param></service:param>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.collectionobjects_common_viewersreferences</service:table>
+                        <service:col>item</service:col>
+                        <service:type>LARGETEXT</service:type>
+                        <service:param></service:param>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
             <service:properties xmlns:service='http://collectionspace.org/services/common/service'>
                 <types:item><types:key>objectNameProperty</types:key><types:value>objectName</types:value></types:item>
                 <types:item><types:key>objectNumberProperty</types:key><types:value>objectNumber</types:value></types:item>
