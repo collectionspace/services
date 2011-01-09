@@ -116,7 +116,7 @@ public abstract class CollectionSpaceIntegrationTest {
      * @param rt the rt
      */
     void fillRelation(RelationsCommon relation, String documentId1, String documentType1,
-    		String documentId2, String documentType2, RelationshipType rt)
+    		String documentId2, String documentType2, String rt)
     {
         relation.setDocumentId1(documentId1);
         relation.setDocumentType1(documentType1);

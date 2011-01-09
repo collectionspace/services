@@ -29,13 +29,14 @@
                 <xs:element name="documentId2" type="xs:string" minOccurs="1"/>
                 <xs:element name="documentType2" type="xs:string" minOccurs="1"/>
                 <!-- type of relationship between two entities -->
-                <xs:element name="relationshipType" type="rel:RelationshipType" minOccurs="1"/>
+                <xs:element name="relationshipType" type="xs:string" minOccurs="1"/>
                 <xs:element name="predicateDisplayName" type="xs:string" minOccurs="1"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
 
     <!-- enumeration defining the type of relationship between two entities -->
+    <!-- REM: Deprecating this type as it is too restrictive for the "relations_common:relationshipType" field  and will be replaced with "xs:string" -->
     <xs:simpleType name="RelationshipType">
         <xs:restriction base="xs:string">
             <!-- Added for compatibility with current default value -->
