@@ -113,7 +113,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    RelationsCommon relation = new RelationsCommon();
 	    fillRelation(relation, collectionObjectCsid, CollectionobjectsCommon.class.getSimpleName(),
 	    		intakeCsid, IntakesCommon.class.getSimpleName(),
-	    		RelationshipType.COLLECTIONOBJECT_INTAKE);
+	    		RelationshipType.COLLECTIONOBJECT_INTAKE.toString());
 	    // Create the part and fill it with the relation object
 	    multipart = new MultipartOutput();
 	    commonPart = multipart.addPart(relation, MediaType.APPLICATION_XML_TYPE);
@@ -132,7 +132,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    //
 	    // Now try to retrieve the Intake record of the CollectionObject.
 	    //
-	    String predicate = RelationshipType.COLLECTIONOBJECT_INTAKE.value();
+	    String predicate = RelationshipType.COLLECTIONOBJECT_INTAKE.toString();
 	    ClientResponse<RelationsCommonList> resultResponse = relationClient.readList(
 	    		collectionObjectCsid,
 	    		CollectionobjectsCommon.class.getSimpleName(),
@@ -175,7 +175,7 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
         	}
         	
         	Assert.assertEquals(resultRelation.getDocumentId1(), collectionObjectCsid);
-        	Assert.assertEquals(resultRelation.getRelationshipType(), RelationshipType.COLLECTIONOBJECT_INTAKE);
+        	Assert.assertEquals(resultRelation.getRelationshipType(), RelationshipType.COLLECTIONOBJECT_INTAKE.toString());
         	Assert.assertEquals(resultRelation.getDocumentId2(), intakeCsid);
             System.out.println();
         	i++;            

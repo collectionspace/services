@@ -126,7 +126,7 @@ public abstract class CollectionSpacePerformanceTest {
         relation.setDocumentId2(documentId2);
         relation.setDocumentType2(documentType2);
         
-        relation.setRelationshipType(rt);
+        relation.setRelationshipType(rt.toString());
     }
 	
 	/**

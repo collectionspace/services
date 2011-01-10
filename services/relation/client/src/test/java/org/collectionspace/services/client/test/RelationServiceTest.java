@@ -851,7 +851,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
                 "SubjectType-" + identifier + "-type",
                 "Object-" + identifier,
                 "ObjectType-" + identifier + "-type",
-                RelationshipType.COLLECTIONOBJECT_INTAKE,
+                RelationshipType.COLLECTIONOBJECT_INTAKE.toString(),
                 RelationshipType.COLLECTIONOBJECT_INTAKE + ".displayName");
     }
 
@@ -868,7 +868,7 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
     private void fillRelation(RelationsCommon relation,
             String documentId1, String documentType1,
             String documentId2, String documentType2,
-            RelationshipType rt,
+            String rt,
             String rtDisplayName) {
         relation.setDocumentId1(documentId1);
         relation.setDocumentType1(documentType1);

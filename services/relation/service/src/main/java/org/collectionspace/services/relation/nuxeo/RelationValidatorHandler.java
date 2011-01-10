@@ -34,6 +34,9 @@ public class RelationValidatorHandler extends ValidatorHandlerImpl<MultipartInpu
     	try {
 	    	RelationsCommon relationsCommon = (RelationsCommon)getCommonPart();
 	    	assert(relationsCommon != null);
+    		if (logger.isTraceEnabled() == true) {
+    			logger.trace(relationsCommon.toString());
+    		}
 	    	
 	    	assert(relationsCommon.getDocumentId1() != null);
 	    	assert(relationsCommon.getDocumentId1().length() != 0);
