@@ -172,7 +172,7 @@ AbstractMultiPartCollectionSpaceResourceImpl {
 	 * Creates the item document handler.
 	 * 
 	 * @param ctx the ctx
-	 * @param inVocabulary the in vocabulary
+	 * @param inAuthority the in vocabulary
 	 * 
 	 * @return the document handler
 	 * 
@@ -339,7 +339,7 @@ AbstractMultiPartCollectionSpaceResourceImpl {
 	/**
 	 * Update authority.
 	 * 
-	 * @param csid the csid
+	 * @param specifier the csid or id
 	 * @param theUpdate the the update
 	 * 
 	 * @return the multipart output
@@ -430,7 +430,7 @@ AbstractMultiPartCollectionSpaceResourceImpl {
 
 	/*************************************************************************
 	 * Create an AuthorityItem - this is a sub-resource of Authority
-	 * @param parentspecifier either a CSID or one of the urn forms
+	 * @param specifier either a CSID or one of the urn forms
 	 * @param input the payload 
 	 * @return Authority item response
 	 *************************************************************************/
@@ -618,8 +618,7 @@ AbstractMultiPartCollectionSpaceResourceImpl {
      * can be passed as a query param "type", and must match a configured type
      * for the service bindings. If not set, the type defaults to
      * ServiceBindingUtils.SERVICE_TYPE_PROCEDURE.
-     * @param parentcsid 
-     * 
+     *
 	 * @param parentspecifier either a CSID or one of the urn forms
 	 * @param itemspecifier either a CSID or one of the urn forms
      * @param ui the ui
