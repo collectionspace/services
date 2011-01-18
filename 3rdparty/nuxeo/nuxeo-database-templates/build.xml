@@ -12,39 +12,86 @@
     <!-- set the name of CollectionSpace's template directory, based in part -->
     <!-- on the name of the current database specified in top-level build.properties -->
     <property name="collectionspace.prefix" value="collectionspace_"/>
+    <!-- Uses the database name from the 'db' property in the top-level build.properties file -->
     <property name="collectionspace.template.dir" value="${collectionspace.prefix}${db}"/>
+    <property name="collectionspace.template.dir.path" value="${basedir}/${db}/${collectionspace.template.dir}"/>
     <property name="backup.suffix" value=".cspace.bak"/>
 
     <target name="init">
     <!-- Create the time stamp -->
         <tstamp/>
     </target>
+    
+    <!-- Deploy-related targets -->
 
     <target name="deploy"
     	description="deploys a database template directory to Nuxeo"
-        depends="copy-templates-dir, update-nuxeo-config">
+        depends="deploy-templates-dir, update-nuxeo-config">
     </target>
-
-    <target name="copy-templates-dir"
-    	description="deploys nuxeo database template folder for the ${db} database to ${nuxeo.templates.dir}">
+    
+    <target name="deploy-templates-dir"
+    	description="deploys a CollectionSpace-specific Nuxeo database template folder for the ${db} database to ${nuxeo.templates.dir}"
+        depends="templates-dir-exists">
         <mkdir dir="${nuxeo.templates.dir}/${collectionspace.template.dir}"/>
         <copy todir="${nuxeo.templates.dir}/${collectionspace.template.dir}">
-            <fileset dir="${basedir}/${db}/${collectionspace.template.dir}"/>
+            <fileset dir="${collectionspace.template.dir.path}"/>
         </copy>
     </target>
 
     <target name="update-nuxeo-config"
-    	description="updates the main nuxeo configuration file to specify the database template folder to use for CollectionSpace}">
-        <!-- Currently requires an optional Ant task, such as PropertyFile or ReplaceRegExp -->
-        <!-- copy file="${nuxeo.main.config.file}" tofile="${nuxeo.main.config.file}${backup.suffix}" overwrite="true"/ -->
-        <!-- propertyfile file="${nuxeo.main.config.file}">
-            <entry key="nuxeo.templates" value="${collectionspace.template.dir}"/>
-        </propertyfile -->
+    	description="updates the main Nuxeo configuration file to specify the database template folder to use for CollectionSpace"
+        depends="templates-dir-exists, has-minimum-ant-version, backup-nuxeo-config" if="ant.minimum.version.verified">
+        <!-- Set the value of the property pointing to the active templates directory (or directories) -->
+        <propertyfile file="${nuxeo.main.config.file}">
+            <entry key="nuxeo.templates" operation="=" value="${collectionspace.template.dir}"/>
+        </propertyfile>
     </target>
+    
+    <!-- Undeploy-related targets -->
 
     <target name="undeploy"
-    description="undeploys nuxeo database template folder for the ${db} database from ${nuxeo.templates.dir}">
-        <delete dir="${nuxeo.templates.dir}/${collectionspace.template.dir}"/>
+        description="undeploys CollectionSpace-specific Nuxeo database template folders from ${nuxeo.templates.dir}"
+        depends="undeploy-template-dirs, reset-nuxeo-config">
+    </target>
+    
+    <target name="undeploy-template-dirs"
+    	description="deletes CollectionSpace-specific database template folders from the deploy directory">
+        <delete quiet="false" includeemptydirs="true">
+            <fileset id="collectionspace.template.files" dir="${nuxeo.templates.dir}">
+                <patternset>
+                    <include name="**/${collectionspace.prefix}*/**"/>
+                </patternset>
+            </fileset>
+        </delete>
+    </target>
+    
+   <target name="reset-nuxeo-config"
+    	description="updates the main Nuxeo configuration file to reset the database template folder to an empty value"
+        depends="templates-dir-exists, has-minimum-ant-version, backup-nuxeo-config" if="ant.minimum.version.verified">
+        <propertyfile file="${nuxeo.main.config.file}">
+            <entry key="nuxeo.templates" operation="=" value="${collectionspace.template.dir}"/>
+        </propertyfile>
+    </target>
+    
+    <!-- Utility targets -->
+
+    <target name="backup-nuxeo-config"
+    	description="makes a single backup copy of the existing main Nuxeo configuration file, overwriting the previous backup">
+        <copy file="${nuxeo.main.config.file}" tofile="${nuxeo.main.config.file}${backup.suffix}" overwrite="true"/>
+    </target>
+    
+    <target name="templates-dir-exists"
+    	description="verifies the existence of a Nuxeo database template folder for the ${db} database">
+        <available file="${collectionspace.template.dir.path}" type="dir" property="has.templates.dir"/>
+        <fail unless="has.templates.dir"
+            message="Nuxeo database templates directory ${collectionspace.template.dir.path} could not be found."/>
+    </target>
+
+    <target name="has-minimum-ant-version"
+    description="verifies that the minimum required ant version exists for one or more tasks in this build file">
+        <condition property="ant.minimum.version.verified">
+          <antversion atleast="1.8.2"/>
+        </condition> 
     </target>
 
 </project>
