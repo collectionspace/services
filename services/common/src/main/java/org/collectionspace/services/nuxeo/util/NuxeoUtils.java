@@ -20,6 +20,7 @@ package org.collectionspace.services.nuxeo.util;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.File;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -34,6 +35,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.PathRef;
@@ -42,6 +44,7 @@ import org.nuxeo.ecm.core.api.model.DocumentPart;
 
 import org.nuxeo.ecm.core.io.DocumentPipe;
 import org.nuxeo.ecm.core.io.DocumentReader;
+import org.nuxeo.ecm.core.io.impl.plugins.DocumentTreeReader;
 import org.nuxeo.ecm.core.io.DocumentWriter;
 import org.nuxeo.ecm.core.io.impl.DocumentPipeImpl;
 import org.nuxeo.ecm.core.io.impl.plugins.SingleDocumentReader;
@@ -63,6 +66,40 @@ public class NuxeoUtils {
     /** The logger. */
     private static Logger logger = LoggerFactory.getLogger(NuxeoUtils.class);
 
+    public static void exportDocModel(DocumentModel src) {
+    	DocumentReader reader = null;
+    	DocumentWriter writer = null;
+
+    	CoreSession repoSession = src.getCoreSession();
+    	try { 
+    	  reader = new SingleDocumentReader(repoSession, src);
+    	        
+    	  // inline all blobs
+//    	  ((DocumentTreeReader)reader).setInlineBlobs(true);
+    	  File tmpFile = new File("/tmp/nuxeo_export-" +
+    			  System.currentTimeMillis() + ".zip");
+    	  System.out.println(tmpFile.getAbsolutePath());
+    	  writer = new XMLDocumentWriter(tmpFile);
+    	        
+    	  // creating a pipe
+    	  DocumentPipe pipe = new DocumentPipeImpl();
+    	        
+    	  // optionally adding a transformer
+//    	  pipe.addTransformer(new MyTransformer());
+    	  pipe.setReader(reader);
+    	  pipe.setWriter(writer); pipe.run();
+    	        
+    	} catch (Exception x) {
+    		x.printStackTrace();
+    	} finally { 
+    	  if (reader != null) {
+    	    reader.close(); 
+    	  } 
+    	  if (writer != null) { 
+    	    writer.close();
+    	  }
+    	}    	
+    }
     /**
      * getDocument retrieve org.dom4j.Document from Nuxeo DocumentModel
      * @param repoSession
