@@ -47,6 +47,7 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.document.BadRequestException;
+import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
@@ -140,34 +141,42 @@ public class RoleResource
      */
     @POST
     public Response createRole(Role input) {
-        try {
+    	Response response = null;
+
+    	try {
             ServiceContext ctx = createServiceContext(input, Role.class);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getStorageClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(RoleResource.class);
             path.path("" + csid);
-            Response response = Response.created(path.build()).build();
-            return response;
+            response = Response.created(path.build()).build();
         } catch (BadRequestException bre) {
-            Response response = Response.status(
+            response = Response.status(
+                    Response.Status.BAD_REQUEST).entity(ServiceMessages.POST_FAILED
+                    + bre.getErrorReason()).type("text/plain").build();
+            throw new WebApplicationException(response);
+        } catch (DocumentException bre) {
+            response = Response.status(
                     Response.Status.BAD_REQUEST).entity(ServiceMessages.POST_FAILED
                     + bre.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (UnauthorizedException ue) {
-            Response response = Response.status(
+            response = Response.status(
                     Response.Status.UNAUTHORIZED).entity(ServiceMessages.POST_FAILED
                     + ue.getErrorReason()).type("text/plain").build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception in createRole", e);
+                logger.debug("Caught a general exception in RoleResource:createRole post: ", e);
             }
             logger.error(ServiceMessages.UNKNOWN_ERROR_MSG, e);
-            Response response = Response.status(
+            response = Response.status(
                     Response.Status.INTERNAL_SERVER_ERROR).entity(ServiceMessages.POST_FAILED
                     + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(e, response);
         }
+        
+        return response;        
     }
 
     /**
