@@ -71,7 +71,7 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        <repository>
+<!--        <repository>
             <id>maven1-repository.dev.java.net</id>
             <name>Java.net Maven 1 Repository</name>
             <url>http://download.java.net/maven/1</url>
@@ -79,7 +79,7 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-        </repository>
+        </repository>-->
 
         <repository>
             <id>maven-restlet</id>
@@ -361,6 +361,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>2.3.1</version>
                 <configuration> </configuration>
                 <reportSets>
                     <reportSet>
