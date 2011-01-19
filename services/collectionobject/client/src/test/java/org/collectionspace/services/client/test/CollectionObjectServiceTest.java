@@ -75,7 +75,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
     private final String OBJECT_NAME_VALUE = "an object name";
     private final String UPDATED_MEASURED_PART_VALUE = "updated measured part value";
-    private final String UTF8_TITLE = "Audiorecording album cover signed by Lech "
+    private final String UTF8_DATA_SAMPLE = "Audiorecording album cover signed by Lech "
             + "Wa" + '\u0142' + '\u0119' + "sa";
 
     /* (non-Javadoc)
@@ -314,10 +314,9 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
      * @param testName the test name
      * @throws Exception the exception
      */
- /*
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
         dependsOnMethods = {"create", "testSubmitRequest"}, groups={"utf8-create"})
-    public void createWithUTF8Title(String testName) throws Exception {
+    public void createWithUTF8Data(String testName) throws Exception {
     	String testDataDir = System.getProperty("test-data.fileName");
     	String newId =
             createFromXmlFile(testName, testDataDir + "/cspace-2779-utf-8-create.xml", false);
@@ -326,14 +325,13 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
             logger.debug("Attempting to retrieve just-created record ...");
         }
         CollectionobjectsCommon collectionObject = readCollectionObjectCommonPart(newId);
-        String title = collectionObject.getTitle(); // will need to be changed for multi-valued title
+        String distinguishingFeatures = collectionObject.getDistinguishingFeatures();
         if (logger.isDebugEnabled()) {
-            logger.debug("Sent title: " + UTF8_TITLE);
-            logger.debug("Received title: " + title);
+            logger.debug("Sent distinguishingFeatures: " + UTF8_DATA_SAMPLE);
+            logger.debug("Received distinguishingFeatures: " + distinguishingFeatures);
         }
-        Assert.assertTrue(title.equals(UTF8_TITLE));
+        Assert.assertTrue(distinguishingFeatures.equals(UTF8_DATA_SAMPLE));
     }
- */
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.ServiceTest#createList()

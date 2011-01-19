@@ -65,15 +65,19 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
     final static List<String> TWO_MORE_KEYWORDS =
             Arrays.asList(new String[]{"Karihaya" + IDENTIFIER, "Hlikku" + IDENTIFIER});
     final static String NOISE_WORD = "Mihalli + IDENTIFIER";
-    // Test Unicode UTF-8 term for keyword searching: the last name of Lech
-    // Wałęsa, which contains two non-USASCII range Unicode UTF-8 characters.
+    // Test Unicode UTF-8 term for keyword searching: a random sequence,
+    // unlikely to be encountered in actual collections data, of two USASCII
+    // characters followed by four non-USASCII range Unicode UTF-8 characters:
     //
-    // For details regarding the łę characters in the last name, see:
-    // http://en.wikipedia.org/wiki/L_with_stroke
-    // http://en.wikipedia.org/wiki/%C4%98
-    final String UTF8_KEYWORD = "Wa" + '\u0142' + '\u0119' + "sa";
-    // Non-existent term, consisting of two back-to-back sets of the first letters
-    // of each of the words in a short pangram for the English alphabet.
+    // Δ : Greek capital letter Delta (U+0394)
+    // Ж : Cyrillic capital letter Zhe with breve (U+04C1)
+    // Ŵ : Latin capital letter W with circumflex (U+0174)
+    // Ω : Greek capital letter Omega (U+03A9)
+
+    final String UTF8_KEYWORD = "to" + '\u0394' + '\u04C1' + '\u0174' +'\u03A9';
+    // Non-existent term unlikely to be encountered in actual collections
+    // data, consisting of two back-to-back sets of the first letters of
+    // each of the words in a short pangram for the English alphabet.
     final static String NON_EXISTENT_KEYWORD = "jlmbsoqjlmbsoq";
 
     final static String KEYWORD_SEPARATOR = " ";
@@ -313,9 +317,6 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
 //    }
 
 
-    // FIXME: Test currently fails with a true UTF-8 String - need to investigate why.
-    // Will be commented out for now until we get this working ...
-/*
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
         groups = {"utf8"})
     public void searchWithUTF8Keyword(String testName) {
@@ -355,7 +356,6 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
         long numMatched = getNumMatched(res, NUM_MATCHES_EXPECTED);
         Assert.assertEquals(numMatched, NUM_MATCHES_EXPECTED);
     }
-*/
     
     // Failure outcomes
 
