@@ -11,17 +11,17 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.person.jaxb</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>pox-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.client</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>pox-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.person.client</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>pox-SNAPSHOT</version>
         </dependency>
     </dependencies>
     
