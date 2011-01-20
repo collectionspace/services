@@ -3,8 +3,12 @@ package org.collectionspace.services.common;
 public class PoxPayload {
 	private String xmlText;
 	
-	private PoxPayload() {
+	protected PoxPayload() {
 		//empty
+	}
+	
+	public void setXmlText(String xmlText) {
+		this.xmlText = xmlText;
 	}
 	
 	public PoxPayload(String xmlText) {

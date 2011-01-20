@@ -25,6 +25,9 @@ package org.collectionspace.services.common.context;
 
 import java.io.IOException;
 import java.io.InputStream;
+
+import org.collectionspace.services.common.PoxPayloadIn;
+import org.collectionspace.services.common.PoxPayloadOut;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.w3c.dom.Document;
@@ -34,14 +37,14 @@ import org.w3c.dom.Document;
  * remotely invokable service
  */
 public interface MultipartServiceContext
-        extends RemoteServiceContext<MultipartInput, MultipartOutput> {
+        extends RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> {
 
     /**
      * Get input parts as received over the wire from service consumer
      * @return the input
      */
     @Override
-    public MultipartInput getInput();
+    public PoxPayloadIn getInput();
 
     /**
      * setInput is used to set request input before starting to
@@ -49,21 +52,21 @@ public interface MultipartServiceContext
      * @param input
      */
     @Override
-    public void setInput(MultipartInput input);
+    public void setInput(PoxPayloadIn input);
 
     /**
      * Get output parts to send over the wire to service consumer
      * @return the output
      */
     @Override
-    public MultipartOutput getOutput();
+    public PoxPayloadOut getOutput();
 
     /**
      * Set output parts to send over the wire to service consumer
      * @return the output
      */
     @Override
-    public void setOutput(MultipartOutput output);
+    public void setOutput(PoxPayloadOut output);
 
     /**
      * getInputPart returns the input part object for given label and clazz
