@@ -49,6 +49,8 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
+import org.collectionspace.services.common.PoxPayloadIn;
+import org.collectionspace.services.common.PoxPayloadOut;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.blob.BlobInput;
@@ -136,7 +138,7 @@ public class CollectionObjectResource
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#createDocumentHandler(org.collectionspace.services.common.context.ServiceContext)
      */
 //    @Override
-//    public DocumentHandler createDocumentHandler(ServiceContext<MultipartInput, MultipartOutput> ctx) throws Exception {
+//    public DocumentHandler createDocumentHandler(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) throws Exception {
 //        DocumentHandler docHandler = ctx.getDocumentHandler();
 //        if (ctx.getInput() != null) {
 //            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(),
@@ -156,9 +158,9 @@ public class CollectionObjectResource
      * @return the response
      */
     @POST
-    public Response createCollectionObject(MultipartInput input) {
+    public Response createCollectionObject(PoxPayloadIn input) {
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input); //
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input); //
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(CollectionObjectResource.class);
@@ -192,7 +194,7 @@ public class CollectionObjectResource
      */
     @GET
     @Path("{csid}")
-    public MultipartOutput getCollectionObject(
+    public PoxPayloadOut getCollectionObject(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getCollectionObject with csid=" + csid);
@@ -204,12 +206,12 @@ public class CollectionObjectResource
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        MultipartOutput result = null;
+        PoxPayloadOut result = null;
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
-            result = (MultipartOutput) ctx.getOutput();
+            result = ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -274,7 +276,7 @@ public class CollectionObjectResource
         profiler.start();
         
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             collectionObjectList = (CollectionobjectsCommonList) handler.getCommonPartList();
@@ -305,9 +307,9 @@ public class CollectionObjectResource
      */
     @PUT
     @Path("{csid}")
-    public MultipartOutput updateCollectionObject(
+    public PoxPayloadOut updateCollectionObject(
             @PathParam("csid") String csid,
-            MultipartInput theUpdate) {
+            PoxPayloadIn theUpdate) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateCollectionObject with csid=" + csid);
         }
@@ -318,12 +320,12 @@ public class CollectionObjectResource
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        MultipartOutput result = null;
+        PoxPayloadOut result = null;
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
-            result = (MultipartOutput) ctx.getOutput();
+            result = ctx.getOutput();
         } catch (BadRequestException bre) {
             Response response = Response.status(
                     Response.Status.BAD_REQUEST).entity("Update failed reason " + bre.getErrorReason()).type("text/plain").build();
@@ -370,7 +372,7 @@ public class CollectionObjectResource
             throw new WebApplicationException(response);
         }
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
@@ -467,11 +469,11 @@ public class CollectionObjectResource
     	AuthorityRefList authRefList = null;
         try {
         	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentWrapper<DocumentModel> docWrapper = 
             	getRepositoryClient(ctx).getDoc(ctx, csid);
-            DocumentModelHandler<MultipartInput, MultipartOutput> docHandler = 
-            	(DocumentModelHandler<MultipartInput, MultipartOutput>)createDocumentHandler(ctx);
+            DocumentModelHandler<PoxPayloadIn, PoxPayloadOut> docHandler = 
+            	(DocumentModelHandler<PoxPayloadIn, PoxPayloadOut>)createDocumentHandler(ctx);
             List<String> authRefFields = 
             	((MultipartServiceContextImpl)ctx).getCommonPartPropertyValues(
             			ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
@@ -547,7 +549,7 @@ public class CollectionObjectResource
         try {
         	Profiler profiler = new Profiler("searchCollectionObjects():", 1);
         	profiler.start();
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
 
             // perform a keyword search

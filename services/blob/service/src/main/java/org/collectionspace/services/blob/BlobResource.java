@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.collectionspace.services.common.FileUtils;
+import org.collectionspace.services.common.PoxPayloadIn;
+import org.collectionspace.services.common.PoxPayloadOut;
 import org.collectionspace.services.common.ResourceBase;
 //import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
@@ -107,7 +109,7 @@ public class BlobResource extends ResourceBase {
          return (BlobsCommonList) super.search(queryParams, keywords);
     }
     
-    private BlobsCommonList getDerivativeList(ServiceContext<MultipartInput, MultipartOutput> ctx,
+    private BlobsCommonList getDerivativeList(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
     		String csid) throws Exception {
     	BlobsCommonList result = null;
     	
@@ -115,7 +117,7 @@ public class BlobResource extends ResourceBase {
     	blobInput.setDerivativeListRequested(true);
     	BlobUtil.setBlobInput(ctx, blobInput);
 
-    	MultipartOutput response = this.get(csid, ctx);
+    	PoxPayloadOut response = this.get(csid, ctx);
     	if (logger.isDebugEnabled() == true) {
     		logger.debug(response.toString());
     	}
@@ -132,12 +134,12 @@ public class BlobResource extends ResourceBase {
     	InputStream result = null;
     	
     	try {
-	    	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
 	    	BlobInput blobInput = BlobUtil.getBlobInput(ctx);
 	    	blobInput.setDerivativeTerm(derivativeTerm);
 	    	blobInput.setContentRequested(true);
 	    	
-	    	MultipartOutput response = this.get(csid, ctx);
+	    	PoxPayloadOut response = this.get(csid, ctx);
 	    	if (logger.isDebugEnabled() == true) {
 	    		logger.debug(response.toString());
 	    	}
@@ -207,7 +209,7 @@ public class BlobResource extends ResourceBase {
     		@QueryParam("blobUri") String blobUri) {
     	Response response = null;    	
     	try {
-	    	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
 	    	BlobInput blobInput = BlobUtil.getBlobInput(ctx);
 	    	blobInput.createBlobFile(req, blobUri);
 	    	response = this.create(null, ctx);
@@ -242,13 +244,13 @@ public class BlobResource extends ResourceBase {
     
     @GET
     @Path("{csid}/derivatives/{derivativeTerm}")
-    public MultipartOutput getDerivative(@PathParam("csid") String csid,
+    public PoxPayloadOut getDerivative(@PathParam("csid") String csid,
     		@PathParam("derivativeTerm") String derivativeTerm) {
-    	MultipartOutput result = null;
+    	PoxPayloadOut result = null;
     	
     	ensureCSID(csid, READ);
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
         	BlobInput blobInput = BlobUtil.getBlobInput(ctx);
         	blobInput.setDerivativeTerm(derivativeTerm);
             result = get(csid, ctx);
@@ -273,7 +275,7 @@ public class BlobResource extends ResourceBase {
 
     	ensureCSID(csid, READ);
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             result = this.getDerivativeList(ctx, csid);
             if (result == null) {
                 Response response = Response.status(Response.Status.NOT_FOUND).entity(

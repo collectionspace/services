@@ -1,5 +1,7 @@
 package org.collectionspace.services.common.blob;
 
+import org.collectionspace.services.common.PoxPayloadIn;
+import org.collectionspace.services.common.PoxPayloadOut;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -11,7 +13,7 @@ public class BlobUtil {
 	public static String BLOB_RESOURCE_NAME = "blobs";
 	private static final Logger logger = LoggerFactory.getLogger(BlobUtil.class);
 	
-    public static BlobInput getBlobInput(ServiceContext<MultipartInput, MultipartOutput> ctx) {
+    public static BlobInput getBlobInput(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
     	BlobInput result = (BlobInput)ctx.getProperty(BlobInput.class.getName());
     	if (result == null) {
     		result = new BlobInput();
@@ -20,13 +22,13 @@ public class BlobUtil {
     	return result;
 	}
     
-    public static BlobInput resetBlobInput(ServiceContext<MultipartInput, MultipartOutput> ctx) {
+    public static BlobInput resetBlobInput(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
     	BlobInput blobInput = new BlobInput();
     	setBlobInput(ctx, blobInput);
     	return blobInput;
     }
     
-    public static void setBlobInput(ServiceContext<MultipartInput, MultipartOutput> ctx,
+    public static void setBlobInput(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
     		BlobInput blobInput) {
     	ctx.setProperty(BlobInput.class.getName(), blobInput);    		
 	}	

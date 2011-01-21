@@ -28,6 +28,8 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IntakeClient;
+import org.collectionspace.services.common.PoxPayloadIn;
+import org.collectionspace.services.common.PoxPayloadOut;
 import org.collectionspace.services.intake.EntryMethodList;
 import org.collectionspace.services.intake.FieldCollectionEventNameList;
 import org.collectionspace.services.intake.CurrentLocationGroup;
@@ -37,9 +39,9 @@ import org.collectionspace.services.intake.IntakesCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 //import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -107,7 +109,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         IntakeClient client = new IntakeClient();
         String identifier = createIdentifier();
-        MultipartOutput multipart = createIntakeInstance(identifier);
+        PoxPayloadIn multipart = createIntakeInstance(identifier);
         ClientResponse<Response> res = client.create(multipart);
 
         int statusCode = res.getStatus();
@@ -287,7 +289,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         IntakeClient client = new IntakeClient();
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<PoxPayloadIn> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -299,7 +301,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
         IntakesCommon intake = (IntakesCommon) extractPart(input,
                 client.getCommonPartName(), IntakesCommon.class);
         Assert.assertNotNull(intake);
@@ -638,8 +640,8 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
         IntakeClient client = new IntakeClient();
-        MultipartOutput multipart = createIntakeInstance(NON_EXISTENT_ID);
-        ClientResponse<MultipartInput> res =
+        PoxPayloadOut multipart = createIntakeInstance(NON_EXISTENT_ID);
+        ClientResponse<PoxPayloadIn> res =
                 client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
 
@@ -761,7 +763,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
      * @param identifier the identifier
      * @return the multipart output
      */
-    private MultipartOutput createIntakeInstance(String identifier) {
+    private PoxPayloadIn createIntakeInstance(String identifier) {
         return createIntakeInstance(
                 "entryNumber-" + identifier,
                 "entryDate-" + identifier,
@@ -776,7 +778,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
      * @param depositor the depositor
      * @return the multipart output
      */
-    private MultipartOutput createIntakeInstance(String entryNumber,
+    private PoxPayloadIn createIntakeInstance(String entryNumber,
     		String entryDate,
     		String depositor) {
         IntakesCommon intake = new IntakesCommon();

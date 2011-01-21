@@ -2,6 +2,8 @@ package org.collectionspace.services.relation.nuxeo;
 
 //import junit.framework.Assert;
 
+import org.collectionspace.services.common.PoxPayloadIn;
+import org.collectionspace.services.common.PoxPayloadOut;
 import org.collectionspace.services.common.document.InvalidDocumentException;
 import org.collectionspace.services.common.document.ValidatorHandlerImpl;
 import org.collectionspace.services.relation.RelationsCommon;
@@ -13,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 //import org.testng.Assert;
 
-public class RelationValidatorHandler extends ValidatorHandlerImpl<MultipartInput, MultipartOutput>	 {
+public class RelationValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, PoxPayloadOut>	 {
 
     /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(RelationValidatorHandler.class);

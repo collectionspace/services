@@ -40,6 +40,8 @@ import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
+import org.collectionspace.services.common.PoxPayloadIn;
+import org.collectionspace.services.common.PoxPayloadOut;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
@@ -123,9 +125,9 @@ public class ContactResource extends
  * @return the response
  */
 @POST
-    public Response createContact(MultipartInput input) {
+    public Response createContact(PoxPayloadIn input) {
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             //contactObject.setCsid(csid);
@@ -152,7 +154,7 @@ public class ContactResource extends
      */
     @GET
     @Path("{csid}")
-    public MultipartOutput getContact(
+    public PoxPayloadOut getContact(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getContact with csid=" + csid);
@@ -164,12 +166,12 @@ public class ContactResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        MultipartOutput result = null;
+        PoxPayloadOut result = null;
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
-            result = (MultipartOutput) ctx.getOutput();
+            result = ctx.getOutput();
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getContact", dnfe);
@@ -208,7 +210,7 @@ public class ContactResource extends
     	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
         ContactsCommonList contactObjectList = new ContactsCommonList();
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             contactObjectList = (ContactsCommonList) handler.getCommonPartList();
@@ -233,9 +235,9 @@ public class ContactResource extends
      */
     @PUT
     @Path("{csid}")
-    public MultipartOutput updateContact(
+    public PoxPayloadOut updateContact(
             @PathParam("csid") String csid,
-            MultipartInput theUpdate) {
+            PoxPayloadIn theUpdate) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateContact with csid=" + csid);
         }
@@ -246,12 +248,12 @@ public class ContactResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        MultipartOutput result = null;
+        PoxPayloadOut result = null;
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
-            result = (MultipartOutput) ctx.getOutput();
+            result = ctx.getOutput();
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in updateContact", dnfe);
@@ -290,7 +292,7 @@ public class ContactResource extends
             throw new WebApplicationException(response);
         }
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (DocumentNotFoundException dnfe) {

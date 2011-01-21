@@ -24,6 +24,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.collectionspace.services.common.PoxPayloadIn;
+import org.collectionspace.services.common.PoxPayloadOut;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.query.IQueryManager;
@@ -91,7 +93,7 @@ public class RepositoryJavaClientImpl implements RepositoryClient {
      * @param documentModel the document model
      * @throws ClientException the client exception
      */
-    private void setCollectionSpaceCoreValues(ServiceContext<MultipartInput, MultipartOutput> ctx,
+    private void setCollectionSpaceCoreValues(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             DocumentModel documentModel,
             Action action) throws ClientException {
         //

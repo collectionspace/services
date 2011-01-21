@@ -44,6 +44,8 @@ import javax.ws.rs.core.UriInfo;
 //import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
+import org.collectionspace.services.common.PoxPayloadIn;
+import org.collectionspace.services.common.PoxPayloadOut;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 //import org.collectionspace.services.common.context.MultipartServiceContext;
@@ -123,7 +125,7 @@ public class IntakeResource extends
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#createDocumentHandler(org.collectionspace.services.common.context.ServiceContext)
      */
 //    @Override
-//    public DocumentHandler createDocumentHandler(ServiceContext<MultipartInput, MultipartOutput> ctx) throws Exception {
+//    public DocumentHandler createDocumentHandler(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) throws Exception {
 //        DocumentHandler docHandler = ctx.getDocumentHandler();
 //        if (ctx.getInput() != null) {
 //            Object obj = ((MultipartServiceContext) ctx).getInputPart(ctx.getCommonPartLabel(), IntakesCommon.class);
@@ -142,9 +144,9 @@ public class IntakeResource extends
      * @return the response
      */
     @POST
-    public Response createIntake(MultipartInput input) {
+    public Response createIntake(PoxPayloadIn input) {
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             //intakeObject.setCsid(csid);
@@ -175,7 +177,7 @@ public class IntakeResource extends
      */
     @GET
     @Path("{csid}")
-    public MultipartOutput getIntake(
+    public PoxPayloadOut getIntake(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getIntake with csid=" + csid);
@@ -187,12 +189,12 @@ public class IntakeResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        MultipartOutput result = null;
+        PoxPayloadOut result = null;
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
-            result = (MultipartOutput) ctx.getOutput();
+            result = ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -254,7 +256,7 @@ public class IntakeResource extends
     private IntakesCommonList getIntakeList(MultivaluedMap<String, String> queryParams) {
         IntakesCommonList intakeObjectList;
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             intakeObjectList = (IntakesCommonList) handler.getCommonPartList();
@@ -290,11 +292,11 @@ public class IntakeResource extends
     	AuthorityRefList authRefList = null;
         try {
         	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();        	
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentWrapper<DocumentModel> docWrapper = 
             	getRepositoryClient(ctx).getDoc(ctx, csid);
-            DocumentModelHandler<MultipartInput, MultipartOutput> handler 
-            	= (DocumentModelHandler<MultipartInput, MultipartOutput>)createDocumentHandler(ctx);
+            DocumentModelHandler<PoxPayloadIn, PoxPayloadOut> handler 
+            	= (DocumentModelHandler<PoxPayloadIn, PoxPayloadOut>)createDocumentHandler(ctx);
             List<String> authRefFields = 
             	((MultipartServiceContextImpl)ctx).getCommonPartPropertyValues(
             			ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
@@ -324,7 +326,7 @@ public class IntakeResource extends
     public IntakesCommonList getIntakeList(List<String> csidList) {
         IntakesCommonList intakeObjectList = new IntakesCommonList();
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csidList, handler);
             intakeObjectList = (IntakesCommonList) handler.getCommonPartList();
@@ -353,9 +355,9 @@ public class IntakeResource extends
      */
     @PUT
     @Path("{csid}")
-    public MultipartOutput updateIntake(
+    public PoxPayloadOut updateIntake(
             @PathParam("csid") String csid,
-            MultipartInput theUpdate) {
+            PoxPayloadIn theUpdate) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateIntake with csid=" + csid);
         }
@@ -366,12 +368,12 @@ public class IntakeResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        MultipartOutput result = null;
+        PoxPayloadOut result = null;
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
-            result = (MultipartOutput) ctx.getOutput();
+            result = ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -414,7 +416,7 @@ public class IntakeResource extends
             throw new WebApplicationException(response);
         }
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
@@ -465,7 +467,7 @@ public class IntakeResource extends
     		String keywords) {
     	IntakesCommonList intakesObjectList;
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
 
             // perform a keyword search

@@ -49,6 +49,8 @@ import org.collectionspace.services.common.vocabulary.AuthorityResource.Specifie
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
+import org.collectionspace.services.common.PoxPayloadIn;
+import org.collectionspace.services.common.PoxPayloadOut;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
@@ -125,7 +127,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
      * @throws Exception the exception
      */
     private DocumentHandler createContactDocumentHandler(
-    		ServiceContext<MultipartInput, MultipartOutput> ctx, String inAuthority,
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String inAuthority,
             String inItem) throws Exception {
     	
     	ContactDocumentModelHandler docHandler = (ContactDocumentModelHandler)createDocumentHandler(
@@ -150,14 +152,14 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
     public Response createContact(
             @PathParam("parentcsid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
-            MultipartInput input) {
+            PoxPayloadIn input) {
         try {
    			Specifier parentSpec = getSpecifier(parentspecifier, 
    					"createContact(authority)", "CREATE_ITEM_CONTACT");
 			Specifier itemSpec = getSpecifier(itemspecifier, 
 					"createContact(item)", "CREATE_ITEM_CONTACT");
 			// Note that we have to create the service context for the Items, not the main service
-            ServiceContext<MultipartInput, MultipartOutput> ctx = null;
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
 			String parentcsid;
 			if(parentSpec.form==SpecifierForm.CSID) {
 				parentcsid = parentSpec.value;
@@ -237,7 +239,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
 			Specifier itemSpec = getSpecifier(itemspecifier, 
 					"getContactList(item)", "GET_CONTACT_LIST");
 			// Note that we have to create the service context for the Items, not the main service
-            ServiceContext<MultipartInput, MultipartOutput> ctx = null;
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
 			String parentcsid;
 			if(parentSpec.form==SpecifierForm.CSID) {
 				parentcsid = parentSpec.value;
@@ -303,18 +305,18 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
      */
     @GET
     @Path("{parentcsid}/items/{itemcsid}/contacts/{csid}")
-    public MultipartOutput getContact(
+    public PoxPayloadOut getContact(
             @PathParam("parentcsid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
             @PathParam("csid") String csid) {
-        MultipartOutput result = null;
+    	PoxPayloadOut result = null;
         try {
    			Specifier parentSpec = getSpecifier(parentspecifier, 
    					"getContact(parent)", "GET_ITEM_CONTACT");
 			Specifier itemSpec = getSpecifier(itemspecifier, 
 					"getContact(item)", "GET_ITEM_CONTACT");
 			// Note that we have to create the service context for the Items, not the main service
-            ServiceContext<MultipartInput, MultipartOutput> ctx = null;
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
 			String parentcsid;
 			if(parentSpec.form==SpecifierForm.CSID) {
 				parentcsid = parentSpec.value;
@@ -337,7 +339,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
         	ctx = createServiceContext(getContactServiceName());
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             getRepositoryClient(ctx).get(ctx, csid, handler);
-            result = (MultipartOutput) ctx.getOutput();
+            result = ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -383,19 +385,19 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
      */
     @PUT
     @Path("{parentcsid}/items/{itemcsid}/contacts/{csid}")
-    public MultipartOutput updateContact(
+    public PoxPayloadOut updateContact(
             @PathParam("parentcsid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
             @PathParam("csid") String csid,
-            MultipartInput theUpdate) {
-        MultipartOutput result = null;
+            PoxPayloadIn theUpdate) {
+    	PoxPayloadOut result = null;
         try {
    			Specifier parentSpec = getSpecifier(parentspecifier, 
    					"updateContact(authority)", "UPDATE_CONTACT");
 			Specifier itemSpec = getSpecifier(itemspecifier, 
 					"updateContact(item)", "UPDATE_CONTACT");
 			// Note that we have to create the service context for the Items, not the main service
-            ServiceContext<MultipartInput, MultipartOutput> ctx = null;
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
 			String parentcsid;
 			if(parentSpec.form==SpecifierForm.CSID) {
 				parentcsid = parentSpec.value;
@@ -418,7 +420,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
         	ctx = createServiceContext(getContactServiceName(), theUpdate);
             DocumentHandler handler = createContactDocumentHandler(ctx, parentcsid, itemcsid);
             getRepositoryClient(ctx).update(ctx, csid, handler);
-            result = (MultipartOutput) ctx.getOutput();
+            result = ctx.getOutput();
         } catch (BadRequestException bre) {
             Response response = Response.status(
                     Response.Status.BAD_REQUEST).entity("Create failed reason " + bre.getErrorReason()).type("text/plain").build();
@@ -466,7 +468,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
 			Specifier itemSpec = getSpecifier(itemspecifier, 
 					"deleteContact(item)", "DELETE_CONTACT");
 			// Note that we have to create the service context for the Items, not the main service
-            ServiceContext<MultipartInput, MultipartOutput> ctx = null;
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
 			String parentcsid;
 			if(parentSpec.form==SpecifierForm.CSID) {
 				parentcsid = parentSpec.value;

@@ -36,6 +36,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.common.PayloadInputPart;
+import org.collectionspace.services.common.PoxPayloadIn;
+import org.collectionspace.services.common.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -79,7 +82,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
      * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#setServiceContext(org.collectionspace.services.common.context.ServiceContext)
      */
     @Override
-    public void setServiceContext(ServiceContext ctx) {  //FIXME: Apply proper generics to ServiceContext<MultipartInput, MultipartOutput>
+    public void setServiceContext(ServiceContext ctx) {  //FIXME: Apply proper generics to ServiceContext<PoxPayloadIn, PoxPayloadOut>
         if (ctx instanceof MultipartServiceContext) {
             super.setServiceContext(ctx);
         } else {
@@ -97,11 +100,11 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         //return at least those document part(s) that were received
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
-        MultipartInput input = ctx.getInput();
+        PoxPayloadIn input = ctx.getInput();
         if (input != null) {
-	        List<InputPart> inputParts = ctx.getInput().getParts();
-	        for (InputPart part : inputParts) {
-	            String partLabel = part.getHeaders().getFirst("label");
+	        List<PayloadInputPart> inputParts = ctx.getInput().getParts();
+	        for (PayloadInputPart part : inputParts) {
+	            String partLabel = part.getLabel();
 	            ObjectPartType partMeta = partsMetaMap.get(partLabel);
 	//            extractPart(docModel, partLabel, partMeta);
 	            Map<String, Object> unQObjectProperties = extractPart(docModel, partLabel, partMeta);
@@ -191,7 +194,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         //not an ideal way of populating objects.
         DocumentModel docModel = wrapDoc.getWrappedObject();
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
-        MultipartInput input = ctx.getInput();
+        PoxPayloadIn input = ctx.getInput();
         if (input.getParts().isEmpty()) {
             String msg = "No payload found!";
             logger.error(msg + "Ctx=" + getServiceContext().toString());
@@ -201,10 +204,10 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
 
         //iterate over parts received and fill those parts
-        List<InputPart> inputParts = input.getParts();
-        for (InputPart part : inputParts) {
+        List<PayloadInputPart> inputParts = input.getParts();
+        for (PayloadInputPart part : inputParts) {
 
-            String partLabel = part.getHeaders().getFirst("label");
+            String partLabel = part.getLabel();
             if (partLabel == null) {
                 String msg = "Part label is missing or empty!";
                 logger.error(msg + "Ctx=" + getServiceContext().toString());
@@ -228,8 +231,8 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
      * @param partMeta metadata for the object to fill
      * @throws Exception
      */
-    protected void fillPart(InputPart part, DocumentModel docModel,
-            ObjectPartType partMeta, Action action, ServiceContext ctx)
+    protected void fillPart(PayloadInputPart part, DocumentModel docModel,
+            ObjectPartType partMeta, Action action, ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
             throws Exception {
         InputStream payload = part.getBody(InputStream.class, null);
 

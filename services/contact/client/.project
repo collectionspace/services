@@ -1,10 +1,10 @@
 <projectDescription>
   <name>org.collectionspace.services.contact.client</name>
-  <comment/>
+  <comment>NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
   <projects>
-	<project>org.collectionspace.services.common</project>
-	<project>org.collectionspace.services.client</project>
-	<project>org.collectionspace.services.contact.jaxb</project>
+    <project>org.collectionspace.services.client</project>
+    <project>org.collectionspace.services.contact.jaxb</project>
+    <project>org.collectionspace.services.jaxb</project>
   </projects>
   <buildSpec>
     <buildCommand>

@@ -26,6 +26,8 @@ package org.collectionspace.services.relation.nuxeo;
 import java.util.Iterator;
 import java.util.List;
 
+import org.collectionspace.services.common.PoxPayloadIn;
+import org.collectionspace.services.common.PoxPayloadOut;
 import org.collectionspace.services.common.relation.RelationJAXBSchema;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -157,7 +159,7 @@ public class RelationDocumentModelHandler
      * @return the relation list item
      * @throws Exception the exception
      */
-    private RelationListItem getRelationListItem(ServiceContext<MultipartInput, MultipartOutput> ctx,
+    private RelationListItem getRelationListItem(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
     		DocumentModel docModel,
             String serviceContextPath) throws Exception {
         RelationListItem relationListItem = new RelationListItem();

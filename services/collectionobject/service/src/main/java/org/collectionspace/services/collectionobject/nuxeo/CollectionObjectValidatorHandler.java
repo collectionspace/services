@@ -52,6 +52,8 @@ package org.collectionspace.services.collectionobject.nuxeo;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 //import org.collectionspace.services.common.context.MultipartServiceContext;
 //import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.PoxPayloadIn;
+import org.collectionspace.services.common.PoxPayloadOut;
 import org.collectionspace.services.common.document.InvalidDocumentException;
 import org.collectionspace.services.common.document.ValidatorHandlerImpl;
 
@@ -65,7 +67,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author 
  */
-public class CollectionObjectValidatorHandler extends ValidatorHandlerImpl<MultipartInput, MultipartOutput> {
+public class CollectionObjectValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, PoxPayloadOut> {
 
     final Logger logger = LoggerFactory.getLogger(CollectionObjectValidatorHandler.class);
 

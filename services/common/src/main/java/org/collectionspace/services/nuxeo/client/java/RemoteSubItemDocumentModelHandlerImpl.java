@@ -27,6 +27,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.collectionspace.services.common.PayloadInputPart;
+import org.collectionspace.services.common.PoxPayloadIn;
+import org.collectionspace.services.common.PoxPayloadOut;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.service.ObjectPartType;
@@ -66,8 +69,8 @@ public abstract class RemoteSubItemDocumentModelHandlerImpl<T, TL> extends
      * @throws Exception
      */
 	@Override
-    protected void fillPart(InputPart part, DocumentModel docModel, 
-    						ObjectPartType partMeta, Action action, ServiceContext ctx)
+    protected void fillPart(PayloadInputPart part, DocumentModel docModel, 
+    						ObjectPartType partMeta, Action action, ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
             throws Exception {
         InputStream payload = part.getBody(InputStream.class, null);
 

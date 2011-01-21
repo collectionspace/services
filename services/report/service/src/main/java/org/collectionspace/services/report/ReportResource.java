@@ -58,6 +58,8 @@ import net.sf.jasperreports.engine.JasperPrint;
 import org.collectionspace.services.ReportJAXBSchema;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
+import org.collectionspace.services.common.PoxPayloadIn;
+import org.collectionspace.services.common.PoxPayloadOut;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.config.ConfigReader;
 import org.collectionspace.services.common.context.MultipartServiceContextImpl;
@@ -152,9 +154,9 @@ public class ReportResource extends
      * @return the response
      */
     @POST
-    public Response createReport(MultipartInput input) {
+    public Response createReport(PoxPayloadIn input) {
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(ReportResource.class);
@@ -184,7 +186,7 @@ public class ReportResource extends
      */
     @GET
     @Path("{csid}")
-    public MultipartOutput getReport(
+    public PoxPayloadOut getReport(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getReport with csid=" + csid);
@@ -196,12 +198,12 @@ public class ReportResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        MultipartOutput result = null;
+        PoxPayloadOut result = null;
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
-            result = (MultipartOutput) ctx.getOutput();
+            result = ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -255,7 +257,7 @@ public class ReportResource extends
             throw new WebApplicationException(response);
         }
         try {
-    		ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             DocumentWrapper<DocumentModel> docWrapper = getRepositoryClient(ctx).getDoc(ctx, csid);
     		DocumentModel docModel = docWrapper.getWrappedObject();
     		String reportFileName = (String)docModel.getPropertyValue(ReportJAXBSchema.FILENAME);
@@ -384,7 +386,7 @@ public class ReportResource extends
     private ReportsCommonList getReportList(MultivaluedMap<String, String> queryParams) {
         ReportsCommonList reportObjectList;
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             reportObjectList = (ReportsCommonList) handler.getCommonPartList();
@@ -413,7 +415,7 @@ public class ReportResource extends
     public ReportsCommonList getReportList(List<String> csidList) {
         ReportsCommonList reportObjectList = new ReportsCommonList();
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csidList, handler);
             reportObjectList = (ReportsCommonList) handler.getCommonPartList();
@@ -443,9 +445,9 @@ public class ReportResource extends
      */
     @PUT
     @Path("{csid}")
-    public MultipartOutput updateReport(
+    public PoxPayloadOut updateReport(
             @PathParam("csid") String csid,
-            MultipartInput theUpdate) {
+            PoxPayloadIn theUpdate) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateReport with csid=" + csid);
         }
@@ -456,12 +458,12 @@ public class ReportResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        MultipartOutput result = null;
+        PoxPayloadOut result = null;
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
-            result = (MultipartOutput) ctx.getOutput();
+            result = ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -504,7 +506,7 @@ public class ReportResource extends
             throw new WebApplicationException(response);
         }
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
@@ -537,7 +539,7 @@ public class ReportResource extends
     		String keywords) {
     	ReportsCommonList reportsObjectList;
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
 
             // perform a keyword search

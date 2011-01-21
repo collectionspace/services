@@ -90,16 +90,16 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
     //======================= CREATE ====================================================
 
     @POST
-    public Response create(MultipartInput input) {
+    public Response create(PoxPayloadIn input) {
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
             return create(input, ctx);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
         }
     }
     
-    protected Response create(MultipartInput input, ServiceContext<MultipartInput, MultipartOutput> ctx) {
+    protected Response create(PoxPayloadIn input, ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
         try {
             DocumentHandler handler = createDocumentHandler(ctx);
             UriBuilder path = UriBuilder.fromResource(this.getClass());
@@ -110,8 +110,8 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
     }
 
     /** Subclasses may override this overload, which gets called from @see #create(MultipartInput)   */
-    protected Response create(MultipartInput input,
-                              ServiceContext<MultipartInput, MultipartOutput> ctx,
+    protected Response create(PoxPayloadIn input,
+                              ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
                               DocumentHandler handler,
                               UriBuilder path)
     throws Exception {
@@ -125,10 +125,10 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
 
     @PUT
     @Path("{csid}")
-    public MultipartOutput update(@PathParam("csid") String csid, MultipartInput theUpdate) {
+    public PoxPayloadOut update(@PathParam("csid") String csid, PoxPayloadIn theUpdate) {
         ensureCSID(csid, UPDATE);
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate);
             return update(csid, theUpdate, ctx); //==> CALL implementation method, which subclasses may override.
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED, csid);
@@ -136,23 +136,23 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
     }
 
     /** Subclasses may override this overload, which gets called from #udpate(String,MultipartInput)   */
-    protected MultipartOutput update(String csid,
-                                     MultipartInput theUpdate,
-                                     ServiceContext<MultipartInput, MultipartOutput> ctx)
+    protected PoxPayloadOut update(String csid,
+    		PoxPayloadIn theUpdate,
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
     throws Exception {
         DocumentHandler handler = createDocumentHandler(ctx);
         getRepositoryClient(ctx).update(ctx, csid, handler);
-        return (MultipartOutput) ctx.getOutput();
+        return ctx.getOutput();
     }
 
     /** Subclasses may override this overload, which gets called from #udpate(String,MultipartInput)   */
-    protected MultipartOutput update(String csid,
+    protected PoxPayloadOut update(String csid,
                                      MultipartInput theUpdate,
-                                     ServiceContext<MultipartInput, MultipartOutput> ctx,
+                                     ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
                                      DocumentHandler handler)
     throws Exception {
         getRepositoryClient(ctx).update(ctx, csid, handler);
-        return (MultipartOutput) ctx.getOutput();
+        return ctx.getOutput();
     }
 
     //======================= DELETE ====================================================
@@ -162,7 +162,7 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
     public Response delete(@PathParam("csid") String csid) {
         ensureCSID(csid, DELETE);
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             return delete(csid, ctx);  //==> CALL implementation method, which subclasses may override.
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, csid);
@@ -171,7 +171,7 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
 
     /** subclasses may override this method, which is called from #delete(String)
      *  which handles setup of ServiceContext, and does Exception handling.  */
-    protected Response delete(String csid, ServiceContext<MultipartInput, MultipartOutput> ctx)
+    protected Response delete(String csid, ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
     throws Exception {
         getRepositoryClient(ctx).delete(ctx, csid);
         return Response.status(HttpResponseCodes.SC_OK).build();   
@@ -182,11 +182,11 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
 
     @GET
     @Path("{csid}")
-    public MultipartOutput get(@PathParam("csid") String csid) {
+    public PoxPayloadOut get(@PathParam("csid") String csid) {
         ensureCSID(csid, READ);
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
-            MultipartOutput result = get(csid, ctx);// ==> CALL implementation method, which subclasses may override.
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+        	PoxPayloadOut result = get(csid, ctx);// ==> CALL implementation method, which subclasses may override.
             if (result == null) {
                 Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
@@ -198,9 +198,9 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
         }
     }
     
-    protected MultipartOutput get(@PathParam("csid") String csid,
-    		ServiceContext<MultipartInput, MultipartOutput> ctx) throws Exception {
-    	MultipartOutput result = null;
+    protected PoxPayloadOut get(@PathParam("csid") String csid,
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) throws Exception {
+    	PoxPayloadOut result = null;
     	
     	ensureCSID(csid, READ);
         DocumentHandler handler = createDocumentHandler(ctx);
@@ -219,12 +219,12 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
 
     /** subclasses may override this method, which is called from #get(String)
      *  which handles setup of ServiceContext and DocumentHandler, and Exception handling.*/
-    protected MultipartOutput get(String csid,
-                               ServiceContext<MultipartInput, MultipartOutput> ctx,
+    protected PoxPayloadOut get(String csid,
+                               ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
                                DocumentHandler handler)
     throws Exception {
         getRepositoryClient(ctx).get(ctx, csid, handler);
-        return (MultipartOutput) ctx.getOutput();
+        return ctx.getOutput();
     }
 
     //======================= GET without csid. List, search, etc. =====================================
@@ -243,7 +243,7 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
 
     protected AbstractCommonList getList(MultivaluedMap<String, String> queryParams) {
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             return (AbstractCommonList)handler.getCommonPartList();
@@ -254,7 +254,7 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
 
     protected AbstractCommonList search(MultivaluedMap<String, String> queryParams, String keywords) {
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             // perform a keyword search
             if (keywords != null && !keywords.isEmpty()) {
@@ -276,7 +276,7 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
     @Deprecated
     public AbstractCommonList getList(List<String> csidList) {
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csidList, handler);
             return (AbstractCommonList)handler.getCommonPartList();
@@ -296,9 +296,9 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
     	AuthorityRefList authRefList = null;
         try {
         	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentWrapper<DocumentModel> docWrapper = getRepositoryClient(ctx).getDoc(ctx, csid);
-            DocumentModelHandler<MultipartInput, MultipartOutput> handler = (DocumentModelHandler<MultipartInput, MultipartOutput>)createDocumentHandler(ctx);
+            DocumentModelHandler<PoxPayloadIn, PoxPayloadOut> handler = (DocumentModelHandler<PoxPayloadIn, PoxPayloadOut>)createDocumentHandler(ctx);
             List<String> authRefFields =
             	    ((MultipartServiceContextImpl) ctx).getCommonPartPropertyValues(
         			ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);

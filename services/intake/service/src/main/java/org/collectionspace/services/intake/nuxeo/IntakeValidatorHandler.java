@@ -1,5 +1,7 @@
 package org.collectionspace.services.intake.nuxeo;
 
+import org.collectionspace.services.common.PoxPayloadIn;
+import org.collectionspace.services.common.PoxPayloadOut;
 import org.collectionspace.services.common.document.InvalidDocumentException;
 import org.collectionspace.services.common.document.ValidatorHandlerImpl;
 import org.collectionspace.services.intake.IntakesCommon;
@@ -10,7 +12,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class IntakeValidatorHandler extends ValidatorHandlerImpl<MultipartInput, MultipartOutput> {
+public class IntakeValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, PoxPayloadOut> {
 
     /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(IntakeValidatorHandler.class);

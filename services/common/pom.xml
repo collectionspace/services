@@ -281,11 +281,11 @@
         </dependency>
 
         <!--fixme where is jaxen needed? -->
-        <dependency>
+<!--        <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
             <version>1.1.1</version>
-        </dependency>
+        </dependency> -->
 		<dependency>
 		    <groupId>commons-fileupload</groupId>
 		    <artifactId>commons-fileupload</artifactId>
