@@ -1,7 +1,7 @@
 package org.collectionspace.services.intake.nuxeo;
 
-import org.collectionspace.services.common.PoxPayloadIn;
-import org.collectionspace.services.common.PoxPayloadOut;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.document.InvalidDocumentException;
 import org.collectionspace.services.common.document.ValidatorHandlerImpl;
 import org.collectionspace.services.intake.IntakesCommon;

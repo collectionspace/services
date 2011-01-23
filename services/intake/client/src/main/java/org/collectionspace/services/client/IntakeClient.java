@@ -29,7 +29,6 @@ package org.collectionspace.services.client;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.common.PoxPayloadIn;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 //import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.intake.IntakesCommonList;
@@ -126,7 +125,7 @@ public class IntakeClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.IntakeProxy#getIntake(java.lang.String)
      */
-    public ClientResponse<PoxPayloadIn> read(String csid) {
+    public ClientResponse<String> read(String csid) {
         return intakeProxy.read(csid);
     }
 
@@ -135,8 +134,9 @@ public class IntakeClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.IntakeProxy#createIntake(org.collectionspace.hello.Intake)
      */
-    public ClientResponse<Response> create(PoxPayloadIn multipart) {
-        return intakeProxy.create(multipart);
+    public ClientResponse<Response> create(PoxPayloadOut multipart) {
+    	String payload = multipart.toXML();
+        return intakeProxy.create(payload);
     }
 
     /**
@@ -145,7 +145,7 @@ public class IntakeClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.IntakeProxy#updateIntake(java.lang.Long, org.collectionspace.hello.Intake)
      */
-    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
+    public ClientResponse<String> update(String csid, PoxPayloadOut multipart) {
         return intakeProxy.update(csid, multipart);
 
     }

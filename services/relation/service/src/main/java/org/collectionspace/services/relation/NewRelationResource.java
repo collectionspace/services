@@ -42,12 +42,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.relation.IRelationsManager;
 import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
-import org.collectionspace.services.common.PoxPayloadIn;
-import org.collectionspace.services.common.PoxPayloadOut;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;

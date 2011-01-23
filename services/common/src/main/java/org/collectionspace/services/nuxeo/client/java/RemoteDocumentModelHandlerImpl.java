@@ -36,9 +36,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.common.PayloadInputPart;
-import org.collectionspace.services.common.PoxPayloadIn;
-import org.collectionspace.services.common.PoxPayloadOut;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;

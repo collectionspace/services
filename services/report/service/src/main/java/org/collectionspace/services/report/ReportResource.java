@@ -56,10 +56,10 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 
 import org.collectionspace.services.ReportJAXBSchema;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
-import org.collectionspace.services.common.PoxPayloadIn;
-import org.collectionspace.services.common.PoxPayloadOut;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.config.ConfigReader;
 import org.collectionspace.services.common.context.MultipartServiceContextImpl;

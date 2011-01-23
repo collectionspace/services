@@ -27,9 +27,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.collectionspace.services.common.PayloadInputPart;
-import org.collectionspace.services.common.PoxPayloadIn;
-import org.collectionspace.services.common.PoxPayloadOut;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.service.ObjectPartType;

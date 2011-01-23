@@ -31,10 +31,10 @@ import java.lang.reflect.Constructor;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.collectionspace.services.common.PayloadInputPart;
-import org.collectionspace.services.common.PayloadOutputPart;
-import org.collectionspace.services.common.PoxPayloadIn;
-import org.collectionspace.services.common.PoxPayloadOut;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.security.UnauthorizedException;
 //import org.jboss.resteasy.plugins.providers.multipart.InputPart;
@@ -68,7 +68,7 @@ public class MultipartServiceContextImpl
     protected MultipartServiceContextImpl(String serviceName)
 			throws UnauthorizedException {
     	super(serviceName);
-    	setOutput(new PoxPayloadOut());
+    	setOutput(new PoxPayloadOut(serviceName));
     }
     
     /**
@@ -81,7 +81,7 @@ public class MultipartServiceContextImpl
     protected MultipartServiceContextImpl(String serviceName, PoxPayloadIn theInput)
     		throws UnauthorizedException {
         super(serviceName, theInput);
-        setOutput(new PoxPayloadOut());
+        setOutput(new PoxPayloadOut(serviceName));
     }
 
     /**
@@ -96,7 +96,7 @@ public class MultipartServiceContextImpl
     		PoxPayloadIn theInput,
     		MultivaluedMap<String, String> queryParams) throws UnauthorizedException {
     	super(serviceName, theInput, queryParams);
-    	setOutput(new PoxPayloadOut());
+    	setOutput(new PoxPayloadOut(serviceName));
     }
 
     /**

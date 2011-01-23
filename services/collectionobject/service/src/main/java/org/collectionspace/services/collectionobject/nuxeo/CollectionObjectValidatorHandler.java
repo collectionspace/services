@@ -49,11 +49,11 @@
  */
 package org.collectionspace.services.collectionobject.nuxeo;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 //import org.collectionspace.services.common.context.MultipartServiceContext;
 //import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.PoxPayloadIn;
-import org.collectionspace.services.common.PoxPayloadOut;
 import org.collectionspace.services.common.document.InvalidDocumentException;
 import org.collectionspace.services.common.document.ValidatorHandlerImpl;
 

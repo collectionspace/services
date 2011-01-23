@@ -47,10 +47,10 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
-import org.collectionspace.services.common.PoxPayloadIn;
-import org.collectionspace.services.common.PoxPayloadOut;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.blob.BlobInput;

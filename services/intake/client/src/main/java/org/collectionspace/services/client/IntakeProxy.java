@@ -36,7 +36,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.common.PoxPayloadIn;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.intake.IntakesCommonList;
 import org.collectionspace.services.person.PersonsCommonList;
@@ -70,7 +69,7 @@ public interface IntakeProxy extends CollectionSpaceProxy {
      * @return the client response
      */
     @POST
-    ClientResponse<Response> create(PoxPayloadIn multipart);
+    ClientResponse<Response> create(String multipart);
 
     //(R)ead
     /**
@@ -81,7 +80,7 @@ public interface IntakeProxy extends CollectionSpaceProxy {
      */
     @GET
     @Path("/{csid}")
-    ClientResponse<PoxPayloadIn> read(@PathParam("csid") String csid);
+    ClientResponse<String> read(@PathParam("csid") String csid);
 
     //(U)pdate
     /**
@@ -93,7 +92,7 @@ public interface IntakeProxy extends CollectionSpaceProxy {
      */
     @PUT
     @Path("/{csid}")
-    ClientResponse<MultipartInput> update(@PathParam("csid") String csid, MultipartOutput multipart);
+    ClientResponse<String> update(@PathParam("csid") String csid, PoxPayloadOut multipart);
 
     //(D)elete
     /**

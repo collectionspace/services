@@ -42,10 +42,10 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 //import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
-import org.collectionspace.services.common.PoxPayloadIn;
-import org.collectionspace.services.common.PoxPayloadOut;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 //import org.collectionspace.services.common.context.MultipartServiceContext;
@@ -144,7 +144,7 @@ public class IntakeResource extends
      * @return the response
      */
     @POST
-    public Response createIntake(PoxPayloadIn input) {
+    public Response createIntake(String input) {
         try {
         	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);

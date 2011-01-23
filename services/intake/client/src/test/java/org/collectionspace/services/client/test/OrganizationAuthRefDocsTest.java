@@ -35,6 +35,8 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IntakeClient;
 import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.client.OrgAuthorityClientUtils;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.intake.ConditionCheckerOrAssessorList;
 import org.collectionspace.services.intake.IntakesCommon;
@@ -117,7 +119,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
         createOrgRefs();
 
         IntakeClient intakeClient = new IntakeClient();
-        MultipartOutput multipart = createIntakeInstance(
+        PoxPayloadOut multipart = createIntakeInstance(
                 "entryNumber-" + identifier,
                 "entryDate-" + identifier,
                 currentOwnerRefName,
@@ -323,7 +325,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
         return SERVICE_PATH_COMPONENT;
     }
 
-   private MultipartOutput createIntakeInstance(String entryNumber,
+   private PoxPayloadOut createIntakeInstance(String entryNumber,
     		String entryDate,
 				String currentOwner,
 				String depositor,
@@ -347,10 +349,10 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
         insurers.add(insurer);
         intake.setInsurers(insurerList);
 
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart =
+        PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart =
             multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new IntakeClient().getCommonPartName());
+        commonPart.setLabel(new IntakeClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, intake common");

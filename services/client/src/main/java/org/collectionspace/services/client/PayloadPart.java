@@ -1,6 +1,6 @@
-package org.collectionspace.services.common;
+package org.collectionspace.services.client;
 
-public class PayloadOutputPart {
+	abstract class PayloadPart {
 	private String label;
 	
 	public void setLabel(String label) {

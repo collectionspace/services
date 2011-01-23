@@ -46,6 +46,8 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.io.FileUtils;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.TestServiceClient;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
@@ -355,24 +357,24 @@ public abstract class BaseServiceTest {
      * @return the object
      * @throws Exception the exception
      */
-    static protected Object extractPart(MultipartInput input, String label, Class<?> clazz)
+    static protected Object extractPart(PoxPayloadIn input, String label, Class<?> clazz)
             throws Exception {
         Object obj = null;
         String partLabel = "";
-        List<InputPart> parts = input.getParts();
+        List<PayloadInputPart> parts = input.getParts();
         if (parts.size() == 0) {
             logger.warn("No parts found in multipart body.");
         }
         if (logger.isDebugEnabled()) {
             logger.debug("Parts:");
-            for (InputPart part : parts) {
-                partLabel = part.getHeaders().getFirst("label");
+            for (PayloadInputPart part : parts) {
+                partLabel = part.getLabel();
                 logger.debug("part = " + partLabel);
             }
         }
         boolean partLabelMatched = false;
-        for (InputPart part : parts) {
-            partLabel = part.getHeaders().getFirst("label");
+        for (PayloadInputPart part : parts) {
+            partLabel = part.getLabel();
             if (label.equalsIgnoreCase(partLabel)) {
                 partLabelMatched = true;
                 if (logger.isDebugEnabled()) {

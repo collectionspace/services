@@ -26,8 +26,8 @@ package org.collectionspace.services.relation.nuxeo;
 import java.util.Iterator;
 import java.util.List;
 
-import org.collectionspace.services.common.PoxPayloadIn;
-import org.collectionspace.services.common.PoxPayloadOut;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.relation.RelationJAXBSchema;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
 import org.collectionspace.services.common.context.ServiceContext;

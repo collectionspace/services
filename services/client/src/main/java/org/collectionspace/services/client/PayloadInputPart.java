@@ -1,15 +1,11 @@
-package org.collectionspace.services.common;
+package org.collectionspace.services.client;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
 
 import javax.ws.rs.core.MediaType;
 
-public class PayloadInputPart {
-	public String getLabel() {
-		return null;
-	}
-	
+public class PayloadInputPart extends PayloadPart {
 	public String getBodyAsString() {
 		return null;
 	}
