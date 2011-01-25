@@ -26,6 +26,7 @@
  */
 package org.collectionspace.services.common;
 
+import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.context.MultipartServiceContext;
@@ -71,12 +72,16 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends
     public DocumentHandler createDocumentHandler(ServiceContext<PoxPayloadIn, PoxPayloadOut> serviceContext,
     		String schemaName, 
     		Class<?> commonClass) throws Exception {
+    	DocumentHandler result = null;
+    	
     	MultipartServiceContext ctx = (MultipartServiceContext)serviceContext;
     	Object commonPart = null;
     	if (ctx.getInput() != null) {
-        	commonPart = ctx.getInputPart(schemaName, commonClass);
+        	commonPart = ctx.getInputPart(schemaName);
         }
-        return super.createDocumentHandler(ctx, commonPart);
+        result = super.createDocumentHandler(ctx, commonPart);
+        
+        return result;
     }
     
     /**

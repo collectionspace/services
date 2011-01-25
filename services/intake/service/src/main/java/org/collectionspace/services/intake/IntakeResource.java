@@ -144,8 +144,9 @@ public class IntakeResource extends
      * @return the response
      */
     @POST
-    public Response createIntake(String input) {
+    public Response createIntake(String xmlText) {    	
         try {
+        	PoxPayloadIn input = new PoxPayloadIn(xmlText);
         	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);

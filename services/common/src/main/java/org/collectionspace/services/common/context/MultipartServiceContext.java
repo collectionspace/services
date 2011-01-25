@@ -74,7 +74,17 @@ public interface MultipartServiceContext
      * @param clazz class of the object
      * @return part
      */
-    public Object getInputPart(String label, Class clazz) throws IOException;
+    @Deprecated
+    public Object getInputPart(String label, Class<?> clazz) throws IOException;
+    
+    /**
+     * Gets the input part.
+     *
+     * @param label the label
+     * @return the input part
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    public Object getInputPart(String label) throws IOException;
 
     /**
      * getInputPartAsString returns the input part with given label in the string form

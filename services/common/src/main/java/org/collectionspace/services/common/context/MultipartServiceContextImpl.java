@@ -108,8 +108,8 @@ public class MultipartServiceContextImpl
      * 
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    private PayloadInputPart getInputPart(String label) throws IOException {
-        if (getInput() != null) {
+    public PayloadInputPart getPayloadInputPart(String label) throws IOException {
+        if (getInput() != null && label != null) {
         	PoxPayloadIn fdip = getInput();
 
             for (PayloadInputPart part : fdip.getParts()) {
@@ -130,21 +130,30 @@ public class MultipartServiceContextImpl
      * @see org.collectionspace.services.common.context.MultipartServiceContext#getInputPart(java.lang.String, java.lang.Class)
      */
     @Override
+    @Deprecated
     public Object getInputPart(String label, Class clazz) throws IOException {
-        Object obj = null;
-        PayloadInputPart part = getInputPart(label);
-        if (part != null) {
-            obj = part.getBody(clazz, null);
-        }
-        return obj;
+        return getInputPart(label);
     }
-
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.common.context.MultipartServiceContext#getInputPart(java.lang.String, java.lang.Class)
+     */
+    @Override
+    public Object getInputPart(String label) throws IOException {
+    	Object result = null;
+        PayloadInputPart payloadInputPart = getPayloadInputPart(label);
+        if (payloadInputPart != null) {
+        	result = payloadInputPart.getBody();
+        }
+        return result;
+    }
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.MultipartServiceContext#getInputPartAsString(java.lang.String)
      */
     @Override
     public String getInputPartAsString(String label) throws IOException {
-    	PayloadInputPart part = getInputPart(label);
+    	PayloadInputPart part = getPayloadInputPart(label);
         if (part != null) {
             return part.getBodyAsString();
         }
@@ -156,7 +165,7 @@ public class MultipartServiceContextImpl
      */
     @Override
     public InputStream getInputPartAsStream(String label) throws IOException {
-    	PayloadInputPart part = getInputPart(label);
+    	PayloadInputPart part = getPayloadInputPart(label);
         if (part != null) {
             return new ByteArrayInputStream(part.getBodyAsString().getBytes());
         }
