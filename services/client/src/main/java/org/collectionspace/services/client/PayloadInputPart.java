@@ -31,6 +31,10 @@ public class PayloadInputPart extends PayloadPart {
 		this.elementBody = elementBody;
 	}
 	
+	public Element getElementBody() {
+		return this.elementBody;
+	}
+	
 	@Override
 	public String asXML() {
 		String result = null;

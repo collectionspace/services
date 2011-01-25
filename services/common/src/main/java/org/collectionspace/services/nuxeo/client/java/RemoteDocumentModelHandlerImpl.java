@@ -49,6 +49,7 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.vocabulary.RefNameUtils;
+import org.dom4j.Element;
 
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -239,9 +240,10 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         //check if this is an xml part
         if (part.getMediaType().equals(MediaType.APPLICATION_XML_TYPE)) {
             if (payload != null) {
-                Document document = DocumentUtils.parseDocument(payload, partMeta,
-                        false /*don't validate*/);
-                Map<String, Object> objectProps = DocumentUtils.parseProperties(partMeta, document, ctx);
+//                Document document = DocumentUtils.parseDocument(payload, partMeta,
+//                        false /*don't validate*/);
+            	Element element = part.getElementBody();
+                Map<String, Object> objectProps = DocumentUtils.parseProperties(partMeta, element, ctx);
                 if (action == Action.UPDATE) {
                     this.filterReadOnlyPropertiesForPart(objectProps, partMeta);
                 }

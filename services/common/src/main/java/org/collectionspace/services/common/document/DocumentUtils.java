@@ -1076,22 +1076,23 @@ public class DocumentUtils {
 	 * @return the map
 	 */
 	public static Map<String, Object> parseProperties(ObjectPartType partMeta,
-			Document document, ServiceContext ctx) throws Exception {
+			org.dom4j.Element document, ServiceContext ctx) throws Exception {
 		Map<String, Object> result = null;
 		String schemaName = partMeta.getLabel();
 		Schema schema = getSchemaFromName(schemaName);
-		
-		org.dom4j.io.DOMReader xmlReader = new org.dom4j.io.DOMReader();
-		org.dom4j.Document dom4jDocument = xmlReader.read(document);
+
+		//		org.dom4j.io.DOMReader xmlReader = new org.dom4j.io.DOMReader();
+		//		org.dom4j.Document dom4jDocument = xmlReader.read(document);
 		try {
-                    result = loadSchema(schema, dom4jDocument.getRootElement(), ctx);
-                } catch (IllegalArgumentException iae) {
-                    throw iae;
+			//                    result = loadSchema(schema, dom4jDocument.getRootElement(), ctx);
+			result = loadSchema(schema, document, ctx);
+		} catch (IllegalArgumentException iae) {
+			throw iae;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return result;
 	}
 	
