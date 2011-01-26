@@ -178,7 +178,7 @@ public class IntakeResource extends
      */
     @GET
     @Path("{csid}")
-    public PoxPayloadOut getIntake(
+    public String getIntake(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getIntake with csid=" + csid);
@@ -222,7 +222,8 @@ public class IntakeResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        
+        return result.toXML();
     }
 
     /**

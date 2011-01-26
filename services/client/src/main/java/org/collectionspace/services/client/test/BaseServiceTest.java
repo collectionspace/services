@@ -46,9 +46,6 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.io.FileUtils;
-import org.collectionspace.services.client.PayloadInputPart;
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.TestServiceClient;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -59,6 +56,10 @@ import org.testng.annotations.DataProvider;
 import org.w3c.dom.Document;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.TestServiceClient;
+
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /**
@@ -380,7 +381,7 @@ public abstract class BaseServiceTest {
                 if (logger.isDebugEnabled()) {
                     logger.debug("found part" + partLabel);
                 }
-                String partStr = part.getBodyAsString();
+                String partStr = part.asXML();
                 if (partStr == null || partStr.trim().isEmpty()) {
                     logger.warn("Part '" + label + "' in multipart body is empty.");
                 } else {

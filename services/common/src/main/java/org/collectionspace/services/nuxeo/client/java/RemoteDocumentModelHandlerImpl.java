@@ -63,7 +63,7 @@ import org.nuxeo.ecm.core.schema.types.Schema;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
+import org.dom4j.Document;
 
 /**
  * RemoteDocumentModelHandler
@@ -129,10 +129,10 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
      */
     private void addOutputPart(Map<String, Object> unQObjectProperties, String schema, ObjectPartType partMeta)
             throws Exception {
-        Document doc = DocumentUtils.buildDocument(partMeta, schema,
+        Element doc = DocumentUtils.buildDocument(partMeta, schema,
                 unQObjectProperties);
         if (logger.isDebugEnabled() == true) {
-            logger.debug(DocumentUtils.xmlToString(doc));
+            logger.debug(doc.asXML());
         }
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
         ctx.addOutputPart(schema, doc, partMeta.getContent().getContentType());
@@ -235,20 +235,16 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
     protected void fillPart(PayloadInputPart part, DocumentModel docModel,
             ObjectPartType partMeta, Action action, ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
             throws Exception {
-        InputStream payload = part.getBody(InputStream.class, null);
-
         //check if this is an xml part
         if (part.getMediaType().equals(MediaType.APPLICATION_XML_TYPE)) {
-            if (payload != null) {
 //                Document document = DocumentUtils.parseDocument(payload, partMeta,
 //                        false /*don't validate*/);
-            	Element element = part.getElementBody();
-                Map<String, Object> objectProps = DocumentUtils.parseProperties(partMeta, element, ctx);
-                if (action == Action.UPDATE) {
-                    this.filterReadOnlyPropertiesForPart(objectProps, partMeta);
-                }
-                docModel.setProperties(partMeta.getLabel(), objectProps);
+        	Element element = part.getElementBody();
+            Map<String, Object> objectProps = DocumentUtils.parseProperties(partMeta, element, ctx);
+            if (action == Action.UPDATE) {
+                this.filterReadOnlyPropertiesForPart(objectProps, partMeta);
             }
+            docModel.setProperties(partMeta.getLabel(), objectProps);
         }
     }
 
@@ -292,7 +288,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         if (mt.equals(MediaType.APPLICATION_XML_TYPE)) {
             Map<String, Object> objectProps = docModel.getProperties(schema);
             //unqualify properties before sending the doc over the wire (to save bandwidh)
-            //FIXME: is there a better way to avoid duplication of a collection?
+            //FIXME: is there a better way to avoid duplication of a Map/Collection?
             Map<String, Object> unQObjectProperties =
                     (addToMap != null) ? addToMap : (new HashMap<String, Object>());
             Set<Entry<String, Object>> qualifiedEntries = objectProps.entrySet();

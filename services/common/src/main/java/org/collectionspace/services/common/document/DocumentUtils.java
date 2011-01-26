@@ -59,6 +59,7 @@ import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.service.ObjectPartContentType;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.service.XmlContentType;
+import org.dom4j.io.DOMReader;
 
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
@@ -493,7 +494,7 @@ public class DocumentUtils {
 	 * @return Document
 	 * @throws Exception
 	 */
-	public static Document buildDocument(ObjectPartType partMeta, String rootElementName,
+	public static org.dom4j.Element buildDocument(ObjectPartType partMeta, String rootElementName,
 			Map<String, Object> objectProps)
 	throws Exception {
 		ObjectPartContentType partContentMeta = partMeta.getContent();
@@ -525,7 +526,11 @@ public class DocumentUtils {
 
 		buildDocument(document, root, objectProps, schema);
 
-		return document;
+		DOMReader reader = new DOMReader();
+		org.dom4j.Document dom4jDoc = reader.read(document);
+		org.dom4j.Element result = dom4jDoc.getRootElement();
+		
+		return result;//FIXME: REM - Add if (logger.isTraceEnabled() == true) logger.trace(document.asXML());
 	}
 
 	/**
@@ -1107,7 +1112,7 @@ public class DocumentUtils {
 	@SuppressWarnings("unchecked")
 	static private Map<String, Object> loadSchema(Schema schema, org.dom4j.Element schemaElement, ServiceContext ctx)
 	throws Exception {
-		String schemaName1 = schemaElement.attributeValue(ExportConstants.NAME_ATTR);
+		String schemaName1 = schemaElement.attributeValue(ExportConstants.NAME_ATTR);//FIXME: Do we need this local var?
 		String schemaName = schema.getName();
 
 		Map<String, Object> data = new HashMap<String, Object>();

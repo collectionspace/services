@@ -28,9 +28,10 @@ import java.io.InputStream;
 
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.dom4j.Element;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.w3c.dom.Document;
+import org.dom4j.Document;
 
 /**
  * RemoteServiceContext is used to encapsulate the service context of a
@@ -107,5 +108,5 @@ public interface MultipartServiceContext
      * @param document
      * @param contentType media type
      */
-    public void addOutputPart(String label, Document doc, String contentType) throws Exception;
+    public void addOutputPart(String label, Element doc, String contentType) throws Exception;
 }

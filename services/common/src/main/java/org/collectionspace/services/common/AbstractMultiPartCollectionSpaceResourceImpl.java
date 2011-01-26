@@ -55,7 +55,7 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends
 
     @Override
     public DocumentHandler createDocumentHandler(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) throws Exception {
-    	return createDocumentHandler(ctx, ctx.getCommonPartLabel(),getCommonPartClass());
+    	return createDocumentHandler(ctx, ctx.getCommonPartLabel(), getCommonPartClass());
     }
     
     /**
