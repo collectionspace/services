@@ -1,17 +1,9 @@
 package org.collectionspace.services.client;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
 
 import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
 public class PayloadInputPart extends PayloadPart {
@@ -22,25 +14,19 @@ public class PayloadInputPart extends PayloadPart {
 	}
 	
 	public PayloadInputPart(String label, Object body, Element elementBody) {
-		super(label, body);
-		this.elementBody = elementBody;
+		super(label, body, elementBody);
 	}
 	
 	public PayloadInputPart(String label, Element elementBody) {
-		super(label);
-		this.elementBody = elementBody;
-	}
-	
-	public Element getElementBody() {
-		return this.elementBody;
+		super(label, elementBody);
 	}
 	
 	@Override
 	public String asXML() {
 		String result = null;
 		Object body = getBody();
-		if (elementBody != null) {
-			result = elementBody.asXML();
+		if (getElementBody() != null) {
+			result = getElementBody().asXML();
 		} else if (body != null) {
 			result = PoxPayload.toElement(getBody()).asXML();
 		}

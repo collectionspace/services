@@ -12,12 +12,17 @@ import org.dom4j.Element;
 	}
 	
 	public PayloadPart(String label, Object body) {
-		this.label = label;
+		this(label);
 		this.body = body;
 	}
-	
+
+	public PayloadPart(String label, Object body, Element elementBody) {
+		this(label, body);
+		this.elementBody = elementBody;
+	}
+
 	public PayloadPart(String label, Element elementBody) {
-		this.label = label;
+		this(label);
 		this.elementBody = elementBody;
 	}
 
