@@ -69,7 +69,7 @@ public interface IntakeProxy extends CollectionSpaceProxy {
      * @return the client response
      */
     @POST
-    ClientResponse<Response> create(String multipart);
+    ClientResponse<Response> create(String payload);
 
     //(R)ead
     /**
@@ -92,7 +92,7 @@ public interface IntakeProxy extends CollectionSpaceProxy {
      */
     @PUT
     @Path("/{csid}")
-    ClientResponse<String> update(@PathParam("csid") String csid, PoxPayloadOut multipart);
+    ClientResponse<String> update(@PathParam("csid") String csid, String payload);
 
     //(D)elete
     /**

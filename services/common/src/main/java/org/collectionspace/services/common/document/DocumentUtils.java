@@ -94,8 +94,9 @@ import org.w3c.dom.Text;
 
 //import org.dom4j.Document;
 //import org.dom4j.Element;
-//import org.dom4j.*;
-
+//import org.dom4j.Node;
+//import org.dom4j.NodeList;
+//import org.dom4j.Text;
 
 /**
  * DocumentUtils is a collection of utilities related to document management
@@ -518,13 +519,19 @@ public class DocumentUtils {
 		String ns = "ns2";
 		Element root = document.createElementNS(xc.getNamespaceURI(), ns + ":" + rootElementName);
 		root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-		root.setAttribute("xsi:schemaLocation", xc.getSchemaLocation());
+		
+//		String getSchemaLocation = xc.getSchemaLocation();
+//		root.setAttribute("xsi:schemaLocation", xc.getSchemaLocation());
+		
+		String getNamespaceURI = xc.getNamespaceURI();
 		root.setAttribute("xmlns:" + ns, xc.getNamespaceURI());
 		document.appendChild(root);
 
 		Schema schema = getSchemaFromName(partMeta.getLabel());
 
 		buildDocument(document, root, objectProps, schema);
+		String w3cDocumentStr = xmlToString(document);
+		
 
 		DOMReader reader = new DOMReader();
 		org.dom4j.Document dom4jDoc = reader.read(document);

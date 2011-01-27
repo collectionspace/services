@@ -42,7 +42,6 @@ public class PoxPayloadIn extends PoxPayload<PayloadInputPart> {
 			Object jaxbObject = PoxPayload.toObject(element);			
 			if (jaxbObject != null) {
 				payloadInputPart = new PayloadInputPart(label, jaxbObject, element);
-				this.addPart(payloadInputPart);
 			} else {
 				payloadInputPart = new PayloadInputPart(label, element);
 			}

@@ -66,13 +66,18 @@ public class PoxPayloadOut extends PoxPayload {
 		
 	@Deprecated
 	public PayloadOutputPart addPart(Object entity, MediaType mediaType) {
-		PayloadOutputPart result = new PayloadOutputPart("unlabelled", entity);
-		getParts().add(result);
+		PayloadOutputPart result = addPart("unlabelled", entity);
 		return result;
 	}
 	
 	public PayloadOutputPart addPart(String label, Element elementBody) {
 		PayloadOutputPart result = new PayloadOutputPart(label, elementBody);
+		getParts().add(result);
+		return result;
+	}
+	
+	public PayloadOutputPart addPart(String label, Object entity) {
+		PayloadOutputPart result = new PayloadOutputPart(label, entity);
 		getParts().add(result);
 		return result;
 	}	

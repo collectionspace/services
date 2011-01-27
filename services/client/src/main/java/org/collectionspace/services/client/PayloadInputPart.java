@@ -15,7 +15,7 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
 public class PayloadInputPart extends PayloadPart {
-	private Element elementBody;
+//	private Element elementBody;
 	
 	public PayloadInputPart(String label, Object body) {
 		super(label, body);

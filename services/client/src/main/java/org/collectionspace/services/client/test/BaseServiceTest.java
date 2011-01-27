@@ -360,56 +360,15 @@ public abstract class BaseServiceTest {
      */
     static protected Object extractPart(PoxPayloadIn input, String label, Class<?> clazz)
             throws Exception {
-        Object obj = null;
-        String partLabel = "";
-        List<PayloadInputPart> parts = input.getParts();
-        if (parts.size() == 0) {
-            logger.warn("No parts found in multipart body.");
+    	Object result = null;
+    	PayloadInputPart payloadInputPart = input.getPart(label);
+        if (payloadInputPart != null) {
+        	result = payloadInputPart.getBody();
+        } else if (logger.isWarnEnabled() == true) {
+        	logger.warn("Payload part: " + label +
+        			" is missing from payload: " + input.getName());
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Parts:");
-            for (PayloadInputPart part : parts) {
-                partLabel = part.getLabel();
-                logger.debug("part = " + partLabel);
-            }
-        }
-        boolean partLabelMatched = false;
-        for (PayloadInputPart part : parts) {
-            partLabel = part.getLabel();
-            if (label.equalsIgnoreCase(partLabel)) {
-                partLabelMatched = true;
-                if (logger.isDebugEnabled()) {
-                    logger.debug("found part" + partLabel);
-                }
-                String partStr = part.asXML();
-                if (partStr == null || partStr.trim().isEmpty()) {
-                    logger.warn("Part '" + label + "' in multipart body is empty.");
-                } else {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("extracted part as str=\n" + partStr);
-                    }
-                    try {
-                        obj = part.getBody(clazz, null);
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("extracted part as obj="+objectAsXmlString(obj, clazz));
-                        }
-                    } catch (Throwable t) {
-                        logger.error("Could not get part body based on content and classname. "+ clazz.getName()+ " error: "+t);
-                    }
-                }
-                break;
-            }
-        }
-        if (!partLabelMatched) {
-            logger.warn("Could not find part '" + label + "' in multipart body.");
-            // In the event that getBodyAsString() or getBody(), above, do *not*
-            // throw an IOException, but getBody() nonetheless retrieves a null object.
-            // This *may* be unreachable.
-        } else if (obj == null) {
-            logger.warn("Could not extract part '" + label
-                    + "' in multipart body as an object.");
-        }
-        return obj;
+        return result;
     }
 
     /**
@@ -420,6 +379,7 @@ public abstract class BaseServiceTest {
      * @return the part object
      * @throws JAXBException the jAXB exception
      */
+    @Deprecated
     static protected Object getPartObject(String partStr, Class<?> clazz)
             throws JAXBException {
         JAXBContext jc = JAXBContext.newInstance(clazz);

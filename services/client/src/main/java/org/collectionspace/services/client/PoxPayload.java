@@ -3,6 +3,7 @@ package org.collectionspace.services.client;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -28,6 +29,21 @@ public class PoxPayload<PT extends PayloadPart> {
 		this.documentName = documentName;
 	}
 	
+	public PT getPart(String label) {
+		PT result = null;
+		if (parts != null) {
+			Iterator<PT> it = parts.iterator();
+			while (it.hasNext() == true) {
+				PT part = it.next();
+				if (part.getLabel().equalsIgnoreCase(label) == true) {
+					result = part;
+					break;
+				}
+			}
+		}
+		return result;
+	}
+	
 	public List<PT> getParts() {
 		return parts;
 	}
@@ -49,7 +65,7 @@ public class PoxPayload<PT extends PayloadPart> {
 	    	JAXBContext jc = JAXBContext.newInstance(thePackage);
 	    	Unmarshaller um = jc.createUnmarshaller();
 	    	result = um.unmarshal(
-	    			new ByteArrayInputStream(elementInput.asXML().getBytes()));
+	    			new ByteArrayInputStream(elementInput.asXML().getBytes())); //FIXME:REM - For efficiency, use org.dom4j.JAXBReader() with a JAXBObjectHandler to get the unmarshalled object
     	} catch (Exception e) {
     		e.printStackTrace();
     	}

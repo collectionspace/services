@@ -357,9 +357,9 @@ public class IntakeResource extends
      */
     @PUT
     @Path("{csid}")
-    public PoxPayloadOut updateIntake(
+    public String updateIntake(
             @PathParam("csid") String csid,
-            PoxPayloadIn theUpdate) {
+            String xmlText) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateIntake with csid=" + csid);
         }
@@ -372,7 +372,8 @@ public class IntakeResource extends
         }
         PoxPayloadOut result = null;
         try {
-        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate);
+            PoxPayloadIn update = new PoxPayloadIn(xmlText);
+        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(update);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = ctx.getOutput();
@@ -393,7 +394,8 @@ public class IntakeResource extends
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        
+        return result.toXML();
     }
 
     /**

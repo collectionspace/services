@@ -146,7 +146,8 @@ public class IntakeClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.services.client.IntakeProxy#updateIntake(java.lang.Long, org.collectionspace.hello.Intake)
      */
     public ClientResponse<String> update(String csid, PoxPayloadOut multipart) {
-        return intakeProxy.update(csid, multipart);
+    	String payload = multipart.toXML();
+        return intakeProxy.update(csid, payload);
 
     }
 

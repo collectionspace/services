@@ -28,6 +28,7 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IntakeClient;
+import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -303,23 +304,28 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        IntakesCommon intake = (IntakesCommon) extractPart(input,
-                client.getCommonPartName(), IntakesCommon.class);
-        Assert.assertNotNull(intake);
+        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+        IntakesCommon intakeCommons = null;
+        if (payloadInputPart != null) {
+        	intakeCommons = (IntakesCommon) payloadInputPart.getBody();
+        }
+//        IntakesCommon intake = (IntakesCommon) extractPart(input,
+//                client.getCommonPartName(), IntakesCommon.class);
+        Assert.assertNotNull(intakeCommons);
 
         // Verify the number and contents of values in repeatable fields,
         // as created in the instance record used for testing.
         List<String> entryMethods =
-                intake.getEntryMethods().getEntryMethod();
+        	intakeCommons.getEntryMethods().getEntryMethod();
         Assert.assertTrue(entryMethods.size() > 0);
         Assert.assertNotNull(entryMethods.get(0));
 
         List<String> fieldCollectionEventNames =
-                intake.getFieldCollectionEventNames().getFieldCollectionEventName();
+        	intakeCommons.getFieldCollectionEventNames().getFieldCollectionEventName();
         Assert.assertTrue(fieldCollectionEventNames.size() > 0);
         Assert.assertNotNull(fieldCollectionEventNames.get(0));
 
-        CurrentLocationGroupList currentLocationGroupList = intake.getCurrentLocationGroupList();
+        CurrentLocationGroupList currentLocationGroupList = intakeCommons.getCurrentLocationGroupList();
         Assert.assertNotNull(currentLocationGroupList);
         List<CurrentLocationGroup> currentLocationGroups = currentLocationGroupList.getCurrentLocationGroup();
         Assert.assertNotNull(currentLocationGroups);
@@ -433,8 +439,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         IntakeClient client = new IntakeClient();
-        ClientResponse<String> res =
-                client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": read status = " + res.getStatus());
         }
@@ -444,19 +449,24 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
             logger.debug("got object to update with ID: " + knownResourceId);
         }
         PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
-        IntakesCommon intake = (IntakesCommon) extractPart(input,
-                client.getCommonPartName(), IntakesCommon.class);
-        Assert.assertNotNull(intake);
+        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+        IntakesCommon intakeCommons = null;
+        if (payloadInputPart != null) {
+        	intakeCommons = (IntakesCommon) payloadInputPart.getBody();
+        }       
+//        IntakesCommon intake = (IntakesCommon) extractPart(input,
+//                client.getCommonPartName(), IntakesCommon.class);
+        Assert.assertNotNull(intakeCommons);
 
         // Update the content of this resource.
-        intake.setEntryNumber("updated-" + intake.getEntryNumber());
-        intake.setEntryDate("updated-" + intake.getEntryDate());
+        intakeCommons.setEntryNumber("updated-" + intakeCommons.getEntryNumber());
+        intakeCommons.setEntryDate("updated-" + intakeCommons.getEntryDate());
         if(logger.isDebugEnabled()){
             logger.debug("to be updated object");
-            logger.debug(objectAsXmlString(intake, IntakesCommon.class));
+            logger.debug(objectAsXmlString(intakeCommons, IntakesCommon.class));
         }
 
-        CurrentLocationGroupList currentLocationGroupList = intake.getCurrentLocationGroupList();
+        CurrentLocationGroupList currentLocationGroupList = intakeCommons.getCurrentLocationGroupList();
         Assert.assertNotNull(currentLocationGroupList);
         List<CurrentLocationGroup> currentLocationGroups = currentLocationGroupList.getCurrentLocationGroup();
         Assert.assertNotNull(currentLocationGroups);
@@ -467,11 +477,11 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(currentLocationNote);
         String updatedCurrentLocationNote = "updated-" + currentLocationNote;
         currentLocationGroups.get(0).setCurrentLocationNote(updatedCurrentLocationNote);
-        intake.setCurrentLocationGroupList(currentLocationGroupList);
+        intakeCommons.setCurrentLocationGroupList(currentLocationGroupList);
 
         // Submit the request to the service and store the response.
         PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
-        PayloadOutputPart commonPart = output.addPart(intake, MediaType.APPLICATION_XML_TYPE);
+        PayloadOutputPart commonPart = output.addPart(intakeCommons, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(client.getCommonPartName());
 
         res = client.update(knownResourceId, output);
@@ -492,7 +502,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(updatedIntake);
 
         Assert.assertEquals(updatedIntake.getEntryDate(),
-                intake.getEntryDate(),
+        		intakeCommons.getEntryDate(),
                 "Data in updated object did not match submitted data.");
 
         currentLocationGroupList = updatedIntake.getCurrentLocationGroupList();
