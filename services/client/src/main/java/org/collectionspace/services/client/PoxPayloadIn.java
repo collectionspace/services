@@ -7,6 +7,9 @@ import java.io.StringReader;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -17,24 +20,13 @@ import org.xml.sax.InputSource;
 
 public class PoxPayloadIn extends PoxPayload<PayloadInputPart> {
 
-	private InputStream getInputStream(String inputString) {
-		return new ByteArrayInputStream(inputString.getBytes());
-	}
-
-	public static PoxPayloadIn createInstance(String xmlText) throws DocumentException {
-		PoxPayloadIn result = null;
-		SAXReader reader = new SAXReader();
-		StringReader strReader = new StringReader(xmlText);
-		Document doc = reader.read(strReader);        
-
-		return result;
-	}
-
-	public PoxPayloadIn(String xmlText) throws DocumentException {
-		this.setXmlText(xmlText);
-		SAXReader reader = new SAXReader();
-		Document doc = reader.read(getInputStream(xmlText));  //FIXME: REM - Use StringReader instead of InputStream
-		Iterator<Element> it = doc.getRootElement().elementIterator();
+	/*
+	 * Parse the POX 'xmlPayload' into individual parts.  Each part is saved
+	 * as a DOM4j Element and, if possible, a JAXB object instance as well.
+	 */
+	public PoxPayloadIn(String xmlPayload) throws DocumentException {
+		super(xmlPayload);
+		Iterator<Element> it = getDOMDocument().getRootElement().elementIterator();
 		PayloadInputPart payloadInputPart = null;
 		while (it.hasNext() == true) {
 			Element element = (Element) it.next();
@@ -48,15 +40,6 @@ public class PoxPayloadIn extends PoxPayload<PayloadInputPart> {
 			if (payloadInputPart != null) {
 				this.addPart(payloadInputPart);
 			}
-			//FIXME: REM - Add this to logger.isTraceEnables()
-			Namespace namespace = (Namespace)element.declaredNamespaces().get(0);
-			System.out.println("element/label name: " + label);
-			System.out.println("attributeCount: " + element.attributeCount());
-			List<Attribute> attributes = element.attributes();
-			for (Attribute  attr : attributes) {
-				System.out.println("Attribute: " + attr.getName() + ":" +
-						attr.asXML());
-			}	
 		}		
 	}
 

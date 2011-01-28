@@ -1,8 +1,12 @@
 package org.collectionspace.services.client;
 
 import org.dom4j.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-	abstract class PayloadPart {
+public abstract class PayloadPart {
+	protected final Logger logger = LoggerFactory.getLogger(PayloadPart.class);
+		
 	private String label;
 	private Object body;
 	private Element elementBody;

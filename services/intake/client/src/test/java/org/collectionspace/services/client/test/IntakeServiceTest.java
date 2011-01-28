@@ -39,6 +39,7 @@ import org.collectionspace.services.intake.CurrentLocationGroupList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.IntakesCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.dom4j.DocumentException;
 
 import org.jboss.resteasy.client.ClientResponse;
 //import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;

@@ -297,9 +297,8 @@ public class DocumentUtils {
 			result = db.parse(payload);
 
 			// Write it to the log so we can see what we've created.
-			if (logger.isDebugEnabled() == true) {
-				logger.debug(xmlToString(result));
-				//System.out.println(xmlToString(result)); //FIXME: REM - Need this until we figure out why messages are not showing up in logger.
+			if (logger.isTraceEnabled() == true) {
+				logger.trace(xmlToString(result));
 			}
 		} finally {
 			if (payload != null) {

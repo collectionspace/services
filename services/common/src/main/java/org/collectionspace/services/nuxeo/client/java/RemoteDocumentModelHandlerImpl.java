@@ -284,7 +284,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
             throws Exception {
         Map<String, Object> result = null;
 
-        MediaType mt = MediaType.valueOf(partMeta.getContent().getContentType());
+        MediaType mt = MediaType.valueOf(partMeta.getContent().getContentType()); //FIXME: REM - This is no longer needed.  Everything is POX
         if (mt.equals(MediaType.APPLICATION_XML_TYPE)) {
             Map<String, Object> objectProps = docModel.getProperties(schema);
             //unqualify properties before sending the doc over the wire (to save bandwidh)

@@ -24,19 +24,17 @@
 package org.collectionspace.services.common.context;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.security.UnauthorizedException;
+import org.dom4j.DocumentException;
 import org.dom4j.Element;
 //import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 //import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -44,7 +42,6 @@ import org.dom4j.Element;
 //import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.dom4j.Document;
 
 /**
  * MultipartServiceContextImpl takes Multipart Input/Output
@@ -67,7 +64,7 @@ public class MultipartServiceContextImpl
      * @throws UnauthorizedException the unauthorized exception
      */
     protected MultipartServiceContextImpl(String serviceName)
-			throws UnauthorizedException {
+    		throws DocumentException, UnauthorizedException {
     	super(serviceName);
     	setOutput(new PoxPayloadOut(serviceName));
     }
@@ -80,7 +77,7 @@ public class MultipartServiceContextImpl
      * @throws UnauthorizedException the unauthorized exception
      */
     protected MultipartServiceContextImpl(String serviceName, PoxPayloadIn theInput)
-    		throws UnauthorizedException {
+    		throws DocumentException, UnauthorizedException {
         super(serviceName, theInput);
         setOutput(new PoxPayloadOut(serviceName));
     }
@@ -95,36 +92,10 @@ public class MultipartServiceContextImpl
      */
     protected MultipartServiceContextImpl(String serviceName,
     		PoxPayloadIn theInput,
-    		MultivaluedMap<String, String> queryParams) throws UnauthorizedException {
+    		MultivaluedMap<String, String> queryParams) 
+    			throws DocumentException, UnauthorizedException {
     	super(serviceName, theInput, queryParams);
     	setOutput(new PoxPayloadOut(serviceName));
-    }
-
-    /**
-     * Gets the input part.
-     * 
-     * @param label the label
-     * 
-     * @return the input part
-     * 
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    public PayloadInputPart getPayloadInputPart(String label) throws IOException {
-        if (getInput() != null && label != null) {
-        	PoxPayloadIn fdip = getInput();
-
-            for (PayloadInputPart part : fdip.getParts()) {
-                String partLabel = part.getLabel();
-                if (label.equalsIgnoreCase(partLabel)) {
-                    if (logger.isTraceEnabled()) {
-                        logger.trace("getInputPart found part with label=" + partLabel
-                                + "\npayload=" + part.asXML());
-                    }
-                    return part;
-                }
-            }
-        }
-        return null;
     }
 
     /* (non-Javadoc)
@@ -142,7 +113,7 @@ public class MultipartServiceContextImpl
     @Override
     public Object getInputPart(String label) throws IOException {
     	Object result = null;
-        PayloadInputPart payloadInputPart = getPayloadInputPart(label);
+        PayloadInputPart payloadInputPart = getInput().getPart(label);
         if (payloadInputPart != null) {
         	result = payloadInputPart.getBody();
         }
@@ -155,7 +126,7 @@ public class MultipartServiceContextImpl
     @Override
     public String getInputPartAsString(String label) throws IOException {
     	String result = null;
-    	PayloadInputPart part = getPayloadInputPart(label);
+    	PayloadInputPart part = getInput().getPart(label);
         if (part != null) {
         	Element element = part.asElement();
         	if (element != null) {
