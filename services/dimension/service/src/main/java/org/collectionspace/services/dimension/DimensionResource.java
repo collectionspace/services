@@ -50,8 +50,6 @@ import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,14 +120,15 @@ public class DimensionResource extends
     /**
      * Creates the dimension.
      * 
-     * @param input the input
+     * @param xmlText an XML payload
      * 
      * @return the response
      */
     @POST
-    public Response createDimension(PoxPayloadIn input) {
+    public Response createDimension(String xmlText) {
         try {
-        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
+            PoxPayloadIn input = new PoxPayloadIn(xmlText);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             //dimensionObject.setCsid(csid);
@@ -156,7 +155,7 @@ public class DimensionResource extends
      */
     @GET
     @Path("{csid}")
-    public PoxPayloadOut getDimension(
+    public String getDimension(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getDimension with csid=" + csid);
@@ -196,7 +195,7 @@ public class DimensionResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.toXML();
     }
 
     /**
@@ -231,15 +230,14 @@ public class DimensionResource extends
      * Update dimension.
      * 
      * @param csid the csid
-     * @param theUpdate the the update
+     * @param xmlText an XML payload
      * 
      * @return the multipart output
      */
     @PUT
     @Path("{csid}")
-    public PoxPayloadOut updateDimension(
-            @PathParam("csid") String csid,
-            PoxPayloadIn theUpdate) {
+    public String updateDimension(
+            @PathParam("csid") String csid, String xmlText) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateDimension with csid=" + csid);
         }
@@ -252,13 +250,14 @@ public class DimensionResource extends
         }
         PoxPayloadOut result = null;
         try {
-        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate);
+            PoxPayloadIn update = new PoxPayloadIn(xmlText);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(update);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = ctx.getOutput();
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
-                logger.debug("caugth exception in updateDimension", dnfe);
+                logger.debug("Caught exception in updateDimension", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Update failed on Dimension csid=" + csid).type(
@@ -269,7 +268,7 @@ public class DimensionResource extends
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.toXML();
     }
 
     /**
@@ -294,7 +293,7 @@ public class DimensionResource extends
             throw new WebApplicationException(response);
         }
         try {
-        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (DocumentNotFoundException dnfe) {

@@ -118,7 +118,7 @@ public class DimensionClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.services.client.DimensionProxy#getDimension(java.lang.String)
      */
 
-    public ClientResponse<MultipartInput> read(String csid) {
+    public ClientResponse<String> read(String csid) {
         return dimensionProxy.read(csid);
     }
 
@@ -127,8 +127,9 @@ public class DimensionClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.DimensionProxy#createDimension(org.collectionspace.services.Dimension)
      */
-    public ClientResponse<Response> create(MultipartOutput multipart) {
-        return dimensionProxy.create(multipart);
+    public ClientResponse<Response> create(PoxPayloadOut multipart) {
+    	String payload = multipart.toXML();
+        return dimensionProxy.create(payload);
     }
 
     /**
@@ -137,9 +138,9 @@ public class DimensionClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.DimensionProxy#updateDimension(java.lang.Long, org.collectionspace.services.Dimension)
      */
-    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
-        return dimensionProxy.update(csid, multipart);
-
+    public ClientResponse<String> update(String csid, PoxPayloadOut multipart) {
+    	String payload = multipart.toXML();
+        return dimensionProxy.update(csid, payload);
     }
 
     /**

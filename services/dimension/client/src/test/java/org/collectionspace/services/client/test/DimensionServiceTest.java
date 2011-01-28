@@ -30,15 +30,16 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.DimensionClient;
 import org.collectionspace.services.client.DimensionFactory;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.dimension.DimensionsCommon;
 import org.collectionspace.services.dimension.DimensionsCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 //import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -104,7 +105,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         DimensionClient client = new DimensionClient();
         String identifier = createIdentifier();
-        MultipartOutput multipart = createDimensionInstance(client.getCommonPartName(),
+        PoxPayloadOut multipart = createDimensionInstance(client.getCommonPartName(),
                 identifier);
         ClientResponse<Response> res = client.create(multipart);
 
@@ -284,7 +285,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         DimensionClient client = new DimensionClient();
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -296,10 +297,13 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
-        DimensionsCommon dimension = (DimensionsCommon) extractPart(input,
-                client.getCommonPartName(), DimensionsCommon.class);
-        Assert.assertNotNull(dimension);
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+        DimensionsCommon dimensionsCommon = null;
+        if (payloadInputPart != null) {
+        	dimensionsCommon = (DimensionsCommon) payloadInputPart.getBody();
+        }
+        Assert.assertNotNull(dimensionsCommon);
     }
 
     // Failure outcomes
@@ -319,7 +323,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         DimensionClient client = new DimensionClient();
-        ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -406,7 +410,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         DimensionClient client = new DimensionClient();
-        ClientResponse<MultipartInput> res =
+        ClientResponse<String> res =
                 client.read(knownResourceId);
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": read status = " + res.getStatus());
@@ -416,22 +420,25 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         if (logger.isDebugEnabled()) {
             logger.debug("got object to update with ID: " + knownResourceId);
         }
-        MultipartInput input = (MultipartInput) res.getEntity();
-        DimensionsCommon dimension = (DimensionsCommon) extractPart(input,
-                client.getCommonPartName(), DimensionsCommon.class);
-        Assert.assertNotNull(dimension);
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+        DimensionsCommon dimensionsCommon = null;
+        if (payloadInputPart != null) {
+        	dimensionsCommon = (DimensionsCommon) payloadInputPart.getBody();
+        }
+        Assert.assertNotNull(dimensionsCommon);
 
         // Update the content of this resource.
-        dimension.setValue("updated-" + dimension.getValue());
-        dimension.setValueDate("updated-" + dimension.getValueDate());
+        dimensionsCommon.setValue("updated-" + dimensionsCommon.getValue());
+        dimensionsCommon.setValueDate("updated-" + dimensionsCommon.getValueDate());
         if (logger.isDebugEnabled()) {
             logger.debug("to be updated object");
-            logger.debug(objectAsXmlString(dimension, DimensionsCommon.class));
+            logger.debug(objectAsXmlString(dimensionsCommon, DimensionsCommon.class));
         }
         // Submit the request to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(dimension, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
+        PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart = output.addPart(dimensionsCommon, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getCommonPartName());
 
         res = client.update(knownResourceId, output);
         int statusCode = res.getStatus();
@@ -443,15 +450,14 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-
-        input = (MultipartInput) res.getEntity();
-        DimensionsCommon updatedDimension =
+        input = new PoxPayloadIn(res.getEntity());
+        DimensionsCommon updatedDimensionsCommon =
                 (DimensionsCommon) extractPart(input,
                 client.getCommonPartName(), DimensionsCommon.class);
-        Assert.assertNotNull(updatedDimension);
+        Assert.assertNotNull(updatedDimensionsCommon);
 
-        Assert.assertEquals(updatedDimension.getValueDate(),
-                dimension.getValueDate(),
+        Assert.assertEquals(updatedDimensionsCommon.getValueDate(),
+                dimensionsCommon.getValueDate(),
                 "Data in updated object did not match submitted data.");
 
     }
@@ -590,9 +596,9 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
         DimensionClient client = new DimensionClient();
-        MultipartOutput multipart = createDimensionInstance(client.getCommonPartName(),
+        PoxPayloadOut multipart = createDimensionInstance(client.getCommonPartName(),
                 NON_EXISTENT_ID);
-        ClientResponse<MultipartInput> res =
+        ClientResponse<String> res =
                 client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
 
@@ -714,7 +720,7 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      * @param identifier the identifier
      * @return the multipart output
      */
-    private MultipartOutput createDimensionInstance(String commonPartName, String identifier) {
+    private PoxPayloadOut createDimensionInstance(String commonPartName, String identifier) {
         return createDimensionInstance(commonPartName, 
                 "dimensionType-" + identifier,
                 "entryNumber-" + identifier,
@@ -729,17 +735,17 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
      * @param entryDate the entry date
      * @return the multipart output
      */
-    private MultipartOutput createDimensionInstance(String commonPartName, String dimensionType, String entryNumber, String entryDate) {
-        DimensionsCommon dimension = new DimensionsCommon();
-        dimension.setDimension(dimensionType);
-        dimension.setValue(entryNumber);
-        dimension.setValueDate(entryDate);
-        MultipartOutput multipart = DimensionFactory.createDimensionInstance(
-                commonPartName, dimension);
+    private PoxPayloadOut createDimensionInstance(String commonPartName, String dimensionType, String entryNumber, String entryDate) {
+        DimensionsCommon dimensionsCommon = new DimensionsCommon();
+        dimensionsCommon.setDimension(dimensionType);
+        dimensionsCommon.setValue(entryNumber);
+        dimensionsCommon.setValueDate(entryDate);
+        PoxPayloadOut multipart = DimensionFactory.createDimensionInstance(
+                commonPartName, dimensionsCommon);
 
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, dimension common");
-            logger.debug(objectAsXmlString(dimension,
+            logger.debug(objectAsXmlString(dimensionsCommon,
                     DimensionsCommon.class));
         }
 

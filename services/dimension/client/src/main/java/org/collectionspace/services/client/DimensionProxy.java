@@ -29,17 +29,17 @@ public interface DimensionProxy extends CollectionSpaceProxy {
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(MultipartOutput multipart);
+    ClientResponse<Response> create(String payload);
 
     //(R)ead
     @GET
     @Path("/{csid}")
-    ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
+    ClientResponse<String> read(@PathParam("csid") String csid);
 
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<MultipartInput> update(@PathParam("csid") String csid, MultipartOutput multipart);
+    ClientResponse<String> update(@PathParam("csid") String csid, String payload);
 
     //(D)elete
     @DELETE
