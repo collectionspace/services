@@ -58,8 +58,8 @@ import org.slf4j.LoggerFactory;
  * The Class DimensionResource.
  */
 @Path("/dimensions")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Consumes("application/xml")
+@Produces("application/xml")
 public class DimensionResource extends
 		AbstractMultiPartCollectionSpaceResourceImpl {
 
