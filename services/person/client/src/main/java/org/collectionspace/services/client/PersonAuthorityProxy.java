@@ -18,7 +18,6 @@ import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.person.PersonauthoritiesCommonList;
 import org.collectionspace.services.person.PersonsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
@@ -41,17 +40,17 @@ public interface PersonAuthorityProxy extends CollectionSpaceProxy {
     //(R)ead
     @GET
     @Path("/{csid}")
-    ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
+    ClientResponse<PoxPayloadIn> read(@PathParam("csid") String csid);
 
     //(R)ead by name
     @GET
     @Path("/urn:cspace:name({name})")
-    ClientResponse<MultipartInput> readByName(@PathParam("name") String name);
+    ClientResponse<PoxPayloadIn> readByName(@PathParam("name") String name);
 
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<MultipartInput> update(@PathParam("csid") String csid, MultipartOutput multipart);
+    ClientResponse<PoxPayloadIn> update(@PathParam("csid") String csid, MultipartOutput multipart);
 
     //(D)elete
     @DELETE
@@ -98,27 +97,27 @@ public interface PersonAuthorityProxy extends CollectionSpaceProxy {
     //(R)ead Item
     @GET
     @Path("/{vcsid}/items/{csid}")
-    ClientResponse<MultipartInput> readItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
+    ClientResponse<PoxPayloadIn> readItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
 
     //(R)ead Named Item
     @GET
     @Path("/{vcsid}/items/urn:cspace:name({specifier})")
-    ClientResponse<MultipartInput> readNamedItem(@PathParam("vcsid") String vcsid, @PathParam("specifier") String specifier);
+    ClientResponse<PoxPayloadIn> readNamedItem(@PathParam("vcsid") String vcsid, @PathParam("specifier") String specifier);
 
     //(R)ead Item In Named Authority
     @GET
     @Path("/urn:cspace:name({specifier})/items/{csid}")
-    ClientResponse<MultipartInput> readItemInNamedAuthority(@PathParam("specifier") String specifier, @PathParam("csid") String csid);
+    ClientResponse<PoxPayloadIn> readItemInNamedAuthority(@PathParam("specifier") String specifier, @PathParam("csid") String csid);
 
     //(R)ead Named Item In Named Authority
     @GET
     @Path("/urn:cspace:name({specifier})/items/urn:cspace:name({itemspecifier})")
-    ClientResponse<MultipartInput> readNamedItemInNamedAuthority(@PathParam("specifier") String specifier, @PathParam("itemspecifier") String itemspecifier);
+    ClientResponse<PoxPayloadIn> readNamedItemInNamedAuthority(@PathParam("specifier") String specifier, @PathParam("itemspecifier") String itemspecifier);
 
     //(U)pdate Item
     @PUT
     @Path("/{vcsid}/items/{csid}")
-    ClientResponse<MultipartInput> updateItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid, MultipartOutput multipart);
+    ClientResponse<PoxPayloadIn> updateItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid, MultipartOutput multipart);
 
     //(D)elete Item
     @DELETE
@@ -180,25 +179,25 @@ public interface PersonAuthorityProxy extends CollectionSpaceProxy {
      //(R)ead Contact
     @GET
     @Path("/{parentcsid}/items/{itemcsid}/contacts/{csid}")
-    ClientResponse<MultipartInput> readContact(
+    ClientResponse<PoxPayloadIn> readContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid);
     @GET
     @Path("/{parentcsid}/items/urn:cspace:name({itemspecifier})/contacts/{csid}")
-    ClientResponse<MultipartInput> readContactForNamedItem(
+    ClientResponse<PoxPayloadIn> readContactForNamedItem(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemspecifier") String itemspecifier,
             @PathParam("csid") String csid);
     @GET
     @Path("/urn:cspace:name({parentspecifier})/items/{itemcsid}/contacts/{csid}")
-    ClientResponse<MultipartInput> readContactInNamedAuthority(
+    ClientResponse<PoxPayloadIn> readContactInNamedAuthority(
             @PathParam("parentspecifier") String parentspecifier,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid);
     @GET
     @Path("/urn:cspace:name({parentspecifier})/items/urn:cspace:name({itemspecifier})/contacts/{csid}")
-    ClientResponse<MultipartInput> readContactForNamedItemInNamedAuthority(
+    ClientResponse<PoxPayloadIn> readContactForNamedItemInNamedAuthority(
             @PathParam("parentspecifier") String parentspecifier,
             @PathParam("itemspecifier") String itemspecifier,
             @PathParam("csid") String csid);
@@ -206,28 +205,28 @@ public interface PersonAuthorityProxy extends CollectionSpaceProxy {
     //(U)pdate Contact
     @PUT
     @Path("/{parentcsid}/items/{itemcsid}/contacts/{csid}")
-    ClientResponse<MultipartInput> updateContact(
+    ClientResponse<PoxPayloadIn> updateContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid,
             MultipartOutput multipart);
     @PUT
     @Path("/{parentcsid}/items/urn:cspace:name({itemspecifier})/contacts/{csid}")
-    ClientResponse<MultipartInput> updateContactForNamedItem(
+    ClientResponse<PoxPayloadIn> updateContactForNamedItem(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemspecifier") String itemspecifier,
             @PathParam("csid") String csid,
             MultipartOutput multipart);
     @PUT
     @Path("/urn:cspace:name({parentspecifier})/items/{itemcsid}/contacts/{csid}")
-    ClientResponse<MultipartInput> updateContactInNamedAuthority(
+    ClientResponse<PoxPayloadIn> updateContactInNamedAuthority(
             @PathParam("parentspecifier") String parentspecifier,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid,
             MultipartOutput multipart);
     @PUT
     @Path("/urn:cspace:name({parentspecifier})/items/urn:cspace:name({itemspecifier})/contacts/{csid}")
-    ClientResponse<MultipartInput> updateContactForNamedItemInNamedAuthority(
+    ClientResponse<PoxPayloadIn> updateContactForNamedItemInNamedAuthority(
             @PathParam("parentspecifier") String parentspecifier,
             @PathParam("itemspecifier") String itemspecifier,
             @PathParam("csid") String csid,

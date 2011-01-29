@@ -32,6 +32,12 @@
             <artifactId>org.collectionspace.services.vocabulary.jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+		    <groupId>org.collectionspace.services</groupId>
+		    <artifactId>org.collectionspace.services.vocabulary.client</artifactId>
+        	<version>${project.version}</version>
+        </dependency>
+        
         <!-- External dependencies -->
         <dependency>
             <groupId>junit</groupId>

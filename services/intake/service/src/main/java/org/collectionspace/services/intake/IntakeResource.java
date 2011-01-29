@@ -42,6 +42,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 //import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
+import org.collectionspace.services.client.IntakeClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
@@ -60,11 +61,11 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.security.UnauthorizedException;
-import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
+//import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
-import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+//import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
@@ -73,14 +74,14 @@ import org.slf4j.LoggerFactory;
 /**
  * The Class IntakeResource.
  */
-@Path("/intakes")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Path("/" + IntakeClient.SERVICE_PATH_COMPONENT)
+@Consumes("application/xml")
+@Produces("application/xml")
 public class IntakeResource extends
 		AbstractMultiPartCollectionSpaceResourceImpl {
 
     /** The Constant serviceName. */
-    private final static String serviceName = "intakes";
+    private final static String serviceName = IntakeClient.SERVICE_PATH_COMPONENT;
     
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(IntakeResource.class);

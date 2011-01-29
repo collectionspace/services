@@ -43,7 +43,7 @@ import org.collectionspace.services.person.PersonauthoritiesCommonList;
 import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadIn;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
@@ -216,7 +216,7 @@ public class Sample {
         // Submit the request to the service and store the response.
         PersonauthoritiesCommon personAuthority = null;
         try {
-            ClientResponse<MultipartInput> res = client.read(personAuthId);
+            ClientResponse<PoxPayloadIn> res = client.read(personAuthId);
             int statusCode = res.getStatus();
             if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
                 throw new RuntimeException("Could not read personAuthority"
@@ -226,7 +226,7 @@ public class Sample {
                 throw new RuntimeException("Unexpected Status when reading " +
                     "personAuthority, Status:"+ statusCode);
             }
-            MultipartInput input = (MultipartInput) res.getEntity();
+            PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
             personAuthority = (PersonauthoritiesCommon) extractPart(input,
                     client.getCommonPartName(), PersonauthoritiesCommon.class);
         } catch (Exception e) {
@@ -459,7 +459,7 @@ public class Sample {
         return sb.toString();
     }
 
-    private Object extractPart(MultipartInput input, String label,
+    private Object extractPart(PoxPayloadIn input, String label,
         Class clazz) throws Exception {
         Object obj = null;
         for(InputPart part : input.getParts()){

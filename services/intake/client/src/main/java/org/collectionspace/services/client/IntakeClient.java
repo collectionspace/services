@@ -26,7 +26,7 @@
  */
 package org.collectionspace.services.client;
 
-import javax.ws.rs.PathParam;
+//import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
@@ -37,8 +37,8 @@ import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
@@ -48,12 +48,13 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
 public class IntakeClient extends AbstractServiceClientImpl {
+	public static final String SERVICE_PATH_COMPONENT = "intakes"; //FIXME: REM - The JAX-RS proxy, client, and resource classes should ref this value
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */
     public String getServicePathComponent() {
-        return "intakes";
+        return SERVICE_PATH_COMPONENT;
     }
     /**
      *

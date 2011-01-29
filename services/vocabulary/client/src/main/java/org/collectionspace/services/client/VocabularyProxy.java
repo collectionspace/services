@@ -9,23 +9,22 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
+//import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+//import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.vocabulary.VocabulariesCommonList;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
  * @version $Revision:$
  */
-@Path("/vocabularies/")
-@Produces({"multipart/mixed"})
-@Consumes({"multipart/mixed"})
+//@Path("/vocabularies/")
+@Path("/" + VocabularyClient.SERVICE_PATH_COMPONENT + "/")
+@Produces({"application/xml"})
+@Consumes({"application/xml"})
 public interface VocabularyProxy extends CollectionSpaceProxy {
 
     // List Vocabularies
@@ -35,22 +34,22 @@ public interface VocabularyProxy extends CollectionSpaceProxy {
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(MultipartOutput multipart);
+    ClientResponse<Response> create(String xmlPayload);
 
     //(R)ead
     @GET
     @Path("/{csid}")
-    ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
+    ClientResponse<String> read(@PathParam("csid") String csid);
 
     //(R)ead by name
     @GET
     @Path("/urn:cspace:name({name})")
-    ClientResponse<MultipartInput> readByName(@PathParam("name") String name);
+    ClientResponse<String> readByName(@PathParam("name") String name);
 
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<MultipartInput> update(@PathParam("csid") String csid, MultipartOutput multipart);
+    ClientResponse<String> update(@PathParam("csid") String csid, String xmlPayload);
 
     //(D)elete
     @DELETE
@@ -78,17 +77,17 @@ public interface VocabularyProxy extends CollectionSpaceProxy {
     //(C)reate Item
     @POST
     @Path("/{vcsid}/items/")
-    ClientResponse<Response> createItem(@PathParam("vcsid") String vcsid, MultipartOutput multipart);
+    ClientResponse<Response> createItem(@PathParam("vcsid") String vcsid, String xmlPayload);
 
     //(R)ead
     @GET
     @Path("/{vcsid}/items/{csid}")
-    ClientResponse<MultipartInput> readItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
+    ClientResponse<String> readItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
 
     //(U)pdate
     @PUT
     @Path("/{vcsid}/items/{csid}")
-    ClientResponse<MultipartInput> updateItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid, MultipartOutput multipart);
+    ClientResponse<String> updateItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid, String xmlPayload);
 
     //(D)elete
     @DELETE

@@ -65,8 +65,7 @@ import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
@@ -75,11 +74,11 @@ import org.slf4j.LoggerFactory;
 /**
  * The Class VocabularyResource.
  */
-@Path("/vocabularies")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+//@Path("/vocabularies")
+//@Consumes("application/xml")
+//@Produces("application/xml")
 public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemCommonList, AuthItemHandler> extends
-AbstractMultiPartCollectionSpaceResourceImpl {
+	AbstractMultiPartCollectionSpaceResourceImpl {
 
 	protected Class<AuthCommon> authCommonClass;
 	protected Class<?> resourceClass;
@@ -202,8 +201,9 @@ AbstractMultiPartCollectionSpaceResourceImpl {
 	 * @return the response
 	 */
 	@POST
-	public Response createAuthority(PoxPayloadIn input) {
+	public Response createAuthority(String xmlPayload) {
 		try {
+			PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
 			DocumentHandler handler = createDocumentHandler(ctx);
 			String csid = getRepositoryClient(ctx).create(ctx, handler);
@@ -254,7 +254,7 @@ AbstractMultiPartCollectionSpaceResourceImpl {
 	 */
 	@GET
 	@Path("{csid}")
-	public PoxPayloadOut getAuthority(@PathParam("csid") String specifier) {
+	public String getAuthority(@PathParam("csid") String specifier) {
 		PoxPayloadOut result = null;
 		try {
 			Specifier spec = getSpecifier(specifier, "getAuthority", "GET");
@@ -300,7 +300,7 @@ AbstractMultiPartCollectionSpaceResourceImpl {
 			throw new WebApplicationException(response);
 		}
 
-		return result;
+		return result.toXML();
 	}
 
 	/**
@@ -348,7 +348,7 @@ AbstractMultiPartCollectionSpaceResourceImpl {
 	 */
 	@PUT
 	@Path("{csid}")
-	public PoxPayloadOut updateAuthority(
+	public String updateAuthority(
 			@PathParam("csid") String specifier,
 			PoxPayloadIn theUpdate) {
 		PoxPayloadOut result = null;
@@ -382,7 +382,7 @@ AbstractMultiPartCollectionSpaceResourceImpl {
 					Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
 			throw new WebApplicationException(response);
 		}
-		return result;
+		return result.toXML();
 	}
 
 	/**
@@ -438,8 +438,9 @@ AbstractMultiPartCollectionSpaceResourceImpl {
 	 *************************************************************************/
 	@POST
 	@Path("{csid}/items")
-	public Response createAuthorityItem(@PathParam("csid") String specifier, PoxPayloadIn input) {
+	public Response createAuthorityItem(@PathParam("csid") String specifier, String xmlPayload) {
 		try {
+			PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
 			Specifier spec = getSpecifier(specifier, "createAuthorityItem", "CREATE_ITEM");
 			String parentcsid;
@@ -485,7 +486,7 @@ AbstractMultiPartCollectionSpaceResourceImpl {
 	 */
 	@GET
 	@Path("{csid}/items/{itemcsid}")
-	public PoxPayloadOut getAuthorityItem(
+	public String getAuthorityItem(
 			@PathParam("csid") String parentspecifier,
 			@PathParam("itemcsid") String itemspecifier) {
 		PoxPayloadOut result = null;
@@ -541,7 +542,7 @@ AbstractMultiPartCollectionSpaceResourceImpl {
 					"text/plain").build();
 			throw new WebApplicationException(response);
 		}
-		return result;
+		return result.toXML();
 	}
 
 
@@ -771,8 +772,6 @@ AbstractMultiPartCollectionSpaceResourceImpl {
         return authRefList;
     }
 
-
-
 	/**
 	 * Update authorityItem.
 	 * 
@@ -784,7 +783,7 @@ AbstractMultiPartCollectionSpaceResourceImpl {
 	 */
 	@PUT
 	@Path("{csid}/items/{itemcsid}")
-	public PoxPayloadOut updateAuthorityItem(
+	public String updateAuthorityItem(
 			@PathParam("csid") String parentspecifier,
 			@PathParam("itemcsid") String itemspecifier,
 			PoxPayloadIn theUpdate) {
@@ -838,7 +837,7 @@ AbstractMultiPartCollectionSpaceResourceImpl {
 					Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
 			throw new WebApplicationException(response);
 		}
-		return result;
+		return result.toXML();
 	}
 
 	/**

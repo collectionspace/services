@@ -45,7 +45,7 @@ import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.SchoolOrStyleList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadIn;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
@@ -69,7 +69,7 @@ public class PersonAuthorityClientUtils {
     public static String getAuthorityRefName(String csid, PersonAuthorityClient client){
     	if(client==null)
     		client = new PersonAuthorityClient();
-        ClientResponse<MultipartInput> res = client.read(csid);
+        ClientResponse<PoxPayloadIn> res = client.read(csid);
         try {
 	        int statusCode = res.getStatus();
 	        if(!READ_REQ.isValidStatusCode(statusCode)
@@ -78,7 +78,7 @@ public class PersonAuthorityClientUtils {
 	        }
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            MultipartInput input = (MultipartInput) res.getEntity();
+	            PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
 	            PersonauthoritiesCommon personAuthority = 
 	            	(PersonauthoritiesCommon) CollectionSpaceClientUtils.extractPart(input,
 	                    client.getCommonPartName(), PersonauthoritiesCommon.class);
@@ -102,7 +102,7 @@ public class PersonAuthorityClientUtils {
     public static String getPersonRefName(String inAuthority, String csid, PersonAuthorityClient client){
     	if(client==null)
     		client = new PersonAuthorityClient();
-        ClientResponse<MultipartInput> res = client.readItem(inAuthority, csid);
+        ClientResponse<PoxPayloadIn> res = client.readItem(inAuthority, csid);
         try {
 	        int statusCode = res.getStatus();
 	        if(!READ_REQ.isValidStatusCode(statusCode)
@@ -111,7 +111,7 @@ public class PersonAuthorityClientUtils {
 	        }
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            MultipartInput input = (MultipartInput) res.getEntity();
+	            PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
 	            PersonsCommon person = 
 	            	(PersonsCommon) CollectionSpaceClientUtils.extractPart(input,
 	                    client.getItemCommonPartName(), PersonsCommon.class);

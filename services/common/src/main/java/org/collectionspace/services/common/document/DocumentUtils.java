@@ -506,20 +506,24 @@ public class DocumentUtils {
 		//FIXME: We support XML validation on the way in, so we should add it here (on the way out) as well.
 		DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		Document document = builder.newDocument();
-		document.setXmlStandalone(true);
-		//JAXB unmarshaller recognizes the following kind of namespace qualification
-		//only. More investigation is needed to use other prefix
-		// <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-		// <ns2:collectionobjects-common xmlns:ns2="http://collectionspace.org/services/collectionobject">
-		// <objectNumber>objectNumber-1252960222412</objectNumber>
-		// <objectName>objectName-1252960222412</objectName>
-		// </ns2:collectionobjects-common>
+		document.setXmlStandalone(true); //FIXME: REM - Can we set this to false since it is not really standalone?
+
+		/*
+		 * JAXB unmarshaller recognizes the following kind of namespace
+		 * qualification only. More investigation is needed to use other prefix
+		 * 
+		 * <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+		 * <ns2:collectionobjects-common xmlns:ns2="http://collectionspace.org/services/collectionobject">
+		 * 		<objectNumber>objectNumber-1252960222412</objectNumber>
+		 * 		<objectName>objectName-1252960222412</objectName>
+		 * </ns2:collectionobjects-common>
+		 */
 
 		String ns = "ns2";
 		Element root = document.createElementNS(xc.getNamespaceURI(), ns + ":" + rootElementName);
 		root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
 		
-//		String getSchemaLocation = xc.getSchemaLocation();
+//		String getSchemaLocation = xc.getSchemaLocation();					//FIXME: REM - w3c Document to DOM4j Document mangles this attribute
 //		root.setAttribute("xsi:schemaLocation", xc.getSchemaLocation());
 		
 		String getNamespaceURI = xc.getNamespaceURI();

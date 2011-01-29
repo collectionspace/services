@@ -38,20 +38,19 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.intake.IntakesCommonList;
-import org.collectionspace.services.person.PersonsCommonList;
+//import org.collectionspace.services.person.PersonsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
  * @version $Revision:$
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
-@Path("/intakes/")
-@Produces({"multipart/mixed"})
-@Consumes({"multipart/mixed"})
+@Path("/" + IntakeClient.SERVICE_PATH_COMPONENT + "/")
+@Produces({"application/xml"})
+@Consumes({"application/xml"})
 public interface IntakeProxy extends CollectionSpaceProxy {
-
     /**
      * Read list.
      *

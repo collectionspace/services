@@ -33,7 +33,7 @@ import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.client.VocabularyClientUtils;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +64,7 @@ public class VocabularyBaseImport {
             logger.debug("Import: Create vocabulary: \"" + vocabDisplayName + "\"");
         }
         String baseVocabRefName = VocabularyClientUtils.createVocabularyRefName(shortName, null);
-        MultipartOutput multipart = VocabularyClientUtils.createEnumerationInstance(
+        PoxPayloadOut multipart = VocabularyClientUtils.createEnumerationInstance(
         		vocabDisplayName, shortName, client.getCommonPartName());
         ClientResponse<Response> res = client.create(multipart);
 

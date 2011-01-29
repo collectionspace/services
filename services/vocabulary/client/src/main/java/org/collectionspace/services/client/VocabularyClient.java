@@ -36,8 +36,6 @@ import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
@@ -45,12 +43,14 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  */
 public class VocabularyClient extends AbstractServiceClientImpl {
 
+	public static final String SERVICE_PATH_COMPONENT = "vocabularies"; //FIXME: REM - The JAX-RS proxy, client, and resource classes should ref this value
+	public static final String SERVICE_PATH_ITEMS_COMPONENT = "vocabularies"; //FIXME: REM - The JAX-RS proxy, client, and resource classes should ref this value
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
      */
     @Override
     public String getServicePathComponent() {
-        return "vocabularies";
+        return SERVICE_PATH_COMPONENT;
     }
 
     /**
@@ -121,7 +121,7 @@ public class VocabularyClient extends AbstractServiceClientImpl {
      * @param csid the csid
      * @return the client response
      */
-    public ClientResponse<MultipartInput> read(String csid) {
+    public ClientResponse<String> read(String csid) {
         return vocabularyProxy.read(csid);
     }
 
@@ -131,7 +131,7 @@ public class VocabularyClient extends AbstractServiceClientImpl {
      * @param name the name
      * @return the client response
      */
-    public ClientResponse<MultipartInput> readByName(String name) {
+    public ClientResponse<String> readByName(String name) {
         return vocabularyProxy.readByName(name);
     }
 
@@ -141,8 +141,9 @@ public class VocabularyClient extends AbstractServiceClientImpl {
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<Response> create(MultipartOutput multipart) {
-        return vocabularyProxy.create(multipart);
+    public ClientResponse<Response> create(PoxPayloadOut poxPayloadout) {
+    	String xmlPayload = poxPayloadout.toXML();
+        return vocabularyProxy.create(xmlPayload);
     }
 
     /**
@@ -152,8 +153,9 @@ public class VocabularyClient extends AbstractServiceClientImpl {
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
-        return vocabularyProxy.update(csid, multipart);
+    public ClientResponse<String> update(String csid, PoxPayloadOut poxPayloadout) {
+    	String xmlPayload = poxPayloadout.toXML();
+        return vocabularyProxy.update(csid, xmlPayload);
 
     }
 
@@ -208,7 +210,7 @@ public class VocabularyClient extends AbstractServiceClientImpl {
      * @param csid the csid
      * @return the client response
      */
-    public ClientResponse<MultipartInput> readItem(String vcsid, String csid) {
+    public ClientResponse<String> readItem(String vcsid, String csid) {
         return vocabularyProxy.readItem(vcsid, csid);
     }
 
@@ -219,8 +221,9 @@ public class VocabularyClient extends AbstractServiceClientImpl {
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<Response> createItem(String vcsid, MultipartOutput multipart) {
-        return vocabularyProxy.createItem(vcsid, multipart);
+    public ClientResponse<Response> createItem(String vcsid, PoxPayloadOut poxPayloadOut) {
+    	String xmlPayload = poxPayloadOut.toXML();
+        return vocabularyProxy.createItem(vcsid, xmlPayload);
     }
 
     /**
@@ -231,9 +234,9 @@ public class VocabularyClient extends AbstractServiceClientImpl {
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<MultipartInput> updateItem(String vcsid, String csid, MultipartOutput multipart) {
-        return vocabularyProxy.updateItem(vcsid, csid, multipart);
-
+    public ClientResponse<String> updateItem(String vcsid, String csid, PoxPayloadOut poxPayloadOut) {
+    	String xmlPayload = poxPayloadOut.toXML();
+        return vocabularyProxy.updateItem(vcsid, csid, xmlPayload);
     }
 
     /**

@@ -43,7 +43,6 @@ import org.collectionspace.services.person.PersonauthoritiesCommonList;
 import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
@@ -735,7 +734,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<MultipartInput> res = null;
+        ClientResponse<String> res = null;
         if(CSID!=null) {
             res = client.read(CSID);
         } else if(shortId!=null) {
@@ -755,7 +754,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            MultipartInput input = (MultipartInput) res.getEntity();
+	            PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
 	            PersonauthoritiesCommon personAuthority = (PersonauthoritiesCommon) extractPart(input,
 	                    client.getCommonPartName(), PersonauthoritiesCommon.class);
 	            Assert.assertNotNull(personAuthority);
@@ -829,7 +828,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<MultipartInput> res = null;
+        ClientResponse<PoxPayloadIn> res = null;
         if(authCSID!=null) {
             if(itemCSID!=null) {
                 res = client.readItem(authCSID, itemCSID);
@@ -862,7 +861,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Check whether we've received a person.
-	        MultipartInput input = (MultipartInput) res.getEntity();
+	        PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
 	        PersonsCommon person = (PersonsCommon) extractPart(input,
 	                client.getItemCommonPartName(), PersonsCommon.class);
 	        Assert.assertNotNull(person);
@@ -904,8 +903,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        MultipartInput input =null;
-        ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
+        PoxPayloadIn input =null;
+        ClientResponse<PoxPayloadIn> res = client.readItem(knownResourceId, knownItemResourceId);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -919,7 +918,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Check whether person has expected displayName.
-	        input = (MultipartInput) res.getEntity();
+	        input = (PoxPayloadIn) res.getEntity();
         } finally {
         	res.releaseConnection();
         }
@@ -972,7 +971,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = (MultipartInput) res.getEntity();
+	        input = (PoxPayloadIn) res.getEntity();
         } finally {
         	res.releaseConnection();
         }
@@ -1016,7 +1015,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = (MultipartInput) res.getEntity();
+	        input = (PoxPayloadIn) res.getEntity();
         } finally {
         	res.releaseConnection();
         }
@@ -1061,8 +1060,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        MultipartInput input = null;
-        ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
+        PoxPayloadIn input = null;
+        ClientResponse<PoxPayloadIn> res = client.readItem(knownResourceId, knownItemResourceId);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -1076,7 +1075,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
 	
 	        // Check whether Person has expected displayName.
-	        input = (MultipartInput) res.getEntity();
+	        input = (PoxPayloadIn) res.getEntity();
         } finally {
         	res.releaseConnection();
         }
@@ -1126,8 +1125,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        MultipartInput input = null;
-        ClientResponse<MultipartInput> res =
+        PoxPayloadIn input = null;
+        ClientResponse<PoxPayloadIn> res =
             client.readContact(knownResourceId, knownItemResourceId,
             knownContactResourceId);
         try {
@@ -1143,7 +1142,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Check whether we've received a contact.
-	        input = (MultipartInput) res.getEntity();
+	        input = (PoxPayloadIn) res.getEntity();
         } finally {
         	res.releaseConnection();
         }
@@ -1178,7 +1177,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
+        ClientResponse<PoxPayloadIn> res = client.read(NON_EXISTENT_ID);
         try {
         	int statusCode = res.getStatus();
 	        // Check the status code of the response: does it match
@@ -1211,7 +1210,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<MultipartInput> res = client.readItem(knownResourceId, NON_EXISTENT_ID);
+        ClientResponse<PoxPayloadIn> res = client.readItem(knownResourceId, NON_EXISTENT_ID);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -1245,7 +1244,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<MultipartInput> res =
+        ClientResponse<PoxPayloadIn> res =
             client.readContact(knownResourceId, knownItemResourceId, NON_EXISTENT_ID);
         try {
 	        int statusCode = res.getStatus();
@@ -1514,8 +1513,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        MultipartInput input = null;
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        PoxPayloadIn input = null;
+        ClientResponse<PoxPayloadIn> res = client.read(knownResourceId);
         try {
 	        if(logger.isDebugEnabled()){
 	            logger.debug(testName + ": read status = " + res.getStatus());
@@ -1559,7 +1558,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = (MultipartInput) res.getEntity();
+	        input = (PoxPayloadIn) res.getEntity();
         } finally {
         	res.releaseConnection();
         }
@@ -1593,8 +1592,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        MultipartInput input = null;
-        ClientResponse<MultipartInput> res =
+        PoxPayloadIn input = null;
+        ClientResponse<PoxPayloadIn> res =
                 client.readItem(knownResourceId, knownItemResourceId);
         try {
 	        if(logger.isDebugEnabled()){
@@ -1647,7 +1646,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = (MultipartInput) res.getEntity();
+	        input = (PoxPayloadIn) res.getEntity();
         } finally {
         	res.releaseConnection();
         }
@@ -1686,8 +1685,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        MultipartInput input = null;
-        ClientResponse<MultipartInput> res =
+        PoxPayloadIn input = null;
+        ClientResponse<PoxPayloadIn> res =
                 client.readContact(knownResourceId, knownItemResourceId, knownContactResourceId);
         try {
 	        if(logger.isDebugEnabled()){
@@ -1735,7 +1734,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = (MultipartInput) res.getEntity();
+	        input = (PoxPayloadIn) res.getEntity();
         } finally {
         	res.releaseConnection();
         }
@@ -1887,7 +1886,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         String displayName = "displayName-NON_EXISTENT_ID";
     	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     				displayName, "NON_EXISTENT_SHORT_ID", client.getCommonPartName());
-        ClientResponse<MultipartInput> res =
+        ClientResponse<PoxPayloadIn> res =
                 client.update(NON_EXISTENT_ID, multipart);
         try {
 	        int statusCode = res.getStatus();
@@ -1935,7 +1934,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     	PersonAuthorityClientUtils.createPersonInstance(NON_EXISTENT_ID, 
     			PersonAuthorityClientUtils.createPersonAuthRefName(NON_EXISTENT_ID, null),
     			nonexMap, nonexRepeatablesMap, client.getItemCommonPartName() );
-        ClientResponse<MultipartInput> res =
+        ClientResponse<PoxPayloadIn> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
         try {
 	        int statusCode = res.getStatus();
