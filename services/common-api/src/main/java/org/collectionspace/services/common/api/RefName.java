@@ -9,10 +9,18 @@ import java.util.regex.Pattern;
  * $LastChangedDate:  $
  */
 public class RefName {
+    public static final String HACK_VOCABULARIES = "Vocabularies"; //TODO: get rid of these.
+    public static final String HACK_ORGANIZATIONS = "Organizations"; //TODO: get rid of these.
+    public static final String HACK_ORGAUTHORITIES = "Orgauthorities";  //TODO: get rid of these.
+    public static final String HACK_PERSONAUTHORITIES = "Personauthorities";  //TODO: get rid of these.
+    public static final String HACK_LOCATIONAUTHORITIES = "Locationauthorities";  //TODO: get rid of these.
 
-    public static final String URN_PREFIX = "urn:cspace:";
+    public static final String URN_PREFIX      = "urn:cspace:";
+    public static final String URN_NAME_PREFIX = "urn:cspace:name";
 
-    public static final String AUTHORITY_REGEX =      "urn:cspace:(.*):(.*)\\((.*)\\)\\'?([^\\']*)\\'?";
+    public static final String REFNAME = "refName";
+
+    public static final String AUTHORITY_REGEX      = "urn:cspace:(.*):(.*)\\((.*)\\)\\'?([^\\']*)\\'?";
     public static final String AUTHORITY_ITEM_REGEX = "urn:cspace:(.*):(.*)\\((.*)\\):items\\((.*)\\)\\'?([^\\']*)\\'?";
 
     public static final String AUTHORITY_EXAMPLE  = "urn:cspace:collectionspace.org:Loansin(shortID)'displayName'";
@@ -49,10 +57,6 @@ public class RefName {
             }
             return null;
         }
-        public String toString() {
-            String displaySuffix = (displayName != null && (!displayName.isEmpty())) ? '\'' + displayName + '\'' : "";
-            return URN_PREFIX + tenantName + ':' + resource + "(" + shortIdentifier + ")" + displaySuffix;
-        }
         public boolean equals(Object other){
             if (other == null){
                 return false;
@@ -67,6 +71,14 @@ public class RefName {
                 return false;
             }
         }
+        public String getRelativeUri() {
+        	return "/"+resource+"/"+URN_NAME_PREFIX+"("+shortIdentifier+")";
+        }
+        public String toString() {
+            String displaySuffix = (displayName != null && (!displayName.isEmpty())) ? '\'' + displayName + '\'' : "";
+            return URN_PREFIX + tenantName + ':' + resource + "(" + shortIdentifier + ")" + displaySuffix;
+        }
+
     }
 
     public static class AuthorityItem {
@@ -108,6 +120,9 @@ public class RefName {
                 return false;
             }
         }
+        public String getRelativeUri() {
+        	return inAuthority.getRelativeUri()+"/items/"+URN_NAME_PREFIX+"("+shortIdentifier+")";
+        }
         public String toString() {
             String displaySuffix = (displayName != null && (!displayName.isEmpty())) ? '\'' + displayName + '\'' : "";
             Authority ai = inAuthority;
@@ -131,12 +146,6 @@ public class RefName {
         return authority;
     }
 
-    public static String buildRefNameForAuthorityItem(String tenantName, String serviceName, String authorityShortIdentifier,
-                                                      String itemShortIdentifier, String itemDisplayName) {
-        AuthorityItem item = buildAuthorityItem(tenantName, serviceName, authorityShortIdentifier, itemShortIdentifier, itemDisplayName);
-        return item.toString();
-    }
-
     public static AuthorityItem buildAuthorityItem(String tenantName, String serviceName, String authorityShortIdentifier,
                                                    String itemShortIdentifier, String itemDisplayName) {
         Authority authority = buildAuthority(tenantName, serviceName, authorityShortIdentifier, "");
@@ -155,6 +164,16 @@ public class RefName {
         item.shortIdentifier = itemShortIdentifier;
         item.displayName = itemDisplayName;
         return item;
+    }
+
+    /** Use this method to avoid formatting any urn's outside of this unit;
+     * Caller passes in a shortId, such as "TestAuthority", and method returns
+     * the correct urn path element, without any path delimiters such as '/'
+     * so that calling shortIdToPath("TestAuthority") returns "urn:cspace:name(TestAuthority)", and
+     * then this value may be put into a path, such as "/personauthorities/urn:cspace:name(TestAuthority)/items".
+     */
+    public static String shortIdToPath(String shortId){
+        return URN_NAME_PREFIX+'('+shortId+')';
     }
 
 
