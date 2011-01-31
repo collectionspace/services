@@ -80,8 +80,6 @@ import org.collectionspace.services.relation.RelationshipType;
 import org.collectionspace.services.common.profile.Profiler;
 import org.collectionspace.services.common.FileUtils;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 
 //FIXME: There should be no direct dependency on Nuxeo in our resource classes.
@@ -97,8 +95,8 @@ import org.slf4j.LoggerFactory;
  * The Class CollectionObjectResource.
  */
 @Path("/collectionobjects")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Consumes("application/xml")
+@Produces("application/xml")
 public class CollectionObjectResource
         extends AbstractMultiPartCollectionSpaceResourceImpl {
 
@@ -158,9 +156,10 @@ public class CollectionObjectResource
      * @return the response
      */
     @POST
-    public Response createCollectionObject(PoxPayloadIn input) {
+    public Response createCollectionObject(String xmlText) {
         try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input); //
+            PoxPayloadIn input = new PoxPayloadIn(xmlText);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(CollectionObjectResource.class);
@@ -194,7 +193,7 @@ public class CollectionObjectResource
      */
     @GET
     @Path("{csid}")
-    public PoxPayloadOut getCollectionObject(
+    public String getCollectionObject(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getCollectionObject with csid=" + csid);
@@ -239,7 +238,7 @@ public class CollectionObjectResource
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.toXML();
     }
     
     /**
@@ -301,15 +300,15 @@ public class CollectionObjectResource
      * Update collection object.
      * 
      * @param csid the csid
-     * @param theUpdate the the update
+     * @param xmlText an XML representation of the data to be used in the update
      * 
-     * @return the multipart output
+     * @return an XML representation of the updated object
      */
     @PUT
     @Path("{csid}")
-    public PoxPayloadOut updateCollectionObject(
+    public String updateCollectionObject(
             @PathParam("csid") String csid,
-            PoxPayloadIn theUpdate) {
+            String xmlText) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateCollectionObject with csid=" + csid);
         }
@@ -322,7 +321,8 @@ public class CollectionObjectResource
         }
         PoxPayloadOut result = null;
         try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate);
+            PoxPayloadIn update = new PoxPayloadIn(xmlText);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(update);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = ctx.getOutput();
@@ -336,7 +336,7 @@ public class CollectionObjectResource
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
-                logger.debug("caugth exception in updateCollectionObject", dnfe);
+                logger.debug("Caught exception in updateCollectionObject", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Update failed on CollectionObject csid=" + csid).type(
@@ -347,7 +347,7 @@ public class CollectionObjectResource
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.toXML();
     }
 
     /**
@@ -394,6 +394,8 @@ public class CollectionObjectResource
         }
 
     }
+
+    // FIXME AR: should the method below be deprecated?
 
     /**
      * Gets the intakes common list.
@@ -518,7 +520,7 @@ public class CollectionObjectResource
     }
 
     /**
-     * This method is deprecated.  Use kwSearchCollectionObjects() method instead.
+     * This method is deprecated.  Use SearchCollectionObjects() method instead.
      * Keywords search collection objects.
      * @param ui 
      * 

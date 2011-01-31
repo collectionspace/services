@@ -25,10 +25,10 @@
 package org.collectionspace.services.client;
 
 import javax.ws.rs.core.MediaType;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.domain.naturalhistory.CollectionobjectsNaturalhistory;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +38,8 @@ import org.slf4j.LoggerFactory;
  */
 public class CollectionObjectFactory {
     static private final Logger logger = LoggerFactory.getLogger(CollectionObjectFactory.class);
+
+    final static String SERVICE_PATH_COMPONENT = "collectionobjects";
 
     /**
      * create account instance
@@ -63,21 +65,24 @@ public class CollectionObjectFactory {
      * @param conh the conh
      * @return the multipart output
      */
-    public static MultipartOutput createCollectionObjectInstance(String commonPartName,
-            CollectionobjectsCommon collectionObject,
+    public static PoxPayloadOut createCollectionObjectInstance(String commonPartName,
+            CollectionobjectsCommon collectionObjectCommon,
             String nhPartName, CollectionobjectsNaturalhistory conh) {
 
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(collectionObject,
-                MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", commonPartName);
+        PoxPayloadOut multipart = new PoxPayloadOut(getServicePathComponent());
+        PayloadOutputPart commonPart =
+                multipart.addPart(collectionObjectCommon, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(commonPartName);
 
         if (conh != null) {
-            OutputPart nhPart = multipart.addPart(conh, MediaType.APPLICATION_XML_TYPE);
-            nhPart.getHeaders().add("label", nhPartName);
+            PayloadOutputPart nhPart = multipart.addPart(conh, MediaType.APPLICATION_XML_TYPE);
+            nhPart.setLabel(nhPartName);
         }
         return multipart;
     }
 
+    public static String getServicePathComponent() {
+        return SERVICE_PATH_COMPONENT;
+    }
 
 }

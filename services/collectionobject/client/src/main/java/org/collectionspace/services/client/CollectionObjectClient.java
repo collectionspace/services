@@ -131,6 +131,7 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
         return collectionObjectProxy.keywordSearch(keywords);
 
     }
+
     
     /**
      * Read.
@@ -140,7 +141,7 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.services.client.CollectionObjectProxy#keywordSearch()
      * @return the client response< multipart input>
      */
-    public ClientResponse<MultipartInput> read(String csid) {
+    public ClientResponse<String> read(String csid) {
         return collectionObjectProxy.read(csid);
     }
 
@@ -166,8 +167,9 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.services.client.CollectionObjectProxy#create()
      * @return the client response< response>
      */
-    public ClientResponse<Response> create(MultipartOutput multipart) {
-        return collectionObjectProxy.create(multipart);
+    public ClientResponse<Response> create(PoxPayloadOut multipart) {
+    	String payload = multipart.toXML();
+        return collectionObjectProxy.create(payload);
     }
 
     /**
@@ -179,8 +181,9 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.services.client.CollectionObjectProxy#update()
      * @return the client response< multipart input>
      */
-    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
-        return collectionObjectProxy.update(csid, multipart);
+    public ClientResponse<String> update(String csid, PoxPayloadOut multipart) {
+    	String payload = multipart.toXML();
+        return collectionObjectProxy.update(csid, payload);
     }
 
     /**

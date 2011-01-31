@@ -7,9 +7,7 @@
 -->
 
 <ns2:collectionobjects_common
-    xmlns:ns2="http://collectionspace.org/services/collectionobject"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-    xsi:schemaLocation="http://collectionspace.org/services/collectionobject http://services.collectionspace.org/collectionobject/collectionobjects_common.xsd">
+    xmlns:ns2="http://collectionspace.org/services/collectionobject">
     <objectNumber>2</objectNumber>
     <comments>Katowice Spodek Live '94 by the band Perfect</comments>
     <distinguishingFeatures>Audiorecording album cover signed by Lech Wałęsa</distinguishingFeatures>
