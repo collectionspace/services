@@ -31,6 +31,7 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.VocabularyClient;
@@ -61,8 +62,10 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
-    final String SERVICE_PATH_COMPONENT = "vocabularies";
-    final String ITEM_SERVICE_PATH_COMPONENT = "items";
+    final String SERVICE_PATH_COMPONENT = VocabularyClient.SERVICE_PATH_COMPONENT;//"vocabularies";
+    final String ITEM_SERVICE_PATH_COMPONENT = VocabularyClient.SERVICE_PATH_ITEMS_COMPONENT;//"items";
+    final String SERVICE_ITEMS_PARTS_PREFIX = VocabularyClient.SERVICE_ITEMS_PARTS_PREFIX;
+    
     private String knownResourceId = null;
     private String knownResourceShortIdentifer = null;
     private String knownResourceRefName = null;
@@ -544,7 +547,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
 
         // Check whether Person has expected displayName.
-        PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         VocabularyitemsCommon vitem = (VocabularyitemsCommon) extractPart(input,
                 client.getItemCommonPartName(), VocabularyitemsCommon.class);
         Assert.assertNotNull(vitem);
@@ -552,9 +555,9 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         vitem.setDisplayName(null);
 
         // Submit the updated resource to the service and store the response.
-        PoxPayloadOut output = new PoxPayloadOut();
-        OutputPart commonPart = output.addPart(vitem, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+        PoxPayloadOut output = new PoxPayloadOut(SERVICE_ITEMS_PARTS_PREFIX);
+        PayloadOutputPart commonPart = output.addPart(vitem, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
         statusCode = res.getStatus();
 
@@ -571,9 +574,9 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         vitem.setDisplayName("a");
 
         // Submit the updated resource to the service and store the response.
-        output = new PoxPayloadOut();
+        output = new PoxPayloadOut(this.getServicePathItemsComponent());
         commonPart = output.addPart(vitem, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+        commonPart.setLabel(client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
         statusCode = res.getStatus();
 
@@ -600,7 +603,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
-        ClientResponse<PoxPayloadIn> res = client.read(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -625,7 +628,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         VocabularyClient client = new VocabularyClient();
-        ClientResponse<PoxPayloadIn> res = client.readItem(knownResourceId, NON_EXISTENT_ID);
+        ClientResponse<String> res = client.readItem(knownResourceId, NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -773,7 +776,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         VocabularyClient client = new VocabularyClient();
-        ClientResponse<PoxPayloadIn> res =
+        ClientResponse<String> res =
                 client.read(knownResourceId);
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": read status = " + res.getStatus());
@@ -783,7 +786,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         if(logger.isDebugEnabled()){
             logger.debug("got Vocabulary to update with ID: " + knownResourceId);
         }
-        PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         VocabulariesCommon vocabulary = (VocabulariesCommon) extractPart(input,
                 client.getCommonPartName(), VocabulariesCommon.class);
         Assert.assertNotNull(vocabulary);
@@ -797,9 +800,9 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         }
 
         // Submit the updated resource to the service and store the response.
-        PoxPayloadOut output = new PoxPayloadOut();
-        OutputPart commonPart = output.addPart(vocabulary, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
+        PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart = output.addPart(vocabulary, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getCommonPartName());
         res = client.update(knownResourceId, output);
         int statusCode = res.getStatus();
 
@@ -812,7 +815,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Retrieve the updated resource and verify that its contents exist.
-        input = (PoxPayloadIn) res.getEntity();
+        input = new PoxPayloadIn(res.getEntity());
         VocabulariesCommon updatedVocabulary =
                 (VocabulariesCommon) extractPart(input,
                         client.getCommonPartName(), VocabulariesCommon.class);
@@ -836,7 +839,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         VocabularyClient client = new VocabularyClient();
-        ClientResponse<PoxPayloadIn> res =
+        ClientResponse<String> res =
                 client.readItem(knownResourceId, knownItemResourceId);
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": read status = " + res.getStatus());
@@ -848,7 +851,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
                 knownItemResourceId +
                 " in Vocab: " + knownResourceId );
         }
-        PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         VocabularyitemsCommon vocabularyItem = (VocabularyitemsCommon) extractPart(input,
                 client.getItemCommonPartName(), VocabularyitemsCommon.class);
         Assert.assertNotNull(vocabularyItem);
@@ -862,7 +865,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         }
 
         // Submit the updated resource to the service and store the response.
-        PoxPayloadOut output = new PoxPayloadOut();
+        PoxPayloadOut output = new PoxPayloadOut(getItemCommonPartName);
         OutputPart commonPart = output.addPart(vocabularyItem, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
@@ -1332,7 +1335,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         return SERVICE_PATH_COMPONENT;
     }
 
-    public String getItemServicePathComponent() {
+    public String getServicePathItemsComponent() {
         return ITEM_SERVICE_PATH_COMPONENT;
     }
 
@@ -1346,7 +1349,7 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
      * @return The root URL for a service.
      */
     protected String getItemServiceRootURL(String parentResourceIdentifier) {
-        return getResourceURL(parentResourceIdentifier) + "/" + getItemServicePathComponent();
+        return getResourceURL(parentResourceIdentifier) + "/" + getServicePathItemsComponent();
     }
 
     /**

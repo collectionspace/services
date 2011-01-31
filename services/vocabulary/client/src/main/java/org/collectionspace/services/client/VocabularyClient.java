@@ -44,13 +44,21 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 public class VocabularyClient extends AbstractServiceClientImpl {
 
 	public static final String SERVICE_PATH_COMPONENT = "vocabularies"; //FIXME: REM - The JAX-RS proxy, client, and resource classes should ref this value
-	public static final String SERVICE_PATH_ITEMS_COMPONENT = "vocabularies"; //FIXME: REM - The JAX-RS proxy, client, and resource classes should ref this value
-    /* (non-Javadoc)
+	public static final String SERVICE_PATH_ITEMS_COMPONENT = "items"; //FIXME: REM - The JAX-RS proxy, client, and resource classes should ref this value
+	
+	public static final String SERVICE_PAYLOAD_NAME = SERVICE_PATH_COMPONENT;
+	public static final String SERVICE_ITEM_PAYLOAD_NAME = "vocabularyitems";
+
+	/* (non-Javadoc)
      * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
      */
     @Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
+    }
+    
+    public String getPayloadName() {
+    	return SERVICE_PAYLOAD_NAME;
     }
 
     /**
@@ -58,8 +66,8 @@ public class VocabularyClient extends AbstractServiceClientImpl {
      *
      * @return the item common part name
      */
-    public String getItemCommonPartName() {
-        return getCommonPartName("vocabularyitems");
+    public String getCommonPartItemName() {
+        return getCommonPartName(SERVICE_ITEM_PAYLOAD_NAME);
     }
     
     /** The Constant instance. */ //FIXME: This is wrong.  There should not be a static instance of the client.
