@@ -66,7 +66,7 @@ public class PoxPayload<PT extends PayloadPart> {
 		this.xmlPayload = xmlPayload;
 		SAXReader reader = new SAXReader();
 		domDocument = reader.read(new StringReader(xmlPayload)); //throws DocumentException if parse fails
-		String label = domDocument.getName();
+		String label = domDocument.getRootElement().getName();
 		if (label != null) {
 			this.payloadName = label;
 		} else if (logger.isWarnEnabled() == true) {

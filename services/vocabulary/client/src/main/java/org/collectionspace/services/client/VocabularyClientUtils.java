@@ -29,9 +29,9 @@ public class VocabularyClientUtils {
         String refName = createVocabularyRefName(shortIdentifier, displayName);
         vocabulary.setRefName(refName);
         vocabulary.setVocabType("enum");
-        PoxPayloadOut multipart = new PoxPayloadOut(VocabularyClient.SERVICE_PATH_COMPONENT);
+        PoxPayloadOut multipart = new PoxPayloadOut(VocabularyClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(vocabulary, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(new VocabularyClient().getCommonPartName());
+        commonPart.setLabel(headerLabel);
 
         if(logger.isDebugEnabled()){
         	logger.debug("to be created, vocabulary common for enumeration ", 
@@ -52,10 +52,10 @@ public class VocabularyClientUtils {
        	vocabularyItem.setDisplayName(displayName);
     	String refName = createVocabularyItemRefName(vocabularyRefName, shortId, displayName);
        	vocabularyItem.setRefName(refName);
-       	PoxPayloadOut multipart = new PoxPayloadOut(VocabularyClient.SERVICE_PATH_ITEMS_COMPONENT);
+       	PoxPayloadOut multipart = new PoxPayloadOut(VocabularyClient.SERVICE_ITEM_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(vocabularyItem,
             MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(new VocabularyClient().getItemCommonPartName());
+        commonPart.setLabel(headerLabel);
 
         if(logger.isDebugEnabled()){
         	logger.debug("to be created, vocabularyItem common ", vocabularyItem, VocabularyitemsCommon.class);
@@ -76,21 +76,20 @@ public class VocabularyClientUtils {
     		logger.debug("Import: Create Item: \""+itemMap.get(AuthorityItemJAXBSchema.SHORT_IDENTIFIER)
     				+"\" in personAuthority: \"" + vcsid +"\"");
     	}
-    	PoxPayloadOut multipart = 
-    		createVocabularyItemInstance( vocabularyRefName,
-    				itemMap, client.getItemCommonPartName() );
+    	PoxPayloadOut multipart = createVocabularyItemInstance(vocabularyRefName,
+    				itemMap, client.getCommonPartItemName());
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
 
     	int statusCode = res.getStatus();
 
     	if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
-    		throw new RuntimeException("Could not create Item: \""+itemMap.get(AuthorityItemJAXBSchema.DISPLAY_NAME)
-    				+"\" in personAuthority: \"" + vocabularyRefName
-    				+"\" "+ invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
+    		throw new RuntimeException("Could not create Item: \"" + itemMap.get(AuthorityItemJAXBSchema.DISPLAY_NAME)
+    				+ "\" in personAuthority: \"" + vocabularyRefName
+    				+ "\" " + invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
     	}
     	if(statusCode != EXPECTED_STATUS_CODE) {
     		throw new RuntimeException("Unexpected Status when creating Item: \""+itemMap.get(AuthorityItemJAXBSchema.DISPLAY_NAME)
-    				+"\" in personAuthority: \"" + vocabularyRefName +"\", Status:"+ statusCode);
+    				+ "\" in personAuthority: \"" + vocabularyRefName + "\", Status:" + statusCode);
     	}
 
     	return extractId(res);
@@ -129,17 +128,17 @@ public class VocabularyClientUtils {
     
     public static String createVocabularyRefName(String shortIdentifier, String displaySuffix) {
     	String refName = "urn:cspace:org.collectionspace.demo:vocabulary:name("
-    			+shortIdentifier+")";
-    	if(displaySuffix!=null&&!displaySuffix.isEmpty())
-    		refName += "'"+displaySuffix+"'";
+    			+ shortIdentifier + ")";
+    	if(displaySuffix != null && !displaySuffix.isEmpty())
+    		refName += "'" + displaySuffix + "'";
     	return refName;
     }
 
     public static String createVocabularyItemRefName(
     						String vocabularyRefName, String shortIdentifier, String displaySuffix) {
     	String refName = vocabularyRefName+":item:name("+shortIdentifier+")";
-    	if(displaySuffix!=null&&!displaySuffix.isEmpty())
-    		refName += "'"+displaySuffix+"'";
+    	if(displaySuffix != null && !displaySuffix.isEmpty())
+    		refName += "'" + displaySuffix + "'";
     	return refName;
     }
 

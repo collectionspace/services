@@ -65,7 +65,6 @@ import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
-import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
@@ -260,7 +259,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 			Specifier spec = getSpecifier(specifier, "getAuthority", "GET");
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
 			DocumentHandler handler = createDocumentHandler(ctx);
-			if(spec.form==SpecifierForm.CSID) {
+			if(spec.form == SpecifierForm.CSID) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("getAuthority with csid=" + spec.value);
 				}
@@ -350,9 +349,10 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	@Path("{csid}")
 	public String updateAuthority(
 			@PathParam("csid") String specifier,
-			PoxPayloadIn theUpdate) {
+			String xmlPayload) {
 		PoxPayloadOut result = null;
 		try {
+			PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
 			Specifier spec = getSpecifier(specifier, "updateAuthority", "UPDATE");
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate);
 			DocumentHandler handler = createDocumentHandler(ctx);
@@ -786,9 +786,10 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	public String updateAuthorityItem(
 			@PathParam("csid") String parentspecifier,
 			@PathParam("itemcsid") String itemspecifier,
-			PoxPayloadIn theUpdate) {
+			String xmlPayload) {
 		PoxPayloadOut result = null;
 		try {
+			PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
    			Specifier parentSpec = getSpecifier(parentspecifier, 
    					"updateAuthorityItem(parent)", "UPDATE_ITEM");
 			Specifier itemSpec = getSpecifier(itemspecifier, 
