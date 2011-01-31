@@ -80,8 +80,8 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new PermissionResource());
         singletons.add(new IntakeResource());
         singletons.add(new VocabularyResource());
-        /* FIXME: Uncomment please
         singletons.add(new DimensionResource());
+        /* FIXME: Uncomment please
         singletons.add(new CollectionObjectResource());
         singletons.add(new IDResource());
         singletons.add(new NoteResource());
