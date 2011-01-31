@@ -27,6 +27,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.contact.AuthorityResourceWithContacts;
 import org.collectionspace.services.person.nuxeo.PersonDocumentModelHandler;
 
@@ -36,7 +37,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The Class PersonAuthorityResource.
  */
-@Path("/personauthorities")
+@Path("/" + PersonAuthorityClient.SERVICE_PATH_COMPONENT)
 @Consumes("multipart/mixed")
 @Produces("multipart/mixed")
 public class PersonAuthorityResource extends

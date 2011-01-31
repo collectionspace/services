@@ -33,6 +33,7 @@ import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.ContactClientUtils;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.client.PersonAuthorityClient;
@@ -43,8 +44,7 @@ import org.collectionspace.services.person.PersonauthoritiesCommonList;
 import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -168,7 +168,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         String shortId = createIdentifier();
     	String displayName = "displayName-" + shortId;
     	String baseRefName = PersonAuthorityClientUtils.createPersonAuthRefName(shortId, null);
-    	MultipartOutput multipart = 
+    	PoxPayloadOut multipart = 
             PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    displayName, shortId, client.getCommonPartName());
         
@@ -318,7 +318,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
         
-        MultipartOutput multipart = 
+        PoxPayloadOut multipart = 
             PersonAuthorityClientUtils.createPersonInstance(vcsid, authRefName, itemFieldProperties,
                 itemRepeatableFieldProperties, client.getItemCommonPartName() );
 
@@ -394,8 +394,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
         String identifier = createIdentifier();
-        MultipartOutput multipart =
-            ContactClientUtils.createContactInstance(parentcsid,
+        PoxPayloadOut multipart = ContactClientUtils.createContactInstance(parentcsid,
             itemcsid, identifier, new ContactClient().getCommonPartName());
         
         String newID = null;
@@ -571,7 +570,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         PersonAuthorityClient client = new PersonAuthorityClient();
         String shortId = createIdentifier() + "*" + createIdentifier();
     	String displayName = "displayName-" + shortId;
-        MultipartOutput multipart =
+        PoxPayloadOut multipart =
             PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    displayName, shortId, client.getCommonPartName());
 
@@ -621,7 +620,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         fieldProperties.put(PersonJAXBSchema.SHORT_DISPLAY_NAME, shortId);
         fieldProperties.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
         final Map NULL_REPEATABLE_FIELD_PROPERTIES = null;
-        MultipartOutput multipart =
+        PoxPayloadOut multipart =
             PersonAuthorityClientUtils.createPersonInstance(knownResourceId,
                 knownResourceRefName, fieldProperties,
                 NULL_REPEATABLE_FIELD_PROPERTIES, client.getItemCommonPartName());
@@ -955,7 +954,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
             		"updated-" + TEST_FORE_NAME, null, TEST_SUR_NAME,null, null);
 
         // Submit the updated resource to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
+        PoxPayloadOut output = new PoxPayloadOut();
         OutputPart commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
@@ -999,7 +998,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         person.setShortDisplayName(expectedDisplayName);
 
         // Submit the updated resource to the service and store the response.
-        output = new MultipartOutput();
+        output = new PoxPayloadOut();
         commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
@@ -1088,7 +1087,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         person.setDisplayName(null);
 
         // Submit the updated resource to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
+        PoxPayloadOut output = new PoxPayloadOut();
         OutputPart commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
@@ -1542,7 +1541,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
 
         // Submit the updated resource to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
+        PoxPayloadOut output = new PoxPayloadOut();
         OutputPart commonPart = output.addPart(personAuthority, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getCommonPartName());
         res = client.update(knownResourceId, output);
@@ -1630,7 +1629,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }    
         
         // Submit the updated resource to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
+        PoxPayloadOut output = new PoxPayloadOut();
         OutputPart commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
@@ -1718,7 +1717,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
 
         // Submit the updated resource to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
+        PoxPayloadOut output = new PoxPayloadOut();
         OutputPart commonPart = output.addPart(contact, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", new ContactClient().getCommonPartName());
         res = client.updateContact(knownResourceId, knownItemResourceId, knownContactResourceId, output);
@@ -1884,7 +1883,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // The only relevant ID may be the one used in update(), below.
         PersonAuthorityClient client = new PersonAuthorityClient();
         String displayName = "displayName-NON_EXISTENT_ID";
-    	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
+    	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     				displayName, "NON_EXISTENT_SHORT_ID", client.getCommonPartName());
         ClientResponse<PoxPayloadIn> res =
                 client.update(NON_EXISTENT_ID, multipart);
@@ -1930,7 +1929,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         nonexMap.put(PersonJAXBSchema.SUR_NAME, "Wayne");
         nonexMap.put(PersonJAXBSchema.GENDER, "male");
         Map<String, List<String>> nonexRepeatablesMap = new HashMap<String, List<String>>();
-        MultipartOutput multipart = 
+        PoxPayloadOut multipart = 
     	PersonAuthorityClientUtils.createPersonInstance(NON_EXISTENT_ID, 
     			PersonAuthorityClientUtils.createPersonAuthRefName(NON_EXISTENT_ID, null),
     			nonexMap, nonexRepeatablesMap, client.getItemCommonPartName() );

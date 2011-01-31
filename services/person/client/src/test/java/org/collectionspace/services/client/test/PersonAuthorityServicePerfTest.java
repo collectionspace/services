@@ -36,7 +36,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.person.PersonsCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -147,7 +147,7 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
         String shortId = "perfTestPersons";
     	String displayName = "Perf Test Person Auth";
     	String baseRefName = PersonAuthorityClientUtils.createPersonAuthRefName(shortId, null);
-    	MultipartOutput multipart =
+    	PoxPayloadOut multipart =
             PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    displayName, shortId, client.getCommonPartName());
 
@@ -201,7 +201,7 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
         personMap.put(PersonJAXBSchema.FORE_NAME, firstName);
         personMap.put(PersonJAXBSchema.SUR_NAME, lastName);
         Map<String, List<String>> personRepeatablesMap = new HashMap<String, List<String>>();
-        MultipartOutput multipart =
+        PoxPayloadOut multipart =
             PersonAuthorityClientUtils.createPersonInstance(authId, authRefName, 
             		personMap, personRepeatablesMap, client.getItemCommonPartName() );
 

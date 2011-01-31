@@ -38,6 +38,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
@@ -47,9 +48,6 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
 
-
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,14 +55,14 @@ import org.slf4j.LoggerFactory;
 /**
  * The Class ContactResource.
  */
-@Path("/contacts")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Path("/" + ContactClient.SERVICE_PATH_COMPONENT)
+@Consumes("application/xml")
+@Produces("application/xml")
 public class ContactResource extends 
 		AbstractMultiPartCollectionSpaceResourceImpl {
 
     /** The Constant serviceName. */
-    private final static String serviceName = "contacts";
+    private final static String serviceName = ContactClient.SERVICE_PATH_COMPONENT;
     
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(ContactResource.class);
@@ -105,7 +103,7 @@ public class ContactResource extends
     	return ContactsCommon.class;
     }
     
-//    @Override
+//    @Override  //FIXME: REM - Remove this dead code please
 //    public DocumentHandler createDocumentHandler(ServiceContext ctx) throws Exception {
 //        DocumentHandler docHandler = ctx.getDocumentHandler();
 //        if (ctx.getInput() != null) {
@@ -118,31 +116,31 @@ public class ContactResource extends
 //    }
 
     /**
- * Creates the contact.
- * 
- * @param input the input
- * 
- * @return the response
- */
-@POST
-    public Response createContact(PoxPayloadIn input) {
-        try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
-            DocumentHandler handler = createDocumentHandler(ctx);
-            String csid = getRepositoryClient(ctx).create(ctx, handler);
-            //contactObject.setCsid(csid);
-            UriBuilder path = UriBuilder.fromResource(ContactResource.class);
-            path.path("" + csid);
-            Response response = Response.created(path.build()).build();
-            return response;
-        } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception in createContact", e);
-            }
-            Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity("Create failed").type("text/plain").build();
-            throw new WebApplicationException(response);
-        }
+     * Creates the contact.
+     *
+     * @param xmlPayload the xml payload
+     * @return the response
+     */
+    @POST
+    public Response createContact(String xmlPayload) {
+    	try {
+    		PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
+    		DocumentHandler handler = createDocumentHandler(ctx);
+    		String csid = getRepositoryClient(ctx).create(ctx, handler);
+    		//contactObject.setCsid(csid);
+    		UriBuilder path = UriBuilder.fromResource(ContactResource.class);
+    		path.path("" + csid);
+    		Response response = Response.created(path.build()).build();
+    		return response;
+    	} catch (Exception e) {
+    		if (logger.isDebugEnabled()) {
+    			logger.debug("Caught exception in createContact", e);
+    		}
+    		Response response = Response.status(
+    				Response.Status.INTERNAL_SERVER_ERROR).entity("Create failed").type("text/plain").build();
+    		throw new WebApplicationException(response);
+    	}
     }
 
     /**
@@ -154,12 +152,12 @@ public class ContactResource extends
      */
     @GET
     @Path("{csid}")
-    public PoxPayloadOut getContact(
+    public String getContact(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getContact with csid=" + csid);
         }
-        if (csid == null || "".equals(csid)) {
+        if (csid == null || "".equals(csid)) {  //FIXME: REM - This is a silly check?  We can't reach this resource if CSID is blank in the URL
             logger.error("getContact: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
                     "Get failed on Contact csid=" + csid).type(
@@ -194,7 +192,7 @@ public class ContactResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.toXML();
     }
 
     /**
@@ -235,13 +233,13 @@ public class ContactResource extends
      */
     @PUT
     @Path("{csid}")
-    public PoxPayloadOut updateContact(
+    public String updateContact(
             @PathParam("csid") String csid,
-            PoxPayloadIn theUpdate) {
+            String xmlPayload) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateContact with csid=" + csid);
         }
-        if (csid == null || "".equals(csid)) {
+        if (csid == null || "".equals(csid)) {//FIXME: REM - This is a silly check?  We can't reach this resource if CSID is blank in the URL.
             logger.error("updateContact: missing csid!");
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(
                     "update failed on Contact csid=" + csid).type(
@@ -250,6 +248,7 @@ public class ContactResource extends
         }
         PoxPayloadOut result = null;
         try {
+        	PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
@@ -267,7 +266,7 @@ public class ContactResource extends
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.toXML();
     }
 
     /**

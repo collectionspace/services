@@ -44,7 +44,7 @@ import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadIn;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
@@ -85,7 +85,7 @@ public class Sample {
         String displaySuffix = "displayName-" + System.currentTimeMillis(); //TODO: Laramie20100728 temp fix, made-up displaySuffix.
         String basePersonRefName = PersonAuthorityClientUtils.createPersonAuthRefName(personAuthorityName, displaySuffix);//TODO: Laramie20100728 temp fix  was personAuthorityName, false
     	String fullPersonRefName = PersonAuthorityClientUtils.createPersonAuthRefName(personAuthorityName, displaySuffix); //TODO: Laramie20100728 temp fix  was personAuthorityName, true
-    	MultipartOutput multipart = 
+    	PoxPayloadOut multipart = 
     		PersonAuthorityClientUtils.createPersonAuthorityInstance(
   				personAuthorityName, fullPersonRefName, client.getCommonPartName() );
     	ClientResponse<Response> res = client.create(multipart);
@@ -147,7 +147,7 @@ public class Sample {
     		logger.debug("Import: Create Item: \""+builtName.toString()
     				+"\" in personAuthorityulary: \"" + personAuthorityRefName +"\"");
     	}
-    	MultipartOutput multipart = createPersonInstance( vcsid, refName,
+    	PoxPayloadOut multipart = createPersonInstance( vcsid, refName,
     			personMap );
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
 
@@ -333,13 +333,13 @@ public class Sample {
     // ---------------------------------------------------------------
 
     /*
-    private MultipartOutput createPersonAuthorityInstance(
+    private PoxPayloadOut createPersonAuthorityInstance(
     		String displayName, String refName ) {
         PersonauthoritiesCommon personAuthority = new PersonauthoritiesCommon();
         personAuthority.setDisplayName(displayName);
         personAuthority.setRefName(refName);
         personAuthority.setVocabType("PersonAuthority");
-        MultipartOutput multipart = new MultipartOutput();
+        PoxPayloadOut multipart = new PoxPayloadOut();
         OutputPart commonPart = multipart.addPart(personAuthority, MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", client.getCommonPartName());
 
@@ -352,7 +352,7 @@ public class Sample {
     }
     */
 
-    private MultipartOutput createPersonInstance(String inAuthority, 
+    private PoxPayloadOut createPersonInstance(String inAuthority, 
     		String refName, Map<String, String> personInfo ) {
             PersonsCommon person = new PersonsCommon();
             person.setInAuthority(inAuthority);
@@ -398,7 +398,7 @@ public class Sample {
             	person.setBioNote(value);
             if((value = (String)personInfo.get(PersonJAXBSchema.NAME_NOTE))!=null)
             	person.setNameNote(value);
-            MultipartOutput multipart = new MultipartOutput();
+            PoxPayloadOut multipart = new PoxPayloadOut();
             OutputPart commonPart = multipart.addPart(person,
                 MediaType.APPLICATION_XML_TYPE);
             commonPart.getHeaders().add("label", client.getItemCommonPartName());

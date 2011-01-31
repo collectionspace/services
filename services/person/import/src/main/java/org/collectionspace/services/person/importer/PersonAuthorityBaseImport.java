@@ -43,7 +43,7 @@ import org.collectionspace.services.person.PersonauthoritiesCommonList;
 import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +75,7 @@ public class PersonAuthorityBaseImport {
     	}
     	String basePersonRefName = 
     		PersonAuthorityClientUtils.createPersonAuthRefName(shortId, null);
-    	MultipartOutput multipart = 
+    	PoxPayloadOut multipart = 
     		PersonAuthorityClientUtils.createPersonAuthorityInstance(
   				displayName, shortId, client.getCommonPartName());
     	ClientResponse<Response> res = client.create(multipart);

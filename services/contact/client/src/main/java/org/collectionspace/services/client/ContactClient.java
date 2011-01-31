@@ -24,8 +24,6 @@ import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
@@ -37,11 +35,14 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  
 public class ContactClient extends AbstractServiceClientImpl {
 
+	public static final String SERVICE_PATH_COMPONENT = "contacts";	
+	public static final String SERVICE_PAYLOAD_NAME = SERVICE_PATH_COMPONENT;
+	
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
 	 */
 	public String getServicePathComponent() {
-		return "contacts";
+		return SERVICE_PATH_COMPONENT;
 	}
 
 	/**
@@ -106,7 +107,7 @@ public class ContactClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.services.client.Contact#getContact(java.lang.String)
      */
 
-    public ClientResponse<MultipartInput> read(String csid) {
+    public ClientResponse<String> read(String csid) {
         return contactProxy.read(csid);
     }
 
@@ -115,8 +116,8 @@ public class ContactClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.Contact#createContact(org.collectionspace.services.Contact)
      */
-    public ClientResponse<Response> create(MultipartOutput multipart) {
-        return contactProxy.create(multipart);
+    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
+        return contactProxy.create(xmlPayload.toXML());
     }
 
     /**
@@ -125,8 +126,8 @@ public class ContactClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.Contact#updateContact(java.lang.Long, org.collectionspace.services.Contact)
      */
-    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
-        return contactProxy.update(csid, multipart);
+    public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
+        return contactProxy.update(csid, xmlPayload.toXML());
 
     }
 

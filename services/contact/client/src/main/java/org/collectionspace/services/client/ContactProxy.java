@@ -12,15 +12,13 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
  * @version $Revision:$
  */
-@Path("/contacts/")
-@Produces({"multipart/mixed"})
-@Consumes({"multipart/mixed"})
+@Path("/" + ContactClient.SERVICE_PATH_COMPONENT + "/")
+@Produces({"application/xml"})
+@Consumes({"application/xml"})
 public interface ContactProxy extends CollectionSpaceProxy {
 
     @GET
@@ -29,17 +27,17 @@ public interface ContactProxy extends CollectionSpaceProxy {
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(MultipartOutput multipart);
+    ClientResponse<Response> create(String xmlPayload);
 
     //(R)ead
     @GET
     @Path("/{csid}")
-    ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
+    ClientResponse<String> read(@PathParam("csid") String csid);
 
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<MultipartInput> update(@PathParam("csid") String csid, MultipartOutput multipart);
+    ClientResponse<String> update(@PathParam("csid") String csid, String xmlPayload);
 
     //(D)elete
     @DELETE

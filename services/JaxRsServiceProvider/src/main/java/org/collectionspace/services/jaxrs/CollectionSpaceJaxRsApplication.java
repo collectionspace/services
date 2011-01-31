@@ -81,6 +81,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new IntakeResource());
         singletons.add(new VocabularyResource());
         singletons.add(new DimensionResource());
+        singletons.add(new ContactResource());
         /* FIXME: Uncomment please
         singletons.add(new CollectionObjectResource());
         singletons.add(new IDResource());
@@ -96,8 +97,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new AcquisitionResource());
         singletons.add(new NewRelationResource());
         singletons.add(new OrgAuthorityResource());
-        singletons.add(new PersonAuthorityResource());
-        singletons.add(new ContactResource()); */
+        singletons.add(new PersonAuthorityResource()); */
 
 //        singletons.add(new QueryResource());
 //        singletons.add(new DomainIdentifierResource());

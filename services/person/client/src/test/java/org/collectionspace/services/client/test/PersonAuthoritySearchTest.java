@@ -39,7 +39,7 @@ import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.person.PersonsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -597,7 +597,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         String shortId = createIdentifier();
     	String displayName = "displayName-" + shortId;
     	String baseRefName = PersonAuthorityClientUtils.createPersonAuthRefName(shortId, null);
-    	MultipartOutput multipart =
+    	PoxPayloadOut multipart =
             PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    displayName, shortId, client.getCommonPartName());
 
@@ -689,7 +689,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     		PersonAuthorityClient client,
     		Map<String, String> partialTermPersonMap,
     		Map<String, List<String>> partialTermRepeatablesMap) throws Exception {
-        MultipartOutput multipart =
+        PoxPayloadOut multipart =
             PersonAuthorityClientUtils.createPersonInstance(authorityCsid, authRefName, 
                 partialTermPersonMap, partialTermRepeatablesMap, client.getItemCommonPartName() );
 
