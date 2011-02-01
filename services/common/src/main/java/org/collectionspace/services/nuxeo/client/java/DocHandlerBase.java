@@ -96,20 +96,20 @@ public abstract class DocHandlerBase<T, TL> extends RemoteDocumentModelHandlerIm
     }
 
     public static class CommonListReflection {
-        public String NuxeoSchemaName;
+        public String SchemaName;		// May be Repository schema, or a pseudo schema we manage
         public String DublinCoreTitle;            // TODO: for CollectionObjectDocumentModelHandler, NUXEO_DC_TITLE = "CollectionSpace-CollectionObject"
         public String SummaryFields;
         public String AbstractCommonListClassname;
         public String CommonListItemClassname;
-        public String ListItemMethodName;
-        public String[][] ListItemsArray;  //setter, element, container, sub-element
-        public static int SETTER=0, ELEMENT=1, CONTAINER=2, SUBELEMENT=3;
+        public String ListResultsItemMethodName;
+        public String[][] ListItemsArray;  //setter, xpath
+        public static int SETTER=0, XPATH=1;
     }
 
     public abstract CommonListReflection getCommonListReflection();
 
-    public String getNuxeoSchemaName(){
-        return getCommonListReflection().NuxeoSchemaName;
+    public String getSchemaName(){
+        return getCommonListReflection().SchemaName;
     }
 
     public String getSummaryFields(AbstractCommonList commonList){
@@ -159,7 +159,7 @@ public abstract class DocHandlerBase<T, TL> extends RemoteDocumentModelHandlerIm
 
     @Override
     public String getQProperty(String prop) {
-        return getNuxeoSchemaName() + ":" + prop;
+        return getSchemaName() + ":" + prop;
     }
 
     //============= dublin core handling =======================================
@@ -181,18 +181,18 @@ public abstract class DocHandlerBase<T, TL> extends RemoteDocumentModelHandlerIm
 
     //================== UTILITY METHODS ================================================
 
-    public static ReflectionMapper.STATUS callSetter(DocumentModel docModel,
+    public static ReflectionMapper.STATUS callPropertySetterWithXPathValue(DocumentModel docModel,
                            Object listItem,
-                           String label,
-                           String id,
                            String setterName,
-                           String elementName)
+                           String schema,
+                           String xpath)
                            throws Exception {
-        Object prop = docModel.getProperty(label, elementName);
-        return ReflectionMapper.callSetter(listItem, setterName, prop);
+        //Object prop = docModel.getProperty(label, elementName);
+        String value = getXPathStringValue(docModel, schema, xpath);
+        return ReflectionMapper.callSetter(listItem, setterName, value);
     }
 
-    public static ReflectionMapper.STATUS callSetter(Object target, String name, Object arg) {
+    public static ReflectionMapper.STATUS callSimplePropertySetter(Object target, String name, Object arg) {
         return ReflectionMapper.callSetter(target, name, arg);
     }
 
@@ -200,11 +200,13 @@ public abstract class DocHandlerBase<T, TL> extends RemoteDocumentModelHandlerIm
      *                             "org.collectionspace.services.objectexit.ObjectexitCommonList$ObjectexitListItem".
      *    @param includeStdFields set to true to have the method set Uri and Csid automatically, based on id param.
      */
-    public Object createItemForCommonList(String commonListClassname, DocumentModel docModel, String label, String id, boolean includeStdFields) throws Exception {
+    public Object createItemForCommonList(String commonListClassname, DocumentModel docModel, 
+    		String schema, String id, boolean includeStdFields) throws Exception {
         //createItemForCommonList(docModel, label, id);
         Object item = ReflectionMapper.instantiate(commonListClassname);
         String [][] names = getListItemsArray();
         for (String[] row : names){
+        	/*
             if (row.length >2
                 && Tools.notEmpty(row[CommonListReflection.CONTAINER])
                 && Tools.notEmpty(row[CommonListReflection.SUBELEMENT])){
@@ -215,12 +217,14 @@ public abstract class DocHandlerBase<T, TL> extends RemoteDocumentModelHandlerIm
                     String primary = primaryValueFromMultivalue(listOfMulti, element);
                     callSetter(item, setter, primary); //"Lender"      //item.setLender(primary);
             } else {
-                callSetter(docModel, item, label, id, row[CommonListReflection.SETTER], row[CommonListReflection.ELEMENT]);
-            }
+            */
+        	callPropertySetterWithXPathValue(docModel, item, row[CommonListReflection.SETTER], 
+                			schema, row[CommonListReflection.XPATH]);
+            //}
         }
         if (includeStdFields){
-            callSetter(item, "setCsid", id);
-            callSetter(item, "setUri", getServiceContextPath() + id);
+        	callSimplePropertySetter(item, "setCsid", id);
+        	callSimplePropertySetter(item, "setUri", getServiceContextPath() + id);
         }
         return item;
     }
@@ -231,7 +235,7 @@ public abstract class DocHandlerBase<T, TL> extends RemoteDocumentModelHandlerIm
      *  field for you if specified.
      */
     public List createItemsList(AbstractCommonList commonList) throws Exception {
-        return createItemsList(commonList, getCommonListReflection().ListItemMethodName);
+        return createItemsList(commonList, getCommonListReflection().ListResultsItemMethodName);
     }
 
     /** e.g. createItemsList(commonList, "getObjectexitListItem" */

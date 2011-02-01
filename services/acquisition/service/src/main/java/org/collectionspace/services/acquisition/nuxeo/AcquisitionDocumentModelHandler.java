@@ -37,17 +37,18 @@ public class AcquisitionDocumentModelHandler
     private static DocHandlerBase.CommonListReflection clr;
     static {
         clr = new DocHandlerBase.CommonListReflection();
-        clr.NuxeoSchemaName= "acquisition";
+        clr.SchemaName= "acquisition";
         clr.DublinCoreTitle = "";//"CollectionSpace-Acquisition";
         clr.SummaryFields = "acquisitionReferenceNumber|acquisitionSources|owners|uri|csid";
         clr.AbstractCommonListClassname = "org.collectionspace.services.acquisition.AcquisitionsCommonList";
         clr.CommonListItemClassname = "org.collectionspace.services.acquisition.AcquisitionsCommonList$AcquisitionListItem";
-        clr.ListItemMethodName = "getAcquisitionListItem";
-                //ListItemsArray array elements: SETTER=0, ELEMENT=1, CONTAINER=2, SUBELEMENT=3;
-        clr.ListItemsArray =   new String[][] { {"setAcquisitionReferenceNumber","acquisitionReferenceNumber","",""},
-                                                {"setAcquisitionSource","acquisitionSources","acquisitionSources","acquisitionSource"},
-                                                {"setOwner","owner","owners","owner"}
-                                              };
+        clr.ListResultsItemMethodName = "getAcquisitionListItem";
+				//ListItemsArray array elements: SETTER=0, XPATH=1
+        clr.ListItemsArray =   new String[][] { 
+						{"setAcquisitionReferenceNumber","acquisitionReferenceNumber"},
+						{"setAcquisitionSource","acquisitionSources/[0]"},
+						{"setOwner","owners/[0]"}
+          };
     }
     public DocHandlerBase.CommonListReflection getCommonListReflection(){
         return clr;

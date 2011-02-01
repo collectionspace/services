@@ -29,6 +29,7 @@ import java.util.List;
 
 //import org.collectionspace.services.jaxb.AbstractCommonList;
 
+import org.collectionspace.services.CollectionObjectJAXBSchema;
 import org.collectionspace.services.CollectionObjectListItemJAXBSchema;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
@@ -40,6 +41,7 @@ import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandler
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.schema.types.ComplexType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,28 +136,25 @@ public class CollectionObjectDocumentModelHandler
             DocumentModel docModel = iter.next();
             CollectionObjectListItem coListItem = new CollectionObjectListItem();
             try {
-	            coListItem.setObjectNumber((String) docModel.getProperty(label,
-                            CollectionObjectListItemJAXBSchema.OBJECT_NUMBER));
+            	String objNumber = getSimpleStringProperty(docModel, label, 
+            							CollectionObjectListItemJAXBSchema.OBJECT_NUMBER);
+            	coListItem.setObjectNumber(objNumber);
 
-	            List<Object> objectNames = (List<Object>) docModel.getProperty(label,
-                            CollectionObjectListItemJAXBSchema.OBJECT_NAME_LIST);
-                    String primaryObjectName = primaryValueFromMultivalue(objectNames,
-                            CollectionObjectListItemJAXBSchema.OBJECT_NAME);
+            	String primaryObjectName = getStringValueInPrimaryRepeatingComplexProperty(
+            			docModel, label, CollectionObjectListItemJAXBSchema.OBJECT_NAME_LIST, 
+            			CollectionObjectListItemJAXBSchema.OBJECT_NAME);
 	            coListItem.setObjectName(primaryObjectName);
                     
-                    List<Object> titles =
-                        (List<Object>) docModel.getProperty(label,
-                            CollectionObjectListItemJAXBSchema.TITLE_GROUP_LIST);
-                    String primaryTitle = primaryValueFromMultivalue(titles,
-                            CollectionObjectListItemJAXBSchema.TITLE);
-                    coListItem.setTitle(primaryTitle);
+            	String primaryTitle = getStringValueInPrimaryRepeatingComplexProperty(
+            			docModel, label, CollectionObjectListItemJAXBSchema.TITLE_GROUP_LIST, 
+            			CollectionObjectListItemJAXBSchema.TITLE);
+                coListItem.setTitle(primaryTitle);
 
-	            List<Object> respDepts =
-                        (List<Object>) docModel.getProperty(label,
-                            CollectionObjectListItemJAXBSchema.RESPONSIBLE_DEPARTMENTS);
-		    coListItem.setResponsibleDepartment(DocumentUtils.getFirstString(respDepts));
+            	String primaryRespDept = this.getFirstRepeatingStringProperty(
+            			docModel, label, CollectionObjectListItemJAXBSchema.RESPONSIBLE_DEPARTMENTS);
+                coListItem.setResponsibleDepartment(primaryRespDept);
 	            
-	            String id = getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
+	            String id = getCsid(docModel);
 	            coListItem.setUri(getServiceContextPath() + id);
 	            coListItem.setCsid(id);
             } catch (ClassCastException cce) {

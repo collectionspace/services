@@ -32,13 +32,15 @@ public class ObjectExitDocumentModelHandler extends DocHandlerBase<ObjectexitCom
     public static DocHandlerBase.CommonListReflection clr;
     static {
         clr = new DocHandlerBase.CommonListReflection();
-        clr.NuxeoSchemaName= "objectexit";
+        clr.SchemaName= "objectexit";
         clr.SummaryFields = "exitNumber|currentOwner|uri|csid";
         clr.AbstractCommonListClassname = "org.collectionspace.services.objectexit.ObjectexitCommonList";
         clr.CommonListItemClassname = "org.collectionspace.services.objectexit.ObjectexitCommonList$ObjectexitListItem";
-        clr.ListItemMethodName = "getObjectexitListItem";
-        clr.ListItemsArray =   new String[][] {{"setExitNumber", "exitNumber", "", ""},
-                                               {"setCurrentOwner", "currentOwner", "", ""}};
+        clr.ListResultsItemMethodName = "getObjectexitListItem";
+        clr.ListItemsArray =   new String[][] {
+						{"setExitNumber", "exitNumber"},
+						{"setCurrentOwner", "currentOwner"}
+				};
     }
     public DocHandlerBase.CommonListReflection getCommonListReflection(){
         return clr;

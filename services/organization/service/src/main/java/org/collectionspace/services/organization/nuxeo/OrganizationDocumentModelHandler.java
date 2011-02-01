@@ -94,21 +94,20 @@ public class OrganizationDocumentModelHandler
     	Boolean shortDisplayNameComputed = (Boolean) docModel.getProperty(commonPartLabel,
     			OrganizationJAXBSchema.SHORT_DISPLAY_NAME_COMPUTED);
     	if(displayNameComputed==null)
-    		displayNameComputed = true;
+    		displayNameComputed = Boolean.TRUE;
     	if(shortDisplayNameComputed==null)
-    		shortDisplayNameComputed = true;
-    	if (displayNameComputed || shortDisplayNameComputed) {
-                 List<Object> mainBodyGroupList = (List<Object>) docModel.getProperty(commonPartLabel,
-                         OrganizationJAXBSchema.MAIN_BODY_GROUP_LIST);
-                 // FIXME: Determine how to handle cases where primary short name is null or empty.
-                String shortName = primaryValueFromMultivalue(mainBodyGroupList,
-                        OrganizationJAXBSchema.SHORT_NAME);
-    		if(shortDisplayNameComputed) {
+    		shortDisplayNameComputed = Boolean.TRUE;
+    	if (displayNameComputed.booleanValue() || shortDisplayNameComputed.booleanValue()) {
+        	String shortName = getStringValueInPrimaryRepeatingComplexProperty(
+        			docModel, commonPartLabel, OrganizationJAXBSchema.MAIN_BODY_GROUP_LIST, 
+        			OrganizationJAXBSchema.SHORT_NAME);
+            // FIXME: Determine how to handle cases where primary short name is null or empty.
+    		if(shortDisplayNameComputed.booleanValue()) {
 	    		String displayName = prepareDefaultDisplayName(shortName, null);
 	    		docModel.setProperty(commonPartLabel, OrganizationJAXBSchema.SHORT_DISPLAY_NAME,
 	    				displayName);
     		}
-    		if(displayNameComputed) {
+    		if(displayNameComputed.booleanValue()) {
             	String foundingPlace = (String) docModel.getProperty(commonPartLabel,
 						OrganizationJAXBSchema.FOUNDING_PLACE);
 	       		String displayName = prepareDefaultDisplayName(shortName, foundingPlace);

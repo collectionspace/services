@@ -280,35 +280,28 @@
             <service:DocHandlerParams xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:classname>org.collectionspace.services.loanin.nuxeo.LoaninDocumentModelHandler</service:classname>
                 <service:params>
-                     <service:NuxeoSchemaName>loansin</service:NuxeoSchemaName>
+                     <service:SchemaName>loansin</service:SchemaName>
                      <service:DublinCoreTitle>loansin</service:DublinCoreTitle>
                      <service:SummaryFields>loanInNumber|lenderList|loanReturnDate|uri|csid</service:SummaryFields>
-                     <service:NuxeoSchemaName>loansin</service:NuxeoSchemaName>
                      <service:AbstractCommonListClassname>org.collectionspace.services.loanin.LoansinCommonList</service:AbstractCommonListClassname>
                      <service:CommonListItemClassname>org.collectionspace.services.loanin.LoansinCommonList$LoaninListItem</service:CommonListItemClassname>
-                     <service:ListItemMethodName>getLoaninListItem</service:ListItemMethodName>
-                     <service:ListItemsArrays>
-                         <service:ListItemsArray>
+                     <service:ListResultsItemMethodName>getLoaninListItem</service:ListResultsItemMethodName>
+                     <service:ListResultsFields>
+                         <service:ListResultField>
                              <service:setter>setLoanInNumber</service:setter>
-                             <service:element>loanInNumber</service:element>
-                             <service:container></service:container>
-                             <service:subelement></service:subelement>
-                         </service:ListItemsArray>
+                             <service:xpath>loanInNumber</service:xpath>
+                         </service:ListResultField>
 
-                        <service:ListItemsArray>
+                        <service:ListResultField>
                             <service:setter>setLender</service:setter>
-                            <service:element>lenderList</service:element>
-                            <service:container>lenderGroupList</service:container>
-                            <service:subelement>lender</service:subelement>
-                        </service:ListItemsArray>
+														<service:xpath>lenderGroupList/[0]/lender</service:xpath>
+                        </service:ListResultField>
 
-                        <service:ListItemsArray>
+                        <service:ListResultField>
                             <service:setter>setLoanReturnDate</service:setter>
-                            <service:element>loanReturnDate</service:element>
-                            <service:container></service:container>
-                            <service:subelement></service:subelement>
-                        </service:ListItemsArray>
-                    </service:ListItemsArrays>
+                            <service:xpath>loanReturnDate</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
                 </service:params>
             </service:DocHandlerParams>
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>

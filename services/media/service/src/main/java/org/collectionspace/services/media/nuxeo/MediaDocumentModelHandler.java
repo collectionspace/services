@@ -44,11 +44,11 @@ public class MediaDocumentModelHandler
     public static DocHandlerBase.CommonListReflection clr;
     static {
         clr = new DocHandlerBase.CommonListReflection();
-        clr.NuxeoSchemaName= "media";
+        clr.SchemaName= "media";
         clr.SummaryFields = "title|source|filename|identificationNumber|uri|csid";
         clr.AbstractCommonListClassname = "org.collectionspace.services.media.MediaCommonList";
         clr.CommonListItemClassname =     "org.collectionspace.services.media.MediaCommonList$MediaListItem";
-        clr.ListItemMethodName = "getMediaListItem";
+        clr.ListResultsItemMethodName = "getMediaListItem";
         clr.ListItemsArray =   new String[][]   {{"setTitle", "title"},
                                                  {"setSource", "source"},
                                                  {"setFilename", "filename"},

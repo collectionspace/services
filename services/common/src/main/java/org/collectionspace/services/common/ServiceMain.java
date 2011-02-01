@@ -574,25 +574,23 @@ public class ServiceMain {
                     DocHandlerParams.Params p = params.getParams();
                     DocHandlerBase.CommonListReflection clr = new DocHandlerBase.CommonListReflection();
                     //List<ListItemsArray> items = p.getListItemsArrays();   //todo: this thing only returns one row. xsd is wrong.  tenant-bindings.xml has an example of multiple elements in loansin.
-                    List<ListItemsArray> items = /*DocHandlerParams.Params.ListItemsArrays items =*/
-                            p.getListItemsArrays().getListItemsArray();   //todo: this thing only returns one row. xsd is wrong.  tenant-bindings.xml has an example of multiple elements in loansin.
+                    List<ListResultField> items = /*DocHandlerParams.Params.ListItemsArrays items =*/
+                            p.getListResultsFields().getListResultField();   //todo: this thing only returns one row. xsd is wrong.  tenant-bindings.xml has an example of multiple elements in loansin.
                     int size = items.size();
                     String[][] rows = new String[size][4];
                     int r = 0;
-                    for (ListItemsArray item: items){
+                    for (ListResultField item: items){
                         String[] row = rows[r];
                         row[0] = item.getSetter();
-                        row[1] = item.getElement();
-                        row[2] = item.getContainer();
-                        row[3] = item.getSubelement();
+                        row[1] = item.getXpath();
                         r++;
                     }
                     clr.ListItemsArray = rows;
                     clr.AbstractCommonListClassname = p.getAbstractCommonListClassname();
                     clr.CommonListItemClassname = p.getCommonListItemClassname();
                     clr.DublinCoreTitle = p.getDublinCoreTitle();
-                    clr.ListItemMethodName = p.getListItemMethodName();
-                    clr.NuxeoSchemaName = p.getNuxeoSchemaName();
+                    clr.ListResultsItemMethodName = p.getListResultsItemMethodName();
+                    clr.SchemaName = p.getSchemaName();
                     clr.SummaryFields = p.getSummaryFields();
                 }
             }

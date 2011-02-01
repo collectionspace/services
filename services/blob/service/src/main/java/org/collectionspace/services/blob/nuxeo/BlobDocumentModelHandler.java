@@ -54,11 +54,11 @@ extends DocHandlerBase<BlobsCommon, AbstractCommonList> {
     public static DocHandlerBase.CommonListReflection clr;
     static {
         clr = new DocHandlerBase.CommonListReflection();
-        clr.NuxeoSchemaName= "blobs";
+        clr.SchemaName= "blobs";
         clr.SummaryFields = "name|mimeType|encoding|length|uri|csid";
         clr.AbstractCommonListClassname = "org.collectionspace.services.blob.BlobsCommonList";
         clr.CommonListItemClassname =     "org.collectionspace.services.blob.BlobsCommonList$BlobListItem";
-        clr.ListItemMethodName = "getBlobListItem";
+        clr.ListResultsItemMethodName = "getBlobListItem";
         clr.ListItemsArray =   new String[][]   {{"setEncoding", "encoding"},
                                                  {"setMimeType", "mimeType"},
                                                  {"setName", "name"},
