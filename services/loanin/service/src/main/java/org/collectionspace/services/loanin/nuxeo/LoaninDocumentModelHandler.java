@@ -23,6 +23,11 @@
  */
 package org.collectionspace.services.loanin.nuxeo;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.collectionspace.services.common.service.ListResultField;
+import org.collectionspace.services.common.service.DocHandlerParams;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanin.LoansinCommon;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
@@ -34,23 +39,43 @@ import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 public class LoaninDocumentModelHandler
         extends DocHandlerBase<LoansinCommon, AbstractCommonList> {
 
-    private static DocHandlerBase.CommonListReflection clr;
+    private static DocHandlerParams.Params params;
     static {
-        clr = new DocHandlerBase.CommonListReflection();
-        clr.SchemaName= "loanin";
-        clr.SummaryFields = "loanInNumber|lender|loanReturnDate|uri|csid";
-        clr.AbstractCommonListClassname = "org.collectionspace.services.loanin.LoansinCommonList";
-        clr.CommonListItemClassname = "org.collectionspace.services.loanin.LoansinCommonList$LoaninListItem";
-        clr.ListResultsItemMethodName = "getLoaninListItem";
+    	params = new DocHandlerParams.Params();
+        params.setSchemaName("loanin");
+        params.setDublinCoreTitle("");//"CollectionSpace-Media";
+        params.setSummaryFields("loanInNumber|lender|loanReturnDate|uri|csid");
+        params.setAbstractCommonListClassname("org.collectionspace.services.loanin.LoansinCommonList");
+        params.setCommonListItemClassname("org.collectionspace.services.loanin.LoansinCommonList$LoaninListItem");
+        params.setListResultsItemMethodName("getLoaninListItem");
+        DocHandlerParams.Params.ListResultsFields lrfs = 
+        	new DocHandlerParams.Params.ListResultsFields();
+        params.setListResultsFields(lrfs);
+        List<ListResultField> lrfl = lrfs.getListResultField();
+		ListResultField lrf = new ListResultField();
+		lrf.setSetter("setLoanInNumber");
+		lrf.setXpath("loanInNumber");
+		lrfl.add( lrf ); 
+		lrf = new ListResultField();
+		lrf.setSetter("setLender");
+		lrf.setXpath("lenderGroupList/[0]/lender");
+		lrfl.add( lrf ); 
+		lrf = new ListResultField();
+		lrf.setSetter("setLoanReturnDate");
+		lrf.setXpath("loanReturnDate");
+		lrfl.add( lrf ); 
+        /*
         //ListItemsArray array elements: SETTER=0, ELEMENT=1, CONTAINER=2, SUBELEMENT=3;
         clr.ListItemsArray =   new String[][] {
         		{"setLoanInNumber",   "loanInNumber"},
                 {"setLender",     "lenderGroupList/[0]/lender"},
                 {"setLoanReturnDate", "loanReturnDate"}
             };
+         */
     }
-    public DocHandlerBase.CommonListReflection getCommonListReflection(){
-        return clr;
+
+    public DocHandlerParams.Params getDocHandlerParams(){
+        return params;
     }
 
 }

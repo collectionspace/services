@@ -560,6 +560,7 @@ public class ServiceMain {
         return null;
     }
 
+    /*
     private void loadDocHandlers() throws Exception {
         Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
         for (TenantBindingType tbt: tenantBindingTypeMap.values()){
@@ -573,9 +574,9 @@ public class ServiceMain {
                     params.getClassname();
                     DocHandlerParams.Params p = params.getParams();
                     DocHandlerBase.CommonListReflection clr = new DocHandlerBase.CommonListReflection();
-                    //List<ListItemsArray> items = p.getListItemsArrays();   //todo: this thing only returns one row. xsd is wrong.  tenant-bindings.xml has an example of multiple elements in loansin.
-                    List<ListResultField> items = /*DocHandlerParams.Params.ListItemsArrays items =*/
-                            p.getListResultsFields().getListResultField();   //todo: this thing only returns one row. xsd is wrong.  tenant-bindings.xml has an example of multiple elements in loansin.
+                    clr.ListItemsArray = 
+                            p.getListResultsFields().getListResultField();
+                    /*
                     int size = items.size();
                     String[][] rows = new String[size][4];
                     int r = 0;
@@ -586,6 +587,7 @@ public class ServiceMain {
                         r++;
                     }
                     clr.ListItemsArray = rows;
+                    * /
                     clr.AbstractCommonListClassname = p.getAbstractCommonListClassname();
                     clr.CommonListItemClassname = p.getCommonListItemClassname();
                     clr.DublinCoreTitle = p.getDublinCoreTitle();
@@ -596,6 +598,7 @@ public class ServiceMain {
             }
         }
     }
+    */
 
     private Connection getConnection() throws LoginException, SQLException {
         return JDBCTools.getConnection(DEFAULT_REPOSITORY_NAME);

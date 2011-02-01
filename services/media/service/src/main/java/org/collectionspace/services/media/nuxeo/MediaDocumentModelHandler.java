@@ -25,6 +25,8 @@ package org.collectionspace.services.media.nuxeo;
 
 import org.collectionspace.services.MediaJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
+import org.collectionspace.services.common.service.DocHandlerParams;
+import org.collectionspace.services.common.service.ListResultField;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -33,6 +35,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.media.MediaCommon;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,22 +44,47 @@ import java.util.List;
 public class MediaDocumentModelHandler
         extends DocHandlerBase<MediaCommon, AbstractCommonList> {
 
-    public static DocHandlerBase.CommonListReflection clr;
+    private static DocHandlerParams.Params params;
     static {
-        clr = new DocHandlerBase.CommonListReflection();
-        clr.SchemaName= "media";
-        clr.SummaryFields = "title|source|filename|identificationNumber|uri|csid";
-        clr.AbstractCommonListClassname = "org.collectionspace.services.media.MediaCommonList";
-        clr.CommonListItemClassname =     "org.collectionspace.services.media.MediaCommonList$MediaListItem";
-        clr.ListResultsItemMethodName = "getMediaListItem";
-        clr.ListItemsArray =   new String[][]   {{"setTitle", "title"},
-                                                 {"setSource", "source"},
-                                                 {"setFilename", "filename"},
-                                                 {"setIdentificationNumber", "identificationNumber"}
-                                                 };
+    	params = new DocHandlerParams.Params();
+        params.setSchemaName("media");
+        params.setDublinCoreTitle("");//"CollectionSpace-Media";
+        params.setSummaryFields("title|source|filename|identificationNumber|uri|csid");
+        params.setAbstractCommonListClassname("org.collectionspace.services.media.MediaCommonList");
+        params.setCommonListItemClassname("org.collectionspace.services.media.MediaCommonList$MediaListItem");
+        params.setListResultsItemMethodName("getMediaListItem");
+        DocHandlerParams.Params.ListResultsFields lrfs = 
+        	new DocHandlerParams.Params.ListResultsFields();
+        params.setListResultsFields(lrfs);
+        List<ListResultField> lrfl = lrfs.getListResultField();
+		ListResultField lrf = new ListResultField();
+		lrf.setSetter("setTitle");
+		lrf.setXpath("title");
+		lrfl.add( lrf ); 
+		lrf = new ListResultField();
+		lrf.setSetter("setSource");
+		lrf.setXpath("source");
+		lrfl.add( lrf ); 
+		lrf = new ListResultField();
+		lrf.setSetter("setFilename");
+		lrf.setXpath("filename");
+		lrfl.add( lrf ); 
+		lrf = new ListResultField();
+		lrf.setSetter("setIdentificationNumber");
+		lrf.setXpath("identificationNumber");
+		lrfl.add( lrf ); 
+        /*
+        clr.ListItemsArray =   new String[][]   
+        	{{"setTitle", "title"},
+            {"setSource", "source"},
+            {"setFilename", "filename"},
+            {"setIdentificationNumber", "identificationNumber"}
+            };
+         */
     }
-    public DocHandlerBase.CommonListReflection getCommonListReflection(){
-        return clr;
+
+    public DocHandlerParams.Params getDocHandlerParams(){
+        return params;
     }
     //==============================================================================
 

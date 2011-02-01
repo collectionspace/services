@@ -32,6 +32,8 @@ import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
+import org.collectionspace.services.common.service.DocHandlerParams;
+import org.collectionspace.services.common.service.ListResultField;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.nuxeo.ecm.core.api.ClientException;
@@ -40,6 +42,7 @@ import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -51,22 +54,46 @@ extends DocHandlerBase<BlobsCommon, AbstractCommonList> {
 	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(BlobDocumentModelHandler.class);
 
-    public static DocHandlerBase.CommonListReflection clr;
+    private static DocHandlerParams.Params params;
     static {
-        clr = new DocHandlerBase.CommonListReflection();
-        clr.SchemaName= "blobs";
-        clr.SummaryFields = "name|mimeType|encoding|length|uri|csid";
-        clr.AbstractCommonListClassname = "org.collectionspace.services.blob.BlobsCommonList";
-        clr.CommonListItemClassname =     "org.collectionspace.services.blob.BlobsCommonList$BlobListItem";
-        clr.ListResultsItemMethodName = "getBlobListItem";
+    	params = new DocHandlerParams.Params();
+        params.setSchemaName("blobs");
+        params.setDublinCoreTitle("");//"CollectionSpace-Blob";
+        params.setSummaryFields("name|mimeType|encoding|length|uri|csid");
+        params.setAbstractCommonListClassname("org.collectionspace.services.blob.BlobsCommonList");
+        params.setCommonListItemClassname("org.collectionspace.services.blob.BlobsCommonList$BlobListItem");
+        params.setListResultsItemMethodName("getBlobListItem");
+        DocHandlerParams.Params.ListResultsFields lrfs = 
+        	new DocHandlerParams.Params.ListResultsFields();
+        params.setListResultsFields(lrfs);
+        List<ListResultField> lrfl = lrfs.getListResultField();
+		ListResultField lrf = new ListResultField();
+		lrf.setSetter("setName");
+		lrf.setXpath("name");
+		lrfl.add( lrf ); 
+		lrf = new ListResultField();
+		lrf.setSetter("setMimeType");
+		lrf.setXpath("mimeType");
+		lrfl.add( lrf ); 
+		lrf = new ListResultField();
+		lrf.setSetter("setEncoding");
+		lrf.setXpath("encoding");
+		lrfl.add( lrf ); 
+		lrf = new ListResultField();
+		lrf.setSetter("setLength");
+		lrf.setXpath("length");
+		lrfl.add( lrf ); 
+				/*
         clr.ListItemsArray =   new String[][]   {{"setEncoding", "encoding"},
                                                  {"setMimeType", "mimeType"},
                                                  {"setName", "name"},
                                                  {"setLength", "length"}
                                                  };
+																								 */
     }
-    public DocHandlerBase.CommonListReflection getCommonListReflection(){
-        return clr;
+
+    public DocHandlerParams.Params getDocHandlerParams(){
+        return params;
     }
 
     //==============================================================================

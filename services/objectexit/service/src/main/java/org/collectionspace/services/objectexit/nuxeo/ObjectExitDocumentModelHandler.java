@@ -23,27 +23,47 @@
  */
 package org.collectionspace.services.objectexit.nuxeo;
 
+import org.collectionspace.services.common.service.ListResultField;
+import org.collectionspace.services.common.service.DocHandlerParams;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.objectexit.ObjectexitCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 public class ObjectExitDocumentModelHandler extends DocHandlerBase<ObjectexitCommon, AbstractCommonList> {
-
-    public static DocHandlerBase.CommonListReflection clr;
+    private static DocHandlerParams.Params params;
     static {
-        clr = new DocHandlerBase.CommonListReflection();
-        clr.SchemaName= "objectexit";
-        clr.SummaryFields = "exitNumber|currentOwner|uri|csid";
-        clr.AbstractCommonListClassname = "org.collectionspace.services.objectexit.ObjectexitCommonList";
-        clr.CommonListItemClassname = "org.collectionspace.services.objectexit.ObjectexitCommonList$ObjectexitListItem";
-        clr.ListResultsItemMethodName = "getObjectexitListItem";
-        clr.ListItemsArray =   new String[][] {
+    	params = new DocHandlerParams.Params();
+        params.setSchemaName("objectexit");
+        params.setDublinCoreTitle("");//"CollectionSpace-Media";
+        params.setSummaryFields("exitNumber|currentOwner|uri|csid");
+        params.setAbstractCommonListClassname("org.collectionspace.services.objectexit.ObjectexitCommonList");
+        params.setCommonListItemClassname("org.collectionspace.services.objectexit.ObjectexitCommonList$ObjectexitListItem");
+        params.setListResultsItemMethodName("getObjectexitListItem");
+        DocHandlerParams.Params.ListResultsFields lrfs = 
+        	new DocHandlerParams.Params.ListResultsFields();
+        params.setListResultsFields(lrfs);
+        List<ListResultField> lrfl = lrfs.getListResultField();
+		ListResultField lrf = new ListResultField();
+		lrf.setSetter("setExitNumber");
+		lrf.setXpath("exitNumber");
+		lrfl.add( lrf ); 
+		lrf = new ListResultField();
+		lrf.setSetter("setCurrentOwner");
+		lrf.setXpath("currentOwner");
+		lrfl.add( lrf ); 
+
+        /*clr.ListItemsArray =   new String[][] {
 						{"setExitNumber", "exitNumber"},
-						{"setCurrentOwner", "currentOwner"}
-				};
+						{"setCurrentOwner", "currentOwner"}};
+		*/
     }
-    public DocHandlerBase.CommonListReflection getCommonListReflection(){
-        return clr;
+
+    public DocHandlerParams.Params getDocHandlerParams(){
+        return params;
     }
 }
 
