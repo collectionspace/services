@@ -29,6 +29,7 @@ import java.util.regex.Matcher;
 
 /** General utility methods.
  *   @author Laramie Crocker
+ * v.1.4
  */
 public class Tools {
     /** @return first glued to second with the separator string, at most one time - useful for appending paths.
