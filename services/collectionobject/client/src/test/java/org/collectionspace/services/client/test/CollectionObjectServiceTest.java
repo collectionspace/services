@@ -607,12 +607,10 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
             logger.debug(testName + ": Reading Natural History part ...");
         }
 
+        // Currently checking only that the natural history part is non-null;
+        // can add specific field-level checks as warranted.
         Object conh = extractPartValue(testName, res, getNHPartName());
-        // Need to determine how to process this; do we need to import DOM classes?
-        if (conh != null) {
-        // 	conh = (Object) payloadInputPart.getElementBody();
-        }
-        // Assert.assertNotNull(conh);
+        Assert.assertNotNull(conh);
     }
 
     // Failure outcomes
@@ -1455,7 +1453,13 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     private CollectionobjectsCommon extractCommonPartValue(String testName, ClientResponse<String> res)
         throws Exception {
         CollectionObjectClient client = new CollectionObjectClient();
-        Object obj = extractPartValue(testName, res, client.getCommonPartName());
+        PayloadInputPart payloadInputPart = extractPart(testName, res, client.getCommonPartName());
+        Object obj = null;
+        if (payloadInputPart != null) {
+        	obj = payloadInputPart.getBody();
+        }
+        Assert.assertNotNull(obj,
+                testName + ": body of " + client.getCommonPartName() + " part was unexpectedly null.");
         CollectionobjectsCommon collectionobjectCommon = (CollectionobjectsCommon) obj;
         Assert.assertNotNull(collectionobjectCommon,
                 testName + ": " + client.getCommonPartName() + " part was unexpectedly null.");
@@ -1467,7 +1471,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         Object obj = null;
         PayloadInputPart payloadInputPart = extractPart(testName, res, partLabel);
         if (payloadInputPart != null) {
-        	obj = payloadInputPart.getBody();
+        	obj = payloadInputPart.getElementBody();
         }
         Assert.assertNotNull(obj,
                 testName + ": value of part " + partLabel + " was unexpectedly null.");
