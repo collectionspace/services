@@ -68,14 +68,6 @@ public class InitHandler implements IInitHandler {
         }
     }
 
-    public ResultSet executeQuery(String sql) throws Exception {
-        return JDBCTools.executeQuery(sql);
-    }
-
-    public void closeResultSet(ResultSet rs) throws SQLException {
-        rs.close();
-    }
-
     public int executeUpdate(String sql) throws Exception {
         return JDBCTools.executeUpdate(sql);
     }
