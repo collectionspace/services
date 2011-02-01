@@ -78,7 +78,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new AccountResource());
         singletons.add(new RoleResource());
         singletons.add(new PermissionResource());
-        singletons.add(new CollectionObjectResource());
+//        singletons.add(new CollectionObjectResource());
         singletons.add(new IntakeResource());
         singletons.add(new VocabularyResource());
         singletons.add(new DimensionResource());

@@ -46,8 +46,8 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
 //import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -170,7 +170,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
         orgAuthRefName = 
     		OrgAuthorityClientUtils.createOrgAuthRefName(ORGANIZATION_AUTHORITY_NAME, null);
-    	MultipartOutput multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
+        PoxPayloadOut multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
     			ORGANIZATION_AUTHORITY_NAME, ORGANIZATION_AUTHORITY_NAME, orgAuthClient.getCommonPartName());
         ClientResponse<Response> res = orgAuthClient.create(multipart);
         int statusCode = res.getStatus();
@@ -212,7 +212,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest {
         orgInfo.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortId);
         orgInfo.put(OrganizationJAXBSchema.SHORT_NAME, shortName);
         orgInfo.put(OrganizationJAXBSchema.LONG_NAME, longName);
-    	MultipartOutput multipart = 
+        PoxPayloadOut multipart = 
     		OrgAuthorityClientUtils.createOrganizationInstance(orgAuthRefName,
     				orgInfo, orgAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = orgAuthClient.createItem(orgAuthCSID, multipart);

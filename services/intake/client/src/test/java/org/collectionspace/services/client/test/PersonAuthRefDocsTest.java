@@ -46,8 +46,8 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 
 //import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -169,7 +169,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
      */
     protected void createPersonRefs() {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-        MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
+        PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
                 PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
@@ -225,7 +225,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
-        MultipartOutput multipart =
+        PoxPayloadOut multipart =
                 PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
                 authRefName, personInfo, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
