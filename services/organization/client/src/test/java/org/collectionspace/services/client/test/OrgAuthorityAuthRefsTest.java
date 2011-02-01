@@ -44,8 +44,8 @@ import org.collectionspace.services.organization.OrganizationsCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadIn;
+import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -148,7 +148,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         String shortId = createIdentifier();
         String displayName = "TestOrgAuth-" + shortId;
     	String baseRefName = OrgAuthorityClientUtils.createOrgAuthRefName(shortId, null);
-        MultipartOutput multipart =
+        PoxPayloadOut multipart =
             OrgAuthorityClientUtils.createOrgAuthorityInstance(
             			displayName, shortId, orgAuthClient.getCommonPartName());
 
@@ -230,7 +230,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding
         // refName by which it can be identified.
-    	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
+    	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         
     	ClientResponse<Response> res = personAuthClient.create(multipart);
@@ -274,7 +274,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
-    	MultipartOutput multipart = 
+    	PoxPayloadOut multipart = 
     	    PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
     	    		authRefName, personInfo, personAuthClient.getItemCommonPartName());
         
@@ -315,7 +315,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
             subBodyName + "-" + shortId);
         subBodyOrgMap.put(OrganizationJAXBSchema.LONG_NAME, subBodyName + " Long Name");
         subBodyOrgMap.put(OrganizationJAXBSchema.FOUNDING_PLACE, subBodyName + " Founding Place");
-    	MultipartOutput multipart =
+    	PoxPayloadOut multipart =
     	    OrgAuthorityClientUtils.createOrganizationInstance(
     		knownResourceRefName, subBodyOrgMap, orgAuthClient.getItemCommonPartName());
 
@@ -353,7 +353,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
-        ClientResponse<MultipartInput> res =
+        ClientResponse<PoxPayloadIn> res =
             orgAuthClient.readItem(knownResourceId, knownItemResourceId);
         int statusCode = res.getStatus();
 
@@ -366,7 +366,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
         OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
             orgAuthClient.getItemCommonPartName(), OrganizationsCommon.class);
         Assert.assertNotNull(organization);

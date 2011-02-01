@@ -27,6 +27,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.contact.AuthorityResourceWithContacts;
 import org.collectionspace.services.organization.nuxeo.OrganizationDocumentModelHandler;
 import org.slf4j.Logger;
@@ -35,9 +36,9 @@ import org.slf4j.LoggerFactory;
 /**
  * The Class OrgAuthorityResource.
  */
-@Path("/orgauthorities")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Path("/" + OrgAuthorityClient.SERVICE_PATH_COMPONENT)
+@Consumes("application/xml")
+@Produces("application/xml")
 public class OrgAuthorityResource extends
 	AuthorityResourceWithContacts<OrgauthoritiesCommon, OrgauthoritiesCommonList, OrganizationsCommon,
 	OrganizationDocumentModelHandler> {

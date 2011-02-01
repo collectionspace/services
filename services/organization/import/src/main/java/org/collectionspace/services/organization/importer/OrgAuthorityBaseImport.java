@@ -38,7 +38,7 @@ import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.client.OrgAuthorityClientUtils;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +70,7 @@ public class OrgAuthorityBaseImport {
     		logger.debug("Import: Create orgAuthority: \"" + orgAuthorityShortId +"\"");
     	}
     	String baseOrgAuthRefName = OrgAuthorityClientUtils.createOrgAuthRefName(orgAuthorityShortId, null);
-    	MultipartOutput multipart = 
+    	PoxPayloadOut multipart = 
     	    OrgAuthorityClientUtils.createOrgAuthorityInstance(
     	    		orgAuthorityDisplayName, orgAuthorityShortId, client.getCommonPartName());
     	ClientResponse<Response> res = client.create(multipart);
