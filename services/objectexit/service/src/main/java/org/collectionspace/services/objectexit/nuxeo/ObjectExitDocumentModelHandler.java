@@ -23,47 +23,11 @@
  */
 package org.collectionspace.services.objectexit.nuxeo;
 
-import org.collectionspace.services.common.service.ListResultField;
-import org.collectionspace.services.common.service.DocHandlerParams;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.objectexit.ObjectexitCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
-public class ObjectExitDocumentModelHandler extends DocHandlerBase<ObjectexitCommon, AbstractCommonList> {
-    private static DocHandlerParams.Params params;
-    static {
-    	params = new DocHandlerParams.Params();
-        params.setSchemaName("objectexit");
-        params.setDublinCoreTitle("");//"CollectionSpace-Media";
-        params.setSummaryFields("exitNumber|currentOwner|uri|csid");
-        params.setAbstractCommonListClassname("org.collectionspace.services.objectexit.ObjectexitCommonList");
-        params.setCommonListItemClassname("org.collectionspace.services.objectexit.ObjectexitCommonList$ObjectexitListItem");
-        params.setListResultsItemMethodName("getObjectexitListItem");
-        DocHandlerParams.Params.ListResultsFields lrfs = 
-        	new DocHandlerParams.Params.ListResultsFields();
-        params.setListResultsFields(lrfs);
-        List<ListResultField> lrfl = lrfs.getListResultField();
-		ListResultField lrf = new ListResultField();
-		lrf.setSetter("setExitNumber");
-		lrf.setXpath("exitNumber");
-		lrfl.add( lrf ); 
-		lrf = new ListResultField();
-		lrf.setSetter("setCurrentOwner");
-		lrf.setXpath("currentOwner");
-		lrfl.add( lrf ); 
-
-        /*clr.ListItemsArray =   new String[][] {
-						{"setExitNumber", "exitNumber"},
-						{"setCurrentOwner", "currentOwner"}};
-		*/
-    }
-
-    public DocHandlerParams.Params getDocHandlerParams(){
-        return params;
-    }
+public class ObjectExitDocumentModelHandler 
+	extends DocHandlerBase<ObjectexitCommon, AbstractCommonList> {
 }
 

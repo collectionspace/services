@@ -23,14 +23,9 @@
  */
 package org.collectionspace.services.acquisition.nuxeo;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
-import org.collectionspace.services.common.service.DocHandlerParams;
-import org.collectionspace.services.common.service.ListResultField;
 
 /** AcquisitionDocumentModelHandler
  *  $LastChangedRevision: $
@@ -38,41 +33,5 @@ import org.collectionspace.services.common.service.ListResultField;
  */
 public class AcquisitionDocumentModelHandler
         extends DocHandlerBase<AcquisitionsCommon, AbstractCommonList> {
-
-    private static DocHandlerParams.Params params;
-    static {
-    	params = new DocHandlerParams.Params();
-        params.setSchemaName("acquisition");
-        params.setDublinCoreTitle("");//"CollectionSpace-Acquisition";
-        params.setSummaryFields("acquisitionReferenceNumber|acquisitionSources|owners|uri|csid");
-        params.setAbstractCommonListClassname("org.collectionspace.services.acquisition.AcquisitionsCommonList");
-        params.setCommonListItemClassname("org.collectionspace.services.acquisition.AcquisitionsCommonList$AcquisitionListItem");
-        params.setListResultsItemMethodName("getAcquisitionListItem");
-        DocHandlerParams.Params.ListResultsFields lrfs = 
-        	new DocHandlerParams.Params.ListResultsFields();
-        params.setListResultsFields(lrfs);
-        List<ListResultField> lrfl = lrfs.getListResultField();
-		ListResultField lrf = new ListResultField();
-		lrf.setSetter("setAcquisitionReferenceNumber");
-		lrf.setXpath("acquisitionReferenceNumber");
-		lrfl.add( lrf ); 
-		lrf = new ListResultField();
-		lrf.setSetter("setAcquisitionSource");
-		lrf.setXpath("acquisitionSources/[0]");
-		lrfl.add( lrf ); 
-		lrf = new ListResultField();
-		lrf.setSetter("setOwner");
-		lrf.setXpath("owners/[0]");
-		lrfl.add( lrf ); 
-		/*
-				{"setAcquisitionReferenceNumber","acquisitionReferenceNumber"},
-				{"setAcquisitionSource","acquisitionSources/[0]"},
-				{"setOwner","owners/[0]"}
-  };					*/
-    }
-    public DocHandlerParams.Params getDocHandlerParams(){
-        return params;
-    }
-
 }
 

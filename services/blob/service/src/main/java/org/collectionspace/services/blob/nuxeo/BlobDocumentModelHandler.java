@@ -32,8 +32,6 @@ import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
-import org.collectionspace.services.common.service.DocHandlerParams;
-import org.collectionspace.services.common.service.ListResultField;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.nuxeo.ecm.core.api.ClientException;
@@ -54,48 +52,6 @@ extends DocHandlerBase<BlobsCommon, AbstractCommonList> {
 	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(BlobDocumentModelHandler.class);
 
-    private static DocHandlerParams.Params params;
-    static {
-    	params = new DocHandlerParams.Params();
-        params.setSchemaName("blobs");
-        params.setDublinCoreTitle("");//"CollectionSpace-Blob";
-        params.setSummaryFields("name|mimeType|encoding|length|uri|csid");
-        params.setAbstractCommonListClassname("org.collectionspace.services.blob.BlobsCommonList");
-        params.setCommonListItemClassname("org.collectionspace.services.blob.BlobsCommonList$BlobListItem");
-        params.setListResultsItemMethodName("getBlobListItem");
-        DocHandlerParams.Params.ListResultsFields lrfs = 
-        	new DocHandlerParams.Params.ListResultsFields();
-        params.setListResultsFields(lrfs);
-        List<ListResultField> lrfl = lrfs.getListResultField();
-		ListResultField lrf = new ListResultField();
-		lrf.setSetter("setName");
-		lrf.setXpath("name");
-		lrfl.add( lrf ); 
-		lrf = new ListResultField();
-		lrf.setSetter("setMimeType");
-		lrf.setXpath("mimeType");
-		lrfl.add( lrf ); 
-		lrf = new ListResultField();
-		lrf.setSetter("setEncoding");
-		lrf.setXpath("encoding");
-		lrfl.add( lrf ); 
-		lrf = new ListResultField();
-		lrf.setSetter("setLength");
-		lrf.setXpath("length");
-		lrfl.add( lrf ); 
-				/*
-        clr.ListItemsArray =   new String[][]   {{"setEncoding", "encoding"},
-                                                 {"setMimeType", "mimeType"},
-                                                 {"setName", "name"},
-                                                 {"setLength", "length"}
-                                                 };
-																								 */
-    }
-
-    public DocHandlerParams.Params getDocHandlerParams(){
-        return params;
-    }
-
     //==============================================================================
 
 	private String getDerivativePathBase(DocumentModel docModel) {
@@ -103,23 +59,6 @@ extends DocHandlerBase<BlobsCommon, AbstractCommonList> {
 			BlobInput.URI_DERIVATIVES_PATH + "/";
 	}
 
-	/*public Object createItemForCommonList(DocumentModel docModel, String label, String id) throws Exception {
-		BlobListItem item = new BlobListItem();
-		item.setEncoding((String)
-				docModel.getProperty(label, BlobJAXBSchema.encoding));
-		item.setMimeType((String)
-				docModel.getProperty(label, BlobJAXBSchema.mimeType));
-		//String theData = (String)
-		docModel.getProperty(label, BlobJAXBSchema.data);
-		item.setName((String)
-				docModel.getProperty(label, BlobJAXBSchema.name));
-		item.setLength((String)
-				docModel.getProperty(label, BlobJAXBSchema.length));
-		item.setUri(getServiceContextPath() + id);
-		item.setCsid(id);
-		return item;
-	}
-    */
 	private BlobsCommon getCommonPartProperties(DocumentModel docModel) throws Exception {
 		String label = getServiceContext().getCommonPartLabel();
 		BlobsCommon result = new BlobsCommon();

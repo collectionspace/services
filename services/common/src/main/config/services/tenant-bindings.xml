@@ -169,6 +169,38 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler
             </service:documentHandler>
+            <service:DocHandlerParams xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler</service:classname>
+                <service:params>
+                     <service:SchemaName>blobs</service:SchemaName>
+                     <service:DublinCoreTitle>blobs</service:DublinCoreTitle>
+                     <service:SummaryFields>name|mimeType|encoding|length|uri|csid</service:SummaryFields>
+                     <service:AbstractCommonListClassname>org.collectionspace.services.blob.BlobsCommonList</service:AbstractCommonListClassname>
+                     <service:CommonListItemClassname>org.collectionspace.services.blob.BlobsCommonList$BlobListItem</service:CommonListItemClassname>
+                     <service:ListResultsItemMethodName>getBlobListItem</service:ListResultsItemMethodName>
+                     <service:ListResultsFields>
+                         <service:ListResultField>
+                             <service:setter>setName</service:setter>
+                             <service:xpath>name</service:xpath>
+                         </service:ListResultField>
+
+                        <service:ListResultField>
+                            <service:setter>setMimeType</service:setter>
+														<service:xpath>mimeType</service:xpath>
+                        </service:ListResultField>
+
+                        <service:ListResultField>
+                            <service:setter>setEncoding</service:setter>
+                            <service:xpath>encoding</service:xpath>
+                        </service:ListResultField>
+
+                        <service:ListResultField>
+                            <service:setter>setLength</service:setter>
+                            <service:xpath>length</service:xpath>
+												</service:ListResultField>
+											</service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.blob.nuxeo.BlobValidatorHandler
             </service:validatorHandler>
@@ -466,6 +498,28 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.objectexit.nuxeo.ObjectExitDocumentModelHandler
             </service:documentHandler>
+            <service:DocHandlerParams xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.objectexit.nuxeo.ObjectExitDocumentModelHandler</service:classname>
+                <service:params>
+                     <service:SchemaName>objectexit</service:SchemaName>
+                     <service:DublinCoreTitle>objectexit</service:DublinCoreTitle>
+                     <service:SummaryFields>exitNumber|currentOwner|uri|csid</service:SummaryFields>
+                     <service:AbstractCommonListClassname>org.collectionspace.services.objectexit.ObjectexitCommonList</service:AbstractCommonListClassname>
+                     <service:CommonListItemClassname>org.collectionspace.services.objectexit.ObjectexitCommonList$ObjectexitListItem</service:CommonListItemClassname>
+                     <service:ListResultsItemMethodName>getObjectexitListItem</service:ListResultsItemMethodName>
+                     <service:ListResultsFields>
+                         <service:ListResultField>
+                             <service:setter>setExitNumber</service:setter>
+                             <service:xpath>exitNumber</service:xpath>
+                         </service:ListResultField>
+
+                        <service:ListResultField>
+                            <service:setter>setCurrentOwner</service:setter>
+														<service:xpath>currentOwner</service:xpath>
+                        </service:ListResultField>
+											</service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.objectexit.nuxeo.ObjectExitValidatorHandler
             </service:validatorHandler>
@@ -517,6 +571,38 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.media.nuxeo.MediaDocumentModelHandler
             </service:documentHandler>
+            <service:DocHandlerParams xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.media.nuxeo.MediaDocumentModelHandler</service:classname>
+                <service:params>
+                     <service:SchemaName>media</service:SchemaName>
+                     <service:DublinCoreTitle>media</service:DublinCoreTitle>
+                     <service:SummaryFields>title|source|filename|identificationNumber|uri|csid</service:SummaryFields>
+                     <service:AbstractCommonListClassname>org.collectionspace.services.media.MediaCommonList</service:AbstractCommonListClassname>
+                     <service:CommonListItemClassname>org.collectionspace.services.media.MediaCommonList$MediaListItem</service:CommonListItemClassname>
+                     <service:ListResultsItemMethodName>getMediaListItem</service:ListResultsItemMethodName>
+                     <service:ListResultsFields>
+                         <service:ListResultField>
+                             <service:setter>setTitle</service:setter>
+                             <service:xpath>title</service:xpath>
+                         </service:ListResultField>
+
+                        <service:ListResultField>
+                            <service:setter>setSource</service:setter>
+														<service:xpath>source</service:xpath>
+                        </service:ListResultField>
+
+                        <service:ListResultField>
+                            <service:setter>setFilename</service:setter>
+                            <service:xpath>filename</service:xpath>
+                        </service:ListResultField>
+
+                        <service:ListResultField>
+                            <service:setter>setIdentificationNumber</service:setter>
+                            <service:xpath>identificationNumber</service:xpath>
+												</service:ListResultField>
+											</service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.media.nuxeo.MediaValidatorHandler
             </service:validatorHandler>
@@ -1104,6 +1190,33 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.acquisition.nuxeo.AcquisitionDocumentModelHandler
             </service:documentHandler>
+            <service:DocHandlerParams xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.loanin.nuxeo.AcquisitionDocumentModelHandler</service:classname>
+                <service:params>
+                     <service:SchemaName>acquisition</service:SchemaName>
+                     <service:DublinCoreTitle>acquisition</service:DublinCoreTitle>
+                     <service:SummaryFields>acquisitionReferenceNumber|acquisitionSources|owners|uri|csid</service:SummaryFields>
+                     <service:AbstractCommonListClassname>org.collectionspace.services.acquisition.AcquisitionsCommonList</service:AbstractCommonListClassname>
+                     <service:CommonListItemClassname>org.collectionspace.services.acquisition.AcquisitionsCommonList$AcquisitionListItem</service:CommonListItemClassname>
+                     <service:ListResultsItemMethodName>getAcquisitionListItem</service:ListResultsItemMethodName>
+                     <service:ListResultsFields>
+                         <service:ListResultField>
+                             <service:setter>setAcquisitionReferenceNumber</service:setter>
+                             <service:xpath>acquisitionReferenceNumber</service:xpath>
+                         </service:ListResultField>
+
+                        <service:ListResultField>
+                            <service:setter>setAcquisitionSource</service:setter>
+														<service:xpath>acquisitionSources/[0]</service:xpath>
+                        </service:ListResultField>
+
+                        <service:ListResultField>
+                            <service:setter>setOwner</service:setter>
+                            <service:xpath>owners/[0]</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.acquisition.nuxeo.AcquisitionValidatorHandler
             </service:validatorHandler>
@@ -1779,6 +1892,38 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler
             </service:documentHandler>
+            <service:DocHandlerParams xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler</service:classname>
+                <service:params>
+                     <service:SchemaName>blobs</service:SchemaName>
+                     <service:DublinCoreTitle>blobs</service:DublinCoreTitle>
+                     <service:SummaryFields>name|mimeType|encoding|length|uri|csid</service:SummaryFields>
+                     <service:AbstractCommonListClassname>org.collectionspace.services.blob.BlobsCommonList</service:AbstractCommonListClassname>
+                     <service:CommonListItemClassname>org.collectionspace.services.blob.BlobsCommonList$BlobListItem</service:CommonListItemClassname>
+                     <service:ListResultsItemMethodName>getBlobListItem</service:ListResultsItemMethodName>
+                     <service:ListResultsFields>
+                         <service:ListResultField>
+                             <service:setter>setName</service:setter>
+                             <service:xpath>name</service:xpath>
+                         </service:ListResultField>
+
+                        <service:ListResultField>
+                            <service:setter>setMimeType</service:setter>
+														<service:xpath>mimeType</service:xpath>
+                        </service:ListResultField>
+
+                        <service:ListResultField>
+                            <service:setter>setEncoding</service:setter>
+                            <service:xpath>encoding</service:xpath>
+                        </service:ListResultField>
+
+                        <service:ListResultField>
+                            <service:setter>setLength</service:setter>
+                            <service:xpath>length</service:xpath>
+												</service:ListResultField>
+											</service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.blob.nuxeo.BlobValidatorHandler
             </service:validatorHandler>
@@ -1886,6 +2031,33 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.loanin.nuxeo.LoaninDocumentModelHandler
             </service:documentHandler>
+            <service:DocHandlerParams xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.loanin.nuxeo.LoaninDocumentModelHandler</service:classname>
+                <service:params>
+                     <service:SchemaName>loansin</service:SchemaName>
+                     <service:DublinCoreTitle>loansin</service:DublinCoreTitle>
+                     <service:SummaryFields>loanInNumber|lenderList|loanReturnDate|uri|csid</service:SummaryFields>
+                     <service:AbstractCommonListClassname>org.collectionspace.services.loanin.LoansinCommonList</service:AbstractCommonListClassname>
+                     <service:CommonListItemClassname>org.collectionspace.services.loanin.LoansinCommonList$LoaninListItem</service:CommonListItemClassname>
+                     <service:ListResultsItemMethodName>getLoaninListItem</service:ListResultsItemMethodName>
+                     <service:ListResultsFields>
+                         <service:ListResultField>
+                             <service:setter>setLoanInNumber</service:setter>
+                             <service:xpath>loanInNumber</service:xpath>
+                         </service:ListResultField>
+
+                        <service:ListResultField>
+                            <service:setter>setLender</service:setter>
+														<service:xpath>lenderGroupList/[0]/lender</service:xpath>
+                        </service:ListResultField>
+
+                        <service:ListResultField>
+                            <service:setter>setLoanReturnDate</service:setter>
+                            <service:xpath>loanReturnDate</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.loanin.nuxeo.LoaninValidatorHandler
             </service:validatorHandler>
@@ -2003,6 +2175,28 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.objectexit.nuxeo.ObjectExitDocumentModelHandler
             </service:documentHandler>
+            <service:DocHandlerParams xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.objectexit.nuxeo.ObjectExitDocumentModelHandler</service:classname>
+                <service:params>
+                     <service:SchemaName>objectexit</service:SchemaName>
+                     <service:DublinCoreTitle>objectexit</service:DublinCoreTitle>
+                     <service:SummaryFields>exitNumber|currentOwner|uri|csid</service:SummaryFields>
+                     <service:AbstractCommonListClassname>org.collectionspace.services.objectexit.ObjectexitCommonList</service:AbstractCommonListClassname>
+                     <service:CommonListItemClassname>org.collectionspace.services.objectexit.ObjectexitCommonList$ObjectexitListItem</service:CommonListItemClassname>
+                     <service:ListResultsItemMethodName>getObjectexitListItem</service:ListResultsItemMethodName>
+                     <service:ListResultsFields>
+                         <service:ListResultField>
+                             <service:setter>setExitNumber</service:setter>
+                             <service:xpath>exitNumber</service:xpath>
+                         </service:ListResultField>
+
+                        <service:ListResultField>
+                            <service:setter>setCurrentOwner</service:setter>
+														<service:xpath>currentOwner</service:xpath>
+                        </service:ListResultField>
+											</service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.objectexit.nuxeo.ObjectExitValidatorHandler
             </service:validatorHandler>
@@ -2054,6 +2248,38 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.media.nuxeo.MediaDocumentModelHandler
             </service:documentHandler>
+            <service:DocHandlerParams xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.media.nuxeo.MediaDocumentModelHandler</service:classname>
+                <service:params>
+                     <service:SchemaName>media</service:SchemaName>
+                     <service:DublinCoreTitle>media</service:DublinCoreTitle>
+                     <service:SummaryFields>title|source|filename|identificationNumber|uri|csid</service:SummaryFields>
+                     <service:AbstractCommonListClassname>org.collectionspace.services.media.MediaCommonList</service:AbstractCommonListClassname>
+                     <service:CommonListItemClassname>org.collectionspace.services.media.MediaCommonList$MediaListItem</service:CommonListItemClassname>
+                     <service:ListResultsItemMethodName>getMediaListItem</service:ListResultsItemMethodName>
+                     <service:ListResultsFields>
+                         <service:ListResultField>
+                             <service:setter>setTitle</service:setter>
+                             <service:xpath>title</service:xpath>
+                         </service:ListResultField>
+
+                        <service:ListResultField>
+                            <service:setter>setSource</service:setter>
+														<service:xpath>source</service:xpath>
+                        </service:ListResultField>
+
+                        <service:ListResultField>
+                            <service:setter>setFilename</service:setter>
+                            <service:xpath>filename</service:xpath>
+                        </service:ListResultField>
+
+                        <service:ListResultField>
+                            <service:setter>setIdentificationNumber</service:setter>
+                            <service:xpath>identificationNumber</service:xpath>
+												</service:ListResultField>
+											</service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.media.nuxeo.MediaValidatorHandler
             </service:validatorHandler>
@@ -2581,6 +2807,33 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.acquisition.nuxeo.AcquisitionDocumentModelHandler
             </service:documentHandler>
+            <service:DocHandlerParams xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.loanin.nuxeo.AcquisitionDocumentModelHandler</service:classname>
+                <service:params>
+                     <service:SchemaName>acquisition</service:SchemaName>
+                     <service:DublinCoreTitle>acquisition</service:DublinCoreTitle>
+                     <service:SummaryFields>acquisitionReferenceNumber|acquisitionSources|owners|uri|csid</service:SummaryFields>
+                     <service:AbstractCommonListClassname>org.collectionspace.services.acquisition.AcquisitionsCommonList</service:AbstractCommonListClassname>
+                     <service:CommonListItemClassname>org.collectionspace.services.acquisition.AcquisitionsCommonList$AcquisitionListItem</service:CommonListItemClassname>
+                     <service:ListResultsItemMethodName>getAcquisitionListItem</service:ListResultsItemMethodName>
+                     <service:ListResultsFields>
+                         <service:ListResultField>
+                             <service:setter>setAcquisitionReferenceNumber</service:setter>
+                             <service:xpath>acquisitionReferenceNumber</service:xpath>
+                         </service:ListResultField>
+
+                        <service:ListResultField>
+                            <service:setter>setAcquisitionSource</service:setter>
+														<service:xpath>acquisitionSources/[0]</service:xpath>
+                        </service:ListResultField>
+
+                        <service:ListResultField>
+                            <service:setter>setOwner</service:setter>
+                            <service:xpath>owners/[0]</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.acquisition.nuxeo.AcquisitionValidatorHandler
             </service:validatorHandler>

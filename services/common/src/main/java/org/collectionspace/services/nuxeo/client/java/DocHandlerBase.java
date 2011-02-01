@@ -32,6 +32,8 @@ import org.collectionspace.services.common.ReflectionMapper;
 import org.collectionspace.services.common.Tools;
 import org.collectionspace.services.common.service.ListResultField;
 import org.collectionspace.services.common.service.DocHandlerParams;
+import org.collectionspace.services.common.service.ServiceBindingType;
+import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
@@ -98,19 +100,15 @@ public abstract class DocHandlerBase<T, TL> extends RemoteDocumentModelHandlerIm
         		docModel, label, id, true);
     }
 
-    /*
-    public static class CommonListReflection {
-        public String SchemaName;		// May be Repository schema, or a pseudo schema we manage
-        public String DublinCoreTitle;            // TODO: for CollectionObjectDocumentModelHandler, NUXEO_DC_TITLE = "CollectionSpace-CollectionObject"
-        public String SummaryFields;
-        public String AbstractCommonListClassname;
-        public String CommonListItemClassname;
-        public String ListResultsItemMethodName;
-        public List<ListResultField> ListItemsArray;  //setter, xpath
+    public DocHandlerParams.Params getDocHandlerParams(){
+    	MultipartServiceContext sc = (MultipartServiceContext) getServiceContext();
+    	ServiceBindingType sb = sc.getServiceBinding();
+    	DocHandlerParams dhb = sb.getDocHandlerParams();
+    	if(dhb!=null&&dhb.getParams()!=null) {
+    		return dhb.getParams();
+    	}
+        throw new RuntimeException("No DocHandlerParams configured for: "+sb.getName());
     }
-     */
-
-    public abstract DocHandlerParams.Params getDocHandlerParams();
 
     public String getSummaryFields(AbstractCommonList commonList){
         return getDocHandlerParams().getSummaryFields();
@@ -212,7 +210,8 @@ public abstract class DocHandlerBase<T, TL> extends RemoteDocumentModelHandlerIm
      *  field for you if specified.
      */
     public List createItemsList(AbstractCommonList commonList) throws Exception {
-        return createItemsList(commonList, getDocHandlerParams().getListResultsItemMethodName());
+        return createItemsList(commonList, 
+        		getDocHandlerParams().getListResultsItemMethodName());
     }
 
     /** e.g. createItemsList(commonList, "getObjectexitListItem" */

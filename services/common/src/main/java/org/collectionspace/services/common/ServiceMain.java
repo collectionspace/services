@@ -88,7 +88,8 @@ public class ServiceMain {
         return instance;
     }
 
-    private void initialize() throws Exception {        setServerRootDir();
+    private void initialize() throws Exception {        
+    	setServerRootDir();
         readConfig();
         propagateConfiguredProperties();
         try {
@@ -97,7 +98,6 @@ public class ServiceMain {
         	logger.error("Default Account setup failed on exception: "+e.getLocalizedMessage());
         }
         try {
-            //loadDocHandlers();
             firePostInitHandlers();
         } catch(Exception e) {
             logger.error("ServiceMain.initialize firePostInitHandlers failed on exception: "+e.getLocalizedMessage());
@@ -559,46 +559,6 @@ public class ServiceMain {
         }
         return null;
     }
-
-    /*
-    private void loadDocHandlers() throws Exception {
-        Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
-        for (TenantBindingType tbt: tenantBindingTypeMap.values()){
-            String name = tbt.getName();
-            String id = tbt.getId();
-
-            List<ServiceBindingType> sbtList = tbt.getServiceBindings();
-            for (ServiceBindingType sbt: sbtList){
-                DocHandlerParams params = sbt.getDocHandlerParams();
-                if (params!=null){
-                    params.getClassname();
-                    DocHandlerParams.Params p = params.getParams();
-                    DocHandlerBase.CommonListReflection clr = new DocHandlerBase.CommonListReflection();
-                    clr.ListItemsArray = 
-                            p.getListResultsFields().getListResultField();
-                    /*
-                    int size = items.size();
-                    String[][] rows = new String[size][4];
-                    int r = 0;
-                    for (ListResultField item: items){
-                        String[] row = rows[r];
-                        row[0] = item.getSetter();
-                        row[1] = item.getXpath();
-                        r++;
-                    }
-                    clr.ListItemsArray = rows;
-                    * /
-                    clr.AbstractCommonListClassname = p.getAbstractCommonListClassname();
-                    clr.CommonListItemClassname = p.getCommonListItemClassname();
-                    clr.DublinCoreTitle = p.getDublinCoreTitle();
-                    clr.ListResultsItemMethodName = p.getListResultsItemMethodName();
-                    clr.SchemaName = p.getSchemaName();
-                    clr.SummaryFields = p.getSummaryFields();
-                }
-            }
-        }
-    }
-    */
 
     private Connection getConnection() throws LoginException, SQLException {
         return JDBCTools.getConnection(DEFAULT_REPOSITORY_NAME);
