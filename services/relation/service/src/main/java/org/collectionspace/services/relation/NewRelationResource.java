@@ -110,8 +110,9 @@ public class NewRelationResource extends
 	 * @return the response
 	 */
 	@POST
-	public Response createRelation(PoxPayloadIn input) {
-		try {
+	public Response createRelation(String xmlText) {
+               try {
+        	        PoxPayloadIn input = new PoxPayloadIn(xmlText);
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
 			DocumentHandler handler = createDocumentHandler(ctx);
 			String csid = getRepositoryClient(ctx).create(ctx, handler);
@@ -150,7 +151,7 @@ public class NewRelationResource extends
 	 */
 	@GET
 	@Path("{csid}")
-	public PoxPayloadOut getRelation(@Context UriInfo ui,
+	public String getRelation(@Context UriInfo ui,
 			@PathParam("csid") String csid) {
 		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
 		if (logger.isDebugEnabled()) {
@@ -200,7 +201,7 @@ public class NewRelationResource extends
 					.build();
 			throw new WebApplicationException(response);
 		}
-		return result;
+		return result.toXML();
 	}
 
 	/**
@@ -237,8 +238,8 @@ public class NewRelationResource extends
 	 */
 	@PUT
 	@Path("{csid}")
-	public PoxPayloadOut updateRelation(@PathParam("csid") String csid,
-			PoxPayloadIn theUpdate) {
+	public String updateRelation(@PathParam("csid") String csid,
+			String xmlText) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("updateRelation with csid=" + csid);
 		}
@@ -251,7 +252,8 @@ public class NewRelationResource extends
 		}
 		PoxPayloadOut result = null;
 		try {
-			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate);
+			PoxPayloadIn update = new PoxPayloadIn(xmlText);
+        	        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(update);
 			DocumentHandler handler = createDocumentHandler(ctx);
 			getRepositoryClient(ctx).update(ctx, csid, handler);
 			result = ctx.getOutput();
@@ -274,7 +276,7 @@ public class NewRelationResource extends
 					"Update failed").type("text/plain").build();
 			throw new WebApplicationException(response);
 		}
-		return result;
+		return result.toXML();
 	}
 
 	/**
