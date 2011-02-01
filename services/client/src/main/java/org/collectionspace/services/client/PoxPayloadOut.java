@@ -73,7 +73,7 @@ public class PoxPayloadOut extends PoxPayload<PayloadOutputPart> {
 	 * @param elementBody the element body
 	 * @return the payload output part
 	 */
-	public PayloadOutputPart addPart(String label, Element elementBody) {
+	public PayloadOutputPart addPart(String label, Element elementBody) { 
 		PayloadOutputPart result = new PayloadOutputPart(label, elementBody);
 		getParts().add(result);
 		return result;

@@ -149,8 +149,9 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
     public Response createContact(
             @PathParam("parentcsid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
-            PoxPayloadIn input) {
+            String xmlPayload) {
         try {
+        	PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
    			Specifier parentSpec = getSpecifier(parentspecifier, 
    					"createContact(authority)", "CREATE_ITEM_CONTACT");
 			Specifier itemSpec = getSpecifier(itemspecifier, 
@@ -302,7 +303,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
      */
     @GET
     @Path("{parentcsid}/items/{itemcsid}/contacts/{csid}")
-    public PoxPayloadOut getContact(
+    public String getContact(
             @PathParam("parentcsid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
             @PathParam("csid") String csid) {
@@ -366,7 +367,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
                 .type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.toXML();
 
     }
 
@@ -382,13 +383,14 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
      */
     @PUT
     @Path("{parentcsid}/items/{itemcsid}/contacts/{csid}")
-    public PoxPayloadOut updateContact(
+    public String updateContact(
             @PathParam("parentcsid") String parentspecifier,
             @PathParam("itemcsid") String itemspecifier,
             @PathParam("csid") String csid,
-            PoxPayloadIn theUpdate) {
+            String xmlPayload) {
     	PoxPayloadOut result = null;
         try {
+        	PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
    			Specifier parentSpec = getSpecifier(parentspecifier, 
    					"updateContact(authority)", "UPDATE_CONTACT");
 			Specifier itemSpec = getSpecifier(itemspecifier, 
@@ -441,7 +443,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthCommonList, 
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.toXML();
     }
 
     /**

@@ -38,10 +38,10 @@ import org.slf4j.LoggerFactory;
  * The Class PersonAuthorityResource.
  */
 @Path("/" + PersonAuthorityClient.SERVICE_PATH_COMPONENT)
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Consumes("application/xml")
+@Produces("application/xml")
 public class PersonAuthorityResource extends
-AuthorityResourceWithContacts<PersonauthoritiesCommon, PersonauthoritiesCommonList, PersonsCommon,
+	AuthorityResourceWithContacts<PersonauthoritiesCommon, PersonauthoritiesCommonList, PersonsCommon,
 		PersonDocumentModelHandler> {
 
     private final static String personAuthorityServiceName = "personauthorities";
