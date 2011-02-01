@@ -36,6 +36,8 @@ import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.client.OrgAuthorityClientUtils;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.organization.MainBodyGroup;
@@ -44,8 +46,6 @@ import org.collectionspace.services.organization.OrganizationsCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadIn;
-import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -353,7 +353,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
-        ClientResponse<PoxPayloadIn> res =
+        ClientResponse<String> res =
             orgAuthClient.readItem(knownResourceId, knownItemResourceId);
         int statusCode = res.getStatus();
 
@@ -366,7 +366,7 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
             orgAuthClient.getItemCommonPartName(), OrganizationsCommon.class);
         Assert.assertNotNull(organization);

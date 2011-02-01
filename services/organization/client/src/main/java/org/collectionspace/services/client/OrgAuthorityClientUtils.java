@@ -49,8 +49,6 @@ import org.collectionspace.services.organization.SubBodyList;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonsCommon;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadIn;
-import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +71,7 @@ public class OrgAuthorityClientUtils {
     public static String getAuthorityRefName(String csid, OrgAuthorityClient client){
     	if(client==null)
     		client = new OrgAuthorityClient();
-        ClientResponse<PoxPayloadIn> res = client.read(csid);
+        ClientResponse<String> res = client.read(csid);
         try {
 	        int statusCode = res.getStatus();
 	        if(!READ_REQ.isValidStatusCode(statusCode)
@@ -82,7 +80,7 @@ public class OrgAuthorityClientUtils {
 	        }
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
+	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 	            OrgauthoritiesCommon orgAuthority = 
 	            	(OrgauthoritiesCommon) CollectionSpaceClientUtils.extractPart(input,
 	                    client.getCommonPartName(), OrgauthoritiesCommon.class);
@@ -107,7 +105,7 @@ public class OrgAuthorityClientUtils {
     public static String getOrgRefName(String inAuthority, String csid, OrgAuthorityClient client){
     	if(client==null)
     		client = new OrgAuthorityClient();
-        ClientResponse<PoxPayloadIn> res = client.readItem(inAuthority, csid);
+        ClientResponse<String> res = client.readItem(inAuthority, csid);
         try {
 	        int statusCode = res.getStatus();
 	        if(!READ_REQ.isValidStatusCode(statusCode)
@@ -116,7 +114,7 @@ public class OrgAuthorityClientUtils {
 	        }
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
+	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 	            OrganizationsCommon org = 
 	            	(OrganizationsCommon) CollectionSpaceClientUtils.extractPart(input,
 	                    client.getItemCommonPartName(), OrganizationsCommon.class);
@@ -148,9 +146,9 @@ public class OrgAuthorityClientUtils {
         String refName = createOrgAuthRefName(shortIdentifier, displayName);
         orgAuthority.setRefName(refName);
         orgAuthority.setVocabType("OrgAuthority");
-        PoxPayloadOut multipart = new PoxPayloadOut();
-        OutputPart commonPart = multipart.addPart(orgAuthority, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", headerLabel);
+        PoxPayloadOut multipart = new PoxPayloadOut(OrgAuthorityClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = multipart.addPart(orgAuthority, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(headerLabel);
 
         if(logger.isDebugEnabled()){
         	logger.debug("to be created, orgAuthority common ",
@@ -305,10 +303,10 @@ public class OrgAuthorityClientUtils {
         }
         if((value = (String)orgInfo.get(OrganizationJAXBSchema.TERM_STATUS))!=null)
         	organization.setTermStatus(value);
-        PoxPayloadOut multipart = new PoxPayloadOut();
-        OutputPart commonPart = multipart.addPart(organization,
+        PoxPayloadOut multipart = new PoxPayloadOut(OrgAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = multipart.addPart(organization,
             MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", headerLabel);
+        commonPart.setLabel(headerLabel);
 
         if(logger.isDebugEnabled()){
         	logger.debug("to be created, organization common ", organization, OrganizationsCommon.class);

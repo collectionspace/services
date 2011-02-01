@@ -33,6 +33,9 @@ import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.ContactClientUtils;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.client.OrgAuthorityClient;
@@ -46,9 +49,8 @@ import org.collectionspace.services.organization.OrganizationsCommon;
 import org.collectionspace.services.organization.OrganizationsCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadIn;
-import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -159,8 +161,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         String shortId = createIdentifier();
         String displayName = "displayName-" + shortId;
     	String baseRefName = OrgAuthorityClientUtils.createOrgAuthRefName(shortId, null);
-    	PoxPayloadOut multipart = 
-    	    OrgAuthorityClientUtils.createOrgAuthorityInstance(
+    	PoxPayloadOut multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
     	    		displayName, shortId, client.getCommonPartName());
         
     	String newID = null;
@@ -537,7 +538,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<PoxPayloadIn> res = null;
+        ClientResponse<String> res = null;
         if(CSID!=null) {
             res = client.read(CSID);
         } else if(shortId!=null) {
@@ -558,7 +559,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
+	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 	            OrgauthoritiesCommon orgAuthority = (OrgauthoritiesCommon) extractPart(input,
 	                    new OrgAuthorityClient().getCommonPartName(), OrgauthoritiesCommon.class);
 	            Assert.assertNotNull(orgAuthority);
@@ -633,7 +634,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<PoxPayloadIn> res = null;
+        ClientResponse<String> res = null;
         if(authCSID!=null) {
             if(itemCSID!=null) {
                 res = client.readItem(authCSID, itemCSID);
@@ -666,7 +667,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Check whether we've received a organization.
-	        PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 	        OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
 	                client.getItemCommonPartName(), OrganizationsCommon.class);
 	        Assert.assertNotNull(organization);
@@ -709,7 +710,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
         PoxPayloadIn input = null;
-        ClientResponse<PoxPayloadIn> res = client.readItem(knownResourceId, knownItemResourceId);
+        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -723,7 +724,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Check whether organization has expected displayName.
-	        input = res.getEntity();
+	        input = new PoxPayloadIn(res.getEntity());
         } finally {
         	res.releaseConnection();
         }
@@ -755,9 +756,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         	updatedShortName, TEST_ORG_FOUNDING_PLACE);
 
         // Submit the updated resource to the service and store the response.
-        PoxPayloadOut output = new PoxPayloadOut();
-        OutputPart commonPart = output.addPart(organization, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+        PoxPayloadOut output = new PoxPayloadOut(OrgAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(organization, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
         try {
 	        int statusCode = res.getStatus();
@@ -771,7 +772,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = (PoxPayloadIn) res.getEntity();
+	        input = new PoxPayloadIn(res.getEntity());
         } finally {
         	res.releaseConnection();
         }
@@ -798,9 +799,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         organization.setDisplayName(expectedDisplayName);
 
         // Submit the updated resource to the service and store the response.
-        output = new PoxPayloadOut();
+        output = new PoxPayloadOut(OrgAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
         commonPart = output.addPart(organization, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+        commonPart.setLabel(client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
         try {
 	        int statusCode = res.getStatus();
@@ -814,7 +815,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = (PoxPayloadIn) res.getEntity();
+	        input = new PoxPayloadIn(res.getEntity());
         } finally {
         	res.releaseConnection();
         }
@@ -852,7 +853,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<PoxPayloadIn> res = client.readItem(knownResourceId, knownItemResourceId);
+        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -866,7 +867,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
 	
 	        // Check whether organization has expected displayName.
-	        PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 	        OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
 	                client.getItemCommonPartName(), OrganizationsCommon.class);
 	        Assert.assertNotNull(organization);
@@ -875,9 +876,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	        organization.setDisplayName(null);
 	
 	        // Submit the updated resource to the service and store the response.
-	        PoxPayloadOut output = new PoxPayloadOut();
-	        OutputPart commonPart = output.addPart(organization, MediaType.APPLICATION_XML_TYPE);
-	        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+	        PoxPayloadOut output = new PoxPayloadOut(OrgAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
+	        PayloadOutputPart commonPart = output.addPart(organization, MediaType.APPLICATION_XML_TYPE);
+	        commonPart.setLabel(client.getItemCommonPartName());
 	    	res.releaseConnection();
 	        res = client.updateItem(knownResourceId, knownItemResourceId, output);
 	        statusCode = res.getStatus();
@@ -912,9 +913,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<PoxPayloadIn> res =
+        ClientResponse<String> res =
             client.readContact(knownResourceId, knownItemResourceId,
-            knownContactResourceId);
+            		knownContactResourceId);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -928,7 +929,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Check whether we've received a contact.
-	        PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 	        ContactsCommon contact = (ContactsCommon) extractPart(input,
 	                new ContactClient().getCommonPartName(), ContactsCommon.class);
 	        Assert.assertNotNull(contact);
@@ -961,7 +962,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<PoxPayloadIn> res = client.read(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -995,7 +996,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<PoxPayloadIn> res = client.readItem(knownResourceId, NON_EXISTENT_ID);
+        ClientResponse<String> res = client.readItem(knownResourceId, NON_EXISTENT_ID);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -1029,7 +1030,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<PoxPayloadIn> res =
+        ClientResponse<String> res =
             client.readContact(knownResourceId, knownItemResourceId, NON_EXISTENT_ID);
         try {
 	        int statusCode = res.getStatus();
@@ -1298,7 +1299,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<PoxPayloadIn> res =
+        ClientResponse<String> res =
                 client.read(knownResourceId);
         try {
 	        if(logger.isDebugEnabled()){
@@ -1309,7 +1310,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	        if(logger.isDebugEnabled()){
 	            logger.debug("got OrgAuthority to update with ID: " + knownResourceId);
 	        }
-	        PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 	        OrgauthoritiesCommon orgAuthority = (OrgauthoritiesCommon) extractPart(input,
 	                client.getCommonPartName(), OrgauthoritiesCommon.class);
 	        Assert.assertNotNull(orgAuthority);
@@ -1323,9 +1324,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	        }
 	
 	        // Submit the updated resource to the service and store the response.
-	        PoxPayloadOut output = new PoxPayloadOut();
-	        OutputPart commonPart = output.addPart(orgAuthority, MediaType.APPLICATION_XML_TYPE);
-	        commonPart.getHeaders().add("label", client.getCommonPartName());
+	        PoxPayloadOut output = new PoxPayloadOut(OrgAuthorityClient.SERVICE_PAYLOAD_NAME);
+	        PayloadOutputPart commonPart = output.addPart(orgAuthority, MediaType.APPLICATION_XML_TYPE);
+	        commonPart.setLabel(client.getCommonPartName());
 	    	res.releaseConnection();
 	        res = client.update(knownResourceId, output);
 	        int statusCode = res.getStatus();
@@ -1339,7 +1340,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = (PoxPayloadIn) res.getEntity();
+	        input = new PoxPayloadIn(res.getEntity());
 	        OrgauthoritiesCommon updatedOrgAuthority =
 	                (OrgauthoritiesCommon) extractPart(input,
 	                        client.getCommonPartName(), OrgauthoritiesCommon.class);
@@ -1372,7 +1373,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<PoxPayloadIn> res =
+        ClientResponse<String> res =
                 client.readItem(knownResourceId, knownItemResourceId);
         try {
 	        if(logger.isDebugEnabled()){
@@ -1385,7 +1386,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	                knownItemResourceId +
 	                " in OrgAuthority: " + knownResourceId );
 	        }
-	        PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 	        OrganizationsCommon organization = (OrganizationsCommon) extractPart(input,
 	                client.getItemCommonPartName(), OrganizationsCommon.class);
 	        Assert.assertNotNull(organization);
@@ -1407,9 +1408,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	        }
 	
 	        // Submit the updated resource to the service and store the response.
-	        PoxPayloadOut output = new PoxPayloadOut();
-	        OutputPart commonPart = output.addPart(organization, MediaType.APPLICATION_XML_TYPE);
-	        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+	        PoxPayloadOut output = new PoxPayloadOut(OrgAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
+	        PayloadOutputPart commonPart = output.addPart(organization, MediaType.APPLICATION_XML_TYPE);
+	        commonPart.setLabel(client.getItemCommonPartName());
 	    	res.releaseConnection();
 	        res = client.updateItem(knownResourceId, knownItemResourceId, output);
 	        int statusCode = res.getStatus();
@@ -1423,7 +1424,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = (PoxPayloadIn) res.getEntity();
+	        input = new PoxPayloadIn(res.getEntity());
 	        OrganizationsCommon updatedOrganization =
 	                (OrganizationsCommon) extractPart(input,
 	                        client.getItemCommonPartName(), OrganizationsCommon.class);
@@ -1458,7 +1459,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         OrgAuthorityClient client = new OrgAuthorityClient();
-        ClientResponse<PoxPayloadIn> res =
+        ClientResponse<String> res =
                 client.readContact(knownResourceId, knownItemResourceId, knownContactResourceId);
         try {
 	        if(logger.isDebugEnabled()){
@@ -1472,7 +1473,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	                " in item: " + knownItemResourceId +
 	                " in parent: " + knownResourceId );
 	        }
-	        PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 	        ContactsCommon contact = (ContactsCommon) extractPart(input,
 	                new ContactClient().getCommonPartName(), ContactsCommon.class);
 	        Assert.assertNotNull(contact);
@@ -1486,9 +1487,9 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	        }
 	
 	        // Submit the updated resource to the service and store the response.
-	        PoxPayloadOut output = new PoxPayloadOut();
-	        OutputPart commonPart = output.addPart(contact, MediaType.APPLICATION_XML_TYPE);
-	        commonPart.getHeaders().add("label", new ContactClient().getCommonPartName());
+	        PoxPayloadOut output = new PoxPayloadOut(ContactClient.SERVICE_PAYLOAD_NAME);
+	        PayloadOutputPart commonPart = output.addPart(contact, MediaType.APPLICATION_XML_TYPE);
+	        commonPart.setLabel(new ContactClient().getCommonPartName());
 	    	res.releaseConnection();
 	        res = client.updateContact(knownResourceId, knownItemResourceId, knownContactResourceId, output);
 	        int statusCode = res.getStatus();
@@ -1502,7 +1503,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = (PoxPayloadIn) res.getEntity();
+	        input = new PoxPayloadIn(res.getEntity());
 	        ContactsCommon updatedContact =
 	                (ContactsCommon) extractPart(input,
 	                        new ContactClient().getCommonPartName(), ContactsCommon.class);
@@ -1651,7 +1652,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     	PoxPayloadOut multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
     			NON_EXISTENT_ID, NON_EXISTENT_ID, 
 				new OrgAuthorityClient().getCommonPartName());
-        ClientResponse<PoxPayloadIn> res =
+        ClientResponse<String> res =
                 client.update(NON_EXISTENT_ID, multipart);
         try {
 	        int statusCode = res.getStatus();
@@ -1696,7 +1697,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
         	OrgAuthorityClientUtils.createOrganizationInstance(
         		knownResourceRefName,
         		nonexOrgMap, client.getItemCommonPartName() );
-        ClientResponse<PoxPayloadIn> res =
+        ClientResponse<String> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
         try {
 	        int statusCode = res.getStatus();
