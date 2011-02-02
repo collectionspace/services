@@ -92,8 +92,9 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
     //======================= CREATE ====================================================
 
     @POST
-    public Response create(PoxPayloadIn input) {
+    public Response create(String xmlPayload) {
         try {
+        	PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
         	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
             return create(input, ctx);
         } catch (Exception e) {
@@ -127,14 +128,17 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
 
     @PUT
     @Path("{csid}")
-    public PoxPayloadOut update(@PathParam("csid") String csid, PoxPayloadIn theUpdate) {
+    public byte[] update(@PathParam("csid") String csid, String xmlPayload) {
+        PoxPayloadOut result = null;
         ensureCSID(csid, UPDATE);
         try {
+        	PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
         	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate);
-            return update(csid, theUpdate, ctx); //==> CALL implementation method, which subclasses may override.
+            result = update(csid, theUpdate, ctx); //==> CALL implementation method, which subclasses may override.
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.UPDATE_FAILED, csid);
         }
+        return result.getBytes();
     }
 
     /** Subclasses may override this overload, which gets called from #udpate(String,MultipartInput)   */
@@ -184,20 +188,22 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
 
     @GET
     @Path("{csid}")
-    public PoxPayloadOut get(@PathParam("csid") String csid) {
+    public byte[] get(@PathParam("csid") String csid) {
+    	PoxPayloadOut result = null;
         ensureCSID(csid, READ);
         try {
         	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
-        	PoxPayloadOut result = get(csid, ctx);// ==> CALL implementation method, which subclasses may override.
+        	result = get(csid, ctx);// ==> CALL implementation method, which subclasses may override.
             if (result == null) {
                 Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
                 throw new WebApplicationException(response);
             }
-            return result;
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
         }
+        
+        return result.getBytes();
     }
     
     protected PoxPayloadOut get(@PathParam("csid") String csid,
@@ -232,7 +238,6 @@ extends AbstractMultiPartCollectionSpaceResourceImpl {
     //======================= GET without csid. List, search, etc. =====================================
 
 	@GET
-	@Produces("application/xml")
 	public AbstractCommonList getList(@Context UriInfo ui,
 			@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
 		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();

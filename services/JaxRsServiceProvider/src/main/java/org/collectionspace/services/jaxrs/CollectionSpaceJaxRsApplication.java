@@ -88,11 +88,11 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new NewRelationResource());
         singletons.add(new LoanoutResource());
         singletons.add(new AcquisitionResource());
+        singletons.add(new ObjectExitResource());        
         /* FIXME: Uncomment please
         singletons.add(new IDResource());
         singletons.add(new NoteResource());
         singletons.add(new LoaninResource());
-        singletons.add(new ObjectExitResource());
         singletons.add(new LocationAuthorityResource());
         singletons.add(new MediaResource());
         singletons.add(new BlobResource());

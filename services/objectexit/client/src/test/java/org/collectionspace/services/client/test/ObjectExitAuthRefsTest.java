@@ -32,17 +32,19 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.ObjectExitClient;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.objectexit.ObjectexitCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -60,7 +62,6 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest {
 
     private final String CLASS_NAME = ObjectExitAuthRefsTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    final String SERVICE_PATH_COMPONENT = "objectexit";
     final String PERSON_AUTHORITY_NAME = "ObjectexitPersonAuth";
     private String knownResourceId = null;
     private List<String> objectexitIdsCreated = new ArrayList<String>();
@@ -70,6 +71,16 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest {
     private String exitDate = null;
     private String exitNumber = null;
 
+	@Override
+	public String getServicePathComponent() {
+		return ObjectExitClient.SERVICE_PATH_COMPONENT;
+	}
+
+	@Override
+	protected String getServiceName() {
+		return ObjectExitClient.SERVICE_NAME;
+	}
+    
     @Override
     protected CollectionSpaceClient getClientInstance() {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
@@ -80,12 +91,7 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
-    @Override
-    public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
-    }
-
-    private MultipartOutput createObjectExitInstance(String depositorRefName, String exitNumber, String exitDate) {
+    private PoxPayloadOut createObjectExitInstance(String depositorRefName, String exitNumber, String exitDate) {
         this.exitDate = exitDate;
         this.exitNumber = exitNumber;
         this.depositorRefName = depositorRefName;
@@ -94,9 +100,9 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest {
         objectexit.setExitNumber(exitNumber);
         objectexit.setExitDate(exitDate);
 
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(objectexit, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new ObjectExitClient().getCommonPartName());
+        PoxPayloadOut multipart = new PoxPayloadOut(ObjectExitClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = multipart.addPart(objectexit, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(new ObjectExitClient().getCommonPartName());
         logger.debug("to be created, objectexit common: " + objectAsXmlString(objectexit, ObjectexitCommon.class));
         return multipart;
     }
@@ -110,7 +116,7 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest {
         // Create a new Loans In resource. One or more fields in this resource will be PersonAuthority
         //    references, and will refer to Person resources by their refNames.
         ObjectExitClient objectexitClient = new ObjectExitClient();
-        MultipartOutput multipart = createObjectExitInstance(depositorRefName, "exitNumber-" + identifier, "exitDate-" + identifier);
+        PoxPayloadOut multipart = createObjectExitInstance(depositorRefName, "exitNumber-" + identifier, "exitDate-" + identifier);
         ClientResponse<Response> res = objectexitClient.create(multipart);
         assertStatusCode(res, testName);
         if (knownResourceId == null) {// Store the ID returned from the first resource created for additional tests below.
@@ -122,7 +128,7 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest {
     protected void createPersonRefs() {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding refName by which it can be identified.
-        MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
+        PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
         assertStatusCode(res, "createPersonRefs (not a surefire test)");
         personAuthCSID = extractId(res);
@@ -145,7 +151,7 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest {
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
-        MultipartOutput multipart = PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, authRefName, personInfo, personAuthClient.getItemCommonPartName());
+        PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, authRefName, personInfo, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         assertStatusCode(res, "createPerson (not a surefire test)");
         return extractId(res);
@@ -156,9 +162,9 @@ public class ObjectExitAuthRefsTest extends BaseServiceTest {
         logger.debug(testBanner(testName, CLASS_NAME));
         testSetup(STATUS_OK, ServiceRequestType.READ);
         ObjectExitClient objectexitClient = new ObjectExitClient();
-        ClientResponse<MultipartInput> res = objectexitClient.read(knownResourceId);
+        ClientResponse<String> res = objectexitClient.read(knownResourceId);
         assertStatusCode(res, testName);
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         ObjectexitCommon objectexit = (ObjectexitCommon) extractPart(input, objectexitClient.getCommonPartName(), ObjectexitCommon.class);
         Assert.assertNotNull(objectexit);
         logger.debug(objectAsXmlString(objectexit, ObjectexitCommon.class));

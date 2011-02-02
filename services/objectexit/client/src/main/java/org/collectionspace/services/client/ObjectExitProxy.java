@@ -13,13 +13,11 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.objectexit.ObjectexitCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
  * @version $Revision: 2108 $
  */
-@Path(ObjectExitClient.SERVICE_PATH_COMPONENT + "/")
+@Path(ObjectExitClient.SERVICE_PATH + "/")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
 public interface ObjectExitProxy extends CollectionSpaceProxy {

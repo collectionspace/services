@@ -20,15 +20,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-//import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.objectexit.ObjectexitCommonList;
 
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
@@ -40,25 +37,24 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  */
 public class ObjectExitClient extends AbstractServiceClientImpl {
 	public static final String SERVICE_NAME = "objectexit";
-	public static final String SERVICE_PATH_COMPONENT = "/" + SERVICE_NAME;
-	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
-	
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
-     */
-	@Override
-    public String getServicePathComponent() {
-        return SERVICE_NAME; //Laramie20100824 was objectexits, but label was a mismatch.
-    }
-    /**
-     *
-     */
-//    private static final ObjectExitClient instance = new ObjectExitClient();
+	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
+	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
+	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;	
     /**
      *
      */
     private ObjectExitProxy objectexitProxy;
 
+	@Override
+	public String getServiceName() {
+		return SERVICE_NAME;
+	}
+	
+	@Override
+    public String getServicePathComponent() {
+        return SERVICE_PATH_COMPONENT;
+    }
+    
     /**
      *
      * Default constructor for ObjectExitClient class.
@@ -129,8 +125,8 @@ public class ObjectExitClient extends AbstractServiceClientImpl {
      * @return
      *
      */
-    public ClientResponse<Response> create(MultipartOutput multipart) {
-        return objectexitProxy.create(multipart);
+    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
+        return objectexitProxy.create(xmlPayload.getBytes());
     }
 
     /**
@@ -138,8 +134,8 @@ public class ObjectExitClient extends AbstractServiceClientImpl {
      * @param objectexit
      * @return
      */
-    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
-        return objectexitProxy.update(csid, multipart);
+    public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
+        return objectexitProxy.update(csid, xmlPayload.getBytes());
 
     }
 
@@ -151,10 +147,4 @@ public class ObjectExitClient extends AbstractServiceClientImpl {
     public ClientResponse<Response> delete(String csid) {
         return objectexitProxy.delete(csid);
     }
-
-	@Override
-	public String getServiceName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

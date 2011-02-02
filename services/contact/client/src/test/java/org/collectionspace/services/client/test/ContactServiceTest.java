@@ -68,7 +68,6 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
 		return ContactClient.SERVICE_PATH_COMPONENT;
 	}
 
-
 	@Override
 	protected String getServiceName() {
 		return ContactClient.SERVICE_NAME;

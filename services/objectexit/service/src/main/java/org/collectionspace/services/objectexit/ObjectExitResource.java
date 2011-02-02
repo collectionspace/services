@@ -30,7 +30,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-@Path(ObjectExitClient.SERVICE_PATH_COMPONENT)
+@Path(ObjectExitClient.SERVICE_PATH)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
 public class ObjectExitResource extends ResourceBase {
