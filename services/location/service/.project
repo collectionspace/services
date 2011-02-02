@@ -5,6 +5,7 @@
     <project>org.collectionspace.services.3rdparty.nuxeo.quote-api</project>
     <project>org.collectionspace.services.client</project>
     <project>org.collectionspace.services.common</project>
+    <project>org.collectionspace.services.contact.client</project>
     <project>org.collectionspace.services.contact.jaxb</project>
     <project>org.collectionspace.services.contact.service</project>
     <project>org.collectionspace.services.hyperjaxb</project>

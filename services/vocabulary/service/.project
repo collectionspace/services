@@ -7,6 +7,7 @@
     <project>org.collectionspace.services.common</project>
     <project>org.collectionspace.services.hyperjaxb</project>
     <project>org.collectionspace.services.jaxb</project>
+    <project>org.collectionspace.services.vocabulary.client</project>
     <project>org.collectionspace.services.vocabulary.jaxb</project>
   </projects>
   <buildSpec>

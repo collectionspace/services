@@ -29,13 +29,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.BriefDescriptionList;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -438,7 +438,7 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
         CollectionObjectClient client = new CollectionObjectClient();
         for (long i = 0; i < numToCreate; i++) {
-            MultipartOutput multipart =
+            PoxPayloadOut multipart =
                     createCollectionObjectInstance(i, keywords, keywordsInSameField);
             ClientResponse<Response> res = client.create(multipart);
             try {
@@ -455,7 +455,7 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
         }
     }
     
-    private MultipartOutput createCollectionObjectInstance(long i, List<String> keywords,
+    private PoxPayloadOut createCollectionObjectInstance(long i, List<String> keywords,
             boolean keywordsInSameField) {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
         collectionObject.setObjectNumber(createIdentifier());
@@ -471,10 +471,10 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
                 Assert.fail("List of keywords must have exactly one or two members.");
             }
         }
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(collectionObject,
+        PoxPayloadOut multipart = new PoxPayloadOut(CollectionObjectClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = multipart.addPart(collectionObject,
                 MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new CollectionObjectClient().getCommonPartName());
+        commonPart.setLabel(new CollectionObjectClient().getCommonPartName());
         return multipart;
     }
 

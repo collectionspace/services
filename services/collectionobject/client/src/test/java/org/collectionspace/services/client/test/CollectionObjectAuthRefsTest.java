@@ -36,8 +36,11 @@ import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.client.OrgAuthorityClientUtils;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.collectionobject.AssocEventOrganizationList;
 import org.collectionspace.services.collectionobject.AssocEventPersonList;
@@ -53,8 +56,6 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -181,7 +182,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         // Create an object record payload, containing
         // authority reference values in a number of its fields
         String identifier = createIdentifier();
-        MultipartOutput multipart =
+        PoxPayloadOut multipart =
             createCollectionObjectInstance(
                 "Obj Title",
                 "ObjNum" + "-" + identifier,
@@ -236,7 +237,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     private void createPersonAuthority(String displayName, String shortIdentifier) {
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-    	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
+    	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     			displayName, shortIdentifier, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
@@ -262,7 +263,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortIdentifier);
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-    	MultipartOutput multipart =
+    	PoxPayloadOut multipart =
     		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
     				personAuthRefName, personInfo, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
@@ -330,7 +331,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     private void createOrgAuthority(String displayName, String shortIdentifier) {
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
-        MultipartOutput multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
+        PoxPayloadOut multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
     			displayName, shortIdentifier, orgAuthClient.getCommonPartName());
         ClientResponse<Response> res = orgAuthClient.create(multipart);
         int statusCode = res.getStatus();
@@ -356,7 +357,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         orgInfo.put(OrganizationJAXBSchema.FOUNDING_PLACE, foundingPlace);
         orgInfo.put(OrganizationJAXBSchema.SHORT_IDENTIFIER, shortIdentifier);
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
-    	MultipartOutput multipart =
+    	PoxPayloadOut multipart =
     		OrgAuthorityClientUtils.createOrganizationInstance(
     				orgAuthRefName, orgInfo, orgAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = orgAuthClient.createItem(orgAuthCSID, multipart);
@@ -415,7 +416,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
 
         // Submit the request to the service and store the response.
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
-        ClientResponse<MultipartInput> res = collectionObjectClient.read(knownResourceId);
+        ClientResponse<String> res = collectionObjectClient.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -427,7 +428,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         CollectionobjectsCommon collectionObject = (CollectionobjectsCommon) extractPart(input,
         		collectionObjectClient.getCommonPartName(), CollectionobjectsCommon.class);
         Assert.assertNotNull(collectionObject);
@@ -553,7 +554,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     * @param inscriber the inscriber
     * @return the multipart output
     */
-   private MultipartOutput createCollectionObjectInstance(
+   private PoxPayloadOut createCollectionObjectInstance(
                 String title,
                 String objNum,
                 String contentOrganization,
@@ -617,10 +618,10 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
         fieldCollectors.add(fieldCollector);
         collectionObject.setFieldCollectors(FieldCollectorList);
 
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart =
+        PoxPayloadOut multipart = new PoxPayloadOut(CollectionObjectClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart =
             multipart.addPart(collectionObject, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new CollectionObjectClient().getCommonPartName());
+        commonPart.setLabel(new CollectionObjectClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, collectionObject common");

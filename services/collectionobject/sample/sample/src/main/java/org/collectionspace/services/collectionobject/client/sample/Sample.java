@@ -40,8 +40,8 @@ import org.collectionspace.services.collectionobject.ResponsibleDepartmentList;
 import org.collectionspace.services.collectionobject.domain.naturalhistory.CollectionobjectsNaturalhistory;
 
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadIn;
+import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 
@@ -72,7 +72,7 @@ public class Sample {
     public String createCollectionObject() {
 
        // Create a CollectionObject record to submit to the service.
-       MultipartOutput multipart = createCollectionObjectInstance();
+       PoxPayloadOut multipart = createCollectionObjectInstance();
 
        // Submit a 'create' request to the service, sending the new
        // CollectionObject record to be created, and store the response.
@@ -97,7 +97,7 @@ public class Sample {
     // Read
     // ---------------------------------------------------------------
 
-    public MultipartInput readCollectionObject(String resourceId) throws Exception {
+    public PoxPayloadIn readCollectionObject(String resourceId) throws Exception {
 
         if (resourceId == null || resourceId.trim().isEmpty()) {
             throw new IllegalArgumentException(
@@ -107,7 +107,7 @@ public class Sample {
         // Submit the read ("get") request to the service and store the response.
         // The resourceId is a unique identifier for the CollectionObject
         // record we're reading.
-        ClientResponse<MultipartInput> res = client.read(resourceId);
+        ClientResponse<PoxPayloadIn> res = client.read(resourceId);
 
         // Get the status code from the response and check it against
         // the expected status code.
@@ -119,7 +119,7 @@ public class Sample {
         }
 
         // Get the entity body of the response from the service.
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
 
         return input;
 
@@ -197,7 +197,7 @@ public class Sample {
    // Utility methods
    // ---------------------------------------------------------------
 
-   private MultipartOutput createCollectionObjectInstance() {
+   private PoxPayloadOut createCollectionObjectInstance() {
 
        // Create the Common part of a CollectionObject and add data to its fields.
 
@@ -216,7 +216,7 @@ public class Sample {
        collectionObject.getBriefDescriptions().getBriefDescription().add("Papier mache bird mask with horns, " +
                       "painted red with black and yellow spots. " +
                       "Puerto Rico. ca. 8&quot; high, 6&quot; wide, projects 10&quot; (with horns).");
-       MultipartOutput multipart = new MultipartOutput();
+       PoxPayloadOut multipart = new PoxPayloadOut();
        OutputPart commonPart = multipart.addPart(collectionObject,
                MediaType.APPLICATION_XML_TYPE);
        commonPart.getHeaders().add("label", getCommonPartName());
@@ -253,7 +253,7 @@ public class Sample {
        return multipart;
    }
 
-    private Object extractPart(MultipartInput input, String label,
+    private Object extractPart(PoxPayloadIn input, String label,
         Class clazz) throws Exception {
         Object obj = null;
         String partLabel = "";
@@ -306,7 +306,7 @@ public class Sample {
         return obj;
     }
 
-    public void displayCollectionObject(MultipartInput input)
+    public void displayCollectionObject(PoxPayloadIn input)
         throws Exception {
 
         if (input == null) {
@@ -412,7 +412,7 @@ public class Sample {
         }
 
         logger.info("Reading the new CollectionObject record ...");
-        MultipartInput corecord = sample.readCollectionObject(newRecordId);
+        PoxPayloadIn corecord = sample.readCollectionObject(newRecordId);
         sample.displayCollectionObject(corecord);
 
         logger.info("Deleting the new CollectionObject record ...");

@@ -48,8 +48,8 @@ import org.collectionspace.services.collectionobject.CollectionobjectsCommonList
 
 import org.jboss.resteasy.client.ClientResponse;
 
-//import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+//import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadIn;
+//import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
 
 /**
  * @version $Revision:$
