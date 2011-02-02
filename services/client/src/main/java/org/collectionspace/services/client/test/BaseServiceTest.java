@@ -47,8 +47,6 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.io.FileUtils;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -104,6 +102,16 @@ public abstract class BaseServiceTest {
         "\n" + BANNER_SEPARATOR_LINE + "\n";
     private static final String BANNER_SUFFIX =
         "\n" + BANNER_SEPARATOR_LINE;
+
+    // A Unicode UTF-8 data fragment for use in test payloads: a random sequence,
+    // unlikely to be encountered in actual collections data, of two USASCII
+    // characters followed by four non-USASCII range Unicode UTF-8 characters:
+    //
+    // Δ : Greek capital letter Delta (U+0394)
+    // Ж : Cyrillic capital letter Zhe with breve (U+04C1)
+    // Ŵ : Latin capital letter W with circumflex (U+0174)
+    // Ω : Greek capital letter Omega (U+03A9)
+    private final static String UTF8_DATA_FRAGMENT = "to" + '\u0394' + '\u04C1' + '\u0174' +'\u03A9';
     
     protected static final int STATUS_BAD_REQUEST =
         Response.Status.BAD_REQUEST.getStatusCode();
@@ -572,5 +580,8 @@ public abstract class BaseServiceTest {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    public static String getUTF8DataFragment() {
+        return UTF8_DATA_FRAGMENT;
+    }
 
 }

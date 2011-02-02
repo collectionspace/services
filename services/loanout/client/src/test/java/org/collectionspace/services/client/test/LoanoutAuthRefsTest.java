@@ -66,6 +66,7 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
+    final String SERVICE_NAME = "loansout";
     final String SERVICE_PATH_COMPONENT = "loansout";
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     private String knownResourceId = null;
@@ -344,6 +345,10 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+    public String getServiceName() {
+        return SERVICE_NAME;
+    }
+
     @Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;

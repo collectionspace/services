@@ -35,19 +35,18 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.LoaninClient;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-//import org.collectionspace.services.common.authorityref.AuthorityRefList.AuthorityRefItem;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanin.LenderGroup;
 import org.collectionspace.services.loanin.LenderGroupList;
 import org.collectionspace.services.loanin.LoansinCommon;
-//import org.collectionspace.services.loanin.LoansinCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -68,6 +67,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     
     // Instance variables specific to this test.
+    final String SERVICE_NAME = "loansin";
     final String SERVICE_PATH_COMPONENT = "loansin";
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     private String knownResourceId = null;
@@ -123,7 +123,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         // One or more fields in this resource will be PersonAuthority
         // references, and will refer to Person resources by their refNames.
         LoaninClient loaninClient = new LoaninClient();
-        MultipartOutput multipart = createLoaninInstance(
+        PoxPayloadOut multipart = createLoaninInstance(
                 "loanInNumber-" + identifier,
                 "returnDate-" + identifier,
 		lenderRefName,
@@ -169,7 +169,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding
         // refName by which it can be identified.
-    	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
+    	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
@@ -215,7 +215,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
-    	MultipartOutput multipart = 
+    	PoxPayloadOut multipart =
     		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
     				authRefName, personInfo, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
@@ -240,7 +240,7 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
 
         // Submit the request to the service and store the response.
         LoaninClient loaninClient = new LoaninClient();
-        ClientResponse<MultipartInput> res = loaninClient.read(knownResourceId);
+        ClientResponse<String> res = loaninClient.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -252,19 +252,21 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
-        LoansinCommon loanin = (LoansinCommon) extractPart(input,
-            loaninClient.getCommonPartName(), LoansinCommon.class);
-        Assert.assertNotNull(loanin);
+        // Extract the common part from the response.
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        LoansinCommon loaninCommon = (LoansinCommon) extractPart(input,
+        		loaninClient.getCommonPartName(), LoansinCommon.class);
+        Assert.assertNotNull(loaninCommon);
         if(logger.isDebugEnabled()){
-            logger.debug(objectAsXmlString(loanin, LoansinCommon.class));
+            logger.debug(objectAsXmlString(loaninCommon, LoansinCommon.class));
         }
+
         // Check a couple of fields
-//        Assert.assertEquals(loanin.getLender(), lenderRefName);
-//        Assert.assertEquals(loanin.getLendersAuthorizer(), lendersAuthorizerRefName);
-//        Assert.assertEquals(loanin.getLendersContact(), lendersContactRefName);
-        Assert.assertEquals(loanin.getLoanInContact(), loanInContactRefName);
-        Assert.assertEquals(loanin.getBorrowersAuthorizer(), borrowersAuthorizerRefName);
+        // Assert.assertEquals(loaninCommon.getLender(), lenderRefName);
+        // Assert.assertEquals(loaninCommon.getLendersAuthorizer(), lendersAuthorizerRefName);
+        // Assert.assertEquals(loaninCommon.getLendersContact(), lendersContactRefName);
+        Assert.assertEquals(loaninCommon.getLoanInContact(), loanInContactRefName);
+        Assert.assertEquals(loaninCommon.getBorrowersAuthorizer(), borrowersAuthorizerRefName);
         
         // Get the auth refs and check them
         ClientResponse<AuthorityRefList> res2 =
@@ -362,38 +364,44 @@ public class LoaninAuthRefsTest extends BaseServiceTest {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+    public String getServiceName() {
+        return SERVICE_NAME;
+    }
+
     @Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
     }
 
-   private MultipartOutput createLoaninInstance(String loaninNumber,
+
+   private PoxPayloadOut createLoaninInstance(String loaninNumber,
     		String returnDate,
                 String lender,
                 String lendersAuthorizer,
                 String lendersContact,
                 String loaninContact,
                 String borrowersAuthorizer) {
-        LoansinCommon loanin = new LoansinCommon();
-        loanin.setLoanInNumber(loaninNumber);
-        loanin.setLoanInNumber(returnDate);
+        LoansinCommon loaninCommon = new LoansinCommon();
+        loaninCommon.setLoanInNumber(loaninNumber);
+        loaninCommon.setLoanInNumber(returnDate);
         LenderGroupList lenderGroupList =  new LenderGroupList();
         LenderGroup lenderGroup = new LenderGroup();
         lenderGroup.setLender(lender);
         lenderGroup.setLendersAuthorizer(lendersAuthorizer);
         lenderGroup.setLendersContact(lendersContact);
         lenderGroupList.getLenderGroup().add(lenderGroup);
-        loanin.setLenderGroupList(lenderGroupList);
-        loanin.setLoanInContact(loaninContact);
-        loanin.setBorrowersAuthorizer(borrowersAuthorizer);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart =
-            multipart.addPart(loanin, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new LoaninClient().getCommonPartName());
+        loaninCommon.setLenderGroupList(lenderGroupList);
+        loaninCommon.setLoanInContact(loaninContact);
+        loaninCommon.setBorrowersAuthorizer(borrowersAuthorizer);
+
+        PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart =
+            multipart.addPart(loaninCommon, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(new LoaninClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, loanin common");
-            logger.debug(objectAsXmlString(loanin, LoansinCommon.class));
+            logger.debug(objectAsXmlString(loaninCommon, LoansinCommon.class));
         }
 
         return multipart;

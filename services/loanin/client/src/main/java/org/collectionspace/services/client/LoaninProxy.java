@@ -13,14 +13,12 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.loanin.LoansinCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
  * @version $Revision$
  */
 @Path("/loansin/")
-@Produces({"application/xml"})
+@Produces({"application/xml;charset=UTF-8"})
 @Consumes({"application/xml"})
 public interface LoaninProxy extends CollectionSpaceProxy {
 
@@ -45,12 +43,10 @@ public interface LoaninProxy extends CollectionSpaceProxy {
     
     // List
     @GET
-    @Produces({"application/xml"})
     ClientResponse<LoansinCommonList> readList();
 
     // List Authority References
     @GET
-    @Produces({"application/xml"})
     @Path("/{csid}/authorityrefs/")
     ClientResponse<AuthorityRefList> getAuthorityRefs(@PathParam("csid") String csid);
     

@@ -39,7 +39,9 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 public class LoaninClient extends AbstractServiceClientImpl {
 
     private LoaninProxy loaninProxy;
-    public static final String SERVICE_PATH_COMPONENT = "loansin";
+    public static final String SERVICE_NAME = "loansin";
+    public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
+
 
     /**
      *
@@ -55,8 +57,13 @@ public class LoaninClient extends AbstractServiceClientImpl {
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */
+    @Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
+    }
+
+    public String getServiceName() {
+        return SERVICE_NAME;
     }
 
     @Override

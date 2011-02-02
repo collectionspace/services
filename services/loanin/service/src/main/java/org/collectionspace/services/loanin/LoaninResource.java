@@ -72,7 +72,7 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/loansin")
 @Consumes("application/xml")
-@Produces("application/xml")
+@Produces("application/xml;charset=UTF-8")
 public class LoaninResource extends
 		AbstractMultiPartCollectionSpaceResourceImpl {
 
@@ -231,7 +231,7 @@ public class LoaninResource extends
      * @return the loanin list
      */
     @GET
-    @Produces("application/xml")
+    @Produces({"application/xml"})
     public LoansinCommonList getLoaninList(@Context UriInfo ui,
     		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
     	LoansinCommonList result = null;
@@ -282,7 +282,6 @@ public class LoaninResource extends
      */
     @GET
     @Path("{csid}/authorityrefs")
-    @Produces("application/xml")
     public AuthorityRefList getAuthorityRefs(
     		@PathParam("csid") String csid, 
     		@Context UriInfo ui) {
@@ -320,6 +319,7 @@ public class LoaninResource extends
      * 
      * @return the loanin list
      */
+    @Produces({"application/xml"})
     @Deprecated
     public LoansinCommonList getLoaninList(List<String> csidList) {
         LoansinCommonList loaninObjectList = new LoansinCommonList();
