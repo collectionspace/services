@@ -276,10 +276,10 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	    	m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
 	    	//Marshal object into file.
 	    	m.marshal(jaxbObject, outputStream);
-	    	text = outputStream.toString();
+	    	text = outputStream.toString("UTF8");
 
     		Document doc = DocumentHelper.parseText(text);
-    		result = doc.getRootElement();
+    		result = doc.getRootElement(); //FIXME: REM - call .detach() to free the element
     	} catch (Exception e) {
     		e.printStackTrace(); //FIXME: REM - Please use proper logger.isWarning() statement
     	}
@@ -296,7 +296,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
     public static Element toElement(String xmlPayload) throws DocumentException {
     	Element result = null;
 		Document doc = DocumentHelper.parseText(xmlPayload);
-		result = doc.getRootElement();
+		result = doc.getRootElement(); //FIXME: REM - .detach();
     	return result;
     }	
     

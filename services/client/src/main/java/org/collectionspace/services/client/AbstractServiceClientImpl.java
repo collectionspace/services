@@ -24,6 +24,7 @@
 package org.collectionspace.services.client;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.Properties;
 
@@ -72,6 +73,18 @@ public abstract class AbstractServiceClientImpl implements
      */
     public Logger getLogger() {
     	return logger;
+    }
+    
+    protected byte[] getBytes(String string) {
+    	byte[] result = null;
+    	try {
+			result = string.getBytes("UTF8");
+		} catch (UnsupportedEncodingException e) {
+			if (logger.isWarnEnabled() == true) {
+				logger.warn(e.getMessage(), e);
+			}
+		}
+		return result;
     }
     
     /**

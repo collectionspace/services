@@ -25,9 +25,10 @@
  */
 package org.collectionspace.services.collectionobject;
 
-import java.io.InputStream;
+import java.io.InputStream; //FIXME: REM - Please remove unneeded imports
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -157,9 +158,11 @@ public class CollectionObjectResource
      * @return the response
      */
     @POST
-    public Response createCollectionObject(String xmlText) {
+    @Consumes("text/plain; charset=UTF-8")
+    public Response createCollectionObject(@Context HttpServletRequest req,
+    		String xmlPayload) {
         try {
-            PoxPayloadIn input = new PoxPayloadIn(xmlText);
+            PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
@@ -194,7 +197,7 @@ public class CollectionObjectResource
      */
     @GET
     @Path("{csid}")
-    public String getCollectionObject(
+    public byte[] getCollectionObject(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getCollectionObject with csid=" + csid);
@@ -239,7 +242,8 @@ public class CollectionObjectResource
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result.toXML();
+        
+        return result.getBytes();
     }
     
     /**
@@ -532,6 +536,7 @@ public class CollectionObjectResource
     @GET
     @Path("/search")
     @Produces("application/xml")
+    @Deprecated
     public CollectionobjectsCommonList keywordsSearchCollectionObjects(@Context UriInfo ui,
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
     	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();

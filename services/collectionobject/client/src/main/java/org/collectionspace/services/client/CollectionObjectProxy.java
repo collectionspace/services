@@ -114,7 +114,9 @@ public interface CollectionObjectProxy extends CollectionSpaceProxy {
      * @return the client response
      */
     @POST
-    ClientResponse<Response> create(String payload);
+    @Produces("application/xml")
+    @Consumes("text/plain; charset=UTF-8")    
+    ClientResponse<Response> create(byte[] payload);
 
     //(R)ead
     /**

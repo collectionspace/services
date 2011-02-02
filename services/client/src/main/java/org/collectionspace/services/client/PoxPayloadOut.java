@@ -10,6 +10,7 @@ import org.dom4j.io.SAXReader;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 
 // TODO: Auto-generated Javadoc
@@ -68,6 +69,7 @@ public class PoxPayloadOut extends PoxPayload<PayloadOutputPart> {
 	public String toXML() {
 		String result = null;
         Document document = DocumentHelper.createDocument();
+        document.setXMLEncoding("UTF-8");
         document.setName(getName());
         Element root = document.addElement( "document" );
         root.addAttribute("name", getName());        
@@ -146,5 +148,16 @@ public class PoxPayloadOut extends PoxPayload<PayloadOutputPart> {
 	@Override
 	public String toString() {
 		return toXML();
+	}
+	
+	public byte[] getBytes() {
+		byte[] result = null;
+		try {
+			result = toString().getBytes("UTF8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace(); //FIXME: REM - Add proper logging statement here
+		}
+		return result;
 	}
 }

@@ -468,8 +468,8 @@ public abstract class BaseServiceTest {
      * @throws Exception the exception
      */
     static protected String getXmlDocumentAsString(String fileName) throws Exception {
-        byte[] b = FileUtils.readFileToByteArray(new File(fileName));
-        return new String(b);
+        String result = FileUtils.readFileToString(new File(fileName), "UTF8");
+        return result;
     }
 
     /**

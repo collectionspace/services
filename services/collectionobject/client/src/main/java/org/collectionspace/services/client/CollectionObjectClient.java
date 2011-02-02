@@ -129,9 +129,8 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.services.client.CollectionObjectProxy#keywordSearch()
      * @return the client response< collectionobjects common list>
      */
-    public ClientResponse<CollectionobjectsCommonList> keywordSearch(String keywords) {
+    public ClientResponse<CollectionobjectsCommonList> keywordSearch(String keywords) {    	
         return collectionObjectProxy.keywordSearch(keywords);
-
     }
 
     
@@ -169,9 +168,8 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.services.client.CollectionObjectProxy#create()
      * @return the client response< response>
      */
-    public ClientResponse<Response> create(PoxPayloadOut multipart) {
-    	String payload = multipart.toXML();
-        return collectionObjectProxy.create(payload);
+    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
+        return collectionObjectProxy.create(xmlPayload.getBytes());
     }
 
     /**
