@@ -92,7 +92,6 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * The Class CollectionObjectResource.
  */
@@ -103,7 +102,7 @@ public class CollectionObjectResource
         extends AbstractMultiPartCollectionSpaceResourceImpl {
 
     /** The Constant serviceName. */
-    static final public String serviceName = "collectionobjects";
+    static final public String serviceName = CollectionObjectClient.SERVICE_PATH_COMPONENT;
     
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(CollectionObjectResource.class);
@@ -158,7 +157,6 @@ public class CollectionObjectResource
      * @return the response
      */
     @POST
-    @Consumes("text/plain; charset=UTF-8")
     public Response createCollectionObject(@Context HttpServletRequest req,
     		String xmlPayload) {
         try {

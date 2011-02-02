@@ -132,6 +132,7 @@ public interface CollectionObjectProxy extends CollectionSpaceProxy {
     @GET
     @Produces({"application/xml"})
     @Path("/{csid}/picture")
+    @Deprecated //FIXME: REM - Remove this method and the corresponding client, and resource as well.
     ClientResponse<Response> createPicture(@PathParam("csid") String csid);
     
     // List Authority references
@@ -157,7 +158,7 @@ public interface CollectionObjectProxy extends CollectionSpaceProxy {
      */
     @PUT
     @Path("/{csid}")
-    ClientResponse<String> update(@PathParam("csid") String csid, String payload);
+    ClientResponse<String> update(@PathParam("csid") String csid, byte[] payload);
 
     //(D)elete
     /**

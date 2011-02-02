@@ -8,8 +8,6 @@ import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
@@ -18,12 +16,14 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * @version $Revision:$
  */
 public class AcquisitionClient extends AbstractServiceClientImpl {
+	public static final String SERVICE_PATH_COMPONENT = "acquisitions"; //FIXME: REM - The JAX-RS proxy, client, and resource classes should ref this value
+	public static final String SERVICE_PAYLOAD_NAME = SERVICE_PATH_COMPONENT;
 
-    /* (non-Javadoc)
+	/* (non-Javadoc)
      * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
      */
     public String getServicePathComponent() {
-        return "acquisitions";
+        return SERVICE_PATH_COMPONENT;
     }
     // FIXME: Is the "instance" member still needed/used?
     /**
@@ -86,7 +86,7 @@ public class AcquisitionClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.hello.client.IntakeProxy#getIntake(java.lang.String)
      */
-    public ClientResponse<MultipartInput> read(String csid) {
+    public ClientResponse<String> read(String csid) {
         return acquisitionProxy.read(csid);
     }
 
@@ -104,8 +104,8 @@ public class AcquisitionClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.hello.client.IntakeProxy#createIntake(org.collectionspace.hello.Intake)
      */
-    public ClientResponse<Response> create(MultipartOutput multipart) {
-        return acquisitionProxy.create(multipart);
+    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
+        return acquisitionProxy.create(xmlPayload.getBytes());
     }
 
     /**
@@ -114,8 +114,8 @@ public class AcquisitionClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.hello.client.IntakeProxy#updateIntake(java.lang.Long, org.collectionspace.hello.Intake)
      */
-    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
-        return acquisitionProxy.update(csid, multipart);
+    public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
+        return acquisitionProxy.update(csid, xmlPayload.getBytes());
     }
 
     /**

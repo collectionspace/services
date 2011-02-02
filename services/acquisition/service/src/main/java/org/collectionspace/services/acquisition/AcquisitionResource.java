@@ -43,6 +43,9 @@ import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.client.AcquisitionClient;
+import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
+
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.ServiceMessages;
@@ -56,11 +59,10 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.security.UnauthorizedException;
-import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,9 +72,9 @@ import org.slf4j.LoggerFactory;
  * Handles requests to the Acquisition service, orchestrates the retrieval
  * of relevant resources, and returns responses to the client.
  */
-@Path("/acquisitions")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Path("/" + AcquisitionClient.SERVICE_PATH_COMPONENT)
+@Produces({"application/xml"})
+@Consumes({"application/xml"})
 public class AcquisitionResource
         extends AbstractMultiPartCollectionSpaceResourceImpl {
 
@@ -104,7 +106,7 @@ public class AcquisitionResource
         return AcquisitionsCommon.class;
     }
 
-    /* (non-Javadoc)
+    /* (non-Javadoc) //FIXME: REM - Please remove dead code.
      * @see org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl#createDocumentHandler(org.collectionspace.services.common.context.ServiceContext)
      */
 //    @Override
@@ -122,7 +124,7 @@ public class AcquisitionResource
      * Instantiates a new acquisition resource.
      */
     public AcquisitionResource() {
-        // do nothing
+        // Empty constructor.  Note that all JAX-RS resource classes are singletons.
     }
 
     /**
@@ -133,9 +135,9 @@ public class AcquisitionResource
      * @return the response
      */
     @POST
-    public Response createAcquisition(PoxPayloadIn input) {
-
+    public Response createAcquisition(String xmlPayload) {
         try {
+        	PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
@@ -168,7 +170,7 @@ public class AcquisitionResource
      */
     @GET
     @Path("{csid}")
-    public PoxPayloadOut getAcquisition(
+    public byte[] getAcquisition(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getAcquisition with csid=" + csid);
@@ -212,7 +214,7 @@ public class AcquisitionResource
                     ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.getBytes();
     }
 
     /**
@@ -277,9 +279,9 @@ public class AcquisitionResource
      */
     @PUT
     @Path("{csid}")
-    public PoxPayloadOut updateAcquisition(
+    public byte[] updateAcquisition(
             @PathParam("csid") String csid,
-            PoxPayloadIn theUpdate) {
+            String xmlPayload) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateAcquisition with csid=" + csid);
         }
@@ -289,11 +291,9 @@ public class AcquisitionResource
                     ServiceMessages.UPDATE_FAILED + ServiceMessages.MISSING_CSID).type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("updateAcquisition with input: ", theUpdate);
-        }
         PoxPayloadOut result = null;
         try {
+        	PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
@@ -316,7 +316,7 @@ public class AcquisitionResource
                     ServiceMessages.UPDATE_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.getBytes();
     }
 
     /**
@@ -389,8 +389,7 @@ public class AcquisitionResource
      * @return the acquisitions common list
      */
     private AcquisitionsCommonList searchAcquisitions(
-            MultivaluedMap<String, String> queryParams,
-            String keywords) {
+            MultivaluedMap<String, String> queryParams, String keywords) {
         AcquisitionsCommonList acquisitionObjectList;
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
@@ -434,7 +433,6 @@ public class AcquisitionResource
      */
     @GET
     @Path("{csid}/authorityrefs")
-    @Produces("application/xml")
     public AuthorityRefList getAuthorityRefs(
             @PathParam("csid") String csid,
             @Context UriInfo ui) {

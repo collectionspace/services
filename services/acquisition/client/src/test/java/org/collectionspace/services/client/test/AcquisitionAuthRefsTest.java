@@ -33,8 +33,11 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.AcquisitionClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
@@ -45,8 +48,6 @@ import org.collectionspace.services.acquisition.OwnerList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -117,7 +118,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         // Create all the person refs and entities
         createPersonRefs();
         
-        MultipartOutput multipart = createAcquisitionInstance(
+        PoxPayloadOut multipart = createAcquisitionInstance(
             "April 1, 2010",
 	    acquisitionAuthorizerRefName,
             acquisitionFundingSourcesRefNames,
@@ -158,7 +159,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
     
     protected void createPersonRefs(){
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-    	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
+    	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     			PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
@@ -207,7 +208,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
-    	MultipartOutput multipart = 
+    	PoxPayloadOut multipart = 
     		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
     				authRefName, personInfo, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
@@ -233,7 +234,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         
         // Submit the request to the service and store the response.
         AcquisitionClient acquisitionClient = new AcquisitionClient();
-        ClientResponse<MultipartInput> res = acquisitionClient.read(knownResourceId);
+        ClientResponse<String> res = acquisitionClient.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -245,7 +246,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         AcquisitionsCommon acquisition = (AcquisitionsCommon) extractPart(input,
         		acquisitionClient.getCommonPartName(), AcquisitionsCommon.class);
         Assert.assertNotNull(acquisition);
@@ -371,7 +372,7 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         return SERVICE_PATH_COMPONENT;
     }
 
-   private MultipartOutput createAcquisitionInstance(
+   private PoxPayloadOut createAcquisitionInstance(
     	String accessionDate,
 	String acquisitionAuthorizer,
 	List<String> acquisitionFundingSources,
@@ -416,11 +417,11 @@ public class AcquisitionAuthRefsTest extends BaseServiceTest {
         }
         acquisition.setAcquisitionSources(acqSourcesList);
 
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart =
+        PoxPayloadOut multipart = new PoxPayloadOut(AcquisitionClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart =
             multipart.addPart(acquisition, MediaType.APPLICATION_XML_TYPE);
         AcquisitionClient acquisitionClient = new AcquisitionClient();
-        commonPart.getHeaders().add("label", acquisitionClient.getCommonPartName());
+        commonPart.setLabel(acquisitionClient.getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, acquisition common");
