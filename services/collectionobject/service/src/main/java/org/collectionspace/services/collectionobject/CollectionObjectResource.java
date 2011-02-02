@@ -47,9 +47,10 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
+//import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils; //FIXME: REM - Please remove all unneeded imports
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
@@ -84,8 +85,8 @@ import org.jboss.resteasy.util.HttpResponseCodes;
 
 //FIXME: There should be no direct dependency on Nuxeo in our resource classes.
 import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
-import org.nuxeo.ecm.core.api.ClientException;
+//import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+//import org.nuxeo.ecm.core.api.ClientException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,7 +95,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The Class CollectionObjectResource.
  */
-@Path("/collectionobjects")
+@Path("/" + CollectionObjectClient.SERVICE_PATH_COMPONENT)
 @Consumes("application/xml")
 @Produces("application/xml")
 public class CollectionObjectResource

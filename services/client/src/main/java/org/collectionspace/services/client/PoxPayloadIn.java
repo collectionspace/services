@@ -1,22 +1,22 @@
 package org.collectionspace.services.client;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.Iterator;
-import java.util.List;
+//import java.io.ByteArrayInputStream; //FIXME: REM - Remove these unneeded import statements
+//import java.io.InputStream;
+//import java.io.Reader;
+//import java.io.StringReader;
+//import java.util.Iterator;
+//import java.util.List;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
+//import javax.xml.transform.Source;
+//import javax.xml.transform.stream.StreamSource;
 
-import org.dom4j.Attribute;
-import org.dom4j.Document;
+//import org.dom4j.Attribute;
+//import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
-import org.dom4j.Namespace;
-import org.dom4j.io.SAXReader;
-import org.xml.sax.InputSource;
+//import org.dom4j.Namespace;
+//import org.dom4j.io.SAXReader;
+//import org.xml.sax.InputSource;
 
 public class PoxPayloadIn extends PoxPayload<PayloadInputPart> {
 
@@ -26,21 +26,26 @@ public class PoxPayloadIn extends PoxPayload<PayloadInputPart> {
 	 */
 	public PoxPayloadIn(String xmlPayload) throws DocumentException {
 		super(xmlPayload);
-		Iterator<Element> it = getDOMDocument().getRootElement().elementIterator();
-		PayloadInputPart payloadInputPart = null;
-		while (it.hasNext() == true) {
-			Element element = (Element) it.next();
-			String label = element.getName();
-			Object jaxbObject = PoxPayload.toObject(element);			
-			if (jaxbObject != null) {
-				payloadInputPart = new PayloadInputPart(label, jaxbObject, element);
-			} else {
-				payloadInputPart = new PayloadInputPart(label, element);
-			}
-			if (payloadInputPart != null) {
-				this.addPart(payloadInputPart);
-			}
-		}		
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.PoxPayload#createPart(java.lang.String, java.lang.Object, org.dom4j.Element)
+	 * 
+	 * We need this method because the generic base class has no way of calling our constructor.
+	 */
+	@Override
+	protected PayloadInputPart createPart(String label, Object jaxbObject, Element element) {
+		return new PayloadInputPart(label, jaxbObject, element);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.PoxPayload#createPart(java.lang.String, org.dom4j.Element)
+	 * 
+	 * We need this method because the generic base class has no way of calling our constructor.
+	 */
+	@Override
+	protected PayloadInputPart createPart(String label, Element element) {
+		return new PayloadInputPart(label, element);
+	}
+	
 }

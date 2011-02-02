@@ -1351,25 +1351,15 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     private PoxPayloadOut createCollectionObjectInstanceFromRawXml(String testName, String commonPartName,
             String commonPartFileName) throws Exception {
 
+    	PoxPayloadOut multipart = new PoxPayloadOut(CollectionObjectClient.SERVICE_PAYLOAD_NAME);
         String stringObject = getXmlDocumentAsString(commonPartFileName);
         if (logger.isDebugEnabled()) {
             logger.debug(testName + " to be created, collectionobject common " + "\n" + stringObject);
         }
-
-        // FIXME: Revise the following to use a new constructor or other method,
-        // coming to PoxPayloadOut, per Richard, that will accept a String representation
-        // of an XML payload.
-
-        // Current, the following is essentially non-functional and the tests which
-        // rely on this method are failing.
-        PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("##### poxpayloadout=" + "\n" + multipart.toXML());
-        }
+        PayloadOutputPart commonPart = multipart.addPart(commonPartName, stringObject);
+//        commonPart.setLabel(commonPartName);
 
         return multipart;
-
     }
 
     /**

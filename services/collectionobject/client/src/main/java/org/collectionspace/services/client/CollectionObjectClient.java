@@ -36,8 +36,8 @@ import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 import org.slf4j.Logger;
@@ -47,6 +47,8 @@ import org.slf4j.Logger;
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
 public class CollectionObjectClient extends AbstractServiceClientImpl {
+	public static final String SERVICE_PATH_COMPONENT = "collectionobjects"; //FIXME: REM - The JAX-RS proxy, client, and resource classes should ref this value
+	public static final String SERVICE_PAYLOAD_NAME = SERVICE_PATH_COMPONENT;
 
     /** The collection object proxy. */
     private CollectionObjectProxy collectionObjectProxy;
@@ -56,7 +58,7 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
 	 */
 	@Override
     public String getServicePathComponent() {
-		return "collectionobjects";
+		return SERVICE_PATH_COMPONENT;
 	}
 
     /**

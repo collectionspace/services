@@ -1,8 +1,5 @@
 package org.collectionspace.services.client;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
-
 import javax.ws.rs.core.MediaType;
 import org.dom4j.Element;
 
@@ -31,10 +28,6 @@ public class PayloadInputPart extends PayloadPart {
 			result = PoxPayload.toElement(getBody()).asXML();
 		}
 		return result;
-	}
-		
-	public <T> T getBody(Class<T> type, Type genericType) throws IOException {
-		return null;
 	}
 
 	public MediaType getMediaType() {

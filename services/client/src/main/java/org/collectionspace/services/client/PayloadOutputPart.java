@@ -1,7 +1,6 @@
 package org.collectionspace.services.client;
 
-import javax.ws.rs.core.MediaType;
-
+import org.dom4j.DocumentException;
 import org.dom4j.Element;
 
 public class PayloadOutputPart extends PayloadPart {
@@ -13,6 +12,14 @@ public class PayloadOutputPart extends PayloadPart {
 	PayloadOutputPart(String label, Element elementBody) {
 		super(label, elementBody);
 	}
+	
+	PayloadOutputPart(String label, String xmlBody) throws DocumentException {
+		super(label, xmlBody);
+	}	
+	
+	PayloadOutputPart(String label, Object body, Element elementBody) {
+		super(label, body, elementBody);
+	}	
 	
 	@Override
 	public String asXML() {

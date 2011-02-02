@@ -1,5 +1,6 @@
 package org.collectionspace.services.client;
 
+import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,20 @@ public abstract class PayloadPart {
 	public PayloadPart(String label, Object body) {
 		this(label);
 		this.body = body;
+	}
+		
+	/**
+	 * Instantiates a new payload part by parsing the XML string 'xmlPayload'
+	 *
+	 * @param label the label
+	 * @param xmlPayload the xml payload
+	 * @throws DocumentException the document exception
+	 */
+	public PayloadPart(String label, String xmlPayload) throws DocumentException {
+		this(label);
+		Element element = PoxPayload.toElement(xmlPayload);
+		this.elementBody = element;
+		
 	}
 
 	public PayloadPart(String label, Object body, Element elementBody) {

@@ -539,6 +539,7 @@ public class DocumentUtils {
 		DOMReader reader = new DOMReader();
 		org.dom4j.Document dom4jDoc = reader.read(document);
 		org.dom4j.Element result = dom4jDoc.getRootElement();
+		result.detach(); //return just the root element detached from the DOM document
 		
 		return result;//FIXME: REM - Add if (logger.isTraceEnabled() == true) logger.trace(document.asXML());
 	}

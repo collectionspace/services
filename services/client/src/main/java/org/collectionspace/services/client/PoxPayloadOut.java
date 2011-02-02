@@ -6,7 +6,10 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 
 // TODO: Auto-generated Javadoc
@@ -26,6 +29,36 @@ public class PoxPayloadOut extends PoxPayload<PayloadOutputPart> {
 		setPayloadName(payloadName);
 	}
 		
+	/**
+	 * Instantiates a new PoxPayloadOut, saves the xml, creates a DOM, and parses the parts.
+	 *
+	 * @param file the file
+	 * @throws DocumentException the document exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	protected PoxPayloadOut(File file) throws DocumentException, IOException {
+		super(file);		
+	}
+		
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.PoxPayload#createPart(java.lang.String, java.lang.Object, org.dom4j.Element)
+	 * 
+	 * We need this method because the generic base class has no way of calling our constructor.
+	 */
+	@Override
+	protected PayloadOutputPart createPart(String label, Object jaxbObject, Element element) {
+		return new PayloadOutputPart(label, jaxbObject, element);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.collectionspace.services.client.PoxPayload#createPart(java.lang.String, org.dom4j.Element)
+	 * 
+	 * We need this method because the generic base class has no way of calling our constructor.
+	 */
+	@Override
+	protected PayloadOutputPart createPart(String label, Element element) {
+		return new PayloadOutputPart(label, element);
+	}
 	
 	/**
 	 * Creates and returns an XML string representation of ourself.
@@ -44,7 +77,7 @@ public class PoxPayloadOut extends PoxPayload<PayloadOutputPart> {
 			PayloadOutputPart outPart = it.next();
 			Element element = outPart.asElement();			
 			if (element != null) {
-				root.add(element);
+				root.add(element.detach());
 			} else {
 				//Add if (logger.isTraceEnabled() == true) logger.trace("Output part: " + outPart.getLabel() + " was empty.");
 			}
@@ -78,6 +111,20 @@ public class PoxPayloadOut extends PoxPayload<PayloadOutputPart> {
 		getParts().add(result);
 		return result;
 	}
+	
+	/**
+	 * Adds a DOM4j Element part.
+	 *
+	 * @param label the label
+	 * @param elementBody the element body
+	 * @return the payload output part
+	 */
+	public PayloadOutputPart addPart(String label, String xmlBody) throws DocumentException { 
+		PayloadOutputPart result = new PayloadOutputPart(label, xmlBody);
+		getParts().add(result);
+		return result;
+	}
+	
 	
 	/**
 	 * Adds a JAXB object part.

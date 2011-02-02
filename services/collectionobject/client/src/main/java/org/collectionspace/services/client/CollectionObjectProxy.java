@@ -48,14 +48,14 @@ import org.collectionspace.services.collectionobject.CollectionobjectsCommonList
 
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
  * @version $Revision:$
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
-@Path("/collectionobjects/")
+@Path("/" + CollectionObjectClient.SERVICE_PATH_COMPONENT + "/")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
 public interface CollectionObjectProxy extends CollectionSpaceProxy {
@@ -70,7 +70,7 @@ public interface CollectionObjectProxy extends CollectionSpaceProxy {
     ClientResponse<CollectionobjectsCommonList> readList();
     
 //    /**
-//     * Read list.
+//     * Read list.  //FIXME: REM - Remove this dead code please.
 //     *
 //     * @param pageSize the page size
 //     * @param pageNumber the page number
