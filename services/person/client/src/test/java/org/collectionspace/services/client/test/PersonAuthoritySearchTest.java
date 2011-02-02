@@ -59,9 +59,16 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     private final String CLASS_NAME = PersonAuthoritySearchTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     
-    /** The service path component. */
-    final String SERVICE_PATH_COMPONENT = "personauthorities";
-    
+	@Override
+	public String getServicePathComponent() {
+		return PersonAuthorityClient.SERVICE_PATH_COMPONENT;
+	}
+
+	@Override
+	protected String getServiceName() {
+		return PersonAuthorityClient.SERVICE_NAME;
+	}
+        
     final String UTF8_CHARSET_NAME = "UTF-8";
     
     // Test name for partial term matching: Lech Wałęsa
@@ -567,14 +574,6 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
-     */
-    @Override
-    public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
-    }
-
 
     // ---------------------------------------------------------------
     // Utilities: setup routines for search tests

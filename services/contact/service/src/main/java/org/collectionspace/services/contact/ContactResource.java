@@ -60,12 +60,11 @@ import org.slf4j.LoggerFactory;
 @Produces("application/xml")
 public class ContactResource extends 
 		AbstractMultiPartCollectionSpaceResourceImpl {
-
-    /** The Constant serviceName. */
-    private final static String serviceName = ContactClient.SERVICE_PATH_COMPONENT;
-    
-    /** The logger. */
+	//
+    // The logger init
+	//
     final Logger logger = LoggerFactory.getLogger(ContactResource.class);
+    
     //FIXME retrieve client type from configuration
     /** The Constant CLIENT_TYPE. */
     final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType();
@@ -92,7 +91,7 @@ public class ContactResource extends
      */
     @Override
     public String getServiceName() {
-        return serviceName;
+        return ContactClient.SERVICE_NAME;
     }
 
     /* (non-Javadoc)

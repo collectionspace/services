@@ -80,13 +80,13 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     private final String UTF8_DATA_SAMPLE = "Audiorecording album cover signed by Lech "
             + "Wa" + '\u0142' + '\u0119' + "sa";
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
-     */
-    @Override
-    protected String getServicePathComponent() {
-        return new CollectionObjectClient().getServicePathComponent();
-    }
+//    /* (non-Javadoc)
+//     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
+//     */
+//    @Override
+//    protected String getServicePathComponent() {
+//        return new CollectionObjectClient().getServicePathComponent();
+//    }
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -826,7 +826,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
     private ClientResponse<String> updateSend(String testName, String id,
             CollectionobjectsCommon collectionObjectCommon) {
         setupUpdate();
-        PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
+        PoxPayloadOut output = new PoxPayloadOut(CollectionObjectClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = output.addPart(collectionObjectCommon, MediaType.APPLICATION_XML_TYPE);
         CollectionObjectClient client = new CollectionObjectClient();
         commonPart.setLabel(client.getCommonPartName());
@@ -1045,7 +1045,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         setupUpdate();
-        PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
+        PoxPayloadOut output = new PoxPayloadOut(CollectionObjectClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = output.addPart(collectionObjectCommon, MediaType.APPLICATION_XML_TYPE);
         CollectionObjectClient client = new CollectionObjectClient();
         commonPart.setLabel(client.getCommonPartName());
@@ -1325,7 +1325,7 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         CollectionobjectsCommon collectionObject =
                 (CollectionobjectsCommon) getObjectFromFile(CollectionobjectsCommon.class,
                 commonPartFileName);
-        PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
+        PoxPayloadOut multipart = new PoxPayloadOut(CollectionObjectClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(collectionObject,
                 MediaType.APPLICATION_XML_TYPE);
         CollectionObjectClient client = new CollectionObjectClient();

@@ -47,11 +47,18 @@ import org.slf4j.Logger;
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
 public class CollectionObjectClient extends AbstractServiceClientImpl {
-	public static final String SERVICE_PATH_COMPONENT = "collectionobjects"; //FIXME: REM - The JAX-RS proxy, client, and resource classes should ref this value
-	public static final String SERVICE_PAYLOAD_NAME = SERVICE_PATH_COMPONENT;
+	public static final String SERVICE_NAME = "collectionobjects";
+	public static final String SERVICE_PATH_COMPONENT = "/" + SERVICE_NAME;
+	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;	
+	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
     /** The collection object proxy. */
     private CollectionObjectProxy collectionObjectProxy;
+    
+	@Override
+	public String getServiceName() {
+		return SERVICE_NAME;
+	}
     
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
@@ -183,7 +190,7 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
      */
     public ClientResponse<String> update(String csid, PoxPayloadOut multipart) {
     	String payload = multipart.toXML();
-        return collectionObjectProxy.update(csid, payload);
+        return collectionObjectProxy.update(csid, payload.getBytes());
     }
 
     /**
@@ -198,4 +205,5 @@ public class CollectionObjectClient extends AbstractServiceClientImpl {
     public ClientResponse<Response> delete(String csid) {
         return collectionObjectProxy.delete(csid);
     }
+
 }

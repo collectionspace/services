@@ -37,18 +37,18 @@ import org.slf4j.LoggerFactory;
 /**
  * The Class PersonAuthorityResource.
  */
-@Path("/" + PersonAuthorityClient.SERVICE_PATH_COMPONENT)
+@Path(PersonAuthorityClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
 public class PersonAuthorityResource extends
 	AuthorityResourceWithContacts<PersonauthoritiesCommon, PersonauthoritiesCommonList, PersonsCommon,
 		PersonDocumentModelHandler> {
 
-    private final static String personAuthorityServiceName = "personauthorities";
-	private final static String PERSONAUTHORITIES_COMMON = "personauthorities_common";
+//    private final static String personAuthorityServiceName = "personauthorities";
+//	private final static String PERSONAUTHORITIES_COMMON = "personauthorities_common";
 	
-    private final static String personServiceName = "persons";
-	private final static String PERSONS_COMMON = "persons_common";
+//    private final static String personServiceName = "persons";
+//	private final static String PERSONS_COMMON = "persons_common";
     
     final Logger logger = LoggerFactory.getLogger(PersonAuthorityResource.class);
 
@@ -57,7 +57,7 @@ public class PersonAuthorityResource extends
      */
     public PersonAuthorityResource() {
 		super(PersonauthoritiesCommon.class, PersonAuthorityResource.class,
-				PERSONAUTHORITIES_COMMON, PERSONS_COMMON);
+				PersonAuthorityClient.SERVICE_COMMON_PART_NAME, PersonAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
     /* (non-Javadoc)
@@ -65,7 +65,7 @@ public class PersonAuthorityResource extends
      */
     @Override
     public String getServiceName() {
-        return personAuthorityServiceName;
+        return PersonAuthorityClient.SERVICE_NAME;
     }
 
     /**
@@ -75,7 +75,7 @@ public class PersonAuthorityResource extends
      */
     @Override
     public String getItemServiceName() {
-        return personServiceName;
+        return PersonAuthorityClient.SERVICE_ITEM_NAME;
     }
 
     @Override

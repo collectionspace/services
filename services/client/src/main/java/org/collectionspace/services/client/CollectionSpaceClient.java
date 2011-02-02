@@ -53,6 +53,8 @@ public interface CollectionSpaceClient {
      * @return the base url
      */
     String getBaseURL();
+    
+    String getServiceName();
 
     /**
      * Gets the http client.

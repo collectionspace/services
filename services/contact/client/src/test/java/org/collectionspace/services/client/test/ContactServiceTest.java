@@ -22,7 +22,6 @@
  */
 package org.collectionspace.services.client.test;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -39,7 +38,6 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 //import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
-import org.dom4j.DocumentException;
 
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -61,9 +59,21 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
-    final String SERVICE_PATH_COMPONENT = "contacts";
+//    final String SERVICE_PATH_COMPONENT = "contacts";
+    
     private String knownResourceId = null;
 
+	@Override
+	public String getServicePathComponent() {
+		return ContactClient.SERVICE_PATH_COMPONENT;
+	}
+
+
+	@Override
+	protected String getServiceName() {
+		return ContactClient.SERVICE_NAME;
+	}
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -653,13 +663,5 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         }
         Assert.assertEquals(statusCode, EXPECTED_STATUS);
 
-    }
-
-    // ---------------------------------------------------------------
-    // Utility methods used by tests above
-    // ---------------------------------------------------------------
-    @Override
-    public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
     }
 }

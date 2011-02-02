@@ -23,19 +23,18 @@ import org.jboss.resteasy.client.ClientResponse;
 /**
  * @version $Revision:$
  */
-@Path("/" + PersonAuthorityClient.SERVICE_PATH_COMPONENT + "/")
+@Path(PersonAuthorityClient.SERVICE_PATH + "/")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
 public interface PersonAuthorityProxy extends CollectionSpaceProxy {
 
     // List Personauthorities
     @GET
-    @Produces({"application/xml"})
     ClientResponse<PersonauthoritiesCommonList> readList();
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(String xmlPayload);
+    ClientResponse<Response> create(byte[] xmlPayload);
 
     //(R)ead
     @GET
@@ -50,7 +49,7 @@ public interface PersonAuthorityProxy extends CollectionSpaceProxy {
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<String> update(@PathParam("csid") String csid, String multipart);
+    ClientResponse<String> update(@PathParam("csid") String csid, byte[] xmlPayload);
 
     //(D)elete
     @DELETE
@@ -92,7 +91,7 @@ public interface PersonAuthorityProxy extends CollectionSpaceProxy {
     //(C)reate Item
     @POST
     @Path("/{vcsid}/items/")
-    ClientResponse<Response> createItem(@PathParam("vcsid") String vcsid, String xmlPayload);
+    ClientResponse<Response> createItem(@PathParam("vcsid") String vcsid, byte[] xmlPayload);
 
     //(R)ead Item
     @GET
@@ -117,7 +116,7 @@ public interface PersonAuthorityProxy extends CollectionSpaceProxy {
     //(U)pdate Item
     @PUT
     @Path("/{vcsid}/items/{csid}")
-    ClientResponse<String> updateItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid, String xmlPayload);
+    ClientResponse<String> updateItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid, byte[] xmlPayload);
 
     //(D)elete Item
     @DELETE
@@ -156,25 +155,25 @@ public interface PersonAuthorityProxy extends CollectionSpaceProxy {
     ClientResponse<Response> createContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
-            String xmlPayload);
+            byte[] xmlPayload);
     @POST
     @Path("/{parentcsid}/items/urn:cspace:name({itemspecifier})/contacts/")
     ClientResponse<Response> createContactForNamedItem(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemspecifier") String itemspecifier,
-            String xmlPayload);
+            byte[] xmlPayload);
     @POST
     @Path("/urn:cspace:name({parentspecifier})/items/{itemcsid}/contacts/")
     ClientResponse<Response> createContactForItemInNamedAuthority(
             @PathParam("parentspecifier") String parentspecifier,
             @PathParam("itemcsid") String itemcsid,
-            String xmlPayload);
+            byte[] xmlPayload);
     @POST
     @Path("/urn:cspace:name({parentspecifier})/items/urn:cspace:name({itemspecifier})/contacts/")
     ClientResponse<Response> createContactForNamedItemInNamedAuthority(
             @PathParam("parentspecifier") String parentspecifier,
             @PathParam("itemspecifier") String itemspecifier,
-            String xmlPayload);
+            byte[] xmlPayload);
 
      //(R)ead Contact
     @GET
@@ -209,28 +208,28 @@ public interface PersonAuthorityProxy extends CollectionSpaceProxy {
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid,
-            String xmlPayload);
+            byte[] xmlPayload);
     @PUT
     @Path("/{parentcsid}/items/urn:cspace:name({itemspecifier})/contacts/{csid}")
     ClientResponse<String> updateContactForNamedItem(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemspecifier") String itemspecifier,
             @PathParam("csid") String csid,
-            String xmlPayload);
+            byte[] xmlPayload);
     @PUT
     @Path("/urn:cspace:name({parentspecifier})/items/{itemcsid}/contacts/{csid}")
     ClientResponse<String> updateContactInNamedAuthority(
             @PathParam("parentspecifier") String parentspecifier,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid,
-            String xmlPayload);
+            byte[] xmlPayload);
     @PUT
     @Path("/urn:cspace:name({parentspecifier})/items/urn:cspace:name({itemspecifier})/contacts/{csid}")
     ClientResponse<String> updateContactForNamedItemInNamedAuthority(
             @PathParam("parentspecifier") String parentspecifier,
             @PathParam("itemspecifier") String itemspecifier,
             @PathParam("csid") String csid,
-            String xmlPayload);
+            byte[] xmlPayload);
 
     //(D)elete Contact
     @DELETE

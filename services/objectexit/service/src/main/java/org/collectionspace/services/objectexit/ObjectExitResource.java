@@ -23,25 +23,22 @@
  */
 package org.collectionspace.services.objectexit;
 
+import org.collectionspace.services.client.ObjectExitClient;
 import org.collectionspace.services.common.ResourceBase;
-import org.collectionspace.services.common.ClientType;
-import org.collectionspace.services.common.ServiceMain;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MultivaluedMap;
-import java.util.List;
 
-@Path("/objectexit")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Path(ObjectExitClient.SERVICE_PATH_COMPONENT)
+@Produces({"application/xml"})
+@Consumes({"application/xml"})
 public class ObjectExitResource extends ResourceBase {
 
     @Override
     public String getServiceName(){
-        return "objectexit";
-    };
+        return ObjectExitClient.SERVICE_NAME;
+    }
 
     @Override
     protected String getVersionString() {

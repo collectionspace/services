@@ -75,6 +75,13 @@ public abstract class AbstractServiceClientImpl implements
     	return logger;
     }
     
+    abstract public String getServicePathComponent();
+    
+    /**
+     * Returns a UTF-8 encode byte array from 'string'
+     *
+     * @return UTF-8 encoded byte array
+     */
     protected byte[] getBytes(String string) {
     	byte[] result = null;
     	try {
@@ -93,7 +100,7 @@ public abstract class AbstractServiceClientImpl implements
      * @return the common part name
      */
     public String getCommonPartName() {
-        return getCommonPartName(getServicePathComponent());
+        return getCommonPartName(getServiceName());
     }
 
     /**
@@ -103,16 +110,16 @@ public abstract class AbstractServiceClientImpl implements
      *            the service path component
      * @return the common part name
      */
-    public String getCommonPartName(String servicePathComponent) {
-        return servicePathComponent + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
+    public String getCommonPartName(String commonPrefix) {
+        return commonPrefix + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
     }
 
-    /**
-     * Gets the service path component.
-     *
-     * @return the service path component
-     */
-    abstract public String getServicePathComponent();
+//    /**
+//     * Gets the service path component.
+//     *
+//     * @return the service path component
+//     */
+//    abstract public String getServicePathComponent();
 
     /**
      * Instantiates a new abstract service client impl.

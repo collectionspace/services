@@ -48,14 +48,11 @@ import org.collectionspace.services.collectionobject.CollectionobjectsCommonList
 
 import org.jboss.resteasy.client.ClientResponse;
 
-//import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadIn;
-//import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
-
 /**
  * @version $Revision:$
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
-@Path("/" + CollectionObjectClient.SERVICE_PATH_COMPONENT + "/")
+@Path(CollectionObjectClient.SERVICE_PATH_COMPONENT + "/")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
 public interface CollectionObjectProxy extends CollectionSpaceProxy {

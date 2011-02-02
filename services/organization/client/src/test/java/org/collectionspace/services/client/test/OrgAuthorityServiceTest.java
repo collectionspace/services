@@ -34,6 +34,7 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.ContactClientUtils;
 import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.contact.ContactsCommon;
@@ -70,15 +71,15 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     private final String CLASS_NAME = OrgAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
-    // Instance variables specific to this test.
-    /** The service path component. */
-    final String SERVICE_PATH_COMPONENT = "orgauthorities";
-    
-    /** The item service path component. */
-    final String ITEM_SERVICE_PATH_COMPONENT = "items";
-    
-    /** The contact service path component. */
-    final String CONTACT_SERVICE_PATH_COMPONENT = "contacts";
+	@Override
+	public String getServicePathComponent() {
+		return OrgAuthorityClient.SERVICE_PATH_COMPONENT;
+	}
+
+	@Override
+	protected String getServiceName() {
+		return OrgAuthorityClient.SERVICE_NAME;
+	}    
     
     /** The test organization shortname. */
     private final String TEST_ORG_SHORTNAME = "Test Org";
@@ -2098,18 +2099,13 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
      */
-    @Override
-    public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
-    }
-
     /**
      * Gets the item service path component.
      *
      * @return the item service path component
      */
     public String getItemServicePathComponent() {
-        return ITEM_SERVICE_PATH_COMPONENT;
+        return OrgAuthorityClient.SERVICE_PATH_ITEMS_COMPONENT;
     }
 
     /**
@@ -2118,7 +2114,7 @@ public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
      * @return the contact service path component
      */
     public String getContactServicePathComponent() {
-        return CONTACT_SERVICE_PATH_COMPONENT;
+        return ContactClient.SERVICE_PATH_COMPONENT;
     }
 
     /**

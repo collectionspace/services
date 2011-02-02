@@ -164,6 +164,8 @@ public abstract class BaseServiceTest {
      * @return The URL path component of the service.
      */
     protected abstract String getServicePathComponent();
+    
+    protected abstract String getServiceName();
 
     /**
      * Reinitializes setup values, to help expose any unintended reuse
@@ -217,7 +219,7 @@ public abstract class BaseServiceTest {
      * @return The root URL for a service.
      */
     protected String getServiceRootURL() {
-        return serviceClient.getBaseURL() + getServicePathComponent();
+        return serviceClient.getBaseURL() + getServiceName();//getServicePathComponent();
     }
 
     /**

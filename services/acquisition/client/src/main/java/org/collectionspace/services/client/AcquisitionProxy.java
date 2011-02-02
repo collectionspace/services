@@ -17,7 +17,7 @@ import org.jboss.resteasy.client.ClientResponse;
 /**
  * @version $Revision:$
  */
-@Path("/" + AcquisitionClient.SERVICE_PATH_COMPONENT + "/")
+@Path(AcquisitionClient.SERVICE_PATH + "/")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
 public interface AcquisitionProxy extends CollectionSpaceProxy {

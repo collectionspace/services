@@ -19,24 +19,24 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 /**
  * @version $Revision: 2108 $
  */
-@Path("/objectexit/")
-@Produces({"multipart/mixed"})
-@Consumes({"multipart/mixed"})
+@Path(ObjectExitClient.SERVICE_PATH_COMPONENT + "/")
+@Produces({"application/xml"})
+@Consumes({"application/xml"})
 public interface ObjectExitProxy extends CollectionSpaceProxy {
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(MultipartOutput multipart);
+    ClientResponse<Response> create(byte[] xmlPayload);
 
     //(R)ead
     @GET
     @Path("/{csid}")
-    ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
+    ClientResponse<String> read(@PathParam("csid") String csid);
 
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<MultipartInput> update(@PathParam("csid") String csid, MultipartOutput multipart);
+    ClientResponse<String> update(@PathParam("csid") String csid, byte[] xmlPayload);
 
     //(D)elete
     @DELETE
@@ -45,12 +45,10 @@ public interface ObjectExitProxy extends CollectionSpaceProxy {
     
     // List
     @GET
-    @Produces({"application/xml"})
     ClientResponse<ObjectexitCommonList> readList();
 
     // List Authority References
     @GET
-    @Produces({"application/xml"})
     @Path("/{csid}/authorityrefs/")
     ClientResponse<AuthorityRefList> getAuthorityRefs(@PathParam("csid") String csid);
     

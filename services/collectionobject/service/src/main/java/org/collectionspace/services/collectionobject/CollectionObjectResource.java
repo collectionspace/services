@@ -95,14 +95,11 @@ import org.slf4j.LoggerFactory;
 /**
  * The Class CollectionObjectResource.
  */
-@Path("/" + CollectionObjectClient.SERVICE_PATH_COMPONENT)
+@Path(CollectionObjectClient.SERVICE_PATH_COMPONENT)
 @Consumes("application/xml")
 @Produces("application/xml")
 public class CollectionObjectResource
         extends AbstractMultiPartCollectionSpaceResourceImpl {
-
-    /** The Constant serviceName. */
-    static final public String serviceName = CollectionObjectClient.SERVICE_PATH_COMPONENT;
     
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(CollectionObjectResource.class);
@@ -122,7 +119,7 @@ public class CollectionObjectResource
      */
     @Override
     public String getServiceName() {
-        return serviceName;
+        return CollectionObjectClient.SERVICE_PATH_COMPONENT;
     }
     
     /* (non-Javadoc)

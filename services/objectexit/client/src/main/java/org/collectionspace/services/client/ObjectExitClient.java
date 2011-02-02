@@ -39,12 +39,16 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  *
  */
 public class ObjectExitClient extends AbstractServiceClientImpl {
-
+	public static final String SERVICE_NAME = "objectexit";
+	public static final String SERVICE_PATH_COMPONENT = "/" + SERVICE_NAME;
+	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
+	
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */
+	@Override
     public String getServicePathComponent() {
-        return "objectexit"; //Laramie20100824 was objectexits, but label was a mismatch.
+        return SERVICE_NAME; //Laramie20100824 was objectexits, but label was a mismatch.
     }
     /**
      *
@@ -116,7 +120,7 @@ public class ObjectExitClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.ObjectExitProxy#getObjectExit(java.lang.String)
      */
-    public ClientResponse<MultipartInput> read(String csid) {
+    public ClientResponse<String> read(String csid) {
         return objectexitProxy.read(csid);
     }
 
@@ -147,4 +151,10 @@ public class ObjectExitClient extends AbstractServiceClientImpl {
     public ClientResponse<Response> delete(String csid) {
         return objectexitProxy.delete(csid);
     }
+
+	@Override
+	public String getServiceName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

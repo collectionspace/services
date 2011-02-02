@@ -67,10 +67,18 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
-    final String SERVICE_PATH_COMPONENT = "orgauthorities";
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     final String ORG_AUTHORITY_NAME = "TestOrgAuth";
     
+	@Override
+	public String getServicePathComponent() {
+		return OrgAuthorityClient.SERVICE_PATH_COMPONENT;
+	}
+
+	@Override
+	protected String getServiceName() {
+		return OrgAuthorityClient.SERVICE_NAME;
+	}
 
     private String knownResourceId = null;
     private String knownResourceRefName = null;
@@ -477,16 +485,5 @@ public class OrgAuthorityAuthRefsTest extends BaseServiceTest {
             // below are ignored and not reported.
             client.delete(resourceId).releaseConnection();
         }
-    }
-
-    // ---------------------------------------------------------------
-    // Utility methods used by tests above
-    // ---------------------------------------------------------------
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
-     */
-    @Override
-    public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
     }
 }

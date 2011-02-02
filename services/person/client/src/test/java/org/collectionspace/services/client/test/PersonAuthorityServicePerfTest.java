@@ -57,8 +57,8 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
-    final String SERVICE_PATH_COMPONENT = "personauthorities";
-    final String ITEM_SERVICE_PATH_COMPONENT = "items";
+//    final String SERVICE_PATH_COMPONENT = "personauthorities";
+//    final String ITEM_SERVICE_PATH_COMPONENT = "items";
     private String authId = null;
     private String authRefName = null;
     private List<String> allItemIdsCreated = new ArrayList<String>();
@@ -92,6 +92,16 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
     		shortTestLimit*shortTestLimit,
     		shortTestLimit, };
     private boolean runFullTest = false;
+    
+	@Override
+	public String getServicePathComponent() {
+		return PersonAuthorityClient.SERVICE_PATH_COMPONENT;
+	}
+
+	@Override
+	protected String getServiceName() {
+		return PersonAuthorityClient.SERVICE_NAME;
+	}
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -322,11 +332,6 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-    @Override
-    public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
-    }
-
     /**
      * Deletes all resources created by tests, after all tests have been run.
      *

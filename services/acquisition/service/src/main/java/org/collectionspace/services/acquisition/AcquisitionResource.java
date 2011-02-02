@@ -72,14 +72,12 @@ import org.slf4j.LoggerFactory;
  * Handles requests to the Acquisition service, orchestrates the retrieval
  * of relevant resources, and returns responses to the client.
  */
-@Path("/" + AcquisitionClient.SERVICE_PATH_COMPONENT)
+@Path(AcquisitionClient.SERVICE_PATH)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
 public class AcquisitionResource
         extends AbstractMultiPartCollectionSpaceResourceImpl {
 
-    /** The service name. */
-    final private String serviceName = "acquisitions";
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(AcquisitionResource.class);
 
@@ -98,7 +96,7 @@ public class AcquisitionResource
      */
     @Override
     public String getServiceName() {
-        return serviceName;
+        return AcquisitionClient.SERVICE_NAME;
     }
 
     @Override

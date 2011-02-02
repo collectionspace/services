@@ -16,13 +16,12 @@ import org.jboss.resteasy.client.ClientResponse;
 /**
  * @version $Revision:$
  */
-@Path("/" + ContactClient.SERVICE_PATH_COMPONENT + "/")
+@Path(ContactClient.SERVICE_PATH + "/")
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
 public interface ContactProxy extends CollectionSpaceProxy {
 
     @GET
-    @Produces({"application/xml"})
     ClientResponse<ContactsCommonList> readList();
 
     //(C)reate

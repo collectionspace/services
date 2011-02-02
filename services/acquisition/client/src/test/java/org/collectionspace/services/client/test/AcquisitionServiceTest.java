@@ -66,6 +66,17 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
     /** The known resource id. */
     private String knownResourceId = null;
 
+	@Override
+	public String getServicePathComponent() {
+		return AcquisitionClient.SERVICE_PATH_COMPONENT;
+	}
+
+
+	@Override
+	protected String getServiceName() {
+		return AcquisitionClient.SERVICE_NAME;
+	}
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -788,14 +799,6 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
-     */
-    @Override
-    public String getServicePathComponent() {
-        return new AcquisitionClient().getServicePathComponent();
-    }
-
 
     /**
      * Creates the acquisition instance.

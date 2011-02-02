@@ -65,16 +65,16 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     /** The logger. */
     private final String CLASS_NAME = PersonAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    
+	@Override
+	public String getServicePathComponent() {
+		return PersonAuthorityClient.SERVICE_PATH_COMPONENT;
+	}
 
-    // Instance variables specific to this test.
-    /** The service path component. */
-    final String SERVICE_PATH_COMPONENT = "personauthorities";
-    
-    /** The item service path component. */
-    final String ITEM_SERVICE_PATH_COMPONENT = "items";
-    
-    /** The contact service path component. */
-    final String CONTACT_SERVICE_PATH_COMPONENT = "contacts";
+	@Override
+	protected String getServiceName() {
+		return PersonAuthorityClient.SERVICE_NAME;
+	}    
     
     /** The test forename. */
     final String TEST_FORE_NAME = "John";
@@ -2331,21 +2331,13 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
-     */
-    @Override
-    public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
-    }
-
     /**
      * Gets the item service path component.
      *
      * @return the item service path component
      */
     public String getItemServicePathComponent() {
-        return ITEM_SERVICE_PATH_COMPONENT;
+        return PersonAuthorityClient.SERVICE_PATH_ITEMS_COMPONENT;
     }
 
     /**
@@ -2354,7 +2346,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
      * @return the contact service path component
      */
     public String getContactServicePathComponent() {
-        return CONTACT_SERVICE_PATH_COMPONENT;
+        return ContactClient.SERVICE_PATH_COMPONENT;
     }
 
     /**

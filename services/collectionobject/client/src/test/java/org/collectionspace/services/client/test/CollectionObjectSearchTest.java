@@ -87,13 +87,13 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
     /* Use this to keep track of resources to delete */
     private List<String> allResourceIdsCreated = new ArrayList<String>();
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
-     */
-    @Override
-    protected String getServicePathComponent() {
-        return new CollectionObjectClient().getServicePathComponent();
-    }
+//    /* (non-Javadoc)
+//     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
+//     */
+//    @Override
+//    protected String getServicePathComponent() {
+//        return new CollectionObjectClient().getServicePathComponent(); //FIXME: REM = Remove all refs to this method.
+//    }
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
