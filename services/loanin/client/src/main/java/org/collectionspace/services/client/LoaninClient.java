@@ -27,8 +27,6 @@ import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
@@ -40,20 +38,8 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  */
 public class LoaninClient extends AbstractServiceClientImpl {
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
-     */
-    public String getServicePathComponent() {
-        return "loansin";
-    }
-    /**
-     *
-     */
-//    private static final LoaninClient instance = new LoaninClient();
-    /**
-     *
-     */
     private LoaninProxy loaninProxy;
+    public static final String SERVICE_PATH_COMPONENT = "loansin";
 
     /**
      *
@@ -65,7 +51,14 @@ public class LoaninClient extends AbstractServiceClientImpl {
         RegisterBuiltin.register(factory);
         setProxy();
     }
-    
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
+     */
+    public String getServicePathComponent() {
+        return SERVICE_PATH_COMPONENT;
+    }
+
     @Override
     public CollectionSpaceProxy getProxy() {
     	return this.loaninProxy;
@@ -116,7 +109,7 @@ public class LoaninClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.LoaninProxy#getLoanin(java.lang.String)
      */
-    public ClientResponse<MultipartInput> read(String csid) {
+    public ClientResponse<String> read(String csid) {
         return loaninProxy.read(csid);
     }
 
@@ -125,8 +118,9 @@ public class LoaninClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.LoaninProxy#createLoanin(org.collectionspace.hello.Loanin)
      */
-    public ClientResponse<Response> create(MultipartOutput multipart) {
-        return loaninProxy.create(multipart);
+    public ClientResponse<Response> create(PoxPayloadOut multipart) {
+        String payload = multipart.toXML();
+        return loaninProxy.create(payload);
     }
 
     /**
@@ -135,8 +129,9 @@ public class LoaninClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.LoaninProxy#updateLoanin(java.lang.Long, org.collectionspace.hello.Loanin)
      */
-    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
-        return loaninProxy.update(csid, multipart);
+    public ClientResponse<String> update(String csid, PoxPayloadOut multipart) {
+        String payload = multipart.toXML();
+        return loaninProxy.update(csid, payload);
 
     }
 
