@@ -132,7 +132,7 @@ public class PersonDocumentModelHandler
 	
     /**
      * Produces a default displayName from the basic name and dates fields.
-     * @see PersonAuthorityClientUtils.prepareDefaultDisplayName() which
+     * see PersonAuthorityClientUtils.prepareDefaultDisplayName(String,String,String,String,String) which
      * duplicates this logic, until we define a service-general utils package
      * that is neither client nor service specific.
      * @param foreName	
