@@ -47,9 +47,6 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
 
-
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,8 +55,8 @@ import org.slf4j.LoggerFactory;
  * The Class NoteResource.
  */
 @Path("/notes")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Consumes("application/xml")
+@Produces("application/xml;charset=UTF-8")
 public class NoteResource extends 
 		AbstractMultiPartCollectionSpaceResourceImpl {
 
@@ -113,9 +110,10 @@ public class NoteResource extends
 		 * 
 		 * @return the response
 		 */
-		@POST
-    public Response createNote(PoxPayloadIn input) {
+    @POST
+    public Response createNote(String xmlText) {
         try {
+            PoxPayloadIn input = new PoxPayloadIn(xmlText);
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
@@ -142,7 +140,7 @@ public class NoteResource extends
      */
     @GET
     @Path("{csid}")
-    public PoxPayloadOut getNote(
+    public String getNote(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getNote with csid=" + csid);
@@ -182,7 +180,7 @@ public class NoteResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.toXML();
     }
 
     /**
@@ -223,9 +221,9 @@ public class NoteResource extends
      */
     @PUT
     @Path("{csid}")
-    public PoxPayloadOut updateNote(
+    public String updateNote(
             @PathParam("csid") String csid,
-            PoxPayloadIn theUpdate) {
+            String xmlText) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateNote with csid=" + csid);
         }
@@ -238,7 +236,8 @@ public class NoteResource extends
         }
         PoxPayloadOut result = null;
         try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate);
+            PoxPayloadIn update = new PoxPayloadIn(xmlText);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(update);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = ctx.getOutput();
@@ -255,7 +254,7 @@ public class NoteResource extends
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.toXML();
     }
 
     /**

@@ -86,6 +86,7 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new PersonAuthorityResource());
         singletons.add(new OrgAuthorityResource());
         singletons.add(new NewRelationResource());
+        singletons.add(new NoteResource());
         singletons.add(new LoaninResource());
         singletons.add(new LoanoutResource());
         singletons.add(new AcquisitionResource());
@@ -97,7 +98,6 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new LocationAuthorityResource());
         singletons.add(new IDResource());
 
-        singletons.add(new NoteResource());
         singletons.add(new ReportResource());
 */
 
