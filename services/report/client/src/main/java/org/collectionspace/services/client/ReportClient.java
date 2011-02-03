@@ -26,7 +26,6 @@
  */
 package org.collectionspace.services.client;
 
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
@@ -37,8 +36,6 @@ import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
@@ -49,20 +46,9 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  */
 public class ReportClient extends AbstractServiceClientImpl {
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
-     */
-    public String getServicePathComponent() {
-        return "reports";
-    }
-    /**
-     *
-     */
-//    private static final ReportClient instance = new ReportClient();
-    /**
-     *
-     */
     private ReportProxy reportProxy;
+    public static final String SERVICE_NAME = "reports";
+    public static final String SERVICE_PATH_COMPONENT = "reports";
 
     /**
      *
@@ -74,6 +60,19 @@ public class ReportClient extends AbstractServiceClientImpl {
         RegisterBuiltin.register(factory);
         setProxy();
     }
+
+    @Override
+    public String getServiceName() {
+        return SERVICE_NAME;
+    }
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
+     */
+    public String getServicePathComponent() {
+        return SERVICE_PATH_COMPONENT;
+    }
+
 
     @Override
     public CollectionSpaceProxy getProxy() {
@@ -92,15 +91,6 @@ public class ReportClient extends AbstractServiceClientImpl {
                     getBaseURL());
         }
     }
-
-    /**
-     * FIXME Comment this
-     *
-     * @return
-     */
-//    public static ReportClient getInstance() {
-//        return instance;
-//    }
 
     /**
      * @return
@@ -125,7 +115,7 @@ public class ReportClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.ReportProxy#getReport(java.lang.String)
      */
-    public ClientResponse<MultipartInput> read(String csid) {
+    public ClientResponse<String> read(String csid) {
         return reportProxy.read(csid);
     }
 
@@ -134,8 +124,9 @@ public class ReportClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.ReportProxy#createReport(org.collectionspace.hello.Report)
      */
-    public ClientResponse<Response> create(MultipartOutput multipart) {
-        return reportProxy.create(multipart);
+    public ClientResponse<Response> create(PoxPayloadOut multipart) {
+        String payload = multipart.toXML();
+        return reportProxy.create(payload);
     }
 
     /**
@@ -144,8 +135,9 @@ public class ReportClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.ReportProxy#updateReport(java.lang.Long, org.collectionspace.hello.Report)
      */
-    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
-        return reportProxy.update(csid, multipart);
+    public ClientResponse<String> update(String csid, PoxPayloadOut multipart) {
+        String payload = multipart.toXML();
+        return reportProxy.update(csid, payload);
 
     }
 
@@ -157,4 +149,6 @@ public class ReportClient extends AbstractServiceClientImpl {
     public ClientResponse<Response> delete(String csid) {
         return reportProxy.delete(csid);
     }
+
+
 }

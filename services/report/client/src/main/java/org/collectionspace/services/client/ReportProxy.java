@@ -40,16 +40,14 @@ import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.report.ReportsCommonList;
 import org.collectionspace.services.person.PersonsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
  * @version $Revision:$
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
 @Path("/reports/")
-@Produces({"multipart/mixed"})
-@Consumes({"multipart/mixed"})
+@Produces({"application/xml;charset=UTF-8"})
+@Consumes({"application/xml"})
 public interface ReportProxy extends CollectionSpaceProxy {
 
     /**
@@ -69,7 +67,7 @@ public interface ReportProxy extends CollectionSpaceProxy {
      * @return the client response
      */
     @POST
-    ClientResponse<Response> create(MultipartOutput multipart);
+    ClientResponse<Response> create(String payload);
 
     //(R)ead
     /**
@@ -80,7 +78,7 @@ public interface ReportProxy extends CollectionSpaceProxy {
      */
     @GET
     @Path("/{csid}")
-    ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
+    ClientResponse<String> read(@PathParam("csid") String csid);
 
     //(U)pdate
     /**
@@ -92,7 +90,7 @@ public interface ReportProxy extends CollectionSpaceProxy {
      */
     @PUT
     @Path("/{csid}")
-    ClientResponse<MultipartInput> update(@PathParam("csid") String csid, MultipartOutput multipart);
+    ClientResponse<String> update(@PathParam("csid") String csid, String payload);
 
     //(D)elete
     /**
