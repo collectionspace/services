@@ -133,4 +133,10 @@ public class AccountRoleClient extends AbstractServiceClientImpl {
     public ClientResponse<Response> delete(String csid) {
         return accountRoleProxy.delete(csid);
     }
+
+	@Override
+	public String getServiceName() {
+		// TODO Auto-generated method stub
+		return null; //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3497
+	}
 }

@@ -144,4 +144,10 @@ public class AccountClient extends AbstractServiceClientImpl {
     public String getTenantId() {
         return getProperty(AccountClient.TENANT_PROPERTY);
     }
+
+	@Override
+	public String getServiceName() {
+		// TODO Auto-generated method stub
+		return null; //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3497
+	}
 }

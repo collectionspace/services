@@ -54,7 +54,7 @@ public class OrgAuthorityClient extends AbstractServiceClientImpl {
 	//
 	public static final String SERVICE_ITEM_NAME = "organizations";
 	public static final String SERVICE_PATH_ITEMS_COMPONENT = "items";	//FIXME: REM - This should be defined in an AuthorityClient base class
-	public static final String SERVICE_ITEM_PAYLOAD_NAME = SERVICE_PATH_ITEMS_COMPONENT;
+	public static final String SERVICE_ITEM_PAYLOAD_NAME = SERVICE_ITEM_NAME;
 	//
 	// Payload Part/Schema part names
 	//

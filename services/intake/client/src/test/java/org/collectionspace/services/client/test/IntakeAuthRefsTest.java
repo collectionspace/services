@@ -82,6 +82,11 @@ public class IntakeAuthRefsTest extends BaseServiceTest {
     private String valuerRefName = null;
     private final int NUM_AUTH_REFS_EXPECTED = 5;
 
+	@Override
+	protected String getServiceName() {
+		throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
+	}
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */

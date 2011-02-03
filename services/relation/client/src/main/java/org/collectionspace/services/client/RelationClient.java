@@ -41,17 +41,20 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * The Class RelationClient.
  */
 public class RelationClient extends AbstractServiceClientImpl {
+	public static final String SERVICE_NAME = "relations";
+	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
+	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
+	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
+	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.collectionspace.services.client.BaseServiceClient#getServicePathComponent
-	 * ()
-	 */
+	@Override
+	public String getServiceName() {
+		return SERVICE_NAME;
+	}
+
 	@Override
 	public String getServicePathComponent() {
-		return "relations";
+		return SERVICE_PATH_COMPONENT;
 	}
 
 	/** The relation proxy. */

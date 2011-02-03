@@ -36,9 +36,9 @@ import org.apache.log4j.BasicConfigurator;
 import org.collectionspace.services.OrganizationJAXBSchema;
 import org.collectionspace.services.client.OrgAuthorityClient;
 import org.collectionspace.services.client.OrgAuthorityClientUtils;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

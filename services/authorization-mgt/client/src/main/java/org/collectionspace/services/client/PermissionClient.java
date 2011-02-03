@@ -135,4 +135,10 @@ public class PermissionClient extends AbstractServiceClientImpl {
     public ClientResponse<Response> delete(String csid) {
         return permissionProxy.delete(csid);
     }
+
+	@Override
+	public String getServiceName() {
+		// TODO Auto-generated method stub
+		return null; //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3497
+	}
 }

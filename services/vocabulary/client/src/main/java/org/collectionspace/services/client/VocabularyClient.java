@@ -42,13 +42,22 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * The Class VocabularyClient.
  */
 public class VocabularyClient extends AbstractServiceClientImpl {
-
-	public static final String SERVICE_PATH_COMPONENT = "vocabularies"; //FIXME: REM - The JAX-RS proxy, client, and resource classes should ref this value
-	public static final String SERVICE_PATH_ITEMS_COMPONENT = "items"; //FIXME: REM - The JAX-RS proxy, client, and resource classes should ref this value
+	public static final String SERVICE_NAME = "vocabularies";
+	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
+	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
+	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
+	//
+	// Subitem constants
+	//
+	public static final String SERVICE_ITEM_NAME = "persons";
+	public static final String SERVICE_PATH_ITEMS_COMPONENT = "items";	//FIXME: REM - This should be defined in an AuthorityClient base class
+	public static final String SERVICE_ITEM_PAYLOAD_NAME = SERVICE_ITEM_NAME;
 	
-	public static final String SERVICE_PAYLOAD_NAME = SERVICE_PATH_COMPONENT;
-	public static final String SERVICE_ITEM_PAYLOAD_NAME = "vocabularyitems";
-
+	@Override
+	public String getServiceName() {
+		return SERVICE_NAME;
+	}
+	
 	/* (non-Javadoc)
      * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
      */

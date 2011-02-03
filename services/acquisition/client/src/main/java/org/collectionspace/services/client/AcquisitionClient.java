@@ -19,6 +19,7 @@ public class AcquisitionClient extends AbstractServiceClientImpl {
 	public static final String SERVICE_NAME = "acquisitions";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
+	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
 	@Override

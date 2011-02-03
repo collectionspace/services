@@ -41,6 +41,7 @@ import org.collectionspace.services.client.AccountFactory;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionObjectFactory;
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
 import org.collectionspace.services.client.test.BaseServiceTest;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
@@ -211,7 +212,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "barney", true, "barney08", true);
         String identifier = BaseServiceTest.createIdentifier();
-        MultipartOutput multipart = createCollectionObjectInstance(
+        PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
         if (logger.isDebugEnabled()) {
@@ -241,7 +242,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         String pass = collectionObjectClient.getProperty(collectionObjectClient.PASSWORD_PROPERTY);
         collectionObjectClient.setAuth(false, user, true, pass, true);
         String identifier = BaseServiceTest.createIdentifier();
-        MultipartOutput multipart = createCollectionObjectInstance(
+        PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
         if (logger.isDebugEnabled()) {
@@ -262,7 +263,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "george", true, "george08", true);
         String identifier = BaseServiceTest.createIdentifier();
-        MultipartOutput multipart = createCollectionObjectInstance(
+        PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
 
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
@@ -287,7 +288,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         String user = collectionObjectClient.getProperty(collectionObjectClient.USER_PROPERTY);
         collectionObjectClient.setAuth(true, user, true, "", false);
         String identifier = BaseServiceTest.createIdentifier();
-        MultipartOutput multipart = createCollectionObjectInstance(
+        PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
         if (logger.isDebugEnabled()) {
@@ -308,7 +309,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "foo", true, "bar", true);
         String identifier = BaseServiceTest.createIdentifier();
-        MultipartOutput multipart = createCollectionObjectInstance(
+        PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
         if (logger.isDebugEnabled()) {
@@ -330,7 +331,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         String user = collectionObjectClient.getProperty(collectionObjectClient.USER_PROPERTY);
         collectionObjectClient.setAuth(true, user, true, "bar", true);
         String identifier = BaseServiceTest.createIdentifier();
-        MultipartOutput multipart = createCollectionObjectInstance(
+        PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
         if (logger.isDebugEnabled()) {
@@ -351,7 +352,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "foo", true, "bar", true);
         String identifier = BaseServiceTest.createIdentifier();
-        MultipartOutput multipart = createCollectionObjectInstance(
+        PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
         if (logger.isDebugEnabled()) {
@@ -373,7 +374,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         CollectionObjectClient collectionObjectClient = new CollectionObjectClient();
         collectionObjectClient.setAuth(true, "babybop", true, "babybop09", true);
         String identifier = BaseServiceTest.createIdentifier();
-        MultipartOutput multipart = createCollectionObjectInstance(
+        PoxPayloadOut multipart = createCollectionObjectInstance(
                 collectionObjectClient.getCommonPartName(), identifier);
         ClientResponse<Response> res = collectionObjectClient.create(multipart);
         if (logger.isDebugEnabled()) {
@@ -436,7 +437,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      *
      * @return the multipart output
      */
-    private MultipartOutput createCollectionObjectInstance(
+    private PoxPayloadOut createCollectionObjectInstance(
             String commonPartName, String identifier) {
         return createCollectionObjectInstance(commonPartName, "objectNumber-"
                 + identifier, "title-" + identifier);
@@ -451,7 +452,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
      *
      * @return the multipart output
      */
-    private MultipartOutput createCollectionObjectInstance(
+    private PoxPayloadOut createCollectionObjectInstance(
             String commonPartName, String objectNumber, String title) {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
 
@@ -462,7 +463,7 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
         titleGroup.setTitle(title);
         titleGroups.add(titleGroup);
         collectionObject.setTitleGroupList(titleGroupList);
-        MultipartOutput multipart =
+        PoxPayloadOut multipart =
                 CollectionObjectFactory.createCollectionObjectInstance(
                 commonPartName, collectionObject, null, null);
 

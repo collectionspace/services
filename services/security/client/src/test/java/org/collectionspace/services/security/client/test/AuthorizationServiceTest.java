@@ -54,10 +54,13 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.DimensionClient;
 import org.collectionspace.services.client.DimensionFactory;
 import org.collectionspace.services.client.IntakeClient;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PermissionClient;
 import org.collectionspace.services.client.PermissionFactory;
 import org.collectionspace.services.client.PermissionRoleClient;
 import org.collectionspace.services.client.PermissionRoleFactory;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.RoleFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
@@ -266,7 +269,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         dimension.setDimension("dimensionType");
         dimension.setValue("value-" + identifier);
         dimension.setValueDate(new Date().toString());
-        MultipartOutput multipart = DimensionFactory.createDimensionInstance(client.getCommonPartName(),
+        PoxPayloadOut multipart = DimensionFactory.createDimensionInstance(client.getCommonPartName(),
                 dimension);
         ClientResponse<Response> res = client.create(multipart);
 
@@ -322,7 +325,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
      * @param depositor the depositor
      * @return the multipart output
      */
-    private MultipartOutput createIntakeInstance(String entryNumber,
+    private PoxPayloadOut createIntakeInstance(String entryNumber,
     		String entryDate,
     		String depositor) {
         IntakesCommon intake = new IntakesCommon();
@@ -330,10 +333,10 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         intake.setEntryDate(entryDate);
         intake.setDepositor(depositor);
 
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart =
+        PoxPayloadOut multipart = new PoxPayloadOut(IntakeClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart =
             multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new IntakeClient().getCommonPartName());
+        commonPart.setLabel(new IntakeClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, intake common");
@@ -365,7 +368,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         dimension.setDimension("dimensionType");
         dimension.setValue("value-" + identifier);
         dimension.setValueDate(new Date().toString());
-        MultipartOutput multipart = DimensionFactory.createDimensionInstance(client.getCommonPartName(),
+        PoxPayloadOut multipart = DimensionFactory.createDimensionInstance(client.getCommonPartName(),
                 dimension);
         ClientResponse<Response> res = client.create(multipart);
 
@@ -437,7 +440,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         DimensionClient client = new DimensionClient();
         //elmo allowed to read
         client.setAuth(true, "elmo2010", true, "elmo2010", true);
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -449,7 +452,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         DimensionsCommon dimension = (DimensionsCommon) extractPart(input,
                 client.getCommonPartName(), DimensionsCommon.class);
         Assert.assertNotNull(dimension);
@@ -469,7 +472,7 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         DimensionClient client = new DimensionClient();
         //lockedOut allowed to read
         client.setAuth(true, "lockedOut", true, "lockedOut", true);
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -536,11 +539,11 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
         dimension.setValue("updated-" + dimension.getValue());
         dimension.setValueDate("updated-" + dimension.getValueDate());
         // Submit the request to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(dimension, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
+        PoxPayloadOut output = new PoxPayloadOut(DimensionClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(dimension, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getCommonPartName());
 
-        ClientResponse<MultipartInput> res = client.update(knownResourceId, output);
+        ClientResponse<String> res = client.update(knownResourceId, output);
         int statusCode = res.getStatus();
         // Check the status code of the response: does it match the expected response(s)?
         if (logger.isDebugEnabled()) {

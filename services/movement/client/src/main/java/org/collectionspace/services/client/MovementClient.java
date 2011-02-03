@@ -36,11 +36,13 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  *
  */
 public class MovementClient extends AbstractServiceClientImpl {
+    public static final String SERVICE_NAME = "movements";
+	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
+	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
+	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
+	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
     private MovementProxy movementProxy;
-    public static final String SERVICE_NAME = "movements";
-    public static final String SERVICE_PATH_COMPONENT = "movements";
-
    /**
      *
      * Default constructor for MovementClient class.

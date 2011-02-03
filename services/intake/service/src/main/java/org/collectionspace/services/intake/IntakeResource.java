@@ -74,14 +74,11 @@ import org.slf4j.LoggerFactory;
 /**
  * The Class IntakeResource.
  */
-@Path("/" + IntakeClient.SERVICE_PATH_COMPONENT)
+@Path(IntakeClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
 public class IntakeResource extends
 		AbstractMultiPartCollectionSpaceResourceImpl {
-
-    /** The Constant serviceName. */
-    private final static String serviceName = IntakeClient.SERVICE_PATH_COMPONENT;
     
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(IntakeResource.class);
@@ -111,7 +108,7 @@ public class IntakeResource extends
      */
     @Override
     public String getServiceName() {
-        return serviceName;
+        return IntakeClient.SERVICE_NAME;
     }
 
     /* (non-Javadoc)

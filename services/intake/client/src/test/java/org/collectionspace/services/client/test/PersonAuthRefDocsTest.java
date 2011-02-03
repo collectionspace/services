@@ -85,6 +85,11 @@ public class PersonAuthRefDocsTest extends BaseServiceTest {
     private String valuerShortId = null;
     private final int NUM_AUTH_REF_DOCS_EXPECTED = 1;
 
+    @Override
+    public String getServiceName() { 
+    	throw new UnsupportedOperationException(); //FIXME: REM - http://issues.collectionspace.org/browse/CSPACE-3498   
+    }
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */

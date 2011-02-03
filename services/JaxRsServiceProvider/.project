@@ -5,12 +5,14 @@
     <project>org.collectionspace.services.3rdparty.nuxeo.quote-api</project>
     <project>org.collectionspace.services.account.jaxb</project>
     <project>org.collectionspace.services.account.service</project>
+    <project>org.collectionspace.services.acquisition.client</project>
     <project>org.collectionspace.services.acquisition.jaxb</project>
     <project>org.collectionspace.services.acquisition.service</project>
     <project>org.collectionspace.services.authentication.jaxb</project>
     <project>org.collectionspace.services.authorization-mgt.service</project>
     <project>org.collectionspace.services.authorization.jaxb</project>
     <project>org.collectionspace.services.authorization.service</project>
+    <project>org.collectionspace.services.blob.client</project>
     <project>org.collectionspace.services.blob.service</project>
     <project>org.collectionspace.services.client</project>
     <project>org.collectionspace.services.collectionobject.client</project>
@@ -32,14 +34,17 @@
     <project>org.collectionspace.services.loanin.service</project>
     <project>org.collectionspace.services.loanout.jaxb</project>
     <project>org.collectionspace.services.loanout.service</project>
+    <project>org.collectionspace.services.location.client</project>
     <project>org.collectionspace.services.location.jaxb</project>
     <project>org.collectionspace.services.location.service</project>
+    <project>org.collectionspace.services.media.client</project>
     <project>org.collectionspace.services.media.jaxb</project>
     <project>org.collectionspace.services.media.service</project>
     <project>org.collectionspace.services.movement.jaxb</project>
     <project>org.collectionspace.services.movement.service</project>
     <project>org.collectionspace.services.note.jaxb</project>
     <project>org.collectionspace.services.note.service</project>
+    <project>org.collectionspace.services.objectexit.client</project>
     <project>org.collectionspace.services.objectexit.jaxb</project>
     <project>org.collectionspace.services.objectexit.service</project>
     <project>org.collectionspace.services.organization.client</project>

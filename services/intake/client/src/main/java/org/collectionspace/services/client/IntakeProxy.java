@@ -47,7 +47,7 @@ import org.jboss.resteasy.client.ClientResponse;
  * @version $Revision:$
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
-@Path("/" + IntakeClient.SERVICE_PATH_COMPONENT + "/")
+@Path(IntakeClient.SERVICE_PATH_PROXY)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
 public interface IntakeProxy extends CollectionSpaceProxy {

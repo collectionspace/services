@@ -698,4 +698,10 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl {
             res.releaseConnection();
         }
     }
+
+	@Override
+	protected String getServiceName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

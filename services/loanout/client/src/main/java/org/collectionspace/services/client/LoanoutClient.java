@@ -34,10 +34,19 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * $LastChangedDate$
  */
 public class LoanoutClient extends AbstractServiceClientImpl {
+	public static final String SERVICE_NAME = "loansout";
+	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
+	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
+	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
+	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    private LoanoutProxy loanoutProxy;
-    public static final String SERVICE_PATH_COMPONENT = "loansout";
+	private LoanoutProxy loanoutProxy;
 
+	@Override
+	public String getServiceName() {
+		return SERVICE_NAME;
+	}
+    
     /**
      *
      * Default constructor for LoanoutClient class.

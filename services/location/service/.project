@@ -10,6 +10,7 @@
     <project>org.collectionspace.services.contact.service</project>
     <project>org.collectionspace.services.hyperjaxb</project>
     <project>org.collectionspace.services.jaxb</project>
+    <project>org.collectionspace.services.location.client</project>
     <project>org.collectionspace.services.location.jaxb</project>
   </projects>
   <buildSpec>

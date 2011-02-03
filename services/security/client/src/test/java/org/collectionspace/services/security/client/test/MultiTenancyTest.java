@@ -53,10 +53,13 @@ import org.collectionspace.services.client.AccountRoleFactory;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.DimensionClient;
 import org.collectionspace.services.client.DimensionFactory;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PermissionClient;
 import org.collectionspace.services.client.PermissionFactory;
 import org.collectionspace.services.client.PermissionRoleClient;
 import org.collectionspace.services.client.PermissionRoleFactory;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.RoleFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
@@ -339,7 +342,7 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
         dimension.setDimension("dimensionType");
         dimension.setValue("value-" + identifier);
         dimension.setValueDate(new Date().toString());
-        MultipartOutput multipart = DimensionFactory.createDimensionInstance(client.getCommonPartName(),
+        PoxPayloadOut multipart = DimensionFactory.createDimensionInstance(client.getCommonPartName(),
                 dimension);
         ClientResponse<Response> res = client.create(multipart);
         int statusCode = res.getStatus();
@@ -418,7 +421,7 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         DimensionClient client = new DimensionClient();
         client.setAuth(true, userName, true, userName, true);
-        ClientResponse<MultipartInput> res = client.read(id);
+        ClientResponse<String> res = client.read(id);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -430,7 +433,7 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         return (DimensionsCommon) extractPart(input,
                 client.getCommonPartName(), DimensionsCommon.class);
     }
@@ -499,11 +502,11 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
         dimension.setValue("updated-" + dimension.getValue());
         dimension.setValueDate("updated-" + dimension.getValueDate());
         // Submit the request to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(dimension, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
+        PoxPayloadOut output = new PoxPayloadOut(DimensionClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(dimension, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getCommonPartName());
 
-        ClientResponse<MultipartInput> res = client.update(TENANT_RESOURCE_2, output);
+        ClientResponse<String> res = client.update(TENANT_RESOURCE_2, output);
         int statusCode = res.getStatus();
         // Check the status code of the response: does it match the expected response(s)?
         if (logger.isDebugEnabled()) {

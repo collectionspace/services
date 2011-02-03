@@ -39,6 +39,9 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 
 import org.collectionspace.services.client.CollectionObjectClient;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 
 import org.collectionspace.services.client.IntakeClient;
@@ -75,9 +78,9 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 		fillCollectionObject(co, createIdentifier());
 		
 		// Next, create a part object
-		MultipartOutput multipart = new MultipartOutput();
-		OutputPart commonPart = multipart.addPart(co, MediaType.APPLICATION_XML_TYPE);
-		commonPart.getHeaders().add("label", collectionObjectClient.getCommonPartName());
+		PoxPayloadOut multipart = new PoxPayloadOut(CollectionObjectClient.SERVICE_PAYLOAD_NAME);
+		PayloadOutputPart commonPart = multipart.addPart(co, MediaType.APPLICATION_XML_TYPE);
+		commonPart.setLabel(collectionObjectClient.getCommonPartName());
 		
 		// Make the create call and check the response
 		ClientResponse<Response> response = collectionObjectClient.create(multipart);
@@ -95,9 +98,9 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    IntakesCommon intake = new IntakesCommon();
 	    fillIntake(intake, createIdentifier());
 	    // Create the a part object
-	    multipart = new MultipartOutput();
+	    multipart = new PoxPayloadOut(IntakeClient.SERVICE_PAYLOAD_NAME);
 	    commonPart = multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
-	    commonPart.getHeaders().add("label", intakeClient.getCommonPartName());
+	    commonPart.setLabel(intakeClient.getCommonPartName());
 
 	    // Make the call to create and check the response
 	    response = intakeClient.create(multipart);
@@ -115,9 +118,9 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
 	    		intakeCsid, IntakesCommon.class.getSimpleName(),
 	    		RelationshipType.COLLECTIONOBJECT_INTAKE.toString());
 	    // Create the part and fill it with the relation object
-	    multipart = new MultipartOutput();
+	    multipart = new PoxPayloadOut(RelationClient.SERVICE_PAYLOAD_NAME);
 	    commonPart = multipart.addPart(relation, MediaType.APPLICATION_XML_TYPE);
-	    commonPart.getHeaders().add("label", relationClient.getCommonPartName());
+	    commonPart.setLabel(relationClient.getCommonPartName());
 
 	    // Make the call to crate
 	    response = relationClient.create(multipart);
@@ -159,12 +162,12 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
         for(RelationsCommonList.RelationListItem listItem : relationListItems){
         	
         	String foundCsid = listItem.getCsid();
-        	ClientResponse<MultipartInput> multiPartResponse = null;
+        	ClientResponse<String> multiPartResponse = null;
         	try {
         		multiPartResponse = relationClient.read(foundCsid);
         		int responseStatus = multiPartResponse.getStatus();
         		Assert.assertEquals(responseStatus, Response.Status.OK.getStatusCode());
-	        	MultipartInput input = (MultipartInput) multiPartResponse.getEntity();
+        		PoxPayloadIn input = new PoxPayloadIn(multiPartResponse.getEntity());
 	        	resultRelation = (RelationsCommon) extractPart(input,
 	        			relationClient.getCommonPartName(),
 	        			RelationsCommon.class);

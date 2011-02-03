@@ -95,12 +95,8 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new BlobResource());
         singletons.add(new MovementResource());
         singletons.add(new ReportResource());
-        /* FIXME: Uncomment please
         singletons.add(new LocationAuthorityResource());
         singletons.add(new IDResource());
-
-*/
-
 //        singletons.add(new QueryResource());
 //        singletons.add(new DomainIdentifierResource());
 //        singletons.add(new PingResource());

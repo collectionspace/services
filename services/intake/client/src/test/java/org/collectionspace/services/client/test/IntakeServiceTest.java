@@ -39,7 +39,6 @@ import org.collectionspace.services.intake.CurrentLocationGroupList;
 import org.collectionspace.services.intake.IntakesCommon;
 import org.collectionspace.services.intake.IntakesCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.dom4j.DocumentException;
 
 import org.jboss.resteasy.client.ClientResponse;
 //import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -61,26 +60,23 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate$
  */
 public class IntakeServiceTest extends AbstractServiceTestImpl {
-
    /** The logger. */
     private final String CLASS_NAME = IntakeServiceTest.class.getName();
-    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-
-    // Instance variables specific to this test.
-    /** The service path component. */
-    final String SERVICE_PATH_COMPONENT = "intakes";
+    private final Logger logger = LoggerFactory.getLogger(IntakeServiceTest.class);
     
     /** The known resource id. */
     private String knownResourceId = null;
     
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
-     */
     @Override
     protected CollectionSpaceClient getClientInstance() {
     	return new IntakeClient();
     }
     
+	@Override
+	protected String getServiceName() {
+		return IntakeClient.SERVICE_NAME;
+	}
+        
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */
@@ -766,7 +762,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
+        return IntakeClient.SERVICE_PATH_COMPONENT;
     }
 
     /**
@@ -821,7 +817,7 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         currentLocationGroups.add(currentLocationGroup);
         intake.setCurrentLocationGroupList(currentLocationGroupList);
 
-        PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
+        PoxPayloadOut multipart = new PoxPayloadOut(IntakeClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart =
             multipart.addPart(intake, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(new IntakeClient().getCommonPartName());
@@ -833,4 +829,5 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
 
         return multipart;
     }
+
 }

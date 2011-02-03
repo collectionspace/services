@@ -13,8 +13,6 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.blob.BlobsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
  * @version $Revision: 2108 $

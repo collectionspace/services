@@ -249,12 +249,14 @@
   <classpathentry kind="src" path="/org.collectionspace.services.3rdparty.nuxeo.quote-api"/>
   <classpathentry kind="src" path="/org.collectionspace.services.account.jaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.account.service"/>
+  <classpathentry kind="src" path="/org.collectionspace.services.acquisition.client"/>
   <classpathentry kind="src" path="/org.collectionspace.services.acquisition.jaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.acquisition.service"/>
   <classpathentry kind="src" path="/org.collectionspace.services.authentication.jaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.authorization-mgt.service"/>
   <classpathentry kind="src" path="/org.collectionspace.services.authorization.jaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.authorization.service"/>
+  <classpathentry kind="src" path="/org.collectionspace.services.blob.client"/>
   <classpathentry kind="src" path="/org.collectionspace.services.blob.service"/>
   <classpathentry kind="src" path="/org.collectionspace.services.client"/>
   <classpathentry kind="src" path="/org.collectionspace.services.collectionobject.client"/>
@@ -276,14 +278,17 @@
   <classpathentry kind="src" path="/org.collectionspace.services.loanin.service"/>
   <classpathentry kind="src" path="/org.collectionspace.services.loanout.jaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.loanout.service"/>
+  <classpathentry kind="src" path="/org.collectionspace.services.location.client"/>
   <classpathentry kind="src" path="/org.collectionspace.services.location.jaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.location.service"/>
+  <classpathentry kind="src" path="/org.collectionspace.services.media.client"/>
   <classpathentry kind="src" path="/org.collectionspace.services.media.jaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.media.service"/>
   <classpathentry kind="src" path="/org.collectionspace.services.movement.jaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.movement.service"/>
   <classpathentry kind="src" path="/org.collectionspace.services.note.jaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.note.service"/>
+  <classpathentry kind="src" path="/org.collectionspace.services.objectexit.client"/>
   <classpathentry kind="src" path="/org.collectionspace.services.objectexit.jaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.objectexit.service"/>
   <classpathentry kind="src" path="/org.collectionspace.services.organization.client"/>

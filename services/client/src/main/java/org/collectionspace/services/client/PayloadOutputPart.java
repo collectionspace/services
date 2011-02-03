@@ -5,6 +5,9 @@ import org.dom4j.Element;
 
 public class PayloadOutputPart extends PayloadPart {
 	
+	//
+	// Constructors
+	//
 	PayloadOutputPart(String label, Object body) {
 		super(label, body);
 	}
@@ -19,7 +22,11 @@ public class PayloadOutputPart extends PayloadPart {
 	
 	PayloadOutputPart(String label, Object body, Element elementBody) {
 		super(label, body, elementBody);
-	}	
+	}
+	
+	//
+	// Utility Methods
+	//
 	
 	@Override
 	public String asXML() {

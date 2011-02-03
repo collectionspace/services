@@ -110,7 +110,7 @@ public abstract class AbstractServiceClientImpl implements
      *            the service path component
      * @return the common part name
      */
-    public String getCommonPartName(String commonPrefix) {
+    protected String getCommonPartName(String commonPrefix) {
         return commonPrefix + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
     }
 

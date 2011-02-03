@@ -29,22 +29,25 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.ContactClient;
-import org.collectionspace.services.client.ContactClientUtils;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.jaxb.AbstractCommonList;
+
+import org.collectionspace.services.client.ContactClient;
+import org.collectionspace.services.client.ContactClientUtils;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactsCommonList;
+
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
-import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonauthoritiesCommonList;
 import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonsCommonList;
+
 import org.jboss.resteasy.client.ClientResponse;
 //import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
@@ -60,7 +63,7 @@ import org.testng.annotations.Test;
  * $LastChangedRevision: 753 $
  * $LastChangedDate: 2009-09-23 11:03:36 -0700 (Wed, 23 Sep 2009) $
  */
-public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
+public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: Test classes for Vocab, Person, Org, and Location should have a base class!
 
     /** The logger. */
     private final String CLASS_NAME = PersonAuthorityServiceTest.class.getName();
@@ -74,7 +77,11 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	@Override
 	protected String getServiceName() {
 		return PersonAuthorityClient.SERVICE_NAME;
-	}    
+	}
+	
+    public String getItemServicePathComponent() {
+        return PersonAuthorityClient.SERVICE_PATH_ITEMS_COMPONENT;
+    }	
     
     /** The test forename. */
     final String TEST_FORE_NAME = "John";
@@ -2332,15 +2339,6 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     // Utility methods used by tests above
     // ---------------------------------------------------------------
     /**
-     * Gets the item service path component.
-     *
-     * @return the item service path component
-     */
-    public String getItemServicePathComponent() {
-        return PersonAuthorityClient.SERVICE_PATH_ITEMS_COMPONENT;
-    }
-
-    /**
      * Gets the contact service path component.
      *
      * @return the contact service path component
@@ -2348,7 +2346,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     public String getContactServicePathComponent() {
         return ContactClient.SERVICE_PATH_COMPONENT;
     }
-
+    
     /**
      * Returns the root URL for the item service.
      *

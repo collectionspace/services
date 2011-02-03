@@ -34,7 +34,6 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.ContactClientUtils;
 import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.contact.ContactsCommon;
@@ -50,7 +49,6 @@ import org.collectionspace.services.organization.OrganizationsCommon;
 import org.collectionspace.services.organization.OrganizationsCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +63,7 @@ import org.testng.annotations.Test;
  * $LastChangedRevision$
  * $LastChangedDate$
  */
-public class OrgAuthorityServiceTest extends AbstractServiceTestImpl {
+public class OrgAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: Test classes for Vocab, Person, Org, and Location should have a base class!
 
     /** The logger. */
     private final String CLASS_NAME = OrgAuthorityServiceTest.class.getName();

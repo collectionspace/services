@@ -49,6 +49,11 @@ public class RoleClient extends AbstractServiceClientImpl {
      */
     private RoleProxy roleProxy;
 
+    @Override
+    public String getServiceName() { 
+    	throw new UnsupportedOperationException(); //FIXME: REM - http://issues.collectionspace.org/browse/CSPACE-3498 }
+    }
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */

@@ -48,20 +48,23 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
 public class IntakeClient extends AbstractServiceClientImpl {
-	public static final String SERVICE_PATH_COMPONENT = "intakes"; //FIXME: REM - The JAX-RS proxy, client, and resource classes should ref this value
-	public static final String SERVICE_PAYLOAD_NAME = SERVICE_PATH_COMPONENT;
+	public static final String SERVICE_NAME = "intakes";
+	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
+	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
+	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
+	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-	/* (non-Javadoc)
-     * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
-     */
+	@Override
+	public String getServiceName() {
+		return SERVICE_NAME;
+	}
+	
+	@Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
     }
-    /**
-     *
-     */
-//    private static final IntakeClient instance = new IntakeClient();
-    /**
+
+	/**
      *
      */
     private IntakeProxy intakeProxy;

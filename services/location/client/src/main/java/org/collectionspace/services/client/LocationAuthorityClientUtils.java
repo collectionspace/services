@@ -15,6 +15,7 @@ import org.collectionspace.services.LocationJAXBSchema;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.location.LocationsCommon;
 import org.collectionspace.services.location.LocationauthoritiesCommon;
+import org.dom4j.DocumentException;
 import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,10 +86,10 @@ public class LocationAuthorityClientUtils {
         	location.setAddress(value);
         if((value = (String)locationInfo.get(LocationJAXBSchema.TERM_STATUS))!=null)
         	location.setTermStatus(value);
-        PoxPayloadOut multipart = new PoxPayloadOut();
-        OutputPart commonPart = multipart.addPart(location,
+        PoxPayloadOut multipart = new PoxPayloadOut(LocationAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = multipart.addPart(location,
             MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", headerLabel);
+        commonPart.setLabel(headerLabel);
 
         if(logger.isDebugEnabled()){
         	logger.debug("to be created, location common ", location, LocationsCommon.class);
@@ -157,11 +158,11 @@ public class LocationAuthorityClientUtils {
     }
 
     public static PoxPayloadOut createLocationInstance(
-    		String commonPartXML, String headerLabel){
-        PoxPayloadOut multipart = new PoxPayloadOut();
-        OutputPart commonPart = multipart.addPart(commonPartXML,
+    		String commonPartXML, String headerLabel)  throws DocumentException {
+        PoxPayloadOut multipart = new PoxPayloadOut(LocationAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = multipart.addPart(commonPartXML,
             MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", headerLabel);
+        commonPart.setLabel(headerLabel);
 
         if(logger.isDebugEnabled()){
         	logger.debug("to be created, location common ", commonPartXML);
@@ -172,14 +173,14 @@ public class LocationAuthorityClientUtils {
     
     public static String createItemInAuthority(String vcsid,
     		String commonPartXML,
-    		LocationAuthorityClient client ) {
+    		LocationAuthorityClient client ) throws DocumentException {
     	// Expected status code: 201 Created
     	int EXPECTED_STATUS_CODE = Response.Status.CREATED.getStatusCode();
     	// Type of service request being tested
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
     	
     	PoxPayloadOut multipart = 
-    		createLocationInstance( commonPartXML, client.getItemCommonPartName() );
+    		createLocationInstance(commonPartXML, client.getItemCommonPartName());
     	String newID = null;
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
         try {

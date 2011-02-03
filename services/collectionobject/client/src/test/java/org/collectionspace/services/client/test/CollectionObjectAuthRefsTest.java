@@ -73,6 +73,16 @@ import org.slf4j.LoggerFactory;
  */
 public class CollectionObjectAuthRefsTest extends BaseServiceTest {
 
+    @Override
+    protected CollectionSpaceClient getClientInstance() {
+    	throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
+    }
+    
+	@Override
+	protected String getServiceName() {
+		throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
+	}
+
    /** The logger. */
     private final String CLASS_NAME = CollectionObjectAuthRefsTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
@@ -138,14 +148,6 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest {
     /** The number of authority references expected. */
     private final int NUM_AUTH_REFS_EXPECTED = 7;
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
-     */
-    @Override
-    protected CollectionSpaceClient getClientInstance() {
-    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
-    }
-    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
      */

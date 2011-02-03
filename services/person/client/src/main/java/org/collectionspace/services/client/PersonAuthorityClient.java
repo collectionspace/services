@@ -55,7 +55,7 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
 	//
 	public static final String SERVICE_ITEM_NAME = "persons";
 	public static final String SERVICE_PATH_ITEMS_COMPONENT = "items";	//FIXME: REM - This should be defined in an AuthorityClient base class
-	public static final String SERVICE_ITEM_PAYLOAD_NAME = SERVICE_PATH_ITEMS_COMPONENT;
+	public static final String SERVICE_ITEM_PAYLOAD_NAME = SERVICE_ITEM_NAME;
 	//
 	// Payload Part/Schema part names
 	//
@@ -74,11 +74,6 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
         return SERVICE_PATH_COMPONENT;
     }
 
-    /**
-     * Gets the item common part name.
-     *
-     * @return the item common part name
-     */
     public String getItemCommonPartName() {
         return getCommonPartName(SERVICE_ITEM_NAME);
     }

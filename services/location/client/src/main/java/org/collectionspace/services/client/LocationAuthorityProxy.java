@@ -28,27 +28,26 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
 
     // List Locationauthorities
     @GET
-    @Produces({"application/xml"})
     ClientResponse<LocationauthoritiesCommonList> readList();
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(PoxPayloadOut multipart);
+    ClientResponse<Response> create(String xmlPayload);
 
     //(R)ead
     @GET
     @Path("/{csid}")
-    ClientResponse<PoxPayloadIn> read(@PathParam("csid") String csid);
+    ClientResponse<String> read(@PathParam("csid") String csid);
 
     //(R)ead by name
     @GET
     @Path("/urn:cspace:name({name})")
-    ClientResponse<PoxPayloadIn> readByName(@PathParam("name") String name);
+    ClientResponse<String> readByName(@PathParam("name") String name);
 
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<PoxPayloadIn> update(@PathParam("csid") String csid, PoxPayloadOut multipart);
+    ClientResponse<String> update(@PathParam("csid") String csid, String xmlPayload);
 
     //(D)elete
     @DELETE
@@ -93,12 +92,12 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
     //(R)ead Item
     @GET
     @Path("/{vcsid}/items/{csid}")
-    ClientResponse<PoxPayloadIn> readItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
+    ClientResponse<String> readItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
 
     //(U)pdate Item
     @PUT
     @Path("/{vcsid}/items/{csid}")
-    ClientResponse<PoxPayloadIn> updateItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid, PoxPayloadOut multipart);
+    ClientResponse<String> updateItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid, String xmlPayload);
 
     //(D)elete Item
     @DELETE
@@ -107,7 +106,6 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
 
      // List Contacts
     @GET
-    @Produces({"application/xml"})
     @Path("/{parentcsid}/items/{itemcsid}/contacts/")
     ClientResponse<ContactsCommonList> readContactList(
             @PathParam("parentcsid") String parentcsid,
@@ -119,12 +117,12 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
     ClientResponse<Response> createContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
-            PoxPayloadOut multipart);
+            String xmlPayload);
 
      //(R)ead Contact
     @GET
     @Path("/{parentcsid}/items/{itemcsid}/contacts/{csid}")
-    ClientResponse<PoxPayloadIn> readContact(
+    ClientResponse<String> readContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid);
@@ -132,11 +130,11 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
     //(U)pdate Contact
     @PUT
     @Path("/{parentcsid}/items/{itemcsid}/contacts/{csid}")
-    ClientResponse<PoxPayloadIn> updateContact(
+    ClientResponse<String> updateContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid,
-            PoxPayloadOut multipart);
+            String xmlPayload);
 
     //(D)elete Contact
     @DELETE

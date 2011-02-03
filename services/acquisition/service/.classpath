@@ -16,7 +16,7 @@
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/javax/script/script-api/1.0/script-api-1.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/javax/xml/stream/stax-api/1.0-2/stax-api-1.0-2.jar" sourcepath="M2_REPO/javax/xml/stream/stax-api/1.0-2/stax-api-1.0-2-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/xml/stream/stax-api/1.0/stax-api-1.0.jar" sourcepath="M2_REPO/javax/xml/stream/stax-api/1.0/stax-api-1.0-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/antlr/antlr/2.7.6/antlr-2.7.6.jar" sourcepath="M2_REPO/antlr/antlr/2.7.6/antlr-2.7.6-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/james/apache-mime4j/0.6/apache-mime4j-0.6.jar" sourcepath="M2_REPO/org/apache/james/apache-mime4j/0.6/apache-mime4j-0.6-sources.jar">
     <attributes>
@@ -46,9 +46,9 @@
       <attribute value="jar:file:/C:/Documents%20and%20Settings/remillet/.m2/repository/commons-lang/commons-lang/2.2/commons-lang-2.2-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar" sourcepath="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-sources.jar">
+  <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar" sourcepath="M2_REPO/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4-sources.jar">
     <attributes>
-      <attribute value="jar:file:/C:/Documents%20and%20Settings/remillet/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-javadoc.jar!/" name="javadoc_location"/>
+      <attribute value="jar:file:/C:/Documents%20and%20Settings/remillet/.m2/repository/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/dom4j/dom4j/1.6.1/dom4j-1.6.1.jar" sourcepath="M2_REPO/dom4j/dom4j/1.6.1/dom4j-1.6.1-sources.jar"/>
@@ -101,6 +101,7 @@
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/jtidy/jtidy/4aug2000r7-dev/jtidy-4aug2000r7-dev.jar" sourcepath="M2_REPO/jtidy/jtidy/4aug2000r7-dev/jtidy-4aug2000r7-dev-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar" sourcepath="M2_REPO/junit/junit/3.8.1/junit-3.8.1-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar" sourcepath="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/maven/maven-artifact/2.0.6/maven-artifact-2.0.6.jar" sourcepath="M2_REPO/org/apache/maven/maven-artifact/2.0.6/maven-artifact-2.0.6-sources.jar">
     <attributes>
       <attribute value="jar:file:/C:/Documents%20and%20Settings/remillet/.m2/repository/org/apache/maven/maven-artifact/2.0.6/maven-artifact-2.0.6-javadoc.jar!/" name="javadoc_location"/>
@@ -215,11 +216,16 @@
   <classpathentry kind="var" path="M2_REPO/org/nuxeo/runtime/nuxeo-runtime-osgi/1.6.2/nuxeo-runtime-osgi-1.6.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/net/java/dev/mistral/Operations/0.9.5/Operations-0.9.5.jar"/>
   <classpathentry kind="src" path="/org.collectionspace.services.3rdparty.nuxeo.quote-api"/>
+  <classpathentry kind="src" path="/org.collectionspace.services.acquisition.client"/>
   <classpathentry kind="src" path="/org.collectionspace.services.acquisition.jaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.client"/>
   <classpathentry kind="src" path="/org.collectionspace.services.common"/>
+  <classpathentry kind="src" path="/org.collectionspace.services.contact.client"/>
+  <classpathentry kind="src" path="/org.collectionspace.services.contact.jaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.hyperjaxb"/>
   <classpathentry kind="src" path="/org.collectionspace.services.jaxb"/>
+  <classpathentry kind="src" path="/org.collectionspace.services.person.client"/>
+  <classpathentry kind="src" path="/org.collectionspace.services.person.jaxb"/>
   <classpathentry kind="var" path="M2_REPO/org/osgi/org.osgi.core/4.1.0/org.osgi.core-4.1.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/restlet/org.restlet/1.0.7/org.restlet-1.0.7.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/codehaus/plexus/plexus-container-default/1.0-alpha-9-stable-1/plexus-container-default-1.0-alpha-9-stable-1.jar" sourcepath="M2_REPO/org/codehaus/plexus/plexus-container-default/1.0-alpha-9-stable-1/plexus-container-default-1.0-alpha-9-stable-1-sources.jar">
@@ -247,6 +253,7 @@
   <classpathentry kind="var" path="M2_REPO/org/mortbay/jetty/servlet-api-2.5/6.1H.7/servlet-api-2.5-6.1H.7.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/sun/xml/stream/sjsxp/1.0.1/sjsxp-1.0.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.5.8/slf4j-api-1.5.8.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j12/1.5.8/slf4j-log4j12-1.5.8.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-simple/1.5.8/slf4j-simple-1.5.8.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/maven/surefire/surefire-api/2.4.3/surefire-api-2.4.3.jar" sourcepath="M2_REPO/org/apache/maven/surefire/surefire-api/2.4.3/surefire-api-2.4.3-sources.jar">
     <attributes>

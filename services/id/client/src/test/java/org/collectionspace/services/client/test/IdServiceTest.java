@@ -236,5 +236,9 @@ public class IdServiceTest extends BaseServiceTest {
         return "4b984865-f93d-4481-b874-3dba863ec589";
     }
 
+    @Override
+    protected String getServiceName() { 
+    	throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498 }
+    }
 }
 

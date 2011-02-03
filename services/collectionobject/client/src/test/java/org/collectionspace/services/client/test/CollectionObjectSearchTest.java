@@ -53,6 +53,17 @@ import org.testng.annotations.Test;
  */
 public class CollectionObjectSearchTest extends BaseServiceTest {
 
+	@Override
+	protected String getServiceName() {
+		throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
+	}
+	
+	@Override
+	protected String getServicePathComponent() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
+	}	
+	
    /** The logger. */
     private final String CLASS_NAME = CollectionObjectSearchTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
@@ -541,5 +552,4 @@ public class CollectionObjectSearchTest extends BaseServiceTest {
     public static String getSystemTimeIdentifier() {
       return Long.toString(System.currentTimeMillis());
     }
-
 }

@@ -40,45 +40,44 @@ import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
-import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadIn;
-import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
  * The Class LocationAuthorityClient.
  */
-public class LocationAuthorityClient extends AbstractServiceClientImpl {
+public class LocationAuthorityClient extends AbstractServiceClientImpl {  //FIXME: REM - Client classes for Person, Org, Vocab, and Location should have a common base class
 	public static final String SERVICE_NAME = "locationauthorities";
 	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
 	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
 	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
-
+	//
+	// Subitem constants
+	//
+	public static final String SERVICE_ITEM_NAME = "locations";
+	public static final String SERVICE_PATH_ITEMS_COMPONENT = "items";	//FIXME: REM - This should be defined in an AuthorityClient base class
+	public static final String SERVICE_ITEM_PAYLOAD_NAME = SERVICE_ITEM_NAME;
+	//
+	// Payload Part/Schema part names
+	//
+	public static final String SERVICE_COMMON_PART_NAME = SERVICE_NAME + 
+		PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
+	public static final String SERVICE_ITEM_COMMON_PART_NAME = SERVICE_ITEM_NAME + 
+		PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
+	
 	@Override
 	public String getServiceName() {
-		// TODO Auto-generated method stub
-		return null;
+		return SERVICE_NAME;
 	}
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
-     */
     @Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
     }
 
-    /**
-     * Gets the item common part name.
-     *
-     * @return the item common part name
-     */
     public String getItemCommonPartName() {
-        return getCommonPartName("locations");
+        return getCommonPartName(SERVICE_ITEM_NAME);
     }
-
-    /** The location authority proxy. */
-//    private static final LocationAuthorityClient instance = new LocationAuthorityClient();
-    
+        
     /**
      *
      */
@@ -119,9 +118,6 @@ public class LocationAuthorityClient extends AbstractServiceClientImpl {
      *
      * @return the client response
      */
-//    public static LocationAuthorityClient getInstance() {
-//        return instance;
-//    }
 
     /**
      * @return list
@@ -137,7 +133,7 @@ public class LocationAuthorityClient extends AbstractServiceClientImpl {
      * @param csid the csid
      * @return the client response
      */
-    public ClientResponse<PoxPayloadIn> read(String csid) {
+    public ClientResponse<String> read(String csid) {
         return locationAuthorityProxy.read(csid);
     }
 
@@ -147,7 +143,7 @@ public class LocationAuthorityClient extends AbstractServiceClientImpl {
      * @param name the name
      * @return the client response
      */
-    public ClientResponse<PoxPayloadIn> readByName(String name) {
+    public ClientResponse<String> readByName(String name) {
         return locationAuthorityProxy.readByName(name);
     }
 
@@ -157,8 +153,8 @@ public class LocationAuthorityClient extends AbstractServiceClientImpl {
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<Response> create(PoxPayloadOut multipart) {
-        return locationAuthorityProxy.create(multipart);
+    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
+        return locationAuthorityProxy.create(xmlPayload.toXML());
     }
 
     /**
@@ -168,8 +164,8 @@ public class LocationAuthorityClient extends AbstractServiceClientImpl {
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<PoxPayloadIn> update(String csid, PoxPayloadOut multipart) {
-        return locationAuthorityProxy.update(csid, multipart);
+    public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
+        return locationAuthorityProxy.update(csid, xmlPayload.toXML());
 
     }
 
@@ -235,7 +231,7 @@ public class LocationAuthorityClient extends AbstractServiceClientImpl {
      * @param csid the csid
      * @return the client response
      */
-    public ClientResponse<PoxPayloadIn> readItem(String vcsid, String csid) {
+    public ClientResponse<String> readItem(String vcsid, String csid) {
         return locationAuthorityProxy.readItem(vcsid, csid);
     }
 
@@ -258,8 +254,8 @@ public class LocationAuthorityClient extends AbstractServiceClientImpl {
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<PoxPayloadIn> updateItem(String vcsid, String csid, PoxPayloadOut multipart) {
-        return locationAuthorityProxy.updateItem(vcsid, csid, multipart);
+    public ClientResponse<String> updateItem(String vcsid, String csid, PoxPayloadOut xmlPayload) {
+        return locationAuthorityProxy.updateItem(vcsid, csid, xmlPayload.toXML());
 
     }
 
@@ -283,8 +279,8 @@ public class LocationAuthorityClient extends AbstractServiceClientImpl {
      * @return the client response
      */
     public ClientResponse<Response> createContact(String parentcsid,
-            String itemcsid, PoxPayloadOut multipart) {
-        return locationAuthorityProxy.createContact(parentcsid, itemcsid, multipart);
+            String itemcsid, PoxPayloadOut xmlPayload) {
+        return locationAuthorityProxy.createContact(parentcsid, itemcsid, xmlPayload.toXML());
     }
 
     /**
@@ -295,7 +291,7 @@ public class LocationAuthorityClient extends AbstractServiceClientImpl {
      * @param csid the csid
      * @return the client response
      */
-    public ClientResponse<PoxPayloadIn> readContact(String parentcsid,
+    public ClientResponse<String> readContact(String parentcsid,
             String itemcsid, String csid) {
         return locationAuthorityProxy.readContact(parentcsid, itemcsid, csid);
     }
@@ -321,9 +317,9 @@ public class LocationAuthorityClient extends AbstractServiceClientImpl {
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<PoxPayloadIn> updateContact(String parentcsid,
-            String itemcsid, String csid, PoxPayloadOut multipart) {
-        return locationAuthorityProxy.updateContact(parentcsid, itemcsid, csid, multipart);
+    public ClientResponse<String> updateContact(String parentcsid,
+            String itemcsid, String csid, PoxPayloadOut xmlPayload) {
+        return locationAuthorityProxy.updateContact(parentcsid, itemcsid, csid, xmlPayload.toXML());
     }
 
     /**

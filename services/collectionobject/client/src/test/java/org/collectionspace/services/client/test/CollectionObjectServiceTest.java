@@ -1480,4 +1480,10 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         return payloadInputPart;
     }
 
+	@Override
+	protected String getServicePathComponent() {
+		// TODO Auto-generated method stub
+		return CollectionObjectClient.SERVICE_PATH_COMPONENT;
+	}
+
 }

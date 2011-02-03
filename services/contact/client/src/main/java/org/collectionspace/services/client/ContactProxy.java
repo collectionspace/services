@@ -16,7 +16,7 @@ import org.jboss.resteasy.client.ClientResponse;
 /**
  * @version $Revision:$
  */
-@Path(ContactClient.SERVICE_PATH + "/")
+@Path(ContactClient.SERVICE_PATH_PROXY)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
 public interface ContactProxy extends CollectionSpaceProxy {

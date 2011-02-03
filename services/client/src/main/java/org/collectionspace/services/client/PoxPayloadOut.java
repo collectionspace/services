@@ -105,6 +105,13 @@ public class PoxPayloadOut extends PoxPayload<PayloadOutputPart> {
 		return result;
 	}
 	
+	@Deprecated
+	public PayloadOutputPart addPart(String xmlPayload, MediaType mediaType) throws DocumentException {
+		PayloadOutputPart result = addPart("unlabelled", xmlPayload);
+		return result;
+	}
+	
+	
 	/**
 	 * Adds a DOM4j Element part.
 	 *

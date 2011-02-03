@@ -24,8 +24,6 @@ package org.collectionspace.services.client.test;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.NoteClient;
@@ -38,7 +36,10 @@ import org.collectionspace.services.note.NotesCommon;
 import org.collectionspace.services.note.NotesCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import org.jboss.resteasy.client.ClientResponse;
+import org.dom4j.DocumentException;
 
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;

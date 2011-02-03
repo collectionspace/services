@@ -34,6 +34,8 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.TitleGroup;
 import org.collectionspace.services.collectionobject.TitleGroupList;
@@ -171,20 +173,12 @@ public abstract class CollectionSpaceIntegrationTest {
 	 * @throws Exception
 	 *             the exception
 	 */
-	static Object extractPart(MultipartInput input, String label, Class clazz) {
+	static Object extractPart(PoxPayloadIn input, String label, Class clazz) {
 		Object obj = null;
-		
-		try {
-			for (InputPart part : input.getParts()) {
-				String partLabel = part.getHeaders().getFirst("label");
-				if (label.equalsIgnoreCase(partLabel)) {
-					String partStr = part.getBodyAsString();
-					obj = part.getBody(clazz, null);
-					break;
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+
+		PayloadInputPart payloadInputPart = input.getPart(label);
+		if (payloadInputPart != null) {
+			obj = payloadInputPart.getBody();
 		}
 
 		return obj;
