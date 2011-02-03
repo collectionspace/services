@@ -41,6 +41,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.client.LocationAuthorityClient;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.LocationJAXBSchema;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
@@ -67,8 +68,6 @@ import org.collectionspace.services.common.vocabulary.RefNameUtils;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.location.nuxeo.LocationDocumentModelHandler;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
@@ -77,9 +76,9 @@ import org.slf4j.LoggerFactory;
 /**
  * The Class LocationAuthorityResource.
  */
-@Path("/locationauthorities")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Path(LocationAuthorityClient.SERVICE_PATH)
+@Consumes("application/xml")
+@Produces("application/xml")
 public class LocationAuthorityResource 
 	extends AuthorityResource<LocationauthoritiesCommon, LocationauthoritiesCommonList, 
 							LocationsCommon, LocationDocumentModelHandler> {

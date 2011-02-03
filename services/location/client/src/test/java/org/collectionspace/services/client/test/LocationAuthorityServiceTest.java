@@ -43,8 +43,8 @@ import org.collectionspace.services.location.LocationauthoritiesCommonList;
 import org.collectionspace.services.location.LocationsCommon;
 import org.collectionspace.services.location.LocationsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadIn;
+import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,7 +161,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         String shortId = createIdentifier();
     	String displayName = "displayName-" + shortId;
     	String baseRefName = LocationAuthorityClientUtils.createLocationAuthRefName(shortId, null);
-    	MultipartOutput multipart = 
+    	PoxPayloadOut multipart = 
             LocationAuthorityClientUtils.createLocationAuthorityInstance(
     	    displayName, shortId, client.getCommonPartName());
     	String newID = null;
@@ -342,7 +342,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
     	String newID = null;
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<PoxPayloadIn> res = client.read(knownResourceId);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -356,7 +356,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            MultipartInput input = (MultipartInput) res.getEntity();
+	            PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
 	            LocationauthoritiesCommon locationAuthority = 
 	            	(LocationauthoritiesCommon) extractPart(input,
 	                    client.getCommonPartName(), LocationauthoritiesCommon.class);
@@ -387,7 +387,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
-        ClientResponse<MultipartInput> res = client.readByName(knownResourceShortIdentifer);
+        ClientResponse<PoxPayloadIn> res = client.readByName(knownResourceShortIdentifer);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -401,7 +401,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            MultipartInput input = (MultipartInput) res.getEntity();
+	            PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
 	            LocationauthoritiesCommon locationAuthority = (LocationauthoritiesCommon) extractPart(input,
 	                    client.getCommonPartName(), LocationauthoritiesCommon.class);
 	            Assert.assertNotNull(locationAuthority);
@@ -432,7 +432,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
-        ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
+        ClientResponse<PoxPayloadIn> res = client.readItem(knownResourceId, knownItemResourceId);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -446,7 +446,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Check whether we've received a location.
-	        MultipartInput input = (MultipartInput) res.getEntity();
+	        PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
 	        LocationsCommon location = (LocationsCommon) extractPart(input,
 	                client.getItemCommonPartName(), LocationsCommon.class);
 	        Assert.assertNotNull(location);
@@ -480,7 +480,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
-        ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
+        ClientResponse<PoxPayloadIn> res = client.readItem(knownResourceId, knownItemResourceId);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -494,7 +494,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Check whether location has expected displayName.
-	        MultipartInput input = (MultipartInput) res.getEntity();
+	        PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
 	        LocationsCommon location = (LocationsCommon) extractPart(input,
 	                client.getItemCommonPartName(), LocationsCommon.class);
 	        Assert.assertNotNull(location);
@@ -512,7 +512,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 	            LocationAuthorityClientUtils.prepareDefaultDisplayName("updated-" + TEST_NAME);
 	
 	        // Submit the updated resource to the service and store the response.
-	        MultipartOutput output = new MultipartOutput();
+	        PoxPayloadOut output = new PoxPayloadOut();
 	        OutputPart commonPart = output.addPart(location, MediaType.APPLICATION_XML_TYPE);
 	        commonPart.getHeaders().add("label", client.getItemCommonPartName());
 	    	res.releaseConnection();
@@ -528,7 +528,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = (MultipartInput) res.getEntity();
+	        input = (PoxPayloadIn) res.getEntity();
 	        LocationsCommon updatedLocation =
 	                (LocationsCommon) extractPart(input,
 	                        client.getItemCommonPartName(), LocationsCommon.class);
@@ -547,7 +547,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 	        location.setDisplayName(expectedDisplayName);
 	
 	        // Submit the updated resource to the service and store the response.
-	        output = new MultipartOutput();
+	        output = new PoxPayloadOut();
 	        commonPart = output.addPart(location, MediaType.APPLICATION_XML_TYPE);
 	        commonPart.getHeaders().add("label", client.getItemCommonPartName());
 	    	res.releaseConnection();
@@ -563,7 +563,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = (MultipartInput) res.getEntity();
+	        input = (PoxPayloadIn) res.getEntity();
 	        updatedLocation =
 	                (LocationsCommon) extractPart(input,
 	                        client.getItemCommonPartName(), LocationsCommon.class);
@@ -600,7 +600,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
-        ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
+        ClientResponse<PoxPayloadIn> res = client.readItem(knownResourceId, knownItemResourceId);
         try {
         	int statusCode = res.getStatus();
 	
@@ -614,7 +614,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
 	
 	        // Check whether Location has expected displayName.
-	        MultipartInput input = (MultipartInput) res.getEntity();
+	        PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
 	        LocationsCommon location = (LocationsCommon) extractPart(input,
 	                client.getItemCommonPartName(), LocationsCommon.class);
 	        Assert.assertNotNull(location);
@@ -623,7 +623,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 	        location.setDisplayName(null);
 	
 	        // Submit the updated resource to the service and store the response.
-	        MultipartOutput output = new MultipartOutput();
+	        PoxPayloadOut output = new PoxPayloadOut();
 	        OutputPart commonPart = output.addPart(location, MediaType.APPLICATION_XML_TYPE);
 	        commonPart.getHeaders().add("label", client.getItemCommonPartName());
 	    	res.releaseConnection();
@@ -660,7 +660,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
-        ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
+        ClientResponse<PoxPayloadIn> res = client.read(NON_EXISTENT_ID);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -694,7 +694,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         LocationAuthorityClient client = new LocationAuthorityClient();
-        ClientResponse<MultipartInput> res = client.readItem(knownResourceId, NON_EXISTENT_ID);
+        ClientResponse<PoxPayloadIn> res = client.readItem(knownResourceId, NON_EXISTENT_ID);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -893,7 +893,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         LocationAuthorityClient client = new LocationAuthorityClient();
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<PoxPayloadIn> res = client.read(knownResourceId);
         try {
 	        if(logger.isDebugEnabled()){
 	            logger.debug(testName + ": read status = " + res.getStatus());
@@ -903,7 +903,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 	        if(logger.isDebugEnabled()){
 	            logger.debug("got LocationAuthority to update with ID: " + knownResourceId);
 	        }
-	        MultipartInput input = (MultipartInput) res.getEntity();
+	        PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
 	        LocationauthoritiesCommon locationAuthority = (LocationauthoritiesCommon) extractPart(input,
 	                client.getCommonPartName(), LocationauthoritiesCommon.class);
 	        Assert.assertNotNull(locationAuthority);
@@ -917,7 +917,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 	        }
 	
 	        // Submit the updated resource to the service and store the response.
-	        MultipartOutput output = new MultipartOutput();
+	        PoxPayloadOut output = new PoxPayloadOut();
 	        OutputPart commonPart = output.addPart(locationAuthority, MediaType.APPLICATION_XML_TYPE);
 	        commonPart.getHeaders().add("label", client.getCommonPartName());
 	    	res.releaseConnection();
@@ -933,7 +933,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = (MultipartInput) res.getEntity();
+	        input = (PoxPayloadIn) res.getEntity();
 	        LocationauthoritiesCommon updatedLocationAuthority =
 	                (LocationauthoritiesCommon) extractPart(input,
 	                        client.getCommonPartName(), LocationauthoritiesCommon.class);
@@ -966,7 +966,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         LocationAuthorityClient client = new LocationAuthorityClient();
-        ClientResponse<MultipartInput> res =
+        ClientResponse<PoxPayloadIn> res =
                 client.readItem(knownResourceId, knownItemResourceId);
         try {
 	        if(logger.isDebugEnabled()){
@@ -979,7 +979,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 	                knownItemResourceId +
 	                " in LocationAuthority: " + knownResourceId );
 	        }
-	        MultipartInput input = (MultipartInput) res.getEntity();
+	        PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
 	        LocationsCommon location = (LocationsCommon) extractPart(input,
 	                client.getItemCommonPartName(), LocationsCommon.class);
 	        Assert.assertNotNull(location);
@@ -994,7 +994,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 	        }        
 	
 	        // Submit the updated resource to the service and store the response.
-	        MultipartOutput output = new MultipartOutput();
+	        PoxPayloadOut output = new PoxPayloadOut();
 	        OutputPart commonPart = output.addPart(location, MediaType.APPLICATION_XML_TYPE);
 	        commonPart.getHeaders().add("label", client.getItemCommonPartName());
 	    	res.releaseConnection();
@@ -1010,7 +1010,7 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = (MultipartInput) res.getEntity();
+	        input = (PoxPayloadIn) res.getEntity();
 	        LocationsCommon updatedLocation =
 	                (LocationsCommon) extractPart(input,
 	                        client.getItemCommonPartName(), LocationsCommon.class);
@@ -1068,9 +1068,9 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         // The only relevant ID may be the one used in update(), below.
         LocationAuthorityClient client = new LocationAuthorityClient();
    	String displayName = "displayName-NON_EXISTENT_ID";
-    	MultipartOutput multipart = LocationAuthorityClientUtils.createLocationAuthorityInstance(
+    	PoxPayloadOut multipart = LocationAuthorityClientUtils.createLocationAuthorityInstance(
     				displayName, "nonEx", client.getCommonPartName());
-        ClientResponse<MultipartInput> res =
+        ClientResponse<PoxPayloadIn> res =
                 client.update(NON_EXISTENT_ID, multipart);
         try {
 	        int statusCode = res.getStatus();
@@ -1113,11 +1113,11 @@ public class LocationAuthorityServiceTest extends AbstractServiceTestImpl {
         nonexMap.put(LocationJAXBSchema.SHORT_IDENTIFIER, "nonEx");
         nonexMap.put(LocationJAXBSchema.LOCATION_TYPE, TEST_LOCATION_TYPE);
         nonexMap.put(LocationJAXBSchema.TERM_STATUS, TEST_STATUS);
-        MultipartOutput multipart = 
+        PoxPayloadOut multipart = 
     	LocationAuthorityClientUtils.createLocationInstance(
     			LocationAuthorityClientUtils.createLocationRefName(knownResourceRefName, "nonEx", "Non Existent"), 
     			nonexMap, client.getItemCommonPartName() );
-        ClientResponse<MultipartInput> res =
+        ClientResponse<PoxPayloadIn> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
         try {
 	        int statusCode = res.getStatus();

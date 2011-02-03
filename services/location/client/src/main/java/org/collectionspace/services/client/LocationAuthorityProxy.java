@@ -17,15 +17,13 @@ import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.location.LocationauthoritiesCommonList;
 import org.collectionspace.services.location.LocationsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
  * @version $Revision:$
  */
-@Path("/locationauthorities/")
-@Produces({"multipart/mixed"})
-@Consumes({"multipart/mixed"})
+@Path(LocationAuthorityClient.SERVICE_PATH + "/")
+@Produces("application/xml")
+@Consumes("application/xml")
 public interface LocationAuthorityProxy extends CollectionSpaceProxy {
 
     // List Locationauthorities
@@ -35,22 +33,22 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(MultipartOutput multipart);
+    ClientResponse<Response> create(PoxPayloadOut multipart);
 
     //(R)ead
     @GET
     @Path("/{csid}")
-    ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
+    ClientResponse<PoxPayloadIn> read(@PathParam("csid") String csid);
 
     //(R)ead by name
     @GET
     @Path("/urn:cspace:name({name})")
-    ClientResponse<MultipartInput> readByName(@PathParam("name") String name);
+    ClientResponse<PoxPayloadIn> readByName(@PathParam("name") String name);
 
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<MultipartInput> update(@PathParam("csid") String csid, MultipartOutput multipart);
+    ClientResponse<PoxPayloadIn> update(@PathParam("csid") String csid, PoxPayloadOut multipart);
 
     //(D)elete
     @DELETE
@@ -90,17 +88,17 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
     //(C)reate Item
     @POST
     @Path("/{vcsid}/items/")
-    ClientResponse<Response> createItem(@PathParam("vcsid") String vcsid, MultipartOutput multipart);
+    ClientResponse<Response> createItem(@PathParam("vcsid") String vcsid, PoxPayloadOut multipart);
 
     //(R)ead Item
     @GET
     @Path("/{vcsid}/items/{csid}")
-    ClientResponse<MultipartInput> readItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
+    ClientResponse<PoxPayloadIn> readItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
 
     //(U)pdate Item
     @PUT
     @Path("/{vcsid}/items/{csid}")
-    ClientResponse<MultipartInput> updateItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid, MultipartOutput multipart);
+    ClientResponse<PoxPayloadIn> updateItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid, PoxPayloadOut multipart);
 
     //(D)elete Item
     @DELETE
@@ -121,12 +119,12 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
     ClientResponse<Response> createContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
-            MultipartOutput multipart);
+            PoxPayloadOut multipart);
 
      //(R)ead Contact
     @GET
     @Path("/{parentcsid}/items/{itemcsid}/contacts/{csid}")
-    ClientResponse<MultipartInput> readContact(
+    ClientResponse<PoxPayloadIn> readContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid);
@@ -134,11 +132,11 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
     //(U)pdate Contact
     @PUT
     @Path("/{parentcsid}/items/{itemcsid}/contacts/{csid}")
-    ClientResponse<MultipartInput> updateContact(
+    ClientResponse<PoxPayloadIn> updateContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid,
-            MultipartOutput multipart);
+            PoxPayloadOut multipart);
 
     //(D)elete Contact
     @DELETE

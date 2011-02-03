@@ -43,7 +43,7 @@ import org.collectionspace.services.location.LocationauthoritiesCommonList;
 import org.collectionspace.services.location.LocationsCommon;
 import org.collectionspace.services.location.LocationsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +80,7 @@ public class LocationAuthorityBaseImport {
         String baseLocationRefName = LocationAuthorityClientUtils.createLocationAuthRefName(locationAuthorityName, displaySuffix);//TODO: make displaySuffix correct. Laramie20100729 temp fix, made-up displaySuffix.  was (locationAuthorityName, false);
         String fullLocationRefName = LocationAuthorityClientUtils.createLocationAuthRefName(locationAuthorityName, displaySuffix);//TODO: make displaySuffix correct. Laramie20100729 temp fix, made-up displaySuffix.  was (locationAuthorityName, true);
 
-        MultipartOutput multipart =  LocationAuthorityClientUtils.createLocationAuthorityInstance(locationAuthorityName, fullLocationRefName, client.getCommonPartName());
+        PoxPayloadOut multipart =  LocationAuthorityClientUtils.createLocationAuthorityInstance(locationAuthorityName, fullLocationRefName, client.getCommonPartName());
         ClientResponse<Response> res = client.create(multipart);
 
     	int statusCode = res.getStatus();

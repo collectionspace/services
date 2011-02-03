@@ -16,8 +16,6 @@ import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.location.LocationsCommon;
 import org.collectionspace.services.location.LocationauthoritiesCommon;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -31,19 +29,19 @@ public class LocationAuthorityClientUtils {
      * @param displayName	The displayName used in UI, etc.
      * @param refName		The proper refName for this authority
      * @param headerLabel	The common part label
-     * @return	The MultipartOutput payload for the create call
+     * @return	The PoxPayloadOut payload for the create call
      */
-    public static MultipartOutput createLocationAuthorityInstance(
+    public static PoxPayloadOut createLocationAuthorityInstance(
     		String displayName, String shortIdentifier, String headerLabel ) {
         LocationauthoritiesCommon locationAuthority = new LocationauthoritiesCommon();
         locationAuthority.setDisplayName(displayName);
         locationAuthority.setShortIdentifier(shortIdentifier);
         String refName = createLocationAuthRefName(shortIdentifier, displayName);
         locationAuthority.setRefName(refName);
-        locationAuthority.setVocabType("LocationAuthority");
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(locationAuthority, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", headerLabel);
+        locationAuthority.setVocabType("LocationAuthority"); //FIXME: REM - Should this really be hard-coded?
+        PoxPayloadOut multipart = new PoxPayloadOut(LocationAuthorityClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = multipart.addPart(locationAuthority, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(headerLabel);
 
         if(logger.isDebugEnabled()){
         	logger.debug("to be created, locationAuthority common ", 
@@ -57,9 +55,9 @@ public class LocationAuthorityClientUtils {
      * @param locationRefName  The proper refName for this authority
      * @param locationInfo the properties for the new Location
      * @param headerLabel	The common part label
-     * @return	The MultipartOutput payload for the create call
+     * @return	The PoxPayloadOut payload for the create call
      */
-    public static MultipartOutput createLocationInstance( 
+    public static PoxPayloadOut createLocationInstance( 
     		String locationAuthRefName, Map<String, String> locationInfo, String headerLabel){
         LocationsCommon location = new LocationsCommon();
     	String shortId = locationInfo.get(LocationJAXBSchema.SHORT_IDENTIFIER);
@@ -87,7 +85,7 @@ public class LocationAuthorityClientUtils {
         	location.setAddress(value);
         if((value = (String)locationInfo.get(LocationJAXBSchema.TERM_STATUS))!=null)
         	location.setTermStatus(value);
-        MultipartOutput multipart = new MultipartOutput();
+        PoxPayloadOut multipart = new PoxPayloadOut();
         OutputPart commonPart = multipart.addPart(location,
             MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", headerLabel);
@@ -131,7 +129,7 @@ public class LocationAuthorityClientUtils {
     		logger.debug("Import: Create Item: \""+displayName
     				+"\" in locationAuthority: \"" + locationAuthorityRefName +"\"");
     	}
-    	MultipartOutput multipart = 
+    	PoxPayloadOut multipart = 
     		createLocationInstance( locationAuthorityRefName,
     			locationMap, client.getItemCommonPartName() );
     	String newID = null;
@@ -158,9 +156,9 @@ public class LocationAuthorityClientUtils {
     	return newID;
     }
 
-    public static MultipartOutput createLocationInstance(
+    public static PoxPayloadOut createLocationInstance(
     		String commonPartXML, String headerLabel){
-        MultipartOutput multipart = new MultipartOutput();
+        PoxPayloadOut multipart = new PoxPayloadOut();
         OutputPart commonPart = multipart.addPart(commonPartXML,
             MediaType.APPLICATION_XML_TYPE);
         commonPart.getHeaders().add("label", headerLabel);
@@ -180,7 +178,7 @@ public class LocationAuthorityClientUtils {
     	// Type of service request being tested
     	ServiceRequestType REQUEST_TYPE = ServiceRequestType.CREATE;
     	
-    	MultipartOutput multipart = 
+    	PoxPayloadOut multipart = 
     		createLocationInstance( commonPartXML, client.getItemCommonPartName() );
     	String newID = null;
     	ClientResponse<Response> res = client.createItem(vcsid, multipart);
