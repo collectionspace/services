@@ -104,14 +104,18 @@ public abstract class BaseServiceTest {
         "\n" + BANNER_SEPARATOR_LINE;
 
     // A Unicode UTF-8 data fragment for use in test payloads: a random sequence,
-    // unlikely to be encountered in actual collections data, of two USASCII
-    // characters followed by four non-USASCII range Unicode UTF-8 characters:
+    // unlikely to be encountered in actual collections data, and capable of
+    // being rendered by the default fonts in many modern operating systems.
+    //
+    // This fragment consists of a run of USASCII characters, followed by
+    // four non-USASCII range Unicode UTF-8 characters:
     //
     // Δ : Greek capital letter Delta (U+0394)
     // Ж : Cyrillic capital letter Zhe with breve (U+04C1)
     // Ŵ : Latin capital letter W with circumflex (U+0174)
     // Ω : Greek capital letter Omega (U+03A9)
-    private final static String UTF8_DATA_FRAGMENT = "to" + '\u0394' + '\u04C1' + '\u0174' +'\u03A9';
+    private final static String UTF8_DATA_FRAGMENT = "utf-8-data-fragment:"
+            + '\u0394' + '\u04C1' + '\u0174' +'\u03A9';
     
     protected static final int STATUS_BAD_REQUEST =
         Response.Status.BAD_REQUEST.getStatusCode();
