@@ -28,6 +28,10 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.BlobClient;
+import org.collectionspace.services.client.ContactClient;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.blob.BlobsCommon;
 import org.collectionspace.services.blob.BlobsCommonList;
@@ -52,9 +56,18 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
 
     private final String CLASS_NAME = BlobServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    final String SERVICE_PATH_COMPONENT = "blobs";
     private String knownResourceId = null;
 
+	@Override
+	public String getServicePathComponent() {
+		return BlobClient.SERVICE_PATH_COMPONENT;
+	}
+
+	@Override
+	protected String getServiceName() {
+		return BlobClient.SERVICE_NAME;
+	}
+    
     @Override
     protected CollectionSpaceClient getClientInstance() {
         return new BlobClient();
@@ -71,7 +84,7 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupCreate();
         BlobClient client = new BlobClient();
-        MultipartOutput multipart = createBlobInstance(createIdentifier());
+        PoxPayloadOut multipart = createBlobInstance(createIdentifier());
         ClientResponse<Response> res = client.create(multipart);
         assertStatusCode(res, testName);
         if (knownResourceId == null) {
@@ -96,9 +109,9 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupRead();
         BlobClient client = new BlobClient();
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         assertStatusCode(res, testName);
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         BlobsCommon blob = (BlobsCommon) extractPart(input, client.getCommonPartName(), BlobsCommon.class);
         Assert.assertNotNull(blob);
     }
@@ -130,21 +143,21 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupUpdate();
         BlobClient client = new BlobClient();
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         assertStatusCode(res, testName);
         logger.debug("got object to update with ID: " + knownResourceId);
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         BlobsCommon blob = (BlobsCommon) extractPart(input, client.getCommonPartName(), BlobsCommon.class);
         Assert.assertNotNull(blob);
 
         blob.setName("updated-" + blob.getName());
         logger.debug("Object to be updated:"+objectAsXmlString(blob, BlobsCommon.class));
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(blob, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
+        PoxPayloadOut output = new PoxPayloadOut(BlobClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(blob, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getCommonPartName());
         res = client.update(knownResourceId, output);
         assertStatusCode(res, testName);
-        input = (MultipartInput) res.getEntity();
+        input = new PoxPayloadIn(res.getEntity());
         BlobsCommon updatedBlob = (BlobsCommon) extractPart(input, client.getCommonPartName(), BlobsCommon.class);
         Assert.assertNotNull(updatedBlob);
     }
@@ -158,8 +171,8 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
         BlobClient client = new BlobClient();
-        MultipartOutput multipart = createBlobInstance(NON_EXISTENT_ID);
-        ClientResponse<MultipartInput> res = client.update(NON_EXISTENT_ID, multipart);
+        PoxPayloadOut multipart = createBlobInstance(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
         assertStatusCode(res, testName);
     }
 
@@ -184,7 +197,7 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupReadNonExistent();
         BlobClient client = new BlobClient();
-        ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
         assertStatusCode(res, testName);
     }
 
@@ -243,19 +256,13 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-
-    @Override
-    public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
-    }
-
-    private MultipartOutput createBlobInstance(String exitNumber) {
+    private PoxPayloadOut createBlobInstance(String exitNumber) {
         String identifier = "blobNumber-" + exitNumber;
         BlobsCommon blob = new BlobsCommon();
         blob.setName(identifier);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(blob, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new BlobClient().getCommonPartName());
+        PoxPayloadOut multipart = new PoxPayloadOut(BlobClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = multipart.addPart(blob, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(new BlobClient().getCommonPartName());
 
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, blob common");

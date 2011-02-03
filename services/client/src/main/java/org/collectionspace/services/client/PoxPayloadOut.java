@@ -30,6 +30,10 @@ public class PoxPayloadOut extends PoxPayload<PayloadOutputPart> {
 		setPayloadName(payloadName);
 	}
 		
+	public PoxPayloadOut(byte[] xmlPayload) throws DocumentException {
+		super(new String(xmlPayload));
+	}
+	
 	/**
 	 * Instantiates a new PoxPayloadOut, saves the xml, creates a DOM, and parses the parts.
 	 *

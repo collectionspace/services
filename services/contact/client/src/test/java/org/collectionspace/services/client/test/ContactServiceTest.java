@@ -54,9 +54,8 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: 2009-11-06 12:20:28 -0800 (Fri, 06 Nov 2009) $
  */
 public class ContactServiceTest extends AbstractServiceTestImpl {
-
     private final String CLASS_NAME = ContactServiceTest.class.getName();
-    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    private final Logger logger = LoggerFactory.getLogger(ContactServiceTest.class);
 
     // Instance variables specific to this test.
 //    final String SERVICE_PATH_COMPONENT = "contacts";

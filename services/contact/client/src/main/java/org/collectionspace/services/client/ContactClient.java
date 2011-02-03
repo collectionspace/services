@@ -121,7 +121,7 @@ public class ContactClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.services.client.Contact#createContact(org.collectionspace.services.Contact)
      */
     public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
-        return contactProxy.create(xmlPayload.toXML());
+        return contactProxy.create(xmlPayload.getBytes());
     }
 
     /**
@@ -131,7 +131,7 @@ public class ContactClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.services.client.Contact#updateContact(java.lang.Long, org.collectionspace.services.Contact)
      */
     public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
-        return contactProxy.update(csid, xmlPayload.toXML());
+        return contactProxy.update(csid, xmlPayload.getBytes());
 
     }
 

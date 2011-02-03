@@ -39,17 +39,21 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  *
  */
 public class MediaClient extends AbstractServiceClientImpl {
+	public static final String SERVICE_NAME = "media";
+	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
+	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
+	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
-     */
+	@Override
+	public String getServiceName() {
+		return SERVICE_NAME;
+	}
+	
+	@Override
     public String getServicePathComponent() {
-        return "media"; //Laramie20100824 was medias, but label was a mismatch.
+        return SERVICE_PATH_COMPONENT;
     }
-    /**
-     *
-     */
-//    private static final MediaClient instance = new MediaClient();
+    
     /**
      *
      */
@@ -85,15 +89,6 @@ public class MediaClient extends AbstractServiceClientImpl {
     }
 
     /**
-     * FIXME Comment this
-     *
-     * @return
-     */
-//    public static MediaClient getInstance() {
-//        return instance;
-//    }
-
-    /**
      * @return
      * @see org.collectionspace.services.client.MediaProxy#getMedia()
      */
@@ -116,7 +111,7 @@ public class MediaClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.MediaProxy#getMedia(java.lang.String)
      */
-    public ClientResponse<MultipartInput> read(String csid) {
+    public ClientResponse<String> read(String csid) {
         return mediaProxy.read(csid);
     }
 
@@ -125,8 +120,8 @@ public class MediaClient extends AbstractServiceClientImpl {
      * @return
      *
      */
-    public ClientResponse<Response> create(MultipartOutput multipart) {
-        return mediaProxy.create(multipart);
+    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
+        return mediaProxy.create(xmlPayload.getBytes());
     }
 
     /**
@@ -134,8 +129,8 @@ public class MediaClient extends AbstractServiceClientImpl {
      * @param media
      * @return
      */
-    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
-        return mediaProxy.update(csid, multipart);
+    public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
+        return mediaProxy.update(csid, xmlPayload.getBytes());
 
     }
 

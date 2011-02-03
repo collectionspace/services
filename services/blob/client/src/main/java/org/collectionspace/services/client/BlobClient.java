@@ -39,17 +39,20 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  *
  */
 public class BlobClient extends AbstractServiceClientImpl {
+	public static final String SERVICE_NAME = "blobs";
+	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
+	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
+	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
-     */
+	@Override
+	public String getServiceName() {
+		return SERVICE_NAME;
+	}
+	
+	@Override
     public String getServicePathComponent() {
-        return "blobs"; //Laramie20100824 was blobs, but label was a mismatch.
+        return SERVICE_PATH_COMPONENT;
     }
-    /**
-     *
-     */
-//    private static final BlobClient instance = new BlobClient();
     /**
      *
      */
@@ -116,7 +119,7 @@ public class BlobClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.BlobProxy#getBlob(java.lang.String)
      */
-    public ClientResponse<MultipartInput> read(String csid) {
+    public ClientResponse<String> read(String csid) {
         return blobProxy.read(csid);
     }
 
@@ -125,8 +128,8 @@ public class BlobClient extends AbstractServiceClientImpl {
      * @return
      *
      */
-    public ClientResponse<Response> create(MultipartOutput multipart) {
-        return blobProxy.create(multipart);
+    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
+        return blobProxy.create(xmlPayload.getBytes());
     }
 
     /**
@@ -134,8 +137,8 @@ public class BlobClient extends AbstractServiceClientImpl {
      * @param blob
      * @return
      */
-    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
-        return blobProxy.update(csid, multipart);
+    public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
+        return blobProxy.update(csid, xmlPayload.getBytes());
 
     }
 

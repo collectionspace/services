@@ -19,24 +19,24 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 /**
  * @version $Revision: 2108 $
  */
-@Path("/media/")
-@Produces({"multipart/mixed"})
-@Consumes({"multipart/mixed"})
+@Path(MediaClient.SERVICE_PATH + "/")
+@Produces({"application/xml", "multipart/mixed"})
+@Consumes({"application/xml", "multipart/mixed"})
 public interface MediaProxy extends CollectionSpaceProxy {
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(MultipartOutput multipart);
+    ClientResponse<Response> create(byte[] xmlPayload);
 
     //(R)ead
     @GET
     @Path("/{csid}")
-    ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
+    ClientResponse<String> read(@PathParam("csid") String csid);
 
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<MultipartInput> update(@PathParam("csid") String csid, MultipartOutput multipart);
+    ClientResponse<String> update(@PathParam("csid") String csid, byte[] xmlPayload);
 
     //(D)elete
     @DELETE

@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The Class ContactResource.
  */
-@Path("/" + ContactClient.SERVICE_PATH_COMPONENT)
+@Path(ContactClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
 public class ContactResource extends 

@@ -27,7 +27,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.MediaClient;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.media.MediaCommon;
 import org.collectionspace.services.media.MediaCommonList;
@@ -52,9 +56,18 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
 
     private final String CLASS_NAME = MediaServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    final String SERVICE_PATH_COMPONENT = "media";
     private String knownResourceId = null;
 
+	@Override
+	public String getServicePathComponent() {
+		return MediaClient.SERVICE_PATH_COMPONENT;
+	}
+
+	@Override
+	protected String getServiceName() {
+		return MediaClient.SERVICE_NAME;
+	}
+    
     @Override
     protected CollectionSpaceClient getClientInstance() {
         return new MediaClient();
@@ -71,7 +84,7 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupCreate();
         MediaClient client = new MediaClient();
-        MultipartOutput multipart = createMediaInstance(createIdentifier());
+        PoxPayloadOut multipart = createMediaInstance(createIdentifier());
         ClientResponse<Response> res = client.create(multipart);
         assertStatusCode(res, testName);
         if (knownResourceId == null) {
@@ -96,9 +109,9 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupRead();
         MediaClient client = new MediaClient();
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         assertStatusCode(res, testName);
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         MediaCommon media = (MediaCommon) extractPart(input, client.getCommonPartName(), MediaCommon.class);
         Assert.assertNotNull(media);
     }
@@ -130,21 +143,21 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupUpdate();
         MediaClient client = new MediaClient();
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         assertStatusCode(res, testName);
         logger.debug("got object to update with ID: " + knownResourceId);
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());;
         MediaCommon media = (MediaCommon) extractPart(input, client.getCommonPartName(), MediaCommon.class);
         Assert.assertNotNull(media);
 
         media.setTitle("updated-" + media.getTitle());
         logger.debug("Object to be updated:"+objectAsXmlString(media, MediaCommon.class));
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(media, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
+        PoxPayloadOut output = new PoxPayloadOut(MediaClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(media, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getCommonPartName());
         res = client.update(knownResourceId, output);
         assertStatusCode(res, testName);
-        input = (MultipartInput) res.getEntity();
+        input = new PoxPayloadIn(res.getEntity());
         MediaCommon updatedMedia = (MediaCommon) extractPart(input, client.getCommonPartName(), MediaCommon.class);
         Assert.assertNotNull(updatedMedia);
     }
@@ -158,8 +171,8 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
         MediaClient client = new MediaClient();
-        MultipartOutput multipart = createMediaInstance(NON_EXISTENT_ID);
-        ClientResponse<MultipartInput> res = client.update(NON_EXISTENT_ID, multipart);
+        PoxPayloadOut multipart = createMediaInstance(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
         assertStatusCode(res, testName);
     }
 
@@ -184,7 +197,7 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupReadNonExistent();
         MediaClient client = new MediaClient();
-        ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
         assertStatusCode(res, testName);
     }
 
@@ -243,19 +256,13 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-
-    @Override
-    public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
-    }
-
-    private MultipartOutput createMediaInstance(String title) {
+    private PoxPayloadOut createMediaInstance(String title) {
         String identifier = "media.title-" + title;
         MediaCommon media = new MediaCommon();
         media.setTitle(identifier);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(media, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new MediaClient().getCommonPartName());
+        PoxPayloadOut multipart = new PoxPayloadOut(MediaClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = multipart.addPart(media, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(new MediaClient().getCommonPartName());
 
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, media common");

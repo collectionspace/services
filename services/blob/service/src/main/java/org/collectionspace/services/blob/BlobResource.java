@@ -26,6 +26,7 @@ package org.collectionspace.services.blob;
 import java.util.Map;
 import java.util.UUID;
 
+import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.FileUtils;
@@ -71,16 +72,15 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 
-@Path("/blobs")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Path(BlobClient.SERVICE_PATH)
+@Consumes({"multipart/mixed", "application/xml"})
+@Produces({"multipart/mixed", "application/xml"})
 public class BlobResource extends ResourceBase {
 
 	@Override
     public String getServiceName(){
         return BlobUtil.BLOB_RESOURCE_NAME;
     }
-
 
     @Override
     protected String getVersionString() {
@@ -244,7 +244,7 @@ public class BlobResource extends ResourceBase {
     
     @GET
     @Path("{csid}/derivatives/{derivativeTerm}")
-    public PoxPayloadOut getDerivative(@PathParam("csid") String csid,
+    public String getDerivative(@PathParam("csid") String csid,
     		@PathParam("derivativeTerm") String derivativeTerm) {
     	PoxPayloadOut result = null;
     	
@@ -263,7 +263,7 @@ public class BlobResource extends ResourceBase {
             throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
         }
         
-        return result;
+        return result.toXML();
     }
         
     @GET

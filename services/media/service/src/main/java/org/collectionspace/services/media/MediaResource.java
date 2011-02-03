@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.media;
 
+import org.collectionspace.services.client.MediaClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.ResourceBase;
@@ -40,6 +41,8 @@ import org.collectionspace.services.blob.BlobResource;
 
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -57,17 +60,19 @@ import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.List;
 
-@Path("/media")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Path(MediaClient.SERVICE_PATH)
+@Produces({"application/xml", "multipart/mixed"})
+@Consumes({"application/xml", "multipart/mixed"})
 public class MediaResource extends ResourceBase {
+    final Logger logger = LoggerFactory.getLogger(MediaResource.class);
 
     @Override
     public String getServiceName(){
-        return "media";
+        return MediaClient.SERVICE_NAME;
     }
     
     private BlobResource blobResource = new BlobResource();
+    
     BlobResource getBlobResource() {
     	return blobResource;
     }
@@ -97,8 +102,7 @@ public class MediaResource extends ResourceBase {
     	ensureCSID(result, READ);
 		
         return result;
-	}
-	
+	}	
     
     //FIXME retrieve client type from configuration
     final static ClientType CLIENT_TYPE = ServiceMain.getInstance().getClientType();
@@ -147,7 +151,7 @@ public class MediaResource extends ResourceBase {
 
     @GET
     @Path("{csid}/blob")
-    public PoxPayloadOut getBlobInfo(@PathParam("csid") String csid) {
+    public byte[] getBlobInfo(@PathParam("csid") String csid) {
     	PoxPayloadOut result = null;
     	
 	    try {
@@ -158,7 +162,7 @@ public class MediaResource extends ResourceBase {
 	        throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
 	    }
 	    
-	    return result;
+	    return result.getBytes();
     }
     
     @GET
@@ -200,7 +204,7 @@ public class MediaResource extends ResourceBase {
             
     @GET
     @Path("{csid}/blob/derivatives/{derivativeTerm}")
-    public PoxPayloadOut getDerivative(@PathParam("csid") String csid,
+    public byte[] getDerivative(@PathParam("csid") String csid,
     		@PathParam("derivativeTerm") String derivativeTerm) {
     	PoxPayloadOut result = null;
 
@@ -208,12 +212,13 @@ public class MediaResource extends ResourceBase {
 	    	ensureCSID(csid, READ);
 	        String blobCsid = this.getBlobCsid(csid);
 	    	ServiceContext<PoxPayloadIn, PoxPayloadOut> blobContext = createServiceContext(BlobUtil.BLOB_RESOURCE_NAME);
-	    	result = getBlobResource().getDerivative(blobCsid, derivativeTerm);	        
+	    	String xmlPayload = getBlobResource().getDerivative(blobCsid, derivativeTerm);
+	    	result = new PoxPayloadOut(xmlPayload.getBytes());
 	    } catch (Exception e) {
 	        throw bigReThrow(e, ServiceMessages.READ_FAILED, csid);
 	    }
 	    
-    	return result;
+    	return result.getBytes();
     }
     
     @GET

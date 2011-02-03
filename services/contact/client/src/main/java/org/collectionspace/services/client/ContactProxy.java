@@ -26,7 +26,7 @@ public interface ContactProxy extends CollectionSpaceProxy {
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(String xmlPayload);
+    ClientResponse<Response> create(byte[] xmlPayload);
 
     //(R)ead
     @GET
@@ -36,7 +36,7 @@ public interface ContactProxy extends CollectionSpaceProxy {
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<String> update(@PathParam("csid") String csid, String xmlPayload);
+    ClientResponse<String> update(@PathParam("csid") String csid, byte[] xmlPayload);
 
     //(D)elete
     @DELETE
