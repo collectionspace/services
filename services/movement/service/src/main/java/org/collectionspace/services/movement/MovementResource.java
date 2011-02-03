@@ -62,8 +62,6 @@ import org.collectionspace.services.movement.MovementsCommon;
 import org.collectionspace.services.movement.MovementsCommonList;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
@@ -79,8 +77,8 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate$
  */
 @Path("/movements")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Consumes("application/xml")
+@Produces("application/xml;charset=UTF-8")
 public class MovementResource extends AbstractMultiPartCollectionSpaceResourceImpl {
 
     /** The Constant serviceName. */
@@ -146,8 +144,9 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
      * @return the response
      */
     @POST
-    public Response createMovement(PoxPayloadIn input) {
+    public Response createMovement(String xmlText) {
         try {
+            PoxPayloadIn input = new PoxPayloadIn(xmlText);
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
@@ -181,7 +180,7 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
      */
     @GET
     @Path("{csid}")
-    public PoxPayloadOut getMovement(
+    public String getMovement(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getMovement with csid=" + csid);
@@ -224,7 +223,7 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
                     ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.toXML();
     }
 
     /**
@@ -363,9 +362,9 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
      */
     @PUT
     @Path("{csid}")
-    public PoxPayloadOut updateMovement(
+    public String updateMovement(
             @PathParam("csid") String csid,
-            PoxPayloadIn theUpdate) {
+            String xmlText) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateMovement with csid=" + csid);
         }
@@ -378,7 +377,8 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
         }
         PoxPayloadOut result = null;
         try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate);
+            PoxPayloadIn update = new PoxPayloadIn(xmlText);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(update);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
             result = ctx.getOutput();
@@ -401,7 +401,7 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
                     ServiceMessages.UPDATE_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.toXML();
     }
 
     /**

@@ -35,6 +35,10 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.MovementClient;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.datetime.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -42,9 +46,6 @@ import org.collectionspace.services.movement.MovementsCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -63,9 +64,10 @@ public class MovementAuthRefsTest extends BaseServiceTest {
 
     private final String CLASS_NAME = MovementAuthRefsTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    final String SERVICE_NAME = "movements";
+    final String SERVICE_PATH_COMPONENT = "movements";
 
     // Instance variables specific to this test.
-    final String SERVICE_PATH_COMPONENT = "movements";
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     private String knownResourceId = null;
     private List<String> movementIdsCreated = new ArrayList<String>();
@@ -118,7 +120,7 @@ public class MovementAuthRefsTest extends BaseServiceTest {
         // One or more fields in this resource will be PersonAuthority
         // references, and will refer to Person resources by their refNames.
         MovementClient movementClient = new MovementClient();
-        MultipartOutput multipart = createMovementInstance(
+        PoxPayloadOut multipart = createMovementInstance(
                 "movementReferenceNumber-" + identifier,
                 GregorianCalendarDateTimeUtils.timestampUTC(),
                 movementContactRefName);
@@ -157,7 +159,7 @@ public class MovementAuthRefsTest extends BaseServiceTest {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding
         // refName by which it can be identified.
-    	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
+    	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
@@ -182,7 +184,7 @@ public class MovementAuthRefsTest extends BaseServiceTest {
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
-    	MultipartOutput multipart = 
+    	PoxPayloadOut multipart =
     		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
     				authRefName, personInfo, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
@@ -207,7 +209,7 @@ public class MovementAuthRefsTest extends BaseServiceTest {
 
         // Submit the request to the service and store the response.
         MovementClient movementClient = new MovementClient();
-        ClientResponse<MultipartInput> res = movementClient.read(knownResourceId);
+        ClientResponse<String> res = movementClient.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -219,16 +221,20 @@ public class MovementAuthRefsTest extends BaseServiceTest {
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
-        MovementsCommon movement = (MovementsCommon) extractPart(input,
-            movementClient.getCommonPartName(), MovementsCommon.class);
-        Assert.assertNotNull(movement);
+        // Extract and return the common part of the record.
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        PayloadInputPart payloadInputPart = input.getPart(movementClient.getCommonPartName());
+        MovementsCommon movementCommon = null;
+        if (payloadInputPart != null) {
+        	movementCommon = (MovementsCommon) payloadInputPart.getBody();
+        }
+        Assert.assertNotNull(movementCommon);
         if(logger.isDebugEnabled()){
-            logger.debug(objectAsXmlString(movement, MovementsCommon.class));
+            logger.debug(objectAsXmlString(movementCommon, MovementsCommon.class));
         }
         // Check a couple of fields
         // FIXME
-        Assert.assertEquals(movement.getMovementContact(), movementContactRefName);
+        Assert.assertEquals(movementCommon.getMovementContact(), movementContactRefName);
         
         // Get the auth refs and check them
         ClientResponse<AuthorityRefList> res2 =
@@ -318,26 +324,32 @@ public class MovementAuthRefsTest extends BaseServiceTest {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+
+    @Override
+    protected String getServiceName() {
+        return SERVICE_NAME;
+    }
+
     @Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
     }
 
-   private MultipartOutput createMovementInstance(String movementReferenceNumber,
+   private PoxPayloadOut createMovementInstance(String movementReferenceNumber,
             String locationDate,
             String movementContact) {
-        MovementsCommon movement = new MovementsCommon();
-        movement.setMovementReferenceNumber(movementReferenceNumber);
-        movement.setLocationDate(locationDate);
-        movement.setMovementContact(movementContact);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart =
-            multipart.addPart(movement, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new MovementClient().getCommonPartName());
+        MovementsCommon movementCommon = new MovementsCommon();
+        movementCommon.setMovementReferenceNumber(movementReferenceNumber);
+        movementCommon.setLocationDate(locationDate);
+        movementCommon.setMovementContact(movementContact);
+        PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart =
+            multipart.addPart(movementCommon, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(new MovementClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, movement common");
-            logger.debug(objectAsXmlString(movement, MovementsCommon.class));
+            logger.debug(objectAsXmlString(movementCommon, MovementsCommon.class));
         }
 
         return multipart;

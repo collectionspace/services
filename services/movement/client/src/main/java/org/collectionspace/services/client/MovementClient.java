@@ -26,8 +26,6 @@ import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
@@ -39,23 +37,11 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  */
 public class MovementClient extends AbstractServiceClientImpl {
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
-     */
-    @Override
-    public String getServicePathComponent() {
-        return "movements";
-    }
-    /**
-     *
-     */
-//    private static final MovementClient instance = new MovementClient();
-    /**
-     *
-     */
     private MovementProxy movementProxy;
+    public static final String SERVICE_NAME = "movements";
+    public static final String SERVICE_PATH_COMPONENT = "movements";
 
-    /**
+   /**
      *
      * Default constructor for MovementClient class.
      *
@@ -66,6 +52,19 @@ public class MovementClient extends AbstractServiceClientImpl {
         setProxy();
     }
 
+    @Override
+    public String getServiceName() {
+        return SERVICE_NAME;
+    }
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
+     */
+    @Override
+    public String getServicePathComponent() {
+        return SERVICE_PATH_COMPONENT;
+    }
+    
     @Override
     public CollectionSpaceProxy getProxy() {
     	return this.movementProxy;
@@ -84,15 +83,6 @@ public class MovementClient extends AbstractServiceClientImpl {
                     getBaseURL());
         }
     }
-
-    /**
-     * FIXME Comment this
-     *
-     * @return
-     */
-//    public static MovementClient getInstance() {
-//        return instance;
-//    }
 
     /**
      * @return
@@ -136,27 +126,29 @@ public class MovementClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.MovementProxy#getMovement(java.lang.String)
      */
-    public ClientResponse<MultipartInput> read(String csid) {
+    public ClientResponse<String> read(String csid) {
         return movementProxy.read(csid);
     }
 
     /**
-     * @param movement
+     * @param multipart
      * @return
      * @see org.collectionspace.services.client.MovementProxy#createMovement(org.collectionspace.hello.Movement)
      */
-    public ClientResponse<Response> create(MultipartOutput multipart) {
-        return movementProxy.create(multipart);
+    public ClientResponse<Response> create(PoxPayloadOut multipart) {
+        String payload = multipart.toXML();
+        return movementProxy.create(payload);
     }
 
     /**
      * @param csid
-     * @param movement
+     * @param multipart
      * @return
      * @see org.collectionspace.services.client.MovementProxy#updateMovement(java.lang.Long, org.collectionspace.hello.Movement)
      */
-    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
-        return movementProxy.update(csid, multipart);
+    public ClientResponse<String> update(String csid, PoxPayloadOut multipart) {
+        String payload = multipart.toXML();
+        return movementProxy.update(csid, payload);
 
     }
 
@@ -165,6 +157,7 @@ public class MovementClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.MovementProxy#deleteMovement(java.lang.Long)
      */
+    @Override
     public ClientResponse<Response> delete(String csid) {
         return movementProxy.delete(csid);
     }

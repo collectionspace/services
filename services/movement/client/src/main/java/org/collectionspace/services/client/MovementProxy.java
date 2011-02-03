@@ -39,8 +39,7 @@ import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.movement.MovementsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+
 
 /**
  * MovementProxy.java
@@ -49,23 +48,23 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
  * $LastChangedDate$
  */
 @Path("/movements/")
-@Produces({"multipart/mixed"})
-@Consumes({"multipart/mixed"})
+@Produces("application/xml;charset=UTF-8")
+@Consumes("application/xml")
 public interface MovementProxy extends CollectionSpaceProxy {
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(MultipartOutput multipart);
+    ClientResponse<Response> create(String payload);
 
     //(R)ead
     @GET
     @Path("/{csid}")
-    ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
+    ClientResponse<String> read(@PathParam("csid") String csid);
 
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<MultipartInput> update(@PathParam("csid") String csid, MultipartOutput multipart);
+    ClientResponse<String> update(@PathParam("csid") String csid, String payload);
 
     //(D)elete
     @DELETE
