@@ -217,6 +217,10 @@ public abstract class BaseServiceTest {
         return serviceClient.getBaseURL() + getServicePathComponent();
     }
 
+    public String getServiceClientTenantID() {
+        return serviceClient.getProperty("cspace.tenantID");
+    }
+
     /**
      * Returns the URL of a specific resource managed by a service, and
      * designated by an identifier (such as a universally unique ID, or UUID).
