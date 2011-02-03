@@ -330,6 +330,11 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         String lender = lenderGroups.get(0).getLender();
         Assert.assertEquals(lender, LENDER_REF_NAME);
 
+        if(logger.isDebugEnabled()){
+            logger.debug("UTF-8 data sent=" + getUTF8DataFragment() + "\n"
+                    + "UTF-8 data received=" + loaninCommon.getLoanInNote());
+        }
+
         Assert.assertEquals(loaninCommon.getLoanInNote(), getUTF8DataFragment(),
                 "UTF-8 data retrieved '" + loaninCommon.getLoanInNote()
                 + "' does not match expected data '" + getUTF8DataFragment());
@@ -513,6 +518,11 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(updatedLoaninCommon.getLoanReturnDate(),
                 loaninCommon.getLoanReturnDate(),
                 "Data in updated object did not match submitted data.");
+
+        if(logger.isDebugEnabled()){
+            logger.debug("UTF-8 data sent=" + loaninCommon.getLoanInNote() + "\n"
+                    + "UTF-8 data received=" + updatedLoaninCommon.getLoanInNote());
+        }
 
         Assert.assertTrue(updatedLoaninCommon.getLoanInNote().contains(getUTF8DataFragment()),
                 "UTF-8 data retrieved '" + updatedLoaninCommon.getLoanInNote()
