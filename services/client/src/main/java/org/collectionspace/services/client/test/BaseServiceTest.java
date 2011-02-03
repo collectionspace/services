@@ -189,8 +189,7 @@ public abstract class BaseServiceTest {
     }
 
     /**
-     * Initializes setup values for a given test.  Returns a banner
-     * identifying the test being run, using the local logger for this class.
+     * Initializes setup values for a given test.
      *
      * @param expectedStatusCode  A status code expected to be returned in the response.
      *
