@@ -321,7 +321,8 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         	loaninCommon = (LoansinCommon) payloadInputPart.getBody();
         }
         Assert.assertNotNull(loaninCommon);
-        
+
+        // Check selected fields.
         LenderGroupList lenderGroupList = loaninCommon.getLenderGroupList();
         Assert.assertNotNull(lenderGroupList);
         List<LenderGroup> lenderGroups = lenderGroupList.getLenderGroup();
@@ -487,7 +488,8 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
             logger.debug(objectAsXmlString(loaninCommon, LoansinCommon.class));
         }
 
-        // Submit the updated resource in an update request to the service and store the response.
+        // Submit the updated common part in an update request to the service
+        // and store the response.
         PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart = output.addPart(loaninCommon, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(client.getCommonPartName());
@@ -514,7 +516,7 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         }
         Assert.assertNotNull(updatedLoaninCommon);
 
-        // Check selected fields in the updated resource.
+        // Check selected fields in the updated common part.
         Assert.assertEquals(updatedLoaninCommon.getLoanReturnDate(),
                 loaninCommon.getLoanReturnDate(),
                 "Data in updated object did not match submitted data.");
@@ -523,11 +525,9 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
             logger.debug("UTF-8 data sent=" + loaninCommon.getLoanInNote() + "\n"
                     + "UTF-8 data received=" + updatedLoaninCommon.getLoanInNote());
         }
-
         Assert.assertTrue(updatedLoaninCommon.getLoanInNote().contains(getUTF8DataFragment()),
                 "UTF-8 data retrieved '" + updatedLoaninCommon.getLoanInNote()
                 + "' does not contain expected data '" + getUTF8DataFragment());
-
         Assert.assertEquals(updatedLoaninCommon.getLoanInNote(),
                 loaninCommon.getLoanInNote(),
                 "Data in updated object did not match submitted data.");
