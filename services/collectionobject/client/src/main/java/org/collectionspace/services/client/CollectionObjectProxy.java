@@ -52,7 +52,7 @@ import org.jboss.resteasy.client.ClientResponse;
  * @version $Revision:$
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1684
  */
-@Path(CollectionObjectClient.SERVICE_PATH_COMPONENT + "/")
+@Path(CollectionObjectClient.SERVICE_PATH_PROXY)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
 public interface CollectionObjectProxy extends CollectionSpaceProxy {
@@ -111,8 +111,6 @@ public interface CollectionObjectProxy extends CollectionSpaceProxy {
      * @return the client response
      */
     @POST
-    @Produces("application/xml")
-    @Consumes("text/plain; charset=UTF-8")    
     ClientResponse<Response> create(byte[] payload);
 
     //(R)ead

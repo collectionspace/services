@@ -87,6 +87,11 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
 //    protected String getServicePathComponent() {
 //        return new CollectionObjectClient().getServicePathComponent();
 //    }
+
+	@Override
+	protected String getServiceName() {
+		return CollectionObjectClient.SERVICE_NAME;
+	}
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
