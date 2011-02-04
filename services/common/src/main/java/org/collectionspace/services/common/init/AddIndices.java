@@ -82,7 +82,7 @@ public class AddIndices extends InitHandler implements IInitHandler {
         //todo: all post-init tasks for services, or delegate to services that override.
         int rows = 0;
         String sql = "";
-        logger.info("Modifying field datatypes for " + sbt.getName()
+        logger.info("Creating indicies for designated fields in " + sbt.getName()
                 + " for repository domain " + sbt.getRepositoryDomain().trim() + "...");
 
         for (Field field : fields) {
