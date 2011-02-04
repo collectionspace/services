@@ -43,7 +43,10 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * @version $Revision:$
  */
 public class PermissionClient extends AbstractServiceClientImpl {
-
+	public static final String SERVICE_NAME = "authorization/permissions";
+	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
+	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
+	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
     /**
      *
      */
@@ -53,7 +56,7 @@ public class PermissionClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */
     public String getServicePathComponent() {
-        return "authorization/permissions";
+        return SERVICE_PATH_COMPONENT;
     }
 
     /**
@@ -138,7 +141,6 @@ public class PermissionClient extends AbstractServiceClientImpl {
 
 	@Override
 	public String getServiceName() {
-		// TODO Auto-generated method stub
-		return null; //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3497
+		return SERVICE_NAME;
 	}
 }

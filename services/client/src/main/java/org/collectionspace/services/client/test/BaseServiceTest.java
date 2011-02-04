@@ -230,7 +230,7 @@ public abstract class BaseServiceTest {
      * @return The root URL for a service.
      */
     protected String getServiceRootURL() {
-        return serviceClient.getBaseURL() + getServiceName();//getServicePathComponent();
+        return serviceClient.getBaseURL() + getServiceName(); //FIXME: REM - This should probably be calling getServicePathComponent() and not getServiceName();
     }
 
     /**

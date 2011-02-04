@@ -43,18 +43,24 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * @version $Revision:$
  */
 public class AccountClient extends AbstractServiceClientImpl {
+    public static final String SERVICE_NAME = "accounts";
 
     /**
      *
      */
     private AccountProxy accountProxy;
 
-    /* (non-Javadoc)
+	@Override
+	public String getServiceName() {
+		return SERVICE_NAME;
+	}
+
+	/* (non-Javadoc)
      * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
      */
     @Override
     public String getServicePathComponent() {
-        return "accounts";
+        return SERVICE_NAME;
     }
 
     /**
@@ -144,10 +150,4 @@ public class AccountClient extends AbstractServiceClientImpl {
     public String getTenantId() {
         return getProperty(AccountClient.TENANT_PROPERTY);
     }
-
-	@Override
-	public String getServiceName() {
-		// TODO Auto-generated method stub
-		return null; //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3497
-	}
 }

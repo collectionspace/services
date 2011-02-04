@@ -62,6 +62,11 @@ public class AccountServiceTest extends AbstractServiceTestImpl {
     /** The add tenant. */
     static boolean addTenant = true;
 
+    @Override
+    public String getServiceName() {
+        return AccountClient.SERVICE_NAME;
+    }
+    
     /*
      * This method is called only by the parent class, AbstractServiceTestImpl
      */

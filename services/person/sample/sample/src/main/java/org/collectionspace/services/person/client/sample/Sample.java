@@ -37,14 +37,13 @@ import org.apache.log4j.BasicConfigurator;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.test.ServiceRequestType;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonauthoritiesCommonList;
 import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadIn;
-import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
@@ -216,7 +215,7 @@ public class Sample {
         // Submit the request to the service and store the response.
         PersonauthoritiesCommon personAuthority = null;
         try {
-            ClientResponse<PoxPayloadIn> res = client.read(personAuthId);
+            ClientResponse<String> res = client.read(personAuthId);
             int statusCode = res.getStatus();
             if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
                 throw new RuntimeException("Could not read personAuthority"

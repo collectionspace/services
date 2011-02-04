@@ -72,7 +72,7 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/loansin")
 @Consumes("application/xml")
-@Produces("application/xml;charset=UTF-8")
+@Produces("application/xml")
 public class LoaninResource extends
 		AbstractMultiPartCollectionSpaceResourceImpl {
 
@@ -175,7 +175,7 @@ public class LoaninResource extends
      */
     @GET
     @Path("{csid}")
-    public String getLoanin(
+    public byte[] getLoanin(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getLoanin with csid=" + csid);
@@ -219,7 +219,7 @@ public class LoaninResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result.toXML();
+        return result.getBytes();
     }
 
     /**
@@ -353,7 +353,7 @@ public class LoaninResource extends
      */
     @PUT
     @Path("{csid}")
-    public String updateLoanin(
+    public byte[] updateLoanin(
             @PathParam("csid") String csid,
             String xmlText) {
         if (logger.isDebugEnabled()) {
@@ -390,7 +390,7 @@ public class LoaninResource extends
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result.toXML();
+        return result.getBytes();
     }
 
     /**

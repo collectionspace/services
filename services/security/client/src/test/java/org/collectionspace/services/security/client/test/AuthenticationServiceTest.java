@@ -76,9 +76,16 @@ public class AuthenticationServiceTest extends AbstractServiceTestImpl {
     protected String getServicePathComponent() {
         // no need to return anything but null since no auth resources are
         // accessed
-        return null;
+    	throw new UnsupportedOperationException();
     }
 
+	@Override
+	protected String getServiceName() {
+        // no need to return anything but null since no auth resources are
+        // accessed
+    	throw new UnsupportedOperationException();
+	}
+	
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */

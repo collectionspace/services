@@ -63,13 +63,11 @@ public class RoleServiceTest extends AbstractServiceTestImpl {
     private String verifyRoleName = "collections_manager_test";
 //    private List<String> allResourceIdsCreated = new ArrayList<String>();
 
-    /*
-     * This method is called only by the parent class, AbstractServiceTestImpl
-     */
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
-     */
+    @Override
+    public String getServiceName() { 
+    	return RoleClient.SERVICE_NAME;
+    }
+    
     @Override
     protected String getServicePathComponent() {
         return new RoleClient().getServicePathComponent();

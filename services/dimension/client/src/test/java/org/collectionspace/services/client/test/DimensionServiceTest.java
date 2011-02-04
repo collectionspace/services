@@ -66,6 +66,11 @@ public class DimensionServiceTest extends AbstractServiceTestImpl {
     /** The known resource id. */
     private String knownResourceId = null;
 
+	@Override
+	protected String getServiceName() {
+		return DimensionClient.SERVICE_NAME;
+	}
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */

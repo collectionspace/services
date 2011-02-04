@@ -587,7 +587,7 @@ public class DocumentUtils {
 		parent.appendChild(element);
 		// extract the element content
 		if (type.isSimpleType()) {
-                        element.setTextContent(type.encode(value));
+			element.setTextContent(type.encode(value));
 		} else if (type.isComplexType()) {
 			ComplexType ctype = (ComplexType) type;
 			if (ctype.getName().equals(TypeConstants.CONTENT)) {

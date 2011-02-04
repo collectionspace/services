@@ -42,6 +42,12 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  * @version $Revision:$
  */
 public class AccountRoleClient extends AbstractServiceClientImpl {
+	public static final String SERVICE_NAME = "accountroles";
+
+	@Override
+	public String getServiceName() {
+		return AccountRoleClient.SERVICE_NAME;
+	}
 
     /**
      *
@@ -133,10 +139,4 @@ public class AccountRoleClient extends AbstractServiceClientImpl {
     public ClientResponse<Response> delete(String csid) {
         return accountRoleProxy.delete(csid);
     }
-
-	@Override
-	public String getServiceName() {
-		// TODO Auto-generated method stub
-		return null; //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3497
-	}
 }

@@ -62,16 +62,18 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
     /** The known resource id. */
     private String knownResourceId = null;
     private String knownResource = "accounts-test";
-    /*
-     * This method is called only by the parent class, AbstractServiceTestImpl
-     */
 
+    @Override
+    public String getServiceName() { 
+    	return PermissionClient.SERVICE_NAME;
+    }
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
      */
     @Override
     protected String getServicePathComponent() {
-        return new PermissionClient().getServicePathComponent();
+        return PermissionClient.SERVICE_PATH_COMPONENT;
     }
 
     /* (non-Javadoc)
@@ -642,7 +644,7 @@ public class PermissionServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    dependsOnMethods = {"updateActions", "testSubmitRequest"})
+    dependsOnMethods = {"update", "updateActions", "testSubmitRequest"})
     public void delete(String testName) throws Exception {
 
         if (logger.isDebugEnabled()) {

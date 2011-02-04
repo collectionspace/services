@@ -112,9 +112,18 @@ public class AuthorizationServiceTest extends AbstractServiceTestImpl {
      * This method is called only by the parent class, AbstractServiceTestImpl
      */
 
+	@Override
+	protected String getServiceName() {
+        // no need to return anything but null since no auth resources are
+        // accessed
+    	throw new UnsupportedOperationException();
+	}
+	
     @Override
     protected String getServicePathComponent() {
-        return null;
+        // no need to return anything but null since no auth resources are
+        // accessed
+    	throw new UnsupportedOperationException();
     }
 
     @BeforeClass(alwaysRun = true)

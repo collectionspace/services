@@ -58,10 +58,6 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
    /** The logger. */
     private final String CLASS_NAME = LoanoutServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-
-    // Instance variables specific to this test.
-    /** The service path component. */
-    final String SERVICE_PATH_COMPONENT = "loansout";
     
     /** The known resource id. */
     private String knownResourceId = null;
@@ -752,7 +748,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
+        return LoanoutClient.SERVICE_PATH_COMPONENT;
     }
 
     /**
@@ -805,4 +801,9 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
 
         return multipart;
     }
+
+	@Override
+	protected String getServiceName() {
+		return LoanoutClient.SERVICE_NAME;
+	}
 }

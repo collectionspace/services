@@ -1367,6 +1367,8 @@ public class VocabularyServiceTest extends AbstractServiceTestImpl {
         return getItemServiceRootURL(parentResourceIdentifier) + "/" + resourceIdentifier;
     }
 
-
-
+	@Override
+	protected String getServiceName() {
+		return VocabularyClient.SERVICE_NAME;
+	}
 }

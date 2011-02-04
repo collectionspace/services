@@ -24,7 +24,7 @@ public interface LoaninProxy extends CollectionSpaceProxy {
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(String payload);
+    ClientResponse<Response> create(byte[] payload);
 
     //(R)ead
     @GET
@@ -34,7 +34,7 @@ public interface LoaninProxy extends CollectionSpaceProxy {
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<String> update(@PathParam("csid") String csid, String payload);
+    ClientResponse<String> update(@PathParam("csid") String csid, byte[] payload);
 
     //(D)elete
     @DELETE

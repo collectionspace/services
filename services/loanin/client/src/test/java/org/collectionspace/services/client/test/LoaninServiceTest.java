@@ -788,6 +788,7 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
     // Utility methods used by tests above
     // ---------------------------------------------------------------
 
+    @Override
     public String getServiceName() {
         return SERVICE_NAME;
     }

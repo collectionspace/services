@@ -125,9 +125,8 @@ public class LoaninClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.LoaninProxy#createLoanin(org.collectionspace.hello.Loanin)
      */
-    public ClientResponse<Response> create(PoxPayloadOut multipart) {
-        String payload = multipart.toXML();
-        return loaninProxy.create(payload);
+    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
+        return loaninProxy.create(xmlPayload.getBytes());
     }
 
     /**
@@ -136,10 +135,8 @@ public class LoaninClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.LoaninProxy#updateLoanin(java.lang.Long, org.collectionspace.hello.Loanin)
      */
-    public ClientResponse<String> update(String csid, PoxPayloadOut multipart) {
-        String payload = multipart.toXML();
-        return loaninProxy.update(csid, payload);
-
+    public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
+        return loaninProxy.update(csid, xmlPayload.getBytes());
     }
 
     /**

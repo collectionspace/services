@@ -93,6 +93,11 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
     protected String getServicePathComponent() {
         return new PermissionRoleClient().getServicePathComponent();
     }
+    
+	@Override
+	protected String getServiceName() {
+    	return PermissionClient.SERVICE_NAME; //Since we're a sub-resource of permission service return its name?
+	}
 
     /**
      * Seed data.
@@ -534,7 +539,7 @@ public class PermissionRoleServiceTest extends AbstractServiceTestImpl {
      * @throws Exception 
      */
     @Test(dependsOnMethods = {"create"})
-    public void testSubmitRequest() throws Exception {
+    public void testSubmitRequest() throws Exception { //FIXME: REM - This is testing /permissions not /permissions/permroles
 
         // Expected status code: 200 OK
         final int EXPECTED_STATUS = Response.Status.OK.getStatusCode();

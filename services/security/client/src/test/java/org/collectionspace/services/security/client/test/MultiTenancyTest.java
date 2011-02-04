@@ -896,4 +896,10 @@ public class MultiTenancyTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
         res.releaseConnection();
     }
+
+	@Override
+	protected String getServiceName() {
+		// TODO Auto-generated method stub
+    	throw new UnsupportedOperationException();
+	}
 }

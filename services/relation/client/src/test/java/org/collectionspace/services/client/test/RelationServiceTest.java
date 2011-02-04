@@ -888,4 +888,9 @@ public class RelationServiceTest extends AbstractServiceTestImpl {
         relationCommon.setRelationshipType(rt);
         relationCommon.setPredicateDisplayName(rtDisplayName);
     }
+
+	@Override
+	protected String getServiceName() {
+		return RelationClient.SERVICE_NAME;
+	}
 }

@@ -62,7 +62,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The Class RoleResource.
  */
-@Path("/authorization/roles")
+@Path("/authorization/roles") //FIXME: REM - Replace string constant with RoleClient.SERVICE_PATH
 @Consumes("application/xml")
 @Produces("application/xml")
 public class RoleResource
