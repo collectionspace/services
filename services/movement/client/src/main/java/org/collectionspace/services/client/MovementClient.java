@@ -137,9 +137,8 @@ public class MovementClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.MovementProxy#createMovement(org.collectionspace.hello.Movement)
      */
-    public ClientResponse<Response> create(PoxPayloadOut multipart) {
-        String payload = multipart.toXML();
-        return movementProxy.create(payload);
+    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
+        return movementProxy.create(xmlPayload.getBytes());
     }
 
     /**
@@ -148,9 +147,8 @@ public class MovementClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.MovementProxy#updateMovement(java.lang.Long, org.collectionspace.hello.Movement)
      */
-    public ClientResponse<String> update(String csid, PoxPayloadOut multipart) {
-        String payload = multipart.toXML();
-        return movementProxy.update(csid, payload);
+    public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
+        return movementProxy.update(csid, xmlPayload.getBytes());
 
     }
 

@@ -243,7 +243,7 @@ public class LocationAuthorityClient extends AbstractServiceClientImpl {  //FIXM
      * @return the client response
      */
     public ClientResponse<Response> createItem(String vcsid, PoxPayloadOut multipart) {
-        return locationAuthorityProxy.createItem(vcsid, multipart);
+        return locationAuthorityProxy.createItem(vcsid, multipart.toXML());
     }
 
     /**

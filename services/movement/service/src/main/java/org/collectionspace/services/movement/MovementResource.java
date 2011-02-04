@@ -78,7 +78,7 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/movements")
 @Consumes("application/xml")
-@Produces("application/xml;charset=UTF-8")
+@Produces("application/xml")
 public class MovementResource extends AbstractMultiPartCollectionSpaceResourceImpl {
 
     /** The Constant serviceName. */
@@ -180,7 +180,7 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
      */
     @GET
     @Path("{csid}")
-    public String getMovement(
+    public byte[] getMovement(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getMovement with csid=" + csid);
@@ -223,7 +223,7 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
                     ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result.toXML();
+        return result.getBytes();
     }
 
     /**
@@ -362,7 +362,7 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
      */
     @PUT
     @Path("{csid}")
-    public String updateMovement(
+    public byte[] updateMovement(
             @PathParam("csid") String csid,
             String xmlText) {
         if (logger.isDebugEnabled()) {
@@ -401,7 +401,7 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
                     ServiceMessages.UPDATE_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result.toXML();
+        return result.getBytes();
     }
 
     /**

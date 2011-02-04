@@ -87,7 +87,7 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
     //(C)reate Item
     @POST
     @Path("/{vcsid}/items/")
-    ClientResponse<Response> createItem(@PathParam("vcsid") String vcsid, PoxPayloadOut multipart);
+    ClientResponse<Response> createItem(@PathParam("vcsid") String vcsid, String multipart);
 
     //(R)ead Item
     @GET
