@@ -229,13 +229,13 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
             createFromXmlFile(testName, "./test-data/cspace-3237-double-quotes.xml", true);
         CollectionobjectsCommon collectionObject = readCollectionObjectCommonPart(newId);
 
-        Assert.assertTrue(collectionObject.getDistinguishingFeatures().matches("^\\\".+?\\\""));
+        Assert.assertTrue(collectionObject.getDistinguishingFeatures().matches("^\\\".+?\\\"$"));
 
         BriefDescriptionList descriptionList = collectionObject.getBriefDescriptions();
         List<String> descriptions = descriptionList.getBriefDescription();
         Assert.assertTrue(descriptions.size() > 0);
         Assert.assertNotNull(descriptions.get(0));
-        Assert.assertTrue(descriptions.get(0).matches("^\\\".+?\\\""));
+        Assert.assertTrue(descriptions.get(0).matches("^\\\".+?\\\"$"));
 
         if (logger.isDebugEnabled()) {
             logger.debug(objectAsXmlString(collectionObject,
