@@ -177,13 +177,13 @@ public class AddIndices extends InitHandler implements IInitHandler {
         } finally {
             try {
                 if (rs != null) {
-                    conn.close();
-                }
-                if (conn != null) {
-                    conn.close();
+                    rs.close();
                 }
                 if (stmt != null) {
                     stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
                 }
             } catch (SQLException sqle) {
                 logger.debug("SQL Exception closing statement/connection in AddIndices: " + sqle.getLocalizedMessage());
