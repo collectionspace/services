@@ -1130,7 +1130,7 @@
                 <service:part id="1" control_group="Managed"
                               versionable="true" auditable="false"
                               label="persons_common" updated="" order="1">
-                    <service:content contentTypeF="application/xml">
+                    <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/person"
                             schemaLocation="http://collectionspace.org/services/person http://services.collectionspace.org/person/persons_common.xsd">
