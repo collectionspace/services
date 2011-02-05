@@ -748,6 +748,19 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.vocabulary.nuxeo.VocabularyValidatorHandler
             </service:validatorHandler>
+            <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>nuxeo.vocabularies_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.vocabularies_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
             <service:object name="Vocabulary" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -805,6 +818,23 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.vocabulary.nuxeo.VocabularyItemValidatorHandler
             </service:validatorHandler>
+            <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>nuxeo.vocabularyitems_common</service:table>
+                        <service:col>inauthority</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.vocabularyitems_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.vocabularyitems_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
             <service:object name="Vocabularyitem" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -856,6 +886,19 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.organization.nuxeo.OrgAuthorityValidatorHandler
             </service:validatorHandler>
+            <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>nuxeo.orgauthorities_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.orgauthorities_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
             <service:object id="1" name="Orgauthority" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -913,6 +956,23 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.organization.nuxeo.OrganizationValidatorHandler
             </service:validatorHandler>
+            <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>nuxeo.organizations_common</service:table>
+                        <service:col>inauthority</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.organizations_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.organizations_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
             <service:object id="1" name="Organization" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -971,6 +1031,19 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.person.nuxeo.PersonAuthorityValidatorHandler
             </service:validatorHandler>
+            <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>nuxeo.personauthorities_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.personauthorities_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
             <service:object id="1" name="Personauthority" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -1025,6 +1098,23 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.person.nuxeo.PersonValidatorHandler
             </service:validatorHandler>
+            <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>nuxeo.persons_common</service:table>
+                        <service:col>inauthority</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.persons_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.persons_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
             <service:object id="1" name="Person" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -1073,6 +1163,19 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.location.nuxeo.LocationAuthorityDocumentModelHandler
             </service:documentHandler>
+            <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>nuxeo.locationauthorities_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.locationauthorities_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
             <service:object id="1" name="Locationauthority" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -1123,6 +1226,23 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.location.nuxeo.LocationValidatorHandler
             </service:validatorHandler>
+            <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>nuxeo.locations_common</service:table>
+                        <service:col>inauthority</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.locations_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.locations_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
             <service:object id="1" name="Locationitem" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -2289,7 +2409,6 @@
         </tenant:serviceBindings>
         <!-- end media service meta-data -->
 
-
         <!-- begin movement service meta-data -->
         <tenant:serviceBindings name="Movements" type="procedure" version="0.1">
             <!-- other URI paths using which this service could be accessed -->
@@ -2353,6 +2472,19 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.vocabulary.nuxeo.VocabularyDocumentModelHandler
             </service:documentHandler>
+            <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>nuxeo.vocabularies_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.vocabularies_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
             <service:object name="Vocabulary" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -2407,6 +2539,23 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.vocabulary.nuxeo.VocabularyItemValidatorHandler
             </service:validatorHandler>
+            <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>nuxeo.vocabularyitems_common</service:table>
+                        <service:col>inauthority</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.vocabularyitems_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.vocabularyitems_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
             <service:object name="Vocabularyitem" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -2458,6 +2607,19 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.organization.nuxeo.OrgAuthorityValidatorHandler
             </service:validatorHandler>
+            <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>nuxeo.orgauthorities_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.orgauthorities_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
             <service:object id="1" name="Orgauthority" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -2515,6 +2677,23 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.organization.nuxeo.OrganizationValidatorHandler
             </service:validatorHandler>
+            <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>nuxeo.organizations_common</service:table>
+                        <service:col>inauthority</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.organizations_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.organizations_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
             <service:object id="1" name="Organization" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -2534,7 +2713,6 @@
                         <types:item><types:key>authRef</types:key><types:value>contactNames|contactName</types:value></types:item>
                         <types:item><types:key>authRef</types:key><types:value>subBodies|subBody</types:value></types:item>
                     </service:properties>
-
                     <service:content contentType="application/xml">
                         <service:xmlContent
                             namespaceURI="http://collectionspace.org/services/organization"
@@ -2577,6 +2755,19 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.person.nuxeo.PersonAuthorityValidatorHandler
             </service:validatorHandler>
+            <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>nuxeo.personauthorities_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.personauthorities_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
             <service:object id="1" name="Personauthority" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -2631,6 +2822,23 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.person.nuxeo.PersonValidatorHandler
             </service:validatorHandler>
+            <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>nuxeo.persons_common</service:table>
+                        <service:col>inauthority</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.persons_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.persons_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
             <service:object id="1" name="Person" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -2679,6 +2887,19 @@
             <service:documentHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.location.nuxeo.LocationAuthorityDocumentModelHandler
             </service:documentHandler>
+            <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>nuxeo.locationauthorities_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.locationauthorities_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
             <service:object id="1" name="Locationauthority" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"
@@ -2729,6 +2950,23 @@
             <service:validatorHandler xmlns:service='http://collectionspace.org/services/common/service'>
                 org.collectionspace.services.location.nuxeo.LocationValidatorHandler
             </service:validatorHandler>
+            <service:initHandler xmlns:service='http://collectionspace.org/services/common/service'>
+                <service:classname>org.collectionspace.services.common.init.AddIndices</service:classname>
+                <service:params>
+                    <service:field>
+                        <service:table>nuxeo.locations_common</service:table>
+                        <service:col>inauthority</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.locations_common</service:table>
+                        <service:col>displayname</service:col>
+                    </service:field>
+                    <service:field>
+                        <service:table>nuxeo.locations_common</service:table>
+                        <service:col>shortidentifier</service:col>
+                    </service:field>
+                </service:params>
+            </service:initHandler>
             <service:object id="1" name="Locationitem" version="0.1"
                             xmlns:service='http://collectionspace.org/services/common/service'>
                 <service:part id="0" control_group="Managed"

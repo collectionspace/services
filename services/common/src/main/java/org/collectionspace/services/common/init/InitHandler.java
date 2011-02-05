@@ -26,7 +26,7 @@ import org.collectionspace.services.common.service.InitHandler.Params.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.*;
+import java.sql.ResultSet;
 import java.util.List;
 
 /** Concrete class which does nothing, but subclasses may override to do
@@ -68,11 +68,4 @@ public class InitHandler implements IInitHandler {
         }
     }
 
-    public int executeUpdate(String sql) throws Exception {
-        return JDBCTools.executeUpdate(sql);
-    }
-
-    public DatabaseProductType getDatabaseProductType() throws Exception {
-        return JDBCTools.getDatabaseProductType();
-    }
 }

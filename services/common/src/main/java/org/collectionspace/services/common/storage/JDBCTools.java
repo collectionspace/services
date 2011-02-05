@@ -117,14 +117,14 @@ public class JDBCTools {
             SQLException tempException = sqle;
             String msg = "";
             while (null != tempException) {       // SQLExceptions can be chained. Loop to log all.
-                if (! msg.isEmpty()){
-                    msg = msg +"::next::";
+                if (!msg.isEmpty()) {
+                    msg = msg + "::next::";
                 }
                 msg = msg + sqle.getLocalizedMessage();
                 logger.debug("SQL Exception: " + msg);
                 tempException = tempException.getNextException();
             }
-            throw new RuntimeException("SQL problem in executeUpdate: "+msg, sqle);
+            throw new RuntimeException("SQL problem in executeUpdate: " + msg, sqle);
         } finally {
             try {
                 if (conn != null) {
@@ -159,19 +159,19 @@ public class JDBCTools {
         }
         return productName;
     }
-    
-        public static DatabaseProductType getDatabaseProductType() throws Exception {
-            DatabaseProductType productType = DatabaseProductType.UNRECOGNIZED;
-            String productName = getDatabaseProductName();
-            if (productName.matches("(?i).*mysql.*")) {
-                productType = DatabaseProductType.MYSQL;
-            } else if (productName.matches("(?i).*postgresql.*")) {
-                productType = DatabaseProductType.POSTGRESQL;
-            } else {
-                throw new Exception("Unrecognized database system " + productName);
-            }
-            return productType;
+
+    public static DatabaseProductType getDatabaseProductType() throws Exception {
+        DatabaseProductType productType = DatabaseProductType.UNRECOGNIZED;
+        String productName = getDatabaseProductName();
+        if (productName.matches("(?i).*mysql.*")) {
+            productType = DatabaseProductType.MYSQL;
+        } else if (productName.matches("(?i).*postgresql.*")) {
+            productType = DatabaseProductType.POSTGRESQL;
+        } else {
+            throw new Exception("Unrecognized database system " + productName);
         }
+        return productType;
+    }
 
     public static String getDefaultRepositoryName() {
         return ServiceMain.DEFAULT_REPOSITORY_NAME;
