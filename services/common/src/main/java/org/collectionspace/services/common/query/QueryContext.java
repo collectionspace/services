@@ -1,5 +1,7 @@
 package org.collectionspace.services.common.query;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
@@ -35,7 +37,7 @@ public class QueryContext {
      * @throws DocumentNotFoundException the document not found exception
      * @throws DocumentException the document exception
      */
-    QueryContext(ServiceContext<MultipartInput, MultipartOutput> ctx) throws DocumentNotFoundException, DocumentException {
+    QueryContext(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) throws DocumentNotFoundException, DocumentException {
         docType = ctx.getDocumentType();
         if (docType == null) {
             throw new DocumentNotFoundException(
@@ -57,7 +59,7 @@ public class QueryContext {
      * @throws DocumentNotFoundException the document not found exception
      * @throws DocumentException the document exception
      */
-    public QueryContext(ServiceContext<MultipartInput, MultipartOutput> ctx,
+    public QueryContext(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             String theWhereClause) throws DocumentNotFoundException, DocumentException {
         this(ctx);
         whereClause = theWhereClause;
@@ -71,7 +73,7 @@ public class QueryContext {
      * @throws DocumentNotFoundException the document not found exception
      * @throws DocumentException the document exception
      */
-    public QueryContext(ServiceContext<MultipartInput, MultipartOutput> ctx,
+    public QueryContext(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             DocumentHandler handler) throws DocumentNotFoundException, DocumentException {
         this(ctx);
         if (handler == null) {

@@ -26,6 +26,9 @@
  */
 package org.collectionspace.services.common;
 
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.MultipartServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -41,17 +44,17 @@ import org.slf4j.LoggerFactory;
  * The Class AbstractMultiPartCollectionSpaceResourceImpl.
  */
 public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends
-		AbstractCollectionSpaceResourceImpl<MultipartInput, MultipartOutput> {
+		AbstractCollectionSpaceResourceImpl<PoxPayloadIn, PoxPayloadOut> {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
-    public ServiceContextFactory<MultipartInput, MultipartOutput> getServiceContextFactory() {
+    public ServiceContextFactory<PoxPayloadIn, PoxPayloadOut> getServiceContextFactory() {
     	return MultipartServiceContextFactory.get();
     }
 
     @Override
-    public DocumentHandler createDocumentHandler(ServiceContext<MultipartInput, MultipartOutput> ctx) throws Exception {
+    public DocumentHandler createDocumentHandler(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) throws Exception {
     	return createDocumentHandler(ctx, ctx.getCommonPartLabel(), getCommonPartClass());
     }
     
@@ -66,15 +69,19 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends
      * 
      * @throws Exception the exception
      */
-    public DocumentHandler createDocumentHandler(ServiceContext<MultipartInput, MultipartOutput> serviceContext,
+    public DocumentHandler createDocumentHandler(ServiceContext<PoxPayloadIn, PoxPayloadOut> serviceContext,
     		String schemaName, 
     		Class<?> commonClass) throws Exception {
+    	DocumentHandler result = null;
+    	
     	MultipartServiceContext ctx = (MultipartServiceContext)serviceContext;
     	Object commonPart = null;
     	if (ctx.getInput() != null) {
-        	commonPart = ctx.getInputPart(schemaName, commonClass);
+        	commonPart = ctx.getInputPart(schemaName);
         }
-        return super.createDocumentHandler(ctx, commonPart);
+        result = super.createDocumentHandler(ctx, commonPart);
+        
+        return result;
     }
     
     /**
@@ -88,7 +95,7 @@ public abstract class AbstractMultiPartCollectionSpaceResourceImpl extends
      * @throws Exception the exception
      */
     public DocumentHandler createDocumentHandler(
-    		ServiceContext<MultipartInput, MultipartOutput> ctx,
+    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
     		Class<Object> commonClass) throws Exception {
     	return createDocumentHandler(ctx, ctx.getCommonPartLabel(), commonClass);
     }

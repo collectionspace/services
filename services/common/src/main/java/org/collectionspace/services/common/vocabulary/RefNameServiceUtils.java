@@ -91,8 +91,6 @@ public class RefNameServiceUtils {
         boolean fFirst = true;
         List<String> authRefFieldPaths = new ArrayList<String>();
         for (ServiceBindingType sb : servicebindings) {
-        	// Gets the property names for each part, qualified with the part label (which
-        	// is also the table name, the way that the repository works).
             authRefFieldPaths =
                     ServiceBindingUtils.getAllPartsPropertyValues(sb,
                     ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
@@ -104,9 +102,6 @@ public class RefNameServiceUtils {
             Map<String, String> authRefFields = new HashMap<String, String>();
             for (int i = 0; i < authRefFieldPaths.size(); i++) {
                 // fieldName = DocumentUtils.getDescendantOrAncestor(authRefFields.get(i));
-            	// For simple field values, we just search on the item.
-            	// For simple repeating scalars, we just search the group field 
-            	// For repeating complex types, we will need to do more.
                 authRefPath = authRefFieldPaths.get(i);
                 ancestorAuthRefFieldName = DocumentUtils.getAncestorAuthRefFieldName(authRefFieldPaths.get(i));
                 authRefFields.put(authRefPath, ancestorAuthRefFieldName);
@@ -180,11 +175,8 @@ public class RefNameServiceUtils {
             // Use this if we go to qualified field names
             for (String path : matchingAuthRefFields.keySet()) {
                 try {
-                	// This is the field name we show in the return info
                     authRefAncestorField = (String) matchingAuthRefFields.get(path);
-                    // This is the qualified field we have to get from the doc model
                     authRefDescendantField = DocumentUtils.getDescendantOrAncestor(path);
-                    // The ancestor field is part-schema (tablename) qualified
                     String[] strings = authRefAncestorField.split(":");
                     if (strings.length != 2) {
                         throw new RuntimeException(
@@ -198,10 +190,7 @@ public class RefNameServiceUtils {
                     // * The name of an ancestor (e.g. parent, grandparent ...) field,
                     //   such as "fieldCollectors", of a repeatable authority reference
                     //   field, such as "fieldCollector".
-                    // TODO - if the value is not simple, or repeating scalar, need a more
-                    // sophisticated fetch. 
                     Object fieldValue = docModel.getProperty(strings[0], strings[1]);
-                    // We cannot be sure why we have this doc, so look for matches
                     boolean fRefMatches = refNameFoundInField(refName, fieldValue);
                     if (fRefMatches) {
                         sourceField = authRefDescendantField;

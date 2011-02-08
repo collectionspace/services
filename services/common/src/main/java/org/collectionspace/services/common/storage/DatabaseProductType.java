@@ -32,13 +32,9 @@ public class DatabaseProductType {
         propertiesFileName = name + PROPERTIES_FILE_SUFFIX;
     }
 
-    public String getName() {
-        return name;
-    }
-
     @Override
     public String toString() {
-        return getName();
+        return name;
     }
 
     public String getPropertiesFileName() {

@@ -23,13 +23,17 @@
 
 package org.collectionspace.services.common;
 
+import org.apache.commons.jexl2.Expression;
+import org.apache.commons.jexl2.JexlContext;
+import org.apache.commons.jexl2.JexlEngine;
+import org.apache.commons.jexl2.MapContext;
+
 import java.io.File;
 import  java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 /** General utility methods.
  *   @author Laramie Crocker
- * v.1.4
  */
 public class Tools {
     /** @return first glued to second with the separator string, at most one time - useful for appending paths.
@@ -116,23 +120,6 @@ public class Tools {
         }
         return dir + file;
     }
-
-    public static String getStackTrace(Throwable e){
-        if (e==null){
-            return "";
-        }
-        java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
-        java.io.PrintStream ps = new java.io.PrintStream(bos);
-        e.printStackTrace(ps);
-        String result = bos.toString();
-        try {
-            if(bos!=null)bos.reset();
-            else System.out.println("bos was null, not closing");
-        } catch (Exception e2)  {System.out.println("ERROR: couldn't reset() bos in Tools "+e2);}
-
-        return result;
-    }
-
 
 
 

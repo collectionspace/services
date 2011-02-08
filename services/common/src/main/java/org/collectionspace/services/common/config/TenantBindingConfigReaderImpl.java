@@ -24,7 +24,6 @@
 package org.collectionspace.services.common.config;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -44,13 +43,11 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class TenantBindingConfigReaderImpl
-        extends AbstractConfigReaderImpl<List<TenantBindingType>> {
-    final private static String TENANT_BINDINGS_ERROR = "Tenant bindings error: ";
-    final private static String TENANT_BINDINGS_FILENAME = "tenant-bindings.xml";
-    final private static String TENANT_BINDINGS_ROOTDIRNAME = "tenants";
+        extends AbstractConfigReaderImpl<TenantBindingConfig> {
 
+    final private static String CONFIG_FILE_NAME = "tenant-bindings.xml";
     final Logger logger = LoggerFactory.getLogger(TenantBindingConfigReaderImpl.class);
-    private List<TenantBindingType> tenantBindingTypeList;
+    private TenantBindingConfig tenantBindingConfig;
     //tenant id, tenant binding
     private Hashtable<String, TenantBindingType> tenantBindings =
             new Hashtable<String, TenantBindingType>();
@@ -67,39 +64,28 @@ public class TenantBindingConfigReaderImpl
 
     @Override
     public String getFileName() {
-        return TENANT_BINDINGS_FILENAME;
+        return CONFIG_FILE_NAME;
     }
 
-	protected File getTenantsRootDir() {
-		File result = null;
-		String tenantsRootPath = getConfigRootDir() + File.separator + TENANT_BINDINGS_ROOTDIRNAME;
-		File tenantsRootDir = new File(tenantsRootPath);
-		if (tenantsRootDir.exists() == true) {
-			result = tenantsRootDir;
-			logger.debug("Tenants home directory is: " + tenantsRootDir.getAbsolutePath()); //FIXME: REM - Add proper if (logger.isDebug() == true) check
-		} else {
-			logger.error("Tenants home directory is missing.  Can't find: " + tenantsRootDir.getAbsolutePath()); //FIXME: REM - Add proper if (logger.isError() == true) check
-		}
-		return result;
-	}
-    
     @Override
     public void read() throws Exception {
-    	String tenantsRootPath = getTenantsRootDir().getAbsolutePath();
-        read(tenantsRootPath);
+        String configFileName = getAbsoluteFileName(CONFIG_FILE_NAME);
+        read(configFileName);
     }
 
     @Override
-    public void read(String tenantRootDirPath) throws Exception {
-        File tenantsRootDir = new File(tenantRootDirPath);
-        if (tenantsRootDir.exists() == false) {
-        	throw new Exception("Cound not find tenant bindings root directory: " +
-        			tenantRootDirPath);
+    public void read(String configFileName) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug("read() config file=" + configFileName);
         }
-        List<File> tenantDirs = getDirectories(tenantsRootDir);
-        tenantBindingTypeList = readTenantConfigs(tenantDirs);
-        
-        for (TenantBindingType tenantBinding : tenantBindingTypeList) {
+        File configFile = new File(configFileName);
+        if (!configFile.exists()) {
+            String msg = "Could not find configuration file " + configFileName;
+            logger.error(msg);
+            throw new RuntimeException(msg);
+        }
+        tenantBindingConfig = (TenantBindingConfig) parse(configFile, TenantBindingConfig.class);
+        for (TenantBindingType tenantBinding : tenantBindingConfig.getTenantBinding()) {
             tenantBindings.put(tenantBinding.getId(), tenantBinding);
             readDomains(tenantBinding);
             readServiceBindings(tenantBinding);
@@ -110,46 +96,6 @@ public class TenantBindingConfigReaderImpl
         }
     }
 
-	List<TenantBindingType> readTenantConfigs(List<File> tenantDirList) throws IOException {
-		List<TenantBindingType> result = new ArrayList<TenantBindingType>();		
-		//
-		// Iterate through a list of directories.
-		//
-		for (File tenantDir : tenantDirList) {
-			boolean found = false;
-			String errMessage = null;
-			File configFile = new File(tenantDir.getAbsoluteFile() + File.separator + TENANT_BINDINGS_FILENAME);
-			if (configFile.exists() == true) {
-				TenantBindingConfig tenantBindingConfig = (TenantBindingConfig) parse(
-						configFile, TenantBindingConfig.class);
-				if (tenantBindingConfig != null) {
-					TenantBindingType binding = tenantBindingConfig.getTenantBinding();
-					if (binding != null) {
-						result.add(binding);
-						found = true;
-						if (logger.isInfoEnabled() == true) {
-							logger.info("Parsed tenant configureation for: " + binding.getDisplayName());
-						}
-					} else {
-						errMessage = "Cound not parse the tentant bindings in: ";
-					}
-				} else {
-					errMessage = "Could not parse the tenant bindings file: ";				
-				}
-			} else {
-				errMessage = "Cound not find a tenant configuration file: ";
-			}
-			if (found == false) {
-				if (logger.isErrorEnabled() == true) {
-					errMessage = errMessage != null ? errMessage : TENANT_BINDINGS_ERROR;
-					logger.error(errMessage + configFile.getAbsolutePath());
-				}
-			}
-		} // else-for
-		
-		return result;
-	}
-    
     private void readDomains(TenantBindingType tenantBinding) throws Exception {
         for (RepositoryDomainType domain : tenantBinding.getRepositoryDomain()) {
             domains.put(domain.getName(), domain);
@@ -170,8 +116,8 @@ public class TenantBindingConfigReaderImpl
     }
 
     @Override
-    public List<TenantBindingType> getConfiguration() {
-        return tenantBindingTypeList;
+    public TenantBindingConfig getConfiguration() {
+        return tenantBindingConfig;
     }
 
     /**

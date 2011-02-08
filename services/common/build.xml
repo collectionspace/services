@@ -161,11 +161,9 @@
         <antcall target="deploy_jpa" />
         <antcall target="deploy_spring" />
         <antcall target="deploy_slf4j" />
-    	
         <copy todir="${jboss.server.cspace}/cspace/config/services">
-            <fileset dir="${basedir}/src/main/cspace/config/services"/>
+            <fileset dir="${basedir}/src/main/config/services"/>
         </copy>
-    	
     </target>
 
     <target name="undeploy"
@@ -216,7 +214,7 @@
 
         <antcall target="dist_spring" />
         <copy todir="${services.trunk}/${dist.server.cspace}/cspace/config/services">
-            <fileset dir="${basedir}/src/main/cspace/config"/>
+            <fileset dir="${basedir}/src/main/config"/>
         </copy>
     </target>
 
