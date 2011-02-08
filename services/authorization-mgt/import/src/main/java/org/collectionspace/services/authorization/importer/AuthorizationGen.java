@@ -80,15 +80,15 @@ public class AuthorizationGen {
     private Hashtable<String, TenantBindingType> tenantBindings =
             new Hashtable<String, TenantBindingType>();
 
-    public void initialize(String tenantBindingFileName) throws Exception {
+    public void initialize(String tenantRootDirPath) throws Exception {
         TenantBindingConfigReaderImpl tenantBindingConfigReader =
-                new TenantBindingConfigReaderImpl(null);
-        tenantBindingConfigReader.read(tenantBindingFileName);
+                new TenantBindingConfigReaderImpl(tenantRootDirPath);
+        tenantBindingConfigReader.read();
         tenantBindings = tenantBindingConfigReader.getTenantBindings();
         cspaceAdminRole = buildCSpaceAdminRole();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("initialized with tenant bindings from " + tenantBindingFileName);
+            logger.debug("initialized with tenant bindings from " + tenantRootDirPath);
         }
     }
 

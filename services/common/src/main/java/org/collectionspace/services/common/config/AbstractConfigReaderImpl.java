@@ -24,7 +24,12 @@
 package org.collectionspace.services.common.config;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +62,51 @@ public abstract class AbstractConfigReaderImpl<T>
     @Override
     abstract public T getConfiguration();
 
+	/**
+	 * Gets a list of File items in the specified directory.  If 'isDirectory' is true, then this
+	 * method will return a list of items that are directories/folders; otherwise, it returns a list
+	 * of file/document items.
+	 *
+	 * @param rootDir the root dir
+	 * @param isDirectory the is directory
+	 * @return the file children
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	List<File> getFileChildren(File rootDir, boolean getDirectories) throws IOException {
+		ArrayList<File> result = new ArrayList<File>();
+		File[] children = rootDir.listFiles();
+		if (children != null) {
+			for (File child : children) {
+				if (child.isHidden() == false) {
+					if (getDirectories == child.isDirectory()) {
+						result.add(child);
+					}
+				}
+			}
+		} else {
+			String errMessage = "An IO exception and/or error occurred while reading the directory: "
+				+ rootDir.getAbsolutePath();
+			logger.debug(errMessage);
+			throw new IOException(errMessage);
+		}
+		return result;
+	}
+	
+	/**
+	 * Gets a list of files/documents in the specified folder -does not return directories/folders.
+	 *
+	 * @param rootDir the root dir
+	 * @return the files
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	List<File> getFiles(File rootDir) throws IOException {
+		return getFileChildren(rootDir, false);
+	}
+	
+	List<File> getDirectories(File rootDir) throws IOException {
+		return getFileChildren(rootDir, true);
+	}
+    
     /**
      * parse parses given configuration file from the disk based on given class
      * definition
@@ -65,14 +115,22 @@ public abstract class AbstractConfigReaderImpl<T>
      * @return A JAXB object
      * @throws Exception
      */
-    protected Object parse(File configFile, Class clazz) throws Exception {
-        JAXBContext jc = JAXBContext.newInstance(clazz);
-        Unmarshaller um = jc.createUnmarshaller();
-        Object readObject = um.unmarshal(configFile);
-        if (logger.isDebugEnabled()) {
-            logger.debug("read() read file " + configFile.getAbsolutePath());
-        }
-        return readObject;
+    protected Object parse(File configFile, Class clazz) {
+    	Object result = null;
+    	try {
+	        JAXBContext jc = JAXBContext.newInstance(clazz);
+	        Unmarshaller um = jc.createUnmarshaller();
+	        result = um.unmarshal(configFile);
+	        if (logger.isDebugEnabled()) {
+	            logger.debug("read() read file " + configFile.getAbsolutePath());
+	        }
+    	} catch (JAXBException e) {
+    		if (logger.isErrorEnabled() == true) {
+    			logger.error("Could not unmarshal CollectionSpace config file: " +
+    					configFile.getAbsolutePath(), e);
+    		}
+    	}
+        return result;
     }
 
     protected String getAbsoluteFileName(String configFileName) {
@@ -84,5 +142,11 @@ public abstract class AbstractConfigReaderImpl<T>
 
     protected String getServerRootDir() {
         return serverRootDir;
+    }
+    
+    protected String getConfigRootDir() {
+        return serverRootDir
+        + File.separator + CSPACE_DIR_NAME
+        + File.separator + CONFIG_DIR_NAME;
     }
 }

@@ -59,6 +59,7 @@ public class ServiceMain {
     public static String DEFAULT_REPOSITORY_NAME = "CspaceDS";
 
     private ServiceMain() {
+    	//empty
     }
     
     /**
@@ -88,26 +89,25 @@ public class ServiceMain {
         return instance;
     }
 
-    private void initialize() throws Exception {        
+    private void initialize() throws Exception {
     	setServerRootDir();
         readConfig();
         propagateConfiguredProperties();
         try {
         	createDefaultAccounts();
         } catch(Exception e) {
-        	logger.error("Default Account setup failed on exception: "+e.getLocalizedMessage());
+        	logger.error("Default Account setup failed on exception: " + e.getLocalizedMessage());
         }
         try {
             firePostInitHandlers();
         } catch(Exception e) {
-            logger.error("ServiceMain.initialize firePostInitHandlers failed on exception: "+e.getLocalizedMessage());
+            logger.error("ServiceMain.initialize firePostInitHandlers failed on exception: " + e.getLocalizedMessage());
         }
 
         if (getClientType().equals(ClientType.JAVA)) {
             nuxeoConnector = NuxeoConnector.getInstance();
             nuxeoConnector.initialize(getServicesConfigReader().getConfiguration().getRepositoryClient());
         }
-
     }
 
     /**
@@ -129,9 +129,9 @@ public class ServiceMain {
     private void readConfig() throws Exception {
         //read service config
         servicesConfigReader = new ServicesConfigReaderImpl(getServerRootDir());
-        getServicesConfigReader().read();
+        servicesConfigReader.read();
 
-        tenantBindingConfigReader = new TenantBindingConfigReaderImpl(getServerRootDir());
+        tenantBindingConfigReader = new TenantBindingConfigReaderImpl(getServerRootDir()); 
         tenantBindingConfigReader.read();
     }
 
