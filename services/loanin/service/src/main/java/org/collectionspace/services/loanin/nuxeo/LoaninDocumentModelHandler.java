@@ -33,24 +33,5 @@ import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
  */
 public class LoaninDocumentModelHandler
         extends DocHandlerBase<LoansinCommon, AbstractCommonList> {
-
-    private static DocHandlerBase.CommonListReflection clr;
-    static {
-        clr = new DocHandlerBase.CommonListReflection();
-        clr.NuxeoSchemaName= "loanin";
-        clr.SummaryFields = "loanInNumber|lenderList|loanReturnDate|uri|csid";
-        clr.AbstractCommonListClassname = "org.collectionspace.services.loanin.LoansinCommonList";
-        clr.CommonListItemClassname = "org.collectionspace.services.loanin.LoansinCommonList$LoaninListItem";
-        clr.ListItemMethodName = "getLoaninListItem";
-        //ListItemsArray array elements: SETTER=0, ELEMENT=1, CONTAINER=2, SUBELEMENT=3;
-        clr.ListItemsArray =   new String[][] { {"setLoanInNumber",   "loanInNumber",   "", ""},
-                                                {"setLender",     "lenderList",     "lenderGroupList", "lender"},
-                                                {"setLoanReturnDate", "loanReturnDate", "", ""}
-                                              };
-    }
-    public DocHandlerBase.CommonListReflection getCommonListReflection(){
-        return clr;
-    }
-
 }
 
