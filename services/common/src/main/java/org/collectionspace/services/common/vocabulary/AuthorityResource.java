@@ -42,8 +42,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.nuxeo.AuthorityItemDocumentModelHandler;
@@ -65,6 +63,8 @@ import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
@@ -73,9 +73,9 @@ import org.slf4j.LoggerFactory;
 /**
  * The Class VocabularyResource.
  */
-//@Path("/vocabularies")
-//@Consumes("application/xml")
-//@Produces("application/xml")
+@Path("/vocabularies")
+@Consumes("multipart/mixed")
+@Produces("multipart/mixed")
 public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemCommonList, AuthItemHandler> extends
 	AbstractMultiPartCollectionSpaceResourceImpl {
 
@@ -179,7 +179,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	 * @throws Exception the exception
 	 */
 	public DocumentHandler createItemDocumentHandler(
-			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+			ServiceContext<MultipartInput, MultipartOutput> ctx,
 			String inAuthority)
 	throws Exception {
 		AuthItemHandler docHandler;
@@ -200,10 +200,9 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	 * @return the response
 	 */
 	@POST
-	public Response createAuthority(String xmlPayload) {
+	public Response createAuthority(MultipartInput input) {
 		try {
-			PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
-			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
+			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
 			DocumentHandler handler = createDocumentHandler(ctx);
 			String csid = getRepositoryClient(ctx).create(ctx, handler);
 			UriBuilder path = UriBuilder.fromResource(resourceClass);
@@ -253,11 +252,11 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	 */
 	@GET
 	@Path("{csid}")
-	public String getAuthority(@PathParam("csid") String specifier) {
-		PoxPayloadOut result = null;
+	public MultipartOutput getAuthority(@PathParam("csid") String specifier) {
+		MultipartOutput result = null;
 		try {
 			Specifier spec = getSpecifier(specifier, "getAuthority", "GET");
-			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
 			DocumentHandler handler = createDocumentHandler(ctx);
 			if(spec.form == SpecifierForm.CSID) {
 				if (logger.isDebugEnabled()) {
@@ -270,7 +269,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 				handler.setDocumentFilter(myFilter);
 				getRepositoryClient(ctx).get(ctx, handler);
 			}
-			result = ctx.getOutput();
+			result = (MultipartOutput) ctx.getOutput();
 		} catch (UnauthorizedException ue) {
 			Response response = Response.status(
 					Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -299,7 +298,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 			throw new WebApplicationException(response);
 		}
 
-		return result.toXML();
+		return result;
 	}
 
 	/**
@@ -314,7 +313,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
     public AuthCommonList getAuthorityList(@Context UriInfo ui) {
 		try {
 			MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
+			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
 			DocumentHandler handler = createDocumentHandler(ctx);
 			DocumentFilter myFilter = handler.getDocumentFilter();
 			String nameQ = queryParams.getFirst("refName");
@@ -347,14 +346,13 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	 */
 	@PUT
 	@Path("{csid}")
-	public String updateAuthority(
+	public MultipartOutput updateAuthority(
 			@PathParam("csid") String specifier,
-			String xmlPayload) {
-		PoxPayloadOut result = null;
+			MultipartInput theUpdate) {
+		MultipartOutput result = null;
 		try {
-			PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
 			Specifier spec = getSpecifier(specifier, "updateAuthority", "UPDATE");
-			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(theUpdate);
+			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
 			DocumentHandler handler = createDocumentHandler(ctx);
 			String csid;
 			if(spec.form==SpecifierForm.CSID) {
@@ -364,7 +362,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 				csid = getRepositoryClient(ctx).findDocCSID(ctx, whereClause);
 			}
 			getRepositoryClient(ctx).update(ctx, csid, handler);
-			result = ctx.getOutput();
+			result = (MultipartOutput) ctx.getOutput();
 		} catch (UnauthorizedException ue) {
 			Response response = Response.status(
 					Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -382,7 +380,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 					Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
 			throw new WebApplicationException(response);
 		}
-		return result.toXML();
+		return result;
 	}
 
 	/**
@@ -407,7 +405,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 			throw new WebApplicationException(response);
 		}
 		try {
-			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
 			getRepositoryClient(ctx).delete(ctx, csid);
 			return Response.status(HttpResponseCodes.SC_OK).build();
 		} catch (UnauthorizedException ue) {
@@ -438,10 +436,9 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	 *************************************************************************/
 	@POST
 	@Path("{csid}/items")
-	public Response createAuthorityItem(@PathParam("csid") String specifier, String xmlPayload) {
+	public Response createAuthorityItem(@PathParam("csid") String specifier, MultipartInput input) {
 		try {
-			PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
-			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
+			ServiceContext<MultipartInput, MultipartOutput> ctx = null;
 			Specifier spec = getSpecifier(specifier, "createAuthorityItem", "CREATE_ITEM");
 			String parentcsid;
 			if(spec.form==SpecifierForm.CSID) {
@@ -486,15 +483,15 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	 */
 	@GET
 	@Path("{csid}/items/{itemcsid}")
-	public String getAuthorityItem(
+	public MultipartOutput getAuthorityItem(
 			@PathParam("csid") String parentspecifier,
 			@PathParam("itemcsid") String itemspecifier) {
-		PoxPayloadOut result = null;
+		MultipartOutput result = null;
 		try {
 			Specifier parentSpec = getSpecifier(parentspecifier, "getAuthorityItem(parent)", "GET_ITEM");
 			Specifier itemSpec = getSpecifier(itemspecifier, "getAuthorityItem(item)", "GET_ITEM");
 			// Note that we have to create the service context for the Items, not the main service
-			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
+			ServiceContext<MultipartInput, MultipartOutput> ctx = null;
 			String parentcsid;
 			if(parentSpec.form==SpecifierForm.CSID) {
 				parentcsid = parentSpec.value;
@@ -515,7 +512,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	            getRepositoryClient(ctx).get(ctx, handler);
 			}
 			// TODO should we assert that the item is in the passed vocab?
-			result = ctx.getOutput();
+			result = (MultipartOutput) ctx.getOutput();
 		} catch (UnauthorizedException ue) {
 			Response response = Response.status(
 					Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -542,7 +539,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 					"text/plain").build();
 			throw new WebApplicationException(response);
 		}
-		return result.toXML();
+		return result;
 	}
 
 
@@ -569,7 +566,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 			Specifier spec = getSpecifier(specifier, "getAuthorityItemList", "LIST");
 			MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
 			// Note that docType defaults to the ServiceName, so we're fine with that.
-			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
+			ServiceContext<MultipartInput, MultipartOutput> ctx = null;
 			String parentcsid;
 			if(spec.form==SpecifierForm.CSID) {
 				parentcsid = spec.value;
@@ -643,7 +640,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 			Specifier itemSpec = getSpecifier(itemspecifier, 
 					"getReferencingObjects(item)", "GET_ITEM_REF_OBJS");
 			// Note that we have to create the service context for the Items, not the main service
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
+            ServiceContext<MultipartInput, MultipartOutput> ctx = null;
 			String parentcsid;
 			if(parentSpec.form==SpecifierForm.CSID) {
 				parentcsid = parentSpec.value;
@@ -731,7 +728,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 			Specifier itemSpec = getSpecifier(itemspecifier, "getAuthorityItemAuthRefs(item)", "GET_ITEM_AUTH_REFS");
 			// Note that we have to create the service context for the Items, not the main service
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
+            ServiceContext<MultipartInput, MultipartOutput> ctx = null;
 			String parentcsid;
 			if(parentSpec.form==SpecifierForm.CSID) {
 				parentcsid = parentSpec.value;
@@ -772,6 +769,8 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
         return authRefList;
     }
 
+
+
 	/**
 	 * Update authorityItem.
 	 * 
@@ -783,19 +782,18 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 	 */
 	@PUT
 	@Path("{csid}/items/{itemcsid}")
-	public String updateAuthorityItem(
+	public MultipartOutput updateAuthorityItem(
 			@PathParam("csid") String parentspecifier,
 			@PathParam("itemcsid") String itemspecifier,
-			String xmlPayload) {
-		PoxPayloadOut result = null;
+			MultipartInput theUpdate) {
+		MultipartOutput result = null;
 		try {
-			PoxPayloadIn theUpdate = new PoxPayloadIn(xmlPayload);
    			Specifier parentSpec = getSpecifier(parentspecifier, 
    					"updateAuthorityItem(parent)", "UPDATE_ITEM");
 			Specifier itemSpec = getSpecifier(itemspecifier, 
 					"updateAuthorityItem(item)", "UPDATE_ITEM");
 			// Note that we have to create the service context for the Items, not the main service
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = null;
+            ServiceContext<MultipartInput, MultipartOutput> ctx = null;
 			String parentcsid;
 			if(parentSpec.form==SpecifierForm.CSID) {
 				parentcsid = parentSpec.value;
@@ -816,7 +814,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 			// Note that we have to create the service context for the Items, not the main service
 			DocumentHandler handler = createItemDocumentHandler(ctx, parentcsid);
 			getRepositoryClient(ctx).update(ctx, itemcsid, handler);
-			result = ctx.getOutput();
+			result = (MultipartOutput) ctx.getOutput();
 		} catch (BadRequestException bre) {
 			Response response = Response.status(
 					Response.Status.BAD_REQUEST).entity("Create failed reason " + bre.getErrorReason()).type("text/plain").build();
@@ -838,7 +836,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 					Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
 			throw new WebApplicationException(response);
 		}
-		return result.toXML();
+		return result;
 	}
 
 	/**
@@ -873,7 +871,7 @@ public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemComm
 		}
 		try {
 			// Note that we have to create the service context for the Items, not the main service
-			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName());
+			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(getItemServiceName());
 			getRepositoryClient(ctx).delete(ctx, itemcsid);
 			return Response.status(HttpResponseCodes.SC_OK).build();
 		} catch (UnauthorizedException ue) {

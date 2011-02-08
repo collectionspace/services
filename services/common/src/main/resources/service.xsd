@@ -238,16 +238,16 @@
             <xs:element name="params">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element name="NuxeoSchemaName" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="SchemaName" type="xs:string" minOccurs="0" maxOccurs="1"/>
                         <xs:element name="DublinCoreTitle" type="xs:string" minOccurs="0" maxOccurs="1"/>
                         <xs:element name="SummaryFields" type="xs:string" minOccurs="0" maxOccurs="1"/>
                         <xs:element name="AbstractCommonListClassname" type="xs:string" minOccurs="0" maxOccurs="1"/>
                         <xs:element name="CommonListItemClassname" type="xs:string" minOccurs="0" maxOccurs="1"/>
-                        <xs:element name="ListItemMethodName" type="xs:string" minOccurs="0" maxOccurs="1"/>
-                        <xs:element name="ListItemsArrays" minOccurs="1" maxOccurs="1">
+                        <xs:element name="ListResultsItemMethodName" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="ListResultsFields" minOccurs="1" maxOccurs="1">
                             <xs:complexType>
                                 <xs:sequence>
-                                    <xs:element name="ListItemsArray" type="ListItemsArray" minOccurs="0" maxOccurs="unbounded"/>
+                                    <xs:element name="ListResultField" type="ListResultField" minOccurs="0" maxOccurs="unbounded"/>
                                 </xs:sequence>
                             </xs:complexType>
                         </xs:element>
@@ -257,12 +257,10 @@
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="ListItemsArray">
+    <xs:complexType name="ListResultField">
         <xs:sequence>
             <xs:element name="setter" type="xs:string" minOccurs="1" maxOccurs="1"/>
-            <xs:element name="element" type="xs:string" minOccurs="1" maxOccurs="1"/>
-            <xs:element name="container" type="xs:string" minOccurs="0" maxOccurs="1"/>
-            <xs:element name="subelement" type="xs:string" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="xpath" type="xs:string" minOccurs="1" maxOccurs="1"/>
         </xs:sequence>
     </xs:complexType>
 

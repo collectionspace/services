@@ -36,9 +36,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.client.PayloadInputPart;
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -49,7 +46,6 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.vocabulary.RefNameUtils;
-import org.dom4j.Element;
 
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -63,7 +59,7 @@ import org.nuxeo.ecm.core.schema.types.Schema;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.dom4j.Document;
+import org.w3c.dom.Document;
 
 /**
  * RemoteDocumentModelHandler
@@ -83,7 +79,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
      * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#setServiceContext(org.collectionspace.services.common.context.ServiceContext)
      */
     @Override
-    public void setServiceContext(ServiceContext ctx) {  //FIXME: Apply proper generics to ServiceContext<PoxPayloadIn, PoxPayloadOut>
+    public void setServiceContext(ServiceContext ctx) {  //FIXME: Apply proper generics to ServiceContext<MultipartInput, MultipartOutput>
         if (ctx instanceof MultipartServiceContext) {
             super.setServiceContext(ctx);
         } else {
@@ -101,11 +97,11 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         //return at least those document part(s) that were received
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
-        PoxPayloadIn input = ctx.getInput();
+        MultipartInput input = ctx.getInput();
         if (input != null) {
-	        List<PayloadInputPart> inputParts = ctx.getInput().getParts();
-	        for (PayloadInputPart part : inputParts) {
-	            String partLabel = part.getLabel();
+	        List<InputPart> inputParts = ctx.getInput().getParts();
+	        for (InputPart part : inputParts) {
+	            String partLabel = part.getHeaders().getFirst("label");
 	            ObjectPartType partMeta = partsMetaMap.get(partLabel);
 	//            extractPart(docModel, partLabel, partMeta);
 	            Map<String, Object> unQObjectProperties = extractPart(docModel, partLabel, partMeta);
@@ -129,10 +125,10 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
      */
     private void addOutputPart(Map<String, Object> unQObjectProperties, String schema, ObjectPartType partMeta)
             throws Exception {
-        Element doc = DocumentUtils.buildDocument(partMeta, schema,
+        Document doc = DocumentUtils.buildDocument(partMeta, schema,
                 unQObjectProperties);
         if (logger.isDebugEnabled() == true) {
-            logger.debug(doc.asXML());
+            logger.debug(DocumentUtils.xmlToString(doc));
         }
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
         ctx.addOutputPart(schema, doc, partMeta.getContent().getContentType());
@@ -195,7 +191,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         //not an ideal way of populating objects.
         DocumentModel docModel = wrapDoc.getWrappedObject();
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
-        PoxPayloadIn input = ctx.getInput();
+        MultipartInput input = ctx.getInput();
         if (input.getParts().isEmpty()) {
             String msg = "No payload found!";
             logger.error(msg + "Ctx=" + getServiceContext().toString());
@@ -205,10 +201,10 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
 
         //iterate over parts received and fill those parts
-        List<PayloadInputPart> inputParts = input.getParts();
-        for (PayloadInputPart part : inputParts) {
+        List<InputPart> inputParts = input.getParts();
+        for (InputPart part : inputParts) {
 
-            String partLabel = part.getLabel();
+            String partLabel = part.getHeaders().getFirst("label");
             if (partLabel == null) {
                 String msg = "Part label is missing or empty!";
                 logger.error(msg + "Ctx=" + getServiceContext().toString());
@@ -232,20 +228,23 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
      * @param partMeta metadata for the object to fill
      * @throws Exception
      */
-    protected void fillPart(PayloadInputPart part, DocumentModel docModel,
-            ObjectPartType partMeta, Action action, ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
+    protected void fillPart(InputPart part, DocumentModel docModel,
+            ObjectPartType partMeta, Action action, ServiceContext ctx)
             throws Exception {
+        InputStream payload = part.getBody(InputStream.class, null);
+
         //check if this is an xml part
         if (part.getMediaType().equals(MediaType.APPLICATION_XML_TYPE)) {
-//                Document document = DocumentUtils.parseDocument(payload, partMeta,
-//                        false /*don't validate*/);
-        	Element element = part.getElementBody();
-            Map<String, Object> objectProps = DocumentUtils.parseProperties(partMeta, element, ctx);
+            if (payload != null) {
+                Document document = DocumentUtils.parseDocument(payload, partMeta,
+                        false /*don't validate*/);
+                Map<String, Object> objectProps = DocumentUtils.parseProperties(partMeta, document, ctx);
             if (action == Action.UPDATE) {
                 this.filterReadOnlyPropertiesForPart(objectProps, partMeta);
             }
             docModel.setProperties(partMeta.getLabel(), objectProps);
         }
+    }
     }
 
     /**
@@ -284,11 +283,11 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
             throws Exception {
         Map<String, Object> result = null;
 
-        MediaType mt = MediaType.valueOf(partMeta.getContent().getContentType()); //FIXME: REM - This is no longer needed.  Everything is POX
+        MediaType mt = MediaType.valueOf(partMeta.getContent().getContentType());
         if (mt.equals(MediaType.APPLICATION_XML_TYPE)) {
             Map<String, Object> objectProps = docModel.getProperties(schema);
             //unqualify properties before sending the doc over the wire (to save bandwidh)
-            //FIXME: is there a better way to avoid duplication of a Map/Collection?
+            //FIXME: is there a better way to avoid duplication of a collection?
             Map<String, Object> unQObjectProperties =
                     (addToMap != null) ? addToMap : (new HashMap<String, Object>());
             Set<Entry<String, Object>> qualifiedEntries = objectProps.entrySet();
@@ -482,7 +481,6 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
      * @param propertyName the name of a property through
      *     which the value can be extracted.
      * @return the primary value.
-     */
     protected String primaryValueFromMultivalue(List<Object> values, String propertyName) {
         String primaryValue = "";
         if (values == null || values.size() == 0) {
@@ -509,5 +507,135 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
        }
        return primaryValue;
     }
+     */
 
+    /**
+     * Gets a simple property from the document.
+     *
+     * For completeness, as this duplicates DocumentModel method. 
+     *
+     * @param docModel The document model to get info from
+     * @param schema The name of the schema (part)
+     * @param propertyName The simple scalar property type
+     * @return property value as String
+     */
+    protected String getSimpleStringProperty(DocumentModel docModel, String schema, String propName) {
+    	String xpath = "/"+schema+":"+propName;
+    	try {
+	    	return (String)docModel.getPropertyValue(xpath);
+    	} catch(PropertyException pe) {
+    		throw new RuntimeException("Problem retrieving property {"+xpath+"}. Not a simple String property?"
+    				+pe.getLocalizedMessage());
+    	} catch(ClassCastException cce) {
+    		throw new RuntimeException("Problem retrieving property {"+xpath+"} as String. Not a scalar String property?"
+    				+cce.getLocalizedMessage());
+    	} catch(Exception e) {
+    		throw new RuntimeException("Unknown problem retrieving property {"+xpath+"}."
+    				+e.getLocalizedMessage());
+}
+    }
+
+    /**
+     * Gets first of a repeating list of scalar values, as a String, from the document.
+     *
+     * @param docModel The document model to get info from
+     * @param schema The name of the schema (part)
+     * @param listName The name of the scalar list property
+     * @return first value in list, as a String, or empty string if the list is empty
+     */
+    protected String getFirstRepeatingStringProperty(
+    		DocumentModel docModel, String schema, String listName) {
+    	String xpath = "/"+schema+":"+listName+"/[0]";
+    	try {
+	    	return (String)docModel.getPropertyValue(xpath);
+    	} catch(PropertyException pe) {
+    		throw new RuntimeException("Problem retrieving property {"+xpath+"}. Not a repeating scalar?"
+    				+pe.getLocalizedMessage());
+    	} catch(IndexOutOfBoundsException ioobe) {
+    		// Nuxeo sometimes handles missing sub, and sometimes does not. Odd.
+    		return "";	// gracefully handle missing elements
+    	} catch(ClassCastException cce) {
+    		throw new RuntimeException("Problem retrieving property {"+xpath+"} as String. Not a repeating String property?"
+    				+cce.getLocalizedMessage());
+    	} catch(Exception e) {
+    		throw new RuntimeException("Unknown problem retrieving property {"+xpath+"}."
+    				+e.getLocalizedMessage());
+    	}
+    }
+   
+
+    /**
+     * Gets first of a repeating list of scalar values, as a String, from the document.
+     *
+     * @param docModel The document model to get info from
+     * @param schema The name of the schema (part)
+     * @param listName The name of the scalar list property
+     * @return first value in list, as a String, or empty string if the list is empty
+     */
+    protected String getStringValueInPrimaryRepeatingComplexProperty(
+    		DocumentModel docModel, String schema, String complexPropertyName, String fieldName) {
+    	String xpath = "/"+schema+":"+complexPropertyName+"/[0]/"+fieldName;
+    	try {
+	    	return (String)docModel.getPropertyValue(xpath);
+    	} catch(PropertyException pe) {
+    		throw new RuntimeException("Problem retrieving property {"+xpath+"}. Bad propertyNames?"
+    				+pe.getLocalizedMessage());
+    	} catch(IndexOutOfBoundsException ioobe) {
+    		// Nuxeo sometimes handles missing sub, and sometimes does not. Odd.
+    		return "";	// gracefully handle missing elements
+    	} catch(ClassCastException cce) {
+    		throw new RuntimeException("Problem retrieving property {"+xpath+"} as String. Not a String property?"
+    				+cce.getLocalizedMessage());
+    	} catch(Exception e) {
+    		throw new RuntimeException("Unknown problem retrieving property {"+xpath+"}."
+    				+e.getLocalizedMessage());
+    	}
+    }
+   
+    /**
+     * Gets XPath value from schema. Note that only "/" and "[n]" are
+     * supported for xpath. Can omit grouping elements for repeating complex types, 
+     * e.g., "fieldList/[0]" can be used as shorthand for "fieldList/field[0]" and
+     * "fieldGroupList/[0]/field" can be used as shorthand for "fieldGroupList/fieldGroup[0]/field".
+     * If there are no entries for a list of scalars or for a list of complex types, 
+     * a 0 index expression (e.g., "fieldGroupList/[0]/field") will safely return an empty
+     * string. A non-zero index will throw an IndexOutOfBoundsException if there are not
+     * that many elements in the list. 
+     * N.B.: This does not follow the XPath spec - indices are 0-based, not 1-based.
+     *
+     * @param docModel The document model to get info from
+     * @param schema The name of the schema (part)
+     * @param xpath The XPath expression (without schema prefix)
+     * @return value the indicated property value as a String
+     */
+    protected static String getXPathStringValue(DocumentModel docModel, String schema, String xpath) {
+    	xpath = schema+":"+xpath;
+    	try {
+	    	return (String)docModel.getPropertyValue(xpath);
+    	} catch(PropertyException pe) {
+    		throw new RuntimeException("Problem retrieving property {"+xpath+"}. Bad XPath spec?"
+    				+pe.getLocalizedMessage());
+    	} catch(ClassCastException cce) {
+    		throw new RuntimeException("Problem retrieving property {"+xpath+"} as String. Not a String property?"
+    				+cce.getLocalizedMessage());
+    	} catch(IndexOutOfBoundsException ioobe) {
+    		// Nuxeo seems to handle foo/[0]/bar when it is missing,
+    		// but not foo/bar[0] (for repeating scalars).
+    		if(xpath.endsWith("[0]")) { 		// gracefully handle missing elements
+    			return "";
+    		} else {
+    			String msg = ioobe.getMessage();
+    			if(msg!=null && msg.equals("Index: 0, Size: 0")) {
+    				// Some other variant on a missing sub-field; quietly absorb.
+    				return "";
+    			} // Otherwise, e.g., for true OOB indices, propagate the exception.
+    		}
+    		throw new RuntimeException("Problem retrieving property {"+xpath+"}:"
+    				+ioobe.getLocalizedMessage());
+    	} catch(Exception e) {
+    		throw new RuntimeException("Unknown problem retrieving property {"+xpath+"}."
+    				+e.getLocalizedMessage());
+    	}
+    }
+   
 }

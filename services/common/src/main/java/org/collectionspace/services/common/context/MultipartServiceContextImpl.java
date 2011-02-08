@@ -24,24 +24,22 @@
 package org.collectionspace.services.common.context;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.collectionspace.services.client.PayloadInputPart;
-import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.security.UnauthorizedException;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-//import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-//import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
+import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
 /**
  * MultipartServiceContextImpl takes Multipart Input/Output
@@ -50,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class MultipartServiceContextImpl
-        extends RemoteServiceContextImpl<PoxPayloadIn, PoxPayloadOut>
+        extends RemoteServiceContextImpl<MultipartInput, MultipartOutput>
         implements MultipartServiceContext {
 
     /** The logger. */
@@ -64,9 +62,9 @@ public class MultipartServiceContextImpl
      * @throws UnauthorizedException the unauthorized exception
      */
     protected MultipartServiceContextImpl(String serviceName)
-    		throws DocumentException, UnauthorizedException {
+			throws UnauthorizedException {
     	super(serviceName);
-    	setOutput(new PoxPayloadOut(serviceName));
+    	setOutput(new MultipartOutput());
     }
     
     /**
@@ -76,10 +74,10 @@ public class MultipartServiceContextImpl
      * 
      * @throws UnauthorizedException the unauthorized exception
      */
-    protected MultipartServiceContextImpl(String serviceName, PoxPayloadIn theInput)
-    		throws DocumentException, UnauthorizedException {
+    protected MultipartServiceContextImpl(String serviceName, MultipartInput theInput)
+    		throws UnauthorizedException {
         super(serviceName, theInput);
-        setOutput(new PoxPayloadOut(serviceName));
+        setOutput(new MultipartOutput());
     }
 
     /**
@@ -91,33 +89,50 @@ public class MultipartServiceContextImpl
      * @throws UnauthorizedException the unauthorized exception
      */
     protected MultipartServiceContextImpl(String serviceName,
-    		PoxPayloadIn theInput,
-    		MultivaluedMap<String, String> queryParams) 
-    			throws DocumentException, UnauthorizedException {
+    		MultipartInput theInput,
+    		MultivaluedMap<String, String> queryParams) throws UnauthorizedException {
     	super(serviceName, theInput, queryParams);
-    	setOutput(new PoxPayloadOut(serviceName));
+    	setOutput(new MultipartOutput());
     }
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.common.context.MultipartServiceContext#getInputPart(java.lang.String, java.lang.Class)
+    /**
+     * Gets the input part.
+     * 
+     * @param label the label
+     * 
+     * @return the input part
+     * 
+     * @throws IOException Signals that an I/O exception has occurred.
      */
-    @Override
-    @Deprecated
-    public Object getInputPart(String label, Class clazz) throws IOException {
-        return getInputPart(label);
+    private InputPart getInputPart(String label) throws IOException {
+        if (getInput() != null) {
+            MultipartInput fdip = getInput();
+
+            for (InputPart part : fdip.getParts()) {
+                String partLabel = part.getHeaders().getFirst("label");
+                if (label.equalsIgnoreCase(partLabel)) {
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("getInputPart found part with label=" + partLabel
+                                + "\npayload=" + part.getBodyAsString());
+    }
+                    return part;
+                }
+            }
+        }
+        return null;
     }
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.MultipartServiceContext#getInputPart(java.lang.String, java.lang.Class)
      */
     @Override
-    public Object getInputPart(String label) throws IOException {
-    	Object result = null;
-        PayloadInputPart payloadInputPart = getInput().getPart(label);
-        if (payloadInputPart != null) {
-        	result = payloadInputPart.getBody();
+    public Object getInputPart(String label, Class clazz) throws IOException {
+        Object obj = null;
+        InputPart part = getInputPart(label);
+        if (part != null) {
+            obj = part.getBody(clazz, null);
         }
-        return result;
+        return obj;
     }
     
     /* (non-Javadoc)
@@ -125,40 +140,45 @@ public class MultipartServiceContextImpl
      */
     @Override
     public String getInputPartAsString(String label) throws IOException {
-    	String result = null;
-    	PayloadInputPart part = getInput().getPart(label);
+        InputPart part = getInputPart(label);
         if (part != null) {
-        	Element element = part.asElement();
-        	if (element != null) {
-        		result = element.asXML();
+            return part.getBodyAsString();
         	}
+        return null;
         }
-        return result;
-    }
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.MultipartServiceContext#getInputPartAsStream(java.lang.String)
      */
     @Override
     public InputStream getInputPartAsStream(String label) throws IOException {
-    	InputStream result = null;
-    	String part = getInputPartAsString(label);
+        InputPart part = getInputPart(label);
         if (part != null) {
-        	result = new ByteArrayInputStream(part.getBytes());
+            return new ByteArrayInputStream(part.getBodyAsString().getBytes());
         }
-        return result;
+        return null;
     }
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.context.MultipartServiceContext#addOutputPart(java.lang.String, org.w3c.dom.Document, java.lang.String)
      */
     @Override
-    public void addOutputPart(String label, Element element, String contentType) throws Exception {
-	    PayloadOutputPart part = getOutput().addPart(label, element);
-	    if (logger.isTraceEnabled() == true) {
-	    	logger.trace("Adding part:" + label +
-	    			" to " + getOutput().getName() + " document.");
+    public void addOutputPart(String label, Document doc, String contentType) throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            DocumentUtils.writeDocument(doc, baos);
+            baos.close();
+            OutputPart part = getOutput().addPart(new String(baos.toByteArray()),
+                    MediaType.valueOf(contentType));
+            part.getHeaders().add("label", label);
+        } finally {
+            if (baos != null) {
+                try {
+                    baos.close();
+                } catch (Exception e) {
 	    }
+    }
+        }
     }
 
     /* (non-Javadoc)

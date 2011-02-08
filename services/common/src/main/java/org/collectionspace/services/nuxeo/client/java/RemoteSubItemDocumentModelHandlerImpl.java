@@ -24,13 +24,9 @@
 package org.collectionspace.services.nuxeo.client.java;
 
 import java.io.InputStream;
-import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.collectionspace.services.client.PayloadInputPart;
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.service.ObjectPartType;
@@ -70,11 +66,10 @@ public abstract class RemoteSubItemDocumentModelHandlerImpl<T, TL> extends
      * @throws Exception
      */
 	@Override
-    protected void fillPart(PayloadInputPart part, DocumentModel docModel, 
-    						ObjectPartType partMeta, Action action, ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
+    protected void fillPart(InputPart part, DocumentModel docModel, 
+    						ObjectPartType partMeta, Action action, ServiceContext ctx)
             throws Exception {
-		ByteArrayInputStream bas = new ByteArrayInputStream(part.getElementBody().asXML().getBytes());
-        InputStream payload = bas;//part.getBody(/*InputStream.class, null*/);
+        InputStream payload = part.getBody(InputStream.class, null);
 
         //check if this is an xml part
         // TODO - we could configure the parts that have subitem content, 
