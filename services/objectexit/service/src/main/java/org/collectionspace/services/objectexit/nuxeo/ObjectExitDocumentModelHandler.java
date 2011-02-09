@@ -27,21 +27,7 @@ import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.objectexit.ObjectexitCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
-public class ObjectExitDocumentModelHandler extends DocHandlerBase<ObjectexitCommon, AbstractCommonList> {
-
-    public static DocHandlerBase.CommonListReflection clr;
-    static {
-        clr = new DocHandlerBase.CommonListReflection();
-        clr.NuxeoSchemaName= "objectexit";
-        clr.SummaryFields = "exitNumber|currentOwner|uri|csid";
-        clr.AbstractCommonListClassname = "org.collectionspace.services.objectexit.ObjectexitCommonList";
-        clr.CommonListItemClassname = "org.collectionspace.services.objectexit.ObjectexitCommonList$ObjectexitListItem";
-        clr.ListItemMethodName = "getObjectexitListItem";
-        clr.ListItemsArray =   new String[][] {{"setExitNumber", "exitNumber", "", ""},
-                                               {"setCurrentOwner", "currentOwner", "", ""}};
-    }
-    public DocHandlerBase.CommonListReflection getCommonListReflection(){
-        return clr;
-    }
+public class ObjectExitDocumentModelHandler 
+	extends DocHandlerBase<ObjectexitCommon, AbstractCommonList> {
 }
 
