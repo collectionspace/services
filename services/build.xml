@@ -1,4 +1,3 @@
-
 <project name="services-main" default="package" basedir=".">
     <description>
         collectionspace services main
@@ -262,6 +261,39 @@
         <ant antfile="JaxRsServiceProvider/build.xml" target="dist_installer" inheritAll="false"/>
 -->        
     </target>
+    
+   <target name="generate-dependencies-reports"
+            description="Generate a report of dependencies, including their licensing information.">
+        <exec executable="mvn" failonerror="true">
+            <arg value="project-info-reports:dependencies"/>
+        </exec>
+    </target>
 
+    <target name="copy-dependencies-reports" 
+            description="Copy dependencies reports to a single directory.">
+        <property name="dependencies-reports-dir" value="${basedir}/target/dependencies"/>
+        <mkdir dir="${dependencies-reports-dir}"/>
+        <!-- Copy the top-level services dependencies report -->
+        <copy todir="${dependencies-reports-dir}"
+             file="${basedir}/target/site/dependencies.html"/>
+        <!-- Copy the dependencies reports from each module, flattening -->
+        <!-- report names by substituting dot notation for full module paths -->
+        <copy todir="${dependencies-reports-dir}">
+            <fileset
+                id="dependency-report-files"
+                dir="${basedir}">
+                <include name="**/dependencies.html"/>
+            </fileset>
+            <chainedmapper>
+                <regexpmapper
+                     handledirsep="true"
+                     from="(.*?)/target/site/(.*)"
+                     to="\1${file.separator}\2"/>
+                <filtermapper>
+                    <replacestring from="${file.separator}" to="."/>
+                </filtermapper>
+            </chainedmapper>
+        </copy>
+    </target>
 
 </project>
