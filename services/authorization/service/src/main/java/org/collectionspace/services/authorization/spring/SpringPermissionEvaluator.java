@@ -43,7 +43,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
  */
 public class SpringPermissionEvaluator implements CSpacePermissionEvaluator {
 
-    final Log log = LogFactory.getLog(SpringPermissionEvaluator.class);
+    final Log log = LogFactory.getLog(SpringPermissionEvaluator.class);  //FIXEME: REM - Use SLF4J interfaces instead of directly using Apache Commons Logging.
     private SpringAuthorizationProvider provider;
 
     SpringPermissionEvaluator(SpringAuthorizationProvider provider) {
@@ -68,7 +68,7 @@ public class SpringPermissionEvaluator implements CSpacePermissionEvaluator {
     		Serializable objectIdId,
     		String objectIdType,
     		Permission perm) {
-    	if (log.isDebugEnabled() == true) {
+    	if (log.isTraceEnabled() == true) {
     		log.debug(this.getClass().getCanonicalName() + ":" + this);
     		String resourceTarget = "[" + res.getId() + "]" + " | " +
 				"[" + "objectIdId: " + objectIdType + "(" + objectIdId + ")]";
