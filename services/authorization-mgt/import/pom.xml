@@ -146,7 +146,7 @@
                         <argument>-p</argument>
                         <argument>does_not_matter</argument>
                         <argument>-b</argument>
-                        <argument>${basedir}/../../common/src/main/config/services/tenant-bindings.xml</argument>
+                        <argument>${basedir}/../../common/src/main</argument>
                         <argument>-edir</argument>
                         <argument>${basedir}/target</argument>
                     </arguments>
