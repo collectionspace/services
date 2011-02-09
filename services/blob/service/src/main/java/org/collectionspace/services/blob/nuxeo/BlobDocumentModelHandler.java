@@ -40,6 +40,7 @@ import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -51,24 +52,6 @@ extends DocHandlerBase<BlobsCommon, AbstractCommonList> {
 	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(BlobDocumentModelHandler.class);
 
-    public static DocHandlerBase.CommonListReflection clr;
-    static {
-        clr = new DocHandlerBase.CommonListReflection();
-        clr.NuxeoSchemaName= "blobs";
-        clr.SummaryFields = "name|mimeType|encoding|length|uri|csid";
-        clr.AbstractCommonListClassname = "org.collectionspace.services.blob.BlobsCommonList";
-        clr.CommonListItemClassname =     "org.collectionspace.services.blob.BlobsCommonList$BlobListItem";
-        clr.ListItemMethodName = "getBlobListItem";
-        clr.ListItemsArray =   new String[][]   {{"setEncoding", "encoding"},
-                                                 {"setMimeType", "mimeType"},
-                                                 {"setName", "name"},
-                                                 {"setLength", "length"}
-                                                 };
-    }
-    public DocHandlerBase.CommonListReflection getCommonListReflection(){
-        return clr;
-    }
-
     //==============================================================================
 
 	private String getDerivativePathBase(DocumentModel docModel) {
@@ -76,23 +59,6 @@ extends DocHandlerBase<BlobsCommon, AbstractCommonList> {
 			BlobInput.URI_DERIVATIVES_PATH + "/";
 	}
 
-	/*public Object createItemForCommonList(DocumentModel docModel, String label, String id) throws Exception {
-		BlobListItem item = new BlobListItem();
-		item.setEncoding((String)
-				docModel.getProperty(label, BlobJAXBSchema.encoding));
-		item.setMimeType((String)
-				docModel.getProperty(label, BlobJAXBSchema.mimeType));
-		//String theData = (String)
-		docModel.getProperty(label, BlobJAXBSchema.data);
-		item.setName((String)
-				docModel.getProperty(label, BlobJAXBSchema.name));
-		item.setLength((String)
-				docModel.getProperty(label, BlobJAXBSchema.length));
-		item.setUri(getServiceContextPath() + id);
-		item.setCsid(id);
-		return item;
-	}
-    */
 	private BlobsCommon getCommonPartProperties(DocumentModel docModel) throws Exception {
 		String label = getServiceContext().getCommonPartLabel();
 		BlobsCommon result = new BlobsCommon();
