@@ -59,6 +59,7 @@ public class ServiceMain {
     public static String DEFAULT_REPOSITORY_NAME = "CspaceDS";
 
     private ServiceMain() {
+    	//empty
     }
     
     /**
@@ -88,26 +89,25 @@ public class ServiceMain {
         return instance;
     }
 
-    private void initialize() throws Exception {        setServerRootDir();
+    private void initialize() throws Exception {
+    	setServerRootDir();
         readConfig();
         propagateConfiguredProperties();
         try {
         	createDefaultAccounts();
         } catch(Exception e) {
-        	logger.error("Default Account setup failed on exception: "+e.getLocalizedMessage());
+        	logger.error("Default Account setup failed on exception: " + e.getLocalizedMessage());
         }
         try {
-            //loadDocHandlers();
             firePostInitHandlers();
         } catch(Exception e) {
-            logger.error("ServiceMain.initialize firePostInitHandlers failed on exception: "+e.getLocalizedMessage());
+            logger.error("ServiceMain.initialize firePostInitHandlers failed on exception: " + e.getLocalizedMessage());
         }
 
         if (getClientType().equals(ClientType.JAVA)) {
             nuxeoConnector = NuxeoConnector.getInstance();
             nuxeoConnector.initialize(getServicesConfigReader().getConfiguration().getRepositoryClient());
         }
-
     }
 
     /**
@@ -129,9 +129,9 @@ public class ServiceMain {
     private void readConfig() throws Exception {
         //read service config
         servicesConfigReader = new ServicesConfigReaderImpl(getServerRootDir());
-        getServicesConfigReader().read();
+        servicesConfigReader.read();
 
-        tenantBindingConfigReader = new TenantBindingConfigReaderImpl(getServerRootDir());
+        tenantBindingConfigReader = new TenantBindingConfigReaderImpl(getServerRootDir()); 
         tenantBindingConfigReader.read();
     }
 
@@ -558,45 +558,6 @@ public class ServiceMain {
             return c.newInstance();
         }
         return null;
-    }
-
-    private void loadDocHandlers() throws Exception {
-        Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
-        for (TenantBindingType tbt: tenantBindingTypeMap.values()){
-            String name = tbt.getName();
-            String id = tbt.getId();
-
-            List<ServiceBindingType> sbtList = tbt.getServiceBindings();
-            for (ServiceBindingType sbt: sbtList){
-                DocHandlerParams params = sbt.getDocHandlerParams();
-                if (params!=null){
-                    params.getClassname();
-                    DocHandlerParams.Params p = params.getParams();
-                    DocHandlerBase.CommonListReflection clr = new DocHandlerBase.CommonListReflection();
-                    //List<ListItemsArray> items = p.getListItemsArrays();   //todo: this thing only returns one row. xsd is wrong.  tenant-bindings.xml has an example of multiple elements in loansin.
-                    List<ListItemsArray> items = /*DocHandlerParams.Params.ListItemsArrays items =*/
-                            p.getListItemsArrays().getListItemsArray();   //todo: this thing only returns one row. xsd is wrong.  tenant-bindings.xml has an example of multiple elements in loansin.
-                    int size = items.size();
-                    String[][] rows = new String[size][4];
-                    int r = 0;
-                    for (ListItemsArray item: items){
-                        String[] row = rows[r];
-                        row[0] = item.getSetter();
-                        row[1] = item.getElement();
-                        row[2] = item.getContainer();
-                        row[3] = item.getSubelement();
-                        r++;
-                    }
-                    clr.ListItemsArray = rows;
-                    clr.AbstractCommonListClassname = p.getAbstractCommonListClassname();
-                    clr.CommonListItemClassname = p.getCommonListItemClassname();
-                    clr.DublinCoreTitle = p.getDublinCoreTitle();
-                    clr.ListItemMethodName = p.getListItemMethodName();
-                    clr.NuxeoSchemaName = p.getNuxeoSchemaName();
-                    clr.SummaryFields = p.getSummaryFields();
-                }
-            }
-        }
     }
 
     private Connection getConnection() throws LoginException, SQLException {

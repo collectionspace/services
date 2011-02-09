@@ -27,6 +27,7 @@ import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.service.InitHandler.Params.Field;
 import org.collectionspace.services.common.service.InitHandler.Params.Property;
 import org.collectionspace.services.common.storage.DatabaseProductType;
+import org.collectionspace.services.common.storage.JDBCTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +52,7 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
                     + " for repository domain " + sbt.getRepositoryDomain().trim() + "...");
         }
         try {
-            DatabaseProductType databaseProductType = getDatabaseProductType();
+            DatabaseProductType databaseProductType = JDBCTools.getDatabaseProductType();
             String datatype = "";
             for (Field field : fields) {
                 datatype = getDatatypeFromLogicalType(databaseProductType, field.getType());
@@ -65,7 +66,7 @@ public class ModifyFieldDatatypes extends InitHandler implements IInitHandler {
                 } else {
                     throw new Exception("Unrecognized database system.");
                 }
-                rows = executeUpdate(sql);
+                rows = JDBCTools.executeUpdate(sql);
             }
         } catch (Exception e) {
             throw e;

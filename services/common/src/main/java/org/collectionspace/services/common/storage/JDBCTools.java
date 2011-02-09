@@ -78,17 +78,12 @@ public class JDBCTools {
             ResultSet rs = stmt.executeQuery(sql);
             stmt.close();
             return rs;  //don't call rs.close() here ... Let caller close and catch any exceptions.
-        } catch (RuntimeException rte) {
-            logger.debug("Exception in createDefaultAccounts: " + rte.getLocalizedMessage());
-            logger.debug(rte.getStackTrace().toString());
-            throw rte;
         } catch (SQLException sqle) {
             SQLException tempException = sqle;
             while (null != tempException) {       // SQLExceptions can be chained. Loop to log all.
                 logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
                 tempException = tempException.getNextException();
             }
-            logger.debug(sqle.getStackTrace().toString());
             throw new RuntimeException("SQL problem in executeQuery: ", sqle);
         } finally {
             try {
@@ -120,12 +115,16 @@ public class JDBCTools {
             throw rte;
         } catch (SQLException sqle) {
             SQLException tempException = sqle;
+            String msg = "";
             while (null != tempException) {       // SQLExceptions can be chained. Loop to log all.
-                logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
+                if (!msg.isEmpty()) {
+                    msg = msg + "::next::";
+                }
+                msg = msg + sqle.getLocalizedMessage();
+                logger.debug("SQL Exception: " + msg);
                 tempException = tempException.getNextException();
             }
-            logger.debug(sqle.getStackTrace().toString());
-            throw new RuntimeException("SQL problem in executeUpdate: ", sqle);
+            throw new RuntimeException("SQL problem in executeUpdate: " + msg, sqle);
         } finally {
             try {
                 if (conn != null) {
@@ -160,23 +159,19 @@ public class JDBCTools {
         }
         return productName;
     }
-    
-        public static DatabaseProductType getDatabaseProductType() throws Exception {
-            DatabaseProductType productType = DatabaseProductType.UNRECOGNIZED;
-            try {
-                String productName = getDatabaseProductName();
-                if (productName.matches("(?i).*mysql.*")) {
-                    productType = DatabaseProductType.MYSQL;
-                } else if (productName.matches("(?i).*postgresql.*")) {
-                    productType = DatabaseProductType.POSTGRESQL;
-                } else {
-                    throw new Exception("Unrecognized database system " + productName);
-                }
-            } catch (Exception e) {
-                throw e;
-            }
-            return productType;
+
+    public static DatabaseProductType getDatabaseProductType() throws Exception {
+        DatabaseProductType productType = DatabaseProductType.UNRECOGNIZED;
+        String productName = getDatabaseProductName();
+        if (productName.matches("(?i).*mysql.*")) {
+            productType = DatabaseProductType.MYSQL;
+        } else if (productName.matches("(?i).*postgresql.*")) {
+            productType = DatabaseProductType.POSTGRESQL;
+        } else {
+            throw new Exception("Unrecognized database system " + productName);
         }
+        return productType;
+    }
 
     public static String getDefaultRepositoryName() {
         return ServiceMain.DEFAULT_REPOSITORY_NAME;
