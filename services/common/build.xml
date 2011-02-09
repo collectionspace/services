@@ -153,10 +153,10 @@
               overwrite="false"/>
 
         <copy tofile="${jboss.server.cspace}/conf/jboss-log4j.xml"
-              file="${src}/main/config/log/jboss-log4j.xml"
+              file="${src}/main/cspace/config/log/jboss-log4j.xml"
               overwrite="true"/>
         <copy todir="${jboss.server.cspace}/conf"
-              file="${src}/main/config/log/jboss-log4j-release.xml"
+              file="${src}/main/cspace/config/log/jboss-log4j-release.xml"
               />
         <antcall target="deploy_jpa" />
         <antcall target="deploy_spring" />
