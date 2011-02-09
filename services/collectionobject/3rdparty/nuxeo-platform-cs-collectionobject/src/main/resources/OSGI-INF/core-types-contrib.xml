@@ -14,7 +14,6 @@
             <prefetch>
             collectionobjects_common:objectNumber
             collectionobjects_common:objectNameList
-            collectionobjects_common:title
             collectionobjects_common:responsibleDepartments</prefetch>
         </doctype>
     </extension>

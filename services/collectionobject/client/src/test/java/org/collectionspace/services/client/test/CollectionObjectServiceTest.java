@@ -225,6 +225,31 @@ public class CollectionObjectServiceTest extends AbstractServiceTestImpl {
         Assert.assertTrue(descriptions.size() > 0);
     }
 
+     // Verify that values are preserved when enclosed in double quote marks.
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
+        dependsOnMethods = {"create", "testSubmitRequest"}, groups = {"cspace3237group"})
+    public void doubleQuotesEnclosingFieldContents(String testName) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug(testBanner(testName, CLASS_NAME));
+        }
+        String newId =
+            createFromXmlFile(testName, "./test-data/cspace-3237-double-quotes.xml", true);
+        CollectionobjectsCommon collectionObject = readCollectionObjectCommonPart(newId);
+
+        Assert.assertTrue(collectionObject.getDistinguishingFeatures().matches("^\\\".+?\\\"$"));
+
+        BriefDescriptionList descriptionList = collectionObject.getBriefDescriptions();
+        List<String> descriptions = descriptionList.getBriefDescription();
+        Assert.assertTrue(descriptions.size() > 0);
+        Assert.assertNotNull(descriptions.get(0));
+        Assert.assertTrue(descriptions.get(0).matches("^\\\".+?\\\"$"));
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(objectAsXmlString(collectionObject,
+                    CollectionobjectsCommon.class));
+        }
+    }
+
     /**
      * Creates the from xml rfw s1.
      *
