@@ -33,6 +33,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.media.MediaCommon;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,23 +42,6 @@ import java.util.List;
 public class MediaDocumentModelHandler
         extends DocHandlerBase<MediaCommon, AbstractCommonList> {
 
-    public static DocHandlerBase.CommonListReflection clr;
-    static {
-        clr = new DocHandlerBase.CommonListReflection();
-        clr.NuxeoSchemaName= "media";
-        clr.SummaryFields = "title|source|filename|identificationNumber|uri|csid";
-        clr.AbstractCommonListClassname = "org.collectionspace.services.media.MediaCommonList";
-        clr.CommonListItemClassname =     "org.collectionspace.services.media.MediaCommonList$MediaListItem";
-        clr.ListItemMethodName = "getMediaListItem";
-        clr.ListItemsArray =   new String[][]   {{"setTitle", "title"},
-                                                 {"setSource", "source"},
-                                                 {"setFilename", "filename"},
-                                                 {"setIdentificationNumber", "identificationNumber"}
-                                                 };
-    }
-    public DocHandlerBase.CommonListReflection getCommonListReflection(){
-        return clr;
-    }
     //==============================================================================
 
 	private MediaCommon getCommonPartProperties(DocumentModel docModel) throws Exception {
