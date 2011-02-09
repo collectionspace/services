@@ -33,25 +33,5 @@ import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
  */
 public class AcquisitionDocumentModelHandler
         extends DocHandlerBase<AcquisitionsCommon, AbstractCommonList> {
-
-    private static DocHandlerBase.CommonListReflection clr;
-    static {
-        clr = new DocHandlerBase.CommonListReflection();
-        clr.NuxeoSchemaName= "acquisition";
-        clr.DublinCoreTitle = "";//"CollectionSpace-Acquisition";
-        clr.SummaryFields = "acquisitionReferenceNumber|acquisitionSources|owners|uri|csid";
-        clr.AbstractCommonListClassname = "org.collectionspace.services.acquisition.AcquisitionsCommonList";
-        clr.CommonListItemClassname = "org.collectionspace.services.acquisition.AcquisitionsCommonList$AcquisitionListItem";
-        clr.ListItemMethodName = "getAcquisitionListItem";
-                //ListItemsArray array elements: SETTER=0, ELEMENT=1, CONTAINER=2, SUBELEMENT=3;
-        clr.ListItemsArray =   new String[][] { {"setAcquisitionReferenceNumber","acquisitionReferenceNumber","",""},
-                                                {"setAcquisitionSource","acquisitionSources","acquisitionSources","acquisitionSource"},
-                                                {"setOwner","owner","owners","owner"}
-                                              };
-    }
-    public DocHandlerBase.CommonListReflection getCommonListReflection(){
-        return clr;
-    }
-
 }
 
