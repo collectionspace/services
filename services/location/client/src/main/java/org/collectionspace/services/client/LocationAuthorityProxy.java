@@ -32,7 +32,7 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(String xmlPayload);
+    ClientResponse<Response> create(byte[] xmlPayload);
 
     //(R)ead
     @GET
@@ -47,7 +47,7 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<String> update(@PathParam("csid") String csid, String xmlPayload);
+    ClientResponse<String> update(@PathParam("csid") String csid, byte[] xmlPayload);
 
     //(D)elete
     @DELETE
@@ -64,6 +64,8 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
 
     /**
+     * @param parentcsid
+     * @param itemcsid
      * @param csid
      * @return
      * @see org.collectionspace.services.client.IntakeProxy#getAuthorityRefs(java.lang.String)
@@ -87,7 +89,7 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
     //(C)reate Item
     @POST
     @Path("/{vcsid}/items/")
-    ClientResponse<Response> createItem(@PathParam("vcsid") String vcsid, String multipart);
+    ClientResponse<Response> createItem(@PathParam("vcsid") String vcsid, byte[] xmlPayload);
 
     //(R)ead Item
     @GET
@@ -97,7 +99,7 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
     //(U)pdate Item
     @PUT
     @Path("/{vcsid}/items/{csid}")
-    ClientResponse<String> updateItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid, String xmlPayload);
+    ClientResponse<String> updateItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid, byte[] xmlPayload);
 
     //(D)elete Item
     @DELETE
@@ -117,7 +119,7 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
     ClientResponse<Response> createContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
-            String xmlPayload);
+            byte[] xmlPayload);
 
      //(R)ead Contact
     @GET
@@ -134,7 +136,7 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid,
-            String xmlPayload);
+            byte[] xmlPayload);
 
     //(D)elete Contact
     @DELETE

@@ -155,7 +155,7 @@ public class DimensionResource extends
      */
     @GET
     @Path("{csid}")
-    public String getDimension(
+    public byte[] getDimension(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getDimension with csid=" + csid);
@@ -169,7 +169,7 @@ public class DimensionResource extends
         }
         PoxPayloadOut result = null;
         try {
-        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
             result = ctx.getOutput();
@@ -195,7 +195,7 @@ public class DimensionResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result.toXML();
+        return result.getBytes();
     }
 
     /**
@@ -211,7 +211,7 @@ public class DimensionResource extends
         DimensionsCommonList dimensionObjectList = new DimensionsCommonList();
         MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
         try {
-        	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             dimensionObjectList = (DimensionsCommonList) handler.getCommonPartList();
@@ -236,7 +236,7 @@ public class DimensionResource extends
      */
     @PUT
     @Path("{csid}")
-    public String updateDimension(
+    public byte[] updateDimension(
             @PathParam("csid") String csid, String xmlText) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateDimension with csid=" + csid);
@@ -268,7 +268,7 @@ public class DimensionResource extends
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result.toXML();
+        return result.getBytes();
     }
 
     /**

@@ -172,7 +172,7 @@ public class LoanoutResource extends
      */
     @GET
     @Path("{csid}")
-    public String getLoanout(
+    public byte[] getLoanout(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getLoanout with csid=" + csid);
@@ -216,7 +216,7 @@ public class LoanoutResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result.toXML();
+        return result.getBytes();
     }
 
     /**
@@ -350,7 +350,7 @@ public class LoanoutResource extends
      */
     @PUT
     @Path("{csid}")
-    public String updateLoanout(
+    public byte[] updateLoanout(
             @PathParam("csid") String csid,
             String xmlText) {
         if (logger.isDebugEnabled()) {
@@ -387,7 +387,7 @@ public class LoanoutResource extends
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result.toXML();
+        return result.getBytes();
     }
 
     /**

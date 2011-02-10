@@ -330,6 +330,15 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         CurrentLocationGroup currentLocationGroup = currentLocationGroups.get(0);
         Assert.assertNotNull(currentLocationGroup);
         Assert.assertNotNull(currentLocationGroup.getCurrentLocationNote());
+
+        // Check the values of fields containing Unicode UTF-8 (non-Latin-1) characters.
+        if(logger.isDebugEnabled()){
+            logger.debug("UTF-8 data sent=" + getUTF8DataFragment() + "\n"
+                    + "UTF-8 data received=" + intakeCommons.getEntryNote());
+        }
+        Assert.assertEquals(intakeCommons.getEntryNote(), getUTF8DataFragment(),
+                "UTF-8 data retrieved '" + intakeCommons.getEntryNote()
+                + "' does not match expected data '" + getUTF8DataFragment());
     }
 
     // Failure outcomes
@@ -510,6 +519,17 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(currentLocationGroups.get(0));
         Assert.assertEquals(updatedCurrentLocationNote,
                 currentLocationGroups.get(0).getCurrentLocationNote(),
+                "Data in updated object did not match submitted data.");
+
+        if(logger.isDebugEnabled()){
+            logger.debug("UTF-8 data sent=" + intakeCommons.getEntryNote() + "\n"
+                    + "UTF-8 data received=" + updatedIntake.getEntryNote());
+        }
+        Assert.assertTrue(updatedIntake.getEntryNote().contains(getUTF8DataFragment()),
+                "UTF-8 data retrieved '" + updatedIntake.getEntryNote()
+                + "' does not contain expected data '" + getUTF8DataFragment());
+        Assert.assertEquals(updatedIntake.getEntryNote(),
+                intakeCommons.getEntryNote(),
                 "Data in updated object did not match submitted data.");
 
     }
@@ -816,6 +836,8 @@ public class IntakeServiceTest extends AbstractServiceTestImpl {
         currentLocationGroup.setCurrentLocationNote("A most suitable location.");
         currentLocationGroups.add(currentLocationGroup);
         intake.setCurrentLocationGroupList(currentLocationGroupList);
+
+        intake.setEntryNote(getUTF8DataFragment());
 
         PoxPayloadOut multipart = new PoxPayloadOut(IntakeClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart =

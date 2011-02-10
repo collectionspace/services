@@ -154,7 +154,7 @@ public class LocationAuthorityClient extends AbstractServiceClientImpl {  //FIXM
      * @return the client response
      */
     public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
-        return locationAuthorityProxy.create(xmlPayload.toXML());
+        return locationAuthorityProxy.create(xmlPayload.getBytes());
     }
 
     /**
@@ -165,7 +165,7 @@ public class LocationAuthorityClient extends AbstractServiceClientImpl {  //FIXM
      * @return the client response
      */
     public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
-        return locationAuthorityProxy.update(csid, xmlPayload.toXML());
+        return locationAuthorityProxy.update(csid, xmlPayload.getBytes());
 
     }
 
@@ -242,8 +242,8 @@ public class LocationAuthorityClient extends AbstractServiceClientImpl {  //FIXM
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<Response> createItem(String vcsid, PoxPayloadOut multipart) {
-        return locationAuthorityProxy.createItem(vcsid, multipart.toXML());
+    public ClientResponse<Response> createItem(String vcsid, PoxPayloadOut xmlPayload) {
+        return locationAuthorityProxy.createItem(vcsid, xmlPayload.getBytes());
     }
 
     /**
@@ -255,7 +255,7 @@ public class LocationAuthorityClient extends AbstractServiceClientImpl {  //FIXM
      * @return the client response
      */
     public ClientResponse<String> updateItem(String vcsid, String csid, PoxPayloadOut xmlPayload) {
-        return locationAuthorityProxy.updateItem(vcsid, csid, xmlPayload.toXML());
+        return locationAuthorityProxy.updateItem(vcsid, csid, xmlPayload.getBytes());
 
     }
 
@@ -280,7 +280,7 @@ public class LocationAuthorityClient extends AbstractServiceClientImpl {  //FIXM
      */
     public ClientResponse<Response> createContact(String parentcsid,
             String itemcsid, PoxPayloadOut xmlPayload) {
-        return locationAuthorityProxy.createContact(parentcsid, itemcsid, xmlPayload.toXML());
+        return locationAuthorityProxy.createContact(parentcsid, itemcsid, xmlPayload.getBytes());
     }
 
     /**
@@ -319,7 +319,7 @@ public class LocationAuthorityClient extends AbstractServiceClientImpl {  //FIXM
      */
     public ClientResponse<String> updateContact(String parentcsid,
             String itemcsid, String csid, PoxPayloadOut xmlPayload) {
-        return locationAuthorityProxy.updateContact(parentcsid, itemcsid, csid, xmlPayload.toXML());
+        return locationAuthorityProxy.updateContact(parentcsid, itemcsid, csid, xmlPayload.getBytes());
     }
 
     /**

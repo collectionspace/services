@@ -176,7 +176,7 @@ public class IntakeResource extends
      */
     @GET
     @Path("{csid}")
-    public String getIntake(
+    public byte[] getIntake(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getIntake with csid=" + csid);
@@ -221,7 +221,7 @@ public class IntakeResource extends
             throw new WebApplicationException(response);
         }
         
-        return result.toXML();
+        return result.getBytes();
     }
 
     /**
@@ -355,7 +355,7 @@ public class IntakeResource extends
      */
     @PUT
     @Path("{csid}")
-    public String updateIntake(
+    public byte[] updateIntake(
             @PathParam("csid") String csid,
             String xmlText) {
         if (logger.isDebugEnabled()) {
@@ -381,7 +381,7 @@ public class IntakeResource extends
             throw new WebApplicationException(response);
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
-                logger.debug("caugth exception in updateIntake", dnfe);
+                logger.debug("Caught exception in updateIntake", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Update failed on Intake csid=" + csid).type(
@@ -393,7 +393,7 @@ public class IntakeResource extends
             throw new WebApplicationException(response);
         }
         
-        return result.toXML();
+        return result.getBytes();
     }
 
     /**

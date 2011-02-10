@@ -139,9 +139,8 @@ public class IntakeClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.IntakeProxy#createIntake(org.collectionspace.hello.Intake)
      */
-    public ClientResponse<Response> create(PoxPayloadOut multipart) {
-    	String payload = multipart.toXML();
-        return intakeProxy.create(payload);
+    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
+        return intakeProxy.create(xmlPayload.getBytes());
     }
 
     /**
@@ -150,9 +149,8 @@ public class IntakeClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.IntakeProxy#updateIntake(java.lang.Long, org.collectionspace.hello.Intake)
      */
-    public ClientResponse<String> update(String csid, PoxPayloadOut multipart) {
-    	String payload = multipart.toXML();
-        return intakeProxy.update(csid, payload);
+    public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
+        return intakeProxy.update(csid, xmlPayload.getBytes());
 
     }
 

@@ -12,8 +12,6 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.dimension.DimensionsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
  * @version $Revision:$
@@ -29,7 +27,7 @@ public interface DimensionProxy extends CollectionSpaceProxy {
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(String payload);
+    ClientResponse<Response> create(byte[] payload);
 
     //(R)ead
     @GET
@@ -39,7 +37,7 @@ public interface DimensionProxy extends CollectionSpaceProxy {
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<String> update(@PathParam("csid") String csid, String payload);
+    ClientResponse<String> update(@PathParam("csid") String csid, byte[] payload);
 
     //(D)elete
     @DELETE

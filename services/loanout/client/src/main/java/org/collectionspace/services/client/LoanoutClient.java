@@ -117,9 +117,8 @@ public class LoanoutClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.LoanoutProxy#createLoanout(org.collectionspace.hello.Loanout)
      */
-    public ClientResponse<Response> create(PoxPayloadOut multipart) {
-    	String payload = multipart.toXML();
-        return loanoutProxy.create(payload);
+    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
+        return loanoutProxy.create(xmlPayload.getBytes());
     }
 
     /**
@@ -128,9 +127,8 @@ public class LoanoutClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.LoanoutProxy#updateLoanout(java.lang.Long, org.collectionspace.hello.Loanout)
      */
-    public ClientResponse<String> update(String csid, PoxPayloadOut multipart) {
-    	String payload = multipart.toXML();
-        return loanoutProxy.update(csid, payload);
+    public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
+        return loanoutProxy.update(csid, xmlPayload.getBytes());
 
     }
 

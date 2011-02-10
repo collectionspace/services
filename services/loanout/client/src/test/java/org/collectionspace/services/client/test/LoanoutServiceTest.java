@@ -313,6 +313,15 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         LoanedObjectStatusGroup statusGroup = statusGroups.get(0);
         Assert.assertNotNull(statusGroup);
         Assert.assertNotNull(statusGroup.getLoanedObjectStatus());
+
+        // Check the values of fields containing Unicode UTF-8 (non-Latin-1) characters.
+        if(logger.isDebugEnabled()){
+            logger.debug("UTF-8 data sent=" + getUTF8DataFragment() + "\n"
+                    + "UTF-8 data received=" + loanoutCommon.getLoanOutNote());
+        }
+        Assert.assertEquals(loanoutCommon.getLoanOutNote(), getUTF8DataFragment(),
+                "UTF-8 data retrieved '" + loanoutCommon.getLoanOutNote()
+                + "' does not match expected data '" + getUTF8DataFragment());
     }
 
     // Failure outcomes
@@ -499,6 +508,16 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
                 updatedStatusGroups.get(0).getLoanedObjectStatus(),
                 "Data in updated object did not match submitted data.");
 
+        if(logger.isDebugEnabled()){
+            logger.debug("UTF-8 data sent=" + loanoutCommon.getLoanOutNote() + "\n"
+                    + "UTF-8 data received=" + updatedLoanoutCommon.getLoanOutNote());
+        }
+        Assert.assertTrue(updatedLoanoutCommon.getLoanOutNote().contains(getUTF8DataFragment()),
+                "UTF-8 data retrieved '" + updatedLoanoutCommon.getLoanOutNote()
+                + "' does not contain expected data '" + getUTF8DataFragment());
+        Assert.assertEquals(updatedLoanoutCommon.getLoanOutNote(),
+                loanoutCommon.getLoanOutNote(),
+                "Data in updated object did not match submitted data.");
     }
 
     // Failure outcomes
@@ -787,6 +806,8 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         statusGroup.setLoanedObjectStatusNote("Left under the front mat.");
         statusGroups.add(statusGroup);
         loanoutCommon.setLoanedObjectStatusGroupList(statusGroupList);
+
+        loanoutCommon.setLoanOutNote(getUTF8DataFragment());
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =
