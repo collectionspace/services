@@ -51,9 +51,7 @@
         <module>contact</module>
         <module>JaxRsServiceProvider</module>
         <!--module>sdk</module-->
-        <!-- //FIXME: REM - Disable until XMLReplay scripts have been updated for new POX payloads. 
         <module>IntegrationTests</module>
-         -->
         <module>PerformanceTests</module>
         <module>security</module>
     </modules>
