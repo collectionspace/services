@@ -65,8 +65,8 @@ import org.slf4j.LoggerFactory;
  * The Class NewRelationResource.
  */
 @Path("/relations")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Consumes("application/xml")
+@Produces("application/xml")
 public class NewRelationResource extends
 		AbstractMultiPartCollectionSpaceResourceImpl {
 

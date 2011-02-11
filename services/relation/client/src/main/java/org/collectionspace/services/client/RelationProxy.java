@@ -22,8 +22,8 @@ import javax.ws.rs.QueryParam;
  * @version $Revision:$
  */
 @Path("/relations/")
-@Produces({"multipart/mixed"})
-@Consumes({"multipart/mixed"})
+@Produces({"application/xml"})
+@Consumes({"application/xml"})
 public interface RelationProxy extends CollectionSpaceProxy {
 
     @GET
