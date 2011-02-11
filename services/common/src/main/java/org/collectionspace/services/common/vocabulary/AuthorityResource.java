@@ -71,11 +71,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The Class VocabularyResource.
+ * The Class AuthorityResource.
  */
-//@Path("/vocabularies")
-//@Consumes("application/xml")
-//@Produces("application/xml")
+@Consumes("application/xml")
+@Produces("application/xml")
 public abstract class AuthorityResource<AuthCommon, AuthCommonList, AuthItemCommonList, AuthItemHandler> extends
 	AbstractMultiPartCollectionSpaceResourceImpl {
 
