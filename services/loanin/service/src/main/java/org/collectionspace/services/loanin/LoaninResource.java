@@ -40,6 +40,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
@@ -58,6 +59,8 @@ import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils;
+import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -231,9 +234,9 @@ public class LoaninResource extends
      */
     @GET
     @Produces("application/xml")
-    public LoansinCommonList getLoaninList(@Context UriInfo ui,
+    public AbstractCommonList getLoaninList(@Context UriInfo ui,
     		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
-    	LoansinCommonList result = null;
+    	AbstractCommonList result = null;
     	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
     	if (keywords != null) {
     		result = searchLoansin(queryParams, keywords);
@@ -249,13 +252,13 @@ public class LoaninResource extends
      * 
      * @return the loanin list
      */
-    private LoansinCommonList getLoaninList(MultivaluedMap<String, String> queryParams) {
-        LoansinCommonList loaninObjectList;
+    private CommonList getLoaninList(MultivaluedMap<String, String> queryParams) {
+        CommonList loaninObjectList;
         try {
         	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
-            loaninObjectList = (LoansinCommonList) handler.getCommonPartList();
+            loaninObjectList = (CommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -320,13 +323,14 @@ public class LoaninResource extends
      * @return the loanin list
      */
     @Deprecated
-    public LoansinCommonList getLoaninList(List<String> csidList) {
-        LoansinCommonList loaninObjectList = new LoansinCommonList();
+    public CommonList getLoaninList(List<String> csidList) {
+        CommonList loaninObjectList;
         try {
+            loaninObjectList = new CommonList();
         	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csidList, handler);
-            loaninObjectList = (LoansinCommonList) handler.getCommonPartList();
+            loaninObjectList = (CommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -442,10 +446,10 @@ public class LoaninResource extends
      * 
      * @return the loansin common list
      */
-    private LoansinCommonList searchLoansin(
+    private CommonList searchLoansin(
     		MultivaluedMap<String, String> queryParams,
     		String keywords) {
-    	LoansinCommonList loansinObjectList;
+    	CommonList loansinObjectList;
         try {
         	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
@@ -460,7 +464,7 @@ public class LoaninResource extends
 	            }
             }
             getRepositoryClient(ctx).getFiltered(ctx, handler);
-            loansinObjectList = (LoansinCommonList) handler.getCommonPartList();            
+            loansinObjectList = (CommonList) handler.getCommonPartList();            
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Index failed reason " + ue.getErrorReason()).type("text/plain").build();

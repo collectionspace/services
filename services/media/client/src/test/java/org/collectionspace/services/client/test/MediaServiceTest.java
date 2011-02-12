@@ -30,7 +30,6 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.MediaClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.media.MediaCommon;
-import org.collectionspace.services.media.MediaCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -62,7 +61,7 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
 
     @Override
     protected AbstractCommonList getAbstractCommonList(ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(MediaCommonList.class);
+        return response.getEntity(AbstractCommonList.class);
     }
 
     @Override
@@ -109,16 +108,16 @@ public class MediaServiceTest extends AbstractServiceTestImpl {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupReadList();
         MediaClient client = new MediaClient();
-        ClientResponse<MediaCommonList> res = client.readList();
-        MediaCommonList list = res.getEntity();
+        ClientResponse<AbstractCommonList> res = client.readList();
+        AbstractCommonList list = res.getEntity();
         assertStatusCode(res, testName);
         if (logger.isDebugEnabled()) {
-            List<MediaCommonList.MediaListItem> items = list.getMediaListItem();
+            List<AbstractCommonList.ListItem> items =
+                list.getListItem();
             int i = 0;
-            for (MediaCommonList.MediaListItem item : items) {
-                logger.debug(testName + ": list-item[" + i + "] csid=" + item.getCsid());
-                logger.debug(testName + ": list-item[" + i + "] media.title=" + item.getTitle());
-                logger.debug(testName + ": list-item[" + i + "] URI=" + item.getUri());
+            for(AbstractCommonList.ListItem item : items){
+                logger.debug(testName + ": list-item[" + i + "] " +
+                        item.toString());
                 i++;
             }
         }

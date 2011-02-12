@@ -30,7 +30,6 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.blob.BlobsCommon;
-import org.collectionspace.services.blob.BlobsCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -62,7 +61,7 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
 
     @Override
     protected AbstractCommonList getAbstractCommonList(ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(BlobsCommonList.class);
+        return response.getEntity(AbstractCommonList.class);
     }
 
     @Override
@@ -109,16 +108,16 @@ public class BlobServiceTest extends AbstractServiceTestImpl {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupReadList();
         BlobClient client = new BlobClient();
-        ClientResponse<BlobsCommonList> res = client.readList();
-        BlobsCommonList list = res.getEntity();
+        ClientResponse<AbstractCommonList> res = client.readList();
+        AbstractCommonList list = res.getEntity();
         assertStatusCode(res, testName);
         if (logger.isDebugEnabled()) {
-            List<BlobsCommonList.BlobListItem> items = list.getBlobListItem();
+            List<AbstractCommonList.ListItem> items =
+                list.getListItem();
             int i = 0;
-            for (BlobsCommonList.BlobListItem item : items) {
-                logger.debug(testName + ": list-item[" + i + "] csid=" + item.getCsid());
-                logger.debug(testName + ": list-item[" + i + "] blob.name=" + item.getName());
-                logger.debug(testName + ": list-item[" + i + "] URI=" + item.getUri());
+            for(AbstractCommonList.ListItem item : items){
+                logger.debug(testName + ": list-item[" + i + "] " +
+                        item.toString());
                 i++;
             }
         }

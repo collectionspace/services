@@ -5,7 +5,9 @@ import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.collectionspace.services.blob.BlobsCommonList; 
+//import org.collectionspace.services.blob.BlobsCommonList; 
+import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.common.FileUtils;
 
 public class BlobInput {
@@ -15,7 +17,7 @@ public class BlobInput {
 	
 	private String derivativeTerm;
 	private boolean derivativeListRequested = false;
-	private BlobsCommonList derivativeList;
+	private CommonList derivativeList;
 	
 	private boolean contentRequested = false;
 	private InputStream contentStream;
@@ -88,11 +90,11 @@ public class BlobInput {
 		this.derivativeListRequested = derivativesRequested;
 	}
 
-	public BlobsCommonList getDerivativeList() {
+	public CommonList getDerivativeList() {
 		return derivativeList;
 	}
 
-	public void setDerivativeList(BlobsCommonList derivativeList) {
+	public void setDerivativeList(CommonList derivativeList) {
 		this.derivativeList = derivativeList;
 	}
 

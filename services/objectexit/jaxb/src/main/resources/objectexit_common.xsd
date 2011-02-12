@@ -59,35 +59,5 @@
         </xs:annotation>
     </xs:complexType>
     
-    <!-- objectexit records, as in nuxeo repository -->
-    <xs:element name="objectexit_common_list">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="abstractCommonList">                    
-                    <xs:sequence>
-                        <xs:element name="objectexit_list_item" maxOccurs="unbounded">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element name="exitNumber" type="xs:string"   minOccurs="1" />
-                                    <xs:element name="currentOwner" type="xs:string" minOccurs="1" />
-                                    <xs:element name="uri" type="xs:anyURI"          minOccurs="1" />
-                                    <xs:element name="csid" type="xs:string"         minOccurs="1" />
-                                    <!--
-                                    <xs:element name="depositor" type="xs:string"    minOccurs="1" />
-                                    <xs:element name="exitDate" type="xs:string"     minOccurs="1" />
-                                    <xs:element name="exitMethod" type="xs:string"   minOccurs="1" />
-                                    <xs:element name="exitNote" type="xs:string"     minOccurs="1" />
-                                    <xs:element name="exitReason" type="xs:string"   minOccurs="1" />
-                                    <xs:element name="packingNote" type="xs:string"  minOccurs="1" />
-                                    -->
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                </xs:extension>
-            </xs:complexContent>                    
-        </xs:complexType>
-    </xs:element>
-    
 </xs:schema>
 

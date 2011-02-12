@@ -33,7 +33,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanin.LenderGroup;
 import org.collectionspace.services.loanin.LenderGroupList;
 import org.collectionspace.services.loanin.LoansinCommon;
-import org.collectionspace.services.loanin.LoansinCommonList;
+//import org.collectionspace.services.loanin.LoansinCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -83,7 +83,7 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
     @Override
 	protected AbstractCommonList getAbstractCommonList(
 			ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(LoansinCommonList.class);
+        return response.getEntity(AbstractCommonList.class);
     }
  
     // ---------------------------------------------------------------
@@ -380,9 +380,9 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         setupReadList();
 
         // Submit the request to the service and store the response.
-        LoansinCommonList list = null;
+        AbstractCommonList list = null;
         LoaninClient client = new LoaninClient();
-        ClientResponse<LoansinCommonList> res = client.readList();
+        ClientResponse<AbstractCommonList> res = client.readList();
         try {
 	        int statusCode = res.getStatus();
 	
@@ -403,16 +403,12 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = false;
         if (iterateThroughList && logger.isDebugEnabled()){
-            List<LoansinCommonList.LoaninListItem> items =
-                    list.getLoaninListItem();
+            List<AbstractCommonList.ListItem> items =
+                    list.getListItem();
             int i = 0;
-            for(LoansinCommonList.LoaninListItem item : items){
-                logger.debug(testName + ": list-item[" + i + "] csid=" +
-                        item.getCsid());
-                logger.debug(testName + ": list-item[" + i + "] loanInNumber=" +
-                        item.getLoanInNumber());
-                logger.debug(testName + ": list-item[" + i + "] URI=" +
-                        item.getUri());
+            for(AbstractCommonList.ListItem item : items){
+                logger.debug(testName + ": list-item[" + i + "] " +
+                        item.toString());
                 i++;
             }
         }

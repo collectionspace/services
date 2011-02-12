@@ -21,7 +21,7 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 //import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.loanin.LoansinCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
@@ -97,7 +97,7 @@ public class LoaninClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.LoaninProxy#getLoanin()
      */
-    public ClientResponse<LoansinCommonList> readList() {
+    public ClientResponse<AbstractCommonList> readList() {
         return loaninProxy.readList();
     }
     

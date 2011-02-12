@@ -40,7 +40,7 @@ import java.util.List;
  * The Class MediaDocumentModelHandler.
  */
 public class MediaDocumentModelHandler
-        extends DocHandlerBase<MediaCommon, AbstractCommonList> {
+        extends DocHandlerBase<MediaCommon> {
 
     //==============================================================================
 

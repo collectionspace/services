@@ -24,7 +24,6 @@
 package org.collectionspace.services.acquisition.nuxeo;
 
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
-import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 
 /** AcquisitionDocumentModelHandler
@@ -32,6 +31,6 @@ import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
  *  $LastChangedDate: $
  */
 public class AcquisitionDocumentModelHandler
-        extends DocHandlerBase<AcquisitionsCommon, AbstractCommonList> {
+        extends DocHandlerBase<AcquisitionsCommon> {
 }
 

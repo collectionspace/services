@@ -25,6 +25,7 @@ package org.collectionspace.services.nuxeo.client.java;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -36,6 +37,7 @@ import org.collectionspace.services.common.service.ServiceBindingType;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -44,10 +46,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is generified by the marker types T and TL,
- * however, T is expected to map to something like BlobCommon, MediaCommon, ObjectexitCommon, etc.,
- * whereas TL is expected to map to AbstractCommonList,
- * since, for example, BlobCommonList and ObjectexitCommonList descend from AbstractCommonList,
+ * This class is generified by the marker type T,
+ * where T is expected to map to something like BlobCommon, MediaCommon, ObjectexitCommon, etc.,
  * and so on for every JAXB-generated schema class.
  *
  * User: laramie
@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate:  $
  *
  */
-public abstract class DocHandlerBase<T, TL> extends RemoteDocumentModelHandlerImpl<T, TL> {
+public abstract class DocHandlerBase<T> extends RemoteDocumentModelHandlerImpl<T, AbstractCommonList> {
 
     /** The logger. */
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -63,8 +63,8 @@ public abstract class DocHandlerBase<T, TL> extends RemoteDocumentModelHandlerIm
     private AbstractCommonList commonList;
 
     @Override
-    public TL getCommonPartList() {
-        return (TL)commonList;
+    public AbstractCommonList getCommonPartList() {
+        return commonList;
     }
 
     public void setCommonPartList(AbstractCommonList aCommonList) {
@@ -128,9 +128,10 @@ public abstract class DocHandlerBase<T, TL> extends RemoteDocumentModelHandlerIm
     }
 
     @Override
-    public TL extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
-        String label = getServiceContext().getCommonPartLabel();
-
+    public AbstractCommonList extractCommonPartList(DocumentWrapper<DocumentModelList> wrapDoc) throws Exception {
+        //String label = getServiceContext().getCommonPartLabel();
+        
+        /*
         AbstractCommonList commonList = createAbstractCommonListImpl();
         extractPagingInfo(((TL)commonList), wrapDoc);
         commonList.setFieldsReturned(getSummaryFields(commonList));
@@ -142,7 +143,59 @@ public abstract class DocHandlerBase<T, TL> extends RemoteDocumentModelHandlerIm
             Object item = createItemForCommonList(docModel, label, id);
             list.add(item);
         }
-        return (TL)commonList;
+        */
+        /* Rewrite
+         * Create the CommonList
+         * List<ListResultField> resultsFields = getListItemsArray();
+         * Construct array of strings of resultsFields
+         *   add csid and uri
+         * Set the fieldNames for CommonList
+         * For each doc in list:
+         *   Create HashMap of values
+         *   get csid, set csid hashmap value
+         *   get uri, set uri hashmap value
+         *   for (ListResultField field : resultsFields ){
+         *	   get String value from Xpath
+         *	   set hashMap value
+         *   AddItem to CommonList
+         * 
+         */
+    	String commonSchema = getServiceContext().getCommonPartLabel();
+    	CommonList commonList = new CommonList();
+        extractPagingInfo(commonList, wrapDoc);
+        List<ListResultField> resultsFields = getListItemsArray();
+        int nFields = resultsFields.size()+2;
+        String fields[] = new String[nFields];
+        fields[0] = "csid";
+        fields[1] = "uri";
+        for(int i=2;i<nFields;i++) {
+        	ListResultField field = resultsFields.get(i-2); 
+        	fields[i]=field.getElement();
+        }
+        commonList.setFieldsReturned(fields);
+        Iterator<DocumentModel> iter = wrapDoc.getWrappedObject().iterator();
+		HashMap<String,String> item = new HashMap<String,String>();
+        while(iter.hasNext()){
+            DocumentModel docModel = iter.next();
+            String id = NuxeoUtils.getCsid(docModel);//NuxeoUtils.extractId(docModel.getPathAsString());
+            item.put(fields[0], id);
+            String uri = getServiceContextPath() + id;
+            item.put(fields[1], uri);
+            for (ListResultField field : resultsFields ){
+            	String schema = field.getSchema();
+            	if(schema==null || schema.trim().isEmpty())
+            		schema = commonSchema;
+                String value = 
+                	getXPathStringValue(docModel, schema, field.getXpath());
+                if(value!=null && !value.trim().isEmpty()) {
+                	item.put(field.getElement(), value);
+                }
+            }
+            commonList.addItem(item);
+            item.clear();
+        }
+
+        return commonList;
     }
 
     @Override

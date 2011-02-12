@@ -32,9 +32,9 @@ import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.blob.BlobsCommon;
-import org.collectionspace.services.blob.BlobsCommonList;
 import org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler;
 import org.collectionspace.services.blob.BlobResource;
+import org.collectionspace.services.nuxeo.client.java.CommonList;
 
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -217,9 +217,9 @@ public class MediaResource extends ResourceBase {
     @GET
     @Path("{csid}/blob/derivatives")
     @Produces("application/xml")    
-    public BlobsCommonList getDerivatives(
+    public CommonList getDerivatives(
     		@PathParam("csid") String csid) {
-    	BlobsCommonList result = null;
+    	CommonList result = null;
 
 	    try {
 	    	ensureCSID(csid, READ);

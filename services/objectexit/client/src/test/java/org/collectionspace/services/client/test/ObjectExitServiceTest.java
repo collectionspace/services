@@ -30,7 +30,6 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ObjectExitClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.objectexit.ObjectexitCommon;
-import org.collectionspace.services.objectexit.ObjectexitCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
@@ -62,7 +61,7 @@ public class ObjectExitServiceTest extends AbstractServiceTestImpl {
 
     @Override
     protected AbstractCommonList getAbstractCommonList(ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(ObjectexitCommonList.class);
+        return response.getEntity(AbstractCommonList.class);
     }
 
     @Override
@@ -109,16 +108,16 @@ public class ObjectExitServiceTest extends AbstractServiceTestImpl {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupReadList();
         ObjectExitClient client = new ObjectExitClient();
-        ClientResponse<ObjectexitCommonList> res = client.readList();
-        ObjectexitCommonList list = res.getEntity();
+        ClientResponse<AbstractCommonList> res = client.readList();
+        AbstractCommonList list = res.getEntity();
         assertStatusCode(res, testName);
         if (logger.isDebugEnabled()) {
-            List<ObjectexitCommonList.ObjectexitListItem> items = list.getObjectexitListItem();
+            List<AbstractCommonList.ListItem> items =
+                list.getListItem();
             int i = 0;
-            for (ObjectexitCommonList.ObjectexitListItem item : items) {
-                logger.debug(testName + ": list-item[" + i + "] csid=" + item.getCsid());
-                logger.debug(testName + ": list-item[" + i + "] objectExitNumber=" + item.getExitNumber());
-                logger.debug(testName + ": list-item[" + i + "] URI=" + item.getUri());
+            for(AbstractCommonList.ListItem item : items){
+                logger.debug(testName + ": list-item[" + i + "] " +
+                        item.toString());
                 i++;
             }
         }

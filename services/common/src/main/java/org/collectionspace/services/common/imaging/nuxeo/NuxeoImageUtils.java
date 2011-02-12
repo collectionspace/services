@@ -112,8 +112,11 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentUtils;
 import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.blob.BlobsCommon;
-import org.collectionspace.services.blob.BlobsCommonList;
-import org.collectionspace.services.blob.BlobsCommonList.BlobListItem;
+//import org.collectionspace.services.blob.BlobsCommonList;
+//import org.collectionspace.services.blob.BlobsCommonList.BlobListItem;
+import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.jaxb.BlobJAXBSchema;
+import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.common.blob.BlobOutput;
 
 import org.collectionspace.ecm.platform.quote.api.QuoteManager;
@@ -190,28 +193,43 @@ public class NuxeoImageUtils {
 		return uri + result + "/" + BlobInput.URI_CONTENT_PATH;
 	}
 
-	static private BlobListItem createBlobListItem(Blob blob, String uri) {
-		BlobListItem result = new BlobListItem();
+	static private HashMap<String,String> createBlobListItem(Blob blob, String uri) {
+		HashMap<String,String> item = new HashMap<String,String>();
+		
+		String value = blob.getEncoding();
+		if(value!=null && !value.trim().isEmpty()) {
+        	item.put(BlobJAXBSchema.encoding, value);
+        }
+		value = Long.toString(blob.getLength());
+		if(value!=null && !value.trim().isEmpty()) {
+        	item.put(BlobJAXBSchema.length, value);
+        }
+		value = blob.getMimeType();
+		if(value!=null && !value.trim().isEmpty()) {
+        	item.put(BlobJAXBSchema.mimeType, value);
+        }
+		value = blob.getFilename();
+		if(value!=null && !value.trim().isEmpty()) {
+        	item.put(BlobJAXBSchema.name, value);
+        }
+		value = getDerivativeUri(uri, blob.getFilename());
+		if(value!=null && !value.trim().isEmpty()) {
+        	item.put(BlobJAXBSchema.uri, value);
+        }
 
-		result.setEncoding(blob.getEncoding());
-		result.setLength(Long.toString(blob.getLength()));
-		result.setMimeType(blob.getMimeType());
-		result.setName(blob.getFilename());
-		result.setUri(getDerivativeUri(uri, blob.getFilename()));
-
-		return result;
+		return item;
 	}
 
-	static public BlobsCommonList getBlobDerivatives(RepositoryInstance repoSession,
+	static public CommonList getBlobDerivatives(RepositoryInstance repoSession,
 			String repositoryId,
 			String uri) throws Exception {
-		BlobsCommonList result = new BlobsCommonList();
+		CommonList commonList = new CommonList();
 
 		IdRef documentRef = new IdRef(repositoryId);
 		DocumentModel documentModel = repoSession.getDocument(documentRef);		
 		DocumentBlobHolder docBlobHolder = (DocumentBlobHolder)documentModel.getAdapter(BlobHolder.class);
 		//
-		//
+		// FIXME: REM this looks like cruft
 		try {
 			QuoteManager quoteManager = (QuoteManager)Framework.getService(QuoteManager.class);
 			quoteManager.createQuote(documentModel, "Quoted - Comment" + System.currentTimeMillis(),
@@ -222,14 +240,14 @@ public class NuxeoImageUtils {
 		//
 		//
 		List<Blob> docBlobs = docBlobHolder.getBlobs();		
-		List<BlobListItem> blobListItems = result.getBlobListItem();
-		BlobListItem blobListItem = null;
+		//List<BlobListItem> blobListItems = result.getBlobListItem();
+		HashMap<String,String> item = null;
 		for (Blob blob : docBlobs) {
-			blobListItem = createBlobListItem(blob, uri);
-			blobListItems.add(blobListItem);
+			item = createBlobListItem(blob, uri);
+            commonList.addItem(item);
 		}
 
-		return result;
+		return commonList;
 	}
 
 	static private BlobsCommon createBlobsCommon(DocumentModel documentModel, Blob nuxeoBlob) {

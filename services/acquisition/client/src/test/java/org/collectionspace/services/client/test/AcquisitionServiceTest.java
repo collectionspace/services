@@ -28,16 +28,15 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.AcquisitionClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.collectionspace.services.acquisition.AcquisitionsCommon;
-import org.collectionspace.services.acquisition.AcquisitionsCommonList;
 import org.collectionspace.services.acquisition.AcquisitionDateList;
 import org.collectionspace.services.acquisition.AcquisitionFunding;
 import org.collectionspace.services.acquisition.AcquisitionFundingList;
 import org.collectionspace.services.acquisition.AcquisitionSourceList;
 import org.collectionspace.services.acquisition.OwnerList;
 import org.jboss.resteasy.client.ClientResponse;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -79,7 +78,7 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
     @Override
 	protected AbstractCommonList getAbstractCommonList(
 			ClientResponse<AbstractCommonList> response) {
-        return response.getEntity(AcquisitionsCommonList.class);
+        return response.getEntity(AbstractCommonList.class);
     }
 
     // ---------------------------------------------------------------
@@ -390,8 +389,8 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         AcquisitionClient client = new AcquisitionClient();
-        ClientResponse<AcquisitionsCommonList> res = client.readList();
-        AcquisitionsCommonList list = res.getEntity();
+        ClientResponse<AbstractCommonList> res = client.readList();
+        AbstractCommonList list = res.getEntity();
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -406,22 +405,14 @@ public class AcquisitionServiceTest extends AbstractServiceTestImpl {
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = false;
         if(iterateThroughList && logger.isDebugEnabled()){
-            List<AcquisitionsCommonList.AcquisitionListItem> items =
-                    list.getAcquisitionListItem();
-            int i = 0;
-            for(AcquisitionsCommonList.AcquisitionListItem item : items){
-                logger.debug(testName + ": list-item[" + i + "] csid=" +
-                    item.getCsid());
-                logger.debug(testName + ": list-item[" + i + "] objectNumber=" +
-                    item.getAcquisitionReferenceNumber());
-                logger.debug(testName + ": list-item[" + i + "] acquisitionSource=" +
-                    item.getAcquisitionSource());
-                logger.debug(testName + ": list-item[" + i + "] owner=" +
-                    item.getOwner());
-                logger.debug(testName + ": list-item[" + i + "] URI=" +
-                    item.getUri());
-                i++;
-            }
+        	List<AbstractCommonList.ListItem> items =
+        		list.getListItem();
+        	int i = 0;
+        	for(AbstractCommonList.ListItem item : items){
+        		logger.debug(testName + ": list-item[" + i + "] " +
+        				item.toString());
+        		i++;
+        	}
         }
 
     }

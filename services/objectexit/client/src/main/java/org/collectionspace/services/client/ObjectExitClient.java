@@ -20,8 +20,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-//import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.objectexit.ObjectexitCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
@@ -97,7 +96,7 @@ public class ObjectExitClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.ObjectExitProxy#getObjectExit()
      */
-    public ClientResponse<ObjectexitCommonList> readList() {
+    public ClientResponse<AbstractCommonList> readList() {
         return objectexitProxy.readList();
     }
     

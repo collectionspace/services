@@ -55,6 +55,9 @@ import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.query.QueryManager;
 import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
+import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.nuxeo.client.java.CommonList;
+
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
@@ -223,9 +226,9 @@ public class AcquisitionResource
      */
     @GET
     @Produces("application/xml")
-    public AcquisitionsCommonList getAcquisitionList(@Context UriInfo ui,
+    public CommonList getAcquisitionList(@Context UriInfo ui,
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
-        AcquisitionsCommonList result = null;
+        CommonList result = null;
         MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
         if (keywords != null) {
             result = searchAcquisitions(queryParams, keywords);
@@ -241,13 +244,13 @@ public class AcquisitionResource
      * 
      * @return the acquisitions list
      */
-    private AcquisitionsCommonList getAcquisitionsList(MultivaluedMap<String, String> queryParams) {
-        AcquisitionsCommonList acquisitionObjectList;
+    private CommonList getAcquisitionsList(MultivaluedMap<String, String> queryParams) {
+        CommonList commonList;
         try {
             ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
-            acquisitionObjectList = (AcquisitionsCommonList) handler.getCommonPartList();
+            commonList = (CommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity(
@@ -262,7 +265,7 @@ public class AcquisitionResource
                     ServiceMessages.LIST_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return acquisitionObjectList;
+        return commonList;
     }
 
     /**
@@ -373,7 +376,7 @@ public class AcquisitionResource
     @Path("/search")
     @Produces("application/xml")
     @Deprecated
-    public AcquisitionsCommonList keywordsSearchAcquisitions(@Context UriInfo ui,
+    public CommonList keywordsSearchAcquisitions(@Context UriInfo ui,
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
         MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
         return searchAcquisitions(queryParams, keywords);
@@ -386,10 +389,10 @@ public class AcquisitionResource
      * 
      * @return the acquisitions common list
      */
-    private AcquisitionsCommonList searchAcquisitions(
+    private CommonList searchAcquisitions(
             MultivaluedMap<String, String> queryParams,
             String keywords) {
-        AcquisitionsCommonList acquisitionObjectList;
+        CommonList commonList;
         try {
             ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
@@ -404,7 +407,7 @@ public class AcquisitionResource
                 }
             }
             getRepositoryClient(ctx).getFiltered(ctx, handler);
-            acquisitionObjectList = (AcquisitionsCommonList) handler.getCommonPartList();
+            commonList = (CommonList) handler.getCommonPartList();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity(
@@ -419,7 +422,7 @@ public class AcquisitionResource
                     ServiceMessages.SEARCH_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return acquisitionObjectList;
+        return commonList;
     }
 
     /**

@@ -24,7 +24,6 @@
 package org.collectionspace.services.blob.nuxeo;
 
 import org.collectionspace.services.blob.BlobsCommon;
-import org.collectionspace.services.blob.BlobsCommonList;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.blob.BlobOutput;
@@ -34,6 +33,8 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.BlobJAXBSchema;
+import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
@@ -47,7 +48,7 @@ import java.util.List;
  * The Class BlobDocumentModelHandler.
  */
 public class BlobDocumentModelHandler
-extends DocHandlerBase<BlobsCommon, AbstractCommonList> {
+extends DocHandlerBase<BlobsCommon> {
 
 	/** The logger. */
 	private final Logger logger = LoggerFactory.getLogger(BlobDocumentModelHandler.class);
@@ -110,7 +111,7 @@ extends DocHandlerBase<BlobsCommon, AbstractCommonList> {
 		String blobRepositoryId = blobsCommon.getRepositoryId(); //cache the value to pass to the blob retriever
 		
 		if (blobInput.isDerivativeListRequested() == true) {
-			BlobsCommonList blobsCommonList = NuxeoImageUtils.getBlobDerivatives(
+			CommonList blobsCommonList = NuxeoImageUtils.getBlobDerivatives(
 					repoSession, blobRepositoryId, getDerivativePathBase(docModel));
 //			ctx.setProperty(BlobInput.BLOB_DERIVATIVE_LIST_KEY, blobsCommonList);
 			blobInput.setDerivativeList(blobsCommonList);

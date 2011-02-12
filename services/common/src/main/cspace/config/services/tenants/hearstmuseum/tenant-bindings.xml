@@ -179,19 +179,19 @@
                     <service:ListResultsItemMethodName>getBlobListItem</service:ListResultsItemMethodName>
                     <service:ListResultsFields>
                         <service:ListResultField>
-                            <service:setter>setName</service:setter>
+                            <service:element>name</service:element>
                             <service:xpath>name</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:setter>setMimeType</service:setter>
+                            <service:element>mimeType</service:element>
                             <service:xpath>mimeType</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:setter>setEncoding</service:setter>
+                            <service:element>encoding</service:element>
                             <service:xpath>encoding</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:setter>setLength</service:setter>
+                            <service:element>length</service:element>
                             <service:xpath>length</service:xpath>
                         </service:ListResultField>
                     </service:ListResultsFields>
@@ -315,15 +315,15 @@
                     <service:ListResultsItemMethodName>getLoaninListItem</service:ListResultsItemMethodName>
                     <service:ListResultsFields>
                         <service:ListResultField>
-                            <service:setter>setLoanInNumber</service:setter>
+                            <service:element>loanInNumber</service:element>
                             <service:xpath>loanInNumber</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:setter>setLender</service:setter>
+                            <service:element>lender</service:element>
                             <service:xpath>lenderGroupList/[0]/lender</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:setter>setLoanReturnDate</service:setter>
+                            <service:element>loanReturnDate</service:element>
                             <service:xpath>loanReturnDate</service:xpath>
                         </service:ListResultField>
                     </service:ListResultsFields>
@@ -457,12 +457,12 @@
                     <service:ListResultsItemMethodName>getObjectexitListItem</service:ListResultsItemMethodName>
                     <service:ListResultsFields>
                         <service:ListResultField>
-                            <service:setter>setExitNumber</service:setter>
+                            <service:element>exitNumber</service:element>
                             <service:xpath>exitNumber</service:xpath>
                         </service:ListResultField>
 
                         <service:ListResultField>
-                            <service:setter>setCurrentOwner</service:setter>
+                            <service:element>currentOwner</service:element>
                             <service:xpath>currentOwner</service:xpath>
                         </service:ListResultField>
                     </service:ListResultsFields>
@@ -530,19 +530,19 @@
                     <service:ListResultsItemMethodName>getMediaListItem</service:ListResultsItemMethodName>
                     <service:ListResultsFields>
                         <service:ListResultField>
-                            <service:setter>setTitle</service:setter>
+                            <service:element>title</service:element>
                             <service:xpath>title</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:setter>setSource</service:setter>
+                            <service:element>source</service:element>
                             <service:xpath>source</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:setter>setFilename</service:setter>
+                            <service:element>filename</service:element>
                             <service:xpath>filename</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:setter>setIdentificationNumber</service:setter>
+                            <service:element>identificationNumber</service:element>
                             <service:xpath>identificationNumber</service:xpath>
                         </service:ListResultField>
                     </service:ListResultsFields>
@@ -1204,15 +1204,15 @@
                     <service:ListResultsItemMethodName>getAcquisitionListItem</service:ListResultsItemMethodName>
                     <service:ListResultsFields>
                         <service:ListResultField>
-                            <service:setter>setAcquisitionReferenceNumber</service:setter>
+                            <service:element>acquisitionReferenceNumber</service:element>
                             <service:xpath>acquisitionReferenceNumber</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:setter>setAcquisitionSource</service:setter>
+                            <service:element>acquisitionSource</service:element>
                             <service:xpath>acquisitionSources/[0]</service:xpath>
                         </service:ListResultField>
                         <service:ListResultField>
-                            <service:setter>setOwner</service:setter>
+                            <service:element>owner</service:element>
                             <service:xpath>owners/[0]</service:xpath>
                         </service:ListResultField>
                     </service:ListResultsFields>

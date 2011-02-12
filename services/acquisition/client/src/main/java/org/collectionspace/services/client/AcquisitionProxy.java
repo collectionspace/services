@@ -10,7 +10,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.acquisition.AcquisitionsCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -26,7 +26,7 @@ public interface AcquisitionProxy extends CollectionSpaceProxy {
 
     @GET
     @Produces({"application/xml"})
-    ClientResponse<AcquisitionsCommonList> readList();
+    ClientResponse<AbstractCommonList> readList();
 
     //(C)reate
     @POST

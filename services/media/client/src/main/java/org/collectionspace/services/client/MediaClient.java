@@ -20,8 +20,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-//import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.media.MediaCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
@@ -97,7 +96,7 @@ public class MediaClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.MediaProxy#getMedia()
      */
-    public ClientResponse<MediaCommonList> readList() {
+    public ClientResponse<AbstractCommonList> readList() {
         return mediaProxy.readList();
     }
     

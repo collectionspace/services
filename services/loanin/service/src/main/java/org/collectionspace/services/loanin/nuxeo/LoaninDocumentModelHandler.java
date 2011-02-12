@@ -23,7 +23,6 @@
  */
 package org.collectionspace.services.loanin.nuxeo;
 
-import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanin.LoansinCommon;
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 
@@ -32,6 +31,6 @@ import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
  *  $LastChangedDate$
  */
 public class LoaninDocumentModelHandler
-        extends DocHandlerBase<LoansinCommon, AbstractCommonList> {
+        extends DocHandlerBase<LoansinCommon> {
 }
 

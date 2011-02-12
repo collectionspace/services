@@ -25,9 +25,8 @@ package org.collectionspace.services.objectexit.nuxeo;
 
 import org.collectionspace.services.nuxeo.client.java.DocHandlerBase;
 import org.collectionspace.services.objectexit.ObjectexitCommon;
-import org.collectionspace.services.jaxb.AbstractCommonList;
 
 public class ObjectExitDocumentModelHandler 
-	extends DocHandlerBase<ObjectexitCommon, AbstractCommonList> {
+	extends DocHandlerBase<ObjectexitCommon> {
 }
 

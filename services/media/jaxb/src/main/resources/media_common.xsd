@@ -98,30 +98,5 @@
         </xs:annotation>
     </xs:complexType>
     
-    <!-- media records, as in nuxeo repository -->
-    <xs:element name="media_common_list">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="abstractCommonList">                    
-                    <xs:sequence>
-                        <xs:element name="media_list_item" maxOccurs="unbounded">
-                            <xs:complexType>
-                                <xs:sequence>
-                                    <xs:element name="title" type="xs:string"   minOccurs="1" />
-                                    <xs:element name="source" type="xs:string" minOccurs="1" />
-                                    <xs:element name="filename" type="xs:anyURI"          minOccurs="1" />
-                                    <xs:element name="identificationNumber" type="xs:anyURI"          minOccurs="1" />
-                                    <xs:element name="dimension" type="xs:anyURI"          minOccurs="1" />
-                                    <xs:element name="uri" type="xs:string" />
-                                    <xs:element name="csid" type="xs:string"         minOccurs="1" />
-                                </xs:sequence>
-                            </xs:complexType>
-                        </xs:element>
-                    </xs:sequence>
-                </xs:extension>
-            </xs:complexContent>                    
-        </xs:complexType>
-    </xs:element>
-    
 </xs:schema>
 

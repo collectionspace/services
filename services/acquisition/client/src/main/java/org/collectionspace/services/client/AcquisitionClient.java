@@ -2,7 +2,7 @@ package org.collectionspace.services.client;
 
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.acquisition.AcquisitionsCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
@@ -77,7 +77,7 @@ public class AcquisitionClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.hello.client.IntakeProxy#getIntake()
      */
-    public ClientResponse<AcquisitionsCommonList> readList() {
+    public ClientResponse<AbstractCommonList> readList() {
         return acquisitionProxy.readList();
     }
 

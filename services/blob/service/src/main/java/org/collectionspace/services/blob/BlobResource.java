@@ -37,7 +37,10 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.blob.nuxeo.BlobDocumentModelHandler; //FIXEME: A resource class should not have a dependency on a specific DocumentHandler
 import org.collectionspace.services.blob.BlobsCommon;
-import org.collectionspace.services.blob.BlobsCommonList;
+//import org.collectionspace.services.blob.BlobsCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.nuxeo.client.java.CommonList;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -93,23 +96,23 @@ public class BlobResource extends ResourceBase {
 
     //FIXME: Is this method used/needed?
     @Deprecated
-    private BlobsCommonList getBlobList(MultivaluedMap<String, String> queryParams) {
-        return (BlobsCommonList)getList(queryParams);
+    private CommonList getBlobList(MultivaluedMap<String, String> queryParams) {
+        return (CommonList)getList(queryParams);
     }
 
     @Deprecated
-    public BlobsCommonList getBlobList(List<String> csidList) {
-        return (BlobsCommonList) getList(csidList);
+    public CommonList getBlobList(List<String> csidList) {
+        return (CommonList) getList(csidList);
     }
 
     @Deprecated
-    protected BlobsCommonList search(MultivaluedMap<String,String> queryParams,String keywords) {
-         return (BlobsCommonList) super.search(queryParams, keywords);
+    protected CommonList search(MultivaluedMap<String,String> queryParams,String keywords) {
+         return (CommonList) super.search(queryParams, keywords);
     }
     
-    private BlobsCommonList getDerivativeList(ServiceContext<MultipartInput, MultipartOutput> ctx,
+    private CommonList getDerivativeList(ServiceContext<MultipartInput, MultipartOutput> ctx,
     		String csid) throws Exception {
-    	BlobsCommonList result = null;
+    	CommonList result = null;
     	
     	BlobInput blobInput = new BlobInput();
     	blobInput.setDerivativeListRequested(true);
@@ -267,9 +270,9 @@ public class BlobResource extends ResourceBase {
     @GET
     @Path("{csid}/derivatives")
     @Produces("application/xml")
-    public BlobsCommonList getDerivatives(
+    public CommonList getDerivatives(
     		@PathParam("csid") String csid) {
-    	BlobsCommonList result = null;
+    	CommonList result = null;
 
     	ensureCSID(csid, READ);
         try {

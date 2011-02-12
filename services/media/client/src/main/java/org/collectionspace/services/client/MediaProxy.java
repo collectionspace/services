@@ -11,7 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.media.MediaCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
@@ -46,7 +46,7 @@ public interface MediaProxy extends CollectionSpaceProxy {
     // List
     @GET
     @Produces({"application/xml"})
-    ClientResponse<MediaCommonList> readList();
+    ClientResponse<AbstractCommonList> readList();
 
     // List Authority References
     @GET
