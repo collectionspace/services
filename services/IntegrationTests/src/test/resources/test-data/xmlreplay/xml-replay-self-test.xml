@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xmlReplay>
+<!--
     <testGroup ID="selftestGroup" autoDeletePOSTS="true">
         <test ID="OrgAuth1" auth="admin@collectionspace.org">
             <method>POST</method>
@@ -34,4 +35,5 @@
             <uri>/cspace-services/orgauthorities/${OrgAuth1.CSID}/items/</uri>
         </test>
     </testGroup>
+-->
 </xmlReplay>

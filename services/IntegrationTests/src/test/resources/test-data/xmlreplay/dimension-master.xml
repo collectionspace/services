@@ -14,7 +14,9 @@
     <run controlFile="./dimension.xml" testGroup="dimensionTestGroup" />
     -->
 
+    <!--
     <run controlFile="./dimension.xml" testGroup="dimensionCRUDGroup" />
+    -->
 
     
 </xmlReplayMaster>
