@@ -31,7 +31,7 @@
     
     <target name="deploy-templates-dir"
     	description="deploys a CollectionSpace-specific Nuxeo database template folder for the ${db} database to ${nuxeo.templates.dir}"
-        depends="templates-dir-exists">
+        depends="check-templates-dir-exists">
         <mkdir dir="${nuxeo.templates.dir}/${collectionspace.template.dir}"/>
         <copy todir="${nuxeo.templates.dir}/${collectionspace.template.dir}">
             <fileset dir="${collectionspace.template.dir.path}"/>
@@ -40,7 +40,7 @@
 
     <target name="update-nuxeo-config"
     	description="updates the main Nuxeo configuration file to specify the database template folder to use for CollectionSpace"
-        depends="templates-dir-exists, has-minimum-ant-version, backup-nuxeo-config" if="ant.minimum.version.verified">
+        depends="check-templates-dir-exists, check-propertyfile-task-exists, backup-nuxeo-config" if="has.propertyfile.task">
         <!-- Set the value of the property pointing to the active templates directory (or directories) -->
         <propertyfile file="${nuxeo.main.config.file}">
             <entry key="nuxeo.templates" operation="=" value="${collectionspace.template.dir}"/>
@@ -67,9 +67,9 @@
     
    <target name="reset-nuxeo-config"
     	description="updates the main Nuxeo configuration file to reset the database template folder to an empty value"
-        depends="templates-dir-exists, has-minimum-ant-version, backup-nuxeo-config" if="ant.minimum.version.verified">
+        depends="check-templates-dir-exists, check-propertyfile-task-exists, backup-nuxeo-config" if="has.propertyfile.task">
         <propertyfile file="${nuxeo.main.config.file}">
-            <entry key="nuxeo.templates" operation="=" value="${collectionspace.template.dir}"/>
+            <entry key="nuxeo.templates" operation="=" value=""/>
         </propertyfile>
     </target>
     
@@ -80,18 +80,18 @@
         <copy file="${nuxeo.main.config.file}" tofile="${nuxeo.main.config.file}${backup.suffix}" overwrite="true"/>
     </target>
     
-    <target name="templates-dir-exists"
-    	description="verifies the existence of a Nuxeo database template folder for the ${db} database">
-        <available file="${collectionspace.template.dir.path}" type="dir" property="has.templates.dir"/>
+    <target name="check-templates-dir-exists"
+    	description="checks for the existence of a Nuxeo database template folder for the ${db} database">
+        <available file="${collectionspace.template.dir.path}" type="dir"
+            property="has.templates.dir"/>
         <fail unless="has.templates.dir"
             message="Nuxeo database templates directory ${collectionspace.template.dir.path} could not be found."/>
     </target>
 
-    <target name="has-minimum-ant-version"
-    description="verifies that the minimum required ant version exists for one or more tasks in this build file">
-        <condition property="ant.minimum.version.verified">
-          <antversion atleast="1.8.2"/>
-        </condition> 
+    <target name="check-propertyfile-task-exists"
+    description="checks that the PropertyFile task exists; that task is required by one or more targets in this build file">
+        <available classname="org.apache.tools.ant.taskdefs.optional.PropertyFile"
+            property="has.propertyfile.task"/>
     </target>
 
 </project>
