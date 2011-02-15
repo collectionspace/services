@@ -59,6 +59,7 @@ import org.collectionspace.services.common.datetime.DateTimeFormatUtils;
 import org.collectionspace.services.common.service.ObjectPartContentType;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.service.XmlContentType;
+import org.dom4j.io.DOMReader;
 
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
@@ -93,8 +94,9 @@ import org.w3c.dom.Text;
 
 //import org.dom4j.Document;
 //import org.dom4j.Element;
-//import org.dom4j.*;
-
+//import org.dom4j.Node;
+//import org.dom4j.NodeList;
+//import org.dom4j.Text;
 
 /**
  * DocumentUtils is a collection of utilities related to document management
@@ -295,9 +297,8 @@ public class DocumentUtils {
 			result = db.parse(payload);
 
 			// Write it to the log so we can see what we've created.
-			if (logger.isDebugEnabled() == true) {
-				logger.debug(xmlToString(result));
-				//System.out.println(xmlToString(result)); //FIXME: REM - Need this until we figure out why messages are not showing up in logger.
+			if (logger.isTraceEnabled() == true) {
+				logger.trace(xmlToString(result));
 			}
 		} finally {
 			if (payload != null) {
@@ -493,7 +494,7 @@ public class DocumentUtils {
 	 * @return Document
 	 * @throws Exception
 	 */
-	public static Document buildDocument(ObjectPartType partMeta, String rootElementName,
+	public static org.dom4j.Element buildDocument(ObjectPartType partMeta, String rootElementName,
 			Map<String, Object> objectProps)
 	throws Exception {
 		ObjectPartContentType partContentMeta = partMeta.getContent();
@@ -505,27 +506,42 @@ public class DocumentUtils {
 		//FIXME: We support XML validation on the way in, so we should add it here (on the way out) as well.
 		DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		Document document = builder.newDocument();
-		document.setXmlStandalone(true);
-		//JAXB unmarshaller recognizes the following kind of namespace qualification
-		//only. More investigation is needed to use other prefix
-		// <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-		// <ns2:collectionobjects-common xmlns:ns2="http://collectionspace.org/services/collectionobject">
-		// <objectNumber>objectNumber-1252960222412</objectNumber>
-		// <objectName>objectName-1252960222412</objectName>
-		// </ns2:collectionobjects-common>
+		document.setXmlStandalone(true); //FIXME: REM - Can we set this to false since it is not really standalone?
+
+		/*
+		 * JAXB unmarshaller recognizes the following kind of namespace
+		 * qualification only. More investigation is needed to use other prefix
+		 * 
+		 * <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+		 * <ns2:collectionobjects-common xmlns:ns2="http://collectionspace.org/services/collectionobject">
+		 * 		<objectNumber>objectNumber-1252960222412</objectNumber>
+		 * 		<objectName>objectName-1252960222412</objectName>
+		 * </ns2:collectionobjects-common>
+		 */
 
 		String ns = "ns2";
 		Element root = document.createElementNS(xc.getNamespaceURI(), ns + ":" + rootElementName);
 		root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-		root.setAttribute("xsi:schemaLocation", xc.getSchemaLocation());
+		
+//		String getSchemaLocation = xc.getSchemaLocation();					//FIXME: REM - w3c Document to DOM4j Document mangles this attribute
+//		root.setAttribute("xsi:schemaLocation", xc.getSchemaLocation());
+		
+		String getNamespaceURI = xc.getNamespaceURI();
 		root.setAttribute("xmlns:" + ns, xc.getNamespaceURI());
 		document.appendChild(root);
 
 		Schema schema = getSchemaFromName(partMeta.getLabel());
 
 		buildDocument(document, root, objectProps, schema);
+		String w3cDocumentStr = xmlToString(document);
+		
 
-		return document;
+		DOMReader reader = new DOMReader();
+		org.dom4j.Document dom4jDoc = reader.read(document);
+		org.dom4j.Element result = dom4jDoc.getRootElement();
+		result.detach(); //return just the root element detached from the DOM document
+		
+		return result;//FIXME: REM - Add if (logger.isTraceEnabled() == true) logger.trace(document.asXML());
 	}
 
 	/**
@@ -1076,22 +1092,23 @@ public class DocumentUtils {
 	 * @return the map
 	 */
 	public static Map<String, Object> parseProperties(ObjectPartType partMeta,
-			Document document, ServiceContext ctx) throws Exception {
+			org.dom4j.Element document, ServiceContext ctx) throws Exception {
 		Map<String, Object> result = null;
 		String schemaName = partMeta.getLabel();
 		Schema schema = getSchemaFromName(schemaName);
-		
-		org.dom4j.io.DOMReader xmlReader = new org.dom4j.io.DOMReader();
-		org.dom4j.Document dom4jDocument = xmlReader.read(document);
+
+		//		org.dom4j.io.DOMReader xmlReader = new org.dom4j.io.DOMReader();
+		//		org.dom4j.Document dom4jDocument = xmlReader.read(document);
 		try {
-                    result = loadSchema(schema, dom4jDocument.getRootElement(), ctx);
+			//                    result = loadSchema(schema, dom4jDocument.getRootElement(), ctx);
+			result = loadSchema(schema, document, ctx);
                 } catch (IllegalArgumentException iae) {
                     throw iae;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return result;
 	}
 	
@@ -1106,7 +1123,7 @@ public class DocumentUtils {
 	@SuppressWarnings("unchecked")
 	static private Map<String, Object> loadSchema(Schema schema, org.dom4j.Element schemaElement, ServiceContext ctx)
 	throws Exception {
-		String schemaName1 = schemaElement.attributeValue(ExportConstants.NAME_ATTR);
+		String schemaName1 = schemaElement.attributeValue(ExportConstants.NAME_ATTR);//FIXME: Do we need this local var?
 		String schemaName = schema.getName();
 
 		Map<String, Object> data = new HashMap<String, Object>();

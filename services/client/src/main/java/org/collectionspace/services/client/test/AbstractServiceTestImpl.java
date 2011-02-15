@@ -546,6 +546,16 @@ public abstract class AbstractServiceTestImpl extends BaseServiceTest implements
         }
     }
 
+//	@Override
+//	protected CollectionSpaceClient getClientInstance() {
+//		throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
+//	}
+//	
+//	@Override
+//	protected String getServiceName() {
+//		throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
+//	}
+
 }
 
 

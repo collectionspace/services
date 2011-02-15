@@ -57,5 +57,10 @@ public class TestServiceClient extends AbstractServiceClientImpl {
 
     public ClientResponse<Response> delete(String csid) {
 	throw new UnsupportedOperationException();
+    }
+
+	@Override
+	public String getServiceName() {
+		throw new UnsupportedOperationException();
     } 
 }

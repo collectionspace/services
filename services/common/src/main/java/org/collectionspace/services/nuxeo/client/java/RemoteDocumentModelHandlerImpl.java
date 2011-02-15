@@ -36,6 +36,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.common.context.MultipartServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -46,6 +49,7 @@ import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler.Action;
 import org.collectionspace.services.common.service.ObjectPartType;
 import org.collectionspace.services.common.vocabulary.RefNameUtils;
+import org.dom4j.Element;
 
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
@@ -59,7 +63,7 @@ import org.nuxeo.ecm.core.schema.types.Schema;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
+import org.dom4j.Document;
 
 /**
  * RemoteDocumentModelHandler
@@ -79,7 +83,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
      * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#setServiceContext(org.collectionspace.services.common.context.ServiceContext)
      */
     @Override
-    public void setServiceContext(ServiceContext ctx) {  //FIXME: Apply proper generics to ServiceContext<MultipartInput, MultipartOutput>
+    public void setServiceContext(ServiceContext ctx) {  //FIXME: Apply proper generics to ServiceContext<PoxPayloadIn, PoxPayloadOut>
         if (ctx instanceof MultipartServiceContext) {
             super.setServiceContext(ctx);
         } else {
@@ -97,11 +101,11 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         //return at least those document part(s) that were received
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
-        MultipartInput input = ctx.getInput();
+        PoxPayloadIn input = ctx.getInput();
         if (input != null) {
-	        List<InputPart> inputParts = ctx.getInput().getParts();
-	        for (InputPart part : inputParts) {
-	            String partLabel = part.getHeaders().getFirst("label");
+	        List<PayloadInputPart> inputParts = ctx.getInput().getParts();
+	        for (PayloadInputPart part : inputParts) {
+	            String partLabel = part.getLabel();
 	            ObjectPartType partMeta = partsMetaMap.get(partLabel);
 	//            extractPart(docModel, partLabel, partMeta);
 	            Map<String, Object> unQObjectProperties = extractPart(docModel, partLabel, partMeta);
@@ -125,10 +129,10 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
      */
     private void addOutputPart(Map<String, Object> unQObjectProperties, String schema, ObjectPartType partMeta)
             throws Exception {
-        Document doc = DocumentUtils.buildDocument(partMeta, schema,
+        Element doc = DocumentUtils.buildDocument(partMeta, schema,
                 unQObjectProperties);
         if (logger.isDebugEnabled() == true) {
-            logger.debug(DocumentUtils.xmlToString(doc));
+            logger.debug(doc.asXML());
         }
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
         ctx.addOutputPart(schema, doc, partMeta.getContent().getContentType());
@@ -191,7 +195,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         //not an ideal way of populating objects.
         DocumentModel docModel = wrapDoc.getWrappedObject();
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
-        MultipartInput input = ctx.getInput();
+        PoxPayloadIn input = ctx.getInput();
         if (input.getParts().isEmpty()) {
             String msg = "No payload found!";
             logger.error(msg + "Ctx=" + getServiceContext().toString());
@@ -201,10 +205,10 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
 
         //iterate over parts received and fill those parts
-        List<InputPart> inputParts = input.getParts();
-        for (InputPart part : inputParts) {
+        List<PayloadInputPart> inputParts = input.getParts();
+        for (PayloadInputPart part : inputParts) {
 
-            String partLabel = part.getHeaders().getFirst("label");
+            String partLabel = part.getLabel();
             if (partLabel == null) {
                 String msg = "Part label is missing or empty!";
                 logger.error(msg + "Ctx=" + getServiceContext().toString());
@@ -228,24 +232,21 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
      * @param partMeta metadata for the object to fill
      * @throws Exception
      */
-    protected void fillPart(InputPart part, DocumentModel docModel,
-            ObjectPartType partMeta, Action action, ServiceContext ctx)
+    protected void fillPart(PayloadInputPart part, DocumentModel docModel,
+            ObjectPartType partMeta, Action action, ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
             throws Exception {
-        InputStream payload = part.getBody(InputStream.class, null);
-
         //check if this is an xml part
         if (part.getMediaType().equals(MediaType.APPLICATION_XML_TYPE)) {
-            if (payload != null) {
-                Document document = DocumentUtils.parseDocument(payload, partMeta,
-                        false /*don't validate*/);
-                Map<String, Object> objectProps = DocumentUtils.parseProperties(partMeta, document, ctx);
+//                Document document = DocumentUtils.parseDocument(payload, partMeta,
+//                        false /*don't validate*/);
+        	Element element = part.getElementBody();
+            Map<String, Object> objectProps = DocumentUtils.parseProperties(partMeta, element, ctx);
                 if (action == Action.UPDATE) {
                     this.filterReadOnlyPropertiesForPart(objectProps, partMeta);
                 }
                 docModel.setProperties(partMeta.getLabel(), objectProps);
             }
         }
-    }
 
     /**
      * Filters out read only properties, so they cannot be set on update.
@@ -283,11 +284,11 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
             throws Exception {
         Map<String, Object> result = null;
 
-        MediaType mt = MediaType.valueOf(partMeta.getContent().getContentType());
+        MediaType mt = MediaType.valueOf(partMeta.getContent().getContentType()); //FIXME: REM - This is no longer needed.  Everything is POX
         if (mt.equals(MediaType.APPLICATION_XML_TYPE)) {
             Map<String, Object> objectProps = docModel.getProperties(schema);
             //unqualify properties before sending the doc over the wire (to save bandwidh)
-            //FIXME: is there a better way to avoid duplication of a collection?
+            //FIXME: is there a better way to avoid duplication of a Map/Collection?
             Map<String, Object> unQObjectProperties =
                     (addToMap != null) ? addToMap : (new HashMap<String, Object>());
             Set<Entry<String, Object>> qualifiedEntries = objectProps.entrySet();

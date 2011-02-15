@@ -24,6 +24,7 @@
 package org.collectionspace.services.client;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.Properties;
 
@@ -74,13 +75,32 @@ public abstract class AbstractServiceClientImpl implements
     	return logger;
     }
     
+    abstract public String getServicePathComponent();
+    
+    /**
+     * Returns a UTF-8 encode byte array from 'string'
+     *
+     * @return UTF-8 encoded byte array
+     */
+    protected byte[] getBytes(String string) {
+    	byte[] result = null;
+    	try {
+			result = string.getBytes("UTF8");
+		} catch (UnsupportedEncodingException e) {
+			if (logger.isWarnEnabled() == true) {
+				logger.warn(e.getMessage(), e);
+			}
+		}
+		return result;
+    }
+    
     /**
      * Gets the common part name.
      *
      * @return the common part name
      */
     public String getCommonPartName() {
-        return getCommonPartName(getServicePathComponent());
+        return getCommonPartName(getServiceName());
     }
 
     /**
@@ -90,16 +110,16 @@ public abstract class AbstractServiceClientImpl implements
      *            the service path component
      * @return the common part name
      */
-    public String getCommonPartName(String servicePathComponent) {
-        return servicePathComponent + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
+    protected String getCommonPartName(String commonPrefix) {
+        return commonPrefix + PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
     }
 
-    /**
-     * Gets the service path component.
-     *
-     * @return the service path component
-     */
-    abstract public String getServicePathComponent();
+//    /**
+//     * Gets the service path component.
+//     *
+//     * @return the service path component
+//     */
+//    abstract public String getServicePathComponent();
 
     /**
      * Instantiates a new abstract service client impl.

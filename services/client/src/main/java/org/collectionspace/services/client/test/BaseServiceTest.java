@@ -46,10 +46,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.io.FileUtils;
-import org.collectionspace.services.client.TestServiceClient;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -57,6 +54,10 @@ import org.testng.annotations.DataProvider;
 import org.w3c.dom.Document;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.TestServiceClient;
+
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 /**
@@ -101,6 +102,20 @@ public abstract class BaseServiceTest {
         "\n" + BANNER_SEPARATOR_LINE + "\n";
     private static final String BANNER_SUFFIX =
         "\n" + BANNER_SEPARATOR_LINE;
+
+    // A Unicode UTF-8 data fragment for use in test payloads: a random sequence,
+    // unlikely to be encountered in actual collections data, and capable of
+    // being rendered by the default fonts in many modern operating systems.
+    //
+    // This fragment consists of a run of USASCII characters, followed by
+    // four non-USASCII range Unicode UTF-8 characters:
+    //
+    // Δ : Greek capital letter Delta (U+0394)
+    // Ж : Cyrillic capital letter Zhe with breve (U+04C1)
+    // Ŵ : Latin capital letter W with circumflex (U+0174)
+    // Ω : Greek capital letter Omega (U+03A9)
+    private final static String UTF8_DATA_FRAGMENT = "utf-8-data-fragment:"
+            + '\u0394' + '\u04C1' + '\u0174' +'\u03A9';
     
     protected static final int STATUS_BAD_REQUEST =
         Response.Status.BAD_REQUEST.getStatusCode();
@@ -161,6 +176,8 @@ public abstract class BaseServiceTest {
      * @return The URL path component of the service.
      */
     protected abstract String getServicePathComponent();
+    
+    protected abstract String getServiceName();
 
     /**
      * Reinitializes setup values, to help expose any unintended reuse
@@ -172,8 +189,7 @@ public abstract class BaseServiceTest {
     }
 
     /**
-     * Initializes setup values for a given test.  Returns a banner
-     * identifying the test being run, using the local logger for this class.
+     * Initializes setup values for a given test.
      *
      * @param expectedStatusCode  A status code expected to be returned in the response.
      *
@@ -214,7 +230,7 @@ public abstract class BaseServiceTest {
      * @return The root URL for a service.
      */
     protected String getServiceRootURL() {
-        return serviceClient.getBaseURL() + getServicePathComponent();
+        return serviceClient.getBaseURL() + getServiceName(); //FIXME: REM - This should probably be calling getServicePathComponent() and not getServiceName();
     }
 
     public String getServiceClientTenantID() {
@@ -359,59 +375,18 @@ public abstract class BaseServiceTest {
      * @return the object
      * @throws Exception the exception
      */
-    static protected Object extractPart(MultipartInput input, String label, Class<?> clazz)
+    static protected Object extractPart(PoxPayloadIn input, String label, Class<?> clazz)
             throws Exception {
-        Object obj = null;
-        String partLabel = "";
-        List<InputPart> parts = input.getParts();
-        if (parts.size() == 0) {
-            logger.warn("No parts found in multipart body.");
+    	Object result = null;
+    	PayloadInputPart payloadInputPart = input.getPart(label);
+        if (payloadInputPart != null) {
+        	result = payloadInputPart.getBody();
+        } else if (logger.isWarnEnabled() == true) {
+        	logger.warn("Payload part: " + label +
+        			" is missing from payload: " + input.getName());
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Parts:");
-            for (InputPart part : parts) {
-                partLabel = part.getHeaders().getFirst("label");
-                logger.debug("part = " + partLabel);
+        return result;
             }
-        }
-        boolean partLabelMatched = false;
-        for (InputPart part : parts) {
-            partLabel = part.getHeaders().getFirst("label");
-            if (label.equalsIgnoreCase(partLabel)) {
-                partLabelMatched = true;
-                if (logger.isDebugEnabled()) {
-                    logger.debug("found part" + partLabel);
-                }
-                String partStr = part.getBodyAsString();
-                if (partStr == null || partStr.trim().isEmpty()) {
-                    logger.warn("Part '" + label + "' in multipart body is empty.");
-                } else {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("extracted part as str=\n" + partStr);
-                    }
-                    try {
-                        obj = part.getBody(clazz, null);
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("extracted part as obj="+objectAsXmlString(obj, clazz));
-                        }
-                    } catch (Throwable t) {
-                        logger.error("Could not get part body based on content and classname. "+ clazz.getName()+ " error: "+t);
-                    }
-                }
-                break;
-            }
-        }
-        if (!partLabelMatched) {
-            logger.warn("Could not find part '" + label + "' in multipart body.");
-            // In the event that getBodyAsString() or getBody(), above, do *not*
-            // throw an IOException, but getBody() nonetheless retrieves a null object.
-            // This *may* be unreachable.
-        } else if (obj == null) {
-            logger.warn("Could not extract part '" + label
-                    + "' in multipart body as an object.");
-        }
-        return obj;
-    }
 
     /**
      * Gets the part object.
@@ -421,6 +396,7 @@ public abstract class BaseServiceTest {
      * @return the part object
      * @throws JAXBException the jAXB exception
      */
+    @Deprecated
     static protected Object getPartObject(String partStr, Class<?> clazz)
             throws JAXBException {
         JAXBContext jc = JAXBContext.newInstance(clazz);
@@ -509,8 +485,8 @@ public abstract class BaseServiceTest {
      * @throws Exception the exception
      */
     static protected String getXmlDocumentAsString(String fileName) throws Exception {
-        byte[] b = FileUtils.readFileToByteArray(new File(fileName));
-        return new String(b);
+        String result = FileUtils.readFileToString(new File(fileName), "UTF8");
+        return result;
     }
 
     /**
@@ -611,5 +587,8 @@ public abstract class BaseServiceTest {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
     }
 
+    public static String getUTF8DataFragment() {
+        return UTF8_DATA_FRAGMENT;
+    }
 
 }

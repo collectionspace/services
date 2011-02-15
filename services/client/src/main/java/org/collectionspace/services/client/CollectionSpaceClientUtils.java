@@ -100,6 +100,29 @@ public class CollectionSpaceClientUtils {
      * @return the object
      * @throws Exception the exception
      */
+    static protected Object extractPart(PoxPayloadIn input, String label, Class<?> clazz)
+            throws Exception {
+    	Object result = null;
+    	PayloadInputPart payloadInputPart = input.getPart(label);
+        if (payloadInputPart != null) {
+        	result = payloadInputPart.getBody();
+        } else if (logger.isWarnEnabled() == true) {
+        	logger.warn("Payload part: " + label +
+        			" is missing from payload: " + input.getName());
+        }
+        return result;
+    }
+    
+    /**
+     * Extract part.
+     *
+     * @param input the input
+     * @param label the label
+     * @param clazz the clazz
+     * @return the object
+     * @throws Exception the exception
+     */
+    @Deprecated
     static public Object extractPart(MultipartInput input, String label, Class<?> clazz)
             throws Exception {
         Object obj = null;

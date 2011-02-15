@@ -22,7 +22,6 @@
  */
 package org.collectionspace.services.client.test;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -30,15 +29,16 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.ContactClientUtils;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
+//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -54,14 +54,24 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: 2009-11-06 12:20:28 -0800 (Fri, 06 Nov 2009) $
  */
 public class ContactServiceTest extends AbstractServiceTestImpl {
-
     private final String CLASS_NAME = ContactServiceTest.class.getName();
-    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    private final Logger logger = LoggerFactory.getLogger(ContactServiceTest.class);
 
     // Instance variables specific to this test.
-    final String SERVICE_PATH_COMPONENT = "contacts";
+//    final String SERVICE_PATH_COMPONENT = "contacts";
+    
     private String knownResourceId = null;
 
+	@Override
+	public String getServicePathComponent() {
+		return ContactClient.SERVICE_PATH_COMPONENT;
+	}
+
+	@Override
+	protected String getServiceName() {
+		return ContactClient.SERVICE_NAME;
+	}
+    
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
@@ -98,7 +108,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         ContactClient client = new ContactClient();
         String identifier = createIdentifier();
-        MultipartOutput multipart =
+        PoxPayloadOut multipart =
             ContactClientUtils.createContactInstance(identifier, client.getCommonPartName());
         ClientResponse<Response> res = client.create(multipart);
 
@@ -264,7 +274,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         ContactClient client = new ContactClient();
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -276,7 +286,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         ContactsCommon contact = (ContactsCommon) extractPart(input,
                 client.getCommonPartName(), ContactsCommon.class);
         Assert.assertNotNull(contact);
@@ -296,7 +306,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         ContactClient client = new ContactClient();
-        ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -377,8 +387,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         ContactClient client = new ContactClient();
-        ClientResponse<MultipartInput> res =
-                client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": read status = " + res.getStatus());
         }
@@ -387,7 +396,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         if(logger.isDebugEnabled()){
             logger.debug("got object to update with ID: " + knownResourceId);
         }
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         ContactsCommon contact = (ContactsCommon) extractPart(input,
                 client.getCommonPartName(), ContactsCommon.class);
         Assert.assertNotNull(contact);
@@ -401,9 +410,9 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
             logger.debug(objectAsXmlString(contact, ContactsCommon.class));
         }
         // Submit the request to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(contact, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
+        PoxPayloadOut output = new PoxPayloadOut(ContactClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(contact, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getCommonPartName());
 
         res = client.update(knownResourceId, output);
         int statusCode = res.getStatus();
@@ -416,7 +425,7 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
 
-        input = (MultipartInput) res.getEntity();
+        input = new PoxPayloadIn(res.getEntity());
         ContactsCommon updatedContact =
                 (ContactsCommon) extractPart(input,
                         client.getCommonPartName(), ContactsCommon.class);
@@ -553,9 +562,9 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
         ContactClient client = new ContactClient();
-        MultipartOutput multipart =
+        PoxPayloadOut multipart =
                 ContactClientUtils.createContactInstance(NON_EXISTENT_ID, client.getCommonPartName());
-        ClientResponse<MultipartInput> res =
+        ClientResponse<String> res =
                 client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
 
@@ -652,13 +661,5 @@ public class ContactServiceTest extends AbstractServiceTestImpl {
         }
         Assert.assertEquals(statusCode, EXPECTED_STATUS);
 
-    }
-
-    // ---------------------------------------------------------------
-    // Utility methods used by tests above
-    // ---------------------------------------------------------------
-    @Override
-    public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
     }
 }

@@ -33,8 +33,11 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.BlobClient;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.blob.BlobsCommon;
@@ -60,7 +63,6 @@ public class BlobAuthRefsTest extends BaseServiceTest {
 
     private final String CLASS_NAME = BlobAuthRefsTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    final String SERVICE_PATH_COMPONENT = "blob";
     final String PERSON_AUTHORITY_NAME = "BlobPersonAuth";
     private String knownResourceId = null;
     private List<String> blobIdsCreated = new ArrayList<String>();
@@ -69,6 +71,16 @@ public class BlobAuthRefsTest extends BaseServiceTest {
     private String depositorRefName = null;
     private String blobName = null;
 
+    @Override
+	public String getServicePathComponent() {
+		return BlobClient.SERVICE_PATH_COMPONENT;
+	}
+
+	@Override
+	protected String getServiceName() {
+		return BlobClient.SERVICE_NAME;
+	}
+    
     @Override
     protected CollectionSpaceClient getClientInstance() {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
@@ -79,20 +91,15 @@ public class BlobAuthRefsTest extends BaseServiceTest {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
-    @Override
-    public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
-    }
-
-    private MultipartOutput createBlobInstance(String depositorRefName) {
+    private PoxPayloadOut createBlobInstance(String depositorRefName) {
         this.depositorRefName = depositorRefName;
         this.blobName = "testblob-"+createIdentifier();
         BlobsCommon blob = new BlobsCommon();
         blob.setName(this.blobName);
 
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(blob, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new BlobClient().getCommonPartName());
+        PoxPayloadOut multipart = new PoxPayloadOut(BlobClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = multipart.addPart(blob, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(new BlobClient().getCommonPartName());
         logger.debug("to be created, blob common: " + objectAsXmlString(blob, BlobsCommon.class));
         return multipart;
     }
@@ -106,7 +113,7 @@ public class BlobAuthRefsTest extends BaseServiceTest {
         // Create a new Loans In resource. One or more fields in this resource will be PersonAuthority
         //    references, and will refer to Person resources by their refNames.
         BlobClient blobClient = new BlobClient();
-        MultipartOutput multipart = createBlobInstance(depositorRefName);
+        PoxPayloadOut multipart = createBlobInstance(depositorRefName);
         ClientResponse<Response> res = blobClient.create(multipart);
         assertStatusCode(res, testName);
         if (knownResourceId == null) {// Store the ID returned from the first resource created for additional tests below.
@@ -118,7 +125,7 @@ public class BlobAuthRefsTest extends BaseServiceTest {
     protected void createPersonRefs() {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding refName by which it can be identified.
-        MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
+        PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
         assertStatusCode(res, "createPersonRefs (not a surefire test)");
         personAuthCSID = extractId(res);
@@ -141,7 +148,7 @@ public class BlobAuthRefsTest extends BaseServiceTest {
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
-        MultipartOutput multipart = PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, authRefName, personInfo, personAuthClient.getItemCommonPartName());
+        PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, authRefName, personInfo, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         assertStatusCode(res, "createPerson (not a surefire test)");
         return extractId(res);
@@ -158,9 +165,9 @@ public class BlobAuthRefsTest extends BaseServiceTest {
         logger.debug(testBanner(testName, CLASS_NAME));
         testSetup(STATUS_OK, ServiceRequestType.READ);
         BlobClient blobClient = new BlobClient();
-        ClientResponse<MultipartInput> res = blobClient.read(knownResourceId);
+        ClientResponse<String> res = blobClient.read(knownResourceId);
         assertStatusCode(res, testName);
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         BlobsCommon blob = (BlobsCommon) extractPart(input, blobClient.getCommonPartName(), BlobsCommon.class);
         Assert.assertNotNull(blob);
         logger.debug(objectAsXmlString(blob, BlobsCommon.class));

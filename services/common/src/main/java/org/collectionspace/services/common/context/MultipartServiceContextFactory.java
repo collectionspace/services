@@ -25,6 +25,8 @@ package org.collectionspace.services.common.context;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
@@ -35,7 +37,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
  *
  */
 public class MultipartServiceContextFactory
-        implements ServiceContextFactory<MultipartInput, MultipartOutput> {
+        implements ServiceContextFactory<PoxPayloadIn, PoxPayloadOut> {
 
     /** The Constant self. */
     final private static MultipartServiceContextFactory self = new MultipartServiceContextFactory();
@@ -58,7 +60,7 @@ public class MultipartServiceContextFactory
      * @see org.collectionspace.services.common.context.ServiceContextFactory#createServiceContext(java.lang.String)
      */
     @Override
-    public ServiceContext<MultipartInput, MultipartOutput> createServiceContext(String serviceName) throws Exception {
+    public ServiceContext<PoxPayloadIn, PoxPayloadOut> createServiceContext(String serviceName) throws Exception {
         MultipartServiceContext ctx = new MultipartServiceContextImpl(serviceName);
         return ctx;
     }
@@ -67,8 +69,8 @@ public class MultipartServiceContextFactory
      * @see org.collectionspace.services.common.context.ServiceContextFactory#createServiceContext(java.lang.String, java.lang.Object)
      */
     @Override
-    public ServiceContext<MultipartInput, MultipartOutput> createServiceContext(String serviceName,
-    		MultipartInput input) throws Exception {
+    public ServiceContext<PoxPayloadIn, PoxPayloadOut> createServiceContext(String serviceName,
+    		PoxPayloadIn input) throws Exception {
         MultipartServiceContext ctx = new MultipartServiceContextImpl(serviceName, input);
         return ctx;
     }
@@ -77,11 +79,11 @@ public class MultipartServiceContextFactory
      * @see org.collectionspace.services.common.context.ServiceContextFactory#createServiceContext(java.lang.String, java.lang.Object, javax.ws.rs.core.MultivaluedMap)
      */
     @Override
-    public ServiceContext<MultipartInput, MultipartOutput> createServiceContext(String serviceName,
-    		MultipartInput input, 
+    public ServiceContext<PoxPayloadIn, PoxPayloadOut> createServiceContext(String serviceName,
+    		PoxPayloadIn input, 
     		MultivaluedMap<String, String> queryParams)
     			throws Exception {
-    	ServiceContext<MultipartInput, MultipartOutput> ctx = new MultipartServiceContextImpl(serviceName,
+    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = new MultipartServiceContextImpl(serviceName,
     			input,
     			queryParams);
     	return ctx;
@@ -91,8 +93,8 @@ public class MultipartServiceContextFactory
      * @see org.collectionspace.services.common.context.ServiceContextFactory#createServiceContext(java.lang.String, java.lang.Object, javax.ws.rs.core.MultivaluedMap, java.lang.String, java.lang.String)
      */
     @Override
-    public ServiceContext<MultipartInput, MultipartOutput> createServiceContext(String serviceName, 
-    		MultipartInput input,
+    public ServiceContext<PoxPayloadIn, PoxPayloadOut> createServiceContext(String serviceName, 
+    		PoxPayloadIn input,
     		MultivaluedMap<String, String> queryParams,
     		String documentType,
     		String entityName) throws Exception {
