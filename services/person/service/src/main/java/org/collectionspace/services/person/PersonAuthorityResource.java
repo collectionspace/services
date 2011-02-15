@@ -27,6 +27,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.contact.AuthorityResourceWithContacts;
 import org.collectionspace.services.person.nuxeo.PersonDocumentModelHandler;
 
@@ -36,18 +37,18 @@ import org.slf4j.LoggerFactory;
 /**
  * The Class PersonAuthorityResource.
  */
-@Path("/personauthorities")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Path(PersonAuthorityClient.SERVICE_PATH)
+@Consumes("application/xml")
+@Produces("application/xml")
 public class PersonAuthorityResource extends
-AuthorityResourceWithContacts<PersonauthoritiesCommon, PersonauthoritiesCommonList, PersonsCommon,
+	AuthorityResourceWithContacts<PersonauthoritiesCommon, PersonauthoritiesCommonList, PersonsCommon,
 		PersonDocumentModelHandler> {
 
-    private final static String personAuthorityServiceName = "personauthorities";
-	private final static String PERSONAUTHORITIES_COMMON = "personauthorities_common";
+//    private final static String personAuthorityServiceName = "personauthorities";
+//	private final static String PERSONAUTHORITIES_COMMON = "personauthorities_common";
 	
-    private final static String personServiceName = "persons";
-	private final static String PERSONS_COMMON = "persons_common";
+//    private final static String personServiceName = "persons";
+//	private final static String PERSONS_COMMON = "persons_common";
     
     final Logger logger = LoggerFactory.getLogger(PersonAuthorityResource.class);
 
@@ -56,7 +57,7 @@ AuthorityResourceWithContacts<PersonauthoritiesCommon, PersonauthoritiesCommonLi
      */
     public PersonAuthorityResource() {
 		super(PersonauthoritiesCommon.class, PersonAuthorityResource.class,
-				PERSONAUTHORITIES_COMMON, PERSONS_COMMON);
+				PersonAuthorityClient.SERVICE_COMMON_PART_NAME, PersonAuthorityClient.SERVICE_ITEM_COMMON_PART_NAME);
     }
 
     /* (non-Javadoc)
@@ -64,7 +65,7 @@ AuthorityResourceWithContacts<PersonauthoritiesCommon, PersonauthoritiesCommonLi
      */
     @Override
     public String getServiceName() {
-        return personAuthorityServiceName;
+        return PersonAuthorityClient.SERVICE_NAME;
     }
 
     /**
@@ -74,7 +75,7 @@ AuthorityResourceWithContacts<PersonauthoritiesCommon, PersonauthoritiesCommonLi
      */
     @Override
     public String getItemServiceName() {
-        return personServiceName;
+        return PersonAuthorityClient.SERVICE_ITEM_NAME;
     }
 
     @Override

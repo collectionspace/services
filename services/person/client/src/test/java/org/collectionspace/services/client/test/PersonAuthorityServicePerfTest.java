@@ -32,11 +32,11 @@ import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.person.PersonsCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -57,8 +57,8 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
-    final String SERVICE_PATH_COMPONENT = "personauthorities";
-    final String ITEM_SERVICE_PATH_COMPONENT = "items";
+//    final String SERVICE_PATH_COMPONENT = "personauthorities";
+//    final String ITEM_SERVICE_PATH_COMPONENT = "items";
     private String authId = null;
     private String authRefName = null;
     private List<String> allItemIdsCreated = new ArrayList<String>();
@@ -92,6 +92,16 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
     		shortTestLimit*shortTestLimit,
     		shortTestLimit, };
     private boolean runFullTest = false;
+    
+	@Override
+	public String getServicePathComponent() {
+		return PersonAuthorityClient.SERVICE_PATH_COMPONENT;
+	}
+
+	@Override
+	protected String getServiceName() {
+		return PersonAuthorityClient.SERVICE_NAME;
+	}
     
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -147,7 +157,7 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
         String shortId = "perfTestPersons";
     	String displayName = "Perf Test Person Auth";
     	String baseRefName = PersonAuthorityClientUtils.createPersonAuthRefName(shortId, null);
-    	MultipartOutput multipart =
+    	PoxPayloadOut multipart =
             PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    displayName, shortId, client.getCommonPartName());
 
@@ -201,7 +211,7 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
         personMap.put(PersonJAXBSchema.FORE_NAME, firstName);
         personMap.put(PersonJAXBSchema.SUR_NAME, lastName);
         Map<String, List<String>> personRepeatablesMap = new HashMap<String, List<String>>();
-        MultipartOutput multipart =
+        PoxPayloadOut multipart =
             PersonAuthorityClientUtils.createPersonInstance(authId, authRefName, 
             		personMap, personRepeatablesMap, client.getItemCommonPartName() );
 
@@ -322,11 +332,6 @@ public class PersonAuthorityServicePerfTest extends BaseServiceTest {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-    @Override
-    public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
-    }
-
     /**
      * Deletes all resources created by tests, after all tests have been run.
      *

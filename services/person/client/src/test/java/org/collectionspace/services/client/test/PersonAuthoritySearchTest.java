@@ -36,10 +36,10 @@ import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.person.PersonsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -59,8 +59,15 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     private final String CLASS_NAME = PersonAuthoritySearchTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
     
-    /** The service path component. */
-    final String SERVICE_PATH_COMPONENT = "personauthorities";
+	@Override
+	public String getServicePathComponent() {
+		return PersonAuthorityClient.SERVICE_PATH_COMPONENT;
+	}
+
+	@Override
+	protected String getServiceName() {
+		return PersonAuthorityClient.SERVICE_NAME;
+	}
     
     final String UTF8_CHARSET_NAME = "UTF-8";
     
@@ -567,14 +574,6 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
-     */
-    @Override
-    public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
-    }
-
 
     // ---------------------------------------------------------------
     // Utilities: setup routines for search tests
@@ -597,7 +596,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
         String shortId = createIdentifier();
     	String displayName = "displayName-" + shortId;
     	String baseRefName = PersonAuthorityClientUtils.createPersonAuthRefName(shortId, null);
-    	MultipartOutput multipart =
+    	PoxPayloadOut multipart =
             PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    displayName, shortId, client.getCommonPartName());
 
@@ -689,7 +688,7 @@ public class PersonAuthoritySearchTest extends BaseServiceTest {
     		PersonAuthorityClient client,
     		Map<String, String> partialTermPersonMap,
     		Map<String, List<String>> partialTermRepeatablesMap) throws Exception {
-        MultipartOutput multipart =
+        PoxPayloadOut multipart =
             PersonAuthorityClientUtils.createPersonInstance(authorityCsid, authRefName, 
                 partialTermPersonMap, partialTermRepeatablesMap, client.getItemCommonPartName() );
 

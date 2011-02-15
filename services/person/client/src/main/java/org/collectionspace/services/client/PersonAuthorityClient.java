@@ -27,13 +27,6 @@
 package org.collectionspace.services.client;
 
 //import javax.ws.rs.PathParam;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 //import org.collectionspace.services.common.authorityref.AuthorityRefList;
@@ -47,50 +40,43 @@ import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
  * The Class PersonAuthorityClient.
  */
-/**
- * @author pschmitz
- *
- */
-/**
- * @author pschmitz
- *
- */
-/**
- * @author pschmitz
- *
- */
-/**
- * @author pschmitz
- *
- */
 public class PersonAuthorityClient extends AbstractServiceClientImpl {
-
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
-     */
+	public static final String SERVICE_NAME = "personauthorities";
+	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
+	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
+	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
+	//
+	// Subitem constants
+	//
+	public static final String SERVICE_ITEM_NAME = "persons";
+	public static final String SERVICE_PATH_ITEMS_COMPONENT = "items";	//FIXME: REM - This should be defined in an AuthorityClient base class
+	public static final String SERVICE_ITEM_PAYLOAD_NAME = SERVICE_ITEM_NAME;
+	//
+	// Payload Part/Schema part names
+	//
+	public static final String SERVICE_COMMON_PART_NAME = SERVICE_NAME + 
+		PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
+	public static final String SERVICE_ITEM_COMMON_PART_NAME = SERVICE_ITEM_NAME + 
+		PART_LABEL_SEPARATOR + PART_COMMON_LABEL;
+	
     @Override
+	public String getServiceName() {
+		return SERVICE_NAME;
+	}
+	
+	@Override
     public String getServicePathComponent() {
-        return "personauthorities";
+        return SERVICE_PATH_COMPONENT;
     }
 
-    /**
-     * Gets the item common part name.
-     *
-     * @return the item common part name
-     */
     public String getItemCommonPartName() {
-        return getCommonPartName("persons");
+        return getCommonPartName(SERVICE_ITEM_NAME);
     }
-
-    /** The person authority proxy. */
-//    private static final PersonAuthorityClient instance = new PersonAuthorityClient();
     
     /**
      *
@@ -150,7 +136,7 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @param csid the csid
      * @return the client response
      */
-    public ClientResponse<MultipartInput> read(String csid) {
+    public ClientResponse<String> read(String csid) {
         return personAuthorityProxy.read(csid);
     }
 
@@ -160,7 +146,7 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @param name the name
      * @return the client response
      */
-    public ClientResponse<MultipartInput> readByName(String name) {
+    public ClientResponse<String> readByName(String name) {
         return personAuthorityProxy.readByName(name);
     }
 
@@ -170,8 +156,8 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<Response> create(MultipartOutput multipart) {
-        return personAuthorityProxy.create(multipart);
+    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
+        return personAuthorityProxy.create(xmlPayload.getBytes());
     }
 
     /**
@@ -181,8 +167,8 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
-        return personAuthorityProxy.update(csid, multipart);
+    public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
+        return personAuthorityProxy.update(csid, xmlPayload.getBytes());
 
     }
 
@@ -248,7 +234,7 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @param csid the csid
      * @return the client response
      */
-    public ClientResponse<MultipartInput> readItem(String vcsid, String csid) {
+    public ClientResponse<String> readItem(String vcsid, String csid) {
         return personAuthorityProxy.readItem(vcsid, csid);
     }
 
@@ -259,7 +245,7 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @param shortId the shortIdentifier
      * @return the client response
      */
-    public ClientResponse<MultipartInput> readNamedItem(String vcsid, String shortId) {
+    public ClientResponse<String> readNamedItem(String vcsid, String shortId) {
         return personAuthorityProxy.readNamedItem(vcsid, shortId);
     }
 
@@ -270,7 +256,7 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @param csid the csid
      * @return the client response
      */
-    public ClientResponse<MultipartInput> readItemInNamedAuthority(String authShortId, String csid) {
+    public ClientResponse<String> readItemInNamedAuthority(String authShortId, String csid) {
         return personAuthorityProxy.readItemInNamedAuthority(authShortId, csid);
     }
 
@@ -281,7 +267,7 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @param itemShortId the shortIdentifier for the item
      * @return the client response
      */
-    public ClientResponse<MultipartInput> readNamedItemInNamedAuthority(String authShortId, String itemShortId) {
+    public ClientResponse<String> readNamedItemInNamedAuthority(String authShortId, String itemShortId) {
         return personAuthorityProxy.readNamedItemInNamedAuthority(authShortId, itemShortId);
     }
 
@@ -292,8 +278,8 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<Response> createItem(String vcsid, MultipartOutput multipart) {
-        return personAuthorityProxy.createItem(vcsid, multipart);
+    public ClientResponse<Response> createItem(String vcsid, PoxPayloadOut xmlPayload) {
+        return personAuthorityProxy.createItem(vcsid, xmlPayload.getBytes());
     }
 
     /**
@@ -304,8 +290,8 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<MultipartInput> updateItem(String vcsid, String csid, MultipartOutput multipart) {
-        return personAuthorityProxy.updateItem(vcsid, csid, multipart);
+    public ClientResponse<String> updateItem(String vcsid, String csid, PoxPayloadOut xmlPayload) {
+        return personAuthorityProxy.updateItem(vcsid, csid, xmlPayload.getBytes());
 
     }
 
@@ -335,8 +321,8 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @return the client response
      */
     public ClientResponse<Response> createContact(String parentcsid,
-            String itemcsid, MultipartOutput multipart) {
-        return personAuthorityProxy.createContact(parentcsid, itemcsid, multipart);
+            String itemcsid, PoxPayloadOut xmlPayload) {
+        return personAuthorityProxy.createContact(parentcsid, itemcsid, xmlPayload.getBytes());
     }
 
     /**
@@ -350,8 +336,8 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
     public ClientResponse<Response> createContactForNamedItem(
     		String parentcsid,
     		String itemspecifier,
-    		MultipartOutput multipart) {
-    	return personAuthorityProxy.createContactForNamedItem(parentcsid, itemspecifier, multipart);
+    		PoxPayloadOut xmlPayload) {
+    	return personAuthorityProxy.createContactForNamedItem(parentcsid, itemspecifier, xmlPayload.getBytes());
     }
     /**
      * Creates the contact.
@@ -364,8 +350,9 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
     public ClientResponse<Response> createContactForItemInNamedAuthority(
     		String parentspecifier,
     		String itemcsid,
-    		MultipartOutput multipart) {
-    	return personAuthorityProxy.createContactForItemInNamedAuthority(parentspecifier, itemcsid, multipart);
+    		PoxPayloadOut xmlPayload) {
+    	return personAuthorityProxy.createContactForItemInNamedAuthority(parentspecifier,
+    			itemcsid, xmlPayload.getBytes());
     }
     /**
      * Creates the contact.
@@ -378,8 +365,9 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
     public ClientResponse<Response> createContactForNamedItemInNamedAuthority(
     		String parentspecifier,
     		String itemspecifier,
-    		MultipartOutput multipart) {
-    	return personAuthorityProxy.createContactForNamedItemInNamedAuthority(parentspecifier, itemspecifier, multipart);
+    		PoxPayloadOut xmlPayload) {
+    	return personAuthorityProxy.createContactForNamedItemInNamedAuthority(parentspecifier, itemspecifier,
+    			xmlPayload.getBytes());
     }
     
     /**
@@ -390,7 +378,7 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @param csid the csid
      * @return the client response
      */
-    public ClientResponse<MultipartInput> readContact(String parentcsid,
+    public ClientResponse<String> readContact(String parentcsid,
             String itemcsid, String csid) {
         return personAuthorityProxy.readContact(parentcsid, itemcsid, csid);
     }
@@ -403,7 +391,7 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @param csid
      * @return the client response
      */
-    public ClientResponse<MultipartInput> readContactForNamedItem(
+    public ClientResponse<String> readContactForNamedItem(
     		String parentcsid,
     		String itemspecifier,
     		String csid){
@@ -418,7 +406,7 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @param csid
      * @return the client response
      */
-    public ClientResponse<MultipartInput> readContactInNamedAuthority(
+    public ClientResponse<String> readContactInNamedAuthority(
     		String parentspecifier,
     		String itemcsid,
     		String csid){
@@ -433,7 +421,7 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @param csid
      * @return the client response
      */
-    public ClientResponse<MultipartInput> readContactForNamedItemInNamedAuthority(
+    public ClientResponse<String> readContactForNamedItemInNamedAuthority(
     		String parentspecifier,
     		String itemspecifier,
     		String csid){
@@ -502,9 +490,9 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<MultipartInput> updateContact(String parentcsid,
-            String itemcsid, String csid, MultipartOutput multipart) {
-        return personAuthorityProxy.updateContact(parentcsid, itemcsid, csid, multipart);
+    public ClientResponse<String> updateContact(String parentcsid,
+            String itemcsid, String csid, PoxPayloadOut xmlPayload) {
+        return personAuthorityProxy.updateContact(parentcsid, itemcsid, csid, xmlPayload.getBytes());
     }
     
     /**
@@ -516,12 +504,12 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<MultipartInput> updateContactForNamedItem(
+    public ClientResponse<String> updateContactForNamedItem(
     		String parentcsid,
     		String itemspecifier,
     		String csid,
-    		MultipartOutput multipart) {
-    	return personAuthorityProxy.updateContactForNamedItem(parentcsid, itemspecifier, csid, multipart);
+    		PoxPayloadOut xmlPayload) {
+    	return personAuthorityProxy.updateContactForNamedItem(parentcsid, itemspecifier, csid, xmlPayload.getBytes());
     }
 
     /**
@@ -533,12 +521,12 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<MultipartInput> updateContactInNamedAuthority(
+    public ClientResponse<String> updateContactInNamedAuthority(
     		String parentspecifier,
     		String itemcsid,
     		String csid,
-    		MultipartOutput multipart) {
-    	return personAuthorityProxy.updateContactInNamedAuthority(parentspecifier, itemcsid, csid, multipart);
+    		PoxPayloadOut xmlPayload) {
+    	return personAuthorityProxy.updateContactInNamedAuthority(parentspecifier, itemcsid, csid, xmlPayload.getBytes());
     }
 
     /**
@@ -550,12 +538,13 @@ public class PersonAuthorityClient extends AbstractServiceClientImpl {
      * @param multipart the multipart
      * @return the client response
      */
-    public ClientResponse<MultipartInput> updateContactForNamedItemInNamedAuthority(
+    public ClientResponse<String> updateContactForNamedItemInNamedAuthority(
     		String parentspecifier,
     		String itemspecifier,
     		String csid,
-    		MultipartOutput multipart) {
-    	return personAuthorityProxy.updateContactForNamedItemInNamedAuthority(parentspecifier, itemspecifier, csid, multipart);
+    		PoxPayloadOut xmlPayload) {
+    	return personAuthorityProxy.updateContactForNamedItemInNamedAuthority(parentspecifier, itemspecifier, csid,
+    			xmlPayload.getBytes());
     }
 
 

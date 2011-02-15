@@ -29,23 +29,27 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.jaxb.AbstractCommonList;
+
 import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.ContactClientUtils;
 import org.collectionspace.services.contact.ContactsCommon;
 import org.collectionspace.services.contact.ContactsCommonList;
+
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
-import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.person.PersonauthoritiesCommon;
 import org.collectionspace.services.person.PersonauthoritiesCommonList;
 import org.collectionspace.services.person.PersonsCommon;
 import org.collectionspace.services.person.PersonsCommonList;
+
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+//import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -59,21 +63,25 @@ import org.testng.annotations.Test;
  * $LastChangedRevision: 753 $
  * $LastChangedDate: 2009-09-23 11:03:36 -0700 (Wed, 23 Sep 2009) $
  */
-public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
+public class PersonAuthorityServiceTest extends AbstractServiceTestImpl { //FIXME: Test classes for Vocab, Person, Org, and Location should have a base class!
 
     /** The logger. */
     private final String CLASS_NAME = PersonAuthorityServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    
+	@Override
+	public String getServicePathComponent() {
+		return PersonAuthorityClient.SERVICE_PATH_COMPONENT;
+	}
 
-    // Instance variables specific to this test.
-    /** The service path component. */
-    final String SERVICE_PATH_COMPONENT = "personauthorities";
+	@Override
+	protected String getServiceName() {
+		return PersonAuthorityClient.SERVICE_NAME;
+	}
     
-    /** The item service path component. */
-    final String ITEM_SERVICE_PATH_COMPONENT = "items";
-    
-    /** The contact service path component. */
-    final String CONTACT_SERVICE_PATH_COMPONENT = "contacts";
+    public String getItemServicePathComponent() {
+        return PersonAuthorityClient.SERVICE_PATH_ITEMS_COMPONENT;
+    }	
     
     /** The test forename. */
     final String TEST_FORE_NAME = "John";
@@ -169,7 +177,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         String shortId = createIdentifier();
     	String displayName = "displayName-" + shortId;
     	String baseRefName = PersonAuthorityClientUtils.createPersonAuthRefName(shortId, null);
-    	MultipartOutput multipart = 
+    	PoxPayloadOut multipart = 
             PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    displayName, shortId, client.getCommonPartName());
         
@@ -319,7 +327,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
         
-        MultipartOutput multipart = 
+        PoxPayloadOut multipart = 
             PersonAuthorityClientUtils.createPersonInstance(vcsid, authRefName, itemFieldProperties,
                 itemRepeatableFieldProperties, client.getItemCommonPartName() );
 
@@ -395,8 +403,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
         String identifier = createIdentifier();
-        MultipartOutput multipart =
-            ContactClientUtils.createContactInstance(parentcsid,
+        PoxPayloadOut multipart = ContactClientUtils.createContactInstance(parentcsid,
             itemcsid, identifier, new ContactClient().getCommonPartName());
         
         String newID = null;
@@ -572,7 +579,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         PersonAuthorityClient client = new PersonAuthorityClient();
         String shortId = createIdentifier() + "*" + createIdentifier();
     	String displayName = "displayName-" + shortId;
-        MultipartOutput multipart =
+        PoxPayloadOut multipart =
             PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    displayName, shortId, client.getCommonPartName());
 
@@ -622,7 +629,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         fieldProperties.put(PersonJAXBSchema.SHORT_DISPLAY_NAME, shortId);
         fieldProperties.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
         final Map NULL_REPEATABLE_FIELD_PROPERTIES = null;
-        MultipartOutput multipart =
+        PoxPayloadOut multipart =
             PersonAuthorityClientUtils.createPersonInstance(knownResourceId,
                 knownResourceRefName, fieldProperties,
                 NULL_REPEATABLE_FIELD_PROPERTIES, client.getItemCommonPartName());
@@ -735,7 +742,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<MultipartInput> res = null;
+        ClientResponse<String> res = null;
         if(CSID!=null) {
             res = client.read(CSID);
         } else if(shortId!=null) {
@@ -755,7 +762,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	        //FIXME: remove the following try catch once Aron fixes signatures
 	        try {
-	            MultipartInput input = (MultipartInput) res.getEntity();
+	            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 	            PersonauthoritiesCommon personAuthority = (PersonauthoritiesCommon) extractPart(input,
 	                    client.getCommonPartName(), PersonauthoritiesCommon.class);
 	            Assert.assertNotNull(personAuthority);
@@ -829,7 +836,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<MultipartInput> res = null;
+        ClientResponse<String> res = null;
         if(authCSID!=null) {
             if(itemCSID!=null) {
                 res = client.readItem(authCSID, itemCSID);
@@ -862,7 +869,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Check whether we've received a person.
-	        MultipartInput input = (MultipartInput) res.getEntity();
+	        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
 	        PersonsCommon person = (PersonsCommon) extractPart(input,
 	                client.getItemCommonPartName(), PersonsCommon.class);
 	        Assert.assertNotNull(person);
@@ -904,8 +911,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        MultipartInput input =null;
-        ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
+        PoxPayloadIn input =null;
+        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -919,7 +926,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Check whether person has expected displayName.
-	        input = (MultipartInput) res.getEntity();
+	        input = new PoxPayloadIn(res.getEntity());
         } finally {
         	res.releaseConnection();
         }
@@ -956,9 +963,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
             		"updated-" + TEST_FORE_NAME, null, TEST_SUR_NAME,null, null);
 
         // Submit the updated resource to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+        PoxPayloadOut output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
         try {
 	        int statusCode = res.getStatus();
@@ -972,7 +979,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = (MultipartInput) res.getEntity();
+	        input = new PoxPayloadIn(res.getEntity());
         } finally {
         	res.releaseConnection();
         }
@@ -1000,9 +1007,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         person.setShortDisplayName(expectedDisplayName);
 
         // Submit the updated resource to the service and store the response.
-        output = new MultipartOutput();
+        output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
         commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+        commonPart.setLabel(client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
         try {
 	        int statusCode = res.getStatus();
@@ -1016,7 +1023,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = (MultipartInput) res.getEntity();
+	        input = new PoxPayloadIn(res.getEntity());
         } finally {
         	res.releaseConnection();
         }
@@ -1061,8 +1068,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        MultipartInput input = null;
-        ClientResponse<MultipartInput> res = client.readItem(knownResourceId, knownItemResourceId);
+        PoxPayloadIn input = null;
+        ClientResponse<String> res = client.readItem(knownResourceId, knownItemResourceId);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -1076,7 +1083,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, Response.Status.OK.getStatusCode());
 	
 	        // Check whether Person has expected displayName.
-	        input = (MultipartInput) res.getEntity();
+	        input = new PoxPayloadIn(res.getEntity());
         } finally {
         	res.releaseConnection();
         }
@@ -1089,9 +1096,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         person.setDisplayName(null);
 
         // Submit the updated resource to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+        PoxPayloadOut output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
         try {
 	        int statusCode = res.getStatus();
@@ -1126,8 +1133,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        MultipartInput input = null;
-        ClientResponse<MultipartInput> res =
+        PoxPayloadIn input = null;
+        ClientResponse<String> res =
             client.readContact(knownResourceId, knownItemResourceId,
             knownContactResourceId);
         try {
@@ -1143,7 +1150,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Check whether we've received a contact.
-	        input = (MultipartInput) res.getEntity();
+	        input = new PoxPayloadIn(res.getEntity());
         } finally {
         	res.releaseConnection();
         }
@@ -1178,7 +1185,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
         try {
         	int statusCode = res.getStatus();
 	        // Check the status code of the response: does it match
@@ -1211,7 +1218,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<MultipartInput> res = client.readItem(knownResourceId, NON_EXISTENT_ID);
+        ClientResponse<String> res = client.readItem(knownResourceId, NON_EXISTENT_ID);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -1245,7 +1252,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        ClientResponse<MultipartInput> res =
+        ClientResponse<String> res =
             client.readContact(knownResourceId, knownItemResourceId, NON_EXISTENT_ID);
         try {
 	        int statusCode = res.getStatus();
@@ -1514,8 +1521,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        MultipartInput input = null;
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        PoxPayloadIn input = null;
+        ClientResponse<String> res = client.read(knownResourceId);
         try {
 	        if(logger.isDebugEnabled()){
 	            logger.debug(testName + ": read status = " + res.getStatus());
@@ -1525,7 +1532,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        if(logger.isDebugEnabled()){
 	            logger.debug("got PersonAuthority to update with ID: " + knownResourceId);
 	        }
-	        input = res.getEntity();
+	        input = new PoxPayloadIn(res.getEntity());
         } finally {
         	res.releaseConnection();
         }
@@ -1543,9 +1550,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
 
         // Submit the updated resource to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(personAuthority, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
+        PoxPayloadOut output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(personAuthority, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getCommonPartName());
         res = client.update(knownResourceId, output);
         try {
 	        int statusCode = res.getStatus();
@@ -1559,7 +1566,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = (MultipartInput) res.getEntity();
+	        input = new PoxPayloadIn(res.getEntity());
         } finally {
         	res.releaseConnection();
         }
@@ -1593,8 +1600,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        MultipartInput input = null;
-        ClientResponse<MultipartInput> res =
+        PoxPayloadIn input = null;
+        ClientResponse<String> res =
                 client.readItem(knownResourceId, knownItemResourceId);
         try {
 	        if(logger.isDebugEnabled()){
@@ -1607,7 +1614,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	                knownItemResourceId +
 	                " in PersonAuthority: " + knownResourceId );
 	        }
-	        input = res.getEntity();
+	        input = new PoxPayloadIn(res.getEntity());
         } finally {
         	res.releaseConnection();
         }
@@ -1631,9 +1638,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }    
         
         // Submit the updated resource to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getItemCommonPartName());
+        PoxPayloadOut output = new PoxPayloadOut(PersonAuthorityClient.SERVICE_ITEM_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(person, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getItemCommonPartName());
         res = client.updateItem(knownResourceId, knownItemResourceId, output);
         try {
 	        int statusCode = res.getStatus();
@@ -1647,7 +1654,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = (MultipartInput) res.getEntity();
+	        input = new PoxPayloadIn(res.getEntity());
         } finally {
         	res.releaseConnection();
         }
@@ -1686,8 +1693,8 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         PersonAuthorityClient client = new PersonAuthorityClient();
-        MultipartInput input = null;
-        ClientResponse<MultipartInput> res =
+        PoxPayloadIn input = null;
+        ClientResponse<String> res =
                 client.readContact(knownResourceId, knownItemResourceId, knownContactResourceId);
         try {
 	        if(logger.isDebugEnabled()){
@@ -1701,7 +1708,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	                " in item: " + knownItemResourceId +
 	                " in parent: " + knownResourceId );
 	        }
-	        input = res.getEntity();
+	        input = new PoxPayloadIn(res.getEntity());
         } finally {
         	res.releaseConnection();
         }
@@ -1719,9 +1726,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         }
 
         // Submit the updated resource to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(contact, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new ContactClient().getCommonPartName());
+        PoxPayloadOut output = new PoxPayloadOut(ContactClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(contact, MediaType.APPLICATION_XML_TYPE); //FIXME: REM - Replace with output.addPart(contact, client.getCommonPartName())
+        commonPart.setLabel(client.getCommonPartName());
         res = client.updateContact(knownResourceId, knownItemResourceId, knownContactResourceId, output);
         try {
 	        int statusCode = res.getStatus();
@@ -1735,7 +1742,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 	
 	        // Retrieve the updated resource and verify that its contents exist.
-	        input = (MultipartInput) res.getEntity();
+	        input = new PoxPayloadIn(res.getEntity());;
         } finally {
         	res.releaseConnection();
         }
@@ -1777,7 +1784,7 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     	//Should this really be empty?
     }
 
-/*
+/*	//FIXME: REM - Can we kill all this dead code please?
     @Override
     @Test(dataProvider="testName", dataProviderClass=AbstractServiceTest.class,
         groups = {"update"}, dependsOnMethods = {"update", "testSubmitRequest"})
@@ -1885,9 +1892,9 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         // The only relevant ID may be the one used in update(), below.
         PersonAuthorityClient client = new PersonAuthorityClient();
         String displayName = "displayName-NON_EXISTENT_ID";
-    	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
+    	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     				displayName, "NON_EXISTENT_SHORT_ID", client.getCommonPartName());
-        ClientResponse<MultipartInput> res =
+        ClientResponse<String> res =
                 client.update(NON_EXISTENT_ID, multipart);
         try {
 	        int statusCode = res.getStatus();
@@ -1931,11 +1938,11 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
         nonexMap.put(PersonJAXBSchema.SUR_NAME, "Wayne");
         nonexMap.put(PersonJAXBSchema.GENDER, "male");
         Map<String, List<String>> nonexRepeatablesMap = new HashMap<String, List<String>>();
-        MultipartOutput multipart = 
+        PoxPayloadOut multipart = 
     	PersonAuthorityClientUtils.createPersonInstance(NON_EXISTENT_ID, 
     			PersonAuthorityClientUtils.createPersonAuthRefName(NON_EXISTENT_ID, null),
     			nonexMap, nonexRepeatablesMap, client.getItemCommonPartName() );
-        ClientResponse<MultipartInput> res =
+        ClientResponse<String> res =
                 client.updateItem(knownResourceId, NON_EXISTENT_ID, multipart);
         try {
 	        int statusCode = res.getStatus();
@@ -2331,32 +2338,15 @@ public class PersonAuthorityServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
-     */
-    @Override
-    public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
-    }
-
-    /**
-     * Gets the item service path component.
-     *
-     * @return the item service path component
-     */
-    public String getItemServicePathComponent() {
-        return ITEM_SERVICE_PATH_COMPONENT;
-    }
-
     /**
      * Gets the contact service path component.
      *
      * @return the contact service path component
      */
     public String getContactServicePathComponent() {
-        return CONTACT_SERVICE_PATH_COMPONENT;
+        return ContactClient.SERVICE_PATH_COMPONENT;
     }
-
+    
     /**
      * Returns the root URL for the item service.
      *
