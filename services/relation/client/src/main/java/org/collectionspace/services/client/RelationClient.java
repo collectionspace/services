@@ -35,25 +35,26 @@ import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
  * The Class RelationClient.
  */
 public class RelationClient extends AbstractServiceClientImpl {
+	public static final String SERVICE_NAME = "relations";
+	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
+	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
+	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
+	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.collectionspace.services.client.BaseServiceClient#getServicePathComponent
-	 * ()
-	 */
+	@Override
+	public String getServiceName() {
+		return SERVICE_NAME;
+	}
+
 	@Override
 	public String getServicePathComponent() {
-		return "relations";
+		return SERVICE_PATH_COMPONENT;
 	}
 
 	/** The relation proxy. */
@@ -132,7 +133,7 @@ public class RelationClient extends AbstractServiceClientImpl {
 	 * @param csid the csid
 	 * @return the client response
 	 */
-	public ClientResponse<MultipartInput> read(String csid) {
+	public ClientResponse<String> read(String csid) {
 		return relationProxy.read(csid);
 	}
 
@@ -142,8 +143,9 @@ public class RelationClient extends AbstractServiceClientImpl {
 	 * @param multipart the multipart
 	 * @return the client response
 	 */
-	public ClientResponse<Response> create(MultipartOutput multipart) {
-		return relationProxy.create(multipart);
+	public ClientResponse<Response> create(PoxPayloadOut multipart) {
+            String payload = multipart.toXML();
+            return relationProxy.create(payload);
 	}
 
 	/**
@@ -153,9 +155,10 @@ public class RelationClient extends AbstractServiceClientImpl {
 	 * @param multipart the multipart
 	 * @return the client response
 	 */
-	public ClientResponse<MultipartInput> update(String csid,
-			MultipartOutput multipart) {
-		return relationProxy.update(csid, multipart);
+	public ClientResponse<String> update(String csid,
+                PoxPayloadOut multipart) {
+            String payload = multipart.toXML();
+            return relationProxy.update(csid, payload);
 	}
 
 	/**

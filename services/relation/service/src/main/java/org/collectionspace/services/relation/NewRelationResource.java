@@ -42,6 +42,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.common.relation.IRelationsManager;
 import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
@@ -63,8 +65,8 @@ import org.slf4j.LoggerFactory;
  * The Class NewRelationResource.
  */
 @Path("/relations")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Consumes("application/xml")
+@Produces("application/xml")
 public class NewRelationResource extends
 		AbstractMultiPartCollectionSpaceResourceImpl {
 
@@ -108,9 +110,10 @@ public class NewRelationResource extends
 	 * @return the response
 	 */
 	@POST
-	public Response createRelation(MultipartInput input) {
+	public Response createRelation(String xmlText) {
 		try {
-			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
+        	        PoxPayloadIn input = new PoxPayloadIn(xmlText);
+			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
 			DocumentHandler handler = createDocumentHandler(ctx);
 			String csid = getRepositoryClient(ctx).create(ctx, handler);
 			UriBuilder path = UriBuilder
@@ -148,7 +151,7 @@ public class NewRelationResource extends
 	 */
 	@GET
 	@Path("{csid}")
-	public MultipartOutput getRelation(@Context UriInfo ui,
+	public String getRelation(@Context UriInfo ui,
 			@PathParam("csid") String csid) {
 		MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
 		if (logger.isDebugEnabled()) {
@@ -161,12 +164,12 @@ public class NewRelationResource extends
 							"text/plain").build();
 			throw new WebApplicationException(response);
 		}
-		MultipartOutput result = null;
+		PoxPayloadOut result = null;
 		try {
-			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
 			DocumentHandler handler = createDocumentHandler(ctx);
 			getRepositoryClient(ctx).get(ctx, csid, handler);
-			result = (MultipartOutput) ctx.getOutput();
+			result = ctx.getOutput();
 		} catch (UnauthorizedException ue) {
 			Response response = Response.status(Response.Status.UNAUTHORIZED)
 					.entity("Get failed reason " + ue.getErrorReason()).type(
@@ -198,7 +201,7 @@ public class NewRelationResource extends
 					.build();
 			throw new WebApplicationException(response);
 		}
-		return result;
+		return result.toXML();
 	}
 
 	/**
@@ -235,8 +238,8 @@ public class NewRelationResource extends
 	 */
 	@PUT
 	@Path("{csid}")
-	public MultipartOutput updateRelation(@PathParam("csid") String csid,
-			MultipartInput theUpdate) {
+	public String updateRelation(@PathParam("csid") String csid,
+			String xmlText) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("updateRelation with csid=" + csid);
 		}
@@ -247,12 +250,13 @@ public class NewRelationResource extends
 							"text/plain").build();
 			throw new WebApplicationException(response);
 		}
-		MultipartOutput result = null;
+		PoxPayloadOut result = null;
 		try {
-			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
+			PoxPayloadIn update = new PoxPayloadIn(xmlText);
+        	        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(update);
 			DocumentHandler handler = createDocumentHandler(ctx);
 			getRepositoryClient(ctx).update(ctx, csid, handler);
-			result = (MultipartOutput) ctx.getOutput();
+			result = ctx.getOutput();
 		} catch (UnauthorizedException ue) {
 			Response response = Response.status(Response.Status.UNAUTHORIZED)
 					.entity("Update failed reason " + ue.getErrorReason())
@@ -272,7 +276,7 @@ public class NewRelationResource extends
 					"Update failed").type("text/plain").build();
 			throw new WebApplicationException(response);
 		}
-		return result;
+		return result.toXML();
 	}
 
 	/**
@@ -297,7 +301,7 @@ public class NewRelationResource extends
 			throw new WebApplicationException(response);
 		}
 		try {
-			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
 			getRepositoryClient(ctx).delete(ctx, csid);
 			return Response.status(HttpResponseCodes.SC_OK).build();
 		} catch (UnauthorizedException ue) {
@@ -343,7 +347,7 @@ public class NewRelationResource extends
 			String objectType) throws WebApplicationException {
 		RelationsCommonList relationList = new RelationsCommonList();
 		try {
-			ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
 			DocumentHandler handler = createDocumentHandler(ctx);
 			String relationClause = RelationsUtils.buildWhereClause(subjectCsid, subjectType, predicate,
 					objectCsid, objectType);

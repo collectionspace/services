@@ -22,8 +22,8 @@ import javax.ws.rs.QueryParam;
  * @version $Revision:$
  */
 @Path("/relations/")
-@Produces({"multipart/mixed"})
-@Consumes({"multipart/mixed"})
+@Produces({"application/xml"})
+@Consumes({"application/xml"})
 public interface RelationProxy extends CollectionSpaceProxy {
 
     @GET
@@ -53,17 +53,17 @@ public interface RelationProxy extends CollectionSpaceProxy {
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(MultipartOutput multipart);
+    ClientResponse<Response> create(String payload);
 
     //(R)ead
     @GET
     @Path("/{csid}")
-    ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
+    ClientResponse<String> read(@PathParam("csid") String csid);
 
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<MultipartInput> update(@PathParam("csid") String csid, MultipartOutput multipart);
+    ClientResponse<String> update(@PathParam("csid") String csid, String payload);
 
     //(D)elete
     @DELETE
