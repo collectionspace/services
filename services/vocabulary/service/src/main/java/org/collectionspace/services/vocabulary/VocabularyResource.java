@@ -23,53 +23,56 @@
  */
 package org.collectionspace.services.vocabulary;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
+//import javax.ws.rs.Consumes;
+//import javax.ws.rs.DELETE;
+//import javax.ws.rs.GET;
+//import javax.ws.rs.POST;
+//import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
+//import javax.ws.rs.PathParam;
+//import javax.ws.rs.Produces;
+//import javax.ws.rs.QueryParam;
+//import javax.ws.rs.WebApplicationException;
+//import javax.ws.rs.core.Context;
+//import javax.ws.rs.core.MultivaluedMap;
+//import javax.ws.rs.core.Response;
+//import javax.ws.rs.core.UriBuilder;
+//import javax.ws.rs.core.UriInfo;
 
-import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
-import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
+//import org.collectionspace.services.common.vocabulary.AuthorityJAXBSchema;
+//import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
-import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
-import org.collectionspace.services.common.ClientType;
-import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.BadRequestException;
-import org.collectionspace.services.common.document.DocumentFilter;
-import org.collectionspace.services.common.document.DocumentHandler;
-import org.collectionspace.services.common.document.DocumentNotFoundException;
-import org.collectionspace.services.common.security.UnauthorizedException;
-import org.collectionspace.services.common.query.IQueryManager;
+import org.collectionspace.services.client.VocabularyClient;
+
+//import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
+//import org.collectionspace.services.common.ClientType;
+//import org.collectionspace.services.common.ServiceMain;
+//import org.collectionspace.services.common.context.ServiceContext;
+//import org.collectionspace.services.common.document.BadRequestException;
+//import org.collectionspace.services.common.document.DocumentFilter;
+//import org.collectionspace.services.common.document.DocumentHandler;
+//import org.collectionspace.services.common.document.DocumentNotFoundException;
+//import org.collectionspace.services.common.security.UnauthorizedException;
+//import org.collectionspace.services.common.query.IQueryManager;
 import org.collectionspace.services.vocabulary.nuxeo.VocabularyItemDocumentModelHandler;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.util.HttpResponseCodes;
+//import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadIn;
+//import org.jboss.resteasy.plugins.providers.multipart.PoxPayloadOut;
+//import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * The Class VocabularyResource.
  */
-@Path("/vocabularies")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+//@Path("/vocabularies")
+@Path("/" + VocabularyClient.SERVICE_PATH_COMPONENT)
 public class VocabularyResource extends 
 	AuthorityResource<VocabulariesCommon, VocabulariesCommonList, VocabularyitemsCommonList,
 						VocabularyItemDocumentModelHandler> {
 
-    private final static String vocabularyServiceName = "vocabularies";
+    private final static String vocabularyServiceName = VocabularyClient.SERVICE_PATH_COMPONENT;
+//    private final static String vocabularyServiceName = "vocabularies";
+
 	private final static String VOCABULARIES_COMMON = "vocabularies_common";
     
     private final static String vocabularyItemServiceName = "vocabularyitems";

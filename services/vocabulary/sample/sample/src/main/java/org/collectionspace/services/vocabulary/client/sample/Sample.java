@@ -36,6 +36,9 @@ import org.apache.log4j.BasicConfigurator;
 //import org.collectionspace.services.VocabularyItemJAXBSchema; 
 import org.collectionspace.services.common.vocabulary.AuthorityItemJAXBSchema;
 
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.VocabularyClient;
 import org.collectionspace.services.client.VocabularyClientUtils;
 import org.collectionspace.services.client.test.ServiceRequestType;
@@ -44,8 +47,6 @@ import org.collectionspace.services.vocabulary.VocabulariesCommonList;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommon;
 import org.collectionspace.services.vocabulary.VocabularyitemsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
@@ -86,7 +87,7 @@ public class Sample {
         String displaySuffix = "displayName-" + System.currentTimeMillis(); //TODO: Laramie20100728 temp fix, made-up displaySuffix.
         String baseVocabRefName = VocabularyClientUtils.createVocabularyRefName(vocabName, displaySuffix);   //TODO: Laramie20100728 temp fix  was vocabName, false
     	String fullVocabRefName = VocabularyClientUtils.createVocabularyRefName(vocabName, displaySuffix);   //TODO: Laramie20100728 temp fix  was vocabName, true
-    	MultipartOutput multipart = VocabularyClientUtils.createEnumerationInstance(
+    	PoxPayloadOut multipart = VocabularyClientUtils.createEnumerationInstance(
     			vocabName, fullVocabRefName, client.getCommonPartName());
     	ClientResponse<Response> res = client.create(multipart);
 
@@ -165,7 +166,7 @@ public class Sample {
         // Submit the request to the service and store the response.
         VocabulariesCommon vocabulary = null;
         try {
-            ClientResponse<MultipartInput> res = client.read(vocabId);
+            ClientResponse<String> res = client.read(vocabId);
             int statusCode = res.getStatus();
             if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
                 throw new RuntimeException("Could not read vocabulary"
@@ -175,7 +176,7 @@ public class Sample {
                 throw new RuntimeException("Unexpected Status when reading " +
                     "vocabulary, Status:"+ statusCode);
             }
-            MultipartInput input = (MultipartInput) res.getEntity();
+            PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
             vocabulary = (VocabulariesCommon) extractPart(input,
                     client.getCommonPartName(), VocabulariesCommon.class);
         } catch (Exception e) {
@@ -332,10 +333,10 @@ public class Sample {
     }
 
     // TODO this should be moved to a common utils class
-    private Object extractPart(MultipartInput input, String label,
+    private Object extractPart(PoxPayloadIn input, String label,
         Class clazz) throws Exception {
         Object obj = null;
-        for(InputPart part : input.getParts()){
+        for(PayloadInputPart part : input.getParts()){
             String partLabel = part.getHeaders().getFirst("label");
             if(label.equalsIgnoreCase(partLabel)){
                 String partStr = part.getBodyAsString();
