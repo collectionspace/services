@@ -37,6 +37,8 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 
 import org.collectionspace.services.client.CollectionObjectClient;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 
 /**
@@ -84,9 +86,9 @@ public class I1591Multiple extends CollectionSpacePerformanceTest {
         fillCollectionObject(co, Long.toString(identifier));
 
         // Assign it to the Common part of a multipart payload.
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(co, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", COLLECTION_OBJECT_COMMON_PART_NAME);
+        PoxPayloadOut multipart = new PoxPayloadOut(CollectionObjectClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = multipart.addPart(co, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(collectionObjectClient.getCommonPartName());
 
         // Make a create call with that payload and check the response.
         ClientResponse<Response> response = collectionObjectClient.create(multipart);

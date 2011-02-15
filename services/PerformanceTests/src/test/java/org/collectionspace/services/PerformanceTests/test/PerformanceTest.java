@@ -43,6 +43,8 @@ import org.jboss.resteasy.util.HttpResponseCodes;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.client.CollectionObjectClient;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommonList.CollectionObjectListItem;
@@ -175,7 +177,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 	 * @return the string
 	 */
 	private String createCollectionObject(CollectionObjectClient collectionObjectClient,
-			MultipartOutput multipart) {
+			PoxPayloadOut multipart) {
 		String result = null;
 		// Make the create call and check the response
 		ClientResponse<Response> response = collectionObjectClient.create(multipart);
@@ -214,9 +216,9 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 		fillCollectionObject(co, Long.toString(System.currentTimeMillis()));
 		
 		// Next, create a part object
-		MultipartOutput multipart = new MultipartOutput();
-		OutputPart commonPart = multipart.addPart(co, MediaType.APPLICATION_XML_TYPE);
-		commonPart.getHeaders().add("label", collectionObjectClient.getCommonPartName());		
+		PoxPayloadOut multipart = new PoxPayloadOut(CollectionObjectClient.SERVICE_PAYLOAD_NAME);
+		PayloadOutputPart commonPart = multipart.addPart(co, MediaType.APPLICATION_XML_TYPE);
+		commonPart.setLabel(collectionObjectClient.getCommonPartName());		
 		
 		int createdObjects = 0;
 		try {
@@ -255,7 +257,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
 	 */
 	private void readCollectionObject(CollectionObjectClient collectionObjectClient,
 			String resourceId) {
-		ClientResponse<MultipartInput> res = collectionObjectClient.read(resourceId);
+		ClientResponse<String> res = collectionObjectClient.read(resourceId);
 		res.releaseConnection();
 	}
 
