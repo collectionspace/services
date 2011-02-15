@@ -338,7 +338,6 @@
           <!-- =========================================================== -->
           <!-- Storage Location / Location -->
           <!-- =========================================================== -->
-          <field type="largetext">locations_common:displayName</field>
           <field type="largetext">locations_common:name</field>
           <!-- conditionNote will be made part of a repeatable group of fields in a future release -->
           <field type="largetext">locations_common:conditionNote</field>

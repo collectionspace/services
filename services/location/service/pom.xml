@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services.location</artifactId>
-        <version>pox-SNAPSHOT</version>
+        <version>1.4-SNAPSHOT</version>
     </parent>
     
     <modelVersion>4.0.0</modelVersion>
