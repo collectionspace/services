@@ -27,15 +27,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ReportClient;
 import org.collectionspace.services.report.ReportsCommon;
 import org.collectionspace.services.report.ReportsCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 //import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -57,9 +58,11 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
     private final String CLASS_NAME = ReportServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
-    // Instance variables specific to this test.
-    /** The service path component. */
+    final String SERVICE_NAME = "reports";
     final String SERVICE_PATH_COMPONENT = "reports";
+
+    // Instance variables specific to this test.
+
     
     /** The known resource id. */
     private String knownResourceId = null;
@@ -103,10 +106,8 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         ReportClient client = new ReportClient();
         String identifier = createIdentifier();
-        MultipartOutput multipart = createReportInstance(identifier);
+        PoxPayloadOut multipart = createReportInstance(identifier);
         ClientResponse<Response> res = client.create(multipart);
-
-        int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
         // the expected response(s)?
@@ -114,6 +115,7 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
         // Specifically:
         // Does it fall within the set of valid status codes?
         // Does it exactly match the expected status code?
+        int statusCode = res.getStatus();
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": status = " + statusCode);
         }
@@ -194,11 +196,11 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         ReportClient client = new ReportClient();
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
-        int statusCode = res.getStatus();
+        ClientResponse<String> res = client.read(knownResourceId);
 
         // Check the status code of the response: does it match
         // the expected response(s)?
+        int statusCode = res.getStatus();
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": status = " + statusCode);
         }
@@ -206,10 +208,14 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
-        ReportsCommon report = (ReportsCommon) extractPart(input,
-                client.getCommonPartName(), ReportsCommon.class);
-        Assert.assertNotNull(report);
+        // Get the common part of the response and verify that it is not null.
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+        ReportsCommon reportCommon = null;
+        if (payloadInputPart != null) {
+        	reportCommon = (ReportsCommon) payloadInputPart.getBody();
+    }
+        Assert.assertNotNull(reportCommon);
     }
 
     // Failure outcomes
@@ -229,7 +235,7 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         ReportClient client = new ReportClient();
-        ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -316,37 +322,41 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         ReportClient client = new ReportClient();
-        ClientResponse<MultipartInput> res =
-                client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": read status = " + res.getStatus());
         }
         Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
         if(logger.isDebugEnabled()){
             logger.debug("got object to update with ID: " + knownResourceId);
         }
-        MultipartInput input = (MultipartInput) res.getEntity();
-        ReportsCommon report = (ReportsCommon) extractPart(input,
-                client.getCommonPartName(), ReportsCommon.class);
-        Assert.assertNotNull(report);
 
-        // Update the content of this resource.
-        // Update the content of this resource.
-        report.setName("updated-" + report.getName());
-        report.setOutputMIME("updated-" + report.getOutputMIME());
+        // Extract the common part from the response.
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+        ReportsCommon reportCommon = null;
+        if (payloadInputPart != null) {
+        	reportCommon = (ReportsCommon) payloadInputPart.getBody();
+        }
+        Assert.assertNotNull(reportCommon);
+
+        // Update its content.
+        reportCommon.setName("updated-" + reportCommon.getName());
+        reportCommon.setOutputMIME("updated-" + reportCommon.getOutputMIME());
         if(logger.isDebugEnabled()){
             logger.debug("to be updated object");
-            logger.debug(objectAsXmlString(report, ReportsCommon.class));
+            logger.debug(objectAsXmlString(reportCommon, ReportsCommon.class));
         }
-        // Submit the request to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(report, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
-
+        
+        // Submit the updated common part in an update request to the service
+        // and store the response.
+        PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart = output.addPart(reportCommon, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getCommonPartName());
         res = client.update(knownResourceId, output);
-        int statusCode = res.getStatus();
+
         // Check the status code of the response: does it match the expected response(s)?
+        int statusCode = res.getStatus();
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": status = " + statusCode);
         }
@@ -354,15 +364,22 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
+        // Extract the updated common part from the response.
+        input = new PoxPayloadIn(res.getEntity());
+        payloadInputPart = input.getPart(client.getCommonPartName());
+        ReportsCommon updatedReportCommon = null;
+        if (payloadInputPart != null) {
+        	updatedReportCommon = (ReportsCommon) payloadInputPart.getBody();
+        }
+        Assert.assertNotNull(updatedReportCommon);
+        if(logger.isDebugEnabled()){
+            logger.debug("updated object");
+            logger.debug(objectAsXmlString(updatedReportCommon, ReportsCommon.class));
+        }
 
-        input = (MultipartInput) res.getEntity();
-        ReportsCommon updatedReport =
-                (ReportsCommon) extractPart(input,
-                        client.getCommonPartName(), ReportsCommon.class);
-        Assert.assertNotNull(updatedReport);
-
-        Assert.assertEquals(updatedReport.getName(),
-                report.getName(),
+        // Check selected fields in the updated common part.
+        Assert.assertEquals(updatedReportCommon.getName(),
+                reportCommon.getName(),
                 "Data in updated object did not match submitted data.");
 
     }
@@ -412,9 +429,8 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
         ReportClient client = new ReportClient();
-        MultipartOutput multipart = createReportInstance(NON_EXISTENT_ID);
-        ClientResponse<MultipartInput> res =
-                client.update(NON_EXISTENT_ID, multipart);
+        PoxPayloadOut multipart = createReportInstance(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -493,6 +509,7 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Utility tests : tests of code used in tests above
     // ---------------------------------------------------------------
+
     /**
      * Tests the code for manually submitting data that is used by several
      * of the methods above.
@@ -521,6 +538,13 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+
+
+    @Override
+    protected String getServiceName() {
+        return SERVICE_NAME;
+    }
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
      */
@@ -535,7 +559,7 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
      * @param identifier the identifier
      * @return the multipart output
      */
-    private MultipartOutput createReportInstance(String identifier) {
+    private PoxPayloadOut createReportInstance(String identifier) {
         return createReportInstance(
                 "name-" + identifier,
                 "persAuthTermCountsTest.jasper",
@@ -550,21 +574,23 @@ public class ReportServiceTest extends AbstractServiceTestImpl {
      * @param outputMIME the MIME type we will return for this report
      * @return the multipart output
      */
-    private MultipartOutput createReportInstance(String name,
+    private PoxPayloadOut createReportInstance(String name,
     		String filename,
     		String outputMIME) {
-        ReportsCommon report = new ReportsCommon();
-        report.setName(name);
-        report.setFilename(filename);
-        report.setOutputMIME(outputMIME);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart =
-            multipart.addPart(report, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new ReportClient().getCommonPartName());
+        ReportsCommon reportCommon = new ReportsCommon();
+        reportCommon.setName(name);
+        reportCommon.setFilename(filename);
+        reportCommon.setOutputMIME(outputMIME);
+
+        PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart =
+            multipart.addPart(reportCommon, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(new ReportClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, report common");
-            logger.debug(objectAsXmlString(report, ReportsCommon.class));
+            logger.debug(objectAsXmlString(reportCommon, ReportsCommon.class));
+            logger.debug(multipart.toXML());
         }
 
         return multipart;
