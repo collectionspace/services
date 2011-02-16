@@ -27,13 +27,10 @@
  */
 package org.collectionspace.services.client;
 
-
-
-
 import javax.ws.rs.core.MediaType;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.dimension.DimensionsCommon;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,21 +43,28 @@ public class DimensionFactory {
     static private final Logger logger =
             LoggerFactory.getLogger(DimensionFactory.class);
 
+    final static String SERVICE_PATH_COMPONENT = "dimensions";
+
     /**
      * Creates the dimension instance.
      *
-     * @param commpnPartName
+     * @param commonPartName
      * @param dimension
-     * @return the multipart output
+     * @return an output payload
      */
-    public static MultipartOutput createDimensionInstance(String commonPartName, 
+    public static PoxPayloadOut createDimensionInstance(String commonPartName,
             DimensionsCommon dimension) {
 
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart =
+        PoxPayloadOut multipart = new PoxPayloadOut(getServicePathComponent());
+        PayloadOutputPart commonPart =
                 multipart.addPart(dimension, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", commonPartName);
+        commonPart.setLabel(commonPartName);
 
         return multipart;
     }
+    
+    public static String getServicePathComponent() {
+        return SERVICE_PATH_COMPONENT;
+    }
+
 }

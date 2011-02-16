@@ -72,4 +72,10 @@ public class IdClient extends AbstractServiceClientImpl {
         return idProxy.createId(csid);
     }
 
+	@Override
+	public String getServiceName() {
+		// TODO Auto-generated method stub
+		return null; //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3497
+	}
+
 }

@@ -38,6 +38,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 //import org.collectionspace.services.dimension.DimensionsCommonList.*;
 
@@ -48,8 +50,6 @@ import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,8 +58,8 @@ import org.slf4j.LoggerFactory;
  * The Class DimensionResource.
  */
 @Path("/dimensions")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Consumes("application/xml")
+@Produces("application/xml")
 public class DimensionResource extends
 		AbstractMultiPartCollectionSpaceResourceImpl {
 
@@ -120,14 +120,15 @@ public class DimensionResource extends
     /**
      * Creates the dimension.
      * 
-     * @param input the input
+     * @param xmlText an XML payload
      * 
      * @return the response
      */
     @POST
-    public Response createDimension(MultipartInput input) {
+    public Response createDimension(String xmlText) {
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
+            PoxPayloadIn input = new PoxPayloadIn(xmlText);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             //dimensionObject.setCsid(csid);
@@ -154,7 +155,7 @@ public class DimensionResource extends
      */
     @GET
     @Path("{csid}")
-    public MultipartOutput getDimension(
+    public byte[] getDimension(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getDimension with csid=" + csid);
@@ -166,12 +167,12 @@ public class DimensionResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        MultipartOutput result = null;
+        PoxPayloadOut result = null;
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
-            result = (MultipartOutput) ctx.getOutput();
+            result = ctx.getOutput();
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getDimension", dnfe);
@@ -194,7 +195,7 @@ public class DimensionResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.getBytes();
     }
 
     /**
@@ -210,7 +211,7 @@ public class DimensionResource extends
         DimensionsCommonList dimensionObjectList = new DimensionsCommonList();
         MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             dimensionObjectList = (DimensionsCommonList) handler.getCommonPartList();
@@ -229,15 +230,14 @@ public class DimensionResource extends
      * Update dimension.
      * 
      * @param csid the csid
-     * @param theUpdate the the update
+     * @param xmlText an XML payload
      * 
      * @return the multipart output
      */
     @PUT
     @Path("{csid}")
-    public MultipartOutput updateDimension(
-            @PathParam("csid") String csid,
-            MultipartInput theUpdate) {
+    public byte[] updateDimension(
+            @PathParam("csid") String csid, String xmlText) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateDimension with csid=" + csid);
         }
@@ -248,15 +248,16 @@ public class DimensionResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        MultipartOutput result = null;
+        PoxPayloadOut result = null;
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
+            PoxPayloadIn update = new PoxPayloadIn(xmlText);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(update);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
-            result = (MultipartOutput) ctx.getOutput();
+            result = ctx.getOutput();
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
-                logger.debug("caugth exception in updateDimension", dnfe);
+                logger.debug("Caught exception in updateDimension", dnfe);
             }
             Response response = Response.status(Response.Status.NOT_FOUND).entity(
                     "Update failed on Dimension csid=" + csid).type(
@@ -267,7 +268,7 @@ public class DimensionResource extends
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.getBytes();
     }
 
     /**
@@ -292,7 +293,7 @@ public class DimensionResource extends
             throw new WebApplicationException(response);
         }
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (DocumentNotFoundException dnfe) {
