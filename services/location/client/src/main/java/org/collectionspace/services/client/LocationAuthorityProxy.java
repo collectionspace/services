@@ -17,40 +17,37 @@ import org.collectionspace.services.contact.ContactsCommonList;
 import org.collectionspace.services.location.LocationauthoritiesCommonList;
 import org.collectionspace.services.location.LocationsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 /**
  * @version $Revision:$
  */
-@Path("/locationauthorities/")
-@Produces({"multipart/mixed"})
-@Consumes({"multipart/mixed"})
+@Path(LocationAuthorityClient.SERVICE_PATH + "/")
+@Produces("application/xml")
+@Consumes("application/xml")
 public interface LocationAuthorityProxy extends CollectionSpaceProxy {
 
     // List Locationauthorities
     @GET
-    @Produces({"application/xml"})
     ClientResponse<LocationauthoritiesCommonList> readList();
 
     //(C)reate
     @POST
-    ClientResponse<Response> create(MultipartOutput multipart);
+    ClientResponse<Response> create(byte[] xmlPayload);
 
     //(R)ead
     @GET
     @Path("/{csid}")
-    ClientResponse<MultipartInput> read(@PathParam("csid") String csid);
+    ClientResponse<String> read(@PathParam("csid") String csid);
 
     //(R)ead by name
     @GET
     @Path("/urn:cspace:name({name})")
-    ClientResponse<MultipartInput> readByName(@PathParam("name") String name);
+    ClientResponse<String> readByName(@PathParam("name") String name);
 
     //(U)pdate
     @PUT
     @Path("/{csid}")
-    ClientResponse<MultipartInput> update(@PathParam("csid") String csid, MultipartOutput multipart);
+    ClientResponse<String> update(@PathParam("csid") String csid, byte[] xmlPayload);
 
     //(D)elete
     @DELETE
@@ -67,6 +64,8 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
             @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords);
 
     /**
+     * @param parentcsid
+     * @param itemcsid
      * @param csid
      * @return
      * @see org.collectionspace.services.client.IntakeProxy#getAuthorityRefs(java.lang.String)
@@ -90,17 +89,17 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
     //(C)reate Item
     @POST
     @Path("/{vcsid}/items/")
-    ClientResponse<Response> createItem(@PathParam("vcsid") String vcsid, MultipartOutput multipart);
+    ClientResponse<Response> createItem(@PathParam("vcsid") String vcsid, byte[] xmlPayload);
 
     //(R)ead Item
     @GET
     @Path("/{vcsid}/items/{csid}")
-    ClientResponse<MultipartInput> readItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
+    ClientResponse<String> readItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid);
 
     //(U)pdate Item
     @PUT
     @Path("/{vcsid}/items/{csid}")
-    ClientResponse<MultipartInput> updateItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid, MultipartOutput multipart);
+    ClientResponse<String> updateItem(@PathParam("vcsid") String vcsid, @PathParam("csid") String csid, byte[] xmlPayload);
 
     //(D)elete Item
     @DELETE
@@ -109,7 +108,6 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
 
      // List Contacts
     @GET
-    @Produces({"application/xml"})
     @Path("/{parentcsid}/items/{itemcsid}/contacts/")
     ClientResponse<ContactsCommonList> readContactList(
             @PathParam("parentcsid") String parentcsid,
@@ -121,12 +119,12 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
     ClientResponse<Response> createContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
-            MultipartOutput multipart);
+            byte[] xmlPayload);
 
      //(R)ead Contact
     @GET
     @Path("/{parentcsid}/items/{itemcsid}/contacts/{csid}")
-    ClientResponse<MultipartInput> readContact(
+    ClientResponse<String> readContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid);
@@ -134,11 +132,11 @@ public interface LocationAuthorityProxy extends CollectionSpaceProxy {
     //(U)pdate Contact
     @PUT
     @Path("/{parentcsid}/items/{itemcsid}/contacts/{csid}")
-    ClientResponse<MultipartInput> updateContact(
+    ClientResponse<String> updateContact(
             @PathParam("parentcsid") String parentcsid,
             @PathParam("itemcsid") String itemcsid,
             @PathParam("csid") String csid,
-            MultipartOutput multipart);
+            byte[] xmlPayload);
 
     //(D)elete Contact
     @DELETE
