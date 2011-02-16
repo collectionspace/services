@@ -33,8 +33,11 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.LoanoutClient;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 //import org.collectionspace.services.common.authorityref.AuthorityRefList.AuthorityRefItem;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -43,9 +46,6 @@ import org.collectionspace.services.loanout.LoansoutCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -66,6 +66,7 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     // Instance variables specific to this test.
+    final String SERVICE_NAME = "loansout";
     final String SERVICE_PATH_COMPONENT = "loansout";
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     private String knownResourceId = null;
@@ -122,7 +123,7 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
         // One or more fields in this resource will be PersonAuthority
         // references, and will refer to Person resources by their refNames.
         LoanoutClient loanoutClient = new LoanoutClient();
-        MultipartOutput multipart = createLoanoutInstance(
+        PoxPayloadOut multipart = createLoanoutInstance(
                 "loanOutNumber-" + identifier,
                 "returnDate-" + identifier,
                 borrowerRefName,
@@ -164,7 +165,7 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding
         // refName by which it can be identified.
-    	MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
+        PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
     	    PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
         int statusCode = res.getStatus();
@@ -205,8 +206,8 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
-    	MultipartOutput multipart = 
-    		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, 
+        PoxPayloadOut multipart =
+    		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
     				authRefName, personInfo, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         int statusCode = res.getStatus();
@@ -230,7 +231,7 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
 
         // Submit the request to the service and store the response.
         LoanoutClient loanoutClient = new LoanoutClient();
-        ClientResponse<MultipartInput> res = loanoutClient.read(knownResourceId);
+        ClientResponse<String> res = loanoutClient.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -242,18 +243,19 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
             invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
-        LoansoutCommon loanout = (LoansoutCommon) extractPart(input,
+        // Extract the common part from the response.
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        LoansoutCommon loanoutCommon = (LoansoutCommon) extractPart(input,
             loanoutClient.getCommonPartName(), LoansoutCommon.class);
-        Assert.assertNotNull(loanout);
+        Assert.assertNotNull(loanoutCommon);
         if(logger.isDebugEnabled()){
-            logger.debug(objectAsXmlString(loanout, LoansoutCommon.class));
+            logger.debug(objectAsXmlString(loanoutCommon, LoansoutCommon.class));
         }
         // Check a couple of fields
-        Assert.assertEquals(loanout.getBorrower(), borrowerRefName);
-        Assert.assertEquals(loanout.getBorrowersContact(), borrowersContactRefName);
-        Assert.assertEquals(loanout.getLendersAuthorizer(), lendersAuthorizerRefName);
-        Assert.assertEquals(loanout.getLendersContact(), lendersContactRefName);
+        Assert.assertEquals(loanoutCommon.getBorrower(), borrowerRefName);
+        Assert.assertEquals(loanoutCommon.getBorrowersContact(), borrowersContactRefName);
+        Assert.assertEquals(loanoutCommon.getLendersAuthorizer(), lendersAuthorizerRefName);
+        Assert.assertEquals(loanoutCommon.getLendersContact(), lendersContactRefName);
         
         // Get the auth refs and check them
         ClientResponse<AuthorityRefList> res2 =
@@ -343,32 +345,37 @@ public class LoanoutAuthRefsTest extends BaseServiceTest {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+    public String getServiceName() {
+        return SERVICE_NAME;
+    }
+
     @Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
     }
 
-   private MultipartOutput createLoanoutInstance(String loanoutNumber,
+   private PoxPayloadOut createLoanoutInstance(String loanoutNumber,
     		String returnDate,
                 String borrower,
                 String borrowersContact,
                 String lendersAuthorizer,
                 String lendersContact) {
-        LoansoutCommon loanout = new LoansoutCommon();
-        loanout.setLoanOutNumber(loanoutNumber);
-        loanout.setLoanReturnDate(returnDate);
-        loanout.setBorrower(borrower);
-        loanout.setBorrowersContact(borrowersContact);
-        loanout.setLendersAuthorizer(lendersAuthorizer);
-        loanout.setLendersContact(lendersContact);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart =
-            multipart.addPart(loanout, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new LoanoutClient().getCommonPartName());
+        LoansoutCommon loanoutCommon = new LoansoutCommon();
+        loanoutCommon.setLoanOutNumber(loanoutNumber);
+        loanoutCommon.setLoanReturnDate(returnDate);
+        loanoutCommon.setBorrower(borrower);
+        loanoutCommon.setBorrowersContact(borrowersContact);
+        loanoutCommon.setLendersAuthorizer(lendersAuthorizer);
+        loanoutCommon.setLendersContact(lendersContact);
+
+        PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart =
+            multipart.addPart(loanoutCommon, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(new LoanoutClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, loanout common");
-            logger.debug(objectAsXmlString(loanout, LoansoutCommon.class));
+            logger.debug(objectAsXmlString(loanoutCommon, LoansoutCommon.class));
         }
 
         return multipart;

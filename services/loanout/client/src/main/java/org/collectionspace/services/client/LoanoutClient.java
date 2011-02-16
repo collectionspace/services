@@ -16,19 +16,15 @@
  */
 package org.collectionspace.services.client;
 
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-//import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.loanout.LoansoutCommonList;
 
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
@@ -36,25 +32,21 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  *
  * $LastChangedRevision$
  * $LastChangedDate$
- *
  */
 public class LoanoutClient extends AbstractServiceClientImpl {
+	public static final String SERVICE_NAME = "loansout";
+	public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;	
+	public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
+	public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";	
+	public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    /* (non-Javadoc)
-     * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
-     */
-    public String getServicePathComponent() {
-        return "loansout";
-    }
-    /**
-     *
-     */
-//    private static final LoanoutClient instance = new LoanoutClient();
-    /**
-     *
-     */
     private LoanoutProxy loanoutProxy;
 
+	@Override
+	public String getServiceName() {
+		return SERVICE_NAME;
+	}
+    
     /**
      *
      * Default constructor for LoanoutClient class.
@@ -65,6 +57,14 @@ public class LoanoutClient extends AbstractServiceClientImpl {
         RegisterBuiltin.register(factory);
         setProxy();
     }
+    
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.AbstractServiceClientImpl#getServicePathComponent()
+     */
+    @Override
+    public String getServicePathComponent() {
+        return SERVICE_PATH_COMPONENT;
+    }
 
     @Override
     public CollectionSpaceProxy getProxy() {
@@ -74,6 +74,7 @@ public class LoanoutClient extends AbstractServiceClientImpl {
     /**
      * allow to reset proxy as per security needs
      */
+    @Override
     public void setProxy() {
         if (useAuth()) {
             loanoutProxy = ProxyFactory.create(LoanoutProxy.class,
@@ -83,15 +84,6 @@ public class LoanoutClient extends AbstractServiceClientImpl {
                     getBaseURL());
         }
     }
-
-    /**
-     * FIXME Comment this
-     *
-     * @return
-     */
-//    public static LoanoutClient getInstance() {
-//        return instance;
-//    }
 
     /**
      * @return
@@ -116,27 +108,27 @@ public class LoanoutClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.LoanoutProxy#getLoanout(java.lang.String)
      */
-    public ClientResponse<MultipartInput> read(String csid) {
+    public ClientResponse<String> read(String csid) {
         return loanoutProxy.read(csid);
     }
 
     /**
-     * @param loanout
+     * @param multipart
      * @return
      * @see org.collectionspace.services.client.LoanoutProxy#createLoanout(org.collectionspace.hello.Loanout)
      */
-    public ClientResponse<Response> create(MultipartOutput multipart) {
-        return loanoutProxy.create(multipart);
+    public ClientResponse<Response> create(PoxPayloadOut xmlPayload) {
+        return loanoutProxy.create(xmlPayload.getBytes());
     }
 
     /**
      * @param csid
-     * @param loanout
+     * @param multipart
      * @return
      * @see org.collectionspace.services.client.LoanoutProxy#updateLoanout(java.lang.Long, org.collectionspace.hello.Loanout)
      */
-    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
-        return loanoutProxy.update(csid, multipart);
+    public ClientResponse<String> update(String csid, PoxPayloadOut xmlPayload) {
+        return loanoutProxy.update(csid, xmlPayload.getBytes());
 
     }
 
@@ -145,6 +137,7 @@ public class LoanoutClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.LoanoutProxy#deleteLoanout(java.lang.Long)
      */
+    @Override
     public ClientResponse<Response> delete(String csid) {
         return loanoutProxy.delete(csid);
     }

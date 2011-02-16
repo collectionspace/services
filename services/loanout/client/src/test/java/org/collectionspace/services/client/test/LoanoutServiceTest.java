@@ -28,6 +28,10 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.LoanoutClient;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanout.LoanedObjectStatusGroup;
 import org.collectionspace.services.loanout.LoanedObjectStatusGroupList;
@@ -36,9 +40,6 @@ import org.collectionspace.services.loanout.LoansoutCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -57,10 +58,6 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
    /** The logger. */
     private final String CLASS_NAME = LoanoutServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-
-    // Instance variables specific to this test.
-    /** The service path component. */
-    final String SERVICE_PATH_COMPONENT = "loansout";
     
     /** The known resource id. */
     private String knownResourceId = null;
@@ -104,7 +101,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         LoanoutClient client = new LoanoutClient();
         String identifier = createIdentifier();
-        MultipartOutput multipart = createLoanoutInstance(identifier);
+        PoxPayloadOut multipart = createLoanoutInstance(identifier);
         ClientResponse<Response> res = client.create(multipart);
 
         int statusCode = res.getStatus();
@@ -284,7 +281,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         LoanoutClient client = new LoanoutClient();
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -296,12 +293,19 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
-        LoansoutCommon loanout = (LoansoutCommon) extractPart(input,
-                client.getCommonPartName(), LoansoutCommon.class);
-        Assert.assertNotNull(loanout);
-        Assert.assertNotNull(loanout.getLoanOutNumber());
-        LoanedObjectStatusGroupList statusGroupList = loanout.getLoanedObjectStatusGroupList();
+        // Get the common part of the response and verify that it is not null.
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+        LoansoutCommon loanoutCommon = null;
+        if (payloadInputPart != null) {
+        	loanoutCommon = (LoansoutCommon) payloadInputPart.getBody();
+        }
+        Assert.assertNotNull(loanoutCommon);
+
+        // Check selected fields in the common part.
+        Assert.assertNotNull(loanoutCommon.getLoanOutNumber());
+
+        LoanedObjectStatusGroupList statusGroupList = loanoutCommon.getLoanedObjectStatusGroupList();
         Assert.assertNotNull(statusGroupList);
         List<LoanedObjectStatusGroup> statusGroups = statusGroupList.getLoanedObjectStatusGroup();
         Assert.assertNotNull(statusGroups);
@@ -309,6 +313,15 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         LoanedObjectStatusGroup statusGroup = statusGroups.get(0);
         Assert.assertNotNull(statusGroup);
         Assert.assertNotNull(statusGroup.getLoanedObjectStatus());
+
+        // Check the values of fields containing Unicode UTF-8 (non-Latin-1) characters.
+        if(logger.isDebugEnabled()){
+            logger.debug("UTF-8 data sent=" + getUTF8DataFragment() + "\n"
+                    + "UTF-8 data received=" + loanoutCommon.getLoanOutNote());
+    }
+        Assert.assertEquals(loanoutCommon.getLoanOutNote(), getUTF8DataFragment(),
+                "UTF-8 data retrieved '" + loanoutCommon.getLoanOutNote()
+                + "' does not match expected data '" + getUTF8DataFragment());
     }
 
     // Failure outcomes
@@ -328,7 +341,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         LoanoutClient client = new LoanoutClient();
-        ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -415,8 +428,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         LoanoutClient client = new LoanoutClient();
-        ClientResponse<MultipartInput> res =
-                client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": read status = " + res.getStatus());
         }
@@ -425,19 +437,20 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         if(logger.isDebugEnabled()){
             logger.debug("got object to update with ID: " + knownResourceId);
         }
-        MultipartInput input = (MultipartInput) res.getEntity();
-        LoansoutCommon loanout = (LoansoutCommon) extractPart(input,
-                client.getCommonPartName(), LoansoutCommon.class);
-        Assert.assertNotNull(loanout);
+
+        // Extract the common part from the response.
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+        LoansoutCommon loanoutCommon = null;
+        if (payloadInputPart != null) {
+        	loanoutCommon = (LoansoutCommon) payloadInputPart.getBody();
+        }
+        Assert.assertNotNull(loanoutCommon);
 
         // Update the content of this resource.
-        loanout.setLoanOutNumber("updated-" + loanout.getLoanOutNumber());
-        loanout.setLoanReturnDate("updated-" + loanout.getLoanReturnDate());
-        if(logger.isDebugEnabled()){
-            logger.debug("to be updated object");
-            logger.debug(objectAsXmlString(loanout, LoansoutCommon.class));
-        }
-        LoanedObjectStatusGroupList statusGroupList = loanout.getLoanedObjectStatusGroupList();
+        loanoutCommon.setLoanOutNumber("updated-" + loanoutCommon.getLoanOutNumber());
+        loanoutCommon.setLoanReturnDate("updated-" + loanoutCommon.getLoanReturnDate());
+        LoanedObjectStatusGroupList statusGroupList = loanoutCommon.getLoanedObjectStatusGroupList();
         Assert.assertNotNull(statusGroupList);
         List<LoanedObjectStatusGroup> statusGroups = statusGroupList.getLoanedObjectStatusGroup();
         Assert.assertNotNull(statusGroups);
@@ -448,15 +461,19 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         Assert.assertNotNull(loanedObjectStatus);
         String updatedLoanedObjectStatus = "updated-" + loanedObjectStatus;
         statusGroups.get(0).setLoanedObjectStatus(updatedLoanedObjectStatus);
-        loanout.setLoanedObjectStatusGroupList(statusGroupList);
+        loanoutCommon.setLoanedObjectStatusGroupList(statusGroupList);
+        if(logger.isDebugEnabled()){
+            logger.debug("to be updated object");
+            logger.debug(objectAsXmlString(loanoutCommon, LoansoutCommon.class));
+        }
 
-        // Submit the request to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(loanout, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
-
+        // Submit the updated resource in an update request to the service and store the response.
+        PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart = output.addPart(loanoutCommon, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getCommonPartName());
         res = client.update(knownResourceId, output);
         int statusCode = res.getStatus();
+        
         // Check the status code of the response: does it match the expected response(s)?
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": status = " + statusCode);
@@ -465,27 +482,42 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
+        // Extract the updated common part from the response.
+        input = new PoxPayloadIn(res.getEntity());
+        payloadInputPart = input.getPart(client.getCommonPartName());
+        LoansoutCommon updatedLoanoutCommon = null;
+        if (payloadInputPart != null) {
+        	updatedLoanoutCommon = (LoansoutCommon) payloadInputPart.getBody();
+        }
+        Assert.assertNotNull(updatedLoanoutCommon);
 
-        input = (MultipartInput) res.getEntity();
-        LoansoutCommon updatedLoanout =
-                (LoansoutCommon) extractPart(input,
-                        client.getCommonPartName(), LoansoutCommon.class);
-        Assert.assertNotNull(updatedLoanout);
-
-        Assert.assertEquals(updatedLoanout.getLoanReturnDate(),
-                loanout.getLoanReturnDate(),
+        // Check selected fields in the updated resource.
+        Assert.assertEquals(updatedLoanoutCommon.getLoanReturnDate(),
+                loanoutCommon.getLoanReturnDate(),
                 "Data in updated object did not match submitted data.");
 
-        statusGroupList = updatedLoanout.getLoanedObjectStatusGroupList();
-        Assert.assertNotNull(statusGroupList);
-        statusGroups = statusGroupList.getLoanedObjectStatusGroup();
-        Assert.assertNotNull(statusGroups);
-        Assert.assertTrue(statusGroups.size() > 0);
-        Assert.assertNotNull(statusGroups.get(0));
+        LoanedObjectStatusGroupList updatedStatusGroupList =
+                updatedLoanoutCommon.getLoanedObjectStatusGroupList();
+        Assert.assertNotNull(updatedStatusGroupList);
+        List<LoanedObjectStatusGroup> updatedStatusGroups =
+                updatedStatusGroupList.getLoanedObjectStatusGroup();
+        Assert.assertNotNull(updatedStatusGroups);
+        Assert.assertTrue(updatedStatusGroups.size() > 0);
+        Assert.assertNotNull(updatedStatusGroups.get(0));
         Assert.assertEquals(updatedLoanedObjectStatus,
-                statusGroups.get(0).getLoanedObjectStatus(),
+                updatedStatusGroups.get(0).getLoanedObjectStatus(),
                 "Data in updated object did not match submitted data.");
 
+        if(logger.isDebugEnabled()){
+            logger.debug("UTF-8 data sent=" + loanoutCommon.getLoanOutNote() + "\n"
+                    + "UTF-8 data received=" + updatedLoanoutCommon.getLoanOutNote());
+    }
+        Assert.assertTrue(updatedLoanoutCommon.getLoanOutNote().contains(getUTF8DataFragment()),
+                "UTF-8 data retrieved '" + updatedLoanoutCommon.getLoanOutNote()
+                + "' does not contain expected data '" + getUTF8DataFragment());
+        Assert.assertEquals(updatedLoanoutCommon.getLoanOutNote(),
+                loanoutCommon.getLoanOutNote(),
+                "Data in updated object did not match submitted data.");
     }
 
     // Failure outcomes
@@ -622,9 +654,8 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
         LoanoutClient client = new LoanoutClient();
-        MultipartOutput multipart = createLoanoutInstance(NON_EXISTENT_ID);
-        ClientResponse<MultipartInput> res =
-                client.update(NON_EXISTENT_ID, multipart);
+        PoxPayloadOut multipart = createLoanoutInstance(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -736,7 +767,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      */
     @Override
     public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
+        return LoanoutClient.SERVICE_PATH_COMPONENT;
     }
 
     /**
@@ -745,7 +776,7 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @param identifier the identifier
      * @return the multipart output
      */
-    private MultipartOutput createLoanoutInstance(String identifier) {
+    private PoxPayloadOut createLoanoutInstance(String identifier) {
         return createLoanoutInstance(
                 "loanoutNumber-" + identifier,
                 "returnDate-" + identifier);
@@ -758,33 +789,42 @@ public class LoanoutServiceTest extends AbstractServiceTestImpl {
      * @param returnDate the return date
      * @return the multipart output
      */
-    private MultipartOutput createLoanoutInstance(String loanOutNumber,
+    private PoxPayloadOut createLoanoutInstance(String loanOutNumber,
     		String returnDate) {
-        LoansoutCommon loanout = new LoansoutCommon();
-        loanout.setLoanOutNumber(loanOutNumber);
-        loanout.setLoanReturnDate(returnDate);
-        loanout.setBorrower(
+        LoansoutCommon loanoutCommon = new LoansoutCommon();
+        loanoutCommon.setLoanOutNumber(loanOutNumber);
+        loanoutCommon.setLoanReturnDate(returnDate);
+        loanoutCommon.setBorrower(
            "urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'");
-        loanout.setBorrowersContact(
+        loanoutCommon.setBorrowersContact(
             "urn:cspace:org.collectionspace.demo:personauthority:name(TestPersonAuth):person:name(Chris Contact)'Chris Contact'");
-        loanout.setLoanPurpose("Allow people in cold climes to share the magic of Surfboards of the 1960s.");
+        loanoutCommon.setLoanPurpose("Allow people in cold climes to share the magic of Surfboards of the 1960s.");
         LoanedObjectStatusGroupList statusGroupList = new LoanedObjectStatusGroupList();
         List<LoanedObjectStatusGroup> statusGroups = statusGroupList.getLoanedObjectStatusGroup();
         LoanedObjectStatusGroup statusGroup = new LoanedObjectStatusGroup();
         statusGroup.setLoanedObjectStatus("returned");
         statusGroup.setLoanedObjectStatusNote("Left under the front mat.");
         statusGroups.add(statusGroup);
-        loanout.setLoanedObjectStatusGroupList(statusGroupList);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart =
-            multipart.addPart(loanout, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new LoanoutClient().getCommonPartName());
+        loanoutCommon.setLoanedObjectStatusGroupList(statusGroupList);
+
+        loanoutCommon.setLoanOutNote(getUTF8DataFragment());
+
+        PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart =
+            multipart.addPart(loanoutCommon, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(new LoanoutClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, loanout common");
-            logger.debug(objectAsXmlString(loanout, LoansoutCommon.class));
+            logger.debug(objectAsXmlString(loanoutCommon, LoansoutCommon.class));
+            // logger.debug(multipart.toXML());
         }
 
         return multipart;
     }
+
+	@Override
+	protected String getServiceName() {
+		return LoanoutClient.SERVICE_NAME;
+	}
 }
