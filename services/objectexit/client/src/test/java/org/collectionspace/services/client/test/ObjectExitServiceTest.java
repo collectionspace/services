@@ -27,14 +27,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.ContactClient;
 import org.collectionspace.services.client.ObjectExitClient;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.objectexit.ObjectexitCommon;
 
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -55,6 +57,16 @@ public class ObjectExitServiceTest extends AbstractServiceTestImpl {
     private String knownResourceId = null;
 
     @Override
+	public String getServicePathComponent() {
+		return ObjectExitClient.SERVICE_PATH_COMPONENT;
+	}
+
+	@Override
+	protected String getServiceName() {
+		return ObjectExitClient.SERVICE_NAME;
+	}
+    
+    @Override
     protected CollectionSpaceClient getClientInstance() {
         return new ObjectExitClient();
     }
@@ -70,7 +82,7 @@ public class ObjectExitServiceTest extends AbstractServiceTestImpl {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupCreate();
         ObjectExitClient client = new ObjectExitClient();
-        MultipartOutput multipart = createObjectExitInstance(createIdentifier());
+        PoxPayloadOut multipart = createObjectExitInstance(createIdentifier());
         ClientResponse<Response> res = client.create(multipart);
         assertStatusCode(res, testName);
         if (knownResourceId == null) {
@@ -95,9 +107,9 @@ public class ObjectExitServiceTest extends AbstractServiceTestImpl {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupRead();
         ObjectExitClient client = new ObjectExitClient();
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         assertStatusCode(res, testName);
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         ObjectexitCommon objectexit = (ObjectexitCommon) extractPart(input, client.getCommonPartName(), ObjectexitCommon.class);
         Assert.assertNotNull(objectexit);
     }
@@ -129,21 +141,21 @@ public class ObjectExitServiceTest extends AbstractServiceTestImpl {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupUpdate();
         ObjectExitClient client = new ObjectExitClient();
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         assertStatusCode(res, testName);
         logger.debug("got object to update with ID: " + knownResourceId);
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         ObjectexitCommon objectexit = (ObjectexitCommon) extractPart(input, client.getCommonPartName(), ObjectexitCommon.class);
         Assert.assertNotNull(objectexit);
 
         objectexit.setExitNumber("updated-" + objectexit.getExitNumber());
         logger.debug("Object to be updated:"+objectAsXmlString(objectexit, ObjectexitCommon.class));
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(objectexit, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
+        PoxPayloadOut output = new PoxPayloadOut(ObjectExitClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = output.addPart(objectexit, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getCommonPartName());
         res = client.update(knownResourceId, output);
         assertStatusCode(res, testName);
-        input = (MultipartInput) res.getEntity();
+        input = new PoxPayloadIn(res.getEntity());
         ObjectexitCommon updatedObjectExit = (ObjectexitCommon) extractPart(input, client.getCommonPartName(), ObjectexitCommon.class);
         Assert.assertNotNull(updatedObjectExit);
     }
@@ -157,8 +169,8 @@ public class ObjectExitServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
         ObjectExitClient client = new ObjectExitClient();
-        MultipartOutput multipart = createObjectExitInstance(NON_EXISTENT_ID);
-        ClientResponse<MultipartInput> res = client.update(NON_EXISTENT_ID, multipart);
+        PoxPayloadOut multipart = createObjectExitInstance(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
         assertStatusCode(res, testName);
     }
 
@@ -183,7 +195,7 @@ public class ObjectExitServiceTest extends AbstractServiceTestImpl {
         logger.debug(testBanner(testName, CLASS_NAME));
         setupReadNonExistent();
         ObjectExitClient client = new ObjectExitClient();
-        ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
         assertStatusCode(res, testName);
     }
 
@@ -242,20 +254,14 @@ public class ObjectExitServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
-
-    @Override
-    public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
-    }
-
-    private MultipartOutput createObjectExitInstance(String exitNumber) {
+    private PoxPayloadOut createObjectExitInstance(String exitNumber) {
         String identifier = "objectexitNumber-" + exitNumber;
         ObjectexitCommon objectexit = new ObjectexitCommon();
         objectexit.setExitNumber(identifier);
         objectexit.setDepositor("urn:cspace:org.collectionspace.demo:orgauthority:name(TestOrgAuth):organization:name(Northern Climes Museum)'Northern Climes Museum'");
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(objectexit, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new ObjectExitClient().getCommonPartName());
+        PoxPayloadOut multipart = new PoxPayloadOut(ObjectExitClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = multipart.addPart(objectexit, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(new ObjectExitClient().getCommonPartName());
 
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, objectexit common");

@@ -21,12 +21,17 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.objectexit.client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.objectexit.jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.collectionobject.jaxb</artifactId>
+            <artifactId>org.collectionspace.services.collectionobject.jaxb</artifactId> <!-- FIXME: REM - Is this really a required dependency? -->
             <version>${project.version}</version>
         </dependency>
         <!-- External dependencies -->        
