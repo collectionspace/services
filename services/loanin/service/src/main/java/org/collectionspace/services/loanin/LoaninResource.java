@@ -42,6 +42,8 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
@@ -63,8 +65,6 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
@@ -74,13 +74,13 @@ import org.slf4j.LoggerFactory;
  * The Class LoaninResource.
  */
 @Path("/loansin")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Consumes("application/xml")
+@Produces("application/xml")
 public class LoaninResource extends
 		AbstractMultiPartCollectionSpaceResourceImpl {
 
-    /** The Constant serviceName. */
-    private final static String serviceName = "loansin";
+    /** The Constant SERVICE_NAME. */
+    private final static String SERVICE_NAME = "loansin";
     
     /** The logger. */
     final Logger logger = LoggerFactory.getLogger(LoaninResource.class);
@@ -110,7 +110,7 @@ public class LoaninResource extends
      */
     @Override
     public String getServiceName() {
-        return serviceName;
+        return SERVICE_NAME;
     }
 
     /* (non-Javadoc)
@@ -144,9 +144,10 @@ public class LoaninResource extends
      * @return the response
      */
     @POST
-    public Response createLoanin(MultipartInput input) {
+    public Response createLoanin(String xmlText) {
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
+            PoxPayloadIn input = new PoxPayloadIn(xmlText);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             //loaninObject.setCsid(csid);
@@ -177,7 +178,7 @@ public class LoaninResource extends
      */
     @GET
     @Path("{csid}")
-    public MultipartOutput getLoanin(
+    public byte[] getLoanin(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getLoanin with csid=" + csid);
@@ -189,12 +190,12 @@ public class LoaninResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        MultipartOutput result = null;
+        PoxPayloadOut result = null;
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
-            result = (MultipartOutput) ctx.getOutput();
+            result = ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Get failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -221,7 +222,7 @@ public class LoaninResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.getBytes();
     }
 
     /**
@@ -233,7 +234,7 @@ public class LoaninResource extends
      * @return the loanin list
      */
     @GET
-    @Produces("application/xml")
+    @Produces({"application/xml"})
     public AbstractCommonList getLoaninList(@Context UriInfo ui,
     		@QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS_KW) String keywords) {
     	AbstractCommonList result = null;
@@ -255,7 +256,7 @@ public class LoaninResource extends
     private CommonList getLoaninList(MultivaluedMap<String, String> queryParams) {
         CommonList loaninObjectList;
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             loaninObjectList = (CommonList) handler.getCommonPartList();
@@ -284,18 +285,17 @@ public class LoaninResource extends
      */
     @GET
     @Path("{csid}/authorityrefs")
-    @Produces("application/xml")
     public AuthorityRefList getAuthorityRefs(
     		@PathParam("csid") String csid, 
     		@Context UriInfo ui) {
     	AuthorityRefList authRefList = null;
         try {
         	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentWrapper<DocumentModel> docWrapper = 
             	getRepositoryClient(ctx).getDoc(ctx, csid);
-            DocumentModelHandler<MultipartInput, MultipartOutput> handler 
-            	= (DocumentModelHandler<MultipartInput, MultipartOutput>)createDocumentHandler(ctx);
+            DocumentModelHandler<PoxPayloadIn, PoxPayloadOut> handler 
+            	= (DocumentModelHandler<PoxPayloadIn, PoxPayloadOut>)createDocumentHandler(ctx);
             List<String> authRefFields = 
             	((MultipartServiceContextImpl)ctx).getCommonPartPropertyValues(
             			ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
@@ -322,12 +322,14 @@ public class LoaninResource extends
      * 
      * @return the loanin list
      */
+    @Produces({"application/xml"})
     @Deprecated
     public CommonList getLoaninList(List<String> csidList) {
         CommonList loaninObjectList;
         try {
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             loaninObjectList = new CommonList();
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+//        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csidList, handler);
             loaninObjectList = (CommonList) handler.getCommonPartList();
@@ -356,9 +358,9 @@ public class LoaninResource extends
      */
     @PUT
     @Path("{csid}")
-    public MultipartOutput updateLoanin(
+    public byte[] updateLoanin(
             @PathParam("csid") String csid,
-            MultipartInput theUpdate) {
+            String xmlText) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateLoanin with csid=" + csid);
         }
@@ -369,12 +371,13 @@ public class LoaninResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        MultipartOutput result = null;
+        PoxPayloadOut result = null;
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
+            PoxPayloadIn update = new PoxPayloadIn(xmlText);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(update);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
-            result = (MultipartOutput) ctx.getOutput();
+            result = ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity("Update failed reason " + ue.getErrorReason()).type("text/plain").build();
@@ -392,7 +395,7 @@ public class LoaninResource extends
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.getBytes();
     }
 
     /**
@@ -417,7 +420,7 @@ public class LoaninResource extends
             throw new WebApplicationException(response);
         }
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
@@ -451,7 +454,7 @@ public class LoaninResource extends
     		String keywords) {
     	CommonList loansinObjectList;
         try {
-        	ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
 
             // perform a keyword search

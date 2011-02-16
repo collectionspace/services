@@ -29,6 +29,10 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.LoaninClient;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.loanin.LenderGroup;
 import org.collectionspace.services.loanin.LenderGroupList;
@@ -36,9 +40,6 @@ import org.collectionspace.services.loanin.LoansinCommon;
 //import org.collectionspace.services.loanin.LoansinCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 //import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -61,6 +62,7 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
 
     // Instance variables specific to this test.
     /** The service path component. */
+    final String SERVICE_NAME = "loansin";
     final String SERVICE_PATH_COMPONENT = "loansin";
     
     /** The known resource id. */
@@ -108,7 +110,7 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         LoaninClient client = new LoaninClient();
         String identifier = createIdentifier();
-        MultipartOutput multipart = createLoaninInstance(identifier);
+        PoxPayloadOut multipart = createLoaninInstance(identifier);
         String newID = null;
         ClientResponse<Response> res = client.create(multipart);
         try {
@@ -293,9 +295,9 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         setupRead();
 
         // Submit the request to the service and store the response.
-        MultipartInput input = null;
         LoaninClient client = new LoaninClient();
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
+        PoxPayloadIn input = null;
         try {
         	int statusCode = res.getStatus();
 
@@ -307,23 +309,36 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
 	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	
-	        input = res.getEntity();
+                input = new PoxPayloadIn(res.getEntity());
         } finally {
         	res.releaseConnection();
         }
-        
-        LoansinCommon loanin = (LoansinCommon) extractPart(input,
-                client.getCommonPartName(), LoansinCommon.class);
-        Assert.assertNotNull(loanin);
 
-        LenderGroupList lenderGroupList = loanin.getLenderGroupList();
+        // Get the common part of the response and verify that it is not null.
+        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+        LoansinCommon loaninCommon = null;
+        if (payloadInputPart != null) {
+        	loaninCommon = (LoansinCommon) payloadInputPart.getBody();
+        }
+        Assert.assertNotNull(loaninCommon);
+
+        // Check selected fields.
+        LenderGroupList lenderGroupList = loaninCommon.getLenderGroupList();
         Assert.assertNotNull(lenderGroupList);
         List<LenderGroup> lenderGroups = lenderGroupList.getLenderGroup();
         Assert.assertNotNull(lenderGroups);
         Assert.assertTrue(lenderGroups.size() > 0);
         String lender = lenderGroups.get(0).getLender();
         Assert.assertEquals(lender, LENDER_REF_NAME);
+
+        if(logger.isDebugEnabled()){
+            logger.debug("UTF-8 data sent=" + getUTF8DataFragment() + "\n"
+                    + "UTF-8 data received=" + loaninCommon.getLoanInNote());
+    }
+
+        Assert.assertEquals(loaninCommon.getLoanInNote(), getUTF8DataFragment(),
+                "UTF-8 data retrieved '" + loaninCommon.getLoanInNote()
+                + "' does not match expected data '" + getUTF8DataFragment());
 
     }
 
@@ -344,7 +359,7 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         LoaninClient client = new LoaninClient();
-        ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
         try {
 	        int statusCode = res.getStatus();
 	
@@ -435,10 +450,9 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         setupUpdate();
 
         // Retrieve the contents of a resource to update.
-        MultipartInput input = null;
         LoaninClient client = new LoaninClient();
-        ClientResponse<MultipartInput> res =
-            client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
+        PoxPayloadIn input = null;
         try {
 	        if(logger.isDebugEnabled()){
 	            logger.debug(testName + ": read status = " + res.getStatus());
@@ -448,27 +462,33 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
 	        if(logger.isDebugEnabled()){
 	            logger.debug("got object to update with ID: " + knownResourceId);
 	        }
-	        input = res.getEntity();
+                input = new PoxPayloadIn(res.getEntity());
         } finally {
         	res.releaseConnection();
         }
-        
-        LoansinCommon loanin = (LoansinCommon) extractPart(input,
-                client.getCommonPartName(), LoansinCommon.class);
-        Assert.assertNotNull(loanin);
+
+        // Extract the common part from the response.
+        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+        LoansinCommon loaninCommon = null;
+        if (payloadInputPart != null) {
+        	loaninCommon = (LoansinCommon) payloadInputPart.getBody();
+        }
+        Assert.assertNotNull(loaninCommon);
 
         // Update the content of this resource.
-        loanin.setLoanInNumber("updated-" + loanin.getLoanInNumber());
-        loanin.setLoanReturnDate("updated-" + loanin.getLoanReturnDate());
+        loaninCommon.setLoanInNumber("updated-" + loaninCommon.getLoanInNumber());
+        loaninCommon.setLoanReturnDate("updated-" + loaninCommon.getLoanReturnDate());
+        loaninCommon.setLoanInNote("updated-" + loaninCommon.getLoanInNote());
         if(logger.isDebugEnabled()){
             logger.debug("to be updated object");
-            logger.debug(objectAsXmlString(loanin, LoansinCommon.class));
+            logger.debug(objectAsXmlString(loaninCommon, LoansinCommon.class));
         }
-        // Submit the request to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(loanin, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
 
+        // Submit the updated common part in an update request to the service
+        // and store the response.
+        PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart = output.addPart(loaninCommon, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getCommonPartName());
         res = client.update(knownResourceId, output);
         try {
 	        int statusCode = res.getStatus();
@@ -479,20 +499,33 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
 	        Assert.assertTrue(REQUEST_TYPE.isValidStatusCode(statusCode),
 	                invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
 	        Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
-	
-	
-	        input = (MultipartInput) res.getEntity();
+                input = new PoxPayloadIn(res.getEntity());
         } finally {
         	res.releaseConnection();
         }
-        
-        LoansinCommon updatedLoanin =
-                (LoansinCommon) extractPart(input,
-                        client.getCommonPartName(), LoansinCommon.class);
-        Assert.assertNotNull(updatedLoanin);
 
-        Assert.assertEquals(updatedLoanin.getLoanReturnDate(),
-                loanin.getLoanReturnDate(),
+        // Extract the updated common part from the response.
+        payloadInputPart = input.getPart(client.getCommonPartName());
+        LoansinCommon updatedLoaninCommon = null;
+        if (payloadInputPart != null) {
+        	updatedLoaninCommon = (LoansinCommon) payloadInputPart.getBody();
+        }
+        Assert.assertNotNull(updatedLoaninCommon);
+
+        // Check selected fields in the updated common part.
+        Assert.assertEquals(updatedLoaninCommon.getLoanReturnDate(),
+                loaninCommon.getLoanReturnDate(),
+                "Data in updated object did not match submitted data.");
+
+        if(logger.isDebugEnabled()){
+            logger.debug("UTF-8 data sent=" + loaninCommon.getLoanInNote() + "\n"
+                    + "UTF-8 data received=" + updatedLoaninCommon.getLoanInNote());
+    }
+        Assert.assertTrue(updatedLoaninCommon.getLoanInNote().contains(getUTF8DataFragment()),
+                "UTF-8 data retrieved '" + updatedLoaninCommon.getLoanInNote()
+                + "' does not contain expected data '" + getUTF8DataFragment());
+        Assert.assertEquals(updatedLoaninCommon.getLoanInNote(),
+                loaninCommon.getLoanInNote(),
                 "Data in updated object did not match submitted data.");
     }
 
@@ -630,9 +663,8 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
         LoaninClient client = new LoaninClient();
-        MultipartOutput multipart = createLoaninInstance(NON_EXISTENT_ID);
-        ClientResponse<MultipartInput> res =
-                client.update(NON_EXISTENT_ID, multipart);
+        PoxPayloadOut multipart = createLoaninInstance(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
         try {
         	int statusCode = res.getStatus();
 
@@ -751,6 +783,12 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+
+    @Override
+    public String getServiceName() {
+        return SERVICE_NAME;
+    }
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
      */
@@ -765,7 +803,7 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
      * @param identifier the identifier
      * @return the multipart output
      */
-    private MultipartOutput createLoaninInstance(String identifier) {
+    private PoxPayloadOut createLoaninInstance(String identifier) {
         return createLoaninInstance(
                 "loaninNumber-" + identifier,
                 "returnDate-" + identifier);
@@ -778,25 +816,28 @@ public class LoaninServiceTest extends AbstractServiceTestImpl {
      * @param returnDate the return date
      * @return the multipart output
      */
-    private MultipartOutput createLoaninInstance(String loaninNumber,
+    private PoxPayloadOut createLoaninInstance(String loaninNumber,
     		String returnDate) {
-        LoansinCommon loanin = new LoansinCommon();
-        loanin.setLoanInNumber(loaninNumber);
-        loanin.setLoanReturnDate(returnDate);
+
+        LoansinCommon loaninCommon = new LoansinCommon();
+        loaninCommon.setLoanInNumber(loaninNumber);
+        loaninCommon.setLoanReturnDate(returnDate);
         LenderGroupList lenderGroupList = new LenderGroupList();
         LenderGroup lenderGroup = new LenderGroup();
         lenderGroup.setLender(LENDER_REF_NAME);
         lenderGroupList.getLenderGroup().add(lenderGroup);
-        loanin.setLenderGroupList(lenderGroupList);
-        loanin.setLoanPurpose("For Surfboards of the 1960s exhibition.");
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart =
-            multipart.addPart(loanin, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new LoaninClient().getCommonPartName());
+        loaninCommon.setLenderGroupList(lenderGroupList);
+        loaninCommon.setLoanPurpose("For Surfboards of the 1960s exhibition.");
+        loaninCommon.setLoanInNote(getUTF8DataFragment());
+
+        PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart =
+            multipart.addPart(loaninCommon, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(new LoaninClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, loanin common");
-            logger.debug(objectAsXmlString(loanin, LoansinCommon.class));
+            logger.debug(objectAsXmlString(loaninCommon, LoansinCommon.class));
         }
 
         return multipart;
