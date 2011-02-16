@@ -49,13 +49,13 @@ import javax.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.collectionspace.services.common.FileUtils;
+//import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.authorization.PermissionResource;
 import org.collectionspace.services.authorization.RoleResource;
 import org.collectionspace.services.common.security.SecurityInterceptor;
-import org.collectionspace.services.common.document.DocumentUtils;
-import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
-import org.collectionspace.services.common.profile.Profiler;
+//import org.collectionspace.services.common.document.DocumentUtils;
+//import org.collectionspace.services.common.imaging.nuxeo.NuxeoImageUtils;
+//import org.collectionspace.services.common.profile.Profiler;
 
 /**
  * CollectionSpaceJaxRsApplication, the root application
@@ -79,25 +79,24 @@ public class CollectionSpaceJaxRsApplication extends Application {
         singletons.add(new RoleResource());
         singletons.add(new PermissionResource());
         singletons.add(new CollectionObjectResource());
-        singletons.add(new IDResource());
-        singletons.add(new NoteResource());
         singletons.add(new IntakeResource());
+        singletons.add(new VocabularyResource());
+        singletons.add(new DimensionResource());
+        singletons.add(new ContactResource());
+        singletons.add(new PersonAuthorityResource());
+        singletons.add(new OrgAuthorityResource());
+        singletons.add(new NewRelationResource());
+        singletons.add(new NoteResource());
         singletons.add(new LoaninResource());
         singletons.add(new LoanoutResource());
+        singletons.add(new AcquisitionResource());
         singletons.add(new ObjectExitResource());
-        singletons.add(new LocationAuthorityResource());
         singletons.add(new MediaResource());
         singletons.add(new BlobResource());
         singletons.add(new MovementResource());
         singletons.add(new ReportResource());
-        singletons.add(new AcquisitionResource());
-        singletons.add(new NewRelationResource());
-        singletons.add(new VocabularyResource());
-        singletons.add(new OrgAuthorityResource());
-        singletons.add(new PersonAuthorityResource());
-        singletons.add(new DimensionResource());
-        singletons.add(new ContactResource());
-
+        singletons.add(new LocationAuthorityResource());
+        singletons.add(new IDResource());
 //        singletons.add(new QueryResource());
 //        singletons.add(new DomainIdentifierResource());
 //        singletons.add(new PingResource());
