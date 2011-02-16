@@ -24,21 +24,23 @@ package org.collectionspace.services.client.test;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.NoteClient;
 import org.collectionspace.services.client.NoteClientUtils;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.note.NotesCommon;
 import org.collectionspace.services.note.NotesCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import org.jboss.resteasy.client.ClientResponse;
+import org.dom4j.DocumentException;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -58,8 +60,10 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
     private final String CLASS_NAME = NoteServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
+    private final String SERVICE_PATH_COMPONENT = "notes";
+    private final String SERVICE_NAME = "notes";
+
     // Instance variables specific to this test.
-    final String SERVICE_PATH_COMPONENT = "notes";
     private String knownResourceId = null;
 
     /* (non-Javadoc)
@@ -98,7 +102,7 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         NoteClient client = new NoteClient();
         String identifier = createIdentifier();
-        MultipartOutput multipart =
+        PoxPayloadOut multipart =
             NoteClientUtils.createNoteInstance("owner"+identifier, identifier, 
 								client.getCommonPartName());
         ClientResponse<Response> res = client.create(multipart);
@@ -177,7 +181,7 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         NoteClient client = new NoteClient();
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -189,10 +193,14 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
-        NotesCommon note = (NotesCommon) extractPart(input,
-                client.getCommonPartName(), NotesCommon.class);
-        Assert.assertNotNull(note);
+        // Get the common part of the response and verify that it is not null.
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+        NotesCommon noteCommon = null;
+        if (payloadInputPart != null) {
+        	noteCommon = (NotesCommon) payloadInputPart.getBody();
+    }
+        Assert.assertNotNull(noteCommon);
     }
 
     // Failure outcomes
@@ -209,7 +217,7 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         NoteClient client = new NoteClient();
-        ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -290,36 +298,41 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         NoteClient client = new NoteClient();
-        ClientResponse<MultipartInput> res =
-                client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": read status = " + res.getStatus());
         }
         Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
         if(logger.isDebugEnabled()){
             logger.debug("got object to update with ID: " + knownResourceId);
         }
-        MultipartInput input = (MultipartInput) res.getEntity();
-        NotesCommon note = (NotesCommon) extractPart(input,
-                client.getCommonPartName(), NotesCommon.class);
-        Assert.assertNotNull(note);
 
-        // Update the content of this resource, both the subitem, and the content
-        note.setContent("updated-" + note.getContent());
-        note.setOrder(note.getOrder()+10);
+        // Get the common part of the response and verify that it is not null.
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+        NotesCommon noteCommon = null;
+        if (payloadInputPart != null) {
+        	noteCommon = (NotesCommon) payloadInputPart.getBody();
+        }
+        Assert.assertNotNull(noteCommon);
+
+        // Update the common part, both the subitem, and the content
+        noteCommon.setContent("updated-" + noteCommon.getContent());
+        noteCommon.setOrder(noteCommon.getOrder()+10);
         if(logger.isDebugEnabled()){
             logger.debug("to be updated object");
-            logger.debug(objectAsXmlString(note, NotesCommon.class));
+            logger.debug(objectAsXmlString(noteCommon, NotesCommon.class));
         }
-        // Submit the request to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(note, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
 
+        // Submit the common part in an update request to the service
+        // and store the response.
+        PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart = output.addPart(noteCommon, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getCommonPartName());
         res = client.update(knownResourceId, output);
-        int statusCode = res.getStatus();
+
         // Check the status code of the response: does it match the expected response(s)?
+        int statusCode = res.getStatus();
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": status = " + statusCode);
         }
@@ -327,16 +340,18 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
+        // Extract the updated common part from the response.
+        payloadInputPart = input.getPart(client.getCommonPartName());
+        NotesCommon updatedNoteCommon = null;
+        if (payloadInputPart != null) {
+        	updatedNoteCommon = (NotesCommon) payloadInputPart.getBody();
+        }
+        Assert.assertNotNull(updatedNoteCommon);
 
-        input = (MultipartInput) res.getEntity();
-        NotesCommon updatedNote =
-                (NotesCommon) extractPart(input,
-                        client.getCommonPartName(), NotesCommon.class);
-        Assert.assertNotNull(updatedNote);
-
-        Assert.assertEquals(updatedNote.getContent(), note.getContent(),
+        // Check selected fields in the updated common part.
+        Assert.assertEquals(updatedNoteCommon.getContent(), noteCommon.getContent(),
                 "Data in updated object did not match submitted data.");
-        Assert.assertEquals(updatedNote.getOrder(), note.getOrder(),
+        Assert.assertEquals(updatedNoteCommon.getOrder(), noteCommon.getOrder(),
                 "Data in updated object (subitem) did not match submitted data.");
     }
 
@@ -377,10 +392,10 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
         NoteClient client = new NoteClient();
-        MultipartOutput multipart =
-                NoteClientUtils.createNoteInstance(NON_EXISTENT_ID, NON_EXISTENT_ID, client.getCommonPartName());
-        ClientResponse<MultipartInput> res =
-                client.update(NON_EXISTENT_ID, multipart);
+        PoxPayloadOut multipart =
+                NoteClientUtils.createNoteInstance(
+                        NON_EXISTENT_ID, NON_EXISTENT_ID, client.getCommonPartName());
+        ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -453,6 +468,12 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Utility tests : tests of code used in tests above
     // ---------------------------------------------------------------
+
+    @Override
+    public String getServiceName() {
+        return SERVICE_NAME;
+    }
+
     /**
      * Tests the code for manually submitting data that is used by several
      * of the methods above.
@@ -485,4 +506,5 @@ public class NoteServiceTest extends AbstractServiceTestImpl {
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
     }
+
 }

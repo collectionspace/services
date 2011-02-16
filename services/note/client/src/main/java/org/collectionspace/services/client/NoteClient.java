@@ -24,8 +24,6 @@ import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClientExecutor;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 /**
@@ -37,22 +35,9 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
  
 public class NoteClient extends AbstractServiceClientImpl {
 
-	/* (non-Javadoc)
-	 * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
-	 */
-	public String getServicePathComponent() {
-		return "notes";
-	}
-
-	/**
-     *
-     */
-//    private static final NoteClient instance = new NoteClient();
-    
-    /**
-     *
-     */
     private NoteProxy noteProxy;
+    public static final String SERVICE_NAME = "notes";
+    public static final String SERVICE_PATH_COMPONENT = "notes";
 
     /**
      *
@@ -63,6 +48,19 @@ public class NoteClient extends AbstractServiceClientImpl {
         ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
         RegisterBuiltin.register(factory);
         setProxy();
+    }
+
+    @Override
+    public String getServiceName() {
+            return SERVICE_NAME;
+    }
+
+    /* (non-Javadoc)
+     * @see org.collectionspace.services.client.BaseServiceClient#getServicePathComponent()
+     */
+    @Override
+    public String getServicePathComponent() {
+            return SERVICE_PATH_COMPONENT;
     }
 
     @Override
@@ -84,15 +82,6 @@ public class NoteClient extends AbstractServiceClientImpl {
     }
 
     /**
-     * FIXME Comment this
-     *
-     * @return
-     */
-//    public static NoteClient getInstance() {
-//        return instance;
-//    }
-
-    /**
      * @return
      * @see org.collectionspace.services.client.Note#getNote()
      */
@@ -106,27 +95,30 @@ public class NoteClient extends AbstractServiceClientImpl {
      * @see org.collectionspace.services.client.Note#getNote(java.lang.String)
      */
 
-    public ClientResponse<MultipartInput> read(String csid) {
+    public ClientResponse<String> read(String csid) {
         return noteProxy.read(csid);
     }
 
     /**
+     * @param multipart
      * @param note
      * @return
      * @see org.collectionspace.services.client.Note#createNote(org.collectionspace.services.Note)
      */
-    public ClientResponse<Response> create(MultipartOutput multipart) {
-        return noteProxy.create(multipart);
+    public ClientResponse<Response> create(PoxPayloadOut multipart) {
+        String payload = multipart.toXML();
+        return noteProxy.create(payload);
     }
 
     /**
      * @param csid
-     * @param note
+     * @param multipart
      * @return
      * @see org.collectionspace.services.client.Note#updateNote(java.lang.Long, org.collectionspace.services.Note)
      */
-    public ClientResponse<MultipartInput> update(String csid, MultipartOutput multipart) {
-        return noteProxy.update(csid, multipart);
+    public ClientResponse<String> update(String csid, PoxPayloadOut multipart) {
+        String payload = multipart.toXML();
+        return noteProxy.update(csid, payload);
 
     }
 
@@ -135,6 +127,7 @@ public class NoteClient extends AbstractServiceClientImpl {
      * @return
      * @see org.collectionspace.services.client.Note#deleteNote(java.lang.Long)
      */
+    @Override
     public ClientResponse<Response> delete(String csid) {
         return noteProxy.delete(csid);
     }

@@ -38,6 +38,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
@@ -45,9 +47,6 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentHandler;
 
-
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,8 +55,8 @@ import org.slf4j.LoggerFactory;
  * The Class NoteResource.
  */
 @Path("/notes")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Consumes("application/xml")
+@Produces("application/xml;charset=UTF-8")
 public class NoteResource extends 
 		AbstractMultiPartCollectionSpaceResourceImpl {
 
@@ -112,9 +111,10 @@ public class NoteResource extends
 		 * @return the response
 		 */
 		@POST
-    public Response createNote(MultipartInput input) {
+    public Response createNote(String xmlText) {
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
+            PoxPayloadIn input = new PoxPayloadIn(xmlText);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             UriBuilder path = UriBuilder.fromResource(NoteResource.class);
@@ -140,7 +140,7 @@ public class NoteResource extends
      */
     @GET
     @Path("{csid}")
-    public MultipartOutput getNote(
+    public String getNote(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getNote with csid=" + csid);
@@ -152,12 +152,12 @@ public class NoteResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        MultipartOutput result = null;
+        PoxPayloadOut result = null;
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
-            result = (MultipartOutput) ctx.getOutput();
+            result = ctx.getOutput();
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("getNote", dnfe);
@@ -180,7 +180,7 @@ public class NoteResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.toXML();
     }
 
     /**
@@ -196,7 +196,7 @@ public class NoteResource extends
     	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
         NotesCommonList noteObjectList = new NotesCommonList();
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             noteObjectList = (NotesCommonList) handler.getCommonPartList();
@@ -221,9 +221,9 @@ public class NoteResource extends
      */
     @PUT
     @Path("{csid}")
-    public MultipartOutput updateNote(
+    public String updateNote(
             @PathParam("csid") String csid,
-            MultipartInput theUpdate) {
+            String xmlText) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateNote with csid=" + csid);
         }
@@ -234,12 +234,13 @@ public class NoteResource extends
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        MultipartOutput result = null;
+        PoxPayloadOut result = null;
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
+            PoxPayloadIn update = new PoxPayloadIn(xmlText);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(update);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
-            result = (MultipartOutput) ctx.getOutput();
+            result = ctx.getOutput();
         } catch (DocumentNotFoundException dnfe) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Caught exception in updateNote", dnfe);
@@ -253,7 +254,7 @@ public class NoteResource extends
                     Response.Status.INTERNAL_SERVER_ERROR).entity("Update failed").type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.toXML();
     }
 
     /**
@@ -278,7 +279,7 @@ public class NoteResource extends
             throw new WebApplicationException(response);
         }
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (DocumentNotFoundException dnfe) {

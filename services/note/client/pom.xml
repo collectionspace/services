@@ -34,7 +34,20 @@
             <artifactId>org.collectionspace.services.client</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.common</artifactId>
+            <optional>true</optional>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- External dependencies -->
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.6.1</version>
+            <scope>provided</scope>
+        </dependency>        
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
