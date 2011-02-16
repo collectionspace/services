@@ -43,8 +43,6 @@ import org.collectionspace.services.organization.OrgauthoritiesCommonList;
 import org.collectionspace.services.organization.OrganizationsCommon;
 import org.collectionspace.services.organization.OrganizationsCommonList;
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
@@ -92,7 +90,7 @@ public class Sample {
     	logger.info("Import: Create orgAuthority: \"" + orgAuthName +"\"");
     	String baseOrgAuthRefName = createOrgAuthRefName(orgAuthName);
     	String fullOrgAuthRefName = baseOrgAuthRefName+"'"+orgAuthName+"'";
-    	MultipartOutput multipart = 
+    	PoxPayloadOut multipart = 
     		OrgAuthorityClientUtils.createOrgAuthorityInstance(
 				orgAuthName, fullOrgAuthRefName, 
 				client.getCommonPartName());
@@ -135,7 +133,7 @@ public class Sample {
 
     	logger.info("Import: Create Item: \""+shortName+
     			"\" in orgAuthority: \"" + orgAuthorityRefName +"\"");
-        MultipartOutput multipart = 
+        PoxPayloadOut multipart = 
         	OrgAuthorityClientUtils.createOrganizationInstance( vcsid, 
 				refName, orgInfo, client.getItemCommonPartName() );
 
@@ -207,7 +205,7 @@ public class Sample {
         // Submit the request to the service and store the response.
         OrgauthoritiesCommon orgAuthority = null;
         try {
-            ClientResponse<MultipartInput> res = client.read(orgAuthId);
+            ClientResponse<PoxPayloadIn> res = client.read(orgAuthId);
             int statusCode = res.getStatus();
             if(!REQUEST_TYPE.isValidStatusCode(statusCode)) {
                 throw new RuntimeException("Could not read orgAuthority"
@@ -217,7 +215,7 @@ public class Sample {
                 throw new RuntimeException("Unexpected Status when reading " +
                     "orgAuthority, Status:"+ statusCode);
             }
-            MultipartInput input = (MultipartInput) res.getEntity();
+            PoxPayloadIn input = (PoxPayloadIn) res.getEntity();
             orgAuthority = (OrgauthoritiesCommon) extractPart(input,
                     client.getCommonPartName(), OrgauthoritiesCommon.class);
         } catch (Exception e) {
@@ -377,7 +375,7 @@ public class Sample {
         return sb.toString();
     }
 
-    private Object extractPart(MultipartInput input, String label,
+    private Object extractPart(PoxPayloadIn input, String label,
         Class clazz) throws Exception {
         Object obj = null;
         for(InputPart part : input.getParts()){
