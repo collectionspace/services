@@ -41,9 +41,10 @@ import org.collectionspace.services.movement.MovementMethodsList;
 
 import org.jboss.resteasy.client.ClientResponse;
 
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -63,13 +64,11 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
     private final String CLASS_NAME = MovementServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
-    // Instance variables specific to this test.
-    /** The service path component. */
+    final String SERVICE_NAME = "movements";
     final String SERVICE_PATH_COMPONENT = "movements";
-    
-    /** The known resource id. */
-    private String knownResourceId = null;
 
+    // Instance variables specific to this test.
+    private String knownResourceId = null;
     private final static String TIMESTAMP_UTC = GregorianCalendarDateTimeUtils.timestampUTC();
     
     /* (non-Javadoc)
@@ -111,7 +110,7 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
         String identifier = createIdentifier();
-        MultipartOutput multipart = createMovementInstance(identifier);
+        PoxPayloadOut multipart = createMovementInstance(identifier);
         ClientResponse<Response> res = client.create(multipart);
 
         int statusCode = res.getStatus();
@@ -291,7 +290,7 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
-        ClientResponse<MultipartInput> res = client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -303,19 +302,35 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        MultipartInput input = (MultipartInput) res.getEntity();
-        MovementsCommon movement = (MovementsCommon) extractPart(input,
-                client.getCommonPartName(), MovementsCommon.class);
-        Assert.assertNotNull(movement);
+        // Get the common part of the response and verify that it is not null.
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+        MovementsCommon movementCommon = null;
+        if (payloadInputPart != null) {
+        	movementCommon = (MovementsCommon) payloadInputPart.getBody();
+        }
+        Assert.assertNotNull(movementCommon);
 
-        // Check the values of one or more date/time fields
+        // Check selected fields.
+
+        // Check the values of one or more date/time fields.
         if (logger.isDebugEnabled()) {
-            logger.debug("locationDate=" + movement.getLocationDate());
+            logger.debug("locationDate=" + movementCommon.getLocationDate());
             logger.debug("TIMESTAMP_UTC=" + TIMESTAMP_UTC);
         }
-        Assert.assertTrue(movement.getLocationDate().equals(TIMESTAMP_UTC));
-        Assert.assertTrue(movement.getPlannedRemovalDate().equals(TIMESTAMP_UTC));
-        Assert.assertNull(movement.getRemovalDate());
+        Assert.assertTrue(movementCommon.getLocationDate().equals(TIMESTAMP_UTC));
+        Assert.assertTrue(movementCommon.getPlannedRemovalDate().equals(TIMESTAMP_UTC));
+        Assert.assertNull(movementCommon.getRemovalDate());
+        
+        // Check the values of fields containing Unicode UTF-8 (non-Latin-1) characters.
+       if(logger.isDebugEnabled()){
+            logger.debug("UTF-8 data sent=" + getUTF8DataFragment() + "\n"
+                    + "UTF-8 data received=" + movementCommon.getMovementNote());
+    }
+        Assert.assertEquals(movementCommon.getMovementNote(), getUTF8DataFragment(),
+                "UTF-8 data retrieved '" + movementCommon.getMovementNote()
+                + "' does not match expected data '" + getUTF8DataFragment());
+
     }
 
     // Failure outcomes
@@ -335,7 +350,7 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
 
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
-        ClientResponse<MultipartInput> res = client.read(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.read(NON_EXISTENT_ID);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -424,43 +439,46 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
 
         // Retrieve the contents of a resource to update.
         MovementClient client = new MovementClient();
-        ClientResponse<MultipartInput> res =
-                client.read(knownResourceId);
+        ClientResponse<String> res = client.read(knownResourceId);
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": read status = " + res.getStatus());
         }
         Assert.assertEquals(res.getStatus(), EXPECTED_STATUS_CODE);
-
         if(logger.isDebugEnabled()){
             logger.debug("got object to update with ID: " + knownResourceId);
         }
-        MultipartInput input = (MultipartInput) res.getEntity();
-        MovementsCommon movement = (MovementsCommon) extractPart(input,
-                client.getCommonPartName(), MovementsCommon.class);
-        Assert.assertNotNull(movement);
 
-        // Update the content of this resource.
-        movement.setMovementReferenceNumber("updated-" + movement.getMovementReferenceNumber());
-        movement.setMovementNote("updated movement note-" + movement.getMovementNote());
-        movement.setNormalLocation(""); // Test deletion of existing string value
+        // Extract the common part from the response.
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+        MovementsCommon movementCommon = null;
+        if (payloadInputPart != null) {
+        	movementCommon = (MovementsCommon) payloadInputPart.getBody();
+        }
+        Assert.assertNotNull(movementCommon);
+
+        // Update its content.
+        movementCommon.setMovementReferenceNumber("updated-" + movementCommon.getMovementReferenceNumber());
+        movementCommon.setMovementNote("updated movement note-" + movementCommon.getMovementNote());
+        movementCommon.setNormalLocation(""); // Test deletion of existing string value
 
         String currentTimestamp = GregorianCalendarDateTimeUtils.timestampUTC();
-        movement.setPlannedRemovalDate(""); // Test deletion of existing date or date/time value
-        movement.setRemovalDate(currentTimestamp);
+        movementCommon.setPlannedRemovalDate(""); // Test deletion of existing date or date/time value
+        movementCommon.setRemovalDate(currentTimestamp);
 
         if(logger.isDebugEnabled()){
             logger.debug("to be updated object");
-            logger.debug(objectAsXmlString(movement, MovementsCommon.class));
+            logger.debug(objectAsXmlString(movementCommon, MovementsCommon.class));
         }
 
         // Submit the request to the service and store the response.
-        MultipartOutput output = new MultipartOutput();
-        OutputPart commonPart = output.addPart(movement, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", client.getCommonPartName());
-
+        PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart = output.addPart(movementCommon, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(client.getCommonPartName());
         res = client.update(knownResourceId, output);
-        int statusCode = res.getStatus();
+
         // Check the status code of the response: does it match the expected response(s)?
+        int statusCode = res.getStatus();
         if(logger.isDebugEnabled()){
             logger.debug(testName + ": status = " + statusCode);
         }
@@ -468,33 +486,47 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
                 invalidStatusCodeMessage(REQUEST_TYPE, statusCode));
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
-        input = (MultipartInput) res.getEntity();
-        MovementsCommon updatedMovement =
-                (MovementsCommon) extractPart(input,
-                        client.getCommonPartName(), MovementsCommon.class);
-        Assert.assertNotNull(updatedMovement);
-
+       // Extract the updated common part from the response.
+        input = new PoxPayloadIn(res.getEntity());
+        payloadInputPart = input.getPart(client.getCommonPartName());
+        MovementsCommon updatedMovementCommon = null;
+        if (payloadInputPart != null) {
+        	updatedMovementCommon = (MovementsCommon) payloadInputPart.getBody();
+        }
+        Assert.assertNotNull(movementCommon);
         if(logger.isDebugEnabled()){
             logger.debug("updated object");
-            logger.debug(objectAsXmlString(movement, MovementsCommon.class));
+            logger.debug(objectAsXmlString(updatedMovementCommon, MovementsCommon.class));
         }
 
-        Assert.assertEquals(updatedMovement.getNormalLocation(),
-            movement.getNormalLocation(), "Data in updated object did not match submitted data.");
+        // Check selected fields in the updated common part.
+        Assert.assertEquals(updatedMovementCommon.getNormalLocation(),
+            movementCommon.getNormalLocation(), "Data in updated object did not match submitted data.");
         if(logger.isDebugEnabled()){
-            logger.debug("Normal location after update=|" + updatedMovement.getNormalLocation() + "|");
+            logger.debug("Normal location after update=|" + updatedMovementCommon.getNormalLocation() + "|");
         }
 
-        Assert.assertEquals(updatedMovement.getMovementReferenceNumber(),
-            movement.getMovementReferenceNumber(),
+        Assert.assertEquals(updatedMovementCommon.getMovementReferenceNumber(),
+            movementCommon.getMovementReferenceNumber(),
             "Data in updated object did not match submitted data.");
-        Assert.assertEquals(updatedMovement.getMovementNote(),
-            movement.getMovementNote(),
+        Assert.assertEquals(updatedMovementCommon.getMovementNote(),
+            movementCommon.getMovementNote(),
             "Data in updated object did not match submitted data.");
-        Assert.assertNull(updatedMovement.getPlannedRemovalDate());
-        Assert.assertEquals(updatedMovement.getRemovalDate(),
-            movement.getRemovalDate(),
+        Assert.assertNull(updatedMovementCommon.getPlannedRemovalDate());
+        Assert.assertEquals(updatedMovementCommon.getRemovalDate(),
+            movementCommon.getRemovalDate(),
             "Data in updated object did not match submitted data.");
+
+        if(logger.isDebugEnabled()){
+            logger.debug("UTF-8 data sent=" + movementCommon.getMovementNote() + "\n"
+                    + "UTF-8 data received=" + updatedMovementCommon.getMovementNote());
+    }
+        Assert.assertTrue(updatedMovementCommon.getMovementNote().contains(getUTF8DataFragment()),
+                "UTF-8 data retrieved '" + updatedMovementCommon.getMovementNote()
+                + "' does not contain expected data '" + getUTF8DataFragment());
+        Assert.assertEquals(updatedMovementCommon.getMovementNote(),
+                movementCommon.getMovementNote(),
+                "Data in updated object did not match submitted data.");
 
     }
 
@@ -632,9 +664,8 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         // Note: The ID used in this 'create' call may be arbitrary.
         // The only relevant ID may be the one used in update(), below.
         MovementClient client = new MovementClient();
-        MultipartOutput multipart = createMovementInstance(NON_EXISTENT_ID);
-        ClientResponse<MultipartInput> res =
-                client.update(NON_EXISTENT_ID, multipart);
+        PoxPayloadOut multipart = createMovementInstance(NON_EXISTENT_ID);
+        ClientResponse<String> res = client.update(NON_EXISTENT_ID, multipart);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -746,6 +777,12 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
     // ---------------------------------------------------------------
     // Utility methods used by tests above
     // ---------------------------------------------------------------
+
+    @Override
+    protected String getServiceName() {
+        return SERVICE_NAME;
+    }
+
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getServicePathComponent()
      */
@@ -760,7 +797,7 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
      * @param identifier the identifier
      * @return the multipart output
      */
-    private MultipartOutput createMovementInstance(String identifier) {
+    private PoxPayloadOut createMovementInstance(String identifier) {
         return createInstance("movementReferenceNumber-" + identifier);
     }
 
@@ -771,16 +808,16 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
      * @return Multipart output suitable for use as a payload
      *     in a create or update request.
      */
-    private MultipartOutput createInstance(String movementReferenceNumber) {
-        MovementsCommon movement = new MovementsCommon();
+    private PoxPayloadOut createInstance(String movementReferenceNumber) {
+        MovementsCommon movementCommon = new MovementsCommon();
         // FIXME: Values of currentLocation, normalLocation,
         // and movementContact should be refNames.
-        movement.setCurrentLocation("currentLocation value");
-        movement.setCurrentLocationFitness("currentLocationFitness value");
-        movement.setCurrentLocationNote("currentLocationNote value");
-        movement.setLocationDate(TIMESTAMP_UTC);
-        movement.setNormalLocation("normalLocation value");
-        movement.setMovementContact("movementContact value");
+        movementCommon.setCurrentLocation("currentLocation value");
+        movementCommon.setCurrentLocationFitness("currentLocationFitness value");
+        movementCommon.setCurrentLocationNote("currentLocationNote value");
+        movementCommon.setLocationDate(TIMESTAMP_UTC);
+        movementCommon.setNormalLocation("normalLocation value");
+        movementCommon.setMovementContact("movementContact value");
         MovementMethodsList movementMethodsList = new MovementMethodsList();
         List<String> methods = movementMethodsList.getMovementMethod();
         // @TODO Use properly formatted refNames for representative movement
@@ -788,20 +825,21 @@ public class MovementServiceTest extends AbstractServiceTestImpl {
         String identifier = createIdentifier();
         methods.add("First Movement Method-" + identifier);
         methods.add("Second Movement Method-" + identifier);
-        movement.setMovementMethods(movementMethodsList);
-        movement.setMovementNote("movementNote value");
-        movement.setMovementReferenceNumber(movementReferenceNumber);
-        movement.setPlannedRemovalDate(TIMESTAMP_UTC);
-        movement.setRemovalDate(""); // Test empty date value
-        movement.setReasonForMove("reasonForMove value");
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart =
-            multipart.addPart(movement, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new MovementClient().getCommonPartName());
+        movementCommon.setMovementMethods(movementMethodsList);
+        movementCommon.setMovementNote(getUTF8DataFragment());
+        movementCommon.setMovementReferenceNumber(movementReferenceNumber);
+        movementCommon.setPlannedRemovalDate(TIMESTAMP_UTC);
+        movementCommon.setRemovalDate(""); // Test empty date value
+        movementCommon.setReasonForMove("reasonForMove value");
+
+        PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart =
+            multipart.addPart(movementCommon, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(new MovementClient().getCommonPartName());
 
         if(logger.isDebugEnabled()){
             logger.debug("to be created, movement common");
-            logger.debug(objectAsXmlString(movement, MovementsCommon.class));
+            logger.debug(objectAsXmlString(movementCommon, MovementsCommon.class));
         }
 
         return multipart;

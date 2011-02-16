@@ -33,14 +33,15 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.MovementJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.MovementClient;
+import org.collectionspace.services.client.PayloadInputPart;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.movement.MovementsCommon;
 import org.collectionspace.services.movement.MovementsCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -61,6 +62,7 @@ public class MovementSortByTest extends BaseServiceTest {
 
     private final String CLASS_NAME = MovementSortByTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    final String SERVICE_NAME = "movements";
 
     // Instance variables specific to this test.
     private final String DELIMITER_SCHEMA_AND_FIELD = ":";
@@ -594,6 +596,11 @@ public class MovementSortByTest extends BaseServiceTest {
     // ---------------------------------------------------------------
 
     @Override
+    protected String getServiceName() {
+        return SERVICE_NAME;
+    }
+
+    @Override
     public String getServicePathComponent() {
         return SERVICE_PATH_COMPONENT;
     }
@@ -627,7 +634,7 @@ public class MovementSortByTest extends BaseServiceTest {
      */
     @DataProvider(name = "unsortedValues")
     public Object[][] unsortedValues() {
-        // Add a test record-specific string so we have the option of
+        // FIXME: ADR Add a test record-specific string so we have the option of
         // constraining tests to only test records, in list or search results.
         final String TEST_RECORD_SPECIFIC_STRING = CLASS_NAME + " " + TEST_SPECIFIC_KEYWORD;
         return new Object[][]{
@@ -669,9 +676,9 @@ public class MovementSortByTest extends BaseServiceTest {
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
         // Submit the request to the service and store the response.
-        MovementClient client = new MovementClient();
-        MultipartOutput multipart = createMovementInstance(createIdentifier(),
+        PoxPayloadOut multipart = createMovementInstance(createIdentifier(),
                 movementNote, locationDate);
+        MovementClient client = new MovementClient();
         ClientResponse<Response> res = client.create(multipart);
         int statusCode = res.getStatus();
 
@@ -700,7 +707,7 @@ public class MovementSortByTest extends BaseServiceTest {
 
         // Submit the request to the service and store the response.
         MovementClient client = new MovementClient();
-        ClientResponse<MultipartInput> res = client.read(csid);
+        ClientResponse<String> res = client.read(csid);
         int statusCode = res.getStatus();
 
         // Check the status code of the response: does it match
@@ -713,29 +720,32 @@ public class MovementSortByTest extends BaseServiceTest {
         Assert.assertEquals(statusCode, EXPECTED_STATUS_CODE);
 
         // Extract and return the common part of the record.
-        MultipartInput input = (MultipartInput) res.getEntity();
-        MovementsCommon movement = (MovementsCommon) extractPart(input,
-                client.getCommonPartName(), MovementsCommon.class);
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
+        PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+        MovementsCommon movementCommon = null;
+        if (payloadInputPart != null) {
+        	movementCommon = (MovementsCommon) payloadInputPart.getBody();
+        }
 
-        return movement;
+        return movementCommon;
     }
 
-    private MultipartOutput createMovementInstance(
+    private PoxPayloadOut createMovementInstance(
             String movementReferenceNumber,
             String movementNote,
             String locationDate) {
-        MovementsCommon movement = new MovementsCommon();
-        movement.setMovementReferenceNumber(movementReferenceNumber);
-        movement.setMovementNote(movementNote);
-        movement.setLocationDate(locationDate);
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart =
-                multipart.addPart(movement, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new MovementClient().getCommonPartName());
+        MovementsCommon movementCommon = new MovementsCommon();
+        movementCommon.setMovementReferenceNumber(movementReferenceNumber);
+        movementCommon.setMovementNote(movementNote);
+        movementCommon.setLocationDate(locationDate);
 
+        PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart =
+            multipart.addPart(movementCommon, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(new MovementClient().getCommonPartName());
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, movement common");
-            logger.debug(objectAsXmlString(movement, MovementsCommon.class));
+            logger.debug(objectAsXmlString(movementCommon, MovementsCommon.class));
         }
 
         return multipart;

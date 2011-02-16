@@ -41,6 +41,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.AbstractMultiPartCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.ClientType;
 import org.collectionspace.services.common.ServiceMain;
@@ -60,8 +62,6 @@ import org.collectionspace.services.movement.MovementsCommon;
 import org.collectionspace.services.movement.MovementsCommonList;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
@@ -77,8 +77,8 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate$
  */
 @Path("/movements")
-@Consumes("multipart/mixed")
-@Produces("multipart/mixed")
+@Consumes("application/xml")
+@Produces("application/xml")
 public class MovementResource extends AbstractMultiPartCollectionSpaceResourceImpl {
 
     /** The Constant serviceName. */
@@ -144,9 +144,10 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
      * @return the response
      */
     @POST
-    public Response createMovement(MultipartInput input) {
+    public Response createMovement(String xmlText) {
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(input);
+            PoxPayloadIn input = new PoxPayloadIn(xmlText);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
             DocumentHandler handler = createDocumentHandler(ctx);
             String csid = getRepositoryClient(ctx).create(ctx, handler);
             //movementObject.setCsid(csid);
@@ -179,7 +180,7 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
      */
     @GET
     @Path("{csid}")
-    public MultipartOutput getMovement(
+    public byte[] getMovement(
             @PathParam("csid") String csid) {
         if (logger.isDebugEnabled()) {
             logger.debug("getMovement with csid=" + csid);
@@ -190,12 +191,12 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
                     ServiceMessages.READ_FAILED + ServiceMessages.MISSING_CSID).type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        MultipartOutput result = null;
+        PoxPayloadOut result = null;
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csid, handler);
-            result = (MultipartOutput) ctx.getOutput();
+            result = ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity(
@@ -222,7 +223,7 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
                     ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(csid)).type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.getBytes();
     }
 
     /**
@@ -256,7 +257,7 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
     private MovementsCommonList getMovementList(MultivaluedMap<String, String> queryParams) {
         MovementsCommonList movementObjectList;
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).getFiltered(ctx, handler);
             movementObjectList = (MovementsCommonList) handler.getCommonPartList();
@@ -294,10 +295,10 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
         AuthorityRefList authRefList = null;
         try {
             MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentWrapper<DocumentModel> docWrapper =
                     getRepositoryClient(ctx).getDoc(ctx, csid);
-            DocumentModelHandler<MultipartInput, MultipartOutput> handler = (DocumentModelHandler<MultipartInput, MultipartOutput>) createDocumentHandler(ctx);
+            DocumentModelHandler<PoxPayloadIn, PoxPayloadOut> handler = (DocumentModelHandler<PoxPayloadIn, PoxPayloadOut>) createDocumentHandler(ctx);
             List<String> authRefFields =
                     ((MultipartServiceContextImpl) ctx).getCommonPartPropertyValues(
                     ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
@@ -330,7 +331,7 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
     public MovementsCommonList getMovementList(List<String> csidList) {
         MovementsCommonList movementObjectList = new MovementsCommonList();
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).get(ctx, csidList, handler);
             movementObjectList = (MovementsCommonList) handler.getCommonPartList();
@@ -361,9 +362,9 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
      */
     @PUT
     @Path("{csid}")
-    public MultipartOutput updateMovement(
+    public byte[] updateMovement(
             @PathParam("csid") String csid,
-            MultipartInput theUpdate) {
+            String xmlText) {
         if (logger.isDebugEnabled()) {
             logger.debug("updateMovement with csid=" + csid);
         }
@@ -374,12 +375,13 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
                     "text/plain").build();
             throw new WebApplicationException(response);
         }
-        MultipartOutput result = null;
+        PoxPayloadOut result = null;
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(theUpdate);
+            PoxPayloadIn update = new PoxPayloadIn(xmlText);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(update);
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).update(ctx, csid, handler);
-            result = (MultipartOutput) ctx.getOutput();
+            result = ctx.getOutput();
         } catch (UnauthorizedException ue) {
             Response response = Response.status(
                     Response.Status.UNAUTHORIZED).entity(
@@ -399,7 +401,7 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
                     ServiceMessages.UPDATE_FAILED + e.getMessage()).type("text/plain").build();
             throw new WebApplicationException(response);
         }
-        return result;
+        return result.getBytes();
     }
 
     /**
@@ -424,7 +426,7 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
             throw new WebApplicationException(response);
         }
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
             getRepositoryClient(ctx).delete(ctx, csid);
             return Response.status(HttpResponseCodes.SC_OK).build();
         } catch (UnauthorizedException ue) {
@@ -459,7 +461,7 @@ public class MovementResource extends AbstractMultiPartCollectionSpaceResourceIm
             String keywords) {
         MovementsCommonList movementsObjectList;
         try {
-            ServiceContext<MultipartInput, MultipartOutput> ctx = createServiceContext(queryParams);
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(queryParams);
             DocumentHandler handler = createDocumentHandler(ctx);
 
             // perform a keyword search

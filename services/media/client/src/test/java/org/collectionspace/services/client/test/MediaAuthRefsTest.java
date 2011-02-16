@@ -33,8 +33,11 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.MediaClient;
+import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PersonAuthorityClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.media.MediaCommon;
@@ -57,10 +60,8 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate:  $
  */
 public class MediaAuthRefsTest extends BaseServiceTest {
-
     private final String CLASS_NAME = MediaAuthRefsTest.class.getName();
-    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    final String SERVICE_PATH_COMPONENT = "media";
+    private final Logger logger = LoggerFactory.getLogger(MediaAuthRefsTest.class);
     final String PERSON_AUTHORITY_NAME = "MediaPersonAuth";
     private String knownResourceId = null;
     private List<String> mediaIdsCreated = new ArrayList<String>();
@@ -69,6 +70,16 @@ public class MediaAuthRefsTest extends BaseServiceTest {
     private String depositorRefName = null;
     private String title = null;
 
+    @Override
+	public String getServicePathComponent() {
+		return MediaClient.SERVICE_PATH_COMPONENT;
+	}
+
+	@Override
+	protected String getServiceName() {
+		return MediaClient.SERVICE_NAME;
+	}
+    
     @Override
     protected CollectionSpaceClient getClientInstance() {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
@@ -79,20 +90,15 @@ public class MediaAuthRefsTest extends BaseServiceTest {
         throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
-    @Override
-    public String getServicePathComponent() {
-        return SERVICE_PATH_COMPONENT;
-    }
-
-    private MultipartOutput createMediaInstance(String depositorRefName, String title) {
+    private PoxPayloadOut createMediaInstance(String depositorRefName, String title) {
         this.title = title;
         this.depositorRefName = depositorRefName;
         MediaCommon media = new MediaCommon();
         media.setTitle(title);
 
-        MultipartOutput multipart = new MultipartOutput();
-        OutputPart commonPart = multipart.addPart(media, MediaType.APPLICATION_XML_TYPE);
-        commonPart.getHeaders().add("label", new MediaClient().getCommonPartName());
+        PoxPayloadOut multipart = new PoxPayloadOut(MediaClient.SERVICE_PAYLOAD_NAME);
+        PayloadOutputPart commonPart = multipart.addPart(media, MediaType.APPLICATION_XML_TYPE);
+        commonPart.setLabel(new MediaClient().getCommonPartName());
         logger.debug("to be created, media common: " + objectAsXmlString(media, MediaCommon.class));
         return multipart;
     }
@@ -106,7 +112,7 @@ public class MediaAuthRefsTest extends BaseServiceTest {
         // Create a new Loans In resource. One or more fields in this resource will be PersonAuthority
         //    references, and will refer to Person resources by their refNames.
         MediaClient mediaClient = new MediaClient();
-        MultipartOutput multipart = createMediaInstance(depositorRefName, "media.title-" + identifier);
+        PoxPayloadOut multipart = createMediaInstance(depositorRefName, "media.title-" + identifier);
         ClientResponse<Response> res = mediaClient.create(multipart);
         assertStatusCode(res, testName);
         if (knownResourceId == null) {// Store the ID returned from the first resource created for additional tests below.
@@ -118,7 +124,8 @@ public class MediaAuthRefsTest extends BaseServiceTest {
     protected void createPersonRefs() {
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
         // Create a temporary PersonAuthority resource, and its corresponding refName by which it can be identified.
-        MultipartOutput multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
+        PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
+        		PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         ClientResponse<Response> res = personAuthClient.create(multipart);
         assertStatusCode(res, "createPersonRefs (not a surefire test)");
         personAuthCSID = extractId(res);
@@ -141,7 +148,8 @@ public class MediaAuthRefsTest extends BaseServiceTest {
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
-        MultipartOutput multipart = PersonAuthorityClientUtils.createPersonInstance(personAuthCSID, authRefName, personInfo, personAuthClient.getItemCommonPartName());
+        PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonInstance(
+        		personAuthCSID, authRefName, personInfo, personAuthClient.getItemCommonPartName());
         ClientResponse<Response> res = personAuthClient.createItem(personAuthCSID, multipart);
         assertStatusCode(res, "createPerson (not a surefire test)");
         return extractId(res);
@@ -159,9 +167,9 @@ public class MediaAuthRefsTest extends BaseServiceTest {
         logger.debug(testBanner(testName, CLASS_NAME));
         testSetup(STATUS_OK, ServiceRequestType.READ);
         MediaClient mediaClient = new MediaClient();
-        ClientResponse<MultipartInput> res = mediaClient.read(knownResourceId);
+        ClientResponse<String> res = mediaClient.read(knownResourceId);
         assertStatusCode(res, testName);
-        MultipartInput input = (MultipartInput) res.getEntity();
+        PoxPayloadIn input = new PoxPayloadIn(res.getEntity());
         MediaCommon media = (MediaCommon) extractPart(input, mediaClient.getCommonPartName(), MediaCommon.class);
         Assert.assertNotNull(media);
         logger.debug(objectAsXmlString(media, MediaCommon.class));
